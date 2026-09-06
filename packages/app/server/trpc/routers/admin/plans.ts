@@ -3,7 +3,7 @@ import type { H3Event } from "h3";
 import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { platformAdminProcedure, router } from "../../trpc";
-import { plans, teams } from "@movimenta-bairro/functions/schema";
+import { plans, teams } from "@nuxfire/functions/schema";
 import {
   STRIPE_CANCEL_CONFIG_KV_KEY,
   createStripeCancelConfiguration,

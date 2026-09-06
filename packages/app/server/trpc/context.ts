@@ -1,6 +1,6 @@
 import type { inferAsyncReturnType } from "@trpc/server";
 import type { H3Event } from "h3";
-import { sender } from "@movimenta-bairro/functions/sender";
+import { sender } from "@nuxfire/functions/sender";
 
 export async function createContext(event: H3Event) {
   const session = await getUser(event);

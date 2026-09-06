@@ -10,7 +10,7 @@ Antes de começar, você precisa de:
 - Uma conta Cloudflare (plano pago — websockets e filas exigem Workers Paid)
 - Um domínio configurado com os servidores de nomes da Cloudflare
 - Um banco Postgres real (Supabase, RDS, ou qualquer Postgres padrão — a conexão é sempre via protocolo Postgres nativo, nunca via SDK de um provedor específico)
-- Acesso ao repositório GitHub `pedped-app/movimenta-bairro`
+- Acesso ao repositório GitHub `pedped-app/nuxfire`
 
 ## Estrutura do repositório
 
@@ -65,8 +65,8 @@ Guarde os dois — eles vão precisar ser variável de ambiente (veja o passo 5)
 ### 3. Clonar e instalar
 
 ```bash
-git clone https://github.com/pedped-app/movimenta-bairro.git
-cd movimenta-bairro
+git clone https://github.com/pedped-app/nuxfire.git
+cd nuxfire
 bun install
 ```
 

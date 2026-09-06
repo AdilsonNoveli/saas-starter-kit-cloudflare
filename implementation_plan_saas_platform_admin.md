@@ -66,7 +66,7 @@ REGRAS OBRIGATÓRIAS
 
 ## Contexto (resumo da auditoria)
 
-A aplicação (`movimenta-bairro`, Nuxt + SST + Cloudflare Workers + Postgres/
+A aplicação (`nuxfire`, Nuxt + SST + Cloudflare Workers + Postgres/
 Drizzle) é hoje um SaaS **single-layer**: existe `Team` (tenant/empresa) com
 papéis internos (Owner/Admin/Member via `Role`/`Permission`,
 `packages/functions/src/database/schema.ts`), mas **nenhuma camada acima
@@ -212,7 +212,7 @@ em vez de repetir o aviso — não duplicar este conteúdo dentro de cada fase.
   de `platformAdmins` — um `select *` acidental aqui vazaria o secret de
   TOTP para o navegador do próprio admin.
 - **O cookie de sessão elevada precisa de nome/prefixo próprio**, diferente
-  de `movimenta-bairro-access-token`/`-refresh-token` — para não colidir
+  de `nuxfire-access-token`/`-refresh-token` — para não colidir
   com a lógica de `setTokens()`/`getUserSession()` já existente em
   `packages/app/server/utils/auth.ts`.
 

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
-      "#movimenta-bairro/config": ["./config.ts"]
+      "#nuxfire/config": ["./config.ts"]
     }
   }
 }

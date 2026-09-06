@@ -16,7 +16,7 @@ import {
   teamMemberships,
   teams,
   roles,
-} from "@movimenta-bairro/functions/schema";
+} from "@nuxfire/functions/schema";
 
 export default router({
   list: abilityProcedure.query(async ({ ctx: { authorize, user } }) => {

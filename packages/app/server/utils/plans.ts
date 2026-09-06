@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { plans } from "@movimenta-bairro/functions/schema";
-import { FREE_PLAN } from "@movimenta-bairro/functions/database/seed-data";
+import { plans } from "@nuxfire/functions/schema";
+import { FREE_PLAN } from "@nuxfire/functions/database/seed-data";
 
 export { FREE_PLAN };
 

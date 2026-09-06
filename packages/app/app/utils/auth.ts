@@ -1,5 +1,5 @@
 import { createClient, type Client } from "@openauthjs/openauth/client";
-import type { SubjectUser } from "@movimenta-bairro/functions/subjects";
+import type { SubjectUser } from "@nuxfire/functions/subjects";
 
 /**
  * What /api/auth/session actually returns: the OpenAuth subject plus the
@@ -24,7 +24,7 @@ type UserSession = {
 };
 
 const useSessionState = () =>
-  useState<UserSession>("movimenta-bairro-session", () => ({}));
+  useState<UserSession>("nuxfire-session", () => ({}));
 
 export const useSession = () => {
   const sessionState = useSessionState();
@@ -54,7 +54,7 @@ export const useSession = () => {
 };
 
 const useAuthRedirect = () =>
-  useCookie("movimenta-bairro-redirect", {
+  useCookie("nuxfire-redirect", {
     sameSite: "lax",
   });
 

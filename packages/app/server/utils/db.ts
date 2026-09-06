@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import * as schema from "@movimenta-bairro/functions/schema";
+import * as schema from "@nuxfire/functions/schema";
 import type { Hyperdrive } from "@cloudflare/workers-types";
 
 export { sql, eq, ne, and, or, count } from "drizzle-orm";

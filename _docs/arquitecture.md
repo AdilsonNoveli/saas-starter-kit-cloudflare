@@ -175,7 +175,7 @@
 ## 📦 Estrutura de Pacotes
 
 ```
-movimenta-bairro/
+nuxfire/
 ├── packages/
 │   ├── app/                    # Aplicação principal (Nuxt 4)
 │   │   ├── app/
@@ -1239,7 +1239,7 @@ export default defineNuxtConfig({
 
 1. **Clone o repo**
    ```bash
-   git clone https://github.com/pedped-app/movimenta-bairro.git
+   git clone https://github.com/pedped-app/nuxfire.git
    ```
 
 2. **Instalar dependências**
@@ -1276,7 +1276,7 @@ export default defineNuxtConfig({
 
 Para dúvidas sobre arquitetura:
 - 📧 Email: contato@movimentabairro.org
-- 💬 GitHub Issues: [movimenta-bairro/issues](https://github.com/pedped-app/movimenta-bairro/issues)
+- 💬 GitHub Issues: [nuxfire/issues](https://github.com/pedped-app/nuxfire/issues)
 
 ---
 

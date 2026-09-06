@@ -1,7 +1,7 @@
 import { Resource } from "sst";
 import { resolve } from "path";
 import { Subprocess } from "bun";
-import { flags } from "#movimenta-bairro/config";
+import { flags } from "#nuxfire/config";
 
 let proc: Subprocess<any>;
 

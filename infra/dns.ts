@@ -1,4 +1,4 @@
-import { flags, prodDomain, devDomain } from "#movimenta-bairro/config";
+import { flags, prodDomain, devDomain } from "#nuxfire/config";
 
 export const domain =
   { production: prodDomain }[$app.stage] || `${$app.stage}.${devDomain}`;

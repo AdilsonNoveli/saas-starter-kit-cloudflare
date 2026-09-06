@@ -592,14 +592,14 @@ function getIssuer(env: Env) {
           const data = await ofetch("https://api.github.com/user", {
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              "User-Agent": "movimenta-bairro",
+              "User-Agent": "nuxfire",
             },
           });
           if (!data.email) {
             const emails = (await ofetch("https://api.github.com/user/emails", {
               headers: {
                 Authorization: `Bearer ${accessToken}`,
-                "User-Agent": "movimenta-bairro",
+                "User-Agent": "nuxfire",
               },
             })) as any[];
             data.email = (emails.find((email) => email.primary) || emails[0])

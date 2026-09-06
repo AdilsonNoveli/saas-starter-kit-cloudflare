@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { permissions, roles } from "@movimenta-bairro/functions/schema";
-import { SYSTEM_ROLES } from "@movimenta-bairro/functions/database/seed-data";
+import { permissions, roles } from "@nuxfire/functions/schema";
+import { SYSTEM_ROLES } from "@nuxfire/functions/database/seed-data";
 
 async function insertSystemRole(
   role: InsertRole,
@@ -35,7 +35,7 @@ async function insertSystemRole(
  * installs included — this only matters for the gap that leaves open: a
  * database reset independently of an app deploy (swapped instance, dropped
  * and re-migrated) between two deploys. Both paths import the same role
- * definitions from @movimenta-bairro/functions/database/seed-data, so they
+ * definitions from @nuxfire/functions/database/seed-data, so they
  * cannot drift apart.
  *
  * Guarded by the actual table state, not a flag that could outlive the rows

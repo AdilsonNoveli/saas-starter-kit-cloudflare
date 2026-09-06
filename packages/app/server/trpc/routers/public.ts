@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
-import { waitlistEmails } from "@movimenta-bairro/functions/schema";
+import { waitlistEmails } from "@nuxfire/functions/schema";
 
 export default router({
   addToWaitlist: publicProcedure

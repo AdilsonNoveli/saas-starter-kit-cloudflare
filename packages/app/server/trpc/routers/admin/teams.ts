@@ -9,7 +9,7 @@ import {
   subscriptions,
   teamMemberships,
   teams,
-} from "@movimenta-bairro/functions/schema";
+} from "@nuxfire/functions/schema";
 
 const teamStatusSchema = z.enum(["ACTIVE", "SUSPENDED"]);
 

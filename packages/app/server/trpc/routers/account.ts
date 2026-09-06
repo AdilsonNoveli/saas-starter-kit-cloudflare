@@ -8,7 +8,7 @@ import {
   teamInvites,
   teamMemberships,
   users,
-} from "@movimenta-bairro/functions/schema";
+} from "@nuxfire/functions/schema";
 import { identityDeletePath, signOutOthersPath } from "../../../../../config";
 
 export default router({
@@ -219,8 +219,8 @@ export default router({
 
       // Step 3 — the now-worthless cookies, so the browser stops presenting
       // a session that no longer resolves to anything.
-      deleteCookie(event, "movimenta-bairro-access-token");
-      deleteCookie(event, "movimenta-bairro-refresh-token");
+      deleteCookie(event, "nuxfire-access-token");
+      deleteCookie(event, "nuxfire-refresh-token");
 
       console.log("account deleted", { userId: user.id });
       return { message: "Your account has been permanently deleted." };

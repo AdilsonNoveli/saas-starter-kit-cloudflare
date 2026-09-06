@@ -7,7 +7,7 @@ import {
   jobs,
   logs,
   teams,
-} from "@movimenta-bairro/functions/schema";
+} from "@nuxfire/functions/schema";
 
 /** Cron runs belong to no team, so their logs carry the `Log.jobId` default. */
 const CRON_JOB_ID = "cron";

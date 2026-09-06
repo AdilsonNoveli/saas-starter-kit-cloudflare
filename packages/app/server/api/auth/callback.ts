@@ -1,4 +1,4 @@
-import { users } from "@movimenta-bairro/functions/schema";
+import { users } from "@nuxfire/functions/schema";
 import { getClient } from "~~/server/utils/auth";
 
 export default defineEventHandler(async (event) => {
@@ -68,9 +68,9 @@ export default defineEventHandler(async (event) => {
           "auth callback: token exchange succeeded but getUserSession returned no session",
         );
       }
-      const redirect = getCookie(event, "movimenta-bairro-redirect");
+      const redirect = getCookie(event, "nuxfire-redirect");
       if (redirect) {
-        deleteCookie(event, "movimenta-bairro-redirect");
+        deleteCookie(event, "nuxfire-redirect");
       }
       return sendRedirect(event, redirect || "/");
     }

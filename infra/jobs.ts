@@ -1,4 +1,4 @@
-import { flags } from "#movimenta-bairro/config";
+import { flags } from "#nuxfire/config";
 import { database } from "./database";
 import { COMPATIBILITY } from "./utils/constants";
 

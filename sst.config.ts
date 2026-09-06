@@ -2,7 +2,7 @@
 export default $config({
   app(input) {
     return {
-      name: "movimenta-bairro",
+      name: "nuxfire",
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
       home: "cloudflare",

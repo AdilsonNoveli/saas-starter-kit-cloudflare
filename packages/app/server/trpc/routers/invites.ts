@@ -17,7 +17,7 @@ import {
   teamInvites,
   teamMemberships,
   teams,
-} from "@movimenta-bairro/functions/schema";
+} from "@nuxfire/functions/schema";
 
 export default router({
   sendInvite: abilityProcedure

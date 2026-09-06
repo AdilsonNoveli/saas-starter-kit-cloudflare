@@ -1,5 +1,5 @@
 {
-  "name": "@movimenta-bairro/web",
+  "name": "@nuxfire/web",
   "private": true,
   "type": "module",
   "scripts": {

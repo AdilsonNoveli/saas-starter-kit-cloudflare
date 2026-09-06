@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Secret, TOTP } from "otpauth/slim";
-import { platformAdmins } from "@movimenta-bairro/functions/schema";
+import { platformAdmins } from "@nuxfire/functions/schema";
 
 const bodySchema = z.object({
   code: z.string().regex(/^\d{6}$/),

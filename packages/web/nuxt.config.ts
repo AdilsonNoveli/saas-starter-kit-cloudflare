@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   },
   routeRules: {
     "/docs": { redirect: { to: "/docs/pro", statusCode: 302 } },
-    "/docs/nuxflare": { redirect: { to: "/docs/nuxfire", statusCode: 302 } },
+    "/docs/nuxfire": { redirect: { to: "/docs/nuxfire", statusCode: 302 } },
   },
   app: {
     head: {

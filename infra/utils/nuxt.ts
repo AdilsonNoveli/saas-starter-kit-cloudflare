@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { flags } from "#movimenta-bairro/config";
+import { flags } from "#nuxfire/config";
 import { emails } from "../emails";
 import { websockets } from "../websockets";
 import { jobsQueue } from "../jobs";

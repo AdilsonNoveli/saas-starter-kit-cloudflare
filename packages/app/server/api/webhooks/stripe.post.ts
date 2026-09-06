@@ -2,7 +2,7 @@ import type Stripe from "stripe";
 import { eq } from "drizzle-orm";
 import { PaymentProvider, SubscriptionStatus } from "~~/types/enums";
 import { createStripeClient } from "~~/server/utils/stripe";
-import { plans, subscriptions } from "@movimenta-bairro/functions/schema";
+import { plans, subscriptions } from "@nuxfire/functions/schema";
 
 // stripe-node's Stripe.Subscription type dropped legacy fields (plan,
 // current_period_start/end) that the raw webhook payload still sends for

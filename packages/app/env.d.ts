@@ -4,7 +4,7 @@ import type {
   ExecutionContext,
   Queue,
 } from "@cloudflare/workers-types";
-import type { EmailsWorker } from "@movimenta-bairro/functions/sender";
+import type { EmailsWorker } from "@nuxfire/functions/sender";
 
 declare module "h3" {
   interface H3EventContext {

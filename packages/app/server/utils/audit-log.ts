@@ -1,4 +1,4 @@
-import { auditLogs } from "@movimenta-bairro/functions/schema";
+import { auditLogs } from "@nuxfire/functions/schema";
 
 export interface AuditLogEntry {
   actorUserId: string;

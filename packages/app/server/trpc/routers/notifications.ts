@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
-import { notifications } from "@movimenta-bairro/functions/schema";
+import { notifications } from "@nuxfire/functions/schema";
 import { desc } from "drizzle-orm";
 
 export default router({

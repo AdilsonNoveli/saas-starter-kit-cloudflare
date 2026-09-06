@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { platformAdminProcedure, router } from "../../trpc";
-import { auditLogs, users } from "@movimenta-bairro/functions/schema";
+import { auditLogs, users } from "@nuxfire/functions/schema";
 
 /**
  * The append-only trail every platform-admin mutation writes

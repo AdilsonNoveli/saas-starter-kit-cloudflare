@@ -196,7 +196,7 @@ duplo** — é a única forma de alimentar o Worker nativo com a saída do Nitro
   erro real** — o SST engole a causa no terminal. Sempre olhe
   `.sst/log/sst.log` (última entrada `level=ERROR msg="exited with error"`)
   antes de investigar qualquer outra coisa.
-- **`failed to remove temp log file ... open C:\Users\...\Temp\C:\movimenta-bairro\.sst\log: ...`**
+- **`failed to remove temp log file ... open C:\Users\...\Temp\C:\nuxfire\.sst\log: ...`**
   no `sst.log` é um bug de path-joining do próprio SST no Windows (concatena
   `%TEMP%` com um caminho já absoluto). É inofensivo — não impede o deploy,
   ignore.
@@ -456,7 +456,7 @@ como binding) e reverter esse `enabled: false`.
 **Sintoma:** o build (`AppBuild`) termina com "✨ Build complete!", mas o
 Worker falha ao ser criado com:
 ```
-Error: Could not resolve "C:/movimenta-bairro/packages/app/.output/server/index.mjs"
+Error: Could not resolve "C:/nuxfire/packages/app/.output/server/index.mjs"
 Could not resolve "sst/resource/cloudflare"
     at .sst/platform/src/components/cloudflare/worker.ts:604:17
 ```
@@ -637,7 +637,7 @@ cp .env.example .env.production
 
 `LayoutBanner.vue` ainda tinha o banner "This is a demo landing page site
 for..." apontando pra `movimentabairro.com.br` (**.com.br**, domínio
-diferente do real `.org` deste projeto) — sobra direta do Nuxflare SaaS
+diferente do real `.org` deste projeto) — sobra direta do nuxfire SaaS
 Starter Kit original, nunca adaptado no rebranding. Isso disparava o aviso
 `absolute-site-urls` do `nuxt-link-checker` em toda página (o link aponta pra
 um domínio que não é o nosso).

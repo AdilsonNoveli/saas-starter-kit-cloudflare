@@ -1,7 +1,7 @@
-import { Emails } from "@movimenta-bairro/emails";
-import type { EmailProps } from "@movimenta-bairro/emails/props";
+import { Emails } from "@nuxfire/emails";
+import type { EmailProps } from "@nuxfire/emails/props";
 import { Resource } from "sst/resource";
-import { flags } from "#movimenta-bairro/config";
+import { flags } from "#nuxfire/config";
 import { generateMailer } from "@tanayvk/mailer/generate";
 import { render } from "@react-email/render";
 import { WorkerEntrypoint } from "cloudflare:workers";

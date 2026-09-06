@@ -1,8 +1,8 @@
-import { subjects } from "@movimenta-bairro/functions/subjects";
+import { subjects } from "@nuxfire/functions/subjects";
 import { type Client, createClient } from "@openauthjs/openauth/client";
 import type { H3Event } from "h3";
 import { eq } from "drizzle-orm";
-import { users } from "@movimenta-bairro/functions/schema";
+import { users } from "@nuxfire/functions/schema";
 
 type AuthBinding = { fetch: typeof fetch };
 let _client: Client;
@@ -39,7 +39,7 @@ export const getClient = (event: H3Event) => {
 };
 
 export const setTokens = (event: H3Event, access: string, refresh: string) => {
-  setCookie(event, "movimenta-bairro-access-token", access, {
+  setCookie(event, "nuxfire-access-token", access, {
     path: "/",
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 365,
@@ -47,7 +47,7 @@ export const setTokens = (event: H3Event, access: string, refresh: string) => {
     // in the browser so can't be httpOnly
     httpOnly: false,
   });
-  setCookie(event, "movimenta-bairro-refresh-token", refresh, {
+  setCookie(event, "nuxfire-refresh-token", refresh, {
     path: "/",
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 365,
@@ -56,8 +56,8 @@ export const setTokens = (event: H3Event, access: string, refresh: string) => {
 };
 
 export const getTokens = (event: H3Event) => {
-  const access = getCookie(event, "movimenta-bairro-access-token") || "";
-  const refresh = getCookie(event, "movimenta-bairro-refresh-token") || "";
+  const access = getCookie(event, "nuxfire-access-token") || "";
+  const refresh = getCookie(event, "nuxfire-refresh-token") || "";
   return { access, refresh };
 };
 

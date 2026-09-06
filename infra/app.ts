@@ -1,4 +1,4 @@
-import { flags } from "#movimenta-bairro/config";
+import { flags } from "#nuxfire/config";
 import { appUrl, appDomain, authUrl, websocketsUrl } from "./dns";
 import { secret } from "./secret";
 import { deployWorker } from "./utils/nuxt";

@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
-import { teamMemberships, teams } from "@movimenta-bairro/functions/schema";
+import { teamMemberships, teams } from "@nuxfire/functions/schema";
 import { createStripeClient } from "~~/server/utils/stripe";
 import { STRIPE_CANCEL_CONFIG_KV_KEY } from "~~/server/utils/stripe-portal";
 

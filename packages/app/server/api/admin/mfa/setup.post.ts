@@ -1,5 +1,5 @@
 import { Secret, TOTP } from "otpauth/slim";
-import { platformAdmins } from "@movimenta-bairro/functions/schema";
+import { platformAdmins } from "@nuxfire/functions/schema";
 
 /**
  * Provisions a TOTP seed for a platform admin who has one but hasn't enrolled

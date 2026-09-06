@@ -1,7 +1,7 @@
-import type { EmailProps } from "@movimenta-bairro/emails/props";
+import type { EmailProps } from "@nuxfire/emails/props";
 
 // Split out of emails.ts on purpose: that file imports `cloudflare:workers`
-// and `#movimenta-bairro/config`, both only resolvable from this package's
+// and `#nuxfire/config`, both only resolvable from this package's
 // own build context (its own tsconfig extends the root one for the path
 // mapping, and declares @cloudflare/workers-types). packages/app only ever
 // needs this shape — not the Worker implementation — to type

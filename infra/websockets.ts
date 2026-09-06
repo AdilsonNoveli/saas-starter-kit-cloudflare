@@ -1,4 +1,4 @@
-import { flags } from "#movimenta-bairro/config";
+import { flags } from "#nuxfire/config";
 import { websocketsDomain, websocketsUrl } from "./dns";
 import { COMPATIBILITY } from "./utils/constants";
 import { isDurableObjectClassProvisioned } from "./utils/durable-objects";

@@ -1,5 +1,5 @@
 {
-  "name": "@movimenta-bairro/auth-frontend",
+  "name": "@nuxfire/auth-frontend",
   "private": true,
   "type": "module",
   "scripts": {

@@ -11,13 +11,13 @@ import { unsealSession, updateSession } from "h3";
  * under the hood, which ships with h3 and runs on workerd. Nothing here
  * hand-rolls an HMAC or a token format.
  *
- * The name carries the same `movimenta-bairro-` prefix as the auth cookies in
+ * The name carries the same `nuxfire-` prefix as the auth cookies in
  * server/utils/auth.ts, but is deliberately distinct from
  * `-access-token`/`-refresh-token` so it can never collide with
  * setTokens()/getTokens().
  */
 export const PLATFORM_MFA_COOKIE_NAME =
-  "movimenta-bairro-platform-mfa-verified";
+  "nuxfire-platform-mfa-verified";
 
 const PLATFORM_MFA_MAX_AGE_SECONDS = 30 * 60;
 

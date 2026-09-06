@@ -18,7 +18,7 @@ Backend validado, e a lacuna real de reautenticação de MFA está corrigida. Ag
 
 Enquanto o frontend roda em background, vou dar uma olhada rápida no conteúdo das páginas legais e da landing page para a análise de "pronto para vender".
 
-Confirmado — os Termos de Uso ainda são o boilerplate genérico do template ("Nuxflare", `hi@nuxflare.com`, "leis da Índia"), sem nenhuma customização. Isso entra na lista de bloqueadores reais para venda. Vou aguardar o frontend terminar antes de fechar o relatório completo.
+Confirmado — os Termos de Uso ainda são o boilerplate genérico do template ("nuxfire", `hi@nuxfire.com`, "leis da Índia"), sem nenhuma customização. Isso entra na lista de bloqueadores reais para venda. Vou aguardar o frontend terminar antes de fechar o relatório completo.
 
 Confirmed clean. Now let me quickly verify the QR library claim myself — check `uqr`'s package.json for zero dependencies.
 
@@ -64,7 +64,7 @@ Contas criadas (defaults, sobrescrevíveis por `--owner-email=`/`--owner-passwor
 ## Análise de "pronto para vender"
 
 O checklist que te enviei tem **7 bloqueadores reais** hoje (não hipotéticos — cada um cita o arquivo e, em dois casos, o texto exato encontrado):
-- **Termos de Uso ainda são do template original** ("Welcome to Nuxflare", contato `hi@nuxflare.com`, "leis da Índia") — risco legal literal se vendido assim.
+- **Termos de Uso ainda são do template original** ("Welcome to nuxfire", contato `hi@nuxfire.com`, "leis da Índia") — risco legal literal se vendido assim.
 - **Branding "Movimenta Bairro" espalhado** (namespace de pacotes, prefixo de cookies, `config.ts`, e-mails transacionais) — só é bloqueador se você for vender isto como **template/kit reutilizável** para outros desenvolvedores; se for vender o próprio negócio, pule essa seção.
 
 E gaps de atenção: a página pública de preços é 100% estática e nunca reflete os planos reais que você cadastra em `/admin/plans`; não existe ação para trocar o plano de um time já existente; zero testes automatizados no repositório inteiro.

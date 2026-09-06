@@ -1,7 +1,7 @@
 import { Environment, EventName, Paddle } from "@paddle/paddle-node-sdk";
 import { eq } from "drizzle-orm";
 import { PaymentProvider, SubscriptionStatus } from "~~/types/enums";
-import { plans, subscriptions } from "@movimenta-bairro/functions/schema";
+import { plans, subscriptions } from "@nuxfire/functions/schema";
 
 export default defineEventHandler(async (event) => {
   await assertNotRateLimited(event, "webhook:paddle", {

@@ -1,4 +1,4 @@
-import { platformAdmins } from "@movimenta-bairro/functions/schema";
+import { platformAdmins } from "@nuxfire/functions/schema";
 // `and` is imported explicitly rather than relying on auto-import: VueUse
 // also exports an `and` (the `logicAnd` alias) and wins the resolution,
 // which silently yields a ComputedRef instead of a SQL expression.

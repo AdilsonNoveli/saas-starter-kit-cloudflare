@@ -16,7 +16,7 @@ export default defineNuxtPlugin({
     const { status, data, send } = ticket
       ? useWebSocket(endpoint, {
           autoReconnect: true,
-          protocols: [ticket, "movimenta-bairro"],
+          protocols: [ticket, "nuxfire"],
         })
       : { status: ref<"OPEN" | "CONNECTING" | "CLOSED">("CLOSED"), data: ref(null), send: () => {} };
     const topics = new Set<string>();

@@ -1,4 +1,4 @@
-import { flags } from "#movimenta-bairro/config";
+import { flags } from "#nuxfire/config";
 
 const secretList: Record<string, sst.Secret> = {};
 

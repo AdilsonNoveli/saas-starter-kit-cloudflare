@@ -1,4 +1,4 @@
 export default defineEventHandler(async (event) => {
-  deleteCookie(event, "movimenta-bairro-access-token");
-  deleteCookie(event, "movimenta-bairro-refresh-token");
+  deleteCookie(event, "nuxfire-access-token");
+  deleteCookie(event, "nuxfire-refresh-token");
 });

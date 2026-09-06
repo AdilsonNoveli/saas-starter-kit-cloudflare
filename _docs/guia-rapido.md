@@ -7,7 +7,7 @@ Este guia ajuda você a configurar o ambiente de desenvolvimento e implantar o M
 
 Antes de começar, você precisa de:
 
-- Uma conta Cloudflare (plano pago — websockets e filas exigem Workers Paid)
+- Uma conta Cloudflare (plano pago — websockets e filas exige ativa "Get started with R2" colocar cartão de crédito para ativar use img em: )
 - Um domínio configurado com os servidores de nomes da Cloudflare
 - Um banco Postgres real (Supabase, RDS, ou qualquer Postgres padrão — a conexão é sempre via protocolo Postgres nativo, nunca via SDK de um provedor específico)
 - Acesso ao repositório GitHub `pedped-app/nuxfire`

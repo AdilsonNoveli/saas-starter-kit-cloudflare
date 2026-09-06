@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+.text-muted {
+  color: var(--ui-text-muted);
+}

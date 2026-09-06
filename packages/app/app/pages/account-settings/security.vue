@@ -1,0 +1,182 @@
+<template>
+  <div class="flex flex-col gap-4 sm:gap-6">
+    <UPageCard
+      title="Password"
+      description="We'll email you a verification code to confirm the change."
+      variant="subtle"
+      orientation="horizontal"
+    >
+      <UButton
+        label="Change Password"
+        color="neutral"
+        class="w-fit lg:ms-auto"
+        @click="goToChangePassword"
+      />
+    </UPageCard>
+
+    <UPageCard
+      title="Sessions"
+      description="Sign out of every other browser or device currently signed in to your account."
+      variant="subtle"
+      orientation="horizontal"
+    >
+      <UButton
+        label="Sign out other sessions"
+        color="neutral"
+        variant="outline"
+        :loading="signingOut"
+        class="w-fit lg:ms-auto"
+        @click="onSignOutOthers"
+      />
+    </UPageCard>
+
+    <UPageCard
+      title="Danger Zone"
+      description="Permanently delete your account, credentials and profile. This cannot be undone."
+      variant="subtle"
+      orientation="horizontal"
+      :ui="{ root: 'border-error/50' }"
+    >
+      <UButton
+        label="Delete Account"
+        color="error"
+        variant="outline"
+        class="w-fit lg:ms-auto"
+        @click="showDeleteConfirm = true"
+      />
+    </UPageCard>
+
+    <!--
+      v-model:open, not v-model — @nuxt/ui v4's Modal takes an `open` prop
+      with an `update:open` emit rather than the usual modelValue pair, so a
+      bare v-model silently binds to nothing (same class of v2-vs-v4 mismatch
+      already found in the auth-frontend's UForm loading-auto default).
+    -->
+    <UModal v-model:open="showDeleteConfirm" :dismissible="!deleting">
+      <template #content>
+        <UCard>
+          <template #header>
+            <div class="flex items-center gap-2 text-error">
+              <UIcon name="i-lucide-trash" />
+              <span class="font-medium">Delete Account</span>
+            </div>
+          </template>
+          <div class="space-y-4">
+            <p class="text-sm">
+              This permanently deletes your credentials, every active session,
+              and your profile. Teams you don't own are unaffected; if you are
+              the sole owner of a team with other members, remove them or
+              transfer ownership first.
+            </p>
+            <UFormField
+              :label="`Type ${user?.email} to confirm`"
+              name="confirmEmail"
+            >
+              <UInput
+                v-model="confirmEmail"
+                :placeholder="user?.email || ''"
+                autocomplete="off"
+              />
+            </UFormField>
+          </div>
+          <template #footer>
+            <div class="flex gap-2 w-full justify-end">
+              <UButton
+                variant="ghost"
+                color="neutral"
+                :disabled="deleting"
+                @click="showDeleteConfirm = false"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                color="error"
+                :loading="deleting"
+                :disabled="
+                  confirmEmail.trim().toLowerCase() !==
+                  user?.email?.toLowerCase()
+                "
+                @click="onDeleteAccount"
+              >
+                Permanently Delete
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
+  </div>
+</template>
+
+<script setup lang="ts">
+const toast = useToast();
+const { user } = useSession();
+const runtimeConfig = useRuntimeConfig();
+
+/**
+ * There is no "change password while signed in" endpoint — the auth Worker
+ * only knows the email-OTP reset flow (packages/auth-frontend's
+ * forgot-password.vue), so a password change is that flow, pre-filled.
+ */
+function goToChangePassword() {
+  const url = new URL(`${runtimeConfig.public.authUrl}/forgot-password`);
+  if (user.value?.email) url.searchParams.set("email", user.value.email);
+  navigateTo(url.toString(), { external: true });
+}
+
+const signOutOthersMutation = useTrpcClient().account.signOutOtherSessions;
+const signingOut = ref(false);
+
+async function onSignOutOthers() {
+  signingOut.value = true;
+  try {
+    const result = await signOutOthersMutation.mutate();
+    toast.add({
+      title: "Done",
+      description: result.message,
+      color: "success",
+      icon: "i-lucide-check",
+    });
+  } catch (error: any) {
+    toast.add({
+      title: "Failed",
+      description: error?.message || "Something went wrong",
+      color: "error",
+      icon: "i-lucide-x",
+    });
+  } finally {
+    signingOut.value = false;
+  }
+}
+
+const deleteAccountMutation = useTrpcClient().account.deleteAccount;
+const showDeleteConfirm = ref(false);
+const deleting = ref(false);
+const confirmEmail = ref("");
+
+watch(showDeleteConfirm, (open) => {
+  if (!open) confirmEmail.value = "";
+});
+
+async function onDeleteAccount() {
+  deleting.value = true;
+  try {
+    await deleteAccountMutation.mutate({
+      confirmEmail: confirmEmail.value.trim(),
+    });
+    // The server already cleared the session cookies; this only resets the
+    // client's local copy and forces a full reload through auth, the same
+    // way sign-out does (AccountUserDropdown.vue).
+    await useSession().clear();
+    await navigateTo("/", { external: true });
+  } catch (error: any) {
+    toast.add({
+      title: "Account Deletion Failed",
+      description: error?.message || "Something went wrong.",
+      color: "error",
+      icon: "i-lucide-x",
+    });
+    deleting.value = false;
+  }
+}
+</script>

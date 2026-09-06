@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  --font-family-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+
+  --color-orange-50: #fff8ec;
+  --color-orange-100: #ffefd3;
+  --color-orange-200: #ffdca5;
+  --color-orange-300: #ffc26d;
+  --color-orange-400: #ff9c32;
+  --color-orange-500: #ff7e0a;
+  --color-orange-600: #ff6500;
+  --color-orange-700: #cc4802;
+  --color-orange-800: #a1380b;
+  --color-orange-900: #82300c;
+  --color-orange-950: #461604;
+
+  --color-primary-50: #fff8ec;
+  --color-primary-100: #ffefd3;
+  --color-primary-200: #ffdca5;
+  --color-primary-300: #ffc26d;
+  --color-primary-400: #ff9c32;
+  --color-primary-500: #ff7e0a;
+  --color-primary-600: #ff6500;
+  --color-primary-700: #cc4802;
+  --color-primary-800: #a1380b;
+  --color-primary-900: #82300c;
+  --color-primary-950: #461604;
+}
+
+html {
+  font-family: var(--font-family-sans);
+}
+
+.text-muted {
+  color: var(--ui-text-muted);
+}

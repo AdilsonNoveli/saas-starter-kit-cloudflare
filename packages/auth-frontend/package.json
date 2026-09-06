@@ -1,0 +1,29 @@
+{
+  "name": "@movimenta-bairro/auth-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt generate",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.8.1",
+    "@tailwindcss/aspect-ratio": "0.4.2",
+    "@tailwindcss/container-queries": "0.1.1",
+    "@tailwindcss/forms": "0.5.10",
+    "@tailwindcss/typography": "0.5.16",
+    "nuxt": "^4.5.2",
+    "unenv": "1.10.0",
+    "vue": "latest",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.129",
+    "typescript": "^5",
+    "vue-tsc": "^2.2.10"
+  }
+}

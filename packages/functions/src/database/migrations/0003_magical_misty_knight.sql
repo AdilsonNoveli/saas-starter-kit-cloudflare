@@ -1,0 +1,1 @@
+ALTER TABLE "Team" ADD COLUMN "status" text DEFAULT 'ACTIVE' NOT NULL;

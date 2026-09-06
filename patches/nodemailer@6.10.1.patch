@@ -1,0 +1,61 @@
+diff --git a/lib/mailer/index.js b/lib/mailer/index.js
+index 3c80184d333ad5c8446eafd7b0b9bea049ba123c..e7c38bbc36453ec91acd8ccd81bbe95af6b62139 100644
+--- a/lib/mailer/index.js
++++ b/lib/mailer/index.js
+@@ -1,6 +1,6 @@
+ 'use strict';
+ 
+-const EventEmitter = require('events');
++const { EventEmitter } = require('events');
+ const shared = require('../shared');
+ const mimeTypes = require('../mime-funcs/mime-types');
+ const MailComposer = require('../mail-composer');
+diff --git a/lib/ses-transport/index.js b/lib/ses-transport/index.js
+index 6646a4a72ee5eafeef6269d0511b1a5b7c187605..ef6af40966b5399582b8524eb06ce2fc62aefc0e 100644
+--- a/lib/ses-transport/index.js
++++ b/lib/ses-transport/index.js
+@@ -1,6 +1,6 @@
+ 'use strict';
+ 
+-const EventEmitter = require('events');
++const { EventEmitter } = require('events');
+ const packageData = require('../../package.json');
+ const shared = require('../shared');
+ const LeWindows = require('../mime-node/le-windows');
+diff --git a/lib/smtp-pool/index.js b/lib/smtp-pool/index.js
+index 6a5d3097b4df7ade1f00690503d0353a269c1bab..b9a570ef94a72a6357e53f47f28bf91e9e6a955d 100644
+--- a/lib/smtp-pool/index.js
++++ b/lib/smtp-pool/index.js
+@@ -1,6 +1,6 @@
+ 'use strict';
+ 
+-const EventEmitter = require('events');
++const { EventEmitter } = require('events');
+ const PoolResource = require('./pool-resource');
+ const SMTPConnection = require('../smtp-connection');
+ const wellKnown = require('../well-known');
+diff --git a/lib/smtp-pool/pool-resource.js b/lib/smtp-pool/pool-resource.js
+index d67cc5cb11dbabb82e59bbd417f9b548cffe5862..196c9429dfc8b24aaaafa0bf215927d50e1561e4 100644
+--- a/lib/smtp-pool/pool-resource.js
++++ b/lib/smtp-pool/pool-resource.js
+@@ -3,7 +3,7 @@
+ const SMTPConnection = require('../smtp-connection');
+ const assign = require('../shared').assign;
+ const XOAuth2 = require('../xoauth2');
+-const EventEmitter = require('events');
++const { EventEmitter } = require('events');
+ 
+ /**
+  * Creates an element for the pool
+diff --git a/lib/smtp-transport/index.js b/lib/smtp-transport/index.js
+index a1c45a54d194ef88b383a57edadce3f4e85f6b6d..27bea61c94d5b49a29b4066cf7509067c319242f 100644
+--- a/lib/smtp-transport/index.js
++++ b/lib/smtp-transport/index.js
+@@ -1,6 +1,6 @@
+ 'use strict';
+ 
+-const EventEmitter = require('events');
++const { EventEmitter } = require('events');
+ const SMTPConnection = require('../smtp-connection');
+ const wellKnown = require('../well-known');
+ const shared = require('../shared');

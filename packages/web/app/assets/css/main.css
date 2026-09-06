@@ -1,0 +1,235 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+:root {
+  --background: #ffffff;
+  --shiny-text: #09090b;
+  --shiny-dot: rgba(0, 0, 0, 0.15);
+
+  --color-brand: #dd2c00;
+  --color-brand-hover: #b92400;
+  --color-brand-secondary: #f09237;
+  --color-brand-light: #fff7ed;
+}
+
+.dark {
+  --background: #171717;
+  --shiny-text: #ffffff;
+  --shiny-dot: rgba(255, 255, 255, 0.5);
+}
+
+@theme {
+  --font-family-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-red: #dd2c00;
+  --color-brand-red-dark: #b92400;
+  --color-brand-orange: #f09237;
+
+  --color-primary-50: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
+  --color-primary-300: #fdba74;
+  --color-primary-400: #fb923c;
+  --color-primary-500: #f09237;
+  --color-primary-600: #e07016;
+  --color-primary-700: #dd2c00;
+  --color-primary-800: #b92400;
+  --color-primary-900: #8c1b00;
+  --color-primary-950: #4a0c00;
+}
+
+html {
+  font-family: var(--font-family-sans);
+}
+
+.text-muted {
+  color: var(--ui-text-muted);
+}
+
+/* Hide scrollbars cross-browser while preserving scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Brand focus gradients using #dd2c00 and #f09237 */
+.bg-brand-gradient {
+  background: linear-gradient(135deg, #dd2c00 0%, #f09237 100%);
+}
+
+.text-brand-gradient {
+  background: linear-gradient(135deg, #dd2c00 0%, #f09237 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================================
+   Animated Shiny Button (_docs/shiny-button-export/shiny-button.css)
+   ========================================================================== */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-angle-offset {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Animação da borda girando */
+@keyframes border-spin {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+/* Animação do brilho deslizante */
+@keyframes shimmer {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Animação de respiração do texto */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* Classe principal: .shiny-button */
+.shiny-button {
+  --gradient-angle: 0deg;
+  --gradient-angle-offset: 0deg;
+  --gradient-shine: var(--color-brand-secondary, #f09237);
+  --gradient-brand: var(--color-brand, #dd2c00);
+
+  /* Estrutura base */
+  position: relative;
+  overflow: hidden;
+
+  /* Background com gradiente cônico animado */
+  background:
+    linear-gradient(var(--background, #ffffff), var(--background, #ffffff)) padding-box,
+    conic-gradient(
+      from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
+      transparent 0%,
+      var(--gradient-brand) 5%,
+      var(--gradient-shine) 15%,
+      var(--gradient-brand) 30%,
+      transparent 40%,
+      transparent 100%
+    ) border-box;
+
+  /* Borda e sombras */
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(221, 44, 0, 0.2);
+  isolation: isolate;
+
+  /* Animação da borda */
+  animation: border-spin 2.5s linear infinite;
+  cursor: pointer;
+  color: var(--shiny-text, currentColor);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Pseudo-elemento ::before - Grade de pontos animada */
+.shiny-button::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  background: radial-gradient(
+    circle at 2px 2px,
+    var(--shiny-dot, rgba(255, 255, 255, 0.6)) 0.5px,
+    transparent 0
+  ) padding-box;
+  background-size: 4px 4px;
+  background-repeat: space;
+  mask-image: conic-gradient(
+    from calc(var(--gradient-angle) + 45deg),
+    black,
+    transparent 10% 90%,
+    black
+  );
+  -webkit-mask-image: conic-gradient(
+    from calc(var(--gradient-angle) + 45deg),
+    black,
+    transparent 10% 90%,
+    black
+  );
+  border-radius: inherit;
+  opacity: 0.4;
+}
+
+/* Pseudo-elemento ::after - Brilho deslizante */
+.shiny-button::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(-50deg, transparent, var(--gradient-shine), transparent);
+  mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+  -webkit-mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+  opacity: 0.6;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Conteúdo (span) - Texto com z-index correto */
+/* IMPORTANTE: sem width/height 100% — o span cresce pelo conteúdo (intrinsic) */
+.shiny-button > span {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--shiny-text, currentColor);
+}
+
+/* Conteúdo ::before - Brilho respirando */
+.shiny-button > span::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  width: calc(100% + 1rem);
+  height: calc(100% + 1rem);
+  box-shadow: inset 0 -1ex 2rem 4px var(--gradient-brand);
+  opacity: 0;
+  border-radius: inherit;
+  animation: breathe 4.5s linear infinite;
+}
+
+.shiny-button:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 0 0 1px rgba(240, 146, 55, 0.4), 0 6px 24px rgba(221, 44, 0, 0.25);
+}
+
+/* Estado :active - Feedback de clique */
+.shiny-button:active {
+  transform: translateY(1px);
+}
+

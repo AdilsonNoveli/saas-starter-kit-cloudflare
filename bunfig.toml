@@ -1,0 +1,10 @@
+[install]
+# The default "isolated" linker (pnpm-style: node_modules/.bun/<pkg>@<ver>/
+# with symlinks into each consumer) causes esbuild — used internally by SST's
+# Cloudflare Worker bundler — to fail reading nested symlinked packages on
+# Windows with "Cannot read file ...: Incorrect function." (Win32
+# ERROR_INVALID_FUNCTION), a known esbuild/Windows-junction incompatibility.
+# "hoisted" uses a traditional flat node_modules layout (like npm/yarn
+# classic) instead, which every Node bundler — including esbuild — has always
+# supported correctly.
+linker = "hoisted"

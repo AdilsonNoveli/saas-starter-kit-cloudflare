@@ -1,0 +1,42 @@
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  compatibilityDate: "2024-11-01",
+  devtools: { enabled: true },
+  nitro: {
+    prerender: {
+      autoSubfolderIndex: true,
+      routes: ["/login", "/signup", "/forgot-password"],
+    },
+  },
+  // These pages are entirely driven by query-string state (?state=code,
+  // ?err=..., etc.) set by packages/functions/src/auth.ts's redirects
+  // between steps of the OpenAuth flow — but they're also statically
+  // prerendered (nitro.prerender above), so the HTML Cloudflare serves is
+  // baked in once at build time with NO query string, always showing the
+  // step-1 form. Vue's hydration doesn't correct this: the live route
+  // query IS right client-side (verified directly against the mounted
+  // Vue app's $route), but the structural v-if difference between the
+  // prerendered (query-less) and correct (query-aware) render isn't
+  // reconciled — the page silently keeps showing the wrong step forever,
+  // even after the code was actually emailed and the URL updated correctly.
+  // `ssr: false` makes these three routes mount fresh, client-side only —
+  // no prerendered reactive content to mismatch against.
+  routeRules: {
+    "/login/**": { ssr: false },
+    "/signup/**": { ssr: false },
+    "/forgot-password/**": { ssr: false },
+  },
+  css: ["~/css/main.css"],
+  modules: ["@nuxt/ui"],
+  // Set from infra/auth.ts at build time (NUXT_PUBLIC_GITHUB_AUTH_ENABLED /
+  // NUXT_PUBLIC_GOOGLE_AUTH_ENABLED), based on whether real OAuth
+  // credentials are actually loaded — not just whether the feature flag in
+  // config.ts is on. Defaults false here only matter for local `nuxt dev`
+  // without those env vars set.
+  runtimeConfig: {
+    public: {
+      githubAuthEnabled: false,
+      googleAuthEnabled: false,
+    },
+  },
+});

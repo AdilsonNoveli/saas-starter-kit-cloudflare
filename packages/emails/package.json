@@ -1,0 +1,22 @@
+{
+  "name": "@movimenta-bairro/emails",
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "email dev",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./props": "./props.ts"
+  },
+  "devDependencies": {
+    "react-email": "^4.0.0"
+  },
+  "dependencies": {
+    "@react-email/components": "^0.0.31",
+    "@types/react": "^19.0.2",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  }
+}

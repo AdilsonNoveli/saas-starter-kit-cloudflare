@@ -1,0 +1,32 @@
+{
+  "name": "@movimenta-bairro/functions",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "generate-migrations": "drizzle-kit generate",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./subjects": "./src/subjects.ts",
+    "./sender": "./src/sender.ts",
+    "./schema": "./src/database/schema.ts",
+    "./database/seed-data": "./src/database/seed-data.ts"
+  },
+  "dependencies": {
+    "@cloudflare/workers-types": "^4.20241230.0",
+    "@movimenta-bairro/emails": "workspace:*",
+    "@openauthjs/openauth": "^0.3.6",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@tanayvk/mailer": "^9.5.6",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.13.5",
+    "ofetch": "^1.4.1",
+    "postgres": "^3.4.5",
+    "resend": "^4.0.1",
+    "sst": "4.14.0",
+    "valibot": "1.0.0-beta.14"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10"
+  }
+}

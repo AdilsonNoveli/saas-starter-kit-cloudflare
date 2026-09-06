@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "#movimenta-bairro/config": ["./config.ts"]
+    }
+  }
+}

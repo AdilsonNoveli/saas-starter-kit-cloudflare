@@ -47,9 +47,23 @@
 defineProps<{ isMobile: boolean }>();
 
 const navigation = useContentNavigation();
-// queryCollectionNavigation("docs") already returns just the docs tree, so
-// this is the top-level sidebar list directly — no path-filtering needed.
-const docs = computed(() => navigation?.value ?? []);
+// queryCollectionNavigation("docs") always wraps the tree in one synthetic
+// root node for the collection itself (path "/docs"). Its own children mix
+// two different things: the collection's index page (content/docs/0.index.md,
+// same path as the root) and real product folders (e.g. "SaaS Starter Kit").
+// The index page is already what "/docs" itself renders — showing it again
+// as a pill here would just repeat the page's own title. And with a single
+// product, a pill row containing only that one always-active item has no
+// navigational value — it can't be switched away from — so it's hidden until
+// there's a real choice to make (a second product folder).
+const docs = computed(() => {
+  const root = navigation?.value?.[0];
+  if (!root) return [];
+  const products = (root.children ?? []).filter(
+    (item) => item.path !== root.path,
+  );
+  return products.length > 1 ? products : [];
+});
 const {
   docs: {
     sidebar: { useLevel },

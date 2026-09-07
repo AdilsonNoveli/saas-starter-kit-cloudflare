@@ -23,8 +23,9 @@ export default defineNuxtConfig({
     },
   },
   routeRules: {
-    "/docs": { redirect: { to: "/docs/pro", statusCode: 302 } },
-    "/docs/nuxfire": { redirect: { to: "/docs/nuxfire", statusCode: 302 } },
+    "/docs/pro": { redirect: { to: "/docs/saas-starter-kit", statusCode: 302 } },
+    "/docs/nuxfire": { redirect: { to: "/docs/saas-starter-kit", statusCode: 302 } },
+    "/docs/production": { redirect: { to: "/docs/saas-starter-kit", statusCode: 301 } },
   },
   app: {
     head: {
@@ -61,7 +62,7 @@ export default defineNuxtConfig({
     build: {
       markdown: {
         highlight: {
-          langs: ["ts", "vue", "prisma", "bash"],
+          langs: ["ts", "vue", "bash"],
           theme: {
             default: "github-light",
             dark: "github-dark",

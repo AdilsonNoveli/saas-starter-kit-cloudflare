@@ -6,13 +6,13 @@ export default defineAppConfig({
     },
   },
   site: {
-    url: "https://movimentabairro.com.br",
-    name: "Movimenta Bairro",
-    description: "Movimenta Bairro — mobilizando o bairro, juntos.",
+    url: "https://app.nuxfire.com",
+    name: "NuxFire",
+    description: "Production-ready enterprise-grade Nuxt starter kit for Cloudflare.",
   },
   docs: {
     name: "Docs",
-    description: "Movimenta Bairro Documentation",
+    description: "NuxFire Documentation",
     sidebar: {
       useLevel: false,
       collapse: false,

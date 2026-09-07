@@ -31,7 +31,7 @@
         </div>
         <h3 class="text-lg font-bold text-zinc-900 dark:text-white">Documentation</h3>
         <p class="text-sm text-zinc-600 dark:text-zinc-400">Browse complete guides, architecture and tutorials.</p>
-        <NuxtLink to="/docs/pro" class="inline-block text-sm font-semibold text-primary-500 hover:text-primary-600 underline underline-offset-4">
+        <NuxtLink to="/docs" class="inline-block text-sm font-semibold text-primary-500 hover:text-primary-600 underline underline-offset-4">
           Explore NuxFire Docs →
         </NuxtLink>
       </div>

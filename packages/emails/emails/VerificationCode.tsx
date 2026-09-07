@@ -33,8 +33,8 @@ export const VerificationEmail = ({
           <Container className="p-4 border border-solid border-[#eaeaea] rounded my-[40px] mx-auto max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src="https://movimentabairro.com.br/pwa-192x192.png"
-                alt="Movimenta Bairro"
+                src="https://nuxfire.com/pwa-192x192.png"
+                alt="NuxFire"
                 className="my-0 mx-auto"
               />
             </Section>
@@ -60,6 +60,6 @@ export const VerificationEmail = ({
 export default VerificationEmail;
 
 export const template = ({ code, username }: VerificationEmailProps) => ({
-  subject: "Your Verification Code - Movimenta Bairro",
+  subject: "Your Verification Code - NuxFire",
   body: <VerificationEmail code={code} username={username} />,
 });

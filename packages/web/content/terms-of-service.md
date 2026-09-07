@@ -32,7 +32,7 @@ We reserve the right to modify these Terms and Conditions at any time. Any chang
 
 **7. Governing Law**
 
-These Terms and Conditions shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law principles.
+These Terms and Conditions shall be governed by and construed in accordance with the laws of Brazil, without regard to its conflict of law principles.
 
 **8. Contact Information**
 

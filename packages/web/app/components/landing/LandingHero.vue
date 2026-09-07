@@ -74,7 +74,7 @@ const featureBadges = ref([
           variant="link"
           color="neutral"
           size="xl"
-          to="/docs/getting-started/project-structure"
+          to="/docs"
         >
           View Documentation
         </UButton>

@@ -6,6 +6,8 @@ Last updated: November 09, 2024
 
 This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.
 
+This Service is governed by Brazil's Lei Geral de Proteção de Dados (LGPD — Law No. 13,709/2018). Where this Policy refers to Your rights over Personal Data — access, correction, deletion, portability, or objection — those rights are the ones the LGPD grants, exercised with Us directly or, if unresolved, with Brazil's data protection authority (Autoridade Nacional de Proteção de Dados — ANPD).
+
 We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.
 
 ## Interpretation and Definitions
@@ -25,7 +27,7 @@ For the purposes of this Privacy Policy:
 
 - **Cookies** are small files that are placed on Your computer, mobile device or any other device by a website, containing the details of Your browsing history on that website among its many uses.
 
-- **Country** refers to: Maharashtra, India
+- **Country** refers to: Brazil
 
 - **Device** means any device that can access the Service such as a computer, a cellphone or a digital tablet.
 

@@ -1,18 +1,18 @@
 // this is the domain where the 'production' environment is deployed
-export const prodDomain = "movimentabairro.org";
+export const prodDomain = "nuxfire.com";
 
 // all other stages are deployed to the devDomain
 // for example, in this config, the stage 'tanay' would be deployed to:
-// tanay.dev.movimentabairro.org
-export const devDomain = "dev.movimentabairro.org";
+// tanay.dev.nuxfire.com
+export const devDomain = "dev.nuxfire.com";
 
 // this email is used by the auth service for
 // sending codes, welcome email, and invitations
 export const authEmail = {
-  name: "Movimenta Bairro",
-  address: "contato@movimentabairro.org",
+  name: "NuxFire",
+  address: "contato@nuxfire.com",
 };
-export const authEmailDomain = "movimentabairro.org";
+export const authEmailDomain = "nuxfire.com";
 
 // Path on the auth Worker that erases an identity — credentials and every
 // session. It lives here because both sides have to agree on it: the auth

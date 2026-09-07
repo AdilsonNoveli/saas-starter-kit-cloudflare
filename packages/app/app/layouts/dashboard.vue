@@ -5,7 +5,6 @@
       v-model:open="open"
       collapsible
       resizable
-      class="bg-elevated/25"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">
@@ -20,6 +19,7 @@
           orientation="vertical"
           tooltip
           popover
+          class="px-2"
         />
       </template>
 
@@ -31,6 +31,13 @@
     <slot />
 
     <NotificationsSlideover />
+
+    <AccountMfaSetupModal
+      v-model:open="mfaChallengeOpen"
+      mode="challenge"
+      :dismissible="false"
+      @success="mfaChallengeOpen = false"
+    />
   </UDashboardGroup>
 </template>
 
@@ -43,6 +50,37 @@ const baseRoute = computed(() => `/${currentTeam.value?.slug}`);
 const teamID = computed(() => currentTeam.value?.id || "");
 
 useDashboard();
+
+/**
+ * The self-service 2FA gate, in one place, for every page under this layout
+ * (dashboard, settings, account-settings). Mirrors layouts/admin.vue's own
+ * MFA check, but "once per login" rather than a 30-minute re-challenge —
+ * see user-mfa-session.ts — so this only ever fires right after a login on
+ * a browser that hasn't verified yet, not repeatedly through the day.
+ *
+ * Short-circuits on `user.value?.mfaEnabled` (already in the session
+ * middleware/0.auth.global.ts fetched before this layout ever mounts)
+ * before hitting /api/mfa/status at all — the overwhelming majority of
+ * users have MFA off, and this is the highest-traffic layout in the app, so
+ * that one extra round trip per navigation isn't worth paying for accounts
+ * this can never apply to.
+ *
+ * protectedProcedure (server/trpc/trpc.ts) is what actually enforces this;
+ * this modal is only the UX shortcut so an unverified user gets a clear
+ * prompt instead of every query on the page silently failing FORBIDDEN.
+ */
+const { user } = useSession();
+const mfaChallengeOpen = ref(false);
+
+onMounted(async () => {
+  if (!user.value?.mfaEnabled) return;
+  const status = await $fetch<{ sessionVerified: boolean }>(
+    "/api/mfa/status",
+  ).catch(() => null);
+  if (status && !status.sessionVerified) {
+    mfaChallengeOpen.value = true;
+  }
+});
 
 const closeSidebar = () => {
   open.value = false;

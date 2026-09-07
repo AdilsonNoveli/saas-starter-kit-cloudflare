@@ -6,18 +6,36 @@
       content: collapsed ? 'w-56' : 'w-(--reka-dropdown-menu-trigger-width)',
     }"
   >
+    <!-- Collapsed: square icon button with avatar only -->
     <UButton
-      :label="collapsed ? undefined : (user?.name ?? undefined)"
-      :avatar="{ src: user?.image ?? undefined, alt: user?.name ?? 'Account' }"
-      :trailing-icon="collapsed ? undefined : 'i-lucide-more-vertical'"
+      v-if="collapsed"
+      :avatar="{ src: user?.image ?? undefined, alt: user?.name ?? 'Account', size: 'xs' }"
+      color="neutral"
+      variant="ghost"
+      square
+      class="data-[state=open]:bg-elevated"
+    />
+
+    <!-- Expanded: full row with avatar + name + trailing icon -->
+    <UButton
+      v-else
       color="neutral"
       variant="ghost"
       block
-      :square="collapsed"
-      class="data-[state=open]:bg-elevated"
-      :class="[!collapsed && 'py-2']"
-      :ui="{ trailingIcon: 'text-dimmed' }"
-    />
+      class="data-[state=open]:bg-elevated py-2 justify-start"
+      :ui="{ trailingIcon: 'ms-auto text-dimmed' }"
+      trailing-icon="i-lucide-more-vertical"
+    >
+      <UAvatar
+        :src="user?.image ?? undefined"
+        :alt="user?.name ?? 'Account'"
+        size="2xs"
+        class="shrink-0"
+      />
+      <span class="truncate text-sm font-medium text-highlighted">
+        {{ user?.name ?? 'Account' }}
+      </span>
+    </UButton>
   </UDropdownMenu>
 </template>
 

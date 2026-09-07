@@ -1,7 +1,11 @@
 /**
- * Authenticated encryption for the one secret this app has to keep at rest:
- * a platform admin's TOTP seed. Whoever reads that seed out of the database
- * can mint valid 6-digit codes forever, so it is never stored in plaintext.
+ * Authenticated encryption for the TOTP seeds this app keeps at rest — a
+ * platform admin's (PlatformAdmin.mfaSecret) and a regular user's own
+ * (User.mfaSecret). Whoever reads a seed out of the database can mint valid
+ * 6-digit codes for that account forever, so neither is ever stored in
+ * plaintext. Shared implementation, but each caller passes its own
+ * encryption key (PLATFORM_ADMIN_ENCRYPTION_KEY / USER_MFA_ENCRYPTION_KEY) —
+ * see infra/secret.ts for why those stay separate secrets.
  *
  * Built on Web Crypto (`crypto.subtle`), which workerd exposes natively — no
  * dependency, no hand-rolled cipher. AES-GCM gives confidentiality *and*
@@ -35,9 +39,7 @@ function fromBase64(value: string) {
 
 async function importAesKey(key: string) {
   if (!key) {
-    throw new Error(
-      "platform admin encryption key is not configured (NUXT_PLATFORM_ADMIN_ENCRYPTION_KEY)",
-    );
+    throw new Error("MFA encryption key is not configured");
   }
   const digest = await crypto.subtle.digest(
     "SHA-256",

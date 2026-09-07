@@ -15,6 +15,33 @@
     </UPageCard>
 
     <UPageCard
+      title="Two-Factor Authentication"
+      :description="
+        mfaEnabled
+          ? 'Enabled. You will be asked for a code from your authenticator app the next time you log in on a new device or browser.'
+          : 'Add a time-based code from an authenticator app on top of your password.'
+      "
+      variant="subtle"
+      orientation="horizontal"
+    >
+      <UButton
+        v-if="mfaEnabled"
+        label="Disable 2FA"
+        color="error"
+        variant="outline"
+        class="w-fit lg:ms-auto"
+        @click="showDisableMfaConfirm = true"
+      />
+      <UButton
+        v-else
+        label="Enable 2FA"
+        color="neutral"
+        class="w-fit lg:ms-auto"
+        @click="mfaEnrollOpen = true"
+      />
+    </UPageCard>
+
+    <UPageCard
       title="Sessions"
       description="Sign out of every other browser or device currently signed in to your account."
       variant="subtle"
@@ -29,6 +56,36 @@
         @click="onSignOutOthers"
       />
     </UPageCard>
+
+    <AccountMfaSetupModal
+      v-model:open="mfaEnrollOpen"
+      mode="enroll"
+      @success="onMfaEnrolled"
+    />
+
+    <UModal
+      v-model:open="showDisableMfaConfirm"
+      :dismissible="!disablingMfa"
+      title="Disable two-factor authentication"
+      description="You will only need your password to log in again. You can re-enable it any time."
+      :ui="{ footer: 'justify-end' }"
+    >
+      <template #footer="{ close }">
+        <UButton
+          label="Cancel"
+          color="neutral"
+          variant="outline"
+          :disabled="disablingMfa"
+          @click="close"
+        />
+        <UButton
+          label="Disable"
+          color="error"
+          :loading="disablingMfa"
+          @click="onDisableMfa"
+        />
+      </template>
+    </UModal>
 
     <UPageCard
       title="Danger Zone"
@@ -122,6 +179,43 @@ function goToChangePassword() {
   const url = new URL(`${runtimeConfig.public.authUrl}/forgot-password`);
   if (user.value?.email) url.searchParams.set("email", user.value.email);
   navigateTo(url.toString(), { external: true });
+}
+
+const mfaEnabled = computed(() => Boolean(user.value?.mfaEnabled));
+const mfaEnrollOpen = ref(false);
+const showDisableMfaConfirm = ref(false);
+const disablingMfa = ref(false);
+
+async function onMfaEnrolled() {
+  // The modal already confirmed enrolment with the server; this only syncs
+  // the cached session so `mfaEnabled` above flips without a full reload.
+  await useSession().refresh();
+}
+
+const disableMfaMutation = useTrpcClient().account.disableMfa;
+
+async function onDisableMfa() {
+  disablingMfa.value = true;
+  try {
+    const result = await disableMfaMutation.mutate();
+    await useSession().refresh();
+    showDisableMfaConfirm.value = false;
+    toast.add({
+      title: "Two-Factor Authentication Disabled",
+      description: result.message,
+      color: "success",
+      icon: "i-lucide-check",
+    });
+  } catch (error: any) {
+    toast.add({
+      title: "Failed",
+      description: error?.message || "Something went wrong",
+      color: "error",
+      icon: "i-lucide-x",
+    });
+  } finally {
+    disablingMfa.value = false;
+  }
 }
 
 const signOutOthersMutation = useTrpcClient().account.signOutOtherSessions;

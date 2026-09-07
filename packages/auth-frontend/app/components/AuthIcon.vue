@@ -2,7 +2,7 @@
   <NuxtLink
     to="/"
     aria-label="NuxFire"
-    class="inline-flex items-center justify-center p-2 rounded-xl transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+    class="inline-flex items-center justify-center p-2 rounded-xl transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-flame-500"
   >
     <img
       src="/nuxfire-white.svg"

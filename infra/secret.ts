@@ -78,5 +78,15 @@ secretList.PlatformAdminEncryptionKey = new sst.Secret(
   "",
 );
 
+// Self-service two-factor authentication for regular users
+// (packages/app/server/utils/user-mfa-session.ts, .../mfa-crypto.ts).
+// Deliberately separate secrets from the platform-admin pair above, even
+// though the mechanism is the same: rotating one must never invalidate MFA
+// (or force a re-challenge) for the other population, and a deploy that only
+// cares about end-user 2FA shouldn't need to provision an unrelated
+// admin-console secret to make it work. Same fail-closed default as above.
+secretList.UserMfaSessionSecret = new sst.Secret("USER_MFA_SESSION_SECRET", "");
+secretList.UserMfaEncryptionKey = new sst.Secret("USER_MFA_ENCRYPTION_KEY", "");
+
 export const secret = secretList;
 export const allSecrets = Object.values(secret);

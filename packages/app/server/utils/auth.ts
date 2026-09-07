@@ -71,7 +71,22 @@ export async function getUser(event: H3Event) {
     // permissions were read by id was how the two could disagree.
     const [[user], { permissions, teams }, isPlatformAdmin] = await Promise.all(
       [
-        useDB().select().from(users).where(eq(users.id, session.id)),
+        // Explicit column list, `mfaSecret` deliberately excluded: this
+        // query's result ends up spread into /api/auth/session's response
+        // verbatim, and that encrypted TOTP seed must never reach the
+        // browser. mfaEnabledAt is safe (not a secret) and reduced to a
+        // boolean below, the same treatment isActivePlatformAdmin() gives
+        // platform-admin status.
+        useDB()
+          .select({
+            id: users.id,
+            name: users.name,
+            email: users.email,
+            image: users.image,
+            mfaEnabledAt: users.mfaEnabledAt,
+          })
+          .from(users)
+          .where(eq(users.id, session.id)),
         getUserPermissions(session.id),
         // Deliberately a boolean and nothing else — see
         // isActivePlatformAdmin(). Whether the elevated MFA challenge has been
@@ -85,16 +100,24 @@ export async function getUser(event: H3Event) {
     // object with no `id`, which /api/auth/session reports as 401 — and the
     // global middleware turns that into an endless redirect to /authorize
     // with no way out. The token is valid, so trust its identity.
+    const { mfaEnabledAt, ...profile } = user ?? {
+      id: session.id,
+      email: session.email,
+      name: session.name || null,
+      image: session.image || null,
+      mfaEnabledAt: null,
+    };
     event.context.user = {
-      ...(user ?? {
-        id: session.id,
-        email: session.email,
-        name: session.name || null,
-        image: session.image || null,
-      }),
+      ...profile,
       permissions,
       teams,
       isPlatformAdmin,
+      // Whether *this specific login* has already passed a TOTP challenge is
+      // not part of this payload, same reasoning as isPlatformAdmin above —
+      // that lives in the nuxfire-mfa-verified cookie
+      // (user-mfa-session.ts) and is read by protectedProcedure and
+      // /api/mfa/status, not cached here.
+      mfaEnabled: Boolean(mfaEnabledAt),
     };
   }
   return event.context.user;

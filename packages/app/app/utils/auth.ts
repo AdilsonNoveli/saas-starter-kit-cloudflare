@@ -12,11 +12,18 @@ import type { SubjectUser } from "@nuxfire/functions/subjects";
  * rendered. Authorisation for anything under `admin.*` is decided server-side
  * by platformAdminProcedure, which additionally requires enrolled MFA and a
  * fresh elevated session; neither is reflected here on purpose.
+ *
+ * `mfaEnabled` is the same kind of hint, for the account's own two-factor
+ * setting: whether *this login* has already passed its one-time TOTP
+ * challenge is not reflected here either — layouts/dashboard.vue reads that
+ * separately from /api/mfa/status, and protectedProcedure is what actually
+ * enforces it.
  */
 type SessionUser = SubjectUser & {
   permissions?: Record<string, string[]>;
   teams?: string[];
   isPlatformAdmin?: boolean;
+  mfaEnabled?: boolean;
 };
 
 type UserSession = {

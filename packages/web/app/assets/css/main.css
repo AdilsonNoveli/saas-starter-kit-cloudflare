@@ -6,40 +6,73 @@
   --shiny-text: #09090b;
   --shiny-dot: rgba(0, 0, 0, 0.15);
 
-  --color-brand: #dd2c00;
-  --color-brand-hover: #b92400;
-  --color-brand-secondary: #f09237;
-  --color-brand-light: #fff7ed;
+  --color-brand: #d92626;
+  --color-brand-hover: #f13a3a;
+  --color-brand-secondary: #ff8904;
+  --color-brand-light: #fff8ed;
 }
 
 .dark {
-  --background: #171717;
+  --background: #140807;
   --shiny-text: #ffffff;
   --shiny-dot: rgba(255, 255, 255, 0.5);
+
+  --ui-bg: var(--color-night-950);
+  --ui-bg-muted: var(--color-night-900);
+  --ui-bg-elevated: var(--color-night-800);
+  --ui-bg-accented: var(--color-night-700);
+  --ui-border: color-mix(in oklab, white 8%, transparent);
+  --ui-border-muted: color-mix(in oklab, white 5%, transparent);
+  --ui-border-accented: color-mix(in oklab, white 14%, transparent);
+  --ui-text-highlighted: var(--color-night-50);
+  --ui-text: var(--color-night-100);
+  --ui-text-muted: var(--color-night-300);
+  --ui-text-dimmed: var(--color-night-500);
 }
 
-@theme {
-  --font-family-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+@theme static {
+  --font-sans: "Geist", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", monospace;
 
-  --color-brand-red: #dd2c00;
-  --color-brand-red-dark: #b92400;
-  --color-brand-orange: #f09237;
+  --color-night-50: #f7f4f3;
+  --color-night-100: #efe9e7;
+  --color-night-200: #ddd2cf;
+  --color-night-300: #c2b3af;
+  --color-night-400: #9c8884;
+  --color-night-500: #786461;
+  --color-night-600: #5b4b48;
+  --color-night-700: #443736;
+  --color-night-800: #2a2627;
+  --color-night-900: #1e1a1b;
+  --color-night-950: #140807;
 
-  --color-primary-50: #fff7ed;
-  --color-primary-100: #ffedd5;
-  --color-primary-200: #fed7aa;
-  --color-primary-300: #fdba74;
-  --color-primary-400: #fb923c;
-  --color-primary-500: #f09237;
-  --color-primary-600: #e07016;
-  --color-primary-700: #dd2c00;
-  --color-primary-800: #b92400;
-  --color-primary-900: #8c1b00;
-  --color-primary-950: #4a0c00;
+  --color-flame-50: #fff1f1;
+  --color-flame-100: #ffe1e1;
+  --color-flame-200: #ffc7c7;
+  --color-flame-300: #ffa0a0;
+  --color-flame-400: #ff6f6f;
+  --color-flame-500: #ff4d4d;
+  --color-flame-600: #f13a3a;
+  --color-flame-700: #d92626;
+  --color-flame-800: #991b1b;
+  --color-flame-900: #7a1616;
+  --color-flame-950: #450b0b;
+
+  --color-fire-50: #fff8ed;
+  --color-fire-100: #ffefd1;
+  --color-fire-200: #ffdba3;
+  --color-fire-300: #ffc06b;
+  --color-fire-400: #ffa333;
+  --color-fire-500: #ff8904;
+  --color-fire-600: #e67200;
+  --color-fire-700: #bf5c00;
+  --color-fire-800: #99490a;
+  --color-fire-900: #7a3c10;
+  --color-fire-950: #431e08;
 }
 
 html {
-  font-family: var(--font-family-sans);
+  font-family: var(--font-sans);
 }
 
 .text-muted {
@@ -55,13 +88,13 @@ html {
   scrollbar-width: none;
 }
 
-/* Brand focus gradients using #dd2c00 and #f09237 */
+/* Brand signature gradient using flame-500 and flame-800 (DESIGN_SYSTEM.md) */
 .bg-brand-gradient {
-  background: linear-gradient(135deg, #dd2c00 0%, #f09237 100%);
+  background: linear-gradient(135deg, var(--color-flame-500), var(--color-flame-800));
 }
 
 .text-brand-gradient {
-  background: linear-gradient(135deg, #dd2c00 0%, #f09237 100%);
+  background: linear-gradient(135deg, var(--color-flame-500), var(--color-flame-800));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

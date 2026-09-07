@@ -2,12 +2,12 @@
   <!-- fade-mask wraps the scroll row with left/right fade using mask-image -->
   <div class="testimonial-fade-mask relative flex overflow-hidden">
     <div
-      ref="scrollRef"
       :class="[
         direction === 'left' ? 'animate-scroll-left' : 'animate-scroll-right',
-        'flex flex-shrink gap-[40px]',
+        'scroll-track flex shrink-0 gap-10',
       ]"
     >
+      <!-- Original set -->
       <div
         v-for="testimonial in testimonials"
         :key="testimonial.name"
@@ -15,10 +15,10 @@
       >
         <TestimonialCard v-bind="testimonial" />
       </div>
-      <!-- Duplicate for seamless loop -->
+      <!-- Exact duplicate for seamless loop -->
       <div
         v-for="testimonial in testimonials"
-        :key="`duplicate-${testimonial.name}`"
+        :key="`dup-${testimonial.name}`"
         class="w-[400px] shrink-0"
       >
         <TestimonialCard v-bind="testimonial" />
@@ -40,69 +40,64 @@ defineProps<{
   testimonials: Testimonial[];
   direction: "left" | "right";
 }>();
-
-const scrollRef = ref<HTMLDivElement | null>(null);
-const isDragging = ref(false);
-
-function onMouseMove(_e: MouseEvent) {
-  if (!isDragging.value || !scrollRef.value) return;
-}
-
-function stopDragging() {
-  if (!scrollRef.value) return;
-  isDragging.value = false;
-}
 </script>
 
 <style scoped>
-/* Fade lateral — funciona em light e dark mode usando mask-image */
+/* ------------------------------------------------------------------
+   Layout
+   - Each card is 400px wide with 40px (gap-10) between cards.
+   - One "set" of 3 cards = (3 × 400px) + (2 × 40px gaps) = 1280px.
+   - The track holds 2 sets end-to-end = 2560px total.
+   - To loop seamlessly, we translate exactly −1280px (one full set).
+     translateX(−50%) of the track is exactly −1280px when 2 sets
+     are identical, so the browser never sees a jump.
+   ------------------------------------------------------------------ */
+
+.scroll-track {
+  will-change: transform;
+}
+
+/* Lateral fade — works in both light and dark mode */
 .testimonial-fade-mask {
   mask-image: linear-gradient(
     to right,
     transparent 0%,
-    black 12%,
-    black 88%,
+    black 10%,
+    black 90%,
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0%,
-    black 12%,
-    black 88%,
+    black 10%,
+    black 90%,
     transparent 100%
   );
 }
 
+/* ---- Left scroll ---- */
 .animate-scroll-left {
-  animation: scroll-left 30s linear infinite;
-}
-
-.animate-scroll-right {
-  animation: scroll-right 30s linear infinite;
+  animation: scroll-left 35s linear infinite;
 }
 
 @keyframes scroll-left {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(calc(-50% - 20px));
-  }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ---- Right scroll ---- */
+.animate-scroll-right {
+  animation: scroll-right 35s linear infinite;
 }
 
 @keyframes scroll-right {
-  0% {
-    transform: translateX(calc(-50% - 20px));
-  }
-  100% {
-    transform: translateX(0);
-  }
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
 }
 
-/* Pause animation on hover */
+/* Pause on hover for readability */
 .animate-scroll-left:hover,
 .animate-scroll-right:hover {
   animation-play-state: paused;
 }
 </style>
-

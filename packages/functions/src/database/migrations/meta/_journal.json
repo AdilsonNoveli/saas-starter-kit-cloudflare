@@ -43,6 +43,13 @@
       "when": 1788712149786,
       "tag": "0005_awesome_gambit",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788820250992,
+      "tag": "0006_lying_longshot",
+      "breakpoints": true
     }
   ]
 }

@@ -19,6 +19,14 @@ export const users = pgTable("User", {
   name: text("name"),
   email: text("email").unique(),
   image: text("image"),
+  // Self-service TOTP, mirroring platformAdmins' own mfaSecret/mfaEnabledAt
+  // pair below — always encrypted (AES-GCM, see
+  // packages/app/server/utils/mfa-crypto.ts), never plaintext, never
+  // selected by getUser()'s client-facing session query.
+  mfaSecret: text("mfaSecret"),
+  // null = not enrolled. protectedProcedure only demands a verified session
+  // when this is set — a user who never opts in is unaffected.
+  mfaEnabledAt: timestamp("mfaEnabledAt", { withTimezone: true }),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -435,7 +443,7 @@ export const platformAdmins = pgTable("PlatformAdmin", {
     .references(() => users.id),
   role: platformRoleEnum("role").notNull(),
   // TOTP secret, always stored encrypted (AES-GCM, see
-  // packages/app/server/utils/platform-admin-crypto.ts) — never plaintext,
+  // packages/app/server/utils/mfa-crypto.ts) — never plaintext,
   // and never serialised to any client.
   mfaSecret: text("mfaSecret"),
   // null = MFA setup still pending; blocks platformAdminProcedure entirely.

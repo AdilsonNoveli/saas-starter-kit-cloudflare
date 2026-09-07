@@ -17,6 +17,20 @@ export const protectedProcedure = publicProcedure.use(async (opts) => {
   if (!ctx.session?.email) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+  // Self-service 2FA gate: only checked at all for the accounts that opted
+  // in (ctx.session.mfaEnabled), so a user who never enrolled pays no cost
+  // and sees no behaviour change. One verification per login, not per
+  // request-window — see user-mfa-session.ts for why this differs from
+  // platformAdminProcedure's 30-minute re-challenge. The client's own
+  // pre-emptive redirect lives in layouts/dashboard.vue (via
+  // /api/mfa/status); this is the actual enforcement, same layered pattern
+  // as platform-admin below.
+  if (ctx.session.mfaEnabled) {
+    const mfaSession = await getUserMfaSession(ctx.event);
+    if (mfaSession?.userId !== ctx.session.id) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "MFA_REQUIRED" });
+    }
+  }
   return opts.next({
     ctx: {
       user: ctx.session,

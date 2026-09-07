@@ -132,7 +132,7 @@
                 variant="ghost"
                 size="xs"
                 :aria-label="showRepeatPassword ? 'Hide password' : 'Show password'"
-                class="text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                class="text-night-400 hover:text-night-200 cursor-pointer"
                 tabindex="-1"
                 @click="showRepeatPassword = !showRepeatPassword"
               />
@@ -147,10 +147,10 @@
         size="lg"
         block
         :loading="loading"
-        class="font-semibold shadow-lg shadow-primary-500/20 cursor-pointer mt-2"
-        trailing-icon="i-lucide-arrow-right"
+        class="font-semibold justify-center text-center cursor-pointer mt-2"
+        :ui="{ base: 'justify-center text-center' }"
       >
-        {{ state === "code" ? "Verify Email" : "Create Account" }}
+        <span class="w-full text-center">{{ state === "code" ? "Verify Email" : "Create Account" }}</span>
       </UButton>
     </UForm>
 
@@ -158,7 +158,7 @@
     <template v-if="state !== 'code'">
       <template v-if="githubAuthEnabled || googleAuthEnabled">
         <div class="relative py-1">
-          <USeparator label="Or register with" class="text-xs text-zinc-500 uppercase tracking-wider" />
+          <USeparator label="Or register with" class="text-xs text-night-500 uppercase tracking-wider" />
         </div>
         <AuthSocialLogin :sign-up="true" />
       </template>
@@ -168,12 +168,12 @@
 
     <!-- Card Footer -->
     <template #footer>
-      <p class="text-sm text-zinc-400">
+      <p class="text-sm text-night-300">
         Already have an account?
         <NuxtLink
           :to="`${origin}/password/authorize`"
           external
-          class="text-primary-500 hover:text-primary-400 font-medium transition-colors underline underline-offset-4 ml-1"
+          class="text-flame-400 hover:text-flame-300 font-medium transition-colors underline underline-offset-4 ml-1"
         >
           Sign in
         </NuxtLink>

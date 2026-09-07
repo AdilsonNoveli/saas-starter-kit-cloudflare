@@ -105,6 +105,14 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "USER_MFA_ENCRYPTION_KEY": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "USER_MFA_SESSION_SECRET": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "WebNuxtHubSecret": {
       "type": "random.index/randomUuid.RandomUuid"
       "value": string

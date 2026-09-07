@@ -1,3 +1,41 @@
+import { readdirSync, statSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { join } from "node:path";
+
+// `crawlLinks: true` only finds routes reachable through an <a href> that's
+// actually in the server-rendered HTML — the docs sidebar's nested sections
+// (Getting Started, Features, Concepts) are collapsed by default and Nuxt
+// UI's Accordion doesn't render collapsed panel content into the SSR output,
+// so the crawler never sees those links and those pages never get
+// prerendered. Cloudflare has no Postgres/D1 database backing @nuxt/content
+// at runtime (see infra/web.ts), so any doc page that isn't prerendered
+// 404s/fails live instead of falling back to a dynamic query. Listing every
+// route explicitly — derived straight from the content file tree, same
+// numeric-prefix-stripping rule Nuxt Content itself applies — sidesteps the
+// crawler entirely instead of trying to out-guess Accordion's DOM behavior.
+function docsRoutes(): string[] {
+  const root = fileURLToPath(new URL("./content/docs", import.meta.url));
+  const routes: string[] = [];
+  const stripPrefix = (segment: string) => segment.replace(/^\d+\./, "");
+
+  function walk(dir: string, urlSegments: string[]) {
+    for (const entry of readdirSync(dir)) {
+      if (entry.startsWith(".")) continue; // .navigation.yml etc.
+      const fullPath = join(dir, entry);
+      if (statSync(fullPath).isDirectory()) {
+        walk(fullPath, [...urlSegments, stripPrefix(entry)]);
+      } else if (entry.endsWith(".md")) {
+        const name = stripPrefix(entry.replace(/\.md$/, ""));
+        const segments = name === "index" ? urlSegments : [...urlSegments, name];
+        routes.push(`/docs${segments.length ? "/" + segments.join("/") : ""}`);
+      }
+    }
+  }
+
+  walk(root, []);
+  return routes;
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -18,7 +56,7 @@ export default defineNuxtConfig({
   nitro: {
     preset: "cloudflare-module",
     prerender: {
-      routes: ["/"],
+      routes: ["/", ...docsRoutes()],
       crawlLinks: true,
     },
   },

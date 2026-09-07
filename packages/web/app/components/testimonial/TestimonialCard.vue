@@ -2,12 +2,11 @@
   <div
     class="relative p-6 bg-default rounded-xl shadow-sm border border-default"
   >
-    <div class="absolute -top-4 -left-2">
-      <UIcon
-        name="i-carbon-quotes"
-        class="w-8 h-8 text-primary"
-      />
-    </div>
+    <!-- Typographic opening quote mark -->
+    <span
+      class="absolute -top-3 left-3 text-5xl font-serif leading-none text-flame-600 select-none pointer-events-none"
+      aria-hidden="true"
+    >&#8220;</span>
 
     <div class="space-y-6">
       <p class="text-toned relative z-10">

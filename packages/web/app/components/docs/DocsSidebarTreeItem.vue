@@ -28,7 +28,7 @@
           :items="[{}]"
           :ui="{ item: 'pt-1' }"
         >
-          <template #default="{ open: showSettings }">
+          <template #default>
             <UButton
               :icon="link.icon"
               color="neutral"
@@ -45,13 +45,6 @@
                   {{ badge.value }}
                 </UBadge>
               </span>
-              <template #trailing>
-                <UIcon
-                  name="i-lucide-chevron-right"
-                  class="w-4 h-4 ms-auto transform transition-transform duration-200 text-zinc-400"
-                  :class="[showSettings && 'rotate-90 text-primary-500']"
-                />
-              </template>
             </UButton>
           </template>
           <template #body>

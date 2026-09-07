@@ -221,10 +221,31 @@ export default router({
       // a session that no longer resolves to anything.
       deleteCookie(event, "nuxfire-access-token");
       deleteCookie(event, "nuxfire-refresh-token");
+      deleteCookie(event, "nuxfire-mfa-verified");
 
       console.log("account deleted", { userId: user.id });
       return { message: "Your account has been permanently deleted." };
     }),
+
+  /**
+   * Turns off the caller's own two-factor authentication. Reachable at all
+   * only because protectedProcedure already required this login to be
+   * MFA-verified to get this far (see trpc.ts) — no separate re-auth step is
+   * needed on top of that.
+   *
+   * A plain tRPC mutation, unlike the /api/mfa/* enrollment endpoints: those
+   * exist outside protectedProcedure specifically because they run *before*
+   * MFA is verified (enrolling, or re-verifying an expired session), which
+   * disabling never needs to.
+   */
+  disableMfa: protectedProcedure.mutation(async ({ ctx: { user, event } }) => {
+    await useDB()
+      .update(users)
+      .set({ mfaSecret: null, mfaEnabledAt: null })
+      .where(eq(users.id, user.id));
+    deleteCookie(event, "nuxfire-mfa-verified");
+    return { message: "Two-factor authentication has been disabled." };
+  }),
 
   /**
    * Revokes every other refresh token issued to the caller's identity,

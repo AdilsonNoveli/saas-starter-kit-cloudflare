@@ -79,13 +79,21 @@ export default defineNuxtConfig({
     // fall back to a weak seal. Set from NUXT_PLATFORM_MFA_SESSION_SECRET.
     platformMfaSessionSecret: "",
     // Server-only. Encrypts platform admins' TOTP seeds at rest
-    // (server/utils/platform-admin-crypto.ts). Deliberately separate from the
+    // (server/utils/mfa-crypto.ts). Deliberately separate from the
     // session secret above: that one seals 30-minute cookies and can be
     // rotated at any time, while this one guards data already written to the
     // database — sharing them would mean rotating the cookie key silently
     // invalidates every enrolled admin's MFA. Set from
     // NUXT_PLATFORM_ADMIN_ENCRYPTION_KEY.
     platformAdminEncryptionKey: "",
+    // Same pair for regular-user self-service 2FA
+    // (server/utils/user-mfa-session.ts). Kept on separate secrets from the
+    // platform-admin ones above — see infra/secret.ts for why. Unlike the
+    // platform-admin session cookie, this one is deliberately long-lived
+    // (one verification per login, not one per 30 minutes) — see
+    // user-mfa-session.ts.
+    userMfaSessionSecret: "",
+    userMfaEncryptionKey: "",
   },
   i18n: {
     vueI18n: "../i18n.config.ts",

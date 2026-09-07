@@ -5,17 +5,16 @@
       v-model:open="open"
       collapsible
       resizable
-      class="bg-elevated/50"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">
         <div
-          class="flex items-center gap-2 w-full py-2"
+          class="flex items-center gap-2 w-full py-2 px-2"
           :class="collapsed && 'justify-center'"
         >
-          <UIcon name="i-lucide-shield-check" class="size-5 shrink-0" />
+          <UIcon name="i-lucide-shield-check" class="size-5 shrink-0 text-warning" />
           <template v-if="!collapsed">
-            <span class="font-semibold truncate">Platform</span>
+            <span class="font-semibold truncate text-highlighted">Platform</span>
             <UBadge label="Admin" color="warning" variant="subtle" size="sm" />
           </template>
         </div>
@@ -28,6 +27,7 @@
           orientation="vertical"
           tooltip
           popover
+          class="px-2"
         />
       </template>
 

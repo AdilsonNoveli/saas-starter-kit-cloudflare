@@ -39,6 +39,10 @@ await deployWorker("App", {
     NUXT_PLATFORM_MFA_SESSION_SECRET: secret.PlatformMfaSessionSecret?.value,
     NUXT_PLATFORM_ADMIN_ENCRYPTION_KEY:
       secret.PlatformAdminEncryptionKey?.value,
+    // Same pair, same reasoning, for regular-user self-service 2FA — kept on
+    // separate secrets from the platform-admin ones (see infra/secret.ts).
+    NUXT_USER_MFA_SESSION_SECRET: secret.UserMfaSessionSecret?.value,
+    NUXT_USER_MFA_ENCRYPTION_KEY: secret.UserMfaEncryptionKey?.value,
     NUXT_STRIPE_WEBHOOK_SECRET_KEY: secret.StripeWebhookSecretKey?.value,
     NUXT_STRIPE_SECRET_KEY: secret.StripeSecretKey?.value,
     NUXT_PADDLE_API_KEY: secret.PaddleApiKey?.value,

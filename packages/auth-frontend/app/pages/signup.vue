@@ -1,145 +1,212 @@
 <template>
-  <div class="w-screen min-h-screen flex items-center justify-center p-2">
-    <UCard class="container max-w-md mx-auto">
-      <div class="space-y-4">
-        <div class="items-center flex flex-col space-y-3">
-          <AuthIcon />
-          <span class="text-2xl font-bold">Sign Up</span>
-          <span class="text-muted">{{
-            state === "code"
-              ? "Enter the verification code sent to your email."
-              : "Create an account now."
-          }}</span>
-        </div>
-        <UAlert
-          v-if="errorMessage"
-          icon="i-lucide-circle-x"
-          color="error"
-          title="Error"
-          :description="errorMessage"
-        />
-        <UAlert
-          v-else-if="confirmUser"
-          icon="i-lucide-circle-check"
-          color="success"
-          title="Confirmation sent"
-          :description="`Confirmation email was sent to: ${confirmUser}. Check your email to finish sign up!`"
-        />
-        <!--
-          loading-auto must stay off: with it on (the @nuxt/ui v4 default)
-          UForm flips its own `loading` on submit, and it derives
-          `disabled = props.disabled || loading` which it provides to every
-          field. The await inside its submit wrapper lets Vue apply that to
-          the DOM *before* our handler runs, and a native form.submit()
-          silently omits disabled controls — so the POST reached
-          /password/register carrying only the plain hidden "action" input,
-          with email and password empty. That surfaced as "Invalid email"
-          here and "Invalid credentials" on the login page.
-        -->
-        <UForm
-          class="w-full space-y-4"
-          :schema="state === 'code' ? verifySchema : registerSchema"
-          :state="data"
-          :validate-on="[]"
-          :loading-auto="false"
-          @submit="signUp($event)"
+  <AuthLayout
+    :title="state === 'code' ? 'Verify your email' : 'Create your account'"
+    :subtitle="
+      state === 'code'
+        ? 'Enter the 6-digit verification code sent to your inbox'
+        : 'Get started with NuxFire in just a few minutes'
+    "
+  >
+    <!-- Status Alerts -->
+    <UAlert
+      v-if="errorMessage"
+      icon="i-lucide-circle-alert"
+      color="error"
+      variant="subtle"
+      title="Registration Error"
+      :description="errorMessage"
+    />
+
+    <UAlert
+      v-else-if="confirmUser"
+      icon="i-lucide-mail-check"
+      color="success"
+      variant="subtle"
+      title="Confirmation Sent"
+      :description="`A confirmation link was sent to ${confirmUser}. Please check your email to complete registration.`"
+    />
+
+    <!--
+      loading-auto must stay off: with it on (the @nuxt/ui v4 default),
+      UForm disables input fields before native form.submit() runs,
+      silently omitting them from the POST body and causing authentication errors.
+    -->
+    <UForm
+      class="space-y-4"
+      :schema="state === 'code' ? verifySchema : registerSchema"
+      :state="data"
+      :validate-on="[]"
+      :loading-auto="false"
+      @submit="signUp($event)"
+    >
+      <input
+        type="hidden"
+        name="action"
+        :value="state === 'code' ? 'verify' : 'register'"
+      />
+
+      <!-- Verification Code State -->
+      <template v-if="state === 'code'">
+        <UFormField
+          label="Verification Code"
+          name="code"
+          required
+          description="Enter the one-time code sent to your email"
         >
-          <input
-            type="hidden"
-            name="action"
-            :value="state === 'code' ? 'verify' : 'register'"
+          <UInput
+            v-model="data.code"
+            name="code"
+            icon="i-lucide-key-round"
+            placeholder="000000"
+            size="lg"
+            class="w-full font-mono tracking-widest text-center text-lg"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            autofocus
           />
-
-          <template v-if="state === 'code'">
-            <UFormField label="Verification Code" name="code" required>
-              <UInput
-                v-model="data.code"
-                placeholder="Enter verification code"
-              />
-            </UFormField>
-          </template>
-
-          <template v-else>
-            <UFormField label="Email" name="email" required>
-              <UInput v-model="data.email" placeholder="eg. john@example.com" />
-            </UFormField>
-            <UFormField label="Password" name="password" required>
-              <UInput
-                v-model="data.password"
-                placeholder="**************"
-                type="password"
-              />
-            </UFormField>
-            <UFormField label="Confirm Password" name="repeat" required>
-              <UInput
-                v-model="data.repeat"
-                placeholder="**************"
-                type="password"
-              />
-            </UFormField>
-          </template>
-
-          <UButton :loading="loading" color="neutral" block type="submit">
-            {{ state === "code" ? "Verify Email" : "Sign Up" }}
-          </UButton>
-        </UForm>
-
-        <template
-          v-if="state !== 'code' && (githubAuthEnabled || googleAuthEnabled)"
-        >
-          <USeparator label="OR" />
-          <AuthSocialLogin v-model="errorMessage" :sign-up="true" />
-        </template>
-        <AuthAgreement />
-      </div>
-      <template #footer>
-        <div class="text-center">
-          <!-- <template v-if="state === 'code'"> -->
-          <!--   <form :action="`${origin}/password/register`" method="POST"> -->
-          <!--     <input type="hidden" name="action" value="register" /> -->
-          <!--     <input type="hidden" name="email" :value="email" /> -->
-          <!--     <span -->
-          <!--       >Didn't get the code? -->
-          <!--       <UButton type="submit" variant="link" size="md" class="px-0" -->
-          <!--         >Resend.</UButton -->
-          <!--       ></span -->
-          <!--     > -->
-          <!--   </form> -->
-          <!-- </template> -->
-          <template v-if="true">
-            <span
-              >Already have an account?
-              <UButton
-                @click="
-                  navigateTo(`${origin}/password/authorize`, { external: true })
-                "
-                variant="link"
-                size="md"
-                class="px-0"
-                >Login.</UButton
-              >
-            </span>
-          </template>
-        </div>
+        </UFormField>
       </template>
-    </UCard>
-  </div>
+
+      <!-- Standard Registration Fields -->
+      <template v-else>
+        <UFormField label="Work Email" name="email" required>
+          <UInput
+            v-model="data.email"
+            name="email"
+            type="email"
+            icon="i-lucide-mail"
+            placeholder="name@company.com"
+            size="lg"
+            class="w-full"
+            autocomplete="email"
+            autofocus
+          />
+        </UFormField>
+
+        <UFormField
+          label="Password"
+          name="password"
+          required
+          description="Must be at least 8 characters"
+        >
+          <UInput
+            v-model="data.password"
+            name="password"
+            :type="showPassword ? 'text' : 'password'"
+            icon="i-lucide-lock"
+            placeholder="Create a strong password"
+            size="lg"
+            class="w-full"
+            autocomplete="new-password"
+          >
+            <template #trailing>
+              <UButton
+                :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                class="text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                tabindex="-1"
+                @click="showPassword = !showPassword"
+              />
+            </template>
+          </UInput>
+        </UFormField>
+
+        <UFormField label="Confirm Password" name="repeat" required>
+          <UInput
+            v-model="data.repeat"
+            name="repeat"
+            :type="showRepeatPassword ? 'text' : 'password'"
+            icon="i-lucide-shield-check"
+            placeholder="Confirm your password"
+            size="lg"
+            class="w-full"
+            autocomplete="new-password"
+          >
+            <template #trailing>
+              <UButton
+                :icon="showRepeatPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                :aria-label="showRepeatPassword ? 'Hide password' : 'Show password'"
+                class="text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                tabindex="-1"
+                @click="showRepeatPassword = !showRepeatPassword"
+              />
+            </template>
+          </UInput>
+        </UFormField>
+      </template>
+
+      <UButton
+        type="submit"
+        color="primary"
+        size="lg"
+        block
+        :loading="loading"
+        class="font-semibold shadow-lg shadow-primary-500/20 cursor-pointer mt-2"
+        trailing-icon="i-lucide-arrow-right"
+      >
+        {{ state === "code" ? "Verify Email" : "Create Account" }}
+      </UButton>
+    </UForm>
+
+    <!-- Social Sign Up & Agreement -->
+    <template v-if="state !== 'code'">
+      <template v-if="githubAuthEnabled || googleAuthEnabled">
+        <div class="relative py-1">
+          <USeparator label="Or register with" class="text-xs text-zinc-500 uppercase tracking-wider" />
+        </div>
+        <AuthSocialLogin :sign-up="true" />
+      </template>
+
+      <AuthAgreement />
+    </template>
+
+    <!-- Card Footer -->
+    <template #footer>
+      <p class="text-sm text-zinc-400">
+        Already have an account?
+        <NuxtLink
+          :to="`${origin}/password/authorize`"
+          external
+          class="text-primary-500 hover:text-primary-400 font-medium transition-colors underline underline-offset-4 ml-1"
+        >
+          Sign in
+        </NuxtLink>
+      </p>
+    </template>
+  </AuthLayout>
 </template>
 
 <script setup lang="ts">
-type SignupError =
-  "invalid_email" | "invalid_code" | "email_taken" | "invalid_password" | null;
-
 import { z } from "zod";
+
+type SignupError =
+  | "invalid_email"
+  | "invalid_code"
+  | "email_taken"
+  | "invalid_password"
+  | null;
+
+const ERROR_MESSAGES: Record<string, string> = {
+  invalid_email: "Please enter a valid email address.",
+  invalid_code: "The verification code is invalid or has expired.",
+  email_taken: "An account with this email address already exists.",
+  invalid_password: "Password must be at least 8 characters long.",
+};
 
 const registerSchema = z
   .object({
-    email: z.string().email("Invalid email"),
-    password: z.string().min(8),
-    repeat: z.string().min(8),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    repeat: z.string().min(8, "Password must be at least 8 characters"),
   })
-  .refine((data) => data.password === data.repeat, {
-    message: "Passwords don't match",
+  .refine((val) => val.password === val.repeat, {
+    message: "Passwords do not match",
     path: ["repeat"],
   });
 
@@ -147,32 +214,38 @@ const verifySchema = z.object({
   code: z.string().min(1, "Verification code is required"),
 });
 
+const route = useRoute();
+const notification = useNotification();
+
+const origin = import.meta.dev ? route.query.origin?.toString() || "" : "";
+const state = route.query.state?.toString();
+const err = (route.query.err?.toString() || null) as SignupError;
+
+const {
+  public: { githubAuthEnabled, googleAuthEnabled },
+} = useRuntimeConfig();
+
 const data = reactive({
   email: "",
   password: "",
   repeat: "",
   code: "",
 });
-const loading = ref(false);
-const origin = import.meta.dev ? useRoute().query.origin?.toString() || "" : "";
-const state = useRoute().query.state?.toString();
-const {
-  public: { githubAuthEnabled, googleAuthEnabled },
-} = useRuntimeConfig();
-const confirmUser = ref<string | null>(null);
-// const email = useRoute().query.email?.toString() || "";
-const err = (useRoute().query.err?.toString() || null) as SignupError;
 
-const ERROR_MESSAGES = {
-  invalid_email: "Invalid email",
-  invalid_code: "Invalid verification code",
-  email_taken: "This email is already taken",
-  invalid_password: "Invalid password",
-} as const;
+const loading = ref(false);
+const showPassword = ref(false);
+const showRepeatPassword = ref(false);
+const confirmUser = ref<string | null>(null);
 
 const errorMessage = ref(
-  err ? (ERROR_MESSAGES[err] ?? "Something went wrong") : "",
+  err ? (ERROR_MESSAGES[err] ?? "An unexpected error occurred.") : "",
 );
+
+onMounted(() => {
+  if (err && ERROR_MESSAGES[err]) {
+    notification.error("Registration Error", ERROR_MESSAGES[err]);
+  }
+});
 
 const signUp = (e: Event) => {
   loading.value = true;

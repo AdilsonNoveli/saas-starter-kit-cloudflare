@@ -1,8 +1,8 @@
 <template>
   <LayoutSection>
     <div class="w-full text-center pb-8">
-      <span class="text-3xl font-semibold">{{ title }}</span>
-      <p v-if="subtitle" class="mt-2 text-gray-600 dark:text-gray-400">
+      <span class="text-3xl font-semibold text-highlighted">{{ title }}</span>
+      <p v-if="subtitle" class="mt-2 text-muted">
         {{ subtitle }}
       </p>
     </div>

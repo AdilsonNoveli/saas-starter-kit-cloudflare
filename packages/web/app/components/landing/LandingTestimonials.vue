@@ -1,10 +1,10 @@
 <template>
   <section class="w-full overflow-hidden py-16">
     <div class="container mx-auto max-w-5xl px-4 md:px-8 mb-12 text-center">
-      <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+      <h2 class="text-3xl sm:text-4xl font-bold text-highlighted">
         Trusted by Teams Worldwide
       </h2>
-      <p class="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+      <p class="mt-4 text-lg text-muted max-w-2xl mx-auto">
         Developers and founders rely on NuxFire to ship production-grade products faster.
       </p>
     </div>

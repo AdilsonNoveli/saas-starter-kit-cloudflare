@@ -1,10 +1,22 @@
 <template>
-  <div class="pt-4 text-muted">
+  <p class="text-center text-xs text-zinc-500 leading-relaxed pt-2">
     By continuing, you agree to our
-    <UButton to="#" variant="link" size="md" class="px-0 inline">Terms</UButton>
-    and
-    <UButton to="#" variant="link" size="md" class="px-0 inline">
-      Privacy Policy.</UButton
+    <a
+      href="/terms"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-zinc-400 hover:text-primary transition-colors underline underline-offset-4"
     >
-  </div>
+      Terms of Service
+    </a>
+    and
+    <a
+      href="/privacy"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-zinc-400 hover:text-primary transition-colors underline underline-offset-4"
+    >
+      Privacy Policy
+    </a>.
+  </p>
 </template>

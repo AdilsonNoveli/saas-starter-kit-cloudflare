@@ -1,25 +1,27 @@
 <template>
   <!-- Full-width header flush to top — enterprise grade -->
   <div
-    class="flex justify-between items-center gap-4 px-6 h-14 backdrop-blur-xl bg-white/90 dark:bg-neutral-900/90 border-b border-zinc-200 dark:border-zinc-800"
+    class="grid grid-cols-2 lg:grid-cols-3 items-center px-6 h-14 backdrop-blur-xl bg-white/90 dark:bg-neutral-900/90 border-b border-zinc-200 dark:border-zinc-800"
   >
-    <!-- Left: Brand Logo + Navigation Links -->
-    <div class="flex items-center gap-8 min-w-0">
+    <!-- Left: Brand Logo -->
+    <div class="flex items-center justify-start">
       <NuxtLink to="/" aria-label="NuxFire" class="flex items-center shrink-0">
         <img src="/nuxfire.svg" alt="NuxFire" class="h-8 w-auto dark:hidden" />
         <img src="/nuxfire-white.svg" alt="NuxFire" class="h-8 w-auto hidden dark:block" />
       </NuxtLink>
+    </div>
 
-      <!-- Navigation Links: HOME | DOCS | BLOG | CONTACT -->
+    <!-- Center: Navigation Links (HOME | DOCS | BLOG | CONTACT) -->
+    <div class="hidden lg:flex items-center justify-center">
       <UNavigationMenu
-        class="hidden lg:block text-xs uppercase tracking-widest font-semibold"
+        class="text-xs uppercase tracking-widest font-semibold"
         :items="links"
         variant="link"
       />
     </div>
 
     <!-- Right: ColorMode + Search + Dashboard button -->
-    <div class="hidden lg:flex items-center gap-2 shrink-0">
+    <div class="hidden lg:flex items-center justify-end gap-2 shrink-0">
       <ColorModeSwitch />
       <Search />
       <NuxtLink
@@ -32,7 +34,7 @@
     </div>
 
     <!-- Mobile toggle -->
-    <div class="flex items-center gap-2 lg:hidden">
+    <div class="flex items-center justify-end gap-2 lg:hidden">
       <ColorModeSwitch />
       <UButton
         color="neutral"

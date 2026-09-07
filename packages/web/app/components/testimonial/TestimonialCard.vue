@@ -1,14 +1,16 @@
 <template>
-  <div class="relative p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+  <div
+    class="relative p-6 bg-default rounded-xl shadow-sm border border-default"
+  >
     <div class="absolute -top-4 -left-2">
       <UIcon
         name="i-carbon-quotes"
-        class="w-8 h-8 text-primary-500 dark:text-primary-400"
+        class="w-8 h-8 text-primary"
       />
     </div>
 
     <div class="space-y-6">
-      <p class="text-gray-700 dark:text-gray-300 relative z-10">
+      <p class="text-toned relative z-10">
         {{ testimonial }}
       </p>
 
@@ -16,14 +18,14 @@
       <div class="flex items-center gap-4">
         <UAvatar :src="avatar" :alt="name" size="lg" />
         <div>
-          <h4 class="font-medium text-gray-900 dark:text-white">
+          <h4 class="font-medium text-highlighted">
             {{ name }}
           </h4>
           <a
             :href="socialLink"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
+            class="text-sm text-muted hover:text-primary transition-colors"
           >
             {{ socialHandle }}
           </a>

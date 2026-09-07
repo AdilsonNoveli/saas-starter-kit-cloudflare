@@ -1,133 +1,196 @@
 <template>
-  <div class="w-screen min-h-screen flex items-center justify-center p-2">
-    <UCard class="container max-w-md mx-auto">
-      <div class="space-y-4">
-        <div class="items-center flex flex-col space-y-3">
-          <AuthIcon />
-          <span class="text-2xl font-bold">Forgot Password</span>
-          <span class="text-muted">{{
-            state === "code"
-              ? "Enter the verification code sent to your email."
-              : state === "update"
-                ? "Enter your new password."
-                : "Enter your email to reset your password."
-          }}</span>
-        </div>
+  <AuthLayout
+    :title="pageTitle"
+    :subtitle="pageSubtitle"
+  >
+    <!-- Status Alerts -->
+    <UAlert
+      v-if="successMessage"
+      icon="i-lucide-circle-check"
+      color="success"
+      variant="subtle"
+      title="Success"
+      :description="successMessage"
+    />
 
-        <UAlert
-          v-if="successMessage"
-          icon="i-lucide-circle-check"
-          color="success"
-          title="Success"
-          :description="successMessage"
-        />
+    <UAlert
+      v-if="errorMessage"
+      icon="i-lucide-circle-alert"
+      color="error"
+      variant="subtle"
+      title="Error"
+      :description="errorMessage"
+    />
 
-        <UAlert
-          v-if="errorMessage"
-          icon="i-lucide-circle-x"
-          color="error"
-          title="Error"
-          :description="errorMessage"
-        />
+    <!--
+      loading-auto must stay off: with it on (the @nuxt/ui v4 default),
+      UForm disables input fields before native form.submit() runs,
+      silently omitting them from the POST body and causing authentication errors.
+    -->
+    <UForm
+      class="space-y-4"
+      :schema="formSchema"
+      :state="data"
+      :validate-on="[]"
+      :loading-auto="false"
+      @submit="handleSubmit"
+    >
+      <input
+        type="hidden"
+        name="action"
+        :value="
+          state === 'code'
+            ? 'verify'
+            : state === 'update'
+              ? 'update'
+              : 'code'
+        "
+      />
 
-        <!-- loading-auto off — see the comment on signup.vue's UForm: it
-             disables the fields before our native submit runs, which drops
-             them from the POST entirely. -->
-        <UForm
-          class="w-full space-y-4"
-          :schema="formSchema"
-          :state="data"
-          :validate-on="[]"
-          :loading-auto="false"
-          @submit="handleSubmit"
-        >
-          <input
-            type="hidden"
-            name="action"
-            :value="
-              state === 'code'
-                ? 'verify'
-                : state === 'update'
-                  ? 'update'
-                  : 'code'
-            "
+      <!-- Step 1: Request code -->
+      <template v-if="state === 'start'">
+        <UFormField label="Account Email" name="email" required>
+          <UInput
+            v-model="data.email"
+            name="email"
+            type="email"
+            icon="i-lucide-mail"
+            placeholder="name@company.com"
+            size="lg"
+            class="w-full"
+            autocomplete="email"
+            autofocus
           />
-
-          <template v-if="state === 'start'">
-            <UFormField label="Email" name="email" required>
-              <UInput v-model="data.email" placeholder="eg. john@example.com" />
-            </UFormField>
-          </template>
-
-          <template v-if="state === 'code'">
-            <UFormField label="Verification Code" name="code" required>
-              <UInput
-                v-model="data.code"
-                placeholder="Enter verification code"
-                autocomplete="one-time-code"
-              />
-            </UFormField>
-          </template>
-
-          <template v-if="state === 'update'">
-            <UFormField label="New Password" name="password" required>
-              <UInput
-                v-model="data.password"
-                type="password"
-                placeholder="**************"
-                autocomplete="new-password"
-              />
-            </UFormField>
-            <UFormField label="Confirm Password" name="repeat" required>
-              <UInput
-                v-model="data.repeat"
-                type="password"
-                placeholder="**************"
-                autocomplete="new-password"
-              />
-            </UFormField>
-          </template>
-
-          <UButton :loading="loading" color="neutral" block type="submit">
-            {{
-              state === "code"
-                ? "Verify Code"
-                : state === "update"
-                  ? "Update Password"
-                  : "Send Code"
-            }}
-          </UButton>
-        </UForm>
-
-        <template v-if="state === 'code'">
-          <form :action="`${origin}/password/change`" method="POST">
-            <input type="hidden" name="action" value="code" />
-            <input type="hidden" name="email" :value="data.email" />
-            <div class="text-center space-x-1">
-              <span>Didn't get the code?</span>
-              <UButton type="submit" variant="link" size="md" class="px-0">
-                Resend.
-              </UButton>
-            </div>
-          </form>
-        </template>
-      </div>
-      <template #footer>
-        <div class="text-center">
-          <span>Remember your password? </span>
-          <UButton
-            @click="
-              navigateTo(`${origin}/password/authorize`, { external: true })
-            "
-            variant="link"
-            size="md"
-            class="px-0"
-            >Login.</UButton
-          >
-        </div>
+        </UFormField>
       </template>
-    </UCard>
-  </div>
+
+      <!-- Step 2: Verification code -->
+      <template v-if="state === 'code'">
+        <UFormField
+          label="Verification Code"
+          name="code"
+          required
+          description="Enter the one-time code sent to your email"
+        >
+          <UInput
+            v-model="data.code"
+            name="code"
+            icon="i-lucide-key-round"
+            placeholder="000000"
+            size="lg"
+            class="w-full font-mono tracking-widest text-center text-lg"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            autofocus
+          />
+        </UFormField>
+      </template>
+
+      <!-- Step 3: New password -->
+      <template v-if="state === 'update'">
+        <UFormField
+          label="New Password"
+          name="password"
+          required
+          description="Must be at least 8 characters"
+        >
+          <UInput
+            v-model="data.password"
+            name="password"
+            :type="showPassword ? 'text' : 'password'"
+            icon="i-lucide-lock"
+            placeholder="Enter new password"
+            size="lg"
+            class="w-full"
+            autocomplete="new-password"
+            autofocus
+          >
+            <template #trailing>
+              <UButton
+                :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                class="text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                tabindex="-1"
+                @click="showPassword = !showPassword"
+              />
+            </template>
+          </UInput>
+        </UFormField>
+
+        <UFormField label="Confirm New Password" name="repeat" required>
+          <UInput
+            v-model="data.repeat"
+            name="repeat"
+            :type="showRepeatPassword ? 'text' : 'password'"
+            icon="i-lucide-shield-check"
+            placeholder="Confirm new password"
+            size="lg"
+            class="w-full"
+            autocomplete="new-password"
+          >
+            <template #trailing>
+              <UButton
+                :icon="showRepeatPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                :aria-label="showRepeatPassword ? 'Hide password' : 'Show password'"
+                class="text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                tabindex="-1"
+                @click="showRepeatPassword = !showRepeatPassword"
+              />
+            </template>
+          </UInput>
+        </UFormField>
+      </template>
+
+      <UButton
+        type="submit"
+        color="primary"
+        size="lg"
+        block
+        :loading="loading"
+        class="font-semibold shadow-lg shadow-primary-500/20 cursor-pointer mt-2"
+        trailing-icon="i-lucide-arrow-right"
+      >
+        {{ submitButtonLabel }}
+      </UButton>
+    </UForm>
+
+    <!-- Resend action in code state -->
+    <template v-if="state === 'code'">
+      <div class="text-center pt-2">
+        <form :action="`${origin}/password/change`" method="POST" class="inline-flex items-center gap-1.5 text-sm text-zinc-400">
+          <input type="hidden" name="action" value="code" />
+          <input type="hidden" name="email" :value="data.email" />
+          <span>Didn't receive the code?</span>
+          <button
+            type="submit"
+            class="text-primary-500 hover:text-primary-400 font-medium transition-colors underline underline-offset-4 cursor-pointer"
+          >
+            Resend
+          </button>
+        </form>
+      </div>
+    </template>
+
+    <!-- Card Footer -->
+    <template #footer>
+      <p class="text-sm text-zinc-400">
+        Remember your password?
+        <NuxtLink
+          :to="`${origin}/password/authorize`"
+          external
+          class="text-primary-500 hover:text-primary-400 font-medium transition-colors underline underline-offset-4 ml-1"
+        >
+          Sign in
+        </NuxtLink>
+      </p>
+    </template>
+  </AuthLayout>
 </template>
 
 <script setup lang="ts">
@@ -140,11 +203,21 @@ type ForgotError =
   | "password_mismatch"
   | null;
 
-const state = (useRoute().query.state?.toString() || "start") as
+const ERROR_MESSAGES: Record<string, string> = {
+  invalid_email: "Please enter a valid email address.",
+  invalid_code: "The verification code is invalid or has expired.",
+  invalid_password: "Password must be at least 8 characters long.",
+  password_mismatch: "The entered passwords do not match.",
+};
+
+const route = useRoute();
+const notification = useNotification();
+
+const state = (route.query.state?.toString() || "start") as
   "start" | "code" | "update";
 
 const startSchema = z.object({
-  email: z.string().email("Invalid email"),
+  email: z.string().email("Invalid email address"),
 });
 
 const codeSchema = z.object({
@@ -154,10 +227,10 @@ const codeSchema = z.object({
 const updateSchema = z
   .object({
     password: z.string().min(8, "Password must be at least 8 characters"),
-    repeat: z.string(),
+    repeat: z.string().min(8, "Password must be at least 8 characters"),
   })
-  .refine((data) => data.password === data.repeat, {
-    message: "Passwords don't match",
+  .refine((val) => val.password === val.repeat, {
+    message: "Passwords do not match",
     path: ["repeat"],
   });
 
@@ -172,7 +245,7 @@ const formSchema = computed(() => {
   }
 });
 
-const email = useRoute().query.email?.toString() || "";
+const email = route.query.email?.toString() || "";
 const data = reactive({
   email,
   code: "",
@@ -180,22 +253,41 @@ const data = reactive({
   repeat: "",
 });
 
-const origin = import.meta.dev ? useRoute().query.origin?.toString() || "" : "";
+const origin = import.meta.dev ? route.query.origin?.toString() || "" : "";
 const loading = ref(false);
-const errorMessage = ref("");
+const showPassword = ref(false);
+const showRepeatPassword = ref(false);
 const successMessage = ref("");
 
-const ERROR_MESSAGES = {
-  invalid_email: "Invalid email address",
-  invalid_code: "Invalid verification code",
-  invalid_password: "Password must be at least 8 characters",
-  password_mismatch: "Passwords don't match",
-} as const;
+const err = (route.query.err?.toString() || null) as ForgotError;
+const errorMessage = ref(
+  err ? (ERROR_MESSAGES[err] ?? "An unexpected error occurred.") : "",
+);
 
-const err = (useRoute().query.err?.toString() || null) as ForgotError;
-if (err) {
-  errorMessage.value = ERROR_MESSAGES[err] ?? "Something went wrong";
-}
+onMounted(() => {
+  if (err && ERROR_MESSAGES[err]) {
+    notification.error("Reset Error", ERROR_MESSAGES[err]);
+  }
+});
+
+const pageTitle = computed(() => {
+  if (state === "code") return "Check your email";
+  if (state === "update") return "Create new password";
+  return "Reset your password";
+});
+
+const pageSubtitle = computed(() => {
+  if (state === "code")
+    return `Enter the 6-digit verification code sent to ${data.email || "your email"}`;
+  if (state === "update") return "Choose a new strong password for your account";
+  return "Enter your email to receive a password reset code";
+});
+
+const submitButtonLabel = computed(() => {
+  if (state === "code") return "Verify Code";
+  if (state === "update") return "Update Password";
+  return "Send Reset Code";
+});
 
 const handleSubmit = (e: Event) => {
   loading.value = true;

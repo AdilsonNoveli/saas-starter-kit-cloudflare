@@ -1,10 +1,13 @@
 <template>
-  <NuxtLink to="#">
-    <UIcon
-      name="i-lucide-user"
-      class="w-16 h-16"
-      filled
-      :font-controlled="false"
+  <NuxtLink
+    to="/"
+    aria-label="NuxFire"
+    class="inline-flex items-center justify-center p-2 rounded-xl transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+  >
+    <img
+      src="/nuxfire-white.svg"
+      alt="NuxFire"
+      class="h-8 w-auto block"
     />
   </NuxtLink>
 </template>

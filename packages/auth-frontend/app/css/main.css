@@ -1,6 +1,35 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-.text-muted {
-  color: var(--ui-text-muted);
+:root {
+  color-scheme: dark;
+}
+
+@theme {
+  --font-family-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+
+  --color-primary-50: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
+  --color-primary-300: #fdba74;
+  --color-primary-400: #fb923c;
+  --color-primary-500: #f09237;
+  --color-primary-600: #e07016;
+  --color-primary-700: #dd2c00;
+  --color-primary-800: #b92400;
+  --color-primary-900: #8c1b00;
+  --color-primary-950: #4a0c00;
+}
+
+body {
+  background-color: var(--ui-bg, #09090b);
+  color: var(--ui-text, #fafafa);
+  font-family: var(--font-family-sans);
+  min-height: 100vh;
+  margin: 0;
+}
+
+.auth-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
+  background-size: 24px 24px;
 }

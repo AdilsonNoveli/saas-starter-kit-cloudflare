@@ -1,43 +1,60 @@
 <template>
-  <div v-if="githubAuthEnabled || googleAuthEnabled" class="space-y-2">
-    <UButton
-      v-if="githubAuthEnabled"
-      :loading="loading === 'github'"
-      color="neutral"
-      :label="`${signUp ? 'Sign Up' : 'Sign In'} with GitHub`"
-      icon="i-simple-icons-github"
-      block
-      @click="signIn('github')"
-    />
-    <UButton
-      v-if="googleAuthEnabled"
-      :loading="loading === 'google'"
-      color="neutral"
-      :label="`${signUp ? 'Sign Up' : 'Sign In'} with Google`"
-      icon="i-simple-icons-google"
-      block
-      @click="signIn('google')"
-    />
+  <div v-if="hasOAuth" class="space-y-3">
+    <div
+      :class="[
+        githubAuthEnabled && googleAuthEnabled
+          ? 'grid grid-cols-2 gap-3'
+          : 'space-y-2',
+      ]"
+    >
+      <UButton
+        v-if="githubAuthEnabled"
+        :loading="loadingProvider === 'github'"
+        variant="outline"
+        color="neutral"
+        size="md"
+        icon="i-simple-icons-github"
+        block
+        class="font-medium hover:border-zinc-700 transition-colors"
+        @click="handleSocialSignIn('github')"
+      >
+        GitHub
+      </UButton>
+
+      <UButton
+        v-if="googleAuthEnabled"
+        :loading="loadingProvider === 'google'"
+        variant="outline"
+        color="neutral"
+        size="md"
+        icon="i-simple-icons-google"
+        block
+        class="font-medium hover:border-zinc-700 transition-colors"
+        @click="handleSocialSignIn('google')"
+      >
+        Google
+      </UButton>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const loading = ref<string>("");
-const { signUp } = defineProps<{
+defineProps<{
   signUp?: boolean;
 }>();
 
-// Set from infra/auth.ts at build time, based on whether real credentials
-// are actually loaded for that provider — not just whether it's flagged on
-// in config.ts. A button for an unconfigured provider would otherwise
-// error the moment it's clicked.
 const {
   public: { githubAuthEnabled, googleAuthEnabled },
 } = useRuntimeConfig();
 
-const origin = import.meta.dev ? useRoute().query.origin?.toString() || "" : "";
-async function signIn(provider: string) {
-  loading.value = provider;
+const hasOAuth = computed(() => Boolean(githubAuthEnabled || googleAuthEnabled));
+const loadingProvider = ref<string>("");
+
+const route = useRoute();
+const origin = import.meta.dev ? route.query.origin?.toString() || "" : "";
+
+function handleSocialSignIn(provider: "github" | "google") {
+  loadingProvider.value = provider;
   window.location.href = `${origin}/${provider}/authorize`;
 }
 </script>

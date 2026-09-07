@@ -2,10 +2,10 @@
   <div id="landing-pricing">
     <LayoutSection :has-border="false">
       <div class="text-center mb-16">
-        <h2 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <h2 class="text-4xl font-bold tracking-tight text-highlighted">
           Simple, Transparent Pricing
         </h2>
-        <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
+        <p class="mt-4 text-lg text-muted">
           One plan, everything included. Scale as you grow.
         </p>
       </div>

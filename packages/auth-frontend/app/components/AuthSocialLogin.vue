@@ -15,7 +15,7 @@
         size="md"
         icon="i-simple-icons-github"
         block
-        class="font-medium hover:border-night-600 transition-colors"
+        class="font-medium hover:border-accented transition-colors"
         @click="handleSocialSignIn('github')"
       >
         GitHub
@@ -29,7 +29,7 @@
         size="md"
         icon="i-simple-icons-google"
         block
-        class="font-medium hover:border-night-600 transition-colors"
+        class="font-medium hover:border-accented transition-colors"
         @click="handleSocialSignIn('google')"
       >
         Google

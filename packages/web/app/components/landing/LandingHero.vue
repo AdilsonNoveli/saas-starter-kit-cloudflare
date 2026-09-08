@@ -6,7 +6,7 @@ const heroSubtitle = ref(
     "A complete starter kit with everything you need to ",
     h(
       "span",
-      { class: "px-1 font-bold bg-orange-500 text-neutral-950 rounded" },
+      { class: "px-1 font-bold bg-fire-500 text-night-950 rounded" },
       "launch your SaaS in days, not months",
     ),
     ".",

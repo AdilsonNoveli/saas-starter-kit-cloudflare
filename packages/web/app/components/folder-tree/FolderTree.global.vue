@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-gray-100/20 dark:bg-gray-800/30 backdrop-blur-lg rounded-lg w-full"
+    class="bg-elevated/30 backdrop-blur-lg rounded-lg w-full"
   >
     <FolderTreeItem
       v-for="path in processedPaths"

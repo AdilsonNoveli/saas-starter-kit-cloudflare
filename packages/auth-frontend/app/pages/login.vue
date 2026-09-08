@@ -95,7 +95,7 @@
             <NuxtLink
               :to="`${origin}/password/change`"
               external
-              class="text-xs text-flame-400 hover:text-flame-300 font-medium transition-colors"
+              class="text-xs text-primary hover:text-primary/75 font-medium transition-colors"
               tabindex="-1"
             >
               Forgot password?
@@ -120,7 +120,7 @@
                 variant="ghost"
                 size="xs"
                 :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                class="text-night-400 hover:text-night-200 cursor-pointer"
+                class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showPassword = !showPassword"
               />
@@ -147,7 +147,7 @@
     <template v-if="state !== 'code'">
       <template v-if="githubAuthEnabled || googleAuthEnabled">
         <div class="relative py-1">
-          <USeparator label="Or continue with" class="text-xs text-night-500 uppercase tracking-wider" />
+          <USeparator label="Or continue with" class="text-xs text-dimmed uppercase tracking-wider" />
         </div>
         <AuthSocialLogin />
       </template>
@@ -158,14 +158,14 @@
     <!-- Card Footer Links -->
     <template #footer>
       <template v-if="state === 'code'">
-        <div class="flex flex-col items-center gap-2 text-sm text-night-300">
+        <div class="flex flex-col items-center gap-2 text-sm text-muted">
           <form :action="`${origin}/code/authorize`" method="POST" class="inline-flex items-center gap-1.5">
             <input type="hidden" name="action" value="request" />
             <input type="hidden" name="email" :value="email" />
             <span>Didn't receive a code?</span>
             <button
               type="submit"
-              class="text-flame-400 hover:text-flame-300 font-medium transition-colors underline underline-offset-4 cursor-pointer"
+              class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 cursor-pointer"
             >
               Resend
             </button>
@@ -174,7 +174,7 @@
           <NuxtLink
             :to="`${origin}/password/authorize`"
             external
-            class="text-xs text-night-400 hover:text-night-200 transition-colors inline-flex items-center gap-1 mt-1"
+            class="text-xs text-dimmed hover:text-muted transition-colors inline-flex items-center gap-1 mt-1"
           >
             <UIcon name="i-lucide-arrow-left" class="w-3.5 h-3.5" />
             Return to email sign in
@@ -183,12 +183,12 @@
       </template>
 
       <template v-else>
-        <p class="text-sm text-night-300">
+        <p class="text-sm text-muted">
           Don't have an account?
           <NuxtLink
             :to="`${origin}/password/register`"
             external
-            class="text-flame-400 hover:text-flame-300 font-medium transition-colors underline underline-offset-4 ml-1"
+            class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 ml-1"
           >
             Create account
           </NuxtLink>

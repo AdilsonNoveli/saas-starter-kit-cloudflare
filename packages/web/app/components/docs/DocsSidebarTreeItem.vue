@@ -33,7 +33,7 @@
               :icon="link.icon"
               color="neutral"
               variant="ghost"
-              class="w-full text-zinc-700 dark:text-zinc-300 font-medium hover:bg-zinc-100 dark:hover:bg-zinc-900/60"
+              class="w-full text-default font-medium hover:bg-elevated"
             >
               <span class="truncate">{{ link.title }}</span>
               <span v-for="(badge, i) in link.navBadges" :key="i">
@@ -59,8 +59,8 @@
       class="justify-start w-full text-xs font-normal transition-all rounded-md"
       :class="[
         isActive
-          ? '!text-primary-600 dark:!text-primary-400 bg-primary-500/10 dark:bg-primary-950/40 font-semibold ring-1 ring-primary-500/25'
-          : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900/50',
+          ? '!text-primary bg-primary/10 font-semibold ring-1 ring-primary/25'
+          : 'text-muted hover:text-highlighted hover:bg-elevated',
       ]"
       block
       variant="ghost"

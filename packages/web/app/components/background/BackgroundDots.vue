@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="dots" class="fixed bg-zinc-50 dark:bg-neutral-900 w-screen h-screen z-[-2]">
+    <div id="dots" class="fixed bg-default w-screen h-screen z-[-2]">
       <div
         id="overlay"
         :style="overlayVars"
@@ -38,8 +38,8 @@ const overlayVars = computed(() => ({
 #overlay {
   background: radial-gradient(
     circle,
-    rgba(240, 146, 55, 0.09) 0%,
-    rgba(221, 44, 0, 0.04) 45%,
+    color-mix(in srgb, var(--color-fire-500) 9%, transparent) 0%,
+    color-mix(in srgb, var(--color-flame-700) 4%, transparent) 45%,
     transparent 70%
   );
 }

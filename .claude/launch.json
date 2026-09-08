@@ -8,6 +8,22 @@
       "cwd": "packages/web",
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "app",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "packages/app",
+      "port": 3001,
+      "autoPort": true
+    },
+    {
+      "name": "auth-frontend",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "packages/auth-frontend",
+      "port": 3002,
+      "autoPort": true
     }
   ]
 }

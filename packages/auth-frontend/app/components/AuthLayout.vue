@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen w-screen flex flex-col justify-center items-center px-4 py-8 relative overflow-hidden bg-night-950 text-night-100 selection:bg-flame-500/30 selection:text-flame-200"
+    class="min-h-screen w-screen flex flex-col justify-center items-center px-4 py-8 relative overflow-hidden bg-default text-default selection:bg-primary/30 selection:text-primary"
   >
     <!-- Ambient subtle background pattern -->
     <div
@@ -16,7 +16,7 @@
           <NuxtLink
             to="/"
             aria-label="NuxFire"
-            class="transition-opacity hover:opacity-90 inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-flame-500 rounded-lg p-1"
+            class="transition-opacity hover:opacity-90 inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-1"
           >
             <img
               src="/nuxfire-white.svg"
@@ -27,18 +27,18 @@
         </slot>
       </div>
 
-      <!-- Center Card (DESIGN_SYSTEM: night-800 background, night-700 border, 1px border without heavy shadows) -->
+      <!-- Center Card: raised surface (bg-elevated) on a border of the same tone, one step above the page background — no shadow. -->
       <main class="w-full">
         <div
-          class="rounded-2xl border border-night-700 bg-night-800 p-6 sm:p-8 space-y-6"
+          class="rounded-2xl border border-default bg-elevated p-6 sm:p-8 space-y-6"
         >
           <!-- Header: Title and subtitle -->
           <header v-if="$slots.header || title" class="text-center space-y-1.5">
             <slot name="header">
-              <h1 class="text-2xl font-bold tracking-tight text-night-50">
+              <h1 class="text-2xl font-bold tracking-tight text-highlighted">
                 {{ title }}
               </h1>
-              <p v-if="subtitle" class="text-sm text-night-300">
+              <p v-if="subtitle" class="text-sm text-muted">
                 {{ subtitle }}
               </p>
             </slot>
@@ -50,7 +50,7 @@
           <!-- Card Footer -->
           <footer
             v-if="$slots.footer"
-            class="pt-3 border-t border-night-700 text-center text-sm text-night-300"
+            class="pt-3 border-t border-default text-center text-sm text-muted"
           >
             <slot name="footer" />
           </footer>
@@ -58,7 +58,7 @@
       </main>
 
       <!-- Bottom sub-footer -->
-      <footer class="w-full text-center text-xs text-night-500 mt-5">
+      <footer class="w-full text-center text-xs text-dimmed mt-5">
         <slot name="subfooter">
           <span>NuxFire Enterprise Security</span>
         </slot>

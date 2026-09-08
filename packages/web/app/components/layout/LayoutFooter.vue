@@ -1,5 +1,5 @@
 <template>
-  <footer class="w-full border-t border-zinc-200 dark:border-zinc-800 bg-white/60 dark:bg-neutral-900/60 backdrop-blur-sm">
+  <footer class="w-full border-t border-default bg-default/60 backdrop-blur-sm">
     <div class="container mx-auto max-w-6xl px-6 py-12">
       <div class="grid gap-8 grid-cols-2 md:grid-cols-4">
         <!-- Brand -->

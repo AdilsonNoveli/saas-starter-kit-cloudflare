@@ -1,6 +1,6 @@
 <template>
   <footer
-    class="flex gap-1 lg:gap-0 flex-col lg:flex-row items-center justify-between py-3 px-4 sm:px-8 border-t border-zinc-200 dark:border-zinc-800/80 text-sm"
+    class="flex gap-1 lg:gap-0 flex-col lg:flex-row items-center justify-between py-3 px-4 sm:px-8 border-t border-default text-sm"
   >
 
     <div class="text-muted">© 2026 NuxFire</div>

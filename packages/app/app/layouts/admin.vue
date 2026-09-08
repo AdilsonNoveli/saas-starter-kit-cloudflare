@@ -1,28 +1,38 @@
 <template>
-  <UDashboardGroup unit="rem">
+  <UDashboardGroup unit="rem" :persistent="false">
     <UDashboardSidebar
       id="admin"
       v-model:open="open"
+      v-model:collapsed="collapsed"
+      :collapsed-size="4.5"
+      :default-size="16"
       collapsible
       resizable
-      :ui="{ footer: 'lg:border-t lg:border-default' }"
+      :ui="{
+        root: 'border-e border-default',
+        footer: 'lg:border-t lg:border-default',
+      }"
     >
-      <template #header="{ collapsed }">
+      <template #header="{ collapsed: isCollapsed }">
         <div
           class="flex items-center gap-2 w-full py-2 px-2"
-          :class="collapsed && 'justify-center'"
+          :class="isCollapsed ? 'flex-col items-center gap-2' : 'justify-between'"
         >
-          <UIcon name="i-lucide-shield-check" class="size-5 shrink-0 text-warning" />
-          <template v-if="!collapsed">
-            <span class="font-semibold truncate text-highlighted">Platform</span>
-            <UBadge label="Admin" color="warning" variant="subtle" size="sm" />
-          </template>
+          <UDashboardSidebarCollapse v-if="isCollapsed" />
+          <div class="flex items-center gap-2" :class="isCollapsed && 'justify-center'">
+            <UIcon name="i-lucide-shield-check" class="size-5 shrink-0 text-warning" />
+            <template v-if="!isCollapsed">
+              <span class="font-semibold truncate text-highlighted">Platform</span>
+              <UBadge label="Admin" color="warning" variant="subtle" size="sm" />
+            </template>
+          </div>
+          <UDashboardSidebarCollapse v-if="!isCollapsed" />
         </div>
       </template>
 
-      <template #default="{ collapsed }">
+      <template #default="{ collapsed: isCollapsed }">
         <UNavigationMenu
-          :collapsed="collapsed"
+          :collapsed="isCollapsed"
           :items="links"
           orientation="vertical"
           tooltip
@@ -31,8 +41,8 @@
         />
       </template>
 
-      <template #footer="{ collapsed }">
-        <AccountUserDropdown :collapsed="collapsed" />
+      <template #footer="{ collapsed: isCollapsed }">
+        <AccountUserDropdown :collapsed="isCollapsed" />
       </template>
     </UDashboardSidebar>
 
@@ -50,6 +60,7 @@ import type { NavigationMenuItem } from "@nuxt/ui";
  * glance, because the actions here are cross-tenant.
  */
 const open = ref(false);
+const collapsed = ref(true);
 
 const closeSidebar = () => {
   open.value = false;
@@ -70,6 +81,7 @@ const route = useRoute();
  * page can fix, for no more coverage than a single read gives.
  */
 onMounted(async () => {
+  collapsed.value = true;
   if (route.path === "/admin/mfa") return;
 
   try {

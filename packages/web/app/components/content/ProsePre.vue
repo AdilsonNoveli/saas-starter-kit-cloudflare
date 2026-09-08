@@ -5,7 +5,7 @@
   >
     <div
       v-if="filename"
-      class="flex items-center border-b border-gray-200 dark:border-gray-800 px-3 py-2 font-mono text-sm"
+      class="flex items-center border-b border-default px-3 py-2 font-mono text-sm"
     >
       {{ filename }}
       <CodeCopy :code class="ml-auto" />
@@ -14,7 +14,7 @@
     <span v-else class="absolute right-2 top-2 z-10">
       <CodeCopy :code />
     </span>
-    <div class="bg-primary-50/5 dark:bg-primary-950/5">
+    <div class="bg-primary/5">
       <div
         class="overflow-x-auto py-3 text-sm"
         :class="[!filename && 'inline-copy', !language && 'pl-3']"

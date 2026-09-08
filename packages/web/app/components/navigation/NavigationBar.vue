@@ -1,7 +1,7 @@
 <template>
   <!-- Full-width header flush to top — enterprise grade -->
   <div
-    class="grid grid-cols-2 lg:grid-cols-3 items-center px-6 h-14 backdrop-blur-xl bg-white/90 dark:bg-neutral-900/90 border-b border-zinc-200 dark:border-zinc-800"
+    class="grid grid-cols-2 lg:grid-cols-3 items-center px-6 h-14 backdrop-blur-xl bg-default/90 border-b border-default"
   >
     <!-- Left: Brand Logo -->
     <div class="flex items-center justify-start">
@@ -27,7 +27,7 @@
       <NuxtLink
         :to="useRuntimeConfig().public.appUrl || '/'"
         external
-        class="ml-1 inline-flex items-center justify-center h-8 px-4 text-xs font-semibold tracking-wide rounded border border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 bg-transparent text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 dark:hover:text-white transition-colors"
+        class="ml-1 inline-flex items-center justify-center h-8 px-4 text-xs font-semibold tracking-wide rounded border border-default hover:border-accented bg-transparent text-default hover:text-highlighted transition-colors"
       >
         Dashboard
       </NuxtLink>
@@ -48,7 +48,7 @@
 
   <!-- Mobile Drawer -->
   <div
-    class="block lg:hidden overflow-hidden transition-all duration-300 bg-white/95 dark:bg-neutral-900/95 border-b border-zinc-200 dark:border-zinc-800 backdrop-blur-xl"
+    class="block lg:hidden overflow-hidden transition-all duration-300 bg-default/95 border-b border-default backdrop-blur-xl"
     :class="[show ? 'h-auto p-4' : 'h-0 p-0']"
   >
     <Search class="mb-3" />
@@ -57,11 +57,11 @@
       :items="mobileLinks"
       variant="link"
     />
-    <div class="pt-3 mt-3 flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800">
+    <div class="pt-3 mt-3 flex items-center justify-between border-t border-default">
       <NuxtLink
         :to="useRuntimeConfig().public.appUrl || '/'"
         external
-        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-700 dark:text-zinc-200 transition-colors"
+        class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium rounded border border-default bg-transparent text-default transition-colors"
       >
         Dashboard
       </NuxtLink>

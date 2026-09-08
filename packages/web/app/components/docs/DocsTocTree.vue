@@ -3,8 +3,8 @@
     <li v-for="link in links" :key="link.id" class="space-y-1">
       <NuxtLink
         :to="`#${link.id}`"
-        class="block text-xs transition-colors duration-200 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-        :class="[activeHeadings.includes(link.id) && '!text-primary-500 dark:!text-primary-400 font-medium']"
+        class="block text-xs transition-colors duration-200 text-muted hover:text-highlighted"
+        :class="[activeHeadings.includes(link.id) && '!text-primary font-medium']"
       >
         {{ link.text }}
       </NuxtLink>

@@ -6,7 +6,7 @@
         <span class="text-muted">Blog</span>
       </div>
       <USeparator />
-      <div v-if="posts?.length" class="divide-y divide-gray-200 dark:divide-gray-800">
+      <div v-if="posts?.length" class="divide-y divide-default">
         <div v-for="post in posts" :key="post.path" class="py-4 space-y-1">
           <UButton :to="post.path" variant="link" class="p-0 text-xl">
             {{ post.title }}

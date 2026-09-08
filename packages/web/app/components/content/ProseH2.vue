@@ -1,7 +1,7 @@
 <template>
   <h2
     :id
-    class="scroll-m-20 border-b border-gray-200 dark:border-gray-800 pb-2 text-3xl font-semibold tracking-tight transition-colors [&:not(:first-child)]:mt-10"
+    class="scroll-m-20 border-b border-default pb-2 text-3xl font-semibold tracking-tight transition-colors [&:not(:first-child)]:mt-10"
   >
     <NuxtLink v-if="id && generate" :href="`#${id}`">
       <slot />

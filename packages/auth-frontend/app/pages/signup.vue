@@ -106,7 +106,7 @@
                 variant="ghost"
                 size="xs"
                 :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                class="text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showPassword = !showPassword"
               />
@@ -132,7 +132,7 @@
                 variant="ghost"
                 size="xs"
                 :aria-label="showRepeatPassword ? 'Hide password' : 'Show password'"
-                class="text-night-400 hover:text-night-200 cursor-pointer"
+                class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showRepeatPassword = !showRepeatPassword"
               />
@@ -158,7 +158,7 @@
     <template v-if="state !== 'code'">
       <template v-if="githubAuthEnabled || googleAuthEnabled">
         <div class="relative py-1">
-          <USeparator label="Or register with" class="text-xs text-night-500 uppercase tracking-wider" />
+          <USeparator label="Or register with" class="text-xs text-dimmed uppercase tracking-wider" />
         </div>
         <AuthSocialLogin :sign-up="true" />
       </template>
@@ -168,12 +168,12 @@
 
     <!-- Card Footer -->
     <template #footer>
-      <p class="text-sm text-night-300">
+      <p class="text-sm text-muted">
         Already have an account?
         <NuxtLink
           :to="`${origin}/password/authorize`"
           external
-          class="text-flame-400 hover:text-flame-300 font-medium transition-colors underline underline-offset-4 ml-1"
+          class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 ml-1"
         >
           Sign in
         </NuxtLink>

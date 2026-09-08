@@ -1,20 +1,33 @@
 <template>
-  <UDashboardGroup unit="rem">
+  <UDashboardGroup unit="rem" :persistent="false">
     <UDashboardSidebar
       id="dashboard"
       v-model:open="open"
+      v-model:collapsed="collapsed"
+      :collapsed-size="4.5"
+      :default-size="16"
       collapsible
       resizable
-      :ui="{ footer: 'lg:border-t lg:border-default' }"
+      :ui="{
+        root: 'border-e border-default',
+        footer: 'lg:border-t lg:border-default',
+      }"
     >
-      <template #header="{ collapsed }">
-        <TeamSwitcherDropdown :collapsed="collapsed" />
+      <template #header="{ collapsed: isCollapsed }">
+        <div
+          class="flex items-center gap-2 w-full"
+          :class="isCollapsed ? 'flex-col items-center gap-2' : 'justify-between'"
+        >
+          <UDashboardSidebarCollapse v-if="isCollapsed" />
+          <TeamSwitcherDropdown :collapsed="isCollapsed" :class="isCollapsed ? '' : 'flex-1 min-w-0'" />
+          <UDashboardSidebarCollapse v-if="!isCollapsed" />
+        </div>
       </template>
 
-      <template #default="{ collapsed }">
+      <template #default="{ collapsed: isCollapsed }">
         <UNavigationMenu
           v-if="currentTeam?.slug"
-          :collapsed="collapsed"
+          :collapsed="isCollapsed"
           :items="links"
           orientation="vertical"
           tooltip
@@ -23,8 +36,8 @@
         />
       </template>
 
-      <template #footer="{ collapsed }">
-        <AccountUserDropdown :collapsed="collapsed" />
+      <template #footer="{ collapsed: isCollapsed }">
+        <AccountUserDropdown :collapsed="isCollapsed" />
       </template>
     </UDashboardSidebar>
 
@@ -45,6 +58,7 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 const open = ref(false);
+const collapsed = ref(true);
 const currentTeam = useCurrentTeam();
 const baseRoute = computed(() => `/${currentTeam.value?.slug}`);
 const teamID = computed(() => currentTeam.value?.id || "");
@@ -73,6 +87,7 @@ const { user } = useSession();
 const mfaChallengeOpen = ref(false);
 
 onMounted(async () => {
+  collapsed.value = true;
   if (!user.value?.mfaEnabled) return;
   const status = await $fetch<{ sessionVerified: boolean }>(
     "/api/mfa/status",

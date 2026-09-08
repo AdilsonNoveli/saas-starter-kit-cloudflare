@@ -3,7 +3,7 @@
     class="flex flex-col gap-1 py-1"
     :class="[
       level > 0 &&
-        'mx-3.5 border-l border-gray-200 dark:border-gray-800 px-2.5',
+        'mx-3.5 border-l border-default px-2.5',
     ]"
   >
     <template

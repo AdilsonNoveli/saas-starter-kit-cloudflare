@@ -1,7 +1,7 @@
 <template>
   <div v-if="!page?.body" class="flex h-full items-center justify-center">
     <h3
-      class="scroll-m-20 border-r border-gray-200 dark:border-gray-800 px-4 py-3 text-2xl font-semibold"
+      class="scroll-m-20 border-r border-default px-4 py-3 text-2xl font-semibold"
     >
       404
     </h3>

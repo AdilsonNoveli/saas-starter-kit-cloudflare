@@ -1,6 +1,6 @@
 <template>
   <code
-    class="inline-code relative rounded-md font-mono text-[0.875em] px-1.5 py-0.5 border bg-[#f09237]/15 border-[#f09237]/50 text-[#9a3412] dark:bg-[#dd2c00]/12 dark:border-[#dd2c00]/80 dark:text-zinc-100 transition-colors"
+    class="inline-code relative rounded-md font-mono text-[0.875em] px-1.5 py-0.5 border bg-[var(--color-fire-500)]/15 border-[var(--color-fire-500)]/50 text-[#9a3412] dark:bg-[var(--color-flame-700)]/12 dark:border-[var(--color-flame-700)]/80 dark:text-highlighted transition-colors"
   >
     <slot />
   </code>

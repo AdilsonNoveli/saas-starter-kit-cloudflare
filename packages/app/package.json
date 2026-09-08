@@ -12,6 +12,7 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@nuxfire/design-tokens": "workspace:*",
     "@nuxfire/functions": "workspace:*",
     "@nuxt/eslint": "0.7.3",
     "@nuxt/fonts": "0.10.3",

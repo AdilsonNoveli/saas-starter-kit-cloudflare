@@ -2,7 +2,7 @@
   <div
     ref="target"
     :style="cssVars"
-    :class="['rounded-[15px] p-[2px] shine bg-zinc-200/80 dark:bg-zinc-800', props.class || '']"
+    :class="['rounded-[15px] p-[2px] shine bg-elevated', props.class || '']"
   >
     <div
       class="rounded-[13px] w-full h-full bg-default p-6"

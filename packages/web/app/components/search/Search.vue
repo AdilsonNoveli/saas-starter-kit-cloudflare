@@ -5,14 +5,14 @@
       color="neutral"
       variant="outline"
       size="md"
-      class="rounded-md px-3 py-1.5 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all cursor-pointer"
+      class="rounded-md px-3 py-1.5 text-xs sm:text-sm text-muted hover:text-highlighted hover:border-accented transition-all cursor-pointer"
       @click="isOpen = true"
     >
       <span class="hidden md:inline font-normal">Search docs...</span>
       <template #trailing>
         <div class="hidden sm:flex items-center gap-1 ml-1.5">
-          <UKbd value="Ctrl" size="sm" class="text-[10px] py-0.5 px-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400" />
-          <UKbd value="K" size="sm" class="text-[10px] py-0.5 px-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400" />
+          <UKbd value="Ctrl" size="sm" class="text-[10px] py-0.5 px-1 rounded bg-elevated text-muted" />
+          <UKbd value="K" size="sm" class="text-[10px] py-0.5 px-1 rounded bg-elevated text-muted" />
         </div>
       </template>
     </UButton>

@@ -18,6 +18,7 @@
     "packages/app": {
       "name": "@nuxfire/app",
       "dependencies": {
+        "@nuxfire/design-tokens": "workspace:*",
         "@nuxfire/functions": "workspace:*",
         "@nuxt/eslint": "0.7.3",
         "@nuxt/fonts": "0.10.3",
@@ -66,6 +67,7 @@
     "packages/auth-frontend": {
       "name": "@nuxfire/auth-frontend",
       "dependencies": {
+        "@nuxfire/design-tokens": "workspace:*",
         "@nuxt/ui": "^4.8.1",
         "@tailwindcss/aspect-ratio": "0.4.2",
         "@tailwindcss/container-queries": "0.1.1",
@@ -81,6 +83,10 @@
         "typescript": "^5",
         "vue-tsc": "^2.2.10",
       },
+    },
+    "packages/design-tokens": {
+      "name": "@nuxfire/design-tokens",
+      "version": "0.0.0",
     },
     "packages/emails": {
       "name": "@nuxfire/emails",
@@ -119,6 +125,7 @@
     "packages/web": {
       "name": "@nuxfire/web",
       "dependencies": {
+        "@nuxfire/design-tokens": "workspace:*",
         "@nuxt/content": "^3.16.0",
         "@nuxt/eslint": "0.7.3",
         "@nuxt/fonts": "^0.14.0",
@@ -527,6 +534,8 @@
     "@nuxfire/app": ["@nuxfire/app@workspace:packages/app"],
 
     "@nuxfire/auth-frontend": ["@nuxfire/auth-frontend@workspace:packages/auth-frontend"],
+
+    "@nuxfire/design-tokens": ["@nuxfire/design-tokens@workspace:packages/design-tokens"],
 
     "@nuxfire/emails": ["@nuxfire/emails@workspace:packages/emails"],
 

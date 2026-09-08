@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex flex-col p-6 bg-default rounded-xl shadow-sm border border-default"
+    class="relative flex flex-col p-6 bg-elevated rounded-xl border border-default"
     :class="{ 'ring-2 ring-primary': isCurrent || isFeatured }"
   >
     <div class="mb-4">

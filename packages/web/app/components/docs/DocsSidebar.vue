@@ -5,15 +5,15 @@
   >
     <ul
       v-if="useLevel"
-      class="flex flex-col gap-1.5 pb-4 border-b border-zinc-200 dark:border-zinc-800/80"
+      class="flex flex-col gap-1.5 pb-4 border-b border-default"
     >
       <li v-for="link in docs" :key="link.path">
         <UButton
           :to="link.path"
           :class="[
             path.startsWith(link.path)
-              ? '!text-primary-500 dark:!text-primary-400 bg-primary-500/10 dark:bg-primary-950/40 font-semibold ring-1 ring-primary-500/30'
-              : 'hover:bg-zinc-100 dark:hover:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400',
+              ? '!text-primary bg-primary/10 font-semibold ring-1 ring-primary/30'
+              : 'hover:bg-elevated text-muted',
           ]"
           variant="ghost"
           color="neutral"

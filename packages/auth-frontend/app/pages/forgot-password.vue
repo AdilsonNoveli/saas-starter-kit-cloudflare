@@ -112,7 +112,7 @@
                 variant="ghost"
                 size="xs"
                 :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                class="text-zinc-400 hover:text-zinc-200 cursor-pointer"
+                class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showPassword = !showPassword"
               />
@@ -138,7 +138,7 @@
                 variant="ghost"
                 size="xs"
                 :aria-label="showRepeatPassword ? 'Hide password' : 'Show password'"
-                class="text-night-400 hover:text-night-200 cursor-pointer"
+                class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showRepeatPassword = !showRepeatPassword"
               />
@@ -163,13 +163,13 @@
     <!-- Resend action in code state -->
     <template v-if="state === 'code'">
       <div class="text-center pt-2">
-        <form :action="`${origin}/password/change`" method="POST" class="inline-flex items-center gap-1.5 text-sm text-night-300">
+        <form :action="`${origin}/password/change`" method="POST" class="inline-flex items-center gap-1.5 text-sm text-muted">
           <input type="hidden" name="action" value="code" />
           <input type="hidden" name="email" :value="data.email" />
           <span>Didn't receive the code?</span>
           <button
             type="submit"
-            class="text-flame-400 hover:text-flame-300 font-medium transition-colors underline underline-offset-4 cursor-pointer"
+            class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 cursor-pointer"
           >
             Resend
           </button>
@@ -179,12 +179,12 @@
 
     <!-- Card Footer -->
     <template #footer>
-      <p class="text-sm text-night-300">
+      <p class="text-sm text-muted">
         Remember your password?
         <NuxtLink
           :to="`${origin}/password/authorize`"
           external
-          class="text-flame-400 hover:text-flame-300 font-medium transition-colors underline underline-offset-4 ml-1"
+          class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 ml-1"
         >
           Sign in
         </NuxtLink>

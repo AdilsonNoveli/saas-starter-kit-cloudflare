@@ -1,0 +1,165 @@
+/**
+ * Single source of truth for design tokens across every NuxFire Nuxt app
+ * (app, web, auth-frontend). Import this AFTER `@import "@nuxt/ui";` in
+ * each app's main.css so these overrides win over Nuxt UI's own defaults.
+ *
+ * Everything here — fonts, the brand accent palettes, the neutral surface
+ * scale, corner radius, and the dark-mode surface/text/border mapping — is
+ * defined exactly once. An app's own main.css should not redeclare any of
+ * these; app-specific CSS is for things that are genuinely local (a
+ * one-off animation, a component-scoped effect variable), never a second
+ * copy of a token defined here.
+ *
+ * Rebranding (swapping the flame/fire hues, or the night-* neutral scale)
+ * means editing the hex values below in ONE place — every app picks it up
+ * automatically. Because every token is a CSS custom property (not a
+ * hardcoded utility class baked into components), this is also the right
+ * foundation for a future per-tenant theme editor: overriding a handful of
+ * `--ui-*`/`--color-*` variables at runtime (e.g. injected from an admin
+ * panel) reaches every component for free — no component code to touch.
+ */
+
+/*
+ * `index.ts` emits Tailwind class names (the sharedUiConfig component
+ * overrides). This package reaches each app through a node_modules symlink,
+ * which Tailwind does not scan by default, so without this line any class
+ * that exists ONLY here is silently dropped: it lands in the DOM with no CSS
+ * rule behind it. Verified the hard way — `before:bg-primary/15` rendered as
+ * a class with no generated rule until this was added.
+ */
+@source "./index.ts";
+
+@theme static {
+  --font-sans: "Geist", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", monospace;
+
+  /* Brand accent — primary/secondary in every app's ui.colors config */
+  --color-flame-50: #fff1f1;
+  --color-flame-100: #ffe1e1;
+  --color-flame-200: #ffc7c7;
+  --color-flame-300: #ffa0a0;
+  --color-flame-400: #ff6f6f;
+  --color-flame-500: #ff4d4d;
+  --color-flame-600: #f13a3a;
+  --color-flame-700: #d92626;
+  --color-flame-800: #991b1b;
+  --color-flame-900: #7a1616;
+  --color-flame-950: #450b0b;
+
+  --color-fire-50: #fff8ed;
+  --color-fire-100: #ffefd1;
+  --color-fire-200: #ffdba3;
+  --color-fire-300: #ffc06b;
+  --color-fire-400: #ffa333;
+  --color-fire-500: #ff8904;
+  --color-fire-600: #e67200;
+  --color-fire-700: #bf5c00;
+  --color-fire-800: #99490a;
+  --color-fire-900: #7a3c10;
+  --color-fire-950: #431e08;
+
+  /*
+   * Neutral surface scale — cold true-gray, byte-identical to the pedped
+   * admin reference's own `gray-*` scale (the "enterprise, estilo Linear"
+   * target). Used for every app's page/card/text neutrals; the flame/fire
+   * palettes above are strictly the accent color, never the base neutral.
+   */
+  --color-night-50: #fafafa;
+  --color-night-100: #f8f8f8;
+  --color-night-200: #e6e6e6;
+  --color-night-300: #cccccc;
+  --color-night-400: #888888;
+  --color-night-500: #555555;
+  --color-night-600: #333333;
+  --color-night-700: #1a1a1a;
+  --color-night-800: #0d0d0d;
+  --color-night-900: #000000;
+  --color-night-950: #000000;
+}
+
+:root {
+  color-scheme: light;
+
+  /*
+   * Enterprise-grade corner radius. Nuxt UI derives its whole `rounded-*`
+   * scale from this single variable (--radius-lg: calc(var(--ui-radius) *
+   * 2), etc. — see @nuxt/ui's runtime theme) so lowering it here tightens
+   * every component consistently instead of overriding each `rounded-*`
+   * step by hand, the way pedped's own `!important` overrides do.
+   * 0.1875rem (3px) mirrors the flat, barely-rounded corners of the pedped
+   * admin reference (their own --radius-lg override was 5px; ours lands
+   * at 6px through the proportional scale).
+   */
+  --ui-radius: 0.1875rem;
+
+  /*
+   * Light mode mirrors the dark ladder one step in the other direction, so
+   * both themes hold the same quality bar. Measured on the light canvas:
+   * the stock border sat at 1.18:1 against a card (invisible) and
+   * `text-dimmed` at 3.54:1 (below the 4.5:1 WCAG AA floor, and it drives
+   * placeholders). Text tiers below are 21:1 / 18.1:1 / 12.6:1 / 7.5:1.
+   */
+  --ui-border: var(--color-night-300); /* #cccccc, 1.51:1 on a card */
+  --ui-border-muted: var(--color-night-200); /* #e6e6e6 internal dividers */
+  --ui-border-accented: var(--color-night-400); /* #888888 hover/focus */
+
+  --ui-text: var(--color-night-700); /* #1a1a1a 18.1:1 */
+  --ui-text-muted: var(--color-night-600); /* #333333 12.6:1 */
+  --ui-text-dimmed: var(--color-night-500); /* #555555 7.5:1 */
+}
+
+/*
+ * Dark-mode surface/text/border mapping.
+ *
+ * The surface ladder always goes lighter as it rises — canvas → raised →
+ * accented — and every border is lighter than the surface it sits on, so a
+ * card is legible both by its fill AND by its outline. Contrast ratios below
+ * were measured against the canvas (#0d0d0d) in the running app, not
+ * estimated: the previous mapping put the card fill at 1.00:1 and its border
+ * at 1.117:1 (both invisible), and placeholders/inactive icons at 2.61:1
+ * (below the 4.5:1 WCAG AA floor for text).
+ */
+.dark {
+  color-scheme: dark;
+
+  /* Surfaces — canvas is pedped's `surface`, raised is its `surface-raised`. */
+  --ui-bg: var(--color-night-800); /* #0d0d0d canvas */
+  --ui-bg-muted: var(--color-night-700); /* #1a1a1a subtle raise (hover rows) */
+  --ui-bg-elevated: var(--color-night-700); /* #1a1a1a cards, popovers */
+  --ui-bg-accented: var(--color-night-600); /* #333333 active/selected */
+
+  /*
+   * Borders. #333 on the canvas is 1.538:1 and on a card 1.377:1 — the same
+   * value Nuxt UI already uses for input outlines here, which read clearly,
+   * and the range GitHub (#30363d) and Vercel (#2e2e2e) use for dark borders.
+   * `border-muted` is for dividers *inside* a raised surface, so it must be
+   * lighter than that surface, never darker.
+   */
+  --ui-border: var(--color-night-600); /* #333333 */
+  --ui-border-muted: var(--color-night-700); /* #1a1a1a internal dividers */
+  --ui-border-accented: var(--color-night-500); /* #555555 hover/focus, 2.33:1 */
+
+  /*
+   * Text — four distinct tiers, all at or above WCAG AA (4.5:1) on canvas:
+   * 18.7:1 / 15.6:1 / 12.1:1 / 5.48:1. `dimmed` drives placeholders and
+   * inactive nav icons, which is why it may not sit below the AA floor.
+   */
+  --ui-text-highlighted: var(--color-night-50); /* #fafafa 18.7:1 */
+  --ui-text: var(--color-night-200); /* #e6e6e6 15.6:1 */
+  --ui-text-muted: var(--color-night-300); /* #cccccc 12.1:1 */
+  --ui-text-dimmed: var(--color-night-400); /* #888888 5.48:1 */
+}
+
+html.dark,
+html.dark body {
+  background-color: var(--color-night-800);
+  color: var(--color-night-200);
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+.text-muted {
+  color: var(--ui-text-muted);
+}

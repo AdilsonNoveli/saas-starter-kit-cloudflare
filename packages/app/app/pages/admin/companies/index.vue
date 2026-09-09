@@ -7,14 +7,7 @@
         </template>
 
         <template #right>
-          <UButton
-            label="Refresh"
-            icon="i-lucide-refresh-cw"
-            color="neutral"
-            variant="outline"
-            loading-auto
-            @click="refresh"
-          />
+          <AccountUserDropdown collapsed size="md" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -25,6 +18,7 @@
         :columns="columns"
         :data="companies"
         :loading="status === 'pending'"
+        :row-to="(company) => `/admin/companies/${company.id}`"
         search-column="name"
         search-placeholder="Filter companies..."
       >
@@ -38,6 +32,14 @@
             }"
             placeholder="Filter status"
             class="min-w-32"
+          />
+          <UButton
+            label="Refresh"
+            icon="i-lucide-refresh-cw"
+            color="neutral"
+            variant="outline"
+            loading-auto
+            @click="refresh"
           />
         </template>
       </AdminDataTable>
@@ -70,11 +72,11 @@ definePageMeta({
 
 type Company = RouterOutput["admin"]["teams"]["listTeams"][number];
 
+const UAvatar = resolveComponent("UAvatar");
 const UBadge = resolveComponent("UBadge");
 const UButton = resolveComponent("UButton");
 const UCheckbox = resolveComponent("UCheckbox");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
-const ULink = resolveComponent("ULink");
 
 const { data, status, refresh } =
   await useTrpcClient().admin.teams.listTeams.useQuery({});
@@ -162,19 +164,24 @@ const columns: TableColumn<Company>[] = [
       sortableHeader(column.getIsSorted(), "Name", () =>
         column.toggleSorting(column.getIsSorted() === "asc"),
       ),
-    // Linked by id, not slug: a slug can be renamed by the tenant, the id
-    // cannot. `getTeamDetail` resolves either.
+    // Plain text, not a link: the whole row already navigates to this same
+    // destination (`row-to` above) — pedped's own customer identity cell is
+    // plain text for the same reason, since its `<tr>` carries the click.
     cell: ({ row }) =>
-      h("div", undefined, [
-        h(
-          ULink,
-          {
-            to: `/admin/companies/${row.original.id}`,
-            class: "font-medium text-highlighted",
-          },
-          () => row.original.name,
-        ),
-        h("p", { class: "text-muted" }, `@${row.original.slug}`),
+      h("div", { class: "flex items-center gap-3" }, [
+        h(UAvatar, {
+          src: row.original.logo || undefined,
+          alt: row.original.name,
+          size: "sm",
+        }),
+        h("div", { class: "min-w-0" }, [
+          h(
+            "p",
+            { class: "font-medium text-highlighted truncate" },
+            row.original.name,
+          ),
+          h("p", { class: "text-muted truncate" }, `@${row.original.slug}`),
+        ]),
       ]),
   },
   {

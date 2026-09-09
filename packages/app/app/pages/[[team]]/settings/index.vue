@@ -20,41 +20,15 @@
 
     <UPageCard variant="subtle">
       <UFormField label="Team Avatar" name="avatar">
-        <div class="relative">
-          <input
-            ref="fileInputRef"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            @change="handleFileUpload"
-          />
-          <UChip
-            size="3xl"
-            position="bottom-right"
-            inset
-            :ui="{ base: '-mx-2 rounded-none ring-0' }"
-          >
-            <UAvatar
-              :src="team?.logo || undefined"
-              :alt="team?.name"
-              :ui="{ root: 'h-32 w-32 text-4xl' }"
-            />
-            <template v-if="showUpdate" #content>
-              <UDropdownMenu
-                :items="avatarDropdownItems"
-                :ui="{ item: 'text-xs' }"
-              >
-                <UButton
-                  icon="i-lucide-pencil"
-                  :loading="updatingTeamLogo"
-                  color="neutral"
-                  variant="solid"
-                  :ui="{ base: 'rounded-full' }"
-                />
-              </UDropdownMenu>
-            </template>
-          </UChip>
-        </div>
+        <AvatarUploader
+          :src="team?.logo"
+          :alt="team?.name ?? 'Team'"
+          :uploading="updatingTeamLogo"
+          :disabled="!showUpdate"
+          size="lg"
+          @upload="handleAvatarUpload"
+          @remove="handleAvatarRemove"
+        />
       </UFormField>
       <USeparator />
       <UFormField label="Team Name" name="name">
@@ -82,7 +56,6 @@ const { data: showUpdate } = await useUpdateTeamDetailsAbility(teamID);
 
 const loading = ref(false);
 const updatingTeamLogo = ref(false);
-const fileInputRef = ref<HTMLInputElement | null>(null);
 const uploadProfilePicture = useUpload("/api/upload/profile-picture", {
   method: "PUT",
 });
@@ -121,26 +94,13 @@ async function save() {
   }
 }
 
-async function handleFileUpload(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0];
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    toast.add({
-      title: "File Too Large",
-      description: "Team logo must be less than 2MB",
-      color: "error",
-      icon: "i-lucide-x",
-    });
-    return;
-  }
+async function handleAvatarUpload(file: File) {
   updatingTeamLogo.value = true;
   try {
-    const [upload] = await uploadProfilePicture(
-      event.target as HTMLInputElement,
-    );
+    const upload = await uploadProfilePicture(file);
     if (upload?.pathname) {
       await updateTeamLogoMutation.mutate({
-        key: upload?.pathname,
+        key: upload.pathname,
         teamIdentifier: team.value?.slug || "",
       });
     }
@@ -161,41 +121,28 @@ async function handleFileUpload(event: Event) {
   updatingTeamLogo.value = false;
 }
 
-const avatarDropdownItems = [
-  [
-    {
-      label: "Upload",
-      onSelect: () => {
-        fileInputRef.value?.click();
-      },
-    },
-    {
-      label: "Remove",
-      onSelect: async () => {
-        updatingTeamLogo.value = true;
-        try {
-          await removeTeamLogoMutation.mutate({
-            teamIdentifier: team.value?.slug || "",
-          });
-          await teamsStore.fetchCurrentTeam();
-          toast.add({
-            title: "Team Logo Removed",
-            color: "success",
-            icon: "i-lucide-check",
-          });
-        } catch (error: any) {
-          toast.add({
-            title: "Failed to Remove Team Logo",
-            description: error?.message || "Something went wrong",
-            color: "error",
-            icon: "i-lucide-x",
-          });
-        }
-        updatingTeamLogo.value = false;
-      },
-    },
-  ],
-];
+async function handleAvatarRemove() {
+  updatingTeamLogo.value = true;
+  try {
+    await removeTeamLogoMutation.mutate({
+      teamIdentifier: team.value?.slug || "",
+    });
+    await teamsStore.fetchCurrentTeam();
+    toast.add({
+      title: "Team Logo Removed",
+      color: "success",
+      icon: "i-lucide-check",
+    });
+  } catch (error: any) {
+    toast.add({
+      title: "Failed to Remove Team Logo",
+      description: error?.message || "Something went wrong",
+      color: "error",
+      icon: "i-lucide-x",
+    });
+  }
+  updatingTeamLogo.value = false;
+}
 
 definePageMeta({
   layout: "dashboard",

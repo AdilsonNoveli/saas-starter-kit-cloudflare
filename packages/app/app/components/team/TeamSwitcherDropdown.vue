@@ -1,23 +1,29 @@
 <template>
-  <div>
+  <div class="w-full flex justify-center">
+    <!-- sideOffset: see AccountUserDropdown.vue — same 64px header, same fix. -->
     <UDropdownMenu
       :items="items"
-      :content="{ align: 'center', collisionPadding: 12 }"
+      :content="{ align: 'center', sideOffset: 16, collisionPadding: 12 }"
       :ui="{
-        content: collapsed ? 'w-48' : 'w-(--reka-dropdown-menu-trigger-width)',
+        content: collapsed ? 'w-64' : 'w-64',
       }"
     >
       <UButton
         :label="collapsed ? undefined : (team?.name ?? 'Select Team')"
-        :avatar="{ src: team?.logo || undefined, alt: team?.name ?? 'Team' }"
-        :trailing-icon="collapsed ? undefined : 'i-lucide-chevrons-up-down'"
+        :avatar="{
+          src: team?.logo || undefined,
+          alt: team?.name ?? 'Team',
+          size: collapsed ? 'xl' : '2xs',
+          ui: { root: 'rounded-md' },
+        }"
+        :trailing-icon="collapsed ? undefined : 'i-lucide-chevron-down'"
         color="neutral"
         variant="ghost"
         block
         :square="collapsed"
-        class="data-[state=open]:bg-elevated"
-        :class="[!collapsed && 'py-2']"
-        :ui="{ trailingIcon: 'text-dimmed' }"
+        class="bg-elevated ring ring-default hover:bg-accented data-[state=open]:bg-accented"
+        :class="collapsed ? 'size-11 p-0.5 rounded-lg' : 'py-2'"
+        :ui="{ label: 'text-base', trailingIcon: 'text-dimmed' }"
       />
     </UDropdownMenu>
 
@@ -47,10 +53,18 @@ function navigateToTeam(slug: string) {
   navigateTo(router.resolve({ name: routeName, params: { team: slug } }));
 }
 
+/**
+ * Kept to just switching + creating — team settings is reached from the
+ * team card on the "Select a Team" grid (TeamSwitcher.vue) instead, via its
+ * own gear icon, so this compact dropdown doesn't have to carry a
+ * destination unrelated to picking a team.
+ */
 const items = computed<DropdownMenuItem[][]>(() => {
   const teamItems: DropdownMenuItem[] = teamsStore.allTeams.map((teamItem) => ({
     label: teamItem.name,
-    avatar: { src: teamItem.logo || undefined, alt: teamItem.name },
+    avatar: { src: teamItem.logo || undefined, alt: teamItem.name, ui: { root: "rounded-md" } },
+    type: "checkbox",
+    checked: teamItem.slug === team.value?.slug,
     onSelect: () => navigateToTeam(teamItem.slug),
   }));
 

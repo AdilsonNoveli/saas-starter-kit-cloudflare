@@ -4,7 +4,7 @@
       <div class="grid gap-8 grid-cols-2 md:grid-cols-4">
         <!-- Brand -->
         <div class="col-span-2 flex flex-col gap-4">
-          <NuxtLink to="/" class="flex items-center">
+          <NuxtLink to="/" aria-label="NuxFire" class="flex items-center">
             <img src="/nuxfire.svg" alt="NuxFire" class="h-7 w-auto dark:hidden" />
             <img src="/nuxfire-white.svg" alt="NuxFire" class="h-7 w-auto hidden dark:block" />
           </NuxtLink>

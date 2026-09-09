@@ -8,23 +8,23 @@
       :default-size="16"
       collapsible
       resizable
-      :ui="{
-        root: 'border-e border-default',
-        footer: 'lg:border-t lg:border-default',
-      }"
+      :ui="{ root: 'border-e border-default' }"
     >
+      <!--
+        No collapse toggle here — every page under this layout already has
+        one in its own UDashboardNavbar #leading slot, so a second one next
+        to the team switcher was two controls doing the same thing.
+      -->
       <template #header="{ collapsed: isCollapsed }">
-        <div
-          class="flex items-center gap-2 w-full"
-          :class="isCollapsed ? 'flex-col items-center gap-2' : 'justify-between'"
-        >
-          <UDashboardSidebarCollapse v-if="isCollapsed" />
-          <TeamSwitcherDropdown :collapsed="isCollapsed" :class="isCollapsed ? '' : 'flex-1 min-w-0'" />
-          <UDashboardSidebarCollapse v-if="!isCollapsed" />
-        </div>
+        <TeamSwitcherDropdown :collapsed="isCollapsed" />
       </template>
 
       <template #default="{ collapsed: isCollapsed }">
+        <!--
+          No horizontal padding here: the sidebar's own `body` slot already
+          owns the gutter, so an extra inset only pushed these rows 8px right
+          of the team switcher above them.
+        -->
         <UNavigationMenu
           v-if="currentTeam?.slug"
           :collapsed="isCollapsed"
@@ -32,12 +32,7 @@
           orientation="vertical"
           tooltip
           popover
-          class="px-2"
         />
-      </template>
-
-      <template #footer="{ collapsed: isCollapsed }">
-        <AccountUserDropdown :collapsed="isCollapsed" />
       </template>
     </UDashboardSidebar>
 
@@ -61,7 +56,6 @@ const open = ref(false);
 const collapsed = ref(true);
 const currentTeam = useCurrentTeam();
 const baseRoute = computed(() => `/${currentTeam.value?.slug}`);
-const teamID = computed(() => currentTeam.value?.id || "");
 
 useDashboard();
 
@@ -101,24 +95,18 @@ const closeSidebar = () => {
   open.value = false;
 };
 
-const settingsLinks = useTeamSettingsLinks(teamID);
-const settingsChildren = computed<NavigationMenuItem[]>(() =>
-  settingsLinks.value.map((link) => ({ ...link, onSelect: closeSidebar })),
-);
-
+/*
+ * Team settings is reached from the team's own card on the "Select a Team"
+ * grid (TeamSwitcher.vue), not from this primary nav — configuring the
+ * workspace is an occasional, team-scoped action, not content navigation,
+ * so it doesn't compete with "Dashboard" for space here.
+ */
 const links = computed<NavigationMenuItem[]>(() => [
   {
     label: "Dashboard",
-    icon: "i-lucide-house",
+    icon: "i-lucide-bolt",
     to: `${baseRoute.value}/dashboard`,
     onSelect: closeSidebar,
-  },
-  {
-    label: "Settings",
-    to: `${baseRoute.value}/settings`,
-    icon: "i-lucide-settings",
-    type: "trigger",
-    children: settingsChildren.value,
   },
 ]);
 </script>

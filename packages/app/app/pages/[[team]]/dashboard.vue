@@ -19,17 +19,21 @@
               </UChip>
             </UButton>
           </UTooltip>
+
+          <AccountUserDropdown collapsed size="md" />
         </template>
       </UDashboardNavbar>
     </template>
 
     <template #body>
-      <div class="container mx-auto max-w-4xl space-y-4">
-        <div class="text-2xl py-4">
+      <div class="space-y-4 sm:space-y-6">
+        <div class="text-2xl py-2">
           {{ $t("welcome") }}
         </div>
 
-        <NotificationsPlayground />
+        <TeamDashboardStats />
+        <TeamDashboardChart />
+        <TeamDashboardActivity />
       </div>
     </template>
   </UDashboardPanel>

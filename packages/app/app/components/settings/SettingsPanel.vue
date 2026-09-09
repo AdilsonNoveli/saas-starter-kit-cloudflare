@@ -15,11 +15,21 @@ defineProps<{
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
+
+        <template #right>
+          <AccountUserDropdown collapsed size="md" />
+        </template>
       </UDashboardNavbar>
 
       <UDashboardToolbar>
-        <!-- `-mx-1` aligns the menu with the DashboardSidebarCollapse button. -->
-        <UNavigationMenu :items="[links]" highlight class="-mx-1 flex-1" />
+        <!--
+          `-mx-1` aligns the menu with the DashboardSidebarCollapse button.
+          `variant="link"` (not the app-wide default `pill`) so the active tab
+          is only the underline + brand-colored label — the `pill` variant
+          adds a tinted background and ring (fine for the sidebar it was
+          designed for), which read as a button here, not a tab.
+        -->
+        <UNavigationMenu :items="[links]" highlight variant="link" class="-mx-1 flex-1" />
       </UDashboardToolbar>
     </template>
 

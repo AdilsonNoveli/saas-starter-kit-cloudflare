@@ -108,22 +108,26 @@ import { renderSVG } from "uqr";
 import { z } from "zod";
 
 /**
- * Self-service two-factor setup and re-verification for a regular user's own
- * account, adapted from pages/admin/mfa.vue for use as a modal rather than a
- * full page: layouts/dashboard.vue mounts one instance in `mode="challenge"`,
+ * Self-service two-factor setup and re-verification, reused across three
+ * mount sites: layouts/dashboard.vue mounts one in `mode="challenge"`,
  * non-dismissible, whenever an enrolled account's login hasn't verified yet;
  * account-settings/security.vue mounts a separate instance in
- * `mode="enroll"` for the voluntary "Enable 2FA" flow. Both post to
- * /api/mfa/* — plain Nitro routes, deliberately outside protectedProcedure
- * for the reasons documented on each of those routes.
+ * `mode="enroll"` for the voluntary "Enable 2FA" flow; layouts/admin.vue
+ * mounts a `scope="admin"` instance for the platform-admin elevated-session
+ * gate — previously its own full-page UI at pages/admin/mfa.vue (now
+ * retired), duplicating this exact QR/code-form markup with no blurred
+ * overlay. `scope` only changes which endpoint namespace is called
+ * (/api/mfa/* vs /api/admin/mfa/*, both already existed); the modal chrome
+ * — including the blurred backdrop — is identical for every caller.
  */
 const props = withDefaults(
   defineProps<{
     open: boolean;
     mode: "enroll" | "challenge";
+    scope?: "user" | "admin";
     dismissible?: boolean;
   }>(),
-  { dismissible: true },
+  { dismissible: true, scope: "user" },
 );
 
 const emit = defineEmits<{
@@ -207,10 +211,14 @@ watch(
   },
 );
 
+const apiBase = computed(() =>
+  props.scope === "admin" ? "/api/admin/mfa" : "/api/mfa",
+);
+
 async function startSetup() {
   try {
     const { otpauthUri: uri } = await $fetch<{ otpauthUri: string }>(
-      "/api/mfa/setup",
+      `${apiBase.value}/setup`,
       { method: "POST" },
     );
     otpauthUri.value = uri;
@@ -234,7 +242,9 @@ async function startSetup() {
  * message here would give that back.
  */
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  const endpoint = isEnrolling.value ? "/api/mfa/verify" : "/api/mfa/challenge";
+  const endpoint = isEnrolling.value
+    ? `${apiBase.value}/verify`
+    : `${apiBase.value}/challenge`;
 
   submitting.value = true;
   try {

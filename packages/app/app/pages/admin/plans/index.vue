@@ -7,18 +7,7 @@
         </template>
 
         <template #right>
-          <UButton
-            label="Setup Stripe portal"
-            icon="i-lucide-credit-card"
-            color="neutral"
-            variant="outline"
-            loading-auto
-            @click="setupStripePortal"
-          />
-
-          <AdminPlansCreateEditModal @success="refresh">
-            <UButton label="New plan" icon="i-lucide-plus" />
-          </AdminPlansCreateEditModal>
+          <AccountUserDropdown collapsed size="md" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -33,6 +22,17 @@
       >
         <template #filters>
           <USwitch v-model="includeArchived" label="Show archived" />
+          <UButton
+            label="Setup Stripe portal"
+            icon="i-lucide-credit-card"
+            color="neutral"
+            variant="outline"
+            loading-auto
+            @click="setupStripePortal"
+          />
+          <AdminPlansCreateEditModal @success="refresh">
+            <UButton label="New plan" icon="i-lucide-plus" />
+          </AdminPlansCreateEditModal>
         </template>
       </AdminDataTable>
 

@@ -7,14 +7,7 @@
         </template>
 
         <template #right>
-          <UButton
-            label="Refresh"
-            icon="i-lucide-refresh-cw"
-            color="neutral"
-            variant="outline"
-            loading-auto
-            @click="refreshAll"
-          />
+          <AccountUserDropdown collapsed size="md" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -35,12 +28,22 @@
       </div>
 
       <div class="flex flex-col gap-4">
-        <div>
-          <h2 class="font-semibold text-highlighted">Dead letter queue</h2>
-          <p class="text-sm text-muted">
-            Messages that exhausted every retry. Replaying sends one back to the
-            job queue.
-          </p>
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="font-semibold text-highlighted">Dead letter queue</h2>
+            <p class="text-sm text-muted">
+              Messages that exhausted every retry. Replaying sends one back to
+              the job queue.
+            </p>
+          </div>
+          <UButton
+            label="Refresh"
+            icon="i-lucide-refresh-cw"
+            color="neutral"
+            variant="outline"
+            loading-auto
+            @click="refreshAll"
+          />
         </div>
 
         <AdminDataTable

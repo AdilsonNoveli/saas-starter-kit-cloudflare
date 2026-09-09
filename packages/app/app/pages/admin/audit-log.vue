@@ -7,14 +7,7 @@
         </template>
 
         <template #right>
-          <UButton
-            label="Refresh"
-            icon="i-lucide-refresh-cw"
-            color="neutral"
-            variant="outline"
-            loading-auto
-            @click="refresh"
-          />
+          <AccountUserDropdown collapsed size="md" />
         </template>
       </UDashboardNavbar>
     </template>
@@ -24,9 +17,21 @@
         :columns="columns"
         :data="entries"
         :loading="status === 'pending'"
+        :selectable="false"
         search-column="action"
         search-placeholder="Filter by action..."
-      />
+      >
+        <template #filters>
+          <UButton
+            label="Refresh"
+            icon="i-lucide-refresh-cw"
+            color="neutral"
+            variant="outline"
+            loading-auto
+            @click="refresh"
+          />
+        </template>
+      </AdminDataTable>
     </template>
   </UDashboardPanel>
 </template>
@@ -47,6 +52,7 @@ definePageMeta({
  */
 type AuditEntry = RouterOutput["admin"]["auditLog"]["list"][number];
 
+const UAvatar = resolveComponent("UAvatar");
 const UBadge = resolveComponent("UBadge");
 const UButton = resolveComponent("UButton");
 const UTooltip = resolveComponent("UTooltip");
@@ -87,17 +93,23 @@ const columns: TableColumn<AuditEntry>[] = [
     // so the trail outlives the account it names. Falling all the way back to
     // the raw id keeps a deleted actor's lines attributable.
     cell: ({ row }) =>
-      h("div", { class: "min-w-0" }, [
-        h(
-          "p",
-          { class: "font-medium text-highlighted truncate" },
-          row.original.actorName ??
-            row.original.actorEmail ??
-            row.original.actorUserId,
-        ),
-        row.original.actorName && row.original.actorEmail
-          ? h("p", { class: "text-muted truncate" }, row.original.actorEmail)
-          : undefined,
+      h("div", { class: "flex items-center gap-3 min-w-0" }, [
+        h(UAvatar, {
+          alt: row.original.actorName ?? row.original.actorEmail ?? row.original.actorUserId,
+          size: "sm",
+        }),
+        h("div", { class: "min-w-0" }, [
+          h(
+            "p",
+            { class: "font-medium text-highlighted truncate" },
+            row.original.actorName ??
+              row.original.actorEmail ??
+              row.original.actorUserId,
+          ),
+          row.original.actorName && row.original.actorEmail
+            ? h("p", { class: "text-muted truncate" }, row.original.actorEmail)
+            : undefined,
+        ]),
       ]),
   },
   {

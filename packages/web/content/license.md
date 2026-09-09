@@ -6,7 +6,7 @@ Thank you for your interest in nuxfire. Please review the license terms below to
 
 ## License Agreement
 
-This License Agreement ("Agreement") is a legal contract between you, the user ("Licensee"), and nuxfire, represented by Tanay Karnik. The Agreement governs your use of the nuxfire codebase (the "Product") available on our website at [https://nuxfire.com](https://nuxfire.com) (the "Website").
+This License Agreement ("Agreement") is a legal contract between you, the user ("Licensee"), and nuxfire, represented by Tanay Karnik. The Agreement governs your use of the nuxfire codebase (the "Product") available on our website at [https://nuxfire.com](/) (the "Website").
 
 ### Parties
 

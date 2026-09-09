@@ -25,6 +25,15 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: "cloudflare-module",
+    // Nitro can't see infra/utils/constants.ts's `nodejs_compat` flag — that
+    // one is applied by SST directly to the deployed sst.cloudflare.Worker,
+    // not through a wrangler.toml nitro reads at build time — so it warns
+    // "Node.js compatibility is not enabled" on every build even though the
+    // Worker this ships to actually runs with it. Stating the true, already
+    // real setting here silences the false warning without touching runtime.
+    cloudflare: {
+      nodeCompat: true,
+    },
     experimental: {
       tasks: true,
       // Gives server/utils/db.ts a real per-request context (useEvent()) so
@@ -37,8 +46,9 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      charset: "utf-8",
-      viewport: "width=device-width, initial-scale=1",
+      // No charset/viewport here — Nuxt already sets these exact values by
+      // default (see packages/web/nuxt.config.ts, where nuxt-seo-utils flags
+      // the same two lines as dead config).
       title: "NuxFire",
     },
   },

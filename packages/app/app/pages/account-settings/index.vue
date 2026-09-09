@@ -35,34 +35,14 @@
         description="JPG, GIF or PNG. 2MB max."
         class="flex max-sm:flex-col justify-between sm:items-center gap-4"
       >
-        <div class="relative">
-          <input
-            ref="fileInputRef"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            @change="handleFileUpload"
-          />
-          <div class="relative inline-block">
-            <UAvatar
-              :src="user?.image || undefined"
-              :alt="user?.name || undefined"
-              class="h-24 w-24 text-3xl"
-            />
-            <UDropdownMenu
-              :items="avatarDropdownItems"
-              :content="{ side: 'bottom', align: 'end' }"
-            >
-              <UButton
-                icon="i-lucide-pencil"
-                :loading="updatingProfilePicture"
-                color="neutral"
-                variant="solid"
-                class="absolute bottom-0 right-0 rounded-full"
-              />
-            </UDropdownMenu>
-          </div>
-        </div>
+        <AvatarUploader
+          :src="user?.image"
+          :alt="user?.name ?? 'Account'"
+          :uploading="updatingProfilePicture"
+          size="md"
+          @upload="handleAvatarUpload"
+          @remove="handleAvatarRemove"
+        />
       </UFormField>
 
       <USeparator />
@@ -90,33 +70,19 @@ const updateProfilePictureMutation =
 const toast = useToast();
 const { user } = useSession();
 
-const fileInputRef = ref<HTMLInputElement | null>(null);
 const updatingProfilePicture = ref(false);
 
 const uploadProfilePicture = useUpload("/api/upload/profile-picture", {
   method: "PUT",
 });
 
-async function handleFileUpload(event: Event) {
-  const file = (event.target as HTMLInputElement).files?.[0];
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    toast.add({
-      title: "File Too Large",
-      description: "Profile picture must be less than 2MB",
-      color: "error",
-      icon: "i-lucide-x",
-    });
-    return;
-  }
+async function handleAvatarUpload(file: File) {
   updatingProfilePicture.value = true;
   try {
-    const [upload] = await uploadProfilePicture(
-      event.target as HTMLInputElement,
-    );
+    const upload = await uploadProfilePicture(file);
     if (upload?.pathname) {
       await updateProfilePictureMutation.mutate({
-        key: upload?.pathname,
+        key: upload.pathname,
       });
     }
     useSession().refresh();
@@ -136,39 +102,26 @@ async function handleFileUpload(event: Event) {
   updatingProfilePicture.value = false;
 }
 
-const avatarDropdownItems = [
-  [
-    {
-      label: "Upload",
-      onSelect: () => {
-        fileInputRef.value?.click();
-      },
-    },
-    {
-      label: "Remove",
-      onSelect: async () => {
-        updatingProfilePicture.value = true;
-        try {
-          await removeProfilePictureMutation.mutate();
-          useSession().refresh();
-          toast.add({
-            title: "Profile Picture Removed",
-            color: "success",
-            icon: "i-lucide-check",
-          });
-        } catch (error: any) {
-          toast.add({
-            title: "Failed to Remove Profile Picture",
-            description: error?.message || "Something went wrong",
-            color: "error",
-            icon: "i-lucide-x",
-          });
-        }
-        updatingProfilePicture.value = false;
-      },
-    },
-  ],
-];
+async function handleAvatarRemove() {
+  updatingProfilePicture.value = true;
+  try {
+    await removeProfilePictureMutation.mutate();
+    useSession().refresh();
+    toast.add({
+      title: "Profile Picture Removed",
+      color: "success",
+      icon: "i-lucide-check",
+    });
+  } catch (error: any) {
+    toast.add({
+      title: "Failed to Remove Profile Picture",
+      description: error?.message || "Something went wrong",
+      color: "error",
+      icon: "i-lucide-x",
+    });
+  }
+  updatingProfilePicture.value = false;
+}
 
 const profileLoading = ref(false);
 const profileSchema = z.object({

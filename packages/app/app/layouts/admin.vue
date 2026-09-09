@@ -8,45 +8,62 @@
       :default-size="16"
       collapsible
       resizable
-      :ui="{
-        root: 'border-e border-default',
-        footer: 'lg:border-t lg:border-default',
-      }"
+      :ui="{ root: 'border-e border-default' }"
     >
+      <!--
+        No collapse toggle here — every admin page already has one in its
+        own UDashboardNavbar #leading slot, so a second one here was two
+        controls doing the same thing.
+      -->
       <template #header="{ collapsed: isCollapsed }">
-        <div
-          class="flex items-center gap-2 w-full py-2 px-2"
-          :class="isCollapsed ? 'flex-col items-center gap-2' : 'justify-between'"
-        >
-          <UDashboardSidebarCollapse v-if="isCollapsed" />
-          <div class="flex items-center gap-2" :class="isCollapsed && 'justify-center'">
-            <UIcon name="i-lucide-shield-check" class="size-5 shrink-0 text-warning" />
-            <template v-if="!isCollapsed">
-              <span class="font-semibold truncate text-highlighted">Platform</span>
-              <UBadge label="Admin" color="warning" variant="subtle" size="sm" />
-            </template>
-          </div>
-          <UDashboardSidebarCollapse v-if="!isCollapsed" />
+        <div class="flex items-center gap-2 w-full py-2" :class="isCollapsed && 'justify-center'">
+          <template v-if="isCollapsed">
+            <img src="/nuxfire-icon.svg" alt="NuxFire" class="h-6 w-auto dark:hidden" />
+            <img src="/nuxfire-icon-white.svg" alt="NuxFire" class="h-6 w-auto hidden dark:block" />
+          </template>
+          <template v-else>
+            <img src="/nuxfire.svg" alt="NuxFire" class="h-5 w-auto dark:hidden" />
+            <img src="/nuxfire-white.svg" alt="NuxFire" class="h-5 w-auto hidden dark:block" />
+            <UBadge label="Admin" color="warning" variant="subtle" size="sm" />
+          </template>
         </div>
       </template>
 
       <template #default="{ collapsed: isCollapsed }">
+        <!-- See layouts/dashboard.vue: the gutter belongs to the sidebar. -->
         <UNavigationMenu
           :collapsed="isCollapsed"
           :items="links"
           orientation="vertical"
           tooltip
           popover
-          class="px-2"
         />
-      </template>
-
-      <template #footer="{ collapsed: isCollapsed }">
-        <AccountUserDropdown :collapsed="isCollapsed" />
       </template>
     </UDashboardSidebar>
 
+    <!--
+      While the MFA status read is in flight, nothing behind this veil has
+      real data yet (every admin.* call is independently gated server-side
+      by platformAdminProcedure and fails closed) — but showing an
+      interactive, unblurred shell for that moment still *reads* as
+      unrestricted access. This closes that gap visually, not just by data.
+    -->
+    <div
+      v-if="checkingMfa"
+      class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-default/40"
+    >
+      <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin text-muted" />
+    </div>
+
     <slot />
+
+    <AccountMfaSetupModal
+      v-model:open="mfaModalOpen"
+      :mode="mfaMode"
+      scope="admin"
+      :dismissible="false"
+      @success="onMfaVerified"
+    />
   </UDashboardGroup>
 </template>
 
@@ -66,23 +83,27 @@ const closeSidebar = () => {
   open.value = false;
 };
 
-const route = useRoute();
-
 /**
- * The MFA gate, in one place. Every `admin.*` procedure already rejects an
- * unenrolled or un-elevated admin with `FORBIDDEN`, but that leaves the screens
- * empty and the user guessing at a URL. One status read as the shell mounts
- * turns that into a redirect.
+ * The MFA gate, centralized in one modal (AccountMfaSetupModal, scope=
+ * "admin") instead of the full-page pages/admin/mfa.vue this used to
+ * redirect to — that page duplicated the same QR/code-form markup with a
+ * plain UDashboardPanel chrome and no blurred backdrop. Every `admin.*`
+ * procedure already rejects an unenrolled or un-elevated admin with
+ * `FORBIDDEN`, but that leaves the screens empty and the user guessing; one
+ * status read as the shell mounts turns that into this modal instead.
  *
- * Here rather than in `middleware/admin.ts` because the session payload does
- * not carry MFA state, and one HTTP call per navigation would be the price of
- * putting it there. Not by intercepting tRPC errors either: that would mean
- * classifying every `FORBIDDEN` across every procedure to find the ones this
- * page can fix, for no more coverage than a single read gives.
+ * Still a client-side read, not `middleware/admin.ts`, for the same reason
+ * as before: the session payload does not carry MFA state, and one HTTP
+ * call per navigation would be the price of putting it there.
  */
+const mfaModalOpen = ref(false);
+const mfaMode = ref<"enroll" | "challenge">("challenge");
+// Starts true so the blurred veil covers the shell from first paint, not
+// just from whenever the status read happens to resolve.
+const checkingMfa = ref(true);
+
 onMounted(async () => {
   collapsed.value = true;
-  if (route.path === "/admin/mfa") return;
 
   try {
     const status = await $fetch<{
@@ -91,49 +112,59 @@ onMounted(async () => {
       sessionElevated: boolean;
     }>("/api/admin/mfa/status");
 
-    if (
-      status.isPlatformAdmin &&
-      (!status.mfaEnrolled || !status.sessionElevated)
-    ) {
-      await navigateTo("/admin/mfa");
+    if (status.isPlatformAdmin && (!status.mfaEnrolled || !status.sessionElevated)) {
+      mfaMode.value = status.mfaEnrolled ? "challenge" : "enroll";
+      mfaModalOpen.value = true;
     }
   } catch {
     // A failed status read is not grounds to bounce anyone: the procedures
     // behind each screen are the real gate, and this is only the shortcut to
     // the screen that fixes it.
+  } finally {
+    checkingMfa.value = false;
   }
 });
+
+function onMfaVerified() {
+  mfaModalOpen.value = false;
+}
 
 const links = computed<NavigationMenuItem[]>(() => [
   {
     label: "Overview",
-    icon: "i-lucide-layout-dashboard",
+    icon: "i-lucide-bolt",
     to: "/admin",
     exact: true,
     onSelect: closeSidebar,
   },
   {
     label: "Companies",
-    icon: "i-lucide-building-2",
+    icon: "i-lucide-warehouse",
     to: "/admin/companies",
     onSelect: closeSidebar,
   },
   {
     label: "Plans",
-    icon: "i-lucide-credit-card",
+    icon: "i-lucide-dollar-sign",
     to: "/admin/plans",
     onSelect: closeSidebar,
   },
   {
     label: "Queue",
-    icon: "i-lucide-list-checks",
+    icon: "i-lucide-loader",
     to: "/admin/queue",
     onSelect: closeSidebar,
   },
   {
     label: "Audit Log",
-    icon: "i-lucide-scroll-text",
+    icon: "i-lucide-history",
     to: "/admin/audit-log",
+    onSelect: closeSidebar,
+  },
+  {
+    label: "Notifications",
+    icon: "i-lucide-bell",
+    to: "/admin/notifications",
     onSelect: closeSidebar,
   },
   {

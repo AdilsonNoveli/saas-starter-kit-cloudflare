@@ -55,6 +55,13 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-12-20",
   nitro: {
     preset: "cloudflare-module",
+    // See packages/app/nuxt.config.ts for why this is set explicitly: SST
+    // (infra/utils/constants.ts) already deploys this Worker with
+    // `nodejs_compat`, but Nitro can't see that flag at build time and warns
+    // otherwise.
+    cloudflare: {
+      nodeCompat: true,
+    },
     prerender: {
       routes: ["/", ...docsRoutes()],
       crawlLinks: true,
@@ -67,8 +74,8 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      charset: "utf-8",
-      viewport: "width=device-width, initial-scale=1",
+      // No charset/viewport here — Nuxt already sets these exact defaults;
+      // repeating them just trips nuxt-seo-utils's "repeats a default" check.
       title: "NuxFire Docs | NuxFire",
     },
   },
@@ -111,7 +118,7 @@ export default defineNuxtConfig({
     },
   },
   i18n: {
-    vueI18n: "./i18n.config.ts",
+    vueI18n: "../i18n.config.ts",
     defaultLocale: "en",
     strategy: "no_prefix",
     locales: [

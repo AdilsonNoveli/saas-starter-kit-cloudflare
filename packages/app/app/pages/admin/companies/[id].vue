@@ -7,6 +7,16 @@
         </template>
 
         <template #right>
+          <AccountUserDropdown collapsed size="md" />
+        </template>
+      </UDashboardNavbar>
+    </template>
+
+    <template #body>
+      <LoaderSpin v-if="status === 'pending'" />
+
+      <div v-else-if="team" class="space-y-4">
+        <div class="flex items-center justify-between gap-4">
           <UButton
             label="Back"
             icon="i-lucide-arrow-left"
@@ -15,7 +25,7 @@
             to="/admin/companies"
           />
 
-          <template v-if="team">
+          <div class="flex items-center gap-2">
             <AdminCompaniesReactivateModal
               v-if="team.status === 'SUSPENDED'"
               :team="{ id: team.id, name: team.name }"
@@ -30,15 +40,9 @@
             >
               <UButton label="Suspend" icon="i-lucide-ban" color="error" />
             </AdminCompaniesSuspendModal>
-          </template>
-        </template>
-      </UDashboardNavbar>
-    </template>
+          </div>
+        </div>
 
-    <template #body>
-      <LoaderSpin v-if="status === 'pending'" />
-
-      <div v-else-if="team" class="space-y-4">
         <UPageCard title="Company" variant="subtle">
           <template #description>
             {{ team.description ?? "No description." }}

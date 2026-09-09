@@ -53,6 +53,7 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "DB": import("@cloudflare/workers-types").D1Database
     "Emails": import("@cloudflare/workers-types").Service
     "GITHUB_CLIENT_ID": {
       "type": "sst.sst.Secret"

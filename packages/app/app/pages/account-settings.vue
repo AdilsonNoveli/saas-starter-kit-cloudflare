@@ -20,6 +20,11 @@ const links: NavigationMenuItem[] = [
     exact: true,
   },
   {
+    label: "Appearance",
+    icon: "i-lucide-paintbrush-vertical",
+    to: "/account-settings/appearance",
+  },
+  {
     label: "Notifications",
     icon: "i-lucide-bell",
     to: "/account-settings/notifications",

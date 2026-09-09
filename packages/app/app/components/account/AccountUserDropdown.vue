@@ -1,7 +1,14 @@
 <template>
+  <!--
+    `sideOffset` (16, not the stock 8): the stock value is measured from the
+    trigger button's own edge, not the navbar's — and the button sits
+    centered in a 64px header with ~8px of its own margin above that edge.
+    Net result at 8: the menu's top landed exactly on the header's bottom
+    border, reading as glued to it rather than opened below it.
+  -->
   <UDropdownMenu
     :items="items"
-    :content="{ align: 'center', collisionPadding: 12 }"
+    :content="{ align: 'center', sideOffset: 16, collisionPadding: 12 }"
     :ui="{
       content: collapsed ? 'w-56' : 'w-(--reka-dropdown-menu-trigger-width)',
     }"
@@ -9,7 +16,13 @@
     <!-- Collapsed: square icon button with avatar only -->
     <UButton
       v-if="collapsed"
-      :avatar="{ src: user?.image ?? undefined, alt: user?.name ?? 'Account', size: 'xs' }"
+      :avatar="{
+        src: user?.image ?? undefined,
+        alt: displayName,
+        size: avatarSize,
+        ui: { root: 'rounded-md' },
+      }"
+      :size="buttonSize"
       color="neutral"
       variant="ghost"
       square
@@ -28,65 +41,74 @@
     >
       <UAvatar
         :src="user?.image ?? undefined"
-        :alt="user?.name ?? 'Account'"
+        :alt="displayName"
         size="2xs"
         class="shrink-0"
+        :ui="{ root: 'rounded-md' }"
       />
       <span class="truncate text-sm font-medium text-highlighted">
-        {{ user?.name ?? 'Account' }}
+        {{ displayName }}
       </span>
     </UButton>
   </UDropdownMenu>
 </template>
 
 <script setup lang="ts">
-import type { DropdownMenuItem } from "@nuxt/ui";
+import type { AvatarProps, ButtonProps, DropdownMenuItem } from "@nuxt/ui";
 
-defineProps<{ collapsed?: boolean }>();
+/**
+ * `size` only affects the collapsed (icon-only) rendering — the expanded
+ * row always uses its own fixed "2xs" avatar. Every header that renders
+ * this collapsed passes `size="md"` — the stock "xs" default read as a
+ * speck stuck in the corner next to the navbar's own padding.
+ */
+const { collapsed, size = "xs" } = defineProps<{
+  collapsed?: boolean;
+  size?: AvatarProps["size"];
+}>();
+
+const buttonSizeByAvatarSize: Record<string, ButtonProps["size"]> = {
+  "3xs": "xs",
+  "2xs": "sm",
+  xs: "md",
+  sm: "lg",
+  md: "xl",
+  lg: "xl",
+  xl: "xl",
+  "2xl": "xl",
+  "3xl": "xl",
+};
+
+const avatarSize = computed(() => size);
+const buttonSize = computed(() => buttonSizeByAvatarSize[size ?? "xs"] ?? "md");
 
 const { user } = useSession();
-const colorMode = useColorMode();
-const { locale, locales, setLocale } = useI18n();
 
-const colorModeIcons = {
-  light: "i-lucide-sun",
-  dark: "i-lucide-moon",
-  system: "i-lucide-monitor",
-} as const;
-
-const appearanceChildren = computed<DropdownMenuItem[]>(() =>
-  (["light", "dark", "system"] as const).map((preference) => ({
-    label: toTitleCase(preference),
-    icon: colorModeIcons[preference],
-    type: "checkbox",
-    checked: colorMode.preference === preference,
-    onSelect: (event: Event) => {
-      event.preventDefault();
-      colorMode.preference = preference;
-    },
-  })),
+/*
+ * An unset name should never fall straight to a generic "Account" label —
+ * the email still identifies the person. "Account" is the last resort, not
+ * the first fallback.
+ */
+const displayName = computed(
+  () => user.value?.name ?? user.value?.email ?? "Account",
 );
 
-const localeChildren = computed<DropdownMenuItem[]>(() =>
-  locales.value.map((item) => ({
-    label: item.name ?? item.code,
-    type: "checkbox",
-    checked: locale.value === item.code,
-    onSelect: (event: Event) => {
-      event.preventDefault();
-      setLocale(item.code);
-    },
-  })),
-);
-
+/*
+ * Kept deliberately minimal — label, Account Settings, Sign Out. Appearance
+ * and Language used to live here as nested checkbox submenus; they now have
+ * their own page (/account-settings/appearance) alongside Profile/
+ * Notifications/Security, matching how GitHub/Vercel scope theme and locale
+ * as settings, not as quick actions in the avatar menu.
+ */
 const items = computed<DropdownMenuItem[][]>(() => [
   [
     {
       type: "label",
-      label: user.value?.name ?? "Account",
+      label: displayName.value,
       avatar: {
         src: user.value?.image ?? undefined,
-        alt: user.value?.name ?? "Account",
+        alt: displayName.value,
+        ui: { root: "rounded-md" },
       },
     },
   ],
@@ -95,18 +117,6 @@ const items = computed<DropdownMenuItem[][]>(() => [
       label: "Account Settings",
       icon: "i-lucide-settings",
       to: "/account-settings",
-    },
-  ],
-  [
-    {
-      label: "Appearance",
-      icon: "i-lucide-sun-moon",
-      children: appearanceChildren.value,
-    },
-    {
-      label: "Language",
-      icon: "i-lucide-languages",
-      children: localeChildren.value,
     },
   ],
   [

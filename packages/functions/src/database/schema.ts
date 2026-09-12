@@ -52,6 +52,12 @@ export const teams = pgTable("Team", {
   planId: text("planId")
     .notNull()
     .references(() => plans.id),
+  // Set on the team's first Stripe Checkout attempt, reused on every one
+  // after. Without it, createStripeCheckoutSession had no way to look up a
+  // team's customer, so it created a brand-new Stripe Customer object on
+  // every single "Select Plan" click — including retries after an abandoned
+  // or failed checkout — leaving orphaned customers in the Stripe dashboard.
+  stripeCustomerId: text("stripeCustomerId"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .default(sql`now()`),
@@ -218,6 +224,19 @@ export const plans = pgTable("Plan", {
   period: text("period").notNull(),
   provider: text("provider"),
   providerPriceId: text("providerPriceId"),
+  // The Stripe Product behind providerPriceId, kept separate from it because
+  // Prices are immutable on Stripe: changing amount/currency/interval creates
+  // a new Price under the *same* Product rather than a new Product each time,
+  // which is what this column makes possible. Null for plans not managed by
+  // Stripe's catalog (Paddle, or a plan with a hand-pasted providerPriceId).
+  providerProductId: text("providerProductId"),
+  // unitAmount/currency exist so the app can create/update the Stripe Price
+  // itself instead of an operator hand-pasting a price ID from the Stripe
+  // Dashboard. In minor units (e.g. cents) and lowercase ISO 4217, matching
+  // Stripe's own `unit_amount`/`currency` parameters exactly — both null for
+  // plans not managed this way (Free tier, Paddle, legacy hand-pasted prices).
+  unitAmount: integer("unitAmount"),
+  currency: text("currency"),
   // null = unlimited seats. Nullable rather than a sentinel like 0 or -1, so
   // "this plan has no seat limit" and "this plan allows zero members" stay
   // distinguishable, and every plan that existed before this column keeps

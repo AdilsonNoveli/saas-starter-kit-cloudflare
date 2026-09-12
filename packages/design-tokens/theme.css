@@ -84,11 +84,9 @@
    * Enterprise-grade corner radius. Nuxt UI derives its whole `rounded-*`
    * scale from this single variable (--radius-lg: calc(var(--ui-radius) *
    * 2), etc. — see @nuxt/ui's runtime theme) so lowering it here tightens
-   * every component consistently instead of overriding each `rounded-*`
-   * step by hand, the way pedped's own `!important` overrides do.
-   * 0.1875rem (3px) mirrors the flat, barely-rounded corners of the pedped
-   * admin reference (their own --radius-lg override was 5px; ours lands
-   * at 6px through the proportional scale).
+   * every component consistently with the minimal radius from the prints.
+   * 0.1875rem (3px) mirrors the minimal, flat, barely-rounded corners
+   * seen in the reference prints.
    */
   --ui-radius: 0.1875rem;
 

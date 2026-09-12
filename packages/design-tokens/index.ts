@@ -41,13 +41,13 @@ export const sharedUiConfig = {
     variants: {
       variant: {
         outline: {
-          root: "bg-elevated ring ring-default divide-y divide-default",
+          root: "bg-elevated ring ring-default divide-y divide-default rounded-md",
         },
         subtle: {
-          root: "bg-elevated ring ring-default divide-y divide-default",
+          root: "bg-elevated ring ring-default divide-y divide-default rounded-md",
         },
         soft: {
-          root: "bg-elevated divide-y divide-default",
+          root: "bg-elevated divide-y divide-default rounded-md",
         },
       },
     },

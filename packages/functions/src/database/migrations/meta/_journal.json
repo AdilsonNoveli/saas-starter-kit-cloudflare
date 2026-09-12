@@ -50,6 +50,20 @@
       "when": 1788820250992,
       "tag": "0006_lying_longshot",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789085391313,
+      "tag": "0007_dazzling_viper",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789140335780,
+      "tag": "0008_polite_kabuki",
+      "breakpoints": true
     }
   ]
 }

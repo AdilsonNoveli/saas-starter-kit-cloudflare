@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { and, count, eq, or } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
 import { authEmail } from "../../../../../config";
 import {
@@ -13,11 +13,7 @@ import {
   publicProcedure,
   router,
 } from "../trpc";
-import {
-  teamInvites,
-  teamMemberships,
-  teams,
-} from "@nuxfire/functions/schema";
+import { teamInvites, teamMemberships, teams } from "@nuxfire/functions/schema";
 
 export default router({
   sendInvite: abilityProcedure
@@ -53,17 +49,22 @@ export default router({
         }
         await authorize(sendInvite, team.id);
 
-        // The single point where a plan's seat limit is enforced. Deliberately
-        // only about *new* invites: a team that is already over its limit
+        // Seats are enforced here *and* again in acceptInvite. Counting only
+        // members here let the limit be bypassed outright: every pending
+        // invite saw the same member count, so a 3-seat team with 2 members
+        // could send any number of invites and have them all accepted. A live
+        // invite therefore holds a seat, exactly like a member does.
+        //
+        // Deliberately only about *new* invites: a team already over its limit
         // (because the plan changed under it) keeps every member it has —
         // nothing here removes anyone.
         if (team.plan.maxSeats !== null) {
-          const [memberCount] = await useDB()
-            .select({ value: count() })
-            .from(teamMemberships)
-            .where(eq(teamMemberships.teamId, team.id));
+          const [members, pendingInvites] = await Promise.all([
+            countTeamMembers(team.id),
+            countPendingInvites(team.id),
+          ]);
 
-          if ((memberCount?.value ?? 0) >= team.plan.maxSeats) {
+          if (members + pendingInvites >= team.plan.maxSeats) {
             throw new TRPCError({
               code: "FORBIDDEN",
               message:
@@ -121,6 +122,11 @@ export default router({
     .mutation(async ({ ctx: { user }, input }) => {
       const invite = await useDB().query.teamInvites.findFirst({
         where: eq(teamInvites.id, input.inviteId),
+        with: {
+          team: {
+            with: { plan: { columns: { maxSeats: true } } },
+          },
+        },
       });
       if (!invite || invite.email !== user.email) {
         throw new TRPCError({
@@ -128,24 +134,73 @@ export default router({
           message: "Invalid or expired invite",
         });
       }
-      if (invite.status !== "PENDING") {
+
+      // Expiry used to be decorative: `expiresAt` was written on every invite
+      // and then never read, so a link stayed valid forever. The status check
+      // alone could not catch that — an expired invite is still "PENDING".
+      if (!isInviteAcceptable(invite)) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Invite is no longer valid",
+          message: "This invite is no longer valid",
         });
       }
-      const membership = await useDB().insert(teamMemberships).values({
-        teamId: invite.teamId,
-        userId: user.id,
-        roleId: invite.roleId,
+
+      const existingMembership = await useDB().query.teamMemberships.findFirst({
+        where: and(
+          eq(teamMemberships.teamId, invite.teamId),
+          eq(teamMemberships.userId, user.id),
+        ),
       });
-      await useDB()
-        .update(teamInvites)
-        .set({
-          status: "ACCEPTED",
-        })
-        .where(eq(teamInvites.id, input.inviteId));
-      return membership;
+      if (existingMembership) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "You are already a member of this team",
+        });
+      }
+
+      // The seat limit is re-checked here, not just when the invite was sent:
+      // accepting is the moment a seat is actually taken, and the plan can
+      // change (or other invites can land) between the two. Counts members
+      // only — this invite is converting into one, so the seat it held as a
+      // pending invite is the seat being filled.
+      //
+      // This read sits outside the transaction below, so two invites accepted
+      // in the same instant can still both pass. Closing that fully needs row
+      // locking on the team; the window is milliseconds and the failure mode
+      // is one seat over, so it is deliberately not paid for here.
+      const maxSeats = invite.team.plan.maxSeats;
+      if (maxSeats !== null) {
+        const members = await countTeamMembers(invite.teamId);
+        if (members >= maxSeats) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message:
+              "This team has reached its member limit for the current plan",
+          });
+        }
+      }
+
+      // One transaction: the membership and the invite's new status have to
+      // land together. As two separate statements, a failure between them left
+      // the user a member of a team whose invite stayed PENDING — still
+      // holding a seat, and still re-usable.
+      return useDB().transaction(async (tx) => {
+        const [membership] = await tx
+          .insert(teamMemberships)
+          .values({
+            teamId: invite.teamId,
+            userId: user.id,
+            roleId: invite.roleId,
+          })
+          .returning();
+
+        await tx
+          .update(teamInvites)
+          .set({ status: "ACCEPTED" })
+          .where(eq(teamInvites.id, input.inviteId));
+
+        return membership;
+      });
     }),
   updateInviteRole: abilityProcedure
     .input(

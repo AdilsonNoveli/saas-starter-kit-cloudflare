@@ -56,7 +56,7 @@
       class="mt-6"
       block
       :disabled="isCurrent"
-      @click="handleClick"
+      @click="emit('select')"
     >
       {{ buttonText }}
     </UButton>
@@ -85,20 +85,19 @@ interface Props {
   isCurrent?: boolean;
   isFeatured?: boolean;
   period?: string;
-  onClick?: () => void;
   originalPrice?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   buttonText: "Get started",
   isCurrent: false,
   isFeatured: false,
   period: "",
-  onClick: () => {},
   originalPrice: undefined,
 });
 
-const handleClick = () => {
-  props?.onClick();
-};
+// An event rather than an `onClick` prop: the prop was invoked without `await`
+// or `catch`, so the async checkout handler behind it could reject and leave
+// the button looking inert with the failure buried in the console.
+const emit = defineEmits<{ select: [] }>();
 </script>

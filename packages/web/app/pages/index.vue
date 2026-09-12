@@ -1,6 +1,7 @@
 <template>
   <div>
     <LandingHero />
+    <LandingArchitecture />
     <LandingFeatures />
     <div class="py-8">
       <LandingFAQs

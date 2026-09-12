@@ -34,6 +34,42 @@
           popover
         />
       </template>
+
+      <template #footer="{ collapsed: isCollapsed }">
+        <!--
+          The gear-icon-on-the-team-card at /select-team was, until now, the
+          only way into team settings — nothing inside a team itself linked
+          there. `useTeamSettingsLinks` is the same ability-gated list the
+          settings page's own toolbar renders (see its doc comment), reused
+          here instead of duplicated so this trigger can never drift from
+          which tabs a given user is actually allowed to see.
+        -->
+        <UDropdownMenu
+          v-if="currentTeam?.slug"
+          :items="settingsItems"
+          :content="{
+            align: 'center',
+            side: 'top',
+            sideOffset: 8,
+            collisionPadding: 12,
+          }"
+          :ui="{
+            content: isCollapsed
+              ? 'w-56'
+              : 'w-(--reka-dropdown-menu-trigger-width)',
+          }"
+        >
+          <UButton
+            icon="i-lucide-settings"
+            :label="isCollapsed ? undefined : 'Settings'"
+            color="neutral"
+            variant="ghost"
+            block
+            :square="isCollapsed"
+            class="data-[state=open]:bg-elevated"
+          />
+        </UDropdownMenu>
+      </template>
     </UDashboardSidebar>
 
     <slot />
@@ -50,12 +86,19 @@
 </template>
 
 <script setup lang="ts">
-import type { NavigationMenuItem } from "@nuxt/ui";
+import type { DropdownMenuItem, NavigationMenuItem } from "@nuxt/ui";
 
 const open = ref(false);
 const collapsed = ref(true);
 const currentTeam = useCurrentTeam();
 const baseRoute = computed(() => `/${currentTeam.value?.slug}`);
+const teamID = computed(() => currentTeam.value?.id || "");
+
+// Same ability the Billing tab in useTeamSettingsLinks already gates on —
+// reused rather than re-derived, so this shortcut can't disagree with the
+// settings page about who is allowed to see billing for this team.
+const { data: showBilling } = useGetBillingInfoAbility(teamID);
+const settingsLinks = useTeamSettingsLinks(teamID);
 
 useDashboard();
 
@@ -96,10 +139,11 @@ const closeSidebar = () => {
 };
 
 /*
- * Team settings is reached from the team's own card on the "Select a Team"
- * grid (TeamSwitcher.vue), not from this primary nav — configuring the
- * workspace is an occasional, team-scoped action, not content navigation,
- * so it doesn't compete with "Dashboard" for space here.
+ * Full team settings (General/Members/Danger Zone/Billing) stays out of this
+ * primary nav — see the footer trigger below — but Plans/upgrade is content
+ * navigation in its own right, the same way it sits in the primary nav of
+ * most SaaS dashboards, so it gets its own entry instead of being buried a
+ * click deeper in the settings dropdown.
  */
 const links = computed<NavigationMenuItem[]>(() => [
   {
@@ -108,5 +152,24 @@ const links = computed<NavigationMenuItem[]>(() => [
     to: `${baseRoute.value}/dashboard`,
     onSelect: closeSidebar,
   },
+  ...(showBilling.value
+    ? [
+        {
+          label: "Plans",
+          icon: "i-lucide-crown",
+          to: `${baseRoute.value}/settings/billing`,
+          onSelect: closeSidebar,
+        },
+      ]
+    : []),
+]);
+
+const settingsItems = computed<DropdownMenuItem[][]>(() => [
+  settingsLinks.value.map((link) => ({
+    label: link.label,
+    icon: link.icon,
+    to: link.to,
+    onSelect: closeSidebar,
+  })),
 ]);
 </script>

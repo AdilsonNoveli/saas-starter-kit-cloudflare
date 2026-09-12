@@ -1,0 +1,47 @@
+import { and, count, eq, gt, isNull, or } from "drizzle-orm";
+import { teamInvites, teamMemberships } from "@nuxfire/functions/schema";
+
+/** Members currently occupying a seat on the team. */
+export async function countTeamMembers(teamId: string): Promise<number> {
+  const [row] = await useDB()
+    .select({ value: count() })
+    .from(teamMemberships)
+    .where(eq(teamMemberships.teamId, teamId));
+
+  return row?.value ?? 0;
+}
+
+/**
+ * Invites that can still turn into a member, and therefore already hold a
+ * seat. An invite stops holding one the moment it can no longer be accepted —
+ * which is why the expiry is part of this query and not just the status.
+ *
+ * `expiresAt` is nullable, and a null there means "never expires", so it has
+ * to count as live rather than be silently dropped by the comparison.
+ */
+export async function countPendingInvites(teamId: string): Promise<number> {
+  const [row] = await useDB()
+    .select({ value: count() })
+    .from(teamInvites)
+    .where(
+      and(
+        eq(teamInvites.teamId, teamId),
+        eq(teamInvites.status, "PENDING"),
+        or(
+          isNull(teamInvites.expiresAt),
+          gt(teamInvites.expiresAt, new Date()),
+        ),
+      ),
+    );
+
+  return row?.value ?? 0;
+}
+
+/** An invite is acceptable only while it is pending and not past its expiry. */
+export function isInviteAcceptable(invite: {
+  status: string;
+  expiresAt: Date | null;
+}): boolean {
+  if (invite.status !== "PENDING") return false;
+  return invite.expiresAt === null || invite.expiresAt.getTime() > Date.now();
+}

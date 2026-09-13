@@ -14,7 +14,7 @@ export default defineLayerManifest({
     sidebar: [
       {
         label: "Kanban",
-        icon: "i-lucide-pin",
+        icon: "i-lucide-kanban",
         to: "/{team}/kanban",
         order: 50,
       },

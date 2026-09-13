@@ -61,7 +61,9 @@ navigation all pick it up from that one array.
   `satisfies Record<string, AnyRouter>` and **never annotated** as one — the
   annotation would widen every procedure away and strip the client of its types.
 - **The tRPC routers cross package boundaries by explicit import**
-  (`~~/server/trpc/trpc`, `~~/server/utils/db`, `~~/server/utils/plans`), like
+  (`~~/server/trpc/trpc`, `~~/server/utils/db`) and reach peer layers by package
+  specifier (`@nuxfire/layer-billing/server/utils/plans` since Fase 3 passo 2a,
+  when `ensureFreePlan` moved with `Plan`), like
   `layers/kanban`'s does. They are imported as plain modules by the generated
   `.composition/layer-routers.ts`, outside any auto-import scope.
 - **`server/utils/*.ts` deliberately do NOT do that.** They still call `useDB()`

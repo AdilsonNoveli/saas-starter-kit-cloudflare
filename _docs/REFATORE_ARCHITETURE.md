@@ -240,9 +240,10 @@ export const layers = {
   // lista de nomes para `extends`: essas entradas entram no mesmo
   // `activeLayerNames` que alimenta a composição gerada de tRPC e de navegação
   // (ver §3), então uma core layer não tem import escrito à mão em lugar
-  // nenhum. Hoje só `teams` está extraída (Fase 3 passo 1a); as outras três
-  // entram aqui conforme as fases seguintes as extraem.
-  core: ["teams"], // -> ["teams", "billing", "notifications", "admin"]
+  // nenhum. Hoje `teams` (Fase 3 passo 1a/1b) e `billing` (passo 2a, backend)
+  // estão extraídas; as outras duas entram aqui conforme as fases seguintes as
+  // extraem.
+  core: ["teams", "billing"], // -> ["teams", "billing", "notifications", "admin"]
 
   // Feature Layers opcionais — ativáveis por build/deploy
   features: {
@@ -384,19 +385,34 @@ export * from "./core-schema"; // User, Plan, Subscription, Job, Log, etc.
 // direto.)
 export * from "../../../../layers/kanban/server/database/schema";
 export * from "../../../../layers/teams/server/database/schema"; // Team, TeamMembership, TeamInvite, Role, Permission
+export * from "../../../../layers/billing/server/database/schema"; // Plan, Benefit, BenefitsOnPlan, Subscription
 ```
 
 > [!IMPORTANT]
-> **`core-schema.ts` e o schema de `layers/teams` importam um ao outro — e isso é
-> correto.** `Subscription`, `Job` e `DeadLetterRecord` continuam em core com FK
-> para `Team`; `TeamMembership`/`TeamInvite` estão na layer com FK para `User`.
-> O ciclo é seguro porque **toda** referência que cruza a fronteira está dentro
-> de um callback do Drizzle — `.references(() => users.id)` e
-> `relations(t, ({ one }) => ...)` — então nenhum dos dois módulos lê um binding
-> importado enquanto o outro ainda está sendo avaliado. Regra prática: nada de
-> dereferenciar um import no topo do módulo, em qualquer um dos dois arquivos,
-> ou o ciclo vira TDZ em tempo de import. Validado nas duas ordens de entrada e
-> com `bunx drizzle-kit generate` (20 tabelas, "No schema changes").
+> **Existem hoje DOIS ciclos de import de schema, ambos deliberados, e uma única
+> regra mantém os dois seguros.**
+>
+> 1. `core-schema.ts` ↔ `layers/teams`: `Job` e `DeadLetterRecord` continuam em
+>    core com FK para `Team`; `TeamMembership`/`TeamInvite` estão na layer com FK
+>    para `User`.
+> 2. `layers/teams` ↔ `layers/billing` (novo na Fase 3 passo 2a):
+>    `Subscription.teamId` aponta para `Team`, enquanto `Team.planId` e o
+>    `teamRelations` (`plan`, `subscriptions`) apontam de volta para
+>    `Plan`/`Subscription`.
+>
+> **`core-schema.ts` ficou FORA do ciclo 2**: depois que `Plan`/`Subscription`
+> saíram dele, nada em core referencia mais essas tabelas, então core não importa
+> `layers/billing` de jeito nenhum. O ciclo 2 tem espelho em um ciclo de
+> dependência de workspace entre os dois `package.json` — o `bun install` resolve
+> como symlinks, sem reclamar.
+>
+> Os dois ciclos são seguros porque **toda** referência que cruza a fronteira está
+> dentro de um callback do Drizzle — `.references(() => users.id)` e
+> `relations(t, ({ one }) => ...)` — então nenhum módulo lê um binding importado
+> enquanto o outro ainda está sendo avaliado. Regra prática: nada de
+> dereferenciar um import no topo do módulo, em nenhum dos três arquivos, ou o
+> ciclo vira TDZ em tempo de import. Validado com `bunx drizzle-kit generate`
+> (20 tabelas, "No schema changes") antes e depois de cada extração.
 >
 > Mover uma definição de `pgTable` entre arquivos **não** gera migration: o
 > drizzle-kit compara identidade de tabela/coluna contra o snapshot, não o
@@ -508,7 +524,7 @@ Criada do zero, sem infra própria (usa só Postgres/KV/R2 já provisionados):
 Ordem corrigida, base primeiro:
 
 1. **`layers/teams/`** — multi-tenancy, RBAC, convites. Extraído primeiro porque é dependência transversal de todo o resto.
-2. **`layers/billing/`** — assinaturas, Stripe/Paddle, planos. Depende só de `teams`.
+2. **`layers/billing/`** — assinaturas, Stripe/Paddle, planos. Depende só de `teams`. **Backend extraído no passo 2a** (schema, routers tRPC, server utils, rotas Nitro de webhook, enums e a ability `billingGetBillingInfo`); frontend fica para o passo 2b. Duas coisas foram deixadas de propósito para o 2b remover: a ponte temporária de re-export no fim de `packages/app/types/enums.ts` (mesmo ciclo de vida da ponte `#shared/utils/abilities` do 1a/1b) e o `srcDir: "app"` explícito no `nuxt.config.ts` da layer. `admin/plans.ts` foi para a layer mas **fora** do mapa `routers` — continua montado em `admin.plans` por import nomeado, porque `routers` é espalhado no topo do `appRouter` e mover a chave quebraria `trpc.admin.plans.*`.
 3. **`layers/notifications/`** — depende de `teams` e da infra de websockets (que não muda).
 4. **`layers/admin/`** — extraído por último: seu próprio [admin/index.ts](file:///c:/nuxfire/packages/app/server/trpc/routers/admin/index.ts) já importa sub-routers de `plans` (billing), `notifications` e `queue` — é estruturalmente uma camada de agregação, não uma folha. Extraí-lo antes das outras três forçaria reescrever seus imports duas vezes.
 

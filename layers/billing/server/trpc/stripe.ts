@@ -1,11 +1,14 @@
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure, router } from "../trpc";
+// See the note in billing.ts: layers reach the Composition Root's tRPC
+// primitives and server utils by explicit import, never by Nitro's merge.
+import { protectedProcedure, router } from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
 import { teamMemberships, teams } from "@nuxfire/functions/schema";
-import { createStripeClient } from "~~/server/utils/stripe";
+import { createStripeClient } from "../utils/stripe";
 
-export default router({
+export const stripeRouter = router({
   createStripeCheckoutSession: protectedProcedure
     .input(
       z.object({

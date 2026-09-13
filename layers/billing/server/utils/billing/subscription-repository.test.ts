@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { extractEqCondition } from "../test-support/drizzle-inspect";
-import { PaymentProvider, SubscriptionStatus } from "~~/types/enums";
+import { PaymentProvider, SubscriptionStatus } from "../../../shared/types/enums";
 
 const baseInput = {
   teamId: "team_1",

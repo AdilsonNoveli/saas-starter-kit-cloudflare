@@ -1,5 +1,5 @@
 import type Stripe from "stripe";
-import { SubscriptionStatus } from "~~/types/enums";
+import { SubscriptionStatus } from "../../../shared/types/enums";
 
 /**
  * Keyed by `Stripe.Subscription.Status` so the map stays exhaustive: a status

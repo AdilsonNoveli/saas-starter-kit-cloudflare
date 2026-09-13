@@ -14,20 +14,30 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 //
 // This import and `core-schema`'s own `import { teams } from
 // "@nuxfire/layer-teams/server/database/schema"` form a real, deliberate
-// two-file cycle: `Subscription`/`Job`/`DeadLetterRecord` stay in core and hold
-// FKs to `Team`, while `TeamMembership`/`TeamInvite` live here and hold FKs to
+// two-file cycle: `Job`/`DeadLetterRecord` stay in core and hold FKs to
+// `Team`, while `TeamMembership`/`TeamInvite` live here and hold FKs to
 // `User`. It is safe because Drizzle takes *callbacks* everywhere a table
 // crosses the boundary — `.references(() => users.id)` and
 // `relations(t, ({ one }) => ...)` — so neither module dereferences the other's
 // exports while it is still evaluating. Nothing below may read an imported
 // binding at module top level; keep every cross-file reference inside a
 // callback or the cycle turns into a TDZ crash at import time.
+import { jobs, users } from "@nuxfire/functions/database/core-schema";
+// `Plan` and `Subscription` moved to layers/billing in Fase 3 passo 2a, which
+// turns the `Team` <-> billing references below into a SECOND cycle of exactly
+// the same shape — this time between two peer layers, not between a layer and
+// the aggregator package: `Team.planId` and `teamRelations` point at `Plan`/
+// `Subscription` here, while `Subscription.teamId` and `subscriptionRelations`
+// point back at `Team` there. The same rule keeps it safe, and the same rule is
+// the only thing keeping it safe: every reference to `plans`/`subscriptions`
+// below sits inside a `.references(() => ...)` or a `relations()` callback body.
+// `@nuxfire/layer-billing` is a declared dependency of this layer for this one
+// import (and this layer is a declared dependency of billing for the mirror
+// import) — a workspace dependency cycle that Bun resolves as plain symlinks.
 import {
-  jobs,
   plans,
   subscriptions,
-  users,
-} from "@nuxfire/functions/database/core-schema";
+} from "@nuxfire/layer-billing/server/database/schema";
 
 export const teams = pgTable("Team", {
   id: text("id")

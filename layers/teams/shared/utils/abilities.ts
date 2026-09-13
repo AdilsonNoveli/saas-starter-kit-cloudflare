@@ -81,7 +81,9 @@ export const teamsDeleteInvite = defineAbility(
     hasTeamPermission(user, teamId, PERMISSIONS.TEAMS.INVITE.DELETE),
 );
 
-export const teamsGetBillingInfo = defineAbility(
-  (user: User | null, teamId: string) =>
-    hasTeamPermission(user, teamId, PERMISSIONS.TEAMS.BILLING.VIEW),
-);
+// `teamsGetBillingInfo` used to sit here, gating `PERMISSIONS.TEAMS.BILLING.VIEW`.
+// Fase 3 passo 1b flagged it as a billing ability that merely happened to live
+// in this file; passo 2a moved it to
+// `layers/billing/shared/utils/abilities.ts` as `billingGetBillingInfo`. The
+// permission string itself stays here — it is teams-owned, declared by this
+// layer's manifest and already written into live `Permission` rows.

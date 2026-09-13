@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SubscriptionStatus } from "~~/types/enums";
+import { SubscriptionStatus } from "../../../shared/types/enums";
 import { mapStripeStatus } from "./status-map";
 
 describe("mapStripeStatus", () => {

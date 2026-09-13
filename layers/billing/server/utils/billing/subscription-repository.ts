@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { subscriptions } from "@nuxfire/functions/schema";
-import type { PaymentProvider, SubscriptionStatus } from "~~/types/enums";
+import type { PaymentProvider, SubscriptionStatus } from "../../../shared/types/enums";
 
 export interface SubscriptionUpsertInput {
   teamId: string;

@@ -18,6 +18,7 @@ import {
   kanbanMoveCard,
   kanbanUpdateBoard,
 } from "../../shared/utils/abilities";
+import { ensureKanbanPermissions } from "../utils/permissions";
 
 /**
  * Resolves a team by slug or id and proves the caller is a member of it.
@@ -77,6 +78,7 @@ const kanbanRouter = router({
   listBoards: abilityProcedure
     .input(z.object({ teamIdentifier: z.string() }))
     .query(async ({ ctx: { authorize, user }, input }) => {
+      await ensureKanbanPermissions();
       const team = await requireTeamMembership(user.id, input.teamIdentifier);
       await authorize(kanbanListBoards, team.id);
 

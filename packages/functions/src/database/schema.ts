@@ -21,3 +21,7 @@ export * from "../../../../layers/kanban/server/database/schema";
 // `Permission` live here now, and every consumer keeps importing them from
 // `@nuxfire/functions/schema` exactly as before.
 export * from "../../../../layers/teams/server/database/schema";
+// Core layer (Fase 3 passo 2a): `Plan`, `Benefit`, `BenefitsOnPlan` and
+// `Subscription`, relocated out of core-schema.ts — not new tables, which is
+// why this line comes with no migration.
+export * from "../../../../layers/billing/server/database/schema";

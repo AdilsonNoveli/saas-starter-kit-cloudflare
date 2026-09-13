@@ -2,12 +2,22 @@ import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure, router } from "../trpc";
+// `~~` is the Composition Root (packages/app). Layers import the shared tRPC
+// primitives and server utils explicitly instead of relying on Nitro's
+// cross-layer merge — the decision recorded at the top of
+// _docs/REFATORE_ARCHITETURE.md ("Layers cuidam do frontend; o backend usa
+// import explícito"), and the same pattern layers/teams' routers use.
+import { protectedProcedure, router } from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
 import { teamMemberships, teams } from "@nuxfire/functions/schema";
-import { createStripeClient } from "~~/server/utils/stripe";
-import { STRIPE_CANCEL_CONFIG_KV_KEY } from "~~/server/utils/stripe-portal";
+import { createStripeClient } from "../utils/stripe";
+import { STRIPE_CANCEL_CONFIG_KV_KEY } from "../utils/stripe-portal";
 
-export default router({
+// `hubKV()` further down stays unimported: it is a NuxtHub module auto-import
+// with no importable module path, registered globally in the Nitro scope (which
+// covers every active layer's server/ dir). Same category as `hubBlob()` in
+// layers/teams/server/trpc/teams.ts.
+export const billingRouter = router({
   getBillingInfo: protectedProcedure
     .input(
       z.object({

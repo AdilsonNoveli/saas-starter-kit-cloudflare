@@ -1,10 +1,10 @@
 import type Stripe from "stripe";
-import { createStripeClient } from "~~/server/utils/stripe";
-import { syncStripeSubscription } from "~~/server/utils/stripe/subscription-sync";
+import { createStripeClient } from "../../utils/stripe";
+import { syncStripeSubscription } from "../../utils/stripe/subscription-sync";
 import {
   markEventProcessed,
   wasEventProcessed,
-} from "~~/server/utils/billing/event-ledger";
+} from "../../utils/billing/event-ledger";
 
 /**
  * Deliberately thin: verify → dedupe → dispatch. All the actual state

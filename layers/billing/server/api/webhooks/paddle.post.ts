@@ -1,15 +1,15 @@
 import { Environment, EventName, Paddle } from "@paddle/paddle-node-sdk";
 import { eq } from "drizzle-orm";
-import { PaymentProvider, SubscriptionStatus } from "~~/types/enums";
+import { PaymentProvider, SubscriptionStatus } from "../../../shared/types/enums";
 import { plans } from "@nuxfire/functions/schema";
 import {
   upsertSubscription,
   type SubscriptionUpsertInput,
-} from "~~/server/utils/billing/subscription-repository";
+} from "../../utils/billing/subscription-repository";
 import {
   markEventProcessed,
   wasEventProcessed,
-} from "~~/server/utils/billing/event-ledger";
+} from "../../utils/billing/event-ledger";
 
 export default defineEventHandler(async (event) => {
   await assertNotRateLimited(event, "webhook:paddle", {

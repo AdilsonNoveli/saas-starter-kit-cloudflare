@@ -1,12 +1,12 @@
 import type Stripe from "stripe";
 import { and, eq, isNull } from "drizzle-orm";
 import { plans, teams } from "@nuxfire/functions/schema";
-import { PaymentProvider } from "~~/types/enums";
+import { PaymentProvider } from "../../../shared/types/enums";
 import { mapStripeStatus } from "./status-map";
 import {
   upsertSubscription,
   type SubscriptionUpsertInput,
-} from "~~/server/utils/billing/subscription-repository";
+} from "../billing/subscription-repository";
 
 export type SubscriptionSyncOutcome =
   { ok: true } | { ok: false; reason: string };

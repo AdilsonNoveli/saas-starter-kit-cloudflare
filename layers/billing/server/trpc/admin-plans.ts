@@ -2,22 +2,29 @@ import { TRPCError } from "@trpc/server";
 import type { H3Event } from "h3";
 import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { platformAdminProcedure, router } from "../../trpc";
+// See the note in billing.ts: layers reach the Composition Root's tRPC
+// primitives and server utils by explicit import, never by Nitro's merge.
+// `platformAdminProcedure` in particular is built on `protectedProcedure`, NOT
+// on `abilityProcedure` — platform authority never routes through the tenant
+// ability layer (see _docs/AGENTS.md, "Platform Admin").
+import { platformAdminProcedure, router } from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
+import { recordAuditLog } from "~~/server/utils/audit-log";
 import { plans, teams } from "@nuxfire/functions/schema";
 import {
   PaymentProvider,
   PLAN_BILLING_INTERVALS,
   STRIPE_PLAN_CURRENCIES,
-} from "~~/types/enums";
+} from "../../shared/types/enums";
 import {
   STRIPE_CANCEL_CONFIG_KV_KEY,
   createStripeCancelConfiguration,
-} from "~~/server/utils/stripe-portal";
+} from "../utils/stripe-portal";
 import {
   formatPlanPrice,
   planCatalogNeedsSync,
   syncStripePlanCatalog,
-} from "~~/server/utils/stripe-catalog";
+} from "../utils/stripe-catalog";
 
 /**
  * The editable surface of a plan, defined once and reused by both mutations:
@@ -189,8 +196,23 @@ async function resolvePlanPricing(
  * `archivePlan` is a soft delete: `Team.planId` and `Subscription.planId` are
  * real foreign keys, so removing a row would break tenants that still point at
  * it.
+ *
+ * WHY THIS LIVES IN layers/billing BUT IS NOT IN THIS LAYER'S `routers` MAP
+ * ------------------------------------------------------------------------
+ * Its content is Plan/Benefit CRUD plus Stripe product/price catalog sync —
+ * billing-domain logic that happens to be admin-*gated*, not admin-domain
+ * logic — so the code belongs here. Its mount point does not: it is a
+ * sub-router of `packages/app/server/trpc/routers/admin/index.ts`, reached by
+ * the client as `trpc.admin.plans.*`. `routers` maps are spread into
+ * `appRouter` at the TOP level, so putting this in there would turn a live
+ * `trpc.admin.plans.listPlans` call into `trpc.plans.listPlans` — exactly the
+ * kind of public-surface reshape the teams extraction was careful never to do
+ * (see the `teams`/`invites` note in ./router.ts). So it is exported from
+ * ./router.ts as an extra NAMED export alongside `routers`, and admin/index.ts
+ * — which stays in packages/app until `admin` is itself extracted, the step
+ * after next — imports it from there instead of from a neighbouring file.
  */
-export default router({
+export const adminPlansRouter = router({
   listPlans: platformAdminProcedure
     .input(
       z

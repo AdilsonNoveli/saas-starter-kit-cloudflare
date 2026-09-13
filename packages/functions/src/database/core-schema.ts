@@ -3,18 +3,16 @@ import {
   pgEnum,
   text,
   boolean,
-  integer,
   timestamp,
   jsonb,
-  primaryKey,
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
 // `Team` and the rest of the multi-tenancy/RBAC tables live in the teams layer
-// (Fase 3, passo 1a). `Subscription`, `Job` and `DeadLetterRecord` below still
-// hold foreign keys to `Team`, which is why this file imports back out of a
-// layer — and the teams layer imports `User`/`Plan`/`Job`/`Subscription` from
-// here in turn. That two-file cycle is deliberate and safe: every reference
+// (Fase 3, passo 1a). `Job` and `DeadLetterRecord` below still hold foreign
+// keys to `Team`, which is why this file imports back out of a layer — and the
+// teams layer imports `User`/`Job` from here in turn. That two-file cycle is
+// deliberate and safe: every reference
 // crossing the boundary sits inside a Drizzle callback
 // (`.references(() => teams.id)`, `relations(t, ({ one }) => ...)`), so neither
 // module reads the other's exports while it is still evaluating. Never
@@ -54,99 +52,12 @@ export const usersRelations = relations(users, ({ many }) => ({
 // file. They are still exported from `@nuxfire/functions/schema`, which
 // aggregates both.
 
-export const benefits = pgTable("Benefit", {
-  id: text("id").primaryKey().notNull(),
-  name: text("name").notNull(),
-  data: jsonb("data"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`)
-    .$onUpdate(() => new Date()),
-});
-
-export const benefitsRelations = relations(benefits, ({ many }) => ({
-  BenefitsOnPlan: many(benefitsOnPlan),
-}));
-
-export const benefitsOnPlan = pgTable(
-  "BenefitsOnPlan",
-  {
-    planId: text("planId").notNull(),
-    benefitId: text("benefitId").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`now()`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`now()`)
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [primaryKey({ columns: [table.planId, table.benefitId] })],
-);
-
-export const benefitsOnPlanRelations = relations(benefitsOnPlan, ({ one }) => ({
-  plan: one(plans, {
-    fields: [benefitsOnPlan.planId],
-    references: [plans.id],
-  }),
-  benefit: one(benefits, {
-    fields: [benefitsOnPlan.benefitId],
-    references: [benefits.id],
-  }),
-}));
-
-export const plans = pgTable("Plan", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  tier: text("tier").default("FREE").notNull(),
-  price: text("price").notNull(),
-  period: text("period").notNull(),
-  provider: text("provider"),
-  providerPriceId: text("providerPriceId"),
-  // The Stripe Product behind providerPriceId, kept separate from it because
-  // Prices are immutable on Stripe: changing amount/currency/interval creates
-  // a new Price under the *same* Product rather than a new Product each time,
-  // which is what this column makes possible. Null for plans not managed by
-  // Stripe's catalog (Paddle, or a plan with a hand-pasted providerPriceId).
-  providerProductId: text("providerProductId"),
-  // unitAmount/currency exist so the app can create/update the Stripe Price
-  // itself instead of an operator hand-pasting a price ID from the Stripe
-  // Dashboard. In minor units (e.g. cents) and lowercase ISO 4217, matching
-  // Stripe's own `unit_amount`/`currency` parameters exactly — both null for
-  // plans not managed this way (Free tier, Paddle, legacy hand-pasted prices).
-  unitAmount: integer("unitAmount"),
-  currency: text("currency"),
-  // null = unlimited seats. Nullable rather than a sentinel like 0 or -1, so
-  // "this plan has no seat limit" and "this plan allows zero members" stay
-  // distinguishable, and every plan that existed before this column keeps
-  // behaving exactly as it did.
-  maxSeats: integer("maxSeats"),
-  // Open-ended bag for future quotas (storage, jobs, API calls). A jsonb
-  // column means adding the next limit is a code change, not a migration.
-  limits: jsonb("limits"),
-  // Plans are archived, never deleted: Team.planId and Subscription.planId are
-  // real foreign keys, so a physical delete would break rows that still point
-  // here.
-  isArchived: boolean("isArchived").notNull().default(false),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`)
-    .$onUpdate(() => new Date()),
-});
-
-export const plansRelations = relations(plans, ({ many }) => ({
-  benefits: many(benefitsOnPlan),
-}));
+// `Plan`, `Benefit`, `BenefitsOnPlan` and `Subscription` moved to
+// layers/billing/server/database/schema.ts (Fase 3, passo 2a). Nothing left in
+// this file references them, so — unlike `Team` — they are NOT imported back
+// here; the only cycle core-schema still participates in is the one with
+// layers/teams. They are still exported from `@nuxfire/functions/schema`,
+// which aggregates all three files.
 
 // `Role` and `Permission` — the per-tenant RBAC tables — moved to
 // layers/teams/server/database/schema.ts alongside `Team`.
@@ -165,47 +76,6 @@ export const waitlistEmails = pgTable("WaitlistEmail", {
     .default(sql`now()`)
     .$onUpdate(() => new Date()),
 });
-
-export const subscriptions = pgTable("Subscription", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  teamId: text("teamId")
-    .notNull()
-    .references(() => teams.id),
-  status: text("status").default("ACTIVE").notNull(),
-  provider: text("provider").notNull(),
-  providerSubscriptionId: text("providerSubscriptionId").notNull(),
-  planId: text("planId")
-    .notNull()
-    .references(() => plans.id),
-  currentPeriodStart: timestamp("currentPeriodStart", { withTimezone: true }),
-  currentPeriodEnd: timestamp("currentPeriodEnd", { withTimezone: true }),
-  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false).notNull(),
-  providerMetadata: jsonb("providerMetadata"),
-  customerEmail: text("customerEmail"),
-  lastPaymentDate: timestamp("lastPaymentDate", { withTimezone: true }),
-  nextPaymentDate: timestamp("nextPaymentDate", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`)
-    .$onUpdate(() => new Date()),
-});
-
-export const subscriptionRelations = relations(subscriptions, ({ one }) => ({
-  team: one(teams, {
-    fields: [subscriptions.teamId],
-    references: [teams.id],
-  }),
-  plan: one(plans, {
-    fields: [subscriptions.planId],
-    references: [plans.id],
-  }),
-}));
 
 export const jobs = pgTable("Job", {
   id: text("id")

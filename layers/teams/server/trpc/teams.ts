@@ -12,7 +12,11 @@ import {
   router,
 } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";
-import { ensureFreePlan } from "~~/server/utils/plans";
+// `Plan` is billing's table, so its reactive free-plan safety net moved with it
+// in Fase 3 passo 2a — this is now a peer-layer import, not a Composition Root
+// one. `teams.create` still needs it: a brand-new tenant is inserted with
+// `planId` pointing at the Free plan.
+import { ensureFreePlan } from "@nuxfire/layer-billing/server/utils/plans";
 import {
   teamInvites,
   teamMemberships,

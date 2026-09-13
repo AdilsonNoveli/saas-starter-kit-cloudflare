@@ -1,5 +1,5 @@
 import type { H3Event } from "h3";
-import { createStripeClient } from "~~/server/utils/stripe";
+import { createStripeClient } from "./stripe";
 
 /**
  * KV key holding the id of the Stripe Billing Portal configuration used by the

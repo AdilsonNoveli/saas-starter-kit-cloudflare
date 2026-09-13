@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
   teamsDeleteInvite,
   teamsDeleteTeam,
-  teamsGetBillingInfo,
   teamsGetTeamDetails,
   teamsListMembersAndInvites,
   teamsListTeams,
@@ -57,7 +56,10 @@ const permissionGated = [
   ["teamsRemoveMember", teamsRemoveMember, PERMISSIONS.TEAMS.MEMBERS.REMOVE],
   ["teamsUpdateInvite", teamsUpdateInvite, PERMISSIONS.TEAMS.INVITE.UPDATE],
   ["teamsDeleteInvite", teamsDeleteInvite, PERMISSIONS.TEAMS.INVITE.DELETE],
-  ["teamsGetBillingInfo", teamsGetBillingInfo, PERMISSIONS.TEAMS.BILLING.VIEW],
+  // `teamsGetBillingInfo` was the ninth row here until Fase 3 passo 2a moved it
+  // to layers/billing as `billingGetBillingInfo`. Its six generated cases moved
+  // verbatim to layers/billing/shared/utils/abilities.test.ts — the repo-wide
+  // test count is unchanged by the split, which is the point.
 ] as const;
 
 describe.each(permissionGated)(

@@ -19,6 +19,15 @@ const ACTIONS = {
   INVITE_UPDATE: "teams:invite:update",
   INVITE_DELETE: "teams:invite:delete",
   BILLING_VIEW: "teams:billing:view",
+  // Kanban feature layer
+  KANBAN_BOARDS_VIEW: "kanban:boards:view",
+  KANBAN_BOARDS_CREATE: "kanban:boards:create",
+  KANBAN_BOARDS_UPDATE: "kanban:boards:update",
+  KANBAN_BOARDS_DELETE: "kanban:boards:delete",
+  KANBAN_CARDS_CREATE: "kanban:cards:create",
+  KANBAN_CARDS_UPDATE: "kanban:cards:update",
+  KANBAN_CARDS_MOVE: "kanban:cards:move",
+  KANBAN_CARDS_DELETE: "kanban:cards:delete",
 } as const;
 
 export const FREE_PLAN: InsertPlan = {
@@ -60,6 +69,15 @@ export const SYSTEM_ROLES: {
       { title: "Update Team Invites", action: ACTIONS.INVITE_UPDATE },
       { title: "Delete Team Invites", action: ACTIONS.INVITE_DELETE },
       { title: "View Billing", action: ACTIONS.BILLING_VIEW },
+      // Kanban
+      { title: "View Kanban Boards", action: ACTIONS.KANBAN_BOARDS_VIEW },
+      { title: "Create Kanban Boards", action: ACTIONS.KANBAN_BOARDS_CREATE },
+      { title: "Update Kanban Boards", action: ACTIONS.KANBAN_BOARDS_UPDATE },
+      { title: "Delete Kanban Boards", action: ACTIONS.KANBAN_BOARDS_DELETE },
+      { title: "Create Kanban Cards", action: ACTIONS.KANBAN_CARDS_CREATE },
+      { title: "Update Kanban Cards", action: ACTIONS.KANBAN_CARDS_UPDATE },
+      { title: "Move Kanban Cards", action: ACTIONS.KANBAN_CARDS_MOVE },
+      { title: "Delete Kanban Cards", action: ACTIONS.KANBAN_CARDS_DELETE },
     ],
   },
   {
@@ -77,6 +95,15 @@ export const SYSTEM_ROLES: {
       { title: "Manage Team Invites", action: ACTIONS.INVITE_CREATE },
       { title: "Update Team Invites", action: ACTIONS.INVITE_UPDATE },
       { title: "Delete Team Invites", action: ACTIONS.INVITE_DELETE },
+      // Kanban
+      { title: "View Kanban Boards", action: ACTIONS.KANBAN_BOARDS_VIEW },
+      { title: "Create Kanban Boards", action: ACTIONS.KANBAN_BOARDS_CREATE },
+      { title: "Update Kanban Boards", action: ACTIONS.KANBAN_BOARDS_UPDATE },
+      { title: "Delete Kanban Boards", action: ACTIONS.KANBAN_BOARDS_DELETE },
+      { title: "Create Kanban Cards", action: ACTIONS.KANBAN_CARDS_CREATE },
+      { title: "Update Kanban Cards", action: ACTIONS.KANBAN_CARDS_UPDATE },
+      { title: "Move Kanban Cards", action: ACTIONS.KANBAN_CARDS_MOVE },
+      { title: "Delete Kanban Cards", action: ACTIONS.KANBAN_CARDS_DELETE },
     ],
   },
   {
@@ -86,6 +113,13 @@ export const SYSTEM_ROLES: {
       isSystemRole: true,
       isDefault: true,
     },
-    permissions: [{ title: "List Team Members", action: ACTIONS.MEMBERS_LIST }],
+    permissions: [
+      { title: "List Team Members", action: ACTIONS.MEMBERS_LIST },
+      // Kanban — members can view and create/update/move cards but not delete boards
+      { title: "View Kanban Boards", action: ACTIONS.KANBAN_BOARDS_VIEW },
+      { title: "Create Kanban Cards", action: ACTIONS.KANBAN_CARDS_CREATE },
+      { title: "Update Kanban Cards", action: ACTIONS.KANBAN_CARDS_UPDATE },
+      { title: "Move Kanban Cards", action: ACTIONS.KANBAN_CARDS_MOVE },
+    ],
   },
 ];

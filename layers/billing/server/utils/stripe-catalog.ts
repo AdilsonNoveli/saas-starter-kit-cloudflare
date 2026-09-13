@@ -1,6 +1,6 @@
 import type { H3Event } from "h3";
 import { createStripeClient } from "./stripe";
-import type { PlanBillingInterval } from "~~/types/enums";
+import type { PlanBillingInterval } from "../../shared/types/enums";
 
 export interface StripePlanCatalogInput {
   name: string;

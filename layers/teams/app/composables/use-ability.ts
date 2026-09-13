@@ -8,30 +8,17 @@ import {
   teamsListMembersAndInvites,
   teamsUpdateTeamDetails,
 } from "@nuxfire/layer-teams/shared/utils/abilities";
-// The ability behind this one wrapper moved to layers/billing in Fase 3 passo
-// 2a (`teamsGetBillingInfo` -> `billingGetBillingInfo`); only the import and
-// the identifier changed here. The wrapper itself is still called from this
-// layer (`use-team-settings-links.ts`, to decide whether the Billing tab
-// renders), so it stays put until passo 2b moves the billing frontend and can
-// decide where it really belongs.
-import { billingGetBillingInfo } from "@nuxfire/layer-billing/shared/utils/abilities";
+// `useGetBillingInfoAbility` is NOT here: it wraps `billingGetBillingInfo`,
+// which moved to layers/billing in Fase 3 passo 2a, and the wrapper followed it
+// in passo 2b (`layers/billing/app/composables/use-ability.ts`). This layer
+// still calls it — `use-team-settings-links.ts` decides whether the Billing tab
+// renders — and imports it from that layer by package subpath.
 
 export const useUpdateTeamDetailsAbility = (team: Ref<string>) => {
   return useAsyncData(
     () =>
       allows(
         teamsUpdateTeamDetails,
-        typeof team === "string" ? team : team.value,
-      ),
-    { watch: [team] },
-  );
-};
-
-export const useGetBillingInfoAbility = (team: Ref<string>) => {
-  return useAsyncData(
-    () =>
-      allows(
-        billingGetBillingInfo,
         typeof team === "string" ? team : team.value,
       ),
     { watch: [team] },

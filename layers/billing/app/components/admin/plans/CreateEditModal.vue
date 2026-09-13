@@ -253,7 +253,7 @@ import {
   PaymentProvider,
   PLAN_BILLING_INTERVALS,
   STRIPE_PLAN_CURRENCIES,
-} from "~~/types/enums";
+} from "@nuxfire/layer-billing/shared/types/enums";
 
 type Plan = RouterOutput["admin"]["plans"]["listPlans"][number];
 

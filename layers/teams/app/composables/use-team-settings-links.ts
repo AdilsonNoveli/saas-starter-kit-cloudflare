@@ -1,4 +1,11 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
+// The only cross-layer composable this file uses. The other three ability
+// wrappers below are this layer's own and come from Nuxt's auto-import;
+// `useGetBillingInfoAbility` lives in layers/billing (it wraps that layer's
+// `billingGetBillingInfo`), so it is imported explicitly by package subpath —
+// same shape as the `@nuxfire/layer-billing/shared/utils/abilities` import that
+// passo 2a introduced.
+import { useGetBillingInfoAbility } from "@nuxfire/layer-billing/app/composables/use-ability";
 
 /**
  * The ability-gated list of team settings sections (General/Members/Security

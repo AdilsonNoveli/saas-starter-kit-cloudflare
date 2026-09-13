@@ -30,35 +30,9 @@ export type UserStatus = $Enums.UserStatus;
 
 export const UserStatus: typeof $Enums.UserStatus = $Enums.UserStatus;
 
-// ---------------------------------------------------------------------------
-// TEMPORARY re-export bridge — delete in Fase 3 passo 2b.
-//
-// Two Composition Root frontend files still import the billing enums from this
-// path: `app/pages/[[team]]/settings/billing.vue` and
-// `app/components/admin/plans/CreateEditModal.vue`. Passo 2a is backend-only
-// and deliberately does not touch `packages/app/app/**`, so the alternative to
-// this bridge would be editing exactly the files the next step is going to move
-// anyway.
-//
-// This is the same pattern, and the same lifecycle, as the
-// `#shared/utils/abilities` bridge that passo 1a created and passo 1b deleted:
-// a backend extraction leaves one re-export behind, and the matching frontend
-// extraction removes it together with the last importer. When those two files
-// move into `layers/billing/app/`, they import
-// `@nuxfire/layer-billing/shared/types/enums` directly and everything below
-// this line goes away.
-// `PaymentProvider` and `SubscriptionStatus` are each a const AND a type in the
-// source module; a plain `export { ... } from` carries both meanings across, so
-// `import { PaymentProvider }` and `import type { PaymentProvider }` both keep
-// resolving exactly as they did before the move. The two below them are
-// type-only and need the `export type` form.
-export {
-  PaymentProvider,
-  PLAN_BILLING_INTERVALS,
-  STRIPE_PLAN_CURRENCIES,
-  SubscriptionStatus,
-} from "@nuxfire/layer-billing/shared/types/enums";
-export type {
-  PlanBillingInterval,
-  StripePlanCurrency,
-} from "@nuxfire/layer-billing/shared/types/enums";
+// The temporary billing re-export bridge that passo 2a left at the bottom of
+// this file is gone: passo 2b moved its last two importers
+// (`settings/billing.vue` and `admin/plans/CreateEditModal.vue`) into
+// `layers/billing/app/`, where they import
+// `@nuxfire/layer-billing/shared/types/enums` directly. Nothing outside that
+// layer reads a billing enum from this path any more.

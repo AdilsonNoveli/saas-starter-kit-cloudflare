@@ -93,8 +93,8 @@
 
 <script setup lang="ts">
 import type { RouterOutput } from "~~/server/trpc/routers";
-import { PaymentProvider } from "~~/types/enums";
-import type { BillingPeriod } from "~~/app/components/billing/BillingPeriodToggle.vue";
+import { PaymentProvider } from "@nuxfire/layer-billing/shared/types/enums";
+import type { BillingPeriod } from "../../../components/billing/BillingPeriodToggle.vue";
 
 definePageMeta({
   wide: true,

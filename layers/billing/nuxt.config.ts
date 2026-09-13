@@ -3,26 +3,32 @@ export default defineNuxtConfig({
     // Gives the layer its official `#layers/billing` import alias.
     name: "billing",
   },
-  // Explicit ONLY because this layer has no `app/` directory yet (passo 2a is
-  // backend-only). Nuxt 4's default srcDir is `app/`, but it silently falls
-  // back to the layer ROOT when that directory doesn't exist — and the
-  // generated `.nuxt/tsconfig.json` then globs `layers/billing/**/*` instead of
-  // `layers/billing/app/**/*`, dragging the layer's whole `server/` tree (test
-  // files included) into the CLIENT TypeScript program, where server code is
-  // checked against browser globals. That is not hypothetical: it is how a
-  // latent tuple-typing error in `server/utils/billing/event-ledger.test.ts`
-  // first appeared the moment the file moved here, having typechecked clean
-  // for its whole life inside packages/app. Compare the include lists for
-  // `layers/teams` / `layers/kanban` (both `.../app/**/*`) to confirm.
-  //
-  // Keep this line until passo 2b creates `layers/billing/app/`; after that it
-  // is redundant with the default and can go.
-  srcDir: "app",
-  // No `components` block: this step (Fase 3 passo 2a) is backend-only — the
-  // billing frontend is still in packages/app and moves in passo 2b, which is
-  // when `components: [{ path: "./components" }]` gets added (with NO `prefix`,
-  // same reasoning as layers/teams and layers/kanban: `prefix` prepends with no
-  // de-dup, so "Billing" on a directory of `Billing*.vue` files would render as
-  // `<BillingBillingCard>`). `server/` is scanned by Nitro from directory
-  // convention alone and needs nothing declared here.
+  components: [
+    {
+      // Relative to `srcDir` (`layers/billing/app`), NOT `rootDir` — the bug
+      // fixed in f27adc9: `./app/components` resolves to the non-existent
+      // `layers/billing/app/app/components` and every component of the layer
+      // silently disappears.
+      path: "./components",
+      // No `prefix`, same reasoning as layers/teams and layers/kanban:
+      // `prefix` prepends unconditionally with no de-dup against a filename
+      // that already starts with the same word, so "Billing" over a directory
+      // of `Billing*.vue` files renders `<BillingBillingPortalActions>`.
+      //
+      // Unlike teams (which flattened `components/team/` + `components/members/`
+      // into one directory because the nesting stuttered the names), this
+      // layer KEEPS its subdirectories: Nuxt's directory-nesting auto-prefix is
+      // exactly what produces the live names here. `admin/plans/CreateEditModal.vue`
+      // is registered as `<AdminPlansCreateEditModal>`, which is how
+      // `pages/admin/plans/index.vue` calls it — flattening the tree would
+      // rename it. `billing/` and `pricing/` are redundant for naming (the
+      // filenames already carry the name) but are left as-is: restructuring
+      // them buys nothing and this is a relocation, not a redesign.
+    },
+  ],
+  // `srcDir: "app"` used to be here, explicit, only because this layer had no
+  // `app/` directory while it was backend-only and Nuxt 4 silently falls back
+  // to the layer ROOT in that case (dragging `server/**` into the CLIENT
+  // TypeScript program — see _docs/AGENTS.md). `layers/billing/app/` exists as
+  // of Fase 3 passo 2b, so the default now resolves to it and the line is gone.
 });

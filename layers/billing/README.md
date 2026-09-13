@@ -5,19 +5,18 @@ both payment webhooks, and the platform-admin plan console. Second of the four
 core-layer extractions in Fase 3 of `_docs/REFATORE_ARCHITETURE.md`, after
 `teams` and before `notifications`/`admin`.
 
-> **Status: backend only (Fase 3 passo 2a).** The schema, the tRPC routers, the
-> server utils, the Nitro webhook routes, the billing enums and the billing
-> ability live here. The frontend (`app/pages/[[team]]/settings/billing.vue`,
-> `app/components/billing/**`, `app/components/admin/plans/**`,
-> `usePayments()`) is still in `packages/app` and moves in passo 2b.
+> **Status: complete (Fase 3 passo 2a backend + 2b frontend).** Schema, tRPC
+> routers, server utils, Nitro webhook routes, enums, the billing ability **and**
+> the whole billing frontend (`app/pages/[[team]]/settings/billing.vue`,
+> `app/pages/admin/plans/index.vue`, `app/components/{billing,pricing,admin/plans}/**`,
+> `usePayments()`, `useGetBillingInfoAbility()`) live here.
 >
-> Two things passo 2b must clean up, both deliberately left in place here:
->
-> - the temporary re-export bridge at the bottom of `packages/app/types/enums.ts`
->   (same lifecycle as the `#shared/utils/abilities` bridge passo 1a created and
->   passo 1b deleted), and
-> - `srcDir: "app"` in this layer's `nuxt.config.ts`, which is only needed while
->   this layer has no `app/` directory — see the comment there.
+> Both temporary bridges passo 2a left behind are closed: the re-export at the
+> bottom of `packages/app/types/enums.ts` is deleted (its last two importers
+> moved here), and `srcDir: "app"` is gone from `nuxt.config.ts` now that
+> `app/` actually exists and the Nuxt 4 default resolves to it — confirmed by
+> `packages/app/.nuxt/tsconfig.json` including `layers/billing/app/**/*`, not
+> `layers/billing/**/*`.
 
 ## Activation
 
@@ -39,7 +38,14 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 | Path                                   | Role                                                                                   |
 | -------------------------------------- | -------------------------------------------------------------------------------------- |
 | `layer.manifest.ts`                    | identity; `requires: ["teams"]`; `permissions: []` — see below                          |
-| `nuxt.config.ts`                       | `$meta.name` + a temporary explicit `srcDir` (no `components` block until passo 2b)     |
+| `nuxt.config.ts`                       | `$meta.name` + `components: [{ path: "./components" }]`, no `prefix`, no `srcDir`        |
+| `app/pages/[[team]]/settings/billing.vue` | the `/{team}/settings/billing` tab — a child of the settings parent in `layers/teams` |
+| `app/pages/admin/plans/index.vue`      | `/admin/plans`, the platform-admin plan console (`layout`/`middleware` named `admin`)    |
+| `app/components/admin/plans/CreateEditModal.vue` | `<AdminPlansCreateEditModal>` — the subpath IS the name, see below            |
+| `app/components/billing/*.vue`         | `<BillingComparisonTable>`, `<BillingPeriodToggle>`, `<BillingPortalActions>`, `<BillingTrialBanner>` |
+| `app/components/pricing/PricingCard.vue` | `<PricingCard>`, used by the admin plan modal's preview                                |
+| `app/composables/use-payments.ts`      | `usePayments("PADDLE" \| "STRIPE")` — client-side checkout for both providers            |
+| `app/composables/use-ability.ts`       | `useGetBillingInfoAbility()` — wrapper for this layer's ability; see below               |
 | `server/database/schema.ts`            | `Plan`, `Benefit`, `BenefitsOnPlan`, `Subscription` + their relations                   |
 | `server/trpc/router.ts`                | exports `routers` = `{ billing, stripe }`, **plus** `adminPlansRouter` as a named export |
 | `server/trpc/billing.ts`               | `billingRouter` — `getBillingInfo` (plans, current subscription, portal links)          |
@@ -60,6 +66,38 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 
 ## Conventions that are not optional
 
+- **This layer KEEPS its component subdirectories; `layers/teams` flattened its
+  own for a reason that does not apply here.** Teams merged `components/team/`
+  and `components/members/` into one flat directory because Nuxt's
+  directory-nesting auto-prefix would have stuttered names that already began
+  with the directory's word (`team/TeamSwitcher.vue` → `<TeamTeamSwitcher>`).
+  Here the nesting is what *produces* the live name:
+  `admin/plans/CreateEditModal.vue` registers as `<AdminPlansCreateEditModal>`,
+  which is exactly how `app/pages/admin/plans/index.vue` calls it — flattening
+  the directory would rename the component. `billing/` and `pricing/` are
+  redundant for naming (their filenames already carry the name) but were left
+  untouched: this was a relocation, not a restructure. Proven against a real
+  `nuxt build`, not assumed — the emitted chunks carry
+  `__name:"AdminPlansCreateEditModal"` on the component whose SSR module id is
+  `layers/billing/app/components/admin/plans/CreateEditModal.vue`, and all six
+  names are byte-identical to their pre-move entries in
+  `packages/app/.nuxt/components.d.ts`.
+- **`useGetBillingInfoAbility` lives in `app/composables/use-ability.ts` here,
+  but its only caller is in `layers/teams`.** It wraps `billingGetBillingInfo`,
+  so it follows the ability by domain ownership;
+  `layers/teams/app/composables/use-team-settings-links.ts` (which decides
+  whether the Billing settings tab renders) imports it explicitly as
+  `@nuxfire/layer-billing/app/composables/use-ability`, the same shape as the
+  `@nuxfire/layer-billing/shared/utils/abilities` import passo 2a introduced.
+  That is what the `"./app/*": "./app/*.ts"` entry in this layer's `exports`
+  exists for — note the `.ts` on the target, without which the subpath resolves
+  to nothing under `moduleResolution: bundler`.
+- **The settings route family is contributed by THREE layers.** One parent
+  (`layers/teams/app/pages/[[team]]/settings.vue`) with five children:
+  `index`/`members`/`security` from `layers/teams`, `notifications` from
+  `packages/app` (until that layer is extracted), and `billing` from here.
+  Verified in the built route manifest, not assumed — two-way page-tree merging
+  working did not guarantee three-way would.
 - **`adminPlansRouter` is exported from `server/trpc/router.ts` but is NOT in the
   `routers` map.** `routers` is spread into `appRouter` at the **top level**, so
   putting it there would republish a live `trpc.admin.plans.listPlans` call as

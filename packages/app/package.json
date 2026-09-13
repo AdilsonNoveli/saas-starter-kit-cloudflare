@@ -26,7 +26,6 @@
     "@nuxthub/core": "0.8.15",
     "@nuxtjs/i18n": "^10.6.0",
     "@openauthjs/openauth": "^0.3.6",
-    "@paddle/paddle-js": "^1.3.3",
     "@pinia/nuxt": "^0.9.0",
     "@unovis/ts": "^1.6.7",
     "@unovis/vue": "^1.6.7",

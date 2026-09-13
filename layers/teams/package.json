@@ -1,0 +1,26 @@
+{
+  "name": "@nuxfire/layer-teams",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./layer.manifest.ts",
+    "./server/trpc/router": "./server/trpc/router.ts",
+    "./server/database/schema": "./server/database/schema.ts",
+    "./server/utils/*": "./server/utils/*.ts",
+    "./shared/*": "./shared/*.ts"
+  },
+  "dependencies": {
+    "@nuxfire/functions": "workspace:*",
+    "@nuxfire/layer-types": "workspace:*",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@trpc/server": "^10.45.4",
+    "drizzle-orm": "^0.45.2",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "nuxt": "^4.5.2",
+    "nuxt-authorization": "^0.3.5",
+    "vitest": "^5.0.0"
+  }
+}

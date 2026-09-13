@@ -14,7 +14,7 @@ A primeira versão deste documento foi confrontada com o código real (schema Dr
 2. **Schema Drizzle: barrel file agregador condicional.** `packages/functions/src/database/schema.ts` deixa de ser um arquivo só com todas as tabelas — passa a reexportar (`export *`) o schema de cada layer, condicionado pelas mesmas flags que controlam o build. Isso mantém `useDB()` funcionando sem mudança (continua importando um módulo `schema` único), enquanto cada layer é dona do arquivo-fonte das suas tabelas.
 3. **Ordem de extração da Fase 3: `teams` primeiro.** `teams` é dependência transversal de billing, notifications e admin — extraí-lo por último obrigaria as outras layers a apontar temporariamente para `packages/app` e depois serem re-cabeadas. Dentro da nova ordem, `admin` continua saindo por último: seu próprio router ([admin/index.ts](file:///c:/nuxfire/packages/app/server/trpc/routers/admin/index.ts)) já importa `plans`, `queue`, `notifications` e `auditLog` como sub-routers — ou seja, admin é estruturalmente uma camada de agregação/consumo de outros domínios, não uma folha. Extraí-lo cedo forçaria reescrever seus imports duas vezes.
 
-Outros ajustes menores incorporados ao plano abaixo: convenção de nomenclatura para *abilities* (evita colisão de auto-import entre layers), separação clara entre `core` (sempre ativo) e `features` (toggleable) em `config.ts`, e documentação explícita dos dois limites aceitos: dado órfão quando uma layer é desativada em produção, e contexto tRPC (`createContext()`) permanecendo centralizado.
+Outros ajustes menores incorporados ao plano abaixo: convenção de nomenclatura para _abilities_ (evita colisão de auto-import entre layers), separação clara entre `core` (sempre ativo) e `features` (toggleable) em `config.ts`, e documentação explícita dos dois limites aceitos: dado órfão quando uma layer é desativada em produção, e contexto tRPC (`createContext()`) permanecendo centralizado.
 
 ---
 
@@ -90,7 +90,7 @@ layers/kanban/                        ← @nuxfire/layer-kanban
 │
 ├── server/
 │   ├── trpc/
-│   │   └── router.ts                 ← Exporta kanbanRouter
+│   │   └── router.ts                 ← Exporta o mapa `routers` (ver §3)
 │   └── database/
 │       └── schema.ts                 ← Exporta tabelas Drizzle desta Layer
 │
@@ -182,7 +182,7 @@ export default defineNuxtConfig({
     ".": "./layer.manifest.ts",
     "./server/trpc/router": "./server/trpc/router.ts",
     "./server/database/schema": "./server/database/schema.ts",
-    "./shared/*": "./shared/*"
+    "./shared/*": "./shared/*.ts"
   },
   "dependencies": {
     "@nuxfire/layer-teams": "workspace:*"
@@ -204,9 +204,13 @@ O objeto `layers` original misturava domínios "sempre ativos" com domínios opc
 ```typescript
 // config.ts (adição)
 export const layers = {
-  // Core Layers — sempre ativas no SaaS, não são toggleable.
-  // Existem aqui só para nomear os pacotes que o Composition Root sempre estende.
-  core: ["teams", "billing", "notifications", "admin"],
+  // Core Layers — sempre ativas no SaaS, não são toggleable. NÃO é só uma
+  // lista de nomes para `extends`: essas entradas entram no mesmo
+  // `activeLayerNames` que alimenta a composição gerada de tRPC e de navegação
+  // (ver §3), então uma core layer não tem import escrito à mão em lugar
+  // nenhum. Hoje só `teams` está extraída (Fase 3 passo 1a); as outras três
+  // entram aqui conforme as fases seguintes as extraem.
+  core: ["teams"], // -> ["teams", "billing", "notifications", "admin"]
 
   // Feature Layers opcionais — ativáveis por build/deploy
   features: {
@@ -258,31 +262,57 @@ export default defineNuxtConfig({
 
 ### 3. Composição de tRPC Routers entre Layers
 
+Cada layer exporta **um mapa `routers`** — `{ chaveDeTopo: router }` — de
+`server/trpc/router.ts`. Não um `${name}Router` só:
+
 ```typescript
-// packages/app/server/trpc/routers/index.ts
+// layers/teams/server/trpc/router.ts
+import type { AnyRouter } from "@trpc/server";
+import { teamsRouter } from "./teams";
+import { invitesRouter } from "./invites";
+
+export const routers = {
+  teams: teamsRouter,
+  invites: invitesRouter,
+} satisfies Record<string, AnyRouter>;
+```
+
+Por que um mapa (mudança da v1, feita na Fase 3 passo 1a):
+
+- **Uma layer pode ser dona de mais de uma chave de topo.** `teams` é dona de
+  `teams` _e_ `invites`, porque é essa a API que o cliente já chama hoje
+  (`trpc.invites.acceptInvite`, não `trpc.teams.invites.*`). Extrair um domínio
+  para uma layer não pode remodelar a superfície pública; a convenção de um
+  único export nomeado não conseguia expressar isso sem um caso especial.
+- **O erro fica barato.** A v1 derivava o nome do export por regex a partir do
+  manifesto — um nome divergente só aparecia no build do Nuxt como um opaco "no
+  export named X". Um objeto com nome fixo é checado pelo `tsc`, no arquivo.
+- **`satisfies`, nunca a anotação `: Record<string, AnyRouter>`.** A anotação
+  alargaria os procedures e o cliente perderia os tipos de entrada/saída de
+  `trpc.teams.*` — `AppRouter` é inferido direto através desse objeto.
+
+O Composition Root não importa layer nenhuma à mão. Core layers e feature layers
+saem do **mesmo** `activeLayerNames` (`layers.core` + `layers.features` ligadas)
+e portanto da **mesma** composição gerada — adicionar um nome em `layers.core`
+do `config.ts` é tudo o que existe a fazer:
+
+```typescript
+// packages/app/server/trpc/routers/index.ts (real, pós Fase 3 passo 1a)
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { router } from "../trpc";
 
 import account from "./account";
 import pub from "./public";
 
-// Routers importados das layers via export explícito do package.json — não
-// via merge automático de server/ do Nitro (ver nota de decisão acima).
-import { teamsRouter } from "@nuxfire/layer-teams/server/trpc/router";
-import { billingRouter } from "@nuxfire/layer-billing/server/trpc/router";
-import { notificationsRouter } from "@nuxfire/layer-notifications/server/trpc/router";
-import { adminRouter } from "@nuxfire/layer-admin/server/trpc/router";
-
-import { featureRouters } from "./.composition/feature-routers";
+// Gerado por scripts/compose-layers.ts a cada carga do nuxt.config.ts: o mapa
+// `routers` de toda layer ATIVA, achatado. Core e feature são o mesmo
+// mecanismo aqui — nenhuma das duas precisa de import escrito à mão.
+import { layerRouters } from "./.composition/layer-routers";
 
 export const appRouter = router({
   account,
   public: pub,
-  teams: teamsRouter,
-  billing: billingRouter,
-  notifications: notificationsRouter,
-  admin: adminRouter,
-  ...featureRouters,
+  ...layerRouters,
 });
 
 export type AppRouter = typeof appRouter;
@@ -290,15 +320,26 @@ export type RouterInput = inferRouterInputs<AppRouter>;
 export type RouterOutput = inferRouterOutputs<AppRouter>;
 ```
 
+> [!NOTE]
+> A v1 deste documento mostrava as core layers com imports escritos à mão
+> (`import { teamsRouter } from "@nuxfire/layer-teams/..."`) ao lado do spread
+> das feature layers. Isso está **errado** desde a correção da Fase 2: as
+> entradas de `layers.core` alimentam o mesmo `activeLayerNames` que
+> `composeLayers()` recebe, então elas são compostas automaticamente igual às
+> feature layers. Não existe lista de imports mantida à mão para core layers.
+> O que `packages/app/server/trpc/routers/index.ts` ainda tem escrito à mão são
+> só os routers que continuam morando dentro de `packages/app` (`account`,
+> `public`, e — até as fases seguintes — `billing`, `notifications`, `admin`,
+> `stripe`).
+
 ### 4. Composição de Banco de Dados (Drizzle ORM)
 
 Cada layer define seus modelos de dados em `server/database/schema.ts`. O ponto novo em relação à primeira versão do plano: **`packages/functions/src/database/schema.ts` vira um barrel file condicional**, para que o `schema` único que `useDB()` importa continue existindo de fato:
 
 ```typescript
-// packages/functions/src/database/schema.ts (real, pós Fase 2 — só a linha
-// do kanban existe hoje; teams/billing/notifications/admin ainda não são
-// layers, ver Fase 3)
-export * from "./core-schema"; // User, Team, Role, Permission, Plan, Log, etc.
+// packages/functions/src/database/schema.ts (real, pós Fase 3 passo 1a —
+// billing/notifications/admin ainda não são layers, ver Fase 3)
+export * from "./core-schema"; // User, Plan, Subscription, Job, Log, etc.
 
 // Layer schemas. Sem import de `layers`/config.ts — deliberadamente
 // incondicional, nunca gated por flag (ver aviso abaixo). Cada layer nova
@@ -310,7 +351,25 @@ export * from "./core-schema"; // User, Team, Role, Permission, Plan, Log, etc.
 // pacote functions, não pelo drizzle-kit, cujo próprio glob acha o arquivo
 // direto.)
 export * from "../../../../layers/kanban/server/database/schema";
+export * from "../../../../layers/teams/server/database/schema"; // Team, TeamMembership, TeamInvite, Role, Permission
 ```
+
+> [!IMPORTANT]
+> **`core-schema.ts` e o schema de `layers/teams` importam um ao outro — e isso é
+> correto.** `Subscription`, `Job` e `DeadLetterRecord` continuam em core com FK
+> para `Team`; `TeamMembership`/`TeamInvite` estão na layer com FK para `User`.
+> O ciclo é seguro porque **toda** referência que cruza a fronteira está dentro
+> de um callback do Drizzle — `.references(() => users.id)` e
+> `relations(t, ({ one }) => ...)` — então nenhum dos dois módulos lê um binding
+> importado enquanto o outro ainda está sendo avaliado. Regra prática: nada de
+> dereferenciar um import no topo do módulo, em qualquer um dos dois arquivos,
+> ou o ciclo vira TDZ em tempo de import. Validado nas duas ordens de entrada e
+> com `bunx drizzle-kit generate` (20 tabelas, "No schema changes").
+>
+> Mover uma definição de `pgTable` entre arquivos **não** gera migration: o
+> drizzle-kit compara identidade de tabela/coluna contra o snapshot, não o
+> arquivo-fonte. Se uma migration aparecer numa relocação, alguma coluna mudou
+> sem querer — ache e corrija antes de seguir.
 
 > [!WARNING]
 > Esta exportação é **incondicional de propósito** — nunca gated pelas flags de `layers.features`. Desativar uma feature layer no `config.ts` remove suas páginas/componentes do bundle Nuxt (via `extends`); nunca remove suas tabelas do schema Drizzle nem do client tipado. "Desativado" significa "fora da UI", não "apagado" — ver a nota de dado órfão logo abaixo.
@@ -328,9 +387,7 @@ export default defineConfig({
     "../../layers/*/server/database/schema.ts",
   ],
   out: "./src/database/migrations", // inalterado
-  dbCredentials: {
-    /* inalterado */
-  },
+  dbCredentials: {/* inalterado */},
 });
 ```
 
@@ -358,7 +415,7 @@ Todo nome de ability é prefixado pelo nome da layer, sem exceção — mesma di
 
 ### 7. Composição é automática, não um script manual
 
-`scripts/compose-layers.ts` exporta `composeLayers()`, chamada no topo de `packages/app/nuxt.config.ts`, antes de `defineNuxtConfig(...)`. Isso roda em **todo** `nuxt dev`/`build`/`generate`/`typecheck`/`prepare` — não existe passo manual para lembrar de rodar, e não há como `.composition/feature-routers.ts` ficar dessincronizado do que existe em `layers/`. Verificado apagando o arquivo gerado e confirmando que `nuxt prepare` (o mesmo comando que já roda em `postinstall`) o recria sozinho, sem qualquer intervenção manual.
+`scripts/compose-layers.ts` exporta `composeLayers()`, chamada no topo de `packages/app/nuxt.config.ts`, antes de `defineNuxtConfig(...)`. Isso roda em **todo** `nuxt dev`/`build`/`generate`/`typecheck`/`prepare` — não existe passo manual para lembrar de rodar, e não há como `.composition/layer-routers.ts` ficar dessincronizado do que existe em `layers/`. Verificado apagando o arquivo gerado e confirmando que `nuxt prepare` (o mesmo comando que já roda em `postinstall`) o recria sozinho, sem qualquer intervenção manual.
 
 ### 8. Navegação Dinâmica via Layers
 
@@ -414,12 +471,12 @@ Ordem corrigida, base primeiro:
 
 ### Fase 4: Novas Feature Layers de Negócio
 
-| Layer | Escopo funcional | Dependências | Infra própria? |
-|---|---|---|---|
-| `@nuxfire/layer-kanban` | Quadros, colunas, cartões, tags, drag-and-drop | `teams` | Não |
-| `@nuxfire/layer-calendar` | Agendamentos, eventos por equipe, recorrência | `teams` | Não |
-| `@nuxfire/layer-docs` | Base de conhecimento/documentação interna | `teams` | Não |
-| `@nuxfire/layer-chat` | Mensageria instantânea via Durable Objects | `teams`, `notifications` | **Sim — fora do escopo deste plano**, ver decisão 1 |
+| Layer                     | Escopo funcional                               | Dependências             | Infra própria?                                      |
+| ------------------------- | ---------------------------------------------- | ------------------------ | --------------------------------------------------- |
+| `@nuxfire/layer-kanban`   | Quadros, colunas, cartões, tags, drag-and-drop | `teams`                  | Não                                                 |
+| `@nuxfire/layer-calendar` | Agendamentos, eventos por equipe, recorrência  | `teams`                  | Não                                                 |
+| `@nuxfire/layer-docs`     | Base de conhecimento/documentação interna      | `teams`                  | Não                                                 |
+| `@nuxfire/layer-chat`     | Mensageria instantânea via Durable Objects     | `teams`, `notifications` | **Sim — fora do escopo deste plano**, ver decisão 1 |
 
 ---
 

@@ -16,7 +16,7 @@ const activeLayerNames = new Set([
     .map(([name]) => name),
 ]);
 
-// Regenerates server/trpc/routers/.composition/feature-routers.ts and
+// Regenerates server/trpc/routers/.composition/layer-routers.ts and
 // app/composables/.composition/layer-navigation.ts from whatever exists under
 // layers/ right now, filtered to activeLayerNames. Runs on every `nuxt dev`/
 // `build`/`generate`/`typecheck`/`prepare` — there is no separate script to

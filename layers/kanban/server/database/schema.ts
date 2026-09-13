@@ -1,11 +1,14 @@
 import { pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
-// Deliberately `core-schema`, NOT the `@nuxfire/functions/schema` barrel: that
-// barrel re-exports this very file, so importing it from here would be a
-// circular import. The barrel is the aggregator; layers only ever depend on
-// the core tables directly.
-import { teams } from "@nuxfire/functions/database/core-schema";
+// `Team` moved out of `@nuxfire/functions/database/core-schema` and into the
+// teams layer (Fase 3, passo 1a), so this import follows it. Never the
+// `@nuxfire/functions/schema` barrel: that barrel re-exports this very file,
+// so importing it from here would loop through the aggregator. A layer always
+// imports the owning source file directly — which is also what makes
+// `requires: ["teams"]` in this layer's manifest a real dependency, not just
+// documentation.
+import { teams } from "@nuxfire/layer-teams/server/database/schema";
 
 export const kanbanBoards = pgTable("KanbanBoard", {
   id: text("id")

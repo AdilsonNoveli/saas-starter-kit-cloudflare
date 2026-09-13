@@ -1,4 +1,4 @@
-import { TRPCError } from "@trpc/server";
+import { TRPCError, type AnyRouter } from "@trpc/server";
 import { asc, eq, or } from "drizzle-orm";
 import { z } from "zod";
 // `~~` is the Composition Root (packages/app). Layers import the shared tRPC
@@ -73,7 +73,7 @@ async function requireColumn(userId: string, columnId: string) {
   return { column, board };
 }
 
-export const kanbanRouter = router({
+const kanbanRouter = router({
   listBoards: abilityProcedure
     .input(z.object({ teamIdentifier: z.string() }))
     .query(async ({ ctx: { authorize, user }, input }) => {
@@ -287,3 +287,22 @@ export const kanbanRouter = router({
       return { id: card.id };
     }),
 });
+
+/**
+ * The layer's contribution to `appRouter`, keyed by the top-level name each
+ * router is mounted under. Every layer exports exactly this shape — a map, not
+ * a single `<name>Router` binding — because a layer may own more than one
+ * top-level key (`layers/teams` owns both `teams` and `invites`, matching the
+ * client-facing API that already exists). `scripts/compose-layers.ts` imports
+ * this map by its fixed name and spreads it; it never has to guess an export
+ * name from the manifest.
+ *
+ * `satisfies`, never a `: Record<string, AnyRouter>` annotation: the annotation
+ * would widen every procedure away and `trpc.kanban.listBoards` would lose its
+ * input/output types on the client (AppRouter is inferred straight through this
+ * object). `satisfies` keeps the literal type and still makes `tsc` reject a
+ * wrong shape here, in this file, instead of at Nuxt build time.
+ */
+export const routers = {
+  kanban: kanbanRouter,
+} satisfies Record<string, AnyRouter>;

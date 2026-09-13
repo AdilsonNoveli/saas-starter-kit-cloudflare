@@ -1,6 +1,20 @@
 import { and, count, eq, gt, isNull, or } from "drizzle-orm";
 import { teamInvites, teamMemberships } from "@nuxfire/functions/schema";
 
+// `useDB()` below has no import on purpose, exactly as it had in
+// packages/app/server/utils/: Nitro's auto-import scan covers EVERY active
+// layer's `server/` directory, not just the Composition Root's
+// (`scanDirs: layerDirs.map((dirs) => dirs.server)` in
+// @nuxt/nitro-server). So this file is a byte-for-byte relocation — which is
+// the point: `team-seats.test.ts` next to it stubs `useDB` on `globalThis`,
+// and that net only proves the move changed nothing if the moved code is
+// genuinely unchanged.
+//
+// The layer's tRPC router does NOT do this — it imports `~~/server/utils/db`
+// explicitly, like layers/kanban's does, because a tRPC router has to be
+// importable as a plain module by scripts/compose-layers.ts's generated file,
+// outside any Nitro auto-import scope. See README.md.
+
 /** Members currently occupying a seat on the team. */
 export async function countTeamMembers(teamId: string): Promise<number> {
   const [row] = await useDB()

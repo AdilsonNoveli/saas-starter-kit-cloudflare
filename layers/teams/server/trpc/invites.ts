@@ -1,21 +1,32 @@
 import { TRPCError } from "@trpc/server";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
-import { authEmail } from "../../../../../config";
-import {
-  deleteInvite,
-  sendInvite,
-  updateInvite,
-} from "#shared/utils/abilities";
+// Relative to the repo root's config.ts — four levels up from
+// layers/teams/server/trpc/, where it was five from
+// packages/app/server/trpc/routers/.
+import { authEmail } from "../../../../config";
+// See the note in teams.ts: layers reach the Composition Root's tRPC
+// primitives and server utils by explicit import, never by Nitro's merge.
 import {
   abilityProcedure,
   protectedProcedure,
   publicProcedure,
   router,
-} from "../trpc";
+} from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
 import { teamInvites, teamMemberships, teams } from "@nuxfire/functions/schema";
+import {
+  countPendingInvites,
+  countTeamMembers,
+  isInviteAcceptable,
+} from "../utils/team-seats";
+import {
+  deleteInvite,
+  sendInvite,
+  updateInvite,
+} from "../../shared/utils/abilities";
 
-export default router({
+export const invitesRouter = router({
   sendInvite: abilityProcedure
     .input(
       z.object({

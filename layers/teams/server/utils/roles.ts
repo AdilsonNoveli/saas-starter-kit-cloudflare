@@ -2,6 +2,14 @@ import { eq } from "drizzle-orm";
 import { permissions, roles } from "@nuxfire/functions/schema";
 import { SYSTEM_ROLES } from "@nuxfire/functions/database/seed-data";
 
+// `useDB()`, `InsertRole` and `InsertPermission` are unimported on purpose —
+// Nitro auto-imports them, and its scan covers every active layer's `server/`
+// dir, not only the Composition Root's. See the longer note in team-seats.ts.
+//
+// Kept in `server/utils/`, not `shared/utils/`: this is not framework-agnostic
+// logic. It opens a database connection and writes rows; nothing client-side
+// can or should call it.
+
 async function insertSystemRole(
   role: InsertRole,
   rolePermissions: Omit<InsertPermission, "roleId">[],

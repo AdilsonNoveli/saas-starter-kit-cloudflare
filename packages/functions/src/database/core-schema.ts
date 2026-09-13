@@ -7,10 +7,26 @@ import {
   timestamp,
   jsonb,
   primaryKey,
-  unique,
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
+// `Team` and the rest of the multi-tenancy/RBAC tables live in the teams layer
+// (Fase 3, passo 1a). `Subscription`, `Job` and `DeadLetterRecord` below still
+// hold foreign keys to `Team`, which is why this file imports back out of a
+// layer — and the teams layer imports `User`/`Plan`/`Job`/`Subscription` from
+// here in turn. That two-file cycle is deliberate and safe: every reference
+// crossing the boundary sits inside a Drizzle callback
+// (`.references(() => teams.id)`, `relations(t, ({ one }) => ...)`), so neither
+// module reads the other's exports while it is still evaluating. Never
+// dereference `teams` at this file's top level.
+//
+// Relative, not `@nuxfire/layer-teams/...`, for the same reason schema.ts's
+// barrel lines are relative: this package is the aggregator that reaches *down*
+// into layers, so it must not gain a package.json dependency on each of them —
+// layers already depend on `@nuxfire/functions`, and declaring the reverse
+// would add one workspace dependency cycle per extracted layer. Four levels up,
+// not three: this file sits in packages/functions/src/database/.
+import { teams } from "../../../../layers/teams/server/database/schema";
 
 export const users = pgTable("User", {
   id: text("id")
@@ -33,140 +49,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   notifications: many(notifications),
 }));
 
-export const teams = pgTable("Team", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull(),
-  description: text("description"),
-  logo: text("logo"),
-  // "ACTIVE" | "SUSPENDED" — plain text with a default, like
-  // Subscription.status, rather than a pgEnum: this file uses no enum for any
-  // other status column and a suspension state is the kind of value that gains
-  // members over time. The default matters as much as the column: every
-  // existing team has to come out of the migration ACTIVE, or the suspension
-  // check would read null and lock out tenants that were never suspended.
-  status: text("status").notNull().default("ACTIVE"),
-  planId: text("planId")
-    .notNull()
-    .references(() => plans.id),
-  // Set on the team's first Stripe Checkout attempt, reused on every one
-  // after. Without it, createStripeCheckoutSession had no way to look up a
-  // team's customer, so it created a brand-new Stripe Customer object on
-  // every single "Select Plan" click — including retries after an abandoned
-  // or failed checkout — leaving orphaned customers in the Stripe dashboard.
-  stripeCustomerId: text("stripeCustomerId"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`)
-    .$onUpdate(() => new Date()),
-});
-
-export const teamRelations = relations(teams, ({ one, many }) => ({
-  // The plan a team is on. `planId` is a notNull foreign key, so this is
-  // always present — it is what seat limits and quotas are read from.
-  plan: one(plans, {
-    fields: [teams.planId],
-    references: [plans.id],
-  }),
-  memberships: many(teamMemberships),
-  roles: many(roles),
-  subscriptions: many(subscriptions),
-  jobs: many(jobs),
-}));
-
-export const teamMemberships = pgTable(
-  "TeamMembership",
-  {
-    id: text("id")
-      .$default(() => cuid())
-      .primaryKey()
-      .notNull(),
-    teamId: text("teamId").notNull(),
-    userId: text("userId").notNull(),
-    roleId: text("roleId")
-      .notNull()
-      .references(() => roles.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`now()`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`now()`)
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [unique().on(table.teamId, table.userId)],
-);
-
-export const teamMembershipsRelations = relations(
-  teamMemberships,
-  ({ one }) => ({
-    role: one(roles, {
-      fields: [teamMemberships.roleId],
-      references: [roles.id],
-    }),
-    user: one(users, {
-      fields: [teamMemberships.userId],
-      references: [users.id],
-    }),
-    team: one(teams, {
-      fields: [teamMemberships.teamId],
-      references: [teams.id],
-    }),
-  }),
-);
-
-export const teamInvites = pgTable(
-  "TeamInvite",
-  {
-    id: text("id")
-      .$default(() => cuid())
-      .primaryKey()
-      .notNull(),
-    email: text("email").notNull(),
-    teamId: text("teamId")
-      .notNull()
-      .references(() => teams.id),
-    invitedById: text("invitedById")
-      .notNull()
-      .references(() => users.id),
-    roleId: text("roleId")
-      .notNull()
-      .references(() => roles.id),
-    status: text("status").default("PENDING").notNull(),
-    expiresAt: timestamp("expiresAt", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`now()`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`now()`)
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [unique().on(table.teamId, table.email)],
-);
-
-export const teamInvitesRelations = relations(teamInvites, ({ one }) => ({
-  team: one(teams, {
-    fields: [teamInvites.teamId],
-    references: [teams.id],
-  }),
-
-  invitedBy: one(users, {
-    fields: [teamInvites.invitedById],
-    references: [users.id],
-  }),
-
-  role: one(roles, {
-    fields: [teamInvites.roleId],
-    references: [roles.id],
-  }),
-}));
+// `Team`, `TeamMembership` and `TeamInvite` moved to
+// layers/teams/server/database/schema.ts — see the import at the top of this
+// file. They are still exported from `@nuxfire/functions/schema`, which
+// aggregates both.
 
 export const benefits = pgTable("Benefit", {
   id: text("id").primaryKey().notNull(),
@@ -262,55 +148,8 @@ export const plansRelations = relations(plans, ({ many }) => ({
   benefits: many(benefitsOnPlan),
 }));
 
-export const permissions = pgTable(
-  "Permission",
-  {
-    title: text("title").notNull(),
-    description: text("description"),
-    action: text("action").notNull(),
-    roleId: text("roleId")
-      .notNull()
-      .references(() => roles.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .default(sql`now()`),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .default(sql`now()`)
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [primaryKey({ columns: [table.action, table.roleId] })],
-);
-
-export const roles = pgTable("Role", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  teamId: text("teamId"),
-  name: text("name").notNull(),
-  description: text("description"),
-  isSystemRole: boolean("isSystemRole").default(false).notNull(),
-  isDefault: boolean("isDefault").default(false).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`)
-    .$onUpdate(() => new Date()),
-});
-
-export const rolesRelations = relations(roles, ({ many }) => ({
-  permissions: many(permissions),
-}));
-
-export const permissionsRelations = relations(permissions, ({ one }) => ({
-  role: one(roles, {
-    fields: [permissions.roleId],
-    references: [roles.id],
-  }),
-}));
+// `Role` and `Permission` — the per-tenant RBAC tables — moved to
+// layers/teams/server/database/schema.ts alongside `Team`.
 
 export const waitlistEmails = pgTable("WaitlistEmail", {
   id: text("id")

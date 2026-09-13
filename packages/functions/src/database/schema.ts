@@ -16,3 +16,8 @@ export * from "./core-schema";
 // root. (_docs/REFATORE_ARCHITETURE.md §4 shows three — that example is wrong;
 // `tsc --noEmit` in this package is what catches it.)
 export * from "../../../../layers/kanban/server/database/schema";
+// Core layer (config.ts `layers.core`), not a feature layer — same one-line
+// treatment either way: `Team`, `TeamMembership`, `TeamInvite`, `Role` and
+// `Permission` live here now, and every consumer keeps importing them from
+// `@nuxfire/functions/schema` exactly as before.
+export * from "../../../../layers/teams/server/database/schema";

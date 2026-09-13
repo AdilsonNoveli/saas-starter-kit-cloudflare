@@ -37,10 +37,14 @@ export const seedAccountPath = "/internal/identity/seed";
 // resources in infra/*.ts, this decides which domain layers are compiled into
 // the app at all. See _docs/REFATORE_ARCHITETURE.md, "Composição".
 export const layers = {
-  // Core layers — none exist yet (teams/billing/admin/notifications are
-  // still inside packages/app; extracting them is Fase 3). This array stays
-  // empty until then.
-  core: [] as string[],
+  // Core layers — always extended, never toggleable: every tenant of this
+  // SaaS needs them. Listed here (rather than hardcoded in nuxt.config.ts) so
+  // they feed the exact same `activeLayerNames` set that drives `extends`, the
+  // generated tRPC composition and the generated sidebar navigation. A core
+  // layer needs no hand-written import anywhere; adding its name here is all.
+  // `billing`/`notifications`/`admin` are still inside packages/app — they
+  // join this array as Fase 3 extracts them.
+  core: ["teams"] as string[],
 
   // Feature layers — toggleable per build/deploy. `false` drops the layer's
   // pages, components and Nuxt config from the bundle entirely; it does NOT

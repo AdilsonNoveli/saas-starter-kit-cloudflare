@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 
 // Generates the two composition files the Composition Root consumes:
 //
-//   1. `packages/app/server/trpc/routers/.composition/feature-routers.ts`,
+//   1. `packages/app/server/trpc/routers/.composition/layer-routers.ts`,
 //      spread into `appRouter`. A layer is picked up when it has BOTH a
 //      `layer.manifest.ts` (which names it) and a `server/trpc/router.ts`.
 //   2. `packages/app/app/composables/.composition/layer-navigation.ts`, which
@@ -81,35 +81,52 @@ function write(outFile: string, contents: string) {
   writeFileSync(outFile, contents);
 }
 
+/** A layer directory name turned into a legal JS identifier prefix. */
+function importAlias(dir: string) {
+  return `${dir.replace(/[^A-Za-z0-9]/g, "_")}Routers`;
+}
+
 /**
- * `packages/app/server/trpc/routers/.composition/feature-routers.ts` — the
- * object spread into `appRouter`. The router export is discovered by *name*
- * (`${manifest.name}Router`) rather than by importing the module, because this
- * runs before any bundler exists.
+ * `packages/app/server/trpc/routers/.composition/layer-routers.ts` — the object
+ * spread into `appRouter`.
+ *
+ * Every layer exports a single fixed binding, `routers`, mapping top-level
+ * `appRouter` key -> router. The map (rather than the old one-router-per-layer
+ * `${manifest.name}Router` convention) exists because a layer can legitimately
+ * own more than one top-level key — `layers/teams` owns `teams` *and* `invites`,
+ * which is the API shape the client already calls. It also removes a real
+ * failure mode: the old convention derived an export name by regex from the
+ * manifest, so a mismatch only surfaced at Nuxt build time as an opaque "no
+ * export named X"; a plain object under a fixed name is checked by `tsc`.
+ *
+ * Core layers and feature layers go through this same function. There is no
+ * hand-written import list for core layers anywhere — `layers.core` in
+ * config.ts feeds the very same `activeLayerNames` set (see
+ * packages/app/nuxt.config.ts), so adding a name there is all it takes.
  */
-function composeFeatureRouters(root: string, layers: DiscoveredLayer[]) {
+function composeLayerRouters(root: string, layers: DiscoveredLayer[]) {
   const outFile = resolve(
     root,
-    "packages/app/server/trpc/routers/.composition/feature-routers.ts",
+    "packages/app/server/trpc/routers/.composition/layer-routers.ts",
   );
   const withRouter = layers.filter((layer) => layer.hasRouter);
 
   const imports = withRouter
     .map(
       (layer) =>
-        `import { ${layer.name}Router } from "@nuxfire/layer-${layer.dir}/server/trpc/router";`,
+        `import { routers as ${importAlias(layer.dir)} } from "@nuxfire/layer-${layer.dir}/server/trpc/router";`,
     )
     .join("\n");
 
   const entries = withRouter
-    .map((layer) => `  ${layer.name}: ${layer.name}Router,`)
+    .map((layer) => `  ...${importAlias(layer.dir)},`)
     .join("\n");
 
   write(
     outFile,
     `${GENERATED_HEADER}
 ${imports ? `\n${imports}\n` : ""}
-export const featureRouters = {${entries ? `\n${entries}\n` : ""}};
+export const layerRouters = {${entries ? `\n${entries}\n` : ""}};
 `,
   );
 
@@ -158,7 +175,7 @@ export const layerManifests: LayerManifest[] = [${
 /**
  * Discovers every Nuxt layer under `layers/` and (re)writes both composition
  * files to match. Idempotent and safe to call on every Nuxt config load — with
- * zero layers it writes a stable, empty `featureRouters = {}` and an empty
+ * zero layers it writes a stable, empty `layerRouters = {}` and an empty
  * `layerManifests = []`.
  *
  * `activeLayerNames`, when given, filters discovery down to layers that are
@@ -182,7 +199,7 @@ export function composeLayers(
     ? discovered.filter((l) => new Set(activeLayerNames).has(l.name))
     : discovered;
 
-  const routers = composeFeatureRouters(root, active);
+  const routers = composeLayerRouters(root, active);
   const navigation = composeLayerNavigation(root, active);
 
   const names = active.map((l) => l.name).join(", ") || "none";
@@ -190,7 +207,7 @@ export function composeLayers(
   console.log(
     `compose-layers: ${active.length} active layer(s) [${names}]` +
       (skipped ? ` (${skipped} on disk but not active in config.ts)` : "") +
-      ` -> ${routers.count} router(s) in ${routers.outFile}, ${navigation.count} manifest(s) in ${navigation.outFile}`,
+      ` -> ${routers.count} router module(s) in ${routers.outFile}, ${navigation.count} manifest(s) in ${navigation.outFile}`,
   );
 
   return {

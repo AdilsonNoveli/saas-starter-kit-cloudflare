@@ -7,10 +7,11 @@
     ".": "./layer.manifest.ts",
     "./server/trpc/router": "./server/trpc/router.ts",
     "./server/database/schema": "./server/database/schema.ts",
-    "./shared/*": "./shared/*"
+    "./shared/*": "./shared/*.ts"
   },
   "dependencies": {
     "@nuxfire/functions": "workspace:*",
+    "@nuxfire/layer-teams": "workspace:*",
     "@nuxfire/layer-types": "workspace:*",
     "@paralleldrive/cuid2": "^2.2.2",
     "@trpc/server": "^10.45.4",

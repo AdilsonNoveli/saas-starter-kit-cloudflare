@@ -4,9 +4,11 @@
 // standalone if you just want to inspect the output.
 
 import kanbanManifest from "@nuxfire/layer-kanban";
+import teamsManifest from "@nuxfire/layer-teams";
 
 import type { LayerManifest } from "@nuxfire/layer-types";
 
 export const layerManifests: LayerManifest[] = [
   kanbanManifest,
+  teamsManifest,
 ];

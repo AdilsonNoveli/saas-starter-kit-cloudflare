@@ -4,7 +4,8 @@
 // a command:local:Command right after migrations, for every deploy that has
 // `app: true`, fresh installs included.
 //
-// This is the deterministic counterpart to server/utils/roles.ts's
+// This is the deterministic counterpart to
+// layers/teams/server/utils/roles.ts's
 // ensureSystemRoles() and server/utils/plans.ts's ensureFreePlan(), which
 // exist as a reactive safety net for the case this file doesn't cover: a
 // database reset independently of an app deploy (swapped instance, dropped

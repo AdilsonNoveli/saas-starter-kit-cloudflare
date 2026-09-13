@@ -3,8 +3,10 @@
 // packages/app/nuxt.config.ts); `bun scripts/compose-layers.ts` also works
 // standalone if you just want to inspect the output.
 
-import { kanbanRouter } from "@nuxfire/layer-kanban/server/trpc/router";
+import { routers as kanbanRouters } from "@nuxfire/layer-kanban/server/trpc/router";
+import { routers as teamsRouters } from "@nuxfire/layer-teams/server/trpc/router";
 
-export const featureRouters = {
-  kanban: kanbanRouter,
+export const layerRouters = {
+  ...kanbanRouters,
+  ...teamsRouters,
 };

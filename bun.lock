@@ -21,6 +21,7 @@
       "version": "1.0.0",
       "dependencies": {
         "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-teams": "workspace:*",
         "@nuxfire/layer-types": "workspace:*",
         "@paralleldrive/cuid2": "^2.2.2",
         "@trpc/server": "^10.45.4",
@@ -36,11 +37,29 @@
         "vitest": "^5.0.0",
       },
     },
+    "layers/teams": {
+      "name": "@nuxfire/layer-teams",
+      "version": "1.0.0",
+      "dependencies": {
+        "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-types": "workspace:*",
+        "@paralleldrive/cuid2": "^2.2.2",
+        "@trpc/server": "^10.45.4",
+        "drizzle-orm": "^0.45.2",
+        "zod": "^3.24.1",
+      },
+      "devDependencies": {
+        "nuxt": "^4.5.2",
+        "nuxt-authorization": "^0.3.5",
+        "vitest": "^5.0.0",
+      },
+    },
     "packages/app": {
       "name": "@nuxfire/app",
       "dependencies": {
         "@nuxfire/design-tokens": "workspace:*",
         "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-teams": "workspace:*",
         "@nuxfire/layer-types": "workspace:*",
         "@nuxt/eslint": "0.7.3",
         "@nuxt/fonts": "0.10.3",
@@ -600,6 +619,8 @@
     "@nuxfire/functions": ["@nuxfire/functions@workspace:packages/functions"],
 
     "@nuxfire/layer-kanban": ["@nuxfire/layer-kanban@workspace:layers/kanban"],
+
+    "@nuxfire/layer-teams": ["@nuxfire/layer-teams@workspace:layers/teams"],
 
     "@nuxfire/layer-types": ["@nuxfire/layer-types@workspace:packages/layer-types"],
 

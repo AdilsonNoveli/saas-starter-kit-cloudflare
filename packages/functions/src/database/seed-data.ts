@@ -32,8 +32,8 @@ export const FREE_PLAN: InsertPlan = {
 /**
  * The three built-in team roles. Single source of truth, imported by both:
  *
- *  - server/utils/roles.ts's ensureSystemRoles(), the reactive path that
- *    self-heals if Role is ever found empty at request time (e.g. a
+ *  - layers/teams/server/utils/roles.ts's ensureSystemRoles(), the reactive
+ *    path that self-heals if Role is ever found empty at request time (e.g. a
  *    database swapped or reset independently of a full app deploy).
  *  - database/seed.ts, the deploy-time path that guarantees these exist
  *    deterministically on every deploy, fresh installs included, rather

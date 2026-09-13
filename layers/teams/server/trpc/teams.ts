@@ -1,6 +1,25 @@
 import { TRPCError } from "@trpc/server";
-import { and, count, eq, or } from "drizzle-orm";
+import { and, count, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
+// `~~` is the Composition Root (packages/app). Layers import the shared tRPC
+// primitives and server utils explicitly instead of relying on Nitro's
+// cross-layer merge — the decision recorded at the top of
+// _docs/REFATORE_ARCHITETURE.md ("Layers cuidam do frontend; o backend usa
+// import explícito"), and the same pattern layers/kanban's router uses.
+import {
+  abilityProcedure,
+  protectedProcedure,
+  router,
+} from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
+import { ensureFreePlan } from "~~/server/utils/plans";
+import {
+  teamInvites,
+  teamMemberships,
+  teams,
+  roles,
+} from "@nuxfire/functions/schema";
+import { ensureSystemRoles } from "../utils/roles";
 import {
   deleteTeam,
   getTeamDetails,
@@ -9,16 +28,13 @@ import {
   removeMember,
   updateMemberRole,
   updateTeamDetails,
-} from "#shared/utils/abilities";
-import { abilityProcedure, protectedProcedure, router } from "../trpc";
-import {
-  teamInvites,
-  teamMemberships,
-  teams,
-  roles,
-} from "@nuxfire/functions/schema";
+} from "../../shared/utils/abilities";
 
-export default router({
+// `hubBlob()` further down stays unimported: it is a NuxtHub module
+// auto-import with no importable module path, registered globally in the Nitro
+// scope (which covers every active layer's server/ dir). Same category as
+// `defineAbility` in shared/utils/abilities.ts.
+export const teamsRouter = router({
   list: abilityProcedure.query(async ({ ctx: { authorize, user } }) => {
     await authorize(listTeams);
 

@@ -159,36 +159,45 @@ export default defineLayerManifest({
 // layers/kanban/nuxt.config.ts
 export default defineNuxtConfig({
   $meta: {
-    name: "kanban", // Gera alias oficial de import #layers/kanban
+    name: "kanban", // Alias #layers/kanban — não confirmado em uso, nada o consome ainda
   },
   components: [
     {
-      path: "./app/components",
-      prefix: "Kanban", // Intenção: <KanbanBoard /> evita conflitos globais
+      // Relativo a `srcDir` (`layers/kanban/app`), NÃO a `rootDir` — um erro
+      // real, achado ao corrigir o bug abaixo: `./app/components` apontava
+      // para `layers/kanban/app/app/components` (não existe).
+      path: "./components",
+      // SEM `prefix`: todo arquivo aqui já se chama `Kanban*.vue` (convenção
+      // de nome), e `prefix` gruda sem deduplicar contra um nome que já
+      // começa com a mesma palavra — `prefix: "Kanban"` rende
+      // `<KanbanKanbanBoard>`, não `<KanbanBoard>` (provado trocando por um
+      // valor absurdo e comparando `.nuxt/components.d.ts`: `prefix: "Zebra"`
+      // virou `<ZebraKanbanBoard>`). O namespace vem do nome do arquivo.
     },
   ],
 });
 ```
 
 > [!WARNING]
-> **Achado real na Fase 3, passo 1b: este arquivo não é carregado pelo Nuxt hoje.**
+> **Achado real na Fase 3, passo 1b, corrigido na sequência: este arquivo não
+> era carregado pelo Nuxt de jeito nenhum, da Fase 2 até aqui.**
 > `extends: ["@nuxfire/layer-kanban"]` resolve o pacote pelo `exports["."]` do
-> `package.json` da layer, que aponta para `./layer.manifest.ts` — então o c12
-> carrega o **manifesto** como config Nuxt da layer (confirmado em
+> `package.json` da layer — que apontava para `./layer.manifest.ts`, então o
+> c12 carregava o **manifesto** como config Nuxt da layer (confirmado em
 > `loadNuxtConfig()._layers[].configFile`). As chaves do manifesto não são
-> opções do Nuxt, então nada quebra, mas nada daqui vale: `$meta.name` não cria
-> o alias `#layers/<nome>` e o `prefix` de `components` não é aplicado (provado
-> trocando o prefixo por um valor absurdo e comparando
-> `.nuxt/components.d.ts`). **O namespace dos componentes vem do NOME DO
-> ARQUIVO** (`KanbanBoard.vue`, `TeamSwitcher.vue`), não do `prefix` — é por
-> isso que `layers/kanban` sempre pareceu funcionar. `app/`, `app/pages`,
-> `app/components`, `app/composables`, `app/middleware` e `server/` continuam
-> sendo varridos por convenção de diretório a partir do `rootDir`, que é
-> resolvido corretamente. Corrigir isso é uma mudança à parte e **não** é
-> trocar uma linha: os `path: "./app/components"` existentes resolvem contra o
-> `srcDir` (`layers/*/app`), então passar a honrá-los apontaria para
-> `layers/*/app/app/components`, que não existe, e todo componente de layer
-> sumiria silenciosamente.
+> opções do Nuxt, então nada quebrava — mas nada em `nuxt.config.ts` valia
+> nada: `$meta.name` não criava alias `#layers/<nome>`, `components: [{ prefix
+> }]` não fazia nada. O namespace dos componentes sobreviveu só porque todo
+> arquivo *também* já tinha o nome certo por convenção (`KanbanBoard.vue`).
+> **Corrigido**: `exports["."]` agora aponta para `./nuxt.config.ts`, e o
+> manifesto ganhou seu próprio subpath `./manifest` (`scripts/compose-layers.ts`
+> atualizado pra importar dali, não do specifier nu do pacote — ver §3 e a nota
+> de `package.json` logo abaixo). Corrigir isso revelou mais dois bugs reais,
+> documentados nos comentários do bloco acima: `path` relativo a `srcDir` não
+> `rootDir`, e `prefix` sem dedup contra nome de arquivo repetido. `app/pages`,
+> `app/composables`, `app/middleware` e `server/` sempre foram varridos
+> corretamente por convenção de diretório (não dependiam do `nuxt.config.ts`
+> carregar) — só `components` e o alias `#layers/*` foram afetados.
 
 ### `package.json` da Layer
 
@@ -199,7 +208,10 @@ export default defineNuxtConfig({
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./layer.manifest.ts",
+    // `.` tem que ser o nuxt.config.ts — é isso que `extends` resolve. O
+    // manifesto vai num subpath separado, nunca no `.` (ver aviso acima).
+    ".": "./nuxt.config.ts",
+    "./manifest": "./layer.manifest.ts",
     "./server/trpc/router": "./server/trpc/router.ts",
     "./server/database/schema": "./server/database/schema.ts",
     "./shared/*": "./shared/*.ts"

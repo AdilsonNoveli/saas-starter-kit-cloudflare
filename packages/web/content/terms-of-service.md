@@ -2,7 +2,7 @@
 title: Terms and Conditions
 ---
 
-**Effective Date:** November 09, 2024
+**Effective Date:** January 16, 2026
 
 Welcome to nuxfire. These Terms and Conditions govern your use of our website located at [https://nuxfire.com](/) (the "Site") and the services provided through the Site (collectively, the "Services"). By accessing or using the Site, you agree to comply with and be bound by these Terms and Conditions. If you do not agree to these Terms, you must not use the Site or the Services.
 

@@ -5,11 +5,15 @@ export default defineNuxtConfig({
   },
   components: [
     {
-      path: "./app/components",
-      // Every component of this layer is globally registered as <Kanban*>,
-      // which is what keeps two layers from colliding on a generic name
-      // like <Board> or <Card>.
-      prefix: "Kanban",
+      path: "./components",
+      // No `prefix` option: every file here is already named `Kanban*.vue`
+      // (the naming convention), and `prefix` prepends unconditionally, with
+      // no de-dup against a filename that already starts with the same word
+      // — verified by temporarily setting this to "Zebra" and getting
+      // `<ZebraKanbanBoard>`, not `<ZebraBoard>`. Re-adding "Kanban" here
+      // would render as `<KanbanKanbanBoard>`. `path` is kept explicit
+      // (matches Nuxt's own default for this directory) so this block stays
+      // as the one place a future layer author checks for the convention.
     },
   ],
 });

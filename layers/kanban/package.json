@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./layer.manifest.ts",
+    ".": "./nuxt.config.ts",
+    "./manifest": "./layer.manifest.ts",
     "./server/trpc/router": "./server/trpc/router.ts",
     "./server/database/schema": "./server/database/schema.ts",
     "./shared/*": "./shared/*.ts"

@@ -3,8 +3,8 @@
 // packages/app/nuxt.config.ts); `bun scripts/compose-layers.ts` also works
 // standalone if you just want to inspect the output.
 
-import kanbanManifest from "@nuxfire/layer-kanban";
-import teamsManifest from "@nuxfire/layer-teams";
+import kanbanManifest from "@nuxfire/layer-kanban/manifest";
+import teamsManifest from "@nuxfire/layer-teams/manifest";
 
 import type { LayerManifest } from "@nuxfire/layer-types";
 

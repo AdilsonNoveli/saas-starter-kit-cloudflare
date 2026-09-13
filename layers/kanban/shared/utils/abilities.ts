@@ -18,10 +18,12 @@ interface User {
 
 /**
  * Local copy of the same membership + permission check
- * `packages/app/shared/utils/abilities.ts` uses. Deliberately duplicated
- * rather than imported: that file is the `teams` domain, which is extracted
- * into its own layer in Fase 3 — taking a hard dependency on its current
- * location now would just have to be undone then.
+ * `layers/teams/shared/utils/abilities.ts` uses (that path was
+ * `packages/app/shared/utils/abilities.ts` until Fase 3 extracted the `teams`
+ * domain into its own layer). Still deliberately duplicated rather than
+ * imported: it is a four-line predicate, and importing it would make this
+ * feature layer's ability definitions fail to load whenever the teams layer
+ * is not in the build.
  */
 const hasTeamPermission = (
   user: User | null,

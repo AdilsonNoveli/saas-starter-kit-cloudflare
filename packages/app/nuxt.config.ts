@@ -1,3 +1,11 @@
+import { composeLayers } from "../../scripts/compose-layers";
+
+// Regenerates server/trpc/routers/.composition/feature-routers.ts from
+// whatever exists under layers/ right now. Runs on every `nuxt dev`/`build`/
+// `generate`/`typecheck`/`prepare` — there is no separate script to remember
+// to run, and no way for the composition file to drift from layers/ on disk.
+composeLayers();
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [

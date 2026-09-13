@@ -1,0 +1,12 @@
+{
+  "name": "@nuxfire/layer-types",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./index.ts"
+  }
+}

@@ -4,18 +4,21 @@
   "scripts": {
     "deploy": "sst deploy",
     "format": "prettier -w .",
+    "test": "vitest run",
     "web": "sst shell -- bun scripts/dev.ts web",
     "web-remote": "sst shell -- bun scripts/dev.ts web remote",
     "app": "sst shell -- bun scripts/dev.ts app",
     "app-remote": "sst shell -- bun scripts/dev.ts app remote"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "layers/*"
   ],
   "devDependencies": {
     "@tsconfig/node22": "^22",
     "prettier": "^3.4.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.0.0"
   },
   "dependencies": {
     "@types/bun": "^1.2.0",

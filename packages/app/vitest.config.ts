@@ -13,6 +13,10 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["server/**/*.test.ts"],
+    // `shared/` is a first-class Nuxt 4 source directory in this app (it holds
+    // the RBAC permissions/abilities shared between client and server), so its
+    // suites are collected alongside `server/`.
+    include: ["server/**/*.test.ts", "shared/**/*.test.ts"],
+    setupFiles: ["./vitest.setup.ts"],
   },
 });

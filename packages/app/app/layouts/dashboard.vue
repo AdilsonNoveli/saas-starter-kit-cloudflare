@@ -99,6 +99,7 @@ const teamID = computed(() => currentTeam.value?.id || "");
 // settings page about who is allowed to see billing for this team.
 const { data: showBilling } = useGetBillingInfoAbility(teamID);
 const settingsLinks = useTeamSettingsLinks(teamID);
+const layerLinks = useLayerNavigation();
 
 useDashboard();
 
@@ -152,6 +153,15 @@ const links = computed<NavigationMenuItem[]>(() => [
     to: `${baseRoute.value}/dashboard`,
     onSelect: closeSidebar,
   },
+  // Entries declared by the active Nuxt layers' manifests. `{team}` is the
+  // placeholder a layer writes because it has no way to know which tenant is
+  // open; this is the one place that knows, so it is substituted here.
+  ...layerLinks.value.map((link) => ({
+    label: link.label,
+    icon: link.icon,
+    to: link.to.replace("{team}", currentTeam.value?.slug ?? ""),
+    onSelect: closeSidebar,
+  })),
   ...(showBilling.value
     ? [
         {

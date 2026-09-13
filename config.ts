@@ -32,6 +32,25 @@ export const signOutOthersPath = "/internal/identity/sign-out-others";
 // for the credential to be written rather than write it itself.
 export const seedAccountPath = "/internal/identity/seed";
 
+// Nuxt Layers the Composition Root (packages/app/nuxt.config.ts) extends.
+// Deliberately separate from `flags` below: `flags` provisions Cloudflare
+// resources in infra/*.ts, this decides which domain layers are compiled into
+// the app at all. See _docs/REFATORE_ARCHITETURE.md, "Composição".
+export const layers = {
+  // Core layers — none exist yet (teams/billing/admin/notifications are
+  // still inside packages/app; extracting them is Fase 3). This array stays
+  // empty until then.
+  core: [] as string[],
+
+  // Feature layers — toggleable per build/deploy. `false` drops the layer's
+  // pages, components and Nuxt config from the bundle entirely; it does NOT
+  // drop its tables from the database schema (see section 4 of the plan —
+  // orphan data is intentional, "disabled" means "out of the UI", not "erased").
+  features: {
+    kanban: true,
+  } satisfies Record<string, boolean>,
+};
+
 // enable/disable features/3rd-party integrations
 export const flags: {
   stripe?: boolean;

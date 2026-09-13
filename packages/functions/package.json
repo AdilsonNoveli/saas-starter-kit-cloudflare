@@ -10,6 +10,7 @@
     "./subjects": "./src/subjects.ts",
     "./sender": "./src/sender.ts",
     "./schema": "./src/database/schema.ts",
+    "./database/core-schema": "./src/database/core-schema.ts",
     "./database/seed-data": "./src/database/seed-data.ts"
   },
   "dependencies": {

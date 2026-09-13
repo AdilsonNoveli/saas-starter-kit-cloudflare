@@ -3,4 +3,8 @@
 // packages/app/nuxt.config.ts); `bun scripts/compose-layers.ts` also works
 // standalone if you just want to inspect the output.
 
-export const featureRouters = {};
+import { kanbanRouter } from "@nuxfire/layer-kanban/server/trpc/router";
+
+export const featureRouters = {
+  kanban: kanbanRouter,
+};

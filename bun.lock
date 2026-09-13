@@ -16,11 +16,32 @@
         "vitest": "^5.0.0",
       },
     },
+    "layers/kanban": {
+      "name": "@nuxfire/layer-kanban",
+      "version": "1.0.0",
+      "dependencies": {
+        "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-types": "workspace:*",
+        "@paralleldrive/cuid2": "^2.2.2",
+        "@trpc/server": "^10.45.4",
+        "@vueuse/integrations": "^14.4.0",
+        "drizzle-orm": "^0.45.2",
+        "sortablejs": "^1.15.6",
+        "zod": "^3.24.1",
+      },
+      "devDependencies": {
+        "@types/sortablejs": "^1.15.8",
+        "nuxt": "^4.5.2",
+        "nuxt-authorization": "^0.3.5",
+        "vitest": "^5.0.0",
+      },
+    },
     "packages/app": {
       "name": "@nuxfire/app",
       "dependencies": {
         "@nuxfire/design-tokens": "workspace:*",
         "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-types": "workspace:*",
         "@nuxt/eslint": "0.7.3",
         "@nuxt/fonts": "0.10.3",
         "@nuxt/image": "^2.1.0",
@@ -577,6 +598,8 @@
     "@nuxfire/emails": ["@nuxfire/emails@workspace:packages/emails"],
 
     "@nuxfire/functions": ["@nuxfire/functions@workspace:packages/functions"],
+
+    "@nuxfire/layer-kanban": ["@nuxfire/layer-kanban@workspace:layers/kanban"],
 
     "@nuxfire/layer-types": ["@nuxfire/layer-types@workspace:packages/layer-types"],
 
@@ -1187,6 +1210,8 @@
     "@types/react": ["@types/react@19.2.18", "", { "dependencies": { "csstype": "^3.2.2" } }, "sha512-AnzbBERsrLKtk2XSfTbYRLjQPdy116Sty4q+T+Bp3IC4l6jNBvreVPAHmpq9qhXQM7CXZPjLVmGMw9sy+hxQ3w=="],
 
     "@types/resolve": ["@types/resolve@1.20.2", "", {}, "sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q=="],
+
+    "@types/sortablejs": ["@types/sortablejs@1.15.9", "", {}, "sha512-7HP+rZGE2p886PKV9c9OJzLBI6BBJu1O7lJGYnPyG3fS4/duUCcngkNCjsLwIMV+WMqANe3tt4irrXHSIe68OQ=="],
 
     "@types/supercluster": ["@types/supercluster@5.0.3", "", { "dependencies": { "@types/geojson": "*" } }, "sha512-XMSqQEr7YDuNtFwSgaHHOjsbi0ZGL62V9Js4CW45RBuRYlNWSW/KDqN+RFFE7HdHcGhJPtN0klKvw06r9Kg7rg=="],
 
@@ -2965,6 +2990,8 @@
     "socket.io-client": ["socket.io-client@4.8.3", "", { "dependencies": { "@socket.io/component-emitter": "~3.1.0", "debug": "~4.4.1", "engine.io-client": "~6.6.1", "socket.io-parser": "~4.2.4" } }, "sha512-uP0bpjWrjQmUt5DTHq9RuoCBdFJF10cdX9X+a368j/Ft0wmaVgxlrjvK3kjvgCODOMMOz9lcaRzxmso0bTWZ/g=="],
 
     "socket.io-parser": ["socket.io-parser@4.2.7", "", { "dependencies": { "@socket.io/component-emitter": "~3.1.0", "debug": "~4.4.1" } }, "sha512-IH/iSeO9T6gz1KkFleGDWkG9N3dl4jXVYUtMhIqH10Md0ttMer8nUNWiP1DKuNrybD2xBrixLJdCC9J6ECoYkg=="],
+
+    "sortablejs": ["sortablejs@1.15.7", "", {}, "sha512-Kk8wLQPlS+yi1ZEf48a4+fzHa4yxjC30M/Sr2AnQu+f/MPwvvX9XjZ6OWejiz8crBsLwSq8GHqaxaET7u6ux0A=="],
 
     "source-map": ["source-map@0.5.7", "", {}, "sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ=="],
 

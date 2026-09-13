@@ -1,12 +1,38 @@
+// Relative, not `#nuxfire/config`: this file is loaded by c12/jiti, which has
+// no tsconfig-`paths` resolution, so the alias throws "Cannot find module"
+// before Nuxt ever boots. Same reason the import below is relative too.
+import { layers } from "../../config";
 import { composeLayers } from "../../scripts/compose-layers";
 
-// Regenerates server/trpc/routers/.composition/feature-routers.ts from
-// whatever exists under layers/ right now. Runs on every `nuxt dev`/`build`/
-// `generate`/`typecheck`/`prepare` — there is no separate script to remember
-// to run, and no way for the composition file to drift from layers/ on disk.
-composeLayers();
+// Single source of truth for which layers are active, feeding BOTH
+// mechanisms below — a layer must never be wired into one and not the other,
+// or "desativado" stops being a real guarantee (see composeLayers()'s doc
+// comment for the concrete failure mode this prevents: a live tRPC router or
+// a sidebar link surviving for a layer whose pages were correctly dropped).
+const activeLayerNames = new Set([
+  ...layers.core,
+  ...Object.entries(layers.features)
+    .filter(([, enabled]) => enabled)
+    .map(([name]) => name),
+]);
+
+// Regenerates server/trpc/routers/.composition/feature-routers.ts and
+// app/composables/.composition/layer-navigation.ts from whatever exists under
+// layers/ right now, filtered to activeLayerNames. Runs on every `nuxt dev`/
+// `build`/`generate`/`typecheck`/`prepare` — there is no separate script to
+// remember to run, and no way for the composition files to drift from
+// layers/ + config.ts.
+composeLayers(undefined, activeLayerNames);
+
+// Nuxt's own page/component/config merging. Separate mechanism from
+// composeLayers() above (that one wires the tRPC routers and sidebar nav via
+// explicit workspace-package imports), but driven by the exact same set.
+const activeLayers = [...activeLayerNames].map(
+  (name) => `@nuxfire/layer-${name}`,
+);
 
 export default defineNuxtConfig({
+  extends: activeLayers,
   devtools: { enabled: true },
   modules: [
     "@nuxt/ui",

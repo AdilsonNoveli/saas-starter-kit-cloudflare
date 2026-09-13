@@ -2,3 +2,17 @@
 // own `export * from "../../../layers/<name>/server/database/schema";` line
 // here; `packages/app/server/utils/db.ts` keeps importing this file unchanged.
 export * from "./core-schema";
+
+// Layer schemas. Unconditional on purpose — NOT gated by `layers.features` in
+// config.ts. Turning a feature layer off removes its pages/components from the
+// Nuxt bundle; it never removes its tables from the database or from the typed
+// Drizzle client. See _docs/REFATORE_ARCHITETURE.md §4 ("dado órfão"): disabling
+// means "out of the UI", not "erased".
+//
+// Unlike the tRPC composition (server/trpc/routers/.composition/), this file is
+// hand-maintained: each new layer appends exactly one line here.
+// Four levels up, not three: this file sits at
+// packages/functions/src/database/, so `../../..` is `packages/`, not the repo
+// root. (_docs/REFATORE_ARCHITETURE.md §4 shows three — that example is wrong;
+// `tsc --noEmit` in this package is what catches it.)
+export * from "../../../../layers/kanban/server/database/schema";

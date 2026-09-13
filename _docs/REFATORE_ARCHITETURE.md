@@ -218,16 +218,31 @@ export const layers = {
 
 ### 2. Composition Root — `packages/app/nuxt.config.ts`
 
-```typescript
-// packages/app/nuxt.config.ts (modificado)
-import { layers } from "#nuxfire/config";
+Verificado na Fase 2: `#nuxfire/config` **não resolve aqui**. `nuxt.config.ts` é carregado por `c12`/`jiti` antes de o Nuxt (e o alias de `tsconfig.json` que ele lê) existir — o import precisa ser relativo. A mesma correção vale para o import de `scripts/compose-layers.ts`.
 
-const activeLayers = [
-  ...layers.core.map((name) => `@nuxfire/layer-${name}`),
+```typescript
+// packages/app/nuxt.config.ts (real, pós Fase 2)
+import { layers } from "../../config"; // relativo — #nuxfire/config não resolve aqui (c12/jiti)
+import { composeLayers } from "../../scripts/compose-layers";
+
+// Fonte única de verdade de quais layers estão ativas — alimenta os dois
+// mecanismos abaixo. Uma layer nunca pode ficar ligada em um e desligada no
+// outro, ou "desativado" deixa de ser garantia real.
+const activeLayerNames = new Set([
+  ...layers.core,
   ...Object.entries(layers.features)
     .filter(([, enabled]) => enabled)
-    .map(([name]) => `@nuxfire/layer-${name}`),
-];
+    .map(([name]) => name),
+]);
+
+// Regenera as duas .composition/ (routers tRPC + navegação da sidebar),
+// filtrado por activeLayerNames — ver nota abaixo sobre por que o filtro
+// existe.
+composeLayers(undefined, activeLayerNames);
+
+const activeLayers = [...activeLayerNames].map(
+  (name) => `@nuxfire/layer-${name}`,
+);
 
 export default defineNuxtConfig({
   extends: activeLayers,
@@ -237,6 +252,9 @@ export default defineNuxtConfig({
 
 > [!NOTE]
 > Quando uma feature layer tem seu valor como `false`, ela é **completamente descartada pelo bundler**. Páginas, componentes Vue e rotas Nitro dessa layer não entram no artefato final do Cloudflare Worker.
+
+> [!WARNING]
+> **Achado real na Fase 2**: a primeira versão de `composeLayers()` descobria layers só pela presença de `layer.manifest.ts` em disco, sem checar `config.ts`. Resultado: com `kanban: false`, a página sumia (via `extends`), mas o router tRPC continuava montado (chamável direto) e o link da sidebar continuava aparecendo — apontando para uma rota que não existia mais (404). Corrigido passando `activeLayerNames` para `composeLayers()`, que agora filtra por config.ts além de checar o disco. "Desativado" só é garantia real quando os três mecanismos (`extends`, composição tRPC, composição de navegação) concordam sobre a mesma fonte.
 
 ### 3. Composição de tRPC Routers entre Layers
 
@@ -277,23 +295,25 @@ export type RouterOutput = inferRouterOutputs<AppRouter>;
 Cada layer define seus modelos de dados em `server/database/schema.ts`. O ponto novo em relação à primeira versão do plano: **`packages/functions/src/database/schema.ts` vira um barrel file condicional**, para que o `schema` único que `useDB()` importa continue existindo de fato:
 
 ```typescript
-// packages/functions/src/database/schema.ts (novo formato)
-import { layers } from "#nuxfire/config";
-
+// packages/functions/src/database/schema.ts (real, pós Fase 2 — só a linha
+// do kanban existe hoje; teams/billing/notifications/admin ainda não são
+// layers, ver Fase 3)
 export * from "./core-schema"; // User, Team, Role, Permission, Plan, Log, etc.
 
-// Cada linha abaixo só existe fisicamente se a layer estiver ativa — mas
-// como isto é código estático (não dinâmico), o import é sempre presente e
-// o *gate* real acontece nas flags que também controlam o `extends` do Nuxt
-// e o `schema` do drizzle-kit abaixo. Tabelas de uma feature layer desativada
-// continuam existindo no client tipado; o que muda é se a UI/rotas que as
-// usam entram no bundle.
-export * from "../../../layers/teams/server/database/schema";
-export * from "../../../layers/billing/server/database/schema";
-export * from "../../../layers/notifications/server/database/schema";
-export * from "../../../layers/admin/server/database/schema";
-export * from "../../../layers/kanban/server/database/schema";
+// Layer schemas. Sem import de `layers`/config.ts — deliberadamente
+// incondicional, nunca gated por flag (ver aviso abaixo). Cada layer nova
+// soma UMA linha aqui à mão; isto não é gerado como a composição de tRPC.
+//
+// Quatro níveis acima, não três: este arquivo fica em
+// packages/functions/src/database/, então `../../..` é `packages/`, não a
+// raiz do repo. (Erro real da v1 deste doc — pego pelo `tsc --noEmit` do
+// pacote functions, não pelo drizzle-kit, cujo próprio glob acha o arquivo
+// direto.)
+export * from "../../../../layers/kanban/server/database/schema";
 ```
+
+> [!WARNING]
+> Esta exportação é **incondicional de propósito** — nunca gated pelas flags de `layers.features`. Desativar uma feature layer no `config.ts` remove suas páginas/componentes do bundle Nuxt (via `extends`); nunca remove suas tabelas do schema Drizzle nem do client tipado. "Desativado" significa "fora da UI", não "apagado" — ver a nota de dado órfão logo abaixo.
 
 `packages/app/server/utils/db.ts` **não muda uma linha** — continua fazendo `import * as schema from "@nuxfire/functions/schema"`.
 

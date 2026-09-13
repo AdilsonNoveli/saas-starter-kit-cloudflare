@@ -59,7 +59,6 @@ const links = [
   { label: "Home", to: "/" },
   { label: "Docs", to: "/docs" },
   { label: "Blog", to: "/blog" },
-  { label: "Contact", to: "/contact" },
 ];
 </script>
 

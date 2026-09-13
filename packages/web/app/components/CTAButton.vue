@@ -6,8 +6,8 @@
     :class="[
       'group inline-flex items-center justify-center font-bold uppercase tracking-wider select-none cursor-pointer',
       isShiny
-        ? 'shiny-button'
-        : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white duration-200 active:scale-95 shadow-sm',
+        ? (color === 'green' ? 'shiny-button shiny-button-green' : 'shiny-button')
+        : (color === 'green' ? 'bg-emerald-600 hover:bg-emerald-500 text-white duration-200 active:scale-95 shadow-sm' : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white duration-200 active:scale-95 shadow-sm'),
       sizeClasses,
       radiusClasses,
       widthClasses,
@@ -36,6 +36,7 @@ interface Props {
   href?: string;
   target?: "_blank" | "_self";
   variant?: "shiny" | "solid";
+  color?: "green" | "brand";
   size?: "sm" | "md" | "lg" | "xl";
   radius?: "md" | "lg" | "xl";
   shadow?: "none" | "sm" | "md";
@@ -50,6 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
   href: undefined,
   target: undefined,
   variant: "shiny",
+  color: "green",
   size: "md",
   radius: "lg",
   shadow: "sm",

@@ -21,13 +21,13 @@ import {
 } from "@nuxfire/functions/schema";
 import { ensureSystemRoles } from "../utils/roles";
 import {
-  deleteTeam,
-  getTeamDetails,
-  listMembersAndInvites,
-  listTeams,
-  removeMember,
-  updateMemberRole,
-  updateTeamDetails,
+  teamsDeleteTeam,
+  teamsGetTeamDetails,
+  teamsListMembersAndInvites,
+  teamsListTeams,
+  teamsRemoveMember,
+  teamsUpdateMemberRole,
+  teamsUpdateTeamDetails,
 } from "../../shared/utils/abilities";
 
 // `hubBlob()` further down stays unimported: it is a NuxtHub module
@@ -36,7 +36,7 @@ import {
 // `defineAbility` in shared/utils/abilities.ts.
 export const teamsRouter = router({
   list: abilityProcedure.query(async ({ ctx: { authorize, user } }) => {
-    await authorize(listTeams);
+    await authorize(teamsListTeams);
 
     const teams = await useDB().query.teams.findMany({
       with: {
@@ -110,7 +110,7 @@ export const teamsRouter = router({
           message: "This team has been suspended",
         });
       }
-      await authorize(getTeamDetails, team.id);
+      await authorize(teamsGetTeamDetails, team.id);
       return team;
     }),
   create: protectedProcedure
@@ -222,7 +222,7 @@ export const teamsRouter = router({
       if (
         !team ||
         team.memberships.length === 0 ||
-        (await denies(updateTeamDetails, team.id))
+        (await denies(teamsUpdateTeamDetails, team.id))
       ) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -278,7 +278,7 @@ export const teamsRouter = router({
       if (
         !team ||
         team.memberships.length === 0 ||
-        (await denies(deleteTeam, team.id))
+        (await denies(teamsDeleteTeam, team.id))
       ) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -319,7 +319,7 @@ export const teamsRouter = router({
       if (
         !team ||
         team.memberships.length === 0 ||
-        (await denies(listMembersAndInvites, team.id))
+        (await denies(teamsListMembersAndInvites, team.id))
       ) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -403,7 +403,7 @@ export const teamsRouter = router({
       if (
         !team ||
         !membership ||
-        (await denies(updateMemberRole, team.id, input.memberId))
+        (await denies(teamsUpdateMemberRole, team.id, input.memberId))
       ) {
         throw new TRPCError({
           code: "FORBIDDEN",
@@ -513,7 +513,7 @@ export const teamsRouter = router({
       if (
         !team ||
         !membership ||
-        (await denies(removeMember, team.id, input.memberId))
+        (await denies(teamsRemoveMember, team.id, input.memberId))
       ) {
         throw new TRPCError({
           code: "FORBIDDEN",

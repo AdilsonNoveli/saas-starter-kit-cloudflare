@@ -164,11 +164,31 @@ export default defineNuxtConfig({
   components: [
     {
       path: "./app/components",
-      prefix: "Kanban", // Garante isolamento: <KanbanBoard /> evita conflitos globais
+      prefix: "Kanban", // Intenção: <KanbanBoard /> evita conflitos globais
     },
   ],
 });
 ```
+
+> [!WARNING]
+> **Achado real na Fase 3, passo 1b: este arquivo não é carregado pelo Nuxt hoje.**
+> `extends: ["@nuxfire/layer-kanban"]` resolve o pacote pelo `exports["."]` do
+> `package.json` da layer, que aponta para `./layer.manifest.ts` — então o c12
+> carrega o **manifesto** como config Nuxt da layer (confirmado em
+> `loadNuxtConfig()._layers[].configFile`). As chaves do manifesto não são
+> opções do Nuxt, então nada quebra, mas nada daqui vale: `$meta.name` não cria
+> o alias `#layers/<nome>` e o `prefix` de `components` não é aplicado (provado
+> trocando o prefixo por um valor absurdo e comparando
+> `.nuxt/components.d.ts`). **O namespace dos componentes vem do NOME DO
+> ARQUIVO** (`KanbanBoard.vue`, `TeamSwitcher.vue`), não do `prefix` — é por
+> isso que `layers/kanban` sempre pareceu funcionar. `app/`, `app/pages`,
+> `app/components`, `app/composables`, `app/middleware` e `server/` continuam
+> sendo varridos por convenção de diretório a partir do `rootDir`, que é
+> resolvido corretamente. Corrigir isso é uma mudança à parte e **não** é
+> trocar uma linha: os `path: "./app/components"` existentes resolvem contra o
+> `srcDir` (`layers/*/app`), então passar a honrá-los apontaria para
+> `layers/*/app/app/components`, que não existe, e todo componente de layer
+> sumiria silenciosamente.
 
 ### `package.json` da Layer
 
@@ -407,7 +427,20 @@ export const kanbanCreateBoard = defineAbility(/* ... */);
 export const kanbanDeleteCard = defineAbility(/* ... */);
 ```
 
-Todo nome de ability é prefixado pelo nome da layer, sem exceção — mesma disciplina que já existe para as strings de permissão (`kanban:boards:view`) e para o prefixo de componente Vue (`Kanban*.vue`).
+Todo nome de ability é prefixado pelo nome da layer, sem exceção — mesma disciplina que já existe para as strings de permissão (`kanban:boards:view`) e para o prefixo de componente Vue (`Kanban*.vue`). `layers/teams` foi a única exceção documentada (`listTeams`, `deleteTeam`, …, herdadas de quando o arquivo morava em `packages/app`); ela acabou na Fase 3 passo 1b, no mesmo commit que moveu o último call site — hoje é `teamsListTeams`, `teamsDeleteTeam`, etc.
+
+> [!IMPORTANT]
+> A convenção vale só para os exports de `defineAbility()`. As **chaves de
+> procedure do tRPC não são prefixadas e não podem ser**: `teams.listMembersAndInvites`
+> e `invites.sendInvite` são a API que o cliente já chama, e extrair um domínio
+> não pode remodelar a superfície pública (mesma regra da §3). Um
+> find-and-replace cego pelo nome da ability renomeia as duas coisas.
+
+### 5.1 Limite: middleware global não ordena entre layers
+
+`app/middleware/*.global.*` é coletado **por layer**, ordenado por nome de arquivo apenas _dentro_ de cada layer, e as layers são concatenadas com o Composition Root **por último**. Ou seja: `packages/app/app/middleware/0.auth.global.ts` sempre roda **depois** de qualquer middleware global de layer, e os prefixos `0.`/`1.` só ordenam arquivos do mesmo diretório.
+
+Consequência concreta, encontrada na Fase 3 passo 1b: `1.teams.global.ts` **fica em `packages/app`**. Dentro de `layers/teams` ele passava a rodar antes do guard de autenticação e um deep link deslogado para `/{team}/dashboard` era redirecionado para `/select-team` antes de `0.auth.global.ts` registrar o destino pós-login — o usuário voltava no seletor de times em vez da página pedida. Para verificar qualquer mexida aqui, extraia o array de middleware global do bundle de `nuxt build` (`dist/server/chunks/virtual/entry.mjs`); `nuxt prepare` não materializa esse array. Middleware **nomeado** (`definePageMeta({ middleware: "invite" })`) não tem esse problema — roda sempre depois de todos os globais — e por isso `invite.ts` foi para a layer normalmente.
 
 ### 6. Limite aceito: contexto tRPC continua centralizado
 

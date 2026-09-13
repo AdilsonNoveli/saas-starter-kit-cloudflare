@@ -404,7 +404,6 @@
   "packages/web/app/pages/blog/",
   "packages/web/app/pages/blog/[...slug].vue",
   "packages/web/app/pages/blog/index.vue",
-  "packages/web/app/pages/contact.vue",
   "packages/web/app/pages/docs/",
   "packages/web/app/pages/docs/[...slug].vue",
   "packages/web/app/pages/index.vue",

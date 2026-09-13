@@ -4,12 +4,14 @@
       <h2 class="text-3xl sm:text-4xl font-bold text-highlighted">
         Trusted by Teams Worldwide
       </h2>
-      <p class="mt-4 text-lg text-muted max-w-2xl mx-auto">
+      <LandingAvatars class="my-3" />
+      <p class="mt-3 text-lg text-muted max-w-2xl mx-auto">
         Developers and founders rely on NuxFire to ship production-grade products faster.
       </p>
     </div>
 
-    <div class="space-y-8">
+    <!-- Centralized & Narrower Container for Testimonials -->
+    <div class="container mx-auto max-w-5xl px-4 sm:px-6 space-y-6">
       <TestimonialRow :testimonials="firstRowTestimonials" direction="left" />
       <TestimonialRow :testimonials="secondRowTestimonials" direction="right" />
     </div>

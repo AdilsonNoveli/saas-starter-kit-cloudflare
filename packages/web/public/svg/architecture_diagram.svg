@@ -1,721 +1,459 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" viewBox="0 0 2150 1300" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 780" width="100%" height="100%" style="background: transparent; max-width: 100%; height: auto; display: block; margin: 0 auto;" font-family="'Geist', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
   <defs>
-    <!-- Background Gradients -->
-    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#080A0F"/>
-      <stop offset="50%" stop-color="#0E111A"/>
-      <stop offset="100%" stop-color="#141824"/>
-    </linearGradient>
-
-    <!-- Ambient Glows -->
-    <radialGradient id="glowNuxt" cx="24%" cy="20%" r="45%">
-      <stop offset="0%" stop-color="#00DC82" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#00DC82" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glowCloudflare" cx="80%" cy="45%" r="50%">
-      <stop offset="0%" stop-color="#F6821F" stop-opacity="0.16"/>
-      <stop offset="100%" stop-color="#F6821F" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glowDatabase" cx="50%" cy="88%" r="45%">
-      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glowPurple" cx="62%" cy="65%" r="40%">
-      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.16"/>
-      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"/>
-    </radialGradient>
-
-    <!-- Dot Pattern -->
-    <pattern id="dotGrid" width="28" height="28" patternUnits="userSpaceOnUse">
-      <circle cx="1.5" cy="1.5" r="1.2" fill="#252D40" fill-opacity="0.75"/>
-    </pattern>
-
-    <!-- Card & Element Drop Shadows -->
-    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="150%">
-      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.55"/>
-    </filter>
-    <filter id="cardGlowGreen" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#00DC82" flood-opacity="0.35"/>
-    </filter>
-    <filter id="cardGlowOrange" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#F6821F" flood-opacity="0.35"/>
-    </filter>
-    <filter id="cardGlowBlue" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#38BDF8" flood-opacity="0.35"/>
-    </filter>
-    <filter id="pillShadow" x="-20%" y="-20%" width="140%" height="150%">
-      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.5"/>
+    <!-- Luminous Glow Filters (Matching the shiny button illuminated border) -->
+    <filter id="glowDotGreen" x="-150%" y="-150%" width="400%" height="400%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#00dc82" flood-opacity="1"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="5.5" flood-color="#00dc82" flood-opacity="0.8"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="9" flood-color="#00dc82" flood-opacity="0.4"/>
     </filter>
 
-    <!-- Path Arrow Marker -->
-    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 9 5 L 0 9 z" fill="#586580"/>
-    </marker>
-    <marker id="arrowGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 9 5 L 0 9 z" fill="#00DC82"/>
-    </marker>
-    <marker id="arrowPurple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 9 5 L 0 9 z" fill="#8B5CF6"/>
-    </marker>
-    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 9 5 L 0 9 z" fill="#38BDF8"/>
-    </marker>
+    <filter id="glowDotPurple" x="-150%" y="-150%" width="400%" height="400%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#c084fc" flood-opacity="1"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="5.5" flood-color="#a855f7" flood-opacity="0.8"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="9" flood-color="#a855f7" flood-opacity="0.4"/>
+    </filter>
+
+    <filter id="glowDotOrange" x="-150%" y="-150%" width="400%" height="400%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#ff8904" flood-opacity="1"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="5.5" flood-color="#f6821f" flood-opacity="0.8"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="9" flood-color="#f6821f" flood-opacity="0.4"/>
+    </filter>
+
+    <filter id="glowDotBlue" x="-150%" y="-150%" width="400%" height="400%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#38bdf8" flood-opacity="1"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="5.5" flood-color="#0284c7" flood-opacity="0.8"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="9" flood-color="#0284c7" flood-opacity="0.4"/>
+    </filter>
   </defs>
 
-  <!-- ================= CANVAS BACKGROUND ================= -->
-  <rect width="2150" height="1300" fill="url(#bgGrad)"/>
-  <rect width="2150" height="1300" fill="url(#glowNuxt)"/>
-  <rect width="2150" height="1300" fill="url(#glowCloudflare)"/>
-  <rect width="2150" height="1300" fill="url(#glowDatabase)"/>
-  <rect width="2150" height="1300" fill="url(#glowPurple)"/>
-  <rect width="2150" height="1300" fill="url(#dotGrid)"/>
-
-  <!-- ================= HEADER & LEGEND ================= -->
-  <g transform="translate(60, 42)">
-    <rect x="0" y="0" width="40" height="40" rx="10" fill="#00DC82" fill-opacity="0.15" stroke="#00DC82" stroke-width="1.5"/>
-    <path d="M12 28 L20 12 L28 28 Z" fill="none" stroke="#00DC82" stroke-width="2.5" stroke-linejoin="round"/>
-    <path d="M22 28 L26 20 L30 28 Z" fill="none" stroke="#38BDF8" stroke-width="2.2" stroke-linejoin="round"/>
-
-    <text x="54" y="24" font-size="28" font-weight="800" fill="#F8FAFC" letter-spacing="-0.5">NuxFire Platform Architecture</text>
-    <text x="54" y="46" font-size="14.5" font-weight="500" fill="#94A3B8">100% Serverless on Cloudflare Workers · PostgreSQL via Hyperdrive (Drizzle ORM) · Realtime WebSockets · Queues &amp; DLQ · SST</text>
-  </g>
-
-  <!-- Legend Badges -->
-  <g transform="translate(1310, 48)">
-    <rect x="0" y="0" width="770" height="42" rx="21" fill="#121622" stroke="#252D40" stroke-width="1.2"/>
-    <g transform="translate(24, 21)">
-      <circle cx="0" cy="0" r="5" fill="#FF6D5A"/>
-      <text x="12" y="4.5" font-size="12" font-weight="600" fill="#CBD5E1">Client / Ingress</text>
-    </g>
-    <g transform="translate(152, 21)">
-      <circle cx="0" cy="0" r="5" fill="#00DC82"/>
-      <text x="12" y="4.5" font-size="12" font-weight="600" fill="#CBD5E1">Nuxt 3 Apps</text>
-    </g>
-    <g transform="translate(270, 21)">
-      <circle cx="0" cy="0" r="5" fill="#F6821F"/>
-      <text x="12" y="4.5" font-size="12" font-weight="600" fill="#CBD5E1">Cloudflare Worker</text>
-    </g>
-    <g transform="translate(424, 21)">
-      <circle cx="0" cy="0" r="5" fill="#38BDF8"/>
-      <text x="12" y="4.5" font-size="12" font-weight="600" fill="#CBD5E1">Postgres / Data</text>
-    </g>
-    <g transform="translate(560, 21)">
-      <circle cx="0" cy="0" r="5" fill="#8B5CF6"/>
-      <text x="12" y="4.5" font-size="12" font-weight="600" fill="#CBD5E1">Durable Objects / Cron</text>
-    </g>
-  </g>
-
-  <!-- ================= SECTION CONTAINERS (TIERS) ================= -->
+  <!-- ================= TIER BOUNDARY GROUPS ================= -->
   <!-- Tier 1: Identity & Application -->
-  <rect x="375" y="125" width="530" height="745" rx="24" fill="#0E121C" fill-opacity="0.7" stroke="#252F46" stroke-width="1.5" stroke-dasharray="5 7"/>
-  <rect x="395" y="112" width="220" height="26" rx="13" fill="#141A29" stroke="#2C3752" stroke-width="1"/>
-  <text x="505" y="129" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="#94A3B8" text-anchor="middle">IDENTITY &amp; APPLICATION</text>
+  <rect x="250" y="40" width="330" height="695" rx="4" fill="#141414" fill-opacity="0.4" stroke="#262626" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="268" y="68" font-size="11" font-weight="700" letter-spacing="1.5" fill="#737373" font-family="'Geist Mono', monospace">IDENTITY &amp; APPLICATION</text>
 
   <!-- Tier 2: Realtime & Async Queues -->
-  <rect x="945" y="555" width="765" height="425" rx="24" fill="#0E121C" fill-opacity="0.7" stroke="#252F46" stroke-width="1.5" stroke-dasharray="5 7"/>
-  <rect x="965" y="542" width="230" height="26" rx="13" fill="#141A29" stroke="#2C3752" stroke-width="1"/>
-  <text x="1080" y="559" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="#94A3B8" text-anchor="middle">REALTIME &amp; ASYNC QUEUES</text>
+  <rect x="630" y="40" width="370" height="695" rx="4" fill="#141414" fill-opacity="0.4" stroke="#262626" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="648" y="68" font-size="11" font-weight="700" letter-spacing="1.5" fill="#737373" font-family="'Geist Mono', monospace">REALTIME &amp; ASYNC QUEUES</text>
 
-  <!-- Tier 3: Transactional Email & External Services -->
-  <rect x="1225" y="125" width="865" height="395" rx="24" fill="#0E121C" fill-opacity="0.7" stroke="#252F46" stroke-width="1.5" stroke-dasharray="5 7"/>
-  <rect x="1245" y="112" width="260" height="26" rx="13" fill="#141A29" stroke="#2C3752" stroke-width="1"/>
-  <text x="1375" y="129" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="#94A3B8" text-anchor="middle">TRANSACTIONAL EMAIL &amp; APIS</text>
+  <!-- Tier 3: Shared Data, Storage & External Services -->
+  <rect x="1050" y="40" width="510" height="695" rx="4" fill="#141414" fill-opacity="0.4" stroke="#262626" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="1068" y="68" font-size="11" font-weight="700" letter-spacing="1.5" fill="#737373" font-family="'Geist Mono', monospace">DATA, STORAGE &amp; SERVICES</text>
 
-  <!-- Tier 4: Scheduled Jobs -->
-  <rect x="55" y="1010" width="615" height="245" rx="24" fill="#0E121C" fill-opacity="0.7" stroke="#252F46" stroke-width="1.5" stroke-dasharray="5 7"/>
-  <rect x="75" y="997" width="180" height="26" rx="13" fill="#141A29" stroke="#2C3752" stroke-width="1"/>
-  <text x="165" y="1014" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="#94A3B8" text-anchor="middle">SCHEDULED JOBS</text>
+  <!-- ================= CLEAN CONNECTION LINES (NO ARROWHEADS) ================= -->
+  <!-- Client -> Web Worker -->
+  <path d="M 190 320 C 230 320 230 145 270 145" fill="none" stroke="#333333" stroke-width="1.5"/>
+  
+  <!-- Client -> Auth Worker -->
+  <path d="M 190 370 C 230 370 230 300 270 300" fill="none" stroke="#333333" stroke-width="1.5"/>
 
-  <!-- Tier 5: Shared Data & Storage Platform (AUDITED REAL STACK) -->
-  <rect x="705" y="1010" width="1075" height="245" rx="24" fill="#0E121C" fill-opacity="0.7" stroke="#252F46" stroke-width="1.5" stroke-dasharray="5 7"/>
-  <rect x="725" y="997" width="370" height="26" rx="13" fill="#141A29" stroke="#2C3752" stroke-width="1"/>
-  <text x="910" y="1014" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="#38BDF8" text-anchor="middle">DATA &amp; STORAGE PLATFORM (SHARED LAYER)</text>
+  <!-- Auth Worker -> AuthKV -->
+  <path d="M 405 370 L 405 630" fill="none" stroke="#333333" stroke-width="1.5"/>
 
-  <!-- ================= CONNECTION PATHS (BEZIER CURVES) ================= -->
-  <!-- Path 0: Client -> Web (nuxfire.com) -->
-  <path id="pathClientToWeb" d="M 245 520 C 330 520 330 230 410 230" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
-  <!-- Path 1: Client -> Auth Worker (auth.nuxfire.com) -->
-  <path id="pathClientToAuth" d="M 245 585 C 330 585 330 460 410 460" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
-  <!-- Path 2: Client -> App Worker (app.nuxfire.com) -->
-  <path id="pathClientToApp" d="M 245 650 C 330 650 330 735 410 735" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- Auth Worker -> Email Worker (Zero-hop Service Binding) -->
+  <path d="M 540 280 C 780 280 850 512 1070 512" fill="none" stroke="#2a2a2a" stroke-width="1.4" stroke-dasharray="4 4"/>
 
-  <!-- Path 3: Auth Worker -> AuthKV -->
-  <path id="pathAuthToKV" d="M 660 460 C 690 460 705 480 735 480" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- App Worker -> Auth Worker (Internal Service Binding) -->
+  <path d="M 340 395 L 340 370" fill="none" stroke="#2a2a2a" stroke-width="1.4" stroke-dasharray="4 4"/>
 
-  <!-- Path 4: Auth Worker -> Email Worker (Zero-hop Service Binding) -->
-  <path id="pathAuthToEmail" d="M 660 420 C 950 420 950 250 1245 250" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- Consumer Worker -> JobDLQ (Retry Failures) -->
+  <path d="M 815 500 L 815 525" fill="none" stroke="#333333" stroke-width="1.5"/>
 
-  <!-- Path 5: App Worker -> Auth Worker (Internal Zero-hop Binding) -->
-  <path id="pathAppToAuth" d="M 535 660 C 535 600 535 590 535 540" fill="none" stroke="#4B5568" stroke-width="2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- Web Worker -> Content D1 Database -->
+  <path d="M 540 145 C 780 145 880 395 1070 395" fill="none" stroke="#333333" stroke-width="1.5"/>
 
-  <!-- Path 6: App Worker -> JobQueue (enqueue) -->
-  <path id="pathAppToQueue" d="M 660 720 C 820 720 830 670 985 670" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- Cron Trigger/Worker -> JobQueue / Maintenance -->
+  <path d="M 740 640 L 740 355" fill="none" stroke="#2a2a2a" stroke-width="1.4" stroke-dasharray="4 4"/>
 
-  <!-- Path 7: JobQueue -> Consumer Worker (batch poll) -->
-  <path id="pathQueueToConsumer" d="M 1170 670 C 1200 670 1205 670 1235 670" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- Consumer Worker -> Email Worker -->
+  <path d="M 980 442 C 1020 442 1030 512 1070 512" fill="none" stroke="#333333" stroke-width="1.5"/>
 
-  <!-- Path 8: Consumer Worker -> JobDLQ (retry exhaustion) -->
-  <path id="pathConsumerToDLQ" d="M 1455 670 C 1480 670 1485 670 1515 670" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- App Worker -> Stripe Payments -->
+  <path d="M 540 560 C 780 560 880 650 1070 650" fill="none" stroke="#333333" stroke-width="1.5"/>
 
-  <!-- Path 9: Consumer Worker -> Email Worker (Async Transactional Emails) -->
-  <path id="pathConsumerToEmail" d="M 1350 605 C 1350 510 1350 420 1350 330" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- ================= CONSTANT ACTIVE FLOW PATHS (NO ARROWHEADS) ================= -->
+  <!-- 1. Client -> App Worker (HTTP/tRPC API requests) -->
+  <path id="flowClientToApp" d="M 190 425 C 230 425 230 500 270 500" fill="none" stroke="#2e3b33" stroke-width="1.8"/>
 
-  <!-- Path 10: App Worker -> Durable Object (Push Realtime Event) -->
-  <path id="pathAppToDO" d="M 660 765 C 800 765 830 870 985 870" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- 2. App Worker -> Durable Object (Realtime Broadcast) -->
+  <path id="flowAppToDO" d="M 540 460 C 590 460 600 147 650 147" fill="none" stroke="#372847" stroke-width="1.8"/>
 
-  <!-- Path 11: WebSockets DO -> Client (Realtime Stream wss://) -->
-  <path id="pathDOToClient" d="M 1120 955 C 800 1000 480 820 220 700" fill="none" stroke="#8B5CF6" stroke-width="2.4" stroke-opacity="0.85" marker-end="url(#arrowPurple)"/>
+  <!-- 3. Durable Object -> Client (WebSocket Stream wss://) -->
+  <path id="flowDOToClient" d="M 650 120 C 400 70 230 180 190 460" fill="none" stroke="#3d225c" stroke-width="1.8" stroke-dasharray="5 4"/>
 
-  <!-- Path 12: Email Worker -> React Email Templates -->
-  <path id="pathEmailToTemplates" d="M 1470 250 C 1490 250 1495 250 1515 250" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- 4. App Worker -> JobQueue (Enqueue background work) -->
+  <path id="flowAppToQueue" d="M 540 510 C 590 510 600 297 650 297" fill="none" stroke="#423021" stroke-width="1.8"/>
 
-  <!-- Path 13: React Email -> Delivery Providers -->
-  <path id="pathTemplatesToProviders" d="M 1735 250 C 1755 250 1760 250 1780 250" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- 5. JobQueue -> Consumer Worker (Batch polling & execution) -->
+  <path id="flowQueueToConsumer" d="M 815 355 L 815 385" fill="none" stroke="#423021" stroke-width="1.8"/>
 
-  <!-- Path 14: App Worker -> Payment Providers (Stripe / Paddle) -->
-  <path id="pathAppToPayments" d="M 660 680 C 900 680 970 410 1245 410" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
+  <!-- 6. App Worker -> Hyperdrive Postgres (Active DB queries) -->
+  <path id="flowAppToDB" d="M 540 430 C 780 430 880 157 1070 157" fill="none" stroke="#1c374d" stroke-width="2"/>
 
-  <!-- Path 15: Cron Trigger -> Cron Worker -->
-  <path id="pathCronTriggerToWorker" d="M 230 1135 C 310 1135 320 1135 400 1135" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
-
-  <!-- Path 16: Cron Worker -> JobQueue -->
-  <path id="pathCronToQueue" d="M 525 1060 C 525 960 920 790 1010 745" fill="none" stroke="#4B5568" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#arrow)"/>
-
-  <!-- Path 17: App Worker -> Hyperdrive Postgres -->
-  <path id="pathAppToHyperdrive" d="M 580 820 C 620 960 760 990 820 1060" fill="none" stroke="#38BDF8" stroke-width="2.4" stroke-opacity="0.85" marker-end="url(#arrowBlue)"/>
-
-  <!-- Path 18: Web Worker -> Content D1 -->
-  <path id="pathWebToD1" d="M 660 210 C 1100 210 1600 520 1600 1060" fill="none" stroke="#4B5568" stroke-width="2" stroke-opacity="0.75" marker-end="url(#arrow)"/>
-
-  <!-- ================= ANIMATED PARTICLES ================= -->
-  <!-- Client to Web -->
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#pathClientToWeb"/></animateMotion></circle>
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite"><mpath href="#pathClientToWeb"/></animateMotion></circle>
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite"><mpath href="#pathClientToWeb"/></animateMotion></circle>
-
-  <!-- Client to Auth -->
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#pathClientToAuth"/></animateMotion></circle>
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite"><mpath href="#pathClientToAuth"/></animateMotion></circle>
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite"><mpath href="#pathClientToAuth"/></animateMotion></circle>
-
-  <!-- Client to App -->
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#pathClientToApp"/></animateMotion></circle>
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite"><mpath href="#pathClientToApp"/></animateMotion></circle>
-  <circle r="3.5" fill="#FF6D5A"><animateMotion dur="2.4s" begin="1.6s" repeatCount="indefinite"><mpath href="#pathClientToApp"/></animateMotion></circle>
-
-  <!-- Auth to KV -->
-  <circle r="3.2" fill="#00DC82"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#pathAuthToKV"/></animateMotion></circle>
-  <circle r="3.2" fill="#00DC82"><animateMotion dur="2s" begin="1s" repeatCount="indefinite"><mpath href="#pathAuthToKV"/></animateMotion></circle>
-
-  <!-- Auth to Email -->
-  <circle r="3.5" fill="#00DC82"><animateMotion dur="3s" repeatCount="indefinite"><mpath href="#pathAuthToEmail"/></animateMotion></circle>
-  <circle r="3.5" fill="#00DC82"><animateMotion dur="3s" begin="1.5s" repeatCount="indefinite"><mpath href="#pathAuthToEmail"/></animateMotion></circle>
-
-  <!-- App to Auth -->
-  <circle r="3" fill="#00DC82"><animateMotion dur="1.8s" repeatCount="indefinite"><mpath href="#pathAppToAuth"/></animateMotion></circle>
-
-  <!-- App to Queue -->
-  <circle r="3.5" fill="#00DC82"><animateMotion dur="2.5s" repeatCount="indefinite"><mpath href="#pathAppToQueue"/></animateMotion></circle>
-  <circle r="3.5" fill="#00DC82"><animateMotion dur="2.5s" begin="1.25s" repeatCount="indefinite"><mpath href="#pathAppToQueue"/></animateMotion></circle>
-
-  <!-- Queue to Consumer -->
-  <circle r="3.5" fill="#F6821F"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#pathQueueToConsumer"/></animateMotion></circle>
-  <circle r="3.5" fill="#F6821F"><animateMotion dur="2s" begin="1s" repeatCount="indefinite"><mpath href="#pathQueueToConsumer"/></animateMotion></circle>
-
-  <!-- Consumer to DLQ -->
-  <circle r="3" fill="#EF4444"><animateMotion dur="2.5s" repeatCount="indefinite"><mpath href="#pathConsumerToDLQ"/></animateMotion></circle>
-
-  <!-- Consumer to Email -->
-  <circle r="3.5" fill="#F6821F"><animateMotion dur="2.6s" repeatCount="indefinite"><mpath href="#pathConsumerToEmail"/></animateMotion></circle>
-
-  <!-- App to DO -->
-  <circle r="3.5" fill="#00DC82"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#pathAppToDO"/></animateMotion></circle>
-  <circle r="3.5" fill="#00DC82"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite"><mpath href="#pathAppToDO"/></animateMotion></circle>
-
-  <!-- DO to Client -->
-  <circle r="3.8" fill="#8B5CF6"><animateMotion dur="4s" repeatCount="indefinite"><mpath href="#pathDOToClient"/></animateMotion></circle>
-  <circle r="3.8" fill="#8B5CF6"><animateMotion dur="4s" begin="1.33s" repeatCount="indefinite"><mpath href="#pathDOToClient"/></animateMotion></circle>
-  <circle r="3.8" fill="#8B5CF6"><animateMotion dur="4s" begin="2.66s" repeatCount="indefinite"><mpath href="#pathDOToClient"/></animateMotion></circle>
-
-  <!-- Email to Templates to Providers -->
-  <circle r="3.2" fill="#38BDF8"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#pathEmailToTemplates"/></animateMotion></circle>
-  <circle r="3.2" fill="#38BDF8"><animateMotion dur="2s" begin="1s" repeatCount="indefinite"><mpath href="#pathEmailToTemplates"/></animateMotion></circle>
-  <circle r="3.2" fill="#38BDF8"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#pathTemplatesToProviders"/></animateMotion></circle>
-  <circle r="3.2" fill="#38BDF8"><animateMotion dur="2s" begin="1s" repeatCount="indefinite"><mpath href="#pathTemplatesToProviders"/></animateMotion></circle>
-
-  <!-- App to Payments -->
-  <circle r="3.2" fill="#10B981"><animateMotion dur="3s" repeatCount="indefinite"><mpath href="#pathAppToPayments"/></animateMotion></circle>
-
-  <!-- Cron Trigger to Worker to Queue -->
-  <circle r="3.5" fill="#8B5CF6"><animateMotion dur="2.2s" repeatCount="indefinite"><mpath href="#pathCronTriggerToWorker"/></animateMotion></circle>
-  <circle r="3.5" fill="#8B5CF6"><animateMotion dur="3s" repeatCount="indefinite"><mpath href="#pathCronToQueue"/></animateMotion></circle>
-
-  <!-- App to Hyperdrive -->
-  <circle r="3.8" fill="#38BDF8"><animateMotion dur="2.8s" repeatCount="indefinite"><mpath href="#pathAppToHyperdrive"/></animateMotion></circle>
-  <circle r="3.8" fill="#38BDF8"><animateMotion dur="2.8s" begin="1.4s" repeatCount="indefinite"><mpath href="#pathAppToHyperdrive"/></animateMotion></circle>
-
-  <!-- Web to D1 -->
-  <circle r="3.2" fill="#00DC82"><animateMotion dur="4.2s" repeatCount="indefinite"><mpath href="#pathWebToD1"/></animateMotion></circle>
-
-  <!-- ================= CONNECTION PILL LABELS ================= -->
-  <!-- nuxfire.com -->
-  <g transform="translate(265, 335)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="108" height="24" rx="12" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="54" y="16" font-size="11" font-weight="600" fill="#F1F5F9" text-anchor="middle" font-family="ui-monospace, monospace">nuxfire.com</text>
+  <!-- ================= ILLUMINATED SHINY GLOWING DASHES (ANIMATED LINES FOLLOWING PATH TANGENT) ================= -->
+  <!-- Flow 1: Client -> App (Green Glow Dash) -->
+  <g>
+    <animateMotion dur="2.2s" repeatCount="indefinite" rotate="auto"><mpath href="#flowClientToApp"/></animateMotion>
+    <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#00dc82" filter="url(#glowDotGreen)"/>
+    <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
+  </g>
+  <g>
+    <animateMotion dur="2.2s" begin="1.1s" repeatCount="indefinite" rotate="auto"><mpath href="#flowClientToApp"/></animateMotion>
+    <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#00dc82" filter="url(#glowDotGreen)"/>
+    <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
   </g>
 
-  <!-- auth.nuxfire.com -->
-  <g transform="translate(250, 488)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="140" height="24" rx="12" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="70" y="16" font-size="11" font-weight="600" fill="#F1F5F9" text-anchor="middle" font-family="ui-monospace, monospace">auth.nuxfire.com</text>
+  <!-- Flow 2: App -> Durable Object (Purple Glow Dash) -->
+  <g>
+    <animateMotion dur="2.4s" repeatCount="indefinite" rotate="auto"><mpath href="#flowAppToDO"/></animateMotion>
+    <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#a855f7" filter="url(#glowDotPurple)"/>
+    <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
+  </g>
+  <g>
+    <animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" rotate="auto"><mpath href="#flowAppToDO"/></animateMotion>
+    <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#a855f7" filter="url(#glowDotPurple)"/>
+    <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
   </g>
 
-  <!-- app.nuxfire.com -->
-  <g transform="translate(252, 695)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="136" height="24" rx="12" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="68" y="16" font-size="11" font-weight="600" fill="#F1F5F9" text-anchor="middle" font-family="ui-monospace, monospace">app.nuxfire.com</text>
+  <!-- Flow 3: Durable Object -> Client (Purple Glow Stream Dash) -->
+  <g>
+    <animateMotion dur="3.2s" repeatCount="indefinite" rotate="auto"><mpath href="#flowDOToClient"/></animateMotion>
+    <rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#c084fc" filter="url(#glowDotPurple)"/>
+    <rect x="-6" y="-1" width="12" height="2" rx="1" fill="#ffffff"/>
+  </g>
+  <g>
+    <animateMotion dur="3.2s" begin="1.6s" repeatCount="indefinite" rotate="auto"><mpath href="#flowDOToClient"/></animateMotion>
+    <rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#c084fc" filter="url(#glowDotPurple)"/>
+    <rect x="-6" y="-1" width="12" height="2" rx="1" fill="#ffffff"/>
   </g>
 
-  <!-- verify credentials -->
-  <g transform="translate(670, 442)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="70" height="22" rx="11" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="35" y="15" font-size="10.5" font-weight="600" fill="#94A3B8" text-anchor="middle" font-family="ui-monospace, monospace">verify</text>
+  <!-- Flow 4: App -> JobQueue (Orange Glow Dash) -->
+  <g>
+    <animateMotion dur="2.3s" repeatCount="indefinite" rotate="auto"><mpath href="#flowAppToQueue"/></animateMotion>
+    <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#ff8904" filter="url(#glowDotOrange)"/>
+    <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
+  </g>
+  <g>
+    <animateMotion dur="2.3s" begin="1.15s" repeatCount="indefinite" rotate="auto"><mpath href="#flowAppToQueue"/></animateMotion>
+    <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#ff8904" filter="url(#glowDotOrange)"/>
+    <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
   </g>
 
-  <!-- verification + welcome email -->
-  <g transform="translate(860, 315)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="176" height="24" rx="12" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="88" y="16.5" font-size="11" font-weight="600" fill="#CBD5E1" text-anchor="middle" font-family="ui-monospace, monospace">OTP &amp; welcome email</text>
+  <!-- Flow 5: Queue -> Consumer (Orange Glow Dash) -->
+  <g>
+    <animateMotion dur="1.5s" repeatCount="indefinite" rotate="auto"><mpath href="#flowQueueToConsumer"/></animateMotion>
+    <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#ff8904" filter="url(#glowDotOrange)"/>
+    <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
   </g>
 
-  <!-- app -> auth service binding -->
-  <g transform="translate(470, 585)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="130" height="22" rx="11" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="65" y="15" font-size="10.5" font-weight="600" fill="#00DC82" text-anchor="middle" font-family="ui-monospace, monospace">service binding</text>
+  <!-- Flow 6: App -> Postgres DB (Blue Glow Dash) -->
+  <g>
+    <animateMotion dur="2.6s" repeatCount="indefinite" rotate="auto"><mpath href="#flowAppToDB"/></animateMotion>
+    <rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#38bdf8" filter="url(#glowDotBlue)"/>
+    <rect x="-6" y="-1" width="12" height="2" rx="1" fill="#ffffff"/>
+  </g>
+  <g>
+    <animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite" rotate="auto"><mpath href="#flowAppToDB"/></animateMotion>
+    <rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#38bdf8" filter="url(#glowDotBlue)"/>
+    <rect x="-6" y="-1" width="12" height="2" rx="1" fill="#ffffff"/>
   </g>
 
-  <!-- enqueue job -->
-  <g transform="translate(775, 678)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="112" height="24" rx="12" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="56" y="16.5" font-size="11" font-weight="600" fill="#CBD5E1" text-anchor="middle" font-family="ui-monospace, monospace">enqueue job</text>
-  </g>
+  <!-- ================= COMPONENT 1: CLIENT (DEVICE + BROWSER) ================= -->
+  <g transform="translate(40, 270)">
+    <!-- Browser Window Card -->
+    <rect x="0" y="0" width="150" height="200" rx="4" fill="#171717" stroke="#333333" stroke-width="1"/>
+    
+    <!-- Browser Title Bar -->
+    <rect x="0" y="0" width="150" height="26" rx="4" fill="#202020"/>
+    <circle cx="12" cy="13" r="3.5" fill="#ef4444"/>
+    <circle cx="22" cy="13" r="3.5" fill="#f59e0b"/>
+    <circle cx="32" cy="13" r="3.5" fill="#10b981"/>
+    <rect x="44" y="6" width="96" height="14" rx="2" fill="#171717"/>
+    <text x="92" y="16" font-size="8" font-family="'Geist Mono', monospace" fill="#737373" text-anchor="middle">nuxfire.com</text>
 
-  <!-- batch poll -->
-  <g transform="translate(1185, 642)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="55" height="22" rx="11" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="27.5" y="15" font-size="10.5" font-weight="600" fill="#F6821F" text-anchor="middle" font-family="ui-monospace, monospace">batch</text>
-  </g>
-
-  <!-- DLQ retry fail -->
-  <g transform="translate(1468, 642)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="50" height="22" rx="11" fill="#141824" stroke="#7F1D1D" stroke-width="1"/>
-    <text x="25" y="15" font-size="10.5" font-weight="600" fill="#F87171" text-anchor="middle" font-family="ui-monospace, monospace">DLQ</text>
-  </g>
-
-  <!-- async transactional email -->
-  <g transform="translate(1265, 455)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="168" height="24" rx="12" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="84" y="16.5" font-size="11" font-weight="600" fill="#CBD5E1" text-anchor="middle" font-family="ui-monospace, monospace">async email dispatch</text>
-  </g>
-
-  <!-- realtime event push -->
-  <g transform="translate(775, 792)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="124" height="24" rx="12" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="62" y="16.5" font-size="11" font-weight="600" fill="#CBD5E1" text-anchor="middle" font-family="ui-monospace, monospace">realtime event</text>
-  </g>
-
-  <!-- wss://websockets.nuxfire.com -->
-  <g transform="translate(560, 840)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="225" height="26" rx="13" fill="#141824" stroke="#8B5CF6" stroke-width="1.2"/>
-    <text x="112.5" y="17.5" font-size="11.5" font-weight="600" fill="#DDD6FE" text-anchor="middle" font-family="ui-monospace, monospace">wss://websockets.nuxfire.com</text>
-  </g>
-
-  <!-- Payments checkout & webhooks -->
-  <g transform="translate(930, 480)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="170" height="24" rx="12" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="85" y="16.5" font-size="11" font-weight="600" fill="#10B981" text-anchor="middle" font-family="ui-monospace, monospace">checkout &amp; webhooks</text>
-  </g>
-
-  <!-- render & deliver email -->
-  <g transform="translate(1478, 222)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="52" height="20" rx="10" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="26" y="14" font-size="10" font-weight="600" fill="#94A3B8" text-anchor="middle" font-family="ui-monospace, monospace">render</text>
-  </g>
-  <g transform="translate(1740, 222)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="55" height="20" rx="10" fill="#141824" stroke="#2B364D" stroke-width="1"/>
-    <text x="27.5" y="14" font-size="10" font-weight="600" fill="#94A3B8" text-anchor="middle" font-family="ui-monospace, monospace">deliver</text>
-  </g>
-
-  <!-- Hyperdrive Postgres Read/Write -->
-  <g transform="translate(620, 935)" filter="url(#pillShadow)">
-    <rect x="0" y="0" width="175" height="26" rx="13" fill="#141824" stroke="#38BDF8" stroke-width="1.2"/>
-    <text x="87.5" y="17.5" font-size="11" font-weight="600" fill="#38BDF8" text-anchor="middle" font-family="ui-monospace, monospace">Drizzle ORM (useDB)</text>
-  </g>
-
-  <!-- ================= COMPONENT CARDS ================= -->
-
-  <!-- 1. CLIENT CARD (Left Ingress) -->
-  <g transform="translate(80, 465)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="165" height="235" rx="20" fill="#131826" stroke="#FF6D5A" stroke-width="2"/>
-    <rect x="58" y="24" width="48" height="48" rx="14" fill="#FF6D5A" fill-opacity="0.2" stroke="#FF6D5A" stroke-width="1.5"/>
-    <!-- User Icon -->
-    <g transform="translate(70, 36)" stroke="#FF6D5A" stroke-width="2" fill="none" stroke-linecap="round">
-      <circle cx="12" cy="7" r="4.5"/>
-      <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+    <!-- Client Visual Inner Area -->
+    <g transform="translate(45, 50)">
+      <circle cx="30" cy="24" r="16" fill="#262626" stroke="#404040" stroke-width="1"/>
+      <circle cx="30" cy="19" r="6" fill="#a3a3a3"/>
+      <path d="M 18 36 C 18 29 23 27 30 27 C 37 27 42 29 42 36 Z" fill="#a3a3a3"/>
     </g>
-    <text x="82" y="105" font-size="20" font-weight="700" fill="#F8FAFC" text-anchor="middle">Client</text>
-    <text x="82" y="128" font-size="12" fill="#94A3B8" text-anchor="middle">Browser · Mobile</text>
-    <text x="82" y="146" font-size="12" fill="#94A3B8" text-anchor="middle">End-user entry point</text>
-    <line x1="20" y1="165" x2="145" y2="165" stroke="#252F46" stroke-width="1"/>
-    <text x="82" y="186" font-size="11" font-weight="600" fill="#CBD5E1" text-anchor="middle">HTTPS &amp; WSS</text>
-    <text x="82" y="206" font-size="10.5" fill="#64748B" text-anchor="middle">Edge-routed via CF</text>
+
+    <text x="75" y="132" font-size="14" font-weight="700" fill="#fafafa" text-anchor="middle">Client</text>
+    <text x="75" y="149" font-size="11" fill="#737373" text-anchor="middle">Browser · Mobile</text>
+    
+    <line x1="15" y1="163" x2="135" y2="163" stroke="#262626" stroke-width="1"/>
+    <text x="75" y="180" font-size="9" font-family="'Geist Mono', monospace" fill="#a3a3a3" text-anchor="middle">HTTPS / WSS</text>
   </g>
 
-  <!-- 2. WEB WORKER (packages/web) -->
-  <g transform="translate(410, 160)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="250" height="145" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="20" y="18" width="42" height="42" rx="12" fill="#00DC82" fill-opacity="0.15" stroke="#00DC82" stroke-width="1.2"/>
-    <!-- Nuxt / Globe Icon -->
-    <g transform="translate(29, 27)" stroke="#00DC82" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-    </g>
-    <text x="74" y="38" font-size="17.5" font-weight="700" fill="#F8FAFC">Web Worker</text>
-    <text x="74" y="56" font-size="12" font-weight="600" fill="#00DC82">nuxfire.com</text>
-    <text x="20" y="88" font-size="12" fill="#94A3B8">Nuxt 3 · Landing page · Blog · Docs</text>
-    <text x="20" y="108" font-size="11.5" fill="#64748B">Nuxt Content v3 · Prerendered + SSR</text>
-    <rect x="20" y="118" width="85" height="18" rx="9" fill="#1C2436"/>
-    <text x="62" y="131" font-size="10" font-weight="600" fill="#38BDF8" text-anchor="middle">D1 Powered</text>
+  <!-- ================= TIER 1 COMPONENTS (IDENTITY & APPLICATION) ================= -->
+
+  <!-- Web Worker (packages/web) -->
+  <g transform="translate(270, 85)">
+    <rect x="0" y="0" width="270" height="120" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+    <rect x="14" y="14" width="28" height="28" rx="3" fill="#00dc82" fill-opacity="0.1" stroke="#00dc82" stroke-width="1"/>
+    <path d="M 28 20 L 37 34 L 19 34 Z" fill="none" stroke="#00dc82" stroke-width="1.8" stroke-linejoin="round"/>
+    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">Web Worker</text>
+    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#00dc82">nuxfire.com</text>
+
+    <text x="14" y="66" font-size="11" fill="#d4d4d4">Nuxt 3 · Public Marketing Site</text>
+    <text x="14" y="82" font-size="10" fill="#737373">Documentation &amp; Blog (Nuxt Content v3)</text>
+    <text x="14" y="98" font-size="10" fill="#737373">D1 SQL Full-Text Search Index</text>
   </g>
 
-  <!-- 3. AUTH WORKER (packages/functions/src/auth.ts + auth-frontend) -->
-  <g transform="translate(410, 375)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="250" height="165" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="20" y="18" width="42" height="42" rx="12" fill="#6366F1" fill-opacity="0.15" stroke="#6366F1" stroke-width="1.2"/>
-    <!-- Shield / Key Icon -->
-    <g transform="translate(29, 27)" stroke="#6366F1" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      <path d="M9 12l2 2 4-4"/>
-    </g>
-    <text x="74" y="38" font-size="17.5" font-weight="700" fill="#F8FAFC">Auth Worker</text>
-    <text x="74" y="56" font-size="12" font-weight="600" fill="#818CF8">auth.nuxfire.com</text>
-    <text x="20" y="88" font-size="12" fill="#94A3B8">OpenAuth.js issuer + Static SPA UI</text>
-    <text x="20" y="108" font-size="11.5" fill="#64748B">Password · OTP Code · GitHub · Google</text>
-    <rect x="20" y="124" width="95" height="22" rx="11" fill="#1C2436" stroke="#313D5A" stroke-width="1"/>
-    <text x="67" y="139" font-size="10.5" font-weight="600" fill="#CBD5E1" text-anchor="middle">No DB Sessions</text>
+  <!-- Auth Worker (packages/functions/src/auth.ts + auth-frontend) -->
+  <g transform="translate(270, 230)">
+    <rect x="0" y="0" width="270" height="140" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+    <rect x="14" y="14" width="28" height="28" rx="3" fill="#818cf8" fill-opacity="0.1" stroke="#818cf8" stroke-width="1"/>
+    <rect x="22" y="24" width="12" height="10" rx="1" fill="none" stroke="#818cf8" stroke-width="1.6"/>
+    <path d="M 25 24 L 25 20 C 25 17 31 17 31 20 L 31 24" fill="none" stroke="#818cf8" stroke-width="1.6"/>
+    
+    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">Auth Worker</text>
+    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#818cf8">auth.nuxfire.com</text>
+
+    <text x="14" y="66" font-size="11" fill="#d4d4d4">OpenAuth.js + Static SPA Frontend</text>
+    <text x="14" y="82" font-size="10" fill="#737373">OAuth: GitHub &amp; Google</text>
+    <text x="14" y="96" font-size="10" fill="#737373">Password + Email OTP Verification</text>
+    <rect x="14" y="108" width="118" height="18" rx="2" fill="#202020"/>
+    <text x="73" y="120" font-size="9" font-family="'Geist Mono', monospace" fill="#a3a3a3" text-anchor="middle">Zero DB Sessions</text>
   </g>
 
-  <!-- 4. AUTHKV (Cloudflare KV for Auth) -->
-  <g transform="translate(735, 435)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="145" height="110" rx="16" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="16" y="14" width="36" height="36" rx="10" fill="#6366F1" fill-opacity="0.15" stroke="#6366F1" stroke-width="1.2"/>
-    <g transform="translate(24, 22)" stroke="#6366F1" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="8" cy="14" r="3"/>
-      <path d="M10 12l8-8M14 8l2 2M16 6l2 2"/>
-    </g>
-    <text x="60" y="36" font-size="16" font-weight="700" fill="#F8FAFC">AuthKV</text>
-    <text x="16" y="70" font-size="11.5" fill="#94A3B8">Cloudflare KV</text>
-    <text x="16" y="88" font-size="11" fill="#64748B">User credentials</text>
-    <text x="16" y="102" font-size="10" fill="#64748B">Tokens &amp; session store</text>
-  </g>
+  <!-- App Worker (packages/app - Main Application Logic) -->
+  <g transform="translate(270, 395)">
+    <rect x="0" y="0" width="270" height="210" rx="4" fill="#171717" stroke="#00dc82" stroke-width="1.2"/>
+    <rect x="14" y="14" width="28" height="28" rx="3" fill="#00dc82" fill-opacity="0.1" stroke="#00dc82" stroke-width="1"/>
+    <rect x="20" y="20" width="16" height="16" rx="2" fill="none" stroke="#00dc82" stroke-width="1.6"/>
+    <line x1="20" y1="26" x2="36" y2="26" stroke="#00dc82" stroke-width="1.4"/>
+    <line x1="26" y1="26" x2="26" y2="36" stroke="#00dc82" stroke-width="1.4"/>
 
-  <!-- 5. APP WORKER (packages/app - Main SaaS Engine) -->
-  <g transform="translate(410, 640)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="250" height="180" rx="18" fill="#131826" stroke="#00DC82" stroke-width="1.8"/>
-    <rect x="20" y="18" width="42" height="42" rx="12" fill="#00DC82" fill-opacity="0.15" stroke="#00DC82" stroke-width="1.2"/>
-    <!-- Dashboard / Layout Icon -->
-    <g transform="translate(29, 27)" stroke="#00DC82" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="2"/>
-      <path d="M3 9h18M9 21V9"/>
-    </g>
-    <text x="74" y="38" font-size="18" font-weight="700" fill="#F8FAFC">App Worker</text>
-    <text x="74" y="56" font-size="12" font-weight="600" fill="#00DC82">app.nuxfire.com</text>
-    <text x="20" y="88" font-size="12" fill="#CBD5E1">Main SaaS application logic</text>
-    <text x="20" y="108" font-size="11.5" fill="#94A3B8">Tenant RBAC (nuxt-authorization)</text>
-    <text x="20" y="126" font-size="11.5" fill="#94A3B8">Platform Admin (/admin) · TOTP MFA</text>
-    <text x="20" y="144" font-size="11" fill="#64748B">tRPC APIs · Stripe &amp; Paddle webhooks</text>
-    <rect x="20" y="152" width="105" height="18" rx="9" fill="#064E3B"/>
-    <text x="72" y="165" font-size="10" font-weight="700" fill="#34D399" text-anchor="middle">Nitro / Nuxt 3</text>
-  </g>
+    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">App Worker</text>
+    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#00dc82">app.nuxfire.com</text>
 
-  <!-- 6. WEBSOCKETS DURABLE OBJECT (packages/functions/src/websockets.js) -->
-  <g transform="translate(985, 805)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="280" height="160" rx="18" fill="#131826" stroke="#8B5CF6" stroke-width="1.8"/>
-    <rect x="20" y="18" width="42" height="42" rx="12" fill="#8B5CF6" fill-opacity="0.15" stroke="#8B5CF6" stroke-width="1.2"/>
-    <!-- Lightning / WebSocket Icon -->
-    <g transform="translate(29, 27)" stroke="#8B5CF6" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-    </g>
-    <text x="74" y="38" font-size="17.5" font-weight="700" fill="#F8FAFC">Durable Object</text>
-    <text x="74" y="56" font-size="12" font-weight="600" fill="#A78BFA">websockets.nuxfire.com</text>
-    <text x="20" y="88" font-size="12" fill="#CBD5E1">Stateful realtime pub/sub hub</text>
-    <text x="20" y="108" font-size="11.5" fill="#94A3B8">Private topic per user (user.id)</text>
-    <text x="20" y="126" font-size="11.5" fill="#94A3B8">Short-lived HMAC ticket authentication</text>
-    <rect x="20" y="134" width="135" height="18" rx="9" fill="#2E1065"/>
-    <text x="87" y="147" font-size="10" font-weight="700" fill="#C4B5FD" text-anchor="middle">new_sqlite_classes (DO)</text>
-  </g>
+    <text x="14" y="66" font-size="11" font-weight="600" fill="#fafafa">Multi-Tenant SaaS Core (Nitro/Nuxt)</text>
+    <text x="14" y="84" font-size="10" fill="#d4d4d4">• Tenant RBAC (nuxt-authorization)</text>
+    <text x="14" y="100" font-size="10" fill="#d4d4d4">• Type-safe End-to-End tRPC APIs</text>
+    <text x="14" y="116" font-size="10" fill="#d4d4d4">• Platform Admin (/admin) with TOTP MFA</text>
+    <text x="14" y="132" font-size="10" fill="#d4d4d4">• Stripe Billing &amp; Subscriptions</text>
+    <text x="14" y="148" font-size="10" fill="#d4d4d4">• Zero-hop Service Binding to Auth &amp; Email</text>
 
-  <!-- 7. QUEUE (Cloudflare Queues - JobQueue) -->
-  <g transform="translate(985, 605)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="185" height="135" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="18" y="16" width="38" height="38" rx="10" fill="#F6821F" fill-opacity="0.15" stroke="#F6821F" stroke-width="1.2"/>
-    <!-- Stack / Queue Icon -->
-    <g transform="translate(25, 23)" stroke="#F6821F" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-    </g>
-    <text x="66" y="36" font-size="16.5" font-weight="700" fill="#F8FAFC">JobQueue</text>
-    <text x="66" y="52" font-size="11" font-weight="600" fill="#F6821F">Cloudflare Queue</text>
-    <text x="18" y="82" font-size="11.5" fill="#94A3B8">Async job buffer</text>
-    <text x="18" y="100" font-size="11" fill="#64748B">Concurrency: 5</text>
-    <text x="18" y="118" font-size="11" fill="#64748B">Batch: 10 msg / 5s</text>
-  </g>
-
-  <!-- 8. CONSUMER WORKER (packages/functions/src/jobs-consumer.ts) -->
-  <g transform="translate(1235, 605)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="220" height="135" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="18" y="16" width="38" height="38" rx="10" fill="#F6821F" fill-opacity="0.15" stroke="#F6821F" stroke-width="1.2"/>
-    <!-- Gears / CPU Worker Icon -->
-    <g transform="translate(25, 23)" stroke="#F6821F" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="4" y="4" width="16" height="16" rx="2"/>
-      <rect x="9" y="9" width="6" height="6"/>
-      <line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/>
-      <line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/>
-    </g>
-    <text x="66" y="36" font-size="16.5" font-weight="700" fill="#F8FAFC">Consumer</text>
-    <text x="66" y="52" font-size="11" font-weight="600" fill="#F6821F">jobs-consumer.ts</text>
-    <text x="18" y="82" font-size="11.5" fill="#94A3B8">Processes batched jobs</text>
-    <text x="18" y="100" font-size="11" fill="#64748B">Updates status in Postgres</text>
-    <text x="18" y="118" font-size="11" fill="#64748B">Max 3 retries with delay</text>
-  </g>
-
-  <!-- 9. DEAD LETTER QUEUE & DLQ WORKER (JobDLQ + dlq-consumer.ts) -->
-  <g transform="translate(1515, 605)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="180" height="135" rx="18" fill="#131826" stroke="#DC2626" stroke-width="1.5"/>
-    <rect x="18" y="16" width="38" height="38" rx="10" fill="#DC2626" fill-opacity="0.15" stroke="#DC2626" stroke-width="1.2"/>
-    <!-- Warning Triangle Icon -->
-    <g transform="translate(25, 23)" stroke="#EF4444" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-    </g>
-    <text x="66" y="36" font-size="16.5" font-weight="700" fill="#F8FAFC">JobDLQ</text>
-    <text x="66" y="52" font-size="11" font-weight="600" fill="#F87171">dlq-consumer.ts</text>
-    <text x="18" y="82" font-size="11.5" fill="#94A3B8">Dead-letter archive</text>
-    <text x="18" y="100" font-size="11" fill="#64748B">DeadLetterRecord table</text>
-    <text x="18" y="118" font-size="10.5" fill="#64748B">Operator replay triage</text>
-  </g>
-
-  <!-- 10. EMAIL WORKER (packages/functions/src/emails.ts) -->
-  <g transform="translate(1245, 165)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="225" height="150" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="20" y="18" width="40" height="40" rx="11" fill="#0EA5E9" fill-opacity="0.15" stroke="#0EA5E9" stroke-width="1.2"/>
-    <!-- Mail Icon -->
-    <g transform="translate(28, 26)" stroke="#0EA5E9" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-      <polyline points="22,6 12,13 2,6"/>
-    </g>
-    <text x="72" y="38" font-size="17" font-weight="700" fill="#F8FAFC">Email Worker</text>
-    <text x="72" y="55" font-size="11.5" font-weight="600" fill="#38BDF8">emails.ts</text>
-    <text x="20" y="86" font-size="12" fill="#CBD5E1">Zero-hop Service Binding</text>
-    <text x="20" y="106" font-size="11" fill="#94A3B8">Invoked by Auth, App &amp; Consumer</text>
-    <text x="20" y="126" font-size="11" fill="#64748B">Bypasses public network hop</text>
-  </g>
-
-  <!-- 11. REACT EMAIL TEMPLATES (packages/emails) -->
-  <g transform="translate(1515, 165)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="220" height="150" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="20" y="18" width="40" height="40" rx="11" fill="#0EA5E9" fill-opacity="0.15" stroke="#0EA5E9" stroke-width="1.2"/>
-    <!-- Code / Component Icon -->
-    <g transform="translate(28, 26)" stroke="#0EA5E9" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="16 18 22 12 16 6"/>
-      <polyline points="8 6 2 12 8 18"/>
-    </g>
-    <text x="72" y="36" font-size="16" font-weight="700" fill="#F8FAFC">React Email</text>
-    <text x="72" y="55" font-size="14.5" font-weight="700" fill="#F8FAFC">Templates</text>
-    <text x="20" y="86" font-size="12" fill="#CBD5E1">Typed JSX components</text>
-    <text x="20" y="106" font-size="11" fill="#94A3B8">Verification OTP · Welcome</text>
-    <text x="20" y="126" font-size="11" fill="#64748B">Team Invites · Password Reset</text>
-  </g>
-
-  <!-- 12. DELIVERY PROVIDERS (External ESPs) -->
-  <g transform="translate(1780, 165)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="215" height="235" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="20" y="18" width="40" height="40" rx="11" fill="#94A3B8" fill-opacity="0.15" stroke="#94A3B8" stroke-width="1.2"/>
-    <!-- Cloud Send Icon -->
-    <g transform="translate(28, 26)" stroke="#94A3B8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
-    </g>
-    <text x="72" y="38" font-size="16.5" font-weight="700" fill="#F8FAFC">Delivery</text>
-    <text x="72" y="55" font-size="15" font-weight="700" fill="#F8FAFC">Providers</text>
-    <text x="20" y="86" font-size="11.5" fill="#94A3B8">Pluggable ESPs via flags</text>
-    <g transform="translate(20, 102)">
-      <circle cx="6" cy="6" r="3.5" fill="#10B981"/>
-      <text x="18" y="10" font-size="12" font-weight="600" fill="#E2E8F0">Resend</text>
-      <text x="90" y="10" font-size="10.5" fill="#64748B">(active default)</text>
-
-      <circle cx="6" cy="30" r="3.5" fill="#64748B"/>
-      <text x="18" y="34" font-size="12" fill="#94A3B8">Brevo</text>
-
-      <circle cx="6" cy="54" r="3.5" fill="#64748B"/>
-      <text x="18" y="58" font-size="12" fill="#94A3B8">Amazon SES</text>
-
-      <circle cx="6" cy="78" r="3.5" fill="#64748B"/>
-      <text x="18" y="82" font-size="12" fill="#94A3B8">Mailgun / SparkPost</text>
-
-      <circle cx="6" cy="102" r="3.5" fill="#64748B"/>
-      <text x="18" y="106" font-size="12" fill="#94A3B8">Custom SMTP</text>
+    <line x1="14" y1="162" x2="256" y2="162" stroke="#262626" stroke-width="1"/>
+    <g transform="translate(14, 174)">
+      <rect x="0" y="0" width="95" height="18" rx="2" fill="#202020"/>
+      <text x="47.5" y="12" font-size="9" font-family="'Geist Mono', monospace" fill="#a3a3a3" text-anchor="middle">drizzle-orm</text>
+      <rect x="105" y="0" width="80" height="18" rx="2" fill="#202020"/>
+      <text x="145" y="12" font-size="9" font-family="'Geist Mono', monospace" fill="#a3a3a3" text-anchor="middle">openauth</text>
     </g>
   </g>
 
-  <!-- 13. PAYMENT INTEGRATIONS (Stripe & Paddle) -->
-  <g transform="translate(1245, 345)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="490" height="95" rx="16" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="18" y="16" width="38" height="38" rx="10" fill="#10B981" fill-opacity="0.15" stroke="#10B981" stroke-width="1.2"/>
-    <!-- Credit Card Icon -->
-    <g transform="translate(25, 23)" stroke="#10B981" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="1" y="4" width="22" height="16" rx="2"/>
-      <line x1="1" y1="10" x2="23" y2="10"/>
+  <!-- AuthKV (Cloudflare KV for Auth) -->
+  <g transform="translate(270, 630)">
+    <rect x="0" y="0" width="270" height="75" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+    <rect x="14" y="12" width="22" height="22" rx="2" fill="#818cf8" fill-opacity="0.1"/>
+    <circle cx="21" cy="23" r="3" fill="none" stroke="#818cf8" stroke-width="1.4"/>
+    <path d="M 23 21 L 29 15 M 26 18 L 28 20" stroke="#818cf8" stroke-width="1.4"/>
+
+    <text x="44" y="22" font-size="12" font-weight="700" fill="#fafafa">AuthKV</text>
+    <text x="44" y="32" font-size="9" font-family="'Geist Mono', monospace" fill="#737373">Cloudflare KV Namespace</text>
+    <text x="14" y="52" font-size="10" fill="#a3a3a3">Password hashes · Refresh tokens · Auth state</text>
+    <text x="14" y="66" font-size="9" fill="#525252">Bound exclusively to Auth Worker</text>
+  </g>
+
+  <!-- ================= TIER 2 COMPONENTS (REALTIME & QUEUES) ================= -->
+
+  <!-- WebSockets Durable Object -->
+  <g transform="translate(650, 85)">
+    <rect x="0" y="0" width="330" height="125" rx="4" fill="#171717" stroke="#a855f7" stroke-width="1.2"/>
+    <rect x="14" y="14" width="28" height="28" rx="3" fill="#a855f7" fill-opacity="0.1" stroke="#a855f7" stroke-width="1"/>
+    <path d="M 29 19 L 23 28 L 28 28 L 26 37 L 34 26 L 29 26 Z" fill="none" stroke="#a855f7" stroke-width="1.6" stroke-linejoin="round"/>
+
+    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">Websockets (Durable Object)</text>
+    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#c084fc">websockets.nuxfire.com</text>
+
+    <text x="14" y="66" font-size="11" fill="#d4d4d4">Stateful Realtime Hub (new_sqlite_classes)</text>
+    <text x="14" y="82" font-size="10" fill="#737373">Private topic authorization per user (user.id)</text>
+    <text x="14" y="98" font-size="10" fill="#737373">Short-lived HMAC ticket carried in Sec-WebSocket-Protocol</text>
+  </g>
+
+  <!-- Cloudflare Queues (JobQueue) -->
+  <g transform="translate(650, 240)">
+    <rect x="0" y="0" width="330" height="115" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+    <rect x="14" y="14" width="28" height="28" rx="3" fill="#f6821f" fill-opacity="0.1" stroke="#f6821f" stroke-width="1"/>
+    <path d="M 28 20 L 20 24 L 28 28 L 36 24 Z" fill="none" stroke="#f6821f" stroke-width="1.6"/>
+    <path d="M 20 28 L 28 32 L 36 28" fill="none" stroke="#f6821f" stroke-width="1.6"/>
+    <path d="M 20 32 L 28 36 L 36 32" fill="none" stroke="#f6821f" stroke-width="1.6"/>
+
+    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">JobQueue</text>
+    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#f6821f">Cloudflare Queue</text>
+
+    <text x="14" y="66" font-size="11" fill="#d4d4d4">Asynchronous Job Buffer</text>
+    <text x="14" y="82" font-size="10" fill="#737373">Max Concurrency: 5 · Batch Size: 10 msg / 5s</text>
+    <text x="14" y="98" font-size="10" fill="#737373">Automatic retry with 60s backoff</text>
+  </g>
+
+  <!-- Consumer Worker (jobs-consumer.ts) -->
+  <g transform="translate(650, 385)">
+    <rect x="0" y="0" width="330" height="115" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+    <rect x="14" y="14" width="28" height="28" rx="3" fill="#f6821f" fill-opacity="0.1" stroke="#f6821f" stroke-width="1"/>
+    <rect x="21" y="21" width="14" height="14" rx="2" fill="none" stroke="#f6821f" stroke-width="1.6"/>
+    <line x1="24" y1="18" x2="24" y2="21" stroke="#f6821f" stroke-width="1.4"/>
+    <line x1="32" y1="18" x2="32" y2="21" stroke="#f6821f" stroke-width="1.4"/>
+    <line x1="24" y1="35" x2="24" y2="38" stroke="#f6821f" stroke-width="1.4"/>
+    <line x1="32" y1="35" x2="32" y2="38" stroke="#f6821f" stroke-width="1.4"/>
+
+    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">Consumer Worker</text>
+    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#f6821f">jobs-consumer.ts</text>
+
+    <text x="14" y="66" font-size="11" fill="#d4d4d4">Batch Processor &amp; Status Reporter</text>
+    <text x="14" y="82" font-size="10" fill="#737373">Updates Job status (completed/failed) in DB</text>
+    <text x="14" y="98" font-size="10" fill="#737373">Dispatches async transactional emails via Email Worker</text>
+  </g>
+
+  <!-- Dead Letter Queue (JobDLQ + dlq-consumer.ts) -->
+  <g transform="translate(650, 525)">
+    <rect x="0" y="0" width="330" height="95" rx="4" fill="#171717" stroke="#7f1d1d" stroke-width="1"/>
+    <rect x="14" y="14" width="28" height="28" rx="3" fill="#ef4444" fill-opacity="0.1" stroke="#ef4444" stroke-width="1"/>
+    <path d="M 28 20 L 36 34 L 20 34 Z" fill="none" stroke="#ef4444" stroke-width="1.6"/>
+    <line x1="28" y1="25" x2="28" y2="29" stroke="#ef4444" stroke-width="1.4"/>
+    <circle cx="28" cy="32" r="0.8" fill="#ef4444"/>
+
+    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">JobDLQ &amp; Consumer</text>
+    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#f87171">dlq-consumer.ts</text>
+
+    <text x="14" y="64" font-size="11" fill="#d4d4d4">Dead-Letter Capture (Retry Exhaustion)</text>
+    <text x="14" y="80" font-size="10" fill="#737373">Stores DeadLetterRecord in Postgres for operator inspection</text>
+  </g>
+
+  <!-- Cron Trigger & Worker -->
+  <g transform="translate(650, 640)">
+    <rect x="0" y="0" width="330" height="65" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+    <rect x="14" y="14" width="24" height="24" rx="3" fill="#a855f7" fill-opacity="0.1"/>
+    <circle cx="26" cy="26" r="8" fill="none" stroke="#a855f7" stroke-width="1.4"/>
+    <polyline points="26,22 26,26 29,28" stroke="#a855f7" stroke-width="1.4"/>
+
+    <text x="46" y="24" font-size="12" font-weight="700" fill="#fafafa">Cron Trigger &amp; Worker</text>
+    <text x="46" y="34" font-size="9" font-family="'Geist Mono', monospace" fill="#c084fc">0 * * * * (Hourly Maintenance)</text>
+    <text x="14" y="54" font-size="10" fill="#a3a3a3">Automated maintenance · Logs execution to Postgres</text>
+  </g>
+
+  <!-- ================= TIER 3 COMPONENTS (STORAGE, DATA & SERVICES) ================= -->
+
+  <!-- 1. PostgreSQL via Hyperdrive -->
+  <g transform="translate(1070, 85)">
+    <rect x="0" y="0" width="470" height="145" rx="4" fill="#171717" stroke="#38bdf8" stroke-width="1.2"/>
+    <rect x="16" y="16" width="32" height="32" rx="3" fill="#38bdf8" fill-opacity="0.1" stroke="#38bdf8" stroke-width="1"/>
+    <ellipse cx="32" cy="26" rx="9" ry="3" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+    <path d="M 23 26 V 38 C 23 40 41 40 41 38 V 26" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+    <path d="M 23 32 C 23 34 41 34 41 32" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+
+    <text x="56" y="29" font-size="14" font-weight="700" fill="#fafafa">PostgreSQL Database</text>
+    <text x="56" y="42" font-size="10" font-family="'Geist Mono', monospace" fill="#38bdf8">Cloudflare Hyperdrive (AppDB)</text>
+
+    <text x="16" y="70" font-size="11" font-weight="600" fill="#e5e5e5">Edge Connection Pooling &amp; Zero Cold-Start TCP Acceleration</text>
+    <text x="16" y="88" font-size="10.5" fill="#a3a3a3">Drizzle ORM (postgres-js client scoped per request)</text>
+    <text x="16" y="104" font-size="10.5" fill="#737373">Supabase (Direct Connection) · AWS RDS · Neon · Self-Hosted</text>
+    <rect x="16" y="116" width="438" height="20" rx="2" fill="#202020"/>
+    <text x="235" y="130" font-size="9" font-family="'Geist Mono', monospace" fill="#93c5fd" text-anchor="middle">User · Team · Membership · Role · Permission · Plan · Benefit · Job · AuditLog</text>
+  </g>
+
+  <!-- 2. R2 Object Storage & Edge KV -->
+  <g transform="translate(1070, 245)">
+    <!-- R2 Box -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="230" height="100" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+      <rect x="14" y="12" width="24" height="24" rx="2" fill="#f6821f" fill-opacity="0.1"/>
+      <path d="M 26 16 L 33 20 L 26 24 L 19 20 Z" fill="none" stroke="#f6821f" stroke-width="1.4"/>
+      <path d="M 19 20 V 28 L 26 32 V 24" fill="none" stroke="#f6821f" stroke-width="1.4"/>
+      <path d="M 33 20 V 28 L 26 32 V 24" fill="none" stroke="#f6821f" stroke-width="1.4"/>
+
+      <text x="44" y="22" font-size="12" font-weight="700" fill="#fafafa">R2 Storage (BLOB)</text>
+      <text x="44" y="32" font-size="9" font-family="'Geist Mono', monospace" fill="#f6821f">NuxtHub hubBlob()</text>
+      <text x="14" y="54" font-size="10" fill="#a3a3a3">S3-compatible object store</text>
+      <text x="14" y="70" font-size="10" fill="#737373">Avatars · File uploads · Exports</text>
+      <text x="14" y="86" font-size="9" font-family="'Geist Mono', monospace" fill="#525252">Zero egress fees</text>
     </g>
-    <text x="68" y="36" font-size="16.5" font-weight="700" fill="#F8FAFC">Payments &amp; Billing Integration</text>
-    <text x="68" y="54" font-size="11.5" fill="#94A3B8">Multi-provider subscription engine with webhook validation</text>
-    <g transform="translate(68, 64)">
-      <rect x="0" y="0" width="80" height="22" rx="11" fill="#1E293B"/>
-      <text x="40" y="15" font-size="11" font-weight="600" fill="#6EE7B7" text-anchor="middle">Stripe</text>
-      <rect x="90" y="0" width="80" height="22" rx="11" fill="#1E293B"/>
-      <text x="130" y="15" font-size="11" font-weight="600" fill="#93C5FD" text-anchor="middle">Paddle</text>
-      <text x="185" y="15" font-size="11" fill="#64748B">Webhooks · Invoices · Subscriptions</text>
+
+    <!-- Edge KV Box -->
+    <g transform="translate(240, 0)">
+      <rect x="0" y="0" width="230" height="100" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+      <rect x="14" y="12" width="24" height="24" rx="2" fill="#a855f7" fill-opacity="0.1"/>
+      <circle cx="26" cy="24" r="5" fill="none" stroke="#a855f7" stroke-width="1.4"/>
+      <path d="M 29 21 L 34 16 M 32 18 L 34 20" stroke="#a855f7" stroke-width="1.4"/>
+
+      <text x="44" y="22" font-size="12" font-weight="700" fill="#fafafa">KV &amp; Cache</text>
+      <text x="44" y="32" font-size="9" font-family="'Geist Mono', monospace" fill="#c084fc">Bindings: KV / CACHE</text>
+      <text x="14" y="54" font-size="10" fill="#a3a3a3">Fixed-window rate limiting (60s)</text>
+      <text x="14" y="70" font-size="10" fill="#737373">User MFA temporary state</text>
+      <text x="14" y="86" font-size="9" font-family="'Geist Mono', monospace" fill="#525252">Edge response caching</text>
     </g>
   </g>
 
-  <!-- 14. CRON TRIGGER (Cloudflare Scheduled Event) -->
-  <g transform="translate(80, 1055)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="150" height="150" rx="18" fill="#131826" stroke="#8B5CF6" stroke-width="1.5"/>
-    <rect x="18" y="18" width="40" height="40" rx="11" fill="#8B5CF6" fill-opacity="0.15" stroke="#8B5CF6" stroke-width="1.2"/>
-    <!-- Clock Icon -->
-    <g transform="translate(26, 26)" stroke="#8B5CF6" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <polyline points="12 6 12 12 16 14"/>
-    </g>
-    <text x="18" y="80" font-size="16.5" font-weight="700" fill="#F8FAFC">Cron Trigger</text>
-    <text x="18" y="98" font-size="11.5" font-weight="600" fill="#A78BFA">0 * * * *</text>
-    <text x="18" y="118" font-size="11.5" fill="#94A3B8">Hourly automated</text>
-    <text x="18" y="134" font-size="11" fill="#64748B">time-based schedule</text>
+  <!-- 3. Content D1 Database -->
+  <g transform="translate(1070, 360)">
+    <rect x="0" y="0" width="470" height="70" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+    <rect x="14" y="12" width="24" height="24" rx="2" fill="#00dc82" fill-opacity="0.1"/>
+    <path d="M 21 19 L 26 18 L 31 19 V 29 L 26 28 L 21 29 Z" fill="none" stroke="#00dc82" stroke-width="1.4"/>
+
+    <text x="46" y="22" font-size="12" font-weight="700" fill="#fafafa">Content D1 Database (DB)</text>
+    <text x="46" y="32" font-size="9" font-family="'Geist Mono', monospace" fill="#00dc82">Cloudflare D1 SQL Binding</text>
+    <text x="14" y="52" font-size="10" fill="#a3a3a3">Dedicated database powering @nuxt/content v3 docs &amp; blog collections</text>
   </g>
 
-  <!-- 15. CRON WORKER (packages/functions/src/cron.ts) -->
-  <g transform="translate(400, 1055)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="245" height="150" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="20" y="18" width="40" height="40" rx="11" fill="#8B5CF6" fill-opacity="0.15" stroke="#8B5CF6" stroke-width="1.2"/>
-    <!-- Repeat / Maintenance Icon -->
-    <g transform="translate(28, 26)" stroke="#8B5CF6" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="23 4 23 10 17 10"/>
-      <polyline points="1 20 1 14 7 14"/>
-      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+  <!-- 4. Transactional Email System -->
+  <g transform="translate(1070, 445)">
+    <rect x="0" y="0" width="470" height="135" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+    <rect x="14" y="14" width="28" height="28" rx="3" fill="#0ea5e9" fill-opacity="0.1" stroke="#0ea5e9" stroke-width="1"/>
+    <rect x="20" y="22" width="16" height="12" rx="1" fill="none" stroke="#0ea5e9" stroke-width="1.5"/>
+    <polyline points="20,22 28,28 36,22" stroke="#0ea5e9" stroke-width="1.4"/>
+
+    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">Transactional Email Worker</text>
+    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#38bdf8">emails.ts · Zero-hop env.emails</text>
+
+    <text x="14" y="66" font-size="11" fill="#d4d4d4">React Email Components (@nuxfire/emails)</text>
+    <text x="14" y="82" font-size="10" fill="#737373">Type-safe HTML/plain-text templates for OTP, invitations &amp; alerts</text>
+    
+    <line x1="14" y1="94" x2="456" y2="94" stroke="#262626" stroke-width="1"/>
+    <g transform="translate(14, 104)">
+      <text x="0" y="12" font-size="10" font-weight="600" fill="#a3a3a3">Delivery Providers:</text>
+      <rect x="105" y="0" width="60" height="18" rx="2" fill="#202020"/>
+      <text x="135" y="12" font-size="9" font-family="'Geist Mono', monospace" fill="#34d399" text-anchor="middle">Resend</text>
+      <rect x="175" y="0" width="55" height="18" rx="2" fill="#202020"/>
+      <text x="202.5" y="12" font-size="9" font-family="'Geist Mono', monospace" fill="#737373" text-anchor="middle">Brevo</text>
+      <rect x="240" y="0" width="45" height="18" rx="2" fill="#202020"/>
+      <text x="262.5" y="12" font-size="9" font-family="'Geist Mono', monospace" fill="#737373" text-anchor="middle">SES</text>
+      <rect x="295" y="0" width="60" height="18" rx="2" fill="#202020"/>
+      <text x="325" y="12" font-size="9" font-family="'Geist Mono', monospace" fill="#737373" text-anchor="middle">Mailgun</text>
+      <rect x="365" y="0" width="55" height="18" rx="2" fill="#202020"/>
+      <text x="392.5" y="12" font-size="9" font-family="'Geist Mono', monospace" fill="#737373" text-anchor="middle">SMTP</text>
     </g>
-    <text x="72" y="38" font-size="17" font-weight="700" fill="#F8FAFC">Cron Worker</text>
-    <text x="72" y="55" font-size="11.5" font-weight="600" fill="#A78BFA">cron.ts</text>
-    <text x="20" y="86" font-size="12" fill="#CBD5E1">Maintenance execution</text>
-    <text x="20" y="106" font-size="11.5" fill="#94A3B8">Writes execution log to Postgres</text>
-    <text x="20" y="126" font-size="11" fill="#64748B">Enqueues periodic batch tasks</text>
   </g>
 
-  <!-- ================= DATA & STORAGE LAYER (4 REAL AUDITED PILLARS) ================= -->
+  <!-- 5. Payments (STRIPE ONLY) & SST IaC Deploy -->
+  <g transform="translate(1070, 595)">
+    <!-- Payments (Stripe Only) -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="230" height="110" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+      <rect x="14" y="12" width="24" height="24" rx="2" fill="#635bff" fill-opacity="0.12"/>
+      <rect x="18" y="19" width="16" height="10" rx="1" fill="none" stroke="#635bff" stroke-width="1.4"/>
+      <line x1="18" y1="23" x2="34" y2="23" stroke="#635bff" stroke-width="1.2"/>
 
-  <!-- Pillar 1: PostgreSQL via Hyperdrive (Core Database) -->
-  <g transform="translate(735, 1050)" filter="url(#cardGlowBlue)">
-    <rect x="0" y="0" width="250" height="175" rx="18" fill="#111728" stroke="#38BDF8" stroke-width="2"/>
-    <rect x="18" y="16" width="42" height="42" rx="12" fill="#38BDF8" fill-opacity="0.18" stroke="#38BDF8" stroke-width="1.5"/>
-    <!-- Database Cylinder Icon -->
-    <g transform="translate(27, 25)" stroke="#38BDF8" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <ellipse cx="12" cy="5" rx="9" ry="3"/>
-      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+      <text x="44" y="22" font-size="12" font-weight="700" fill="#fafafa">Payments &amp; Billing</text>
+      <text x="44" y="32" font-size="9" font-family="'Geist Mono', monospace" fill="#818cf8">Stripe</text>
+      <text x="14" y="54" font-size="10" fill="#a3a3a3">Webhooks &amp; checkouts</text>
+      <text x="14" y="70" font-size="10" fill="#737373">Subscription lifecycle</text>
+      <text x="14" y="86" font-size="9" font-family="'Geist Mono', monospace" fill="#525252">Per-stage API secrets</text>
     </g>
-    <text x="70" y="36" font-size="17" font-weight="800" fill="#F8FAFC">PostgreSQL</text>
-    <text x="70" y="54" font-size="12" font-weight="700" fill="#38BDF8">via CF Hyperdrive</text>
-    <text x="18" y="84" font-size="11.5" font-weight="600" fill="#CBD5E1">Global Edge Connection Pool</text>
-    <text x="18" y="102" font-size="11" fill="#94A3B8">Drizzle ORM (postgres-js)</text>
-    <text x="18" y="118" font-size="10.5" fill="#64748B">Supabase / RDS / Neon compatible</text>
-    <rect x="18" y="132" width="214" height="28" rx="8" fill="#172554"/>
-    <text x="125" y="151" font-size="10" font-weight="700" fill="#93C5FD" text-anchor="middle">Users · Teams · RBAC · Plans · Jobs</text>
-  </g>
 
-  <!-- Pillar 2: Cloudflare R2 ("BLOB") -->
-  <g transform="translate(1005, 1050)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="220" height="175" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="18" y="16" width="40" height="40" rx="11" fill="#F6821F" fill-opacity="0.15" stroke="#F6821F" stroke-width="1.2"/>
-    <!-- Bucket / Box Storage Icon -->
-    <g transform="translate(26, 24)" stroke="#F6821F" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-      <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/>
+    <!-- SST Deploy -->
+    <g transform="translate(240, 0)">
+      <rect x="0" y="0" width="230" height="110" rx="4" fill="#171717" stroke="#f59e0b" stroke-width="1"/>
+      <rect x="14" y="12" width="24" height="24" rx="2" fill="#f59e0b" fill-opacity="0.1"/>
+      <polyline points="20,20 24,24 20,28" stroke="#f59e0b" stroke-width="1.4"/>
+      <line x1="26" y1="28" x2="32" y2="28" stroke="#f59e0b" stroke-width="1.4"/>
+
+      <text x="44" y="22" font-size="12" font-weight="700" fill="#fafafa">Infrastructure as Code</text>
+      <text x="44" y="32" font-size="9" font-family="'Geist Mono', monospace" fill="#fbbf24">SST v4 (infra/*.ts)</text>
+      <text x="14" y="54" font-size="10" font-family="'Geist Mono', monospace" fill="#fde68a">$ bun run deploy</text>
+      <text x="14" y="70" font-size="10" fill="#a3a3a3">Automated drizzle migrations</text>
+      <text x="14" y="86" font-size="9" font-family="'Geist Mono', monospace" fill="#10b981">100% Cloudflare Workers</text>
     </g>
-    <text x="68" y="36" font-size="17" font-weight="700" fill="#F8FAFC">R2 Storage</text>
-    <text x="68" y="54" font-size="11.5" font-weight="600" fill="#F6821F">Binding: BLOB</text>
-    <text x="18" y="84" font-size="12" fill="#CBD5E1">Object storage (S3-compatible)</text>
-    <text x="18" y="104" font-size="11.5" fill="#94A3B8">NuxtHub hubBlob()</text>
-    <text x="18" y="122" font-size="11" fill="#64748B">Zero egress fee architecture</text>
-    <rect x="18" y="136" width="184" height="24" rx="8" fill="#1C2436"/>
-    <text x="110" y="152" font-size="10" font-weight="600" fill="#CBD5E1" text-anchor="middle">Avatars · Uploads · Exports</text>
-  </g>
-
-  <!-- Pillar 3: Cloudflare KV ("KV" / "CACHE") -->
-  <g transform="translate(1245, 1050)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="220" height="175" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="18" y="16" width="40" height="40" rx="11" fill="#8B5CF6" fill-opacity="0.15" stroke="#8B5CF6" stroke-width="1.2"/>
-    <!-- Key Icon -->
-    <g transform="translate(26, 24)" stroke="#8B5CF6" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 2l-2 2m-1.5 1.5L14 9l-3 3-2-2-4 4 4 4 2-2 3-3 3.5-3.5"/>
-      <circle cx="7.5" cy="16.5" r="3.5"/>
-    </g>
-    <text x="68" y="36" font-size="17" font-weight="700" fill="#F8FAFC">KV &amp; Cache</text>
-    <text x="68" y="54" font-size="11.5" font-weight="600" fill="#A78BFA">Bindings: KV / CACHE</text>
-    <text x="18" y="84" font-size="12" fill="#CBD5E1">Fixed-window rate limiting</text>
-    <text x="18" y="104" font-size="11.5" fill="#94A3B8">60s TTL floor protection</text>
-    <text x="18" y="122" font-size="11" fill="#64748B">Edge query &amp; session cache</text>
-    <rect x="18" y="136" width="184" height="24" rx="8" fill="#1C2436"/>
-    <text x="110" y="152" font-size="10" font-weight="600" fill="#CBD5E1" text-anchor="middle">API Throttling &amp; MFA State</text>
-  </g>
-
-  <!-- Pillar 4: Content D1 Database ("DB") -->
-  <g transform="translate(1485, 1050)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="220" height="175" rx="18" fill="#131826" stroke="#28354E" stroke-width="1.5"/>
-    <rect x="18" y="16" width="40" height="40" rx="11" fill="#00DC82" fill-opacity="0.15" stroke="#00DC82" stroke-width="1.2"/>
-    <!-- Book / Content DB Icon -->
-    <g transform="translate(26, 24)" stroke="#00DC82" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-    </g>
-    <text x="68" y="36" font-size="17" font-weight="700" fill="#F8FAFC">Content D1</text>
-    <text x="68" y="54" font-size="11.5" font-weight="600" fill="#00DC82">Binding: DB</text>
-    <text x="18" y="84" font-size="12" fill="#CBD5E1">Cloudflare D1 SQL database</text>
-    <text x="18" y="104" font-size="11.5" fill="#94A3B8">Powers @nuxt/content v3</text>
-    <text x="18" y="122" font-size="11" fill="#64748B">Docs &amp; blog search queries</text>
-    <rect x="18" y="136" width="184" height="24" rx="8" fill="#1C2436"/>
-    <text x="110" y="152" font-size="10" font-weight="600" fill="#CBD5E1" text-anchor="middle">Docs &amp; Blog Indexing</text>
-  </g>
-
-  <!-- ================= DEPLOY & IAC CARD (Bottom Right) ================= -->
-  <g transform="translate(1805, 1025)" filter="url(#cardShadow)">
-    <rect x="0" y="0" width="285" height="215" rx="18" fill="#1A1811" stroke="#F59E0B" stroke-width="1.5"/>
-    <rect x="18" y="16" width="40" height="40" rx="11" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="1.2"/>
-    <!-- Terminal Icon -->
-    <g transform="translate(26, 24)" stroke="#F59E0B" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="4 17 10 11 4 5"/>
-      <line x1="12" y1="19" x2="20" y2="19"/>
-    </g>
-    <text x="68" y="36" font-size="17" font-weight="800" fill="#FDE68A">Deploy &amp; IaC</text>
-    <text x="68" y="54" font-size="12" font-weight="600" fill="#F59E0B">SST v4 (infra/*.ts)</text>
-
-    <!-- Terminal Code Window inside Deploy -->
-    <rect x="16" y="74" width="253" height="122" rx="10" fill="#0C0A06" stroke="#382C10" stroke-width="1"/>
-    <circle cx="32" cy="90" r="3.5" fill="#EF4444"/>
-    <circle cx="44" cy="90" r="3.5" fill="#F59E0B"/>
-    <circle cx="56" cy="90" r="3.5" fill="#10B981"/>
-    <text x="75" y="93" font-size="10.5" fill="#786638" font-family="ui-monospace, monospace">sst deploy</text>
-
-    <text x="28" y="118" font-size="12" fill="#FDE68A" font-family="ui-monospace, monospace">$ bun install</text>
-    <text x="28" y="138" font-size="12" fill="#FDE68A" font-family="ui-monospace, monospace">$ bun run deploy</text>
-    <text x="28" y="158" font-size="11" fill="#10B981" font-family="ui-monospace, monospace">✔ Cloudflare Workers live</text>
-    <text x="28" y="176" font-size="10" font-weight="600" fill="#EAB308" font-family="ui-monospace, monospace">Auto drizzle-kit migrate</text>
   </g>
 
 </svg>

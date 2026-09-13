@@ -5,12 +5,16 @@ Multi-tenancy: teams, memberships, invitations and the per-tenant RBAC
 extractions in Fase 3 of `_docs/REFATORE_ARCHITETURE.md`, and first on purpose —
 `billing`, `notifications` and `admin` all reference it.
 
-> **Status: backend only.** Fase 3 passo 1a moved the schema, the tRPC routers,
-> the server utils and the RBAC abilities here. The Pinia store, the Vue
-> components/pages and the route middleware are still in `packages/app/app/` and
-> move in passo 1b. Until then `packages/app/shared/utils/abilities.ts` is a
-> temporary re-export bridge so the app's `#shared/utils/abilities` specifier
-> keeps resolving — delete it with the frontend move.
+> **Status: complete.** Fase 3 passo 1a moved the schema, the tRPC routers, the
+> server utils and the RBAC abilities here; passo 1b moved the Pinia stores, the
+> composables, the Vue components and the pages, renamed every ability to the
+> `teams*` convention and deleted the `packages/app/shared/utils/abilities.ts`
+> re-export bridge (`packages/app/shared/` no longer exists).
+>
+> Two things stayed in the Composition Root on purpose, both documented below:
+> `app/middleware/1.teams.global.ts` (global middleware ordering) and
+> `app/layouts/dashboard.vue` (the app shell, which consumes this layer purely
+> through cross-layer auto-import and needed zero edits).
 
 ## Activation
 
@@ -30,18 +34,22 @@ navigation all pick it up from that one array.
 
 ## Layout
 
-| Path                          | Role                                                                           |
-| ----------------------------- | ------------------------------------------------------------------------------ |
-| `layer.manifest.ts`           | identity, permission catalogue; no `navigation` (no top-level nav item)        |
-| `nuxt.config.ts`              | `$meta.name` only — no `components` prefix until the frontend moves here       |
-| `server/trpc/router.ts`       | exports `routers` = `{ teams, invites }`, the two top-level `appRouter` keys   |
-| `server/trpc/teams.ts`        | `teamsRouter` — CRUD, membership, roles, logo                                  |
-| `server/trpc/invites.ts`      | `invitesRouter` — send/accept/update/delete, seat enforcement                  |
-| `server/database/schema.ts`   | `Team`, `TeamMembership`, `TeamInvite`, `Role`, `Permission` + their relations |
-| `server/utils/roles.ts`       | `ensureSystemRoles()` — reactive Owner/Admin/Member safety net                 |
-| `server/utils/team-seats.ts`  | seat counting and invite-expiry rules (+ its test)                             |
-| `shared/utils/permissions.ts` | `PERMISSIONS`, the string constants abilities check against                    |
-| `shared/utils/abilities.ts`   | `defineAbility()` calls (+ the 66-case test that guards this whole move)       |
+| Path                          | Role                                                                                                                        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `layer.manifest.ts`           | identity, permission catalogue; no `navigation` (no top-level nav item)                                                     |
+| `nuxt.config.ts`              | `$meta.name` + `components` prefix — **currently not loaded by Nuxt**, see below                                            |
+| `app/composables/`            | `useTeamsStore`/`useCurrentTeam`, `useInviteStore`, the four ability wrappers, `useTeamSettingsLinks`                       |
+| `app/components/`             | `Team*.vue`, flat — `TeamSwitcher`, `TeamSwitcherDropdown`, `TeamCreateModal`, `TeamMembersListItem`, `TeamInvitesListItem` |
+| `app/pages/`                  | `select-team`, `invite/[[id]]`, and `[[team]]/settings` + its General/Members/Danger-Zone children                          |
+| `app/middleware/invite.ts`    | named middleware for the invite-acceptance page                                                                             |
+| `server/trpc/router.ts`       | exports `routers` = `{ teams, invites }`, the two top-level `appRouter` keys                                                |
+| `server/trpc/teams.ts`        | `teamsRouter` — CRUD, membership, roles, logo                                                                               |
+| `server/trpc/invites.ts`      | `invitesRouter` — send/accept/update/delete, seat enforcement                                                               |
+| `server/database/schema.ts`   | `Team`, `TeamMembership`, `TeamInvite`, `Role`, `Permission` + their relations                                              |
+| `server/utils/roles.ts`       | `ensureSystemRoles()` — reactive Owner/Admin/Member safety net                                                              |
+| `server/utils/team-seats.ts`  | seat counting and invite-expiry rules (+ its test)                                                                          |
+| `shared/utils/permissions.ts` | `PERMISSIONS`, the string constants abilities check against                                                                 |
+| `shared/utils/abilities.ts`   | `defineAbility()` calls, all `teams*`-prefixed (+ the 66-case test that guards this whole move)                             |
 
 ## Conventions that are not optional
 
@@ -71,10 +79,30 @@ navigation all pick it up from that one array.
   (`.references(() => users.id)`, `relations(t, ({ one }) => ...)`) — nothing may
   read an imported binding at module top level, or the cycle becomes a TDZ crash
   at import time.
-- **Ability names here are the one unprefixed set in the repo.** Every other
-  layer prefixes (`kanbanListBoards`); these predate the convention and renaming
-  them has to land with their call sites. See the comment at the top of
-  `shared/utils/abilities.ts`. Anything new added here takes the `teams*` prefix.
+- **Every ability export is `teams*`-prefixed** (`teamsDeleteTeam`,
+  `teamsSendInvite`, …), like every other layer's. These were the repo's one
+  unprefixed set until passo 1b retrofitted them alongside their last call
+  sites. The tRPC **procedure** keys are deliberately NOT prefixed
+  (`teams.listMembersAndInvites`, `invites.sendInvite`) — that is the live
+  client-facing API and extracting a domain must not reshape it, so a blind
+  find-and-replace on an ability name is exactly the wrong tool here.
+- **`#shared/utils/abilities` does not work from a layer.** `#shared` is aliased
+  to the Composition Root's own `shared/` only. Import
+  `@nuxfire/layer-teams/shared/utils/abilities` instead (that is what the
+  deleted bridge existed to paper over).
+- **`nuxt.config.ts` in this directory is not loaded by Nuxt today.** `extends`
+  resolves `@nuxfire/layer-teams` through `package.json`'s `exports["."]`, which
+  points at `layer.manifest.ts`, so c12 loads the manifest as the layer config.
+  The `components` `prefix` therefore does nothing and `#layers/teams` is not a
+  real alias — the `Team*` component namespace comes from the FILENAMES, exactly
+  as `layers/kanban`'s `Kanban*.vue` always really worked. Keep new components
+  named `Team*.vue`. Full detail in the comment at the bottom of that file.
+- **`1.teams.global.ts` stays in `packages/app/app/middleware/`.** Nuxt runs
+  every layer's global middleware BEFORE the Composition Root's, sorting by
+  filename only within a single directory, so from here it would run before
+  `0.auth.global.ts` — which silently rewrites the post-login redirect for any
+  logged-out deep link into a team. `invite.ts` is named (not global) middleware
+  and has no such constraint, which is why it does live here.
 - **`Role.teamId = null` means a system role shared by every team**, not an
   unscoped row. Do not "fix" it into a NOT NULL column.
 

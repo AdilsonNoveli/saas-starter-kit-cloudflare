@@ -1,0 +1,197 @@
+{
+  "name": "@adonisjs/mail",
+  "description": "Mail provider for adonis framework and has support for all common mailing services to send emails",
+  "version": "10.4.0",
+  "main": "build/index.js",
+  "type": "module",
+  "files": [
+    "build",
+    "!build/bin",
+    "!build/tests"
+  ],
+  "exports": {
+    ".": "./build/index.js",
+    "./types": "./build/src/types.js",
+    "./commands": "./build/commands/main.js",
+    "./services/main": "./build/services/main.js",
+    "./plugins/edge": "./build/src/plugins/edge.js",
+    "./mail_provider": "./build/providers/mail_provider.js",
+    "./transports/ses": "./build/src/transports/ses.js",
+    "./transports/json": "./build/src/transports/json.js",
+    "./transports/smtp": "./build/src/transports/smtp.js",
+    "./transports/brevo": "./build/src/transports/brevo.js",
+    "./transports/resend": "./build/src/transports/resend.js",
+    "./transports/mailgun": "./build/src/transports/mailgun.js",
+    "./transports/sparkpost": "./build/src/transports/sparkpost.js",
+    "./transports/cloudflare": "./build/src/transports/cloudflare.js",
+    "./transports/postmark": "./build/src/transports/postmark.js",
+    "./messengers/memory": "./build/src/messengers/memory_queue.js"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "pretest": "npm run lint",
+    "test": "npm run quick:test",
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "del-cli build",
+    "precompile": "npm run lint && npm run clean",
+    "copy:templates": "copyfiles --up=1 \"stubs/**/**/*.stub\" build",
+    "compile": "tsdown && tsc --emitDeclarationOnly --declaration",
+    "postcompile": "npm run copy:templates && npm run index:commands",
+    "build": "npm run compile",
+    "release": "npx release-it",
+    "version": "npm run build",
+    "index:commands": "adonis-kit index build/commands",
+    "quick:test": "NODE_DEBUG=\"adonisjs:mail\" node --enable-source-maps --import=@poppinss/ts-exec bin/test.ts"
+  },
+  "devDependencies": {
+    "@adonisjs/assembler": "^8.5.0",
+    "@adonisjs/core": "^7.5.0",
+    "@adonisjs/eslint-config": "^3.1.0",
+    "@adonisjs/prettier-config": "^1.5.0",
+    "@adonisjs/tsconfig": "^2.0.0",
+    "@aws-sdk/client-sesv2": "^3.1115.0",
+    "@japa/assert": "^4.2.0",
+    "@japa/expect-type": "^2.0.4",
+    "@japa/file-system": "^3.0.0",
+    "@japa/runner": "^5.3.0",
+    "@japa/snapshot": "^2.0.10",
+    "@poppinss/ts-exec": "^1.4.4",
+    "@release-it/conventional-changelog": "^12.0.0",
+    "@types/async-retry": "^1.4.9",
+    "@types/luxon": "^3.7.4",
+    "@types/mjml": "^5.0.0",
+    "@types/node": "^26.2.0",
+    "@types/sinon": "^22.0.0",
+    "async-retry": "^1.3.3",
+    "copyfiles": "^2.4.1",
+    "del-cli": "^7.0.0",
+    "dotenv": "^17.4.2",
+    "edge.js": "^6.5.1",
+    "eslint": "^10.8.1",
+    "luxon": "^3.7.2",
+    "mjml": "^5.4.0",
+    "prettier": "^3.9.6",
+    "release-it": "^21.0.2",
+    "sinon": "^22.1.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@poppinss/macroable": "^1.1.2",
+    "@poppinss/object-builder": "^1.1.0",
+    "@types/nodemailer": "^8.0.1",
+    "fastq": "^1.20.1",
+    "ical-generator": "^11.1.0",
+    "ky": "^2.0.2",
+    "nodemailer": "^9.0.5"
+  },
+  "peerDependencies": {
+    "@adonisjs/assembler": "^8.0.0-next.14 || ^8.0.0",
+    "@adonisjs/core": "^7.0.0-next.8 || ^7.0.0",
+    "@aws-sdk/client-sesv2": "^3.997.0",
+    "edge.js": "^6.0.1",
+    "mjml": "^4.18.0 || ^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "edge.js": {
+      "optional": true
+    },
+    "mjml": {
+      "optional": true
+    },
+    "@adonisjs/assembler": {
+      "optional": true
+    },
+    "@aws-sdk/client-sesv2": {
+      "optional": true
+    }
+  },
+  "homepage": "https://github.com/adonisjs/mail#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adonisjs/mail.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adonisjs/mail/issues"
+  },
+  "keywords": [
+    "adonisjs",
+    "mailer",
+    "emails",
+    "node-mailer"
+  ],
+  "author": "Harminder Virk <virk@adonisjs.com>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "tsdown": {
+    "entry": [
+      "index.ts",
+      "src/types.ts",
+      "src/plugins/edge.ts",
+      "services/main.ts",
+      "commands/make_mail.ts",
+      "providers/mail_provider.ts",
+      "src/transports/brevo.ts",
+      "src/transports/ses.ts",
+      "src/transports/json.ts",
+      "src/transports/resend.ts",
+      "src/transports/smtp.ts",
+      "src/transports/mailgun.ts",
+      "src/transports/sparkpost.ts",
+      "src/transports/cloudflare.ts",
+      "src/transports/postmark.ts",
+      "src/messengers/memory_queue.ts"
+    ],
+    "outDir": "./build",
+    "clean": true,
+    "format": "esm",
+    "minify": "dce-only",
+    "fixedExtension": false,
+    "dts": false,
+    "treeshake": false,
+    "sourcemaps": false,
+    "target": "esnext"
+  },
+  "release-it": {
+    "git": {
+      "requireCleanWorkingDir": true,
+      "requireUpstream": true,
+      "commitMessage": "chore(release): ${version}",
+      "tagAnnotation": "v${version}",
+      "push": true,
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true
+    },
+    "npm": {
+      "publish": true,
+      "skipChecks": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "angular"
+        }
+      }
+    }
+  },
+  "c8": {
+    "reporter": [
+      "text",
+      "html"
+    ],
+    "exclude": [
+      "tests/**",
+      "bin/**"
+    ]
+  },
+  "prettier": "@adonisjs/prettier-config"
+}

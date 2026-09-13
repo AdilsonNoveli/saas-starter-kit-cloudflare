@@ -2,7 +2,8 @@
   <div>
     <LandingHero />
     <LandingArchitecture />
-    <LandingFeatures />
+    <LandingComparisonTable />
+    <LandingFeatureBadges />
     <div class="py-8">
       <LandingFAQs
         title="Common Questions"
@@ -11,11 +12,10 @@
     </div>
     <LandingTestimonials />
     <LandingCTA
-      title="Your Next SaaS Project Starts Here"
-      description="A complete starter kit with everything you need to launch and scale your SaaS in record time."
-      cta="Get Started"
+      title="Sign Up and Join the Community"
+      description="Connect with fellow developers, access production-tested architectures, and launch your SaaS faster together."
+      cta="GET STARTED TO COMMUNITY"
     />
-    <LandingPricing />
   </div>
 </template>
 
@@ -27,4 +27,6 @@ definePageMeta({
 useSeoMeta({
   title: "Demo SaaS",
 });
+const colorMode = useColorMode();
+colorMode.preference = "dark";
 </script>

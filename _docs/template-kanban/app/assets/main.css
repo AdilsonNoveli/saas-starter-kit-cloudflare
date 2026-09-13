@@ -1,0 +1,1182 @@
+@import "tailwindcss";
+
+/* ============================================
+   DARK MODE — variante baseada na classe `.dark`
+   Tailwind v4 resolve utilitários via CSS custom properties; sobrescrever
+   as variáveis dentro de `.dark` faz todo `bg-surface`, `text-text-primary`
+   etc. mudar de tema sem precisar de utilitários `dark:` espalhados.
+   ============================================ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* ============================================
+     PADRÃO MODERNO
+     Cores oficiais do Design System 
+     Referência: *
+     ============================================ */
+
+  /* Brand Colors — fonte única de verdade */
+  /* Anteriormente havia duplicação (#22b473 vs #22b573); padronizado em #22b573 */
+  --color-brand: #22b573;
+  --color-brand-hover: #1da065;
+  --color-brand-light: #d4f2e3;
+
+  /* Brand Colors — Área Admin (Principal: #0e46e2 | Secundária: #11379a | Acento 3: #44acee | Acento 4: #3485d6) */
+  --color-admin-primary: #0e46e2;
+  --color-admin-secondary: #11379a;
+  --color-admin-accent: #44acee;
+  --color-admin-blue: #3485d6;
+
+  /* Aliases mantidos para retrocompatibilidade do catálogo (DRY) */
+  --color-brand-green: var(--color-brand);
+  --color-brand-greenDark: var(--color-brand-hover);
+  --color-brand-red: #ff6666;
+  --color-brand-redIcon: #ff7777;
+  --color-brand-blue: #4b66fb;
+  --color-brand-grayLight: #f2f2f2;
+  --color-brand-grayText: #cccccc;
+
+  /* Checkout Colors */
+  --color-input-bg: #faf9ec;
+  --color-input-border: #e5e3d8;
+  --color-input-text: #c4c4c4;
+  --color-text-main: #333333;
+  --color-text-label: #2e2e2e;
+
+  /* Primary - Azul Governo (Menu/Headers/Ações principais) */
+  --color-primary-50: #F0F4FA;
+  --color-primary-100: #E7EFF9;
+  --color-primary-200: #C5D4EB;
+  --color-primary-300: #A3BFDD;
+  --color-primary-400: #6B9ACF;
+  --color-primary-500: #3375C1;
+  --color-primary-600: #155BCB;
+  --color-primary-700: #1351B4;
+  --color-primary-800: #0C326F;
+  --color-primary-900: #071D41;
+  --color-primary-950: #04132B;
+
+  /* Secondary - Verde (Sucesso/Confirmação) */
+  --color-secondary-50: #E8F5E9;
+  --color-secondary-100: #C8E6C9;
+  --color-secondary-200: #A5D6A7;
+  --color-secondary-300: #81C784;
+  --color-secondary-400: #66BB6A;
+  --color-secondary-500: #4CAF50;
+  --color-secondary-600: #168821;
+  --color-secondary-700: #0F6016;
+  --color-secondary-800: #0A4010;
+  --color-secondary-900: #05200A;
+  --color-secondary-950: #031005;
+
+  /* Danger - Vermelho (Erro/Urgente) */
+  --color-danger-50: #FFEBEE;
+  --color-danger-100: #FFCDD2;
+  --color-danger-200: #EF9A9A;
+  --color-danger-300: #E57373;
+  --color-danger-400: #EF5350;
+  --color-danger-500: #F44336;
+  --color-danger-600: #E52207;
+  --color-danger-700: #C41C00;
+  --color-danger-800: #8B1400;
+  --color-danger-900: #520C00;
+  --color-danger-950: #2A0600;
+
+  /* Warning - Amarelo (Alerta/Atenção) */
+  --color-warning-50: #FFFBF0;
+  --color-warning-100: #FFF6D9;
+  --color-warning-200: #FFECB3;
+  --color-warning-300: #FFE082;
+  --color-warning-400: #FFD54F;
+  --color-warning-500: #FFCD07;
+  --color-warning-600: #E6B800;
+  --color-warning-700: #B38F00;
+  --color-warning-800: #806600;
+  --color-warning-900: #4D3D00;
+  --color-warning-950: #261F00;
+
+  /* Info - Laranja (Avisos importantes) */
+  --color-info-50: #FFF3E0;
+  --color-info-100: #FFE0B2;
+  --color-info-200: #FFCC80;
+  --color-info-300: #FFB74D;
+  --color-info-400: #FFA726;
+  --color-info-500: #FF9800;
+  --color-info-600: #C75D00;
+  --color-info-700: #9A4700;
+  --color-info-800: #6D3200;
+  --color-info-900: #401D00;
+  --color-info-950: #200F00;
+
+  /* Blue - Azul claro (Status, informações secundárias) */
+  --color-blue-50: #EFF6FF;
+  --color-blue-100: #DBEAFE;
+  --color-blue-200: #BFDBFE;
+  --color-blue-300: #93C5FD;
+  --color-blue-400: #60A5FA;
+  --color-blue-500: #3B82F6;
+  --color-blue-600: #2563EB;
+  --color-blue-700: #1D4ED8;
+  --color-blue-800: #1E40AF;
+  --color-blue-900: #1E3A8A;
+  --color-blue-950: #172554;
+
+  /* Indigo - Roxo azulado (Alternativa ao primary) */
+  --color-indigo-50: #EEF2FF;
+  --color-indigo-100: #E0E7FF;
+  --color-indigo-200: #C7D2FE;
+  --color-indigo-300: #A5B4FC;
+  --color-indigo-400: #818CF8;
+  --color-indigo-500: #6366F1;
+  --color-indigo-600: #4F46E5;
+  --color-indigo-700: #4338CA;
+  --color-indigo-800: #3730A3;
+  --color-indigo-900: #312E81;
+  --color-indigo-950: #1E1B4B;
+
+  /* Neutras - Cinzas */
+  --color-gray-50: #FAFAFA;
+  --color-gray-100: #F8F8F8;
+  --color-gray-200: #E6E6E6;
+  --color-gray-300: #CCCCCC;
+  --color-gray-400: #888888;
+  --color-gray-500: #555555;
+  --color-gray-600: #333333;
+  --color-gray-700: #1A1A1A;
+  --color-gray-800: #0D0D0D;
+  --color-gray-900: #000000;
+  --color-gray-950: #000000;
+
+  /* Aliases semânticos */
+  --color-azul: var(--color-primary-600);
+  --color-azul-hover: var(--color-primary-700);
+  --color-azul-light: var(--color-primary-200);
+  --color-azul-lighter: var(--color-primary-100);
+  --color-verde: var(--color-secondary-600);
+  --color-amarelo: var(--color-warning-500);
+  --color-vermelho: var(--color-danger-600);
+  --color-laranja: var(--color-info-600);
+  --color-bg: var(--color-gray-100);
+  --color-card: #FFFFFF;
+  --color-border: var(--color-gray-200);
+  --color-text: var(--color-gray-700);
+  --color-text-secondary: var(--color-gray-500);
+
+  /* ============================================
+     TOKENS SEMÂNTICOS (Design System)
+     Consumidos pela biblioteca de UI (Card, Modal, Combobox, etc.).
+     Em modo escuro (1.2), os valores são sobrescritos pela classe `.dark`
+     declarada fora deste bloco — Tailwind v4 resolve `bg-surface` etc. via
+     CSS custom properties, respeitando o cascata.
+     ============================================ */
+
+  /* Superfície e texto */
+  --color-surface: #FFFFFF;
+  --color-surface-raised: var(--color-gray-100);
+  --color-text-primary: var(--color-gray-900);
+  /* `--color-text-secondary` já declarado acima como alias semântico legado */
+  --color-text-muted: var(--color-gray-400);
+  --color-text-inverse: #FFFFFF;
+
+  /* Bordas e foco */
+  --color-ring: var(--color-brand);
+
+  /* Status semânticos */
+  --color-success: var(--color-secondary-600);
+  --color-warning: var(--color-warning-600);
+  --color-alert: var(--color-danger-600);
+  --color-info: var(--color-blue-600);
+
+  /* Interativos */
+  --color-interactive-primary: var(--color-gray-900);
+  --color-interactive-primary-hover: var(--color-gray-700);
+  --color-interactive-secondary: var(--color-gray-100);
+  --color-interactive-secondary-hover: var(--color-gray-200);
+
+  /* Toggle (switch) */
+  --color-toggle-off-bg: var(--color-gray-300);
+  --color-toggle-track: #FFFFFF;
+
+  /* Kanban — diferenciação visual por tipo de entrega */
+  --color-order-retirada: #c084fc;
+  --color-order-entrega: #2dd4bf;
+
+  /* Break Cards - Cores customizadas */
+  --color-card-primary: #314158;
+  --color-recurring-start: #ff6f47;
+  --color-recurring-end: #ffcd0f;
+  --color-period-start: #1b44b1;
+  --color-period-end: #207ecb;
+
+  /* ============================================
+     CUSTOM SPACING
+     Valores adicionais ao Tailwind padrão
+     ============================================ */
+  --spacing-18: 4.5rem;
+  --spacing-88: 22rem;
+  --spacing-120: 30rem;
+
+  /* ============================================
+     CUSTOM FONTS
+     Rawline (texto) e Raleway (títulos)
+     ============================================ */
+  --font-sans: "Rawline", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Raleway", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ============================================
+     CUSTOM SHADOWS
+     ============================================ */
+  --shadow-soft: 0 2px 15px -3px rgb(0 0 0 / 0.07), 0 10px 20px -2px rgb(0 0 0 / 0.04);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06);
+  --shadow-float: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+  --shadow-elevated: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+
+  /* ============================================
+     CUSTOM BREAKPOINTS
+     ============================================ */
+  --breakpoint-3xl: 120rem;
+}
+
+/* ============================================
+   COLOR-SCHEME PADRÃO
+   Informa ao browser que o documento é light por padrão.
+   Sem isso, web components (ex: PlaceAutocompleteElement) leem
+   prefers-color-scheme do OS e ficam dark mesmo quando o app está claro.
+   O .dark override abaixo cuida do tema escuro via classe.
+   ============================================ */
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background-color: var(--color-surface, #ffffff);
+  color: var(--color-text-primary, #111827);
+  min-height: 100vh;
+}
+
+/* ============================================
+   PALETA DE CORES DA ÁREA ADMIN (Branding de Referência)
+   Principal:  #2563eb (Azul Elétrico Moderno)
+   Secundária: #162055 (Navy Dark Elegante)
+   Tom 3:      #dbe6fe (Soft Blue Fill / Background Chip)
+   Tom 4:      #388cf8 (Vibrant Accent Blue)
+   Preserva 100% o verde (#22b573) do Catálogo / Loja.
+   ============================================ */
+.admin-layout,
+#admin-layout,
+:root:has(#pdv-page),
+:root:has(#kanban-page),
+:root:has(#preorders-page),
+:root:has([id^="admin-"]) {
+  --color-brand: #2563eb;
+  --color-brand-hover: #162055;
+  --color-brand-light: #dbe6fe;
+  --color-brand-green: #2563eb;
+  --color-brand-greenDark: #162055;
+  --color-admin-primary: #2563eb;
+  --color-admin-secondary: #162055;
+  --color-admin-accent: #388cf8;
+  --color-admin-blue: #dbe6fe;
+  --color-ring: #2563eb;
+}
+
+.dark .admin-layout,
+.dark #admin-layout,
+.dark :root:has(#pdv-page),
+.dark :root:has(#kanban-page),
+.dark :root:has(#preorders-page),
+.dark :root:has([id^="admin-"]) {
+  --color-brand: #3b82f6;
+  --color-brand-hover: #1d4ed8;
+  --color-brand-light: rgba(59, 130, 246, 0.2);
+  --color-brand-green: #3b82f6;
+  --color-brand-greenDark: #1d4ed8;
+  --color-ring: #3b82f6;
+}
+
+/* ============================================
+   DARK MODE OVERRIDES
+   Sobrescreve as variáveis de tokens semânticos quando `.dark` está
+   aplicada em qualquer ancestral. Tokens "primários" (gray-50..950,
+   primary-*, secondary-*, etc.) ficam fixos: dark mode opera sobre os
+   tokens semânticos (`surface`, `text-*`, `border`, `interactive-*`).
+   ============================================ */
+.dark {
+  /* Superfície e texto */
+  --color-surface: var(--color-gray-800);
+  --color-surface-raised: var(--color-gray-700);
+  --color-text-primary: var(--color-gray-50);
+  --color-text-secondary: var(--color-gray-300);
+  --color-text-muted: var(--color-gray-400);
+  --color-text-inverse: var(--color-gray-900);
+
+  /* Bordas — contraste nítido contra surface (#0D0D0D) e surface-raised (#1A1A1A) */
+  --color-border: #333333;
+
+  /* Cor de marca permanece a mesma — opera bem em ambos os temas */
+
+  /* Status semânticos: tons mais claros para garantir contraste mínimo
+     (WCAG AA) sobre superfícies escuras. */
+  --color-success: var(--color-secondary-400);
+  --color-warning: var(--color-warning-400);
+  --color-alert: var(--color-danger-400);
+  --color-info: var(--color-blue-400);
+
+  /* Interativos invertidos */
+  --color-interactive-primary: var(--color-gray-50);
+  --color-interactive-primary-hover: var(--color-gray-200);
+  --color-interactive-secondary: var(--color-gray-700);
+  --color-interactive-secondary-hover: var(--color-gray-600);
+
+  /* Toggle (switch) */
+  --color-toggle-off-bg: var(--color-gray-600);
+  --color-toggle-track: var(--color-gray-200);
+
+  /* Kanban — versões ligeiramente atenuadas para dark mode */
+  --color-order-retirada: #a855f7;
+  --color-order-entrega: #14b8a6;
+
+  /* Aliases semânticos legados (consistência com `.dark`) */
+  --color-card: var(--color-gray-800);
+  --color-bg: var(--color-gray-900);
+  --color-text: var(--color-gray-50);
+
+  /* Color-scheme nativo: scrollbars/inputs do navegador seguem o tema */
+  color-scheme: dark;
+}
+
+html.dark,
+html.dark body,
+.dark html,
+.dark body {
+  background-color: var(--color-bg, #0d0d0d);
+  color: var(--color-text-primary, #fafafa);
+}
+
+/* ============================================
+   GLOBAL FOCUS RING REMOVAL
+   Remove o contorno azul padrão do navegador
+   MAS preserva outlines customizados do Tailwind
+   ============================================ */
+
+*:focus:not([class*="outline-"]),
+*:focus-visible:not([class*="outline-"]) {
+  outline: none;
+}
+
+/* Garante que elementos com outline- do Tailwind mantenham suas bordas */
+[class*="outline-"]:focus,
+[class*="outline-"]:focus-visible {
+  outline-width: var(--tw-outline-width, 1px);
+  outline-style: var(--tw-outline-style, solid);
+  outline-color: var(--tw-outline-color, currentColor);
+  outline-offset: var(--tw-outline-offset, 0);
+}
+
+/* ============================================
+   CUSTOM UTILITIES
+   ============================================ */
+
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+@utility shadow-float {
+  box-shadow: var(--shadow-float);
+}
+
+/* Padrão visual para slots passados (linhas diagonais) */
+@utility bg-diagonal-striped {
+  background-color: transparent;
+  background-image: repeating-linear-gradient(45deg,
+      color-mix(in srgb, #fff1f2, transparent 50%) 0px,
+      color-mix(in srgb, #fff1f2, transparent 50%) 10px,
+      color-mix(in srgb, #ffe4e6, transparent 50%) 10px,
+      color-mix(in srgb, #ffe4e6, transparent 50%) 20px);
+}
+
+/* ============================================
+   BREAK CARDS - Gradientes Customizados
+   ============================================ */
+
+/* Gradiente para Pausa Recorrente (Laranja → Amarelo) */
+.bg-gradient-recurring {
+  background: linear-gradient(to right, var(--color-recurring-start), var(--color-recurring-end));
+}
+
+/* Gradiente para Período (Azul Escuro → Azul Claro) */
+.bg-gradient-period {
+  background: linear-gradient(to right, var(--color-period-start), var(--color-period-end));
+}
+
+/* Cor de texto/ícones dos cards */
+.text-card-primary {
+  color: var(--color-card-primary);
+}
+
+/* ============================================
+   BUTTON STYLES - Padrão Enterprise
+   Todos os botões seguem o padrão preto/cinza
+   ============================================ */
+
+/* Button Base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: 0.375rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.btn-md {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.btn-lg {
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+/* Button Primary - Preto sólido */
+.btn-primary {
+  background-color: var(--color-gray-900);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-gray-700);
+}
+
+.btn-primary:active:not(:disabled) {
+  background-color: var(--color-gray-800);
+}
+
+/* Button Secondary - Cinza com borda */
+.btn-secondary {
+  background-color: white;
+  color: var(--color-gray-900);
+  border: 1px solid var(--color-gray-300);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-gray-50);
+  border-color: var(--color-gray-400);
+}
+
+.btn-secondary:active:not(:disabled) {
+  background-color: var(--color-gray-100);
+}
+
+/* Button Ghost - Transparente */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-gray-700);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-900);
+}
+
+.btn-ghost:active:not(:disabled) {
+  background-color: var(--color-gray-200);
+}
+
+/* Button Soft - Cinza claro */
+.btn-soft {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-700);
+}
+
+.btn-soft:hover:not(:disabled) {
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-900);
+}
+
+.btn-soft:active:not(:disabled) {
+  background-color: var(--color-gray-300);
+}
+
+/* Button Neutral - Cinza neutro */
+.btn-neutral {
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-700);
+}
+
+.btn-neutral:hover:not(:disabled) {
+  background-color: var(--color-gray-300);
+  color: var(--color-gray-900);
+}
+
+.btn-neutral:active:not(:disabled) {
+  background-color: var(--color-gray-400);
+}
+
+/* Button Danger - Vermelho para ações destrutivas */
+.btn-danger {
+  background-color: var(--color-danger-600);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--color-danger-700);
+}
+
+.btn-danger:active:not(:disabled) {
+  background-color: var(--color-danger-800);
+}
+
+/* Button Success - Verde para confirmações */
+.btn-success {
+  background-color: var(--color-secondary-600);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: var(--color-secondary-700);
+}
+
+.btn-success:active:not(:disabled) {
+  background-color: var(--color-secondary-800);
+}
+
+/* ============================================
+   FOUC Prevention (Flash of Unstyled Content)
+   ============================================ */
+
+.app-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--color-surface, white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dark .app-shell {
+  background: var(--color-bg, #0d0d0d);
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--color-surface-raised, #f3f4f6) 0%, var(--color-surface, #f9fafb) 50%, var(--color-surface-raised, #f3f4f6) 100%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, var(--color-gray-800, #1f2937) 0%, var(--color-gray-700, #374151) 50%, var(--color-gray-800, #1f2937) 100%);
+  background-size: 1000px 100%;
+}
+
+/* ============================================
+   Content Animations
+   ============================================ */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+
+/* ============================================
+   CALENDAR COMPONENTS
+   Estilos compartilhados para calendários de bloqueio
+   ============================================ */
+
+/* Navigation */
+.calendar-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.calendar-navigation .current-month {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.calendar-navigation .nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.calendar-navigation .nav-button:hover:not(:disabled) {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
+.calendar-navigation .nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.calendar-navigation .nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Grid */
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.calendar-grid .weekday-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.calendar-grid .weekday-label {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-gray-500);
+  padding: 0.25rem;
+}
+
+.calendar-grid .days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+/* Day Cell */
+.calendar-grid .day-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  border: none;
+  background-color: var(--color-gray-50);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.calendar-grid .day-cell:hover:not(:disabled) {
+  background-color: var(--color-gray-100);
+}
+
+.calendar-grid .day-cell:disabled {
+  cursor: not-allowed;
+}
+
+.calendar-grid .day-cell.other-month {
+  opacity: 0.3;
+}
+
+.calendar-grid .day-cell.past-day {
+  opacity: 0.4;
+  background-color: var(--color-gray-100);
+}
+
+.calendar-grid .day-cell.non-working-day {
+  opacity: 0.5;
+  background-color: var(--color-gray-50);
+  cursor: not-allowed;
+}
+
+.calendar-grid .day-cell.non-working-day .day-number {
+  color: var(--color-gray-400);
+}
+
+.calendar-grid .day-cell.today {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: -2px;
+}
+
+.calendar-grid .day-cell.blocked {
+  background-color: var(--color-danger-100);
+}
+
+.calendar-grid .day-cell.blocked:hover:not(:disabled) {
+  background-color: var(--color-danger-200);
+}
+
+.calendar-grid .day-cell.partially-blocked {
+  background-color: var(--color-warning-100);
+}
+
+.calendar-grid .day-cell.partially-blocked:hover:not(:disabled) {
+  background-color: var(--color-warning-200);
+}
+
+/* Day Number */
+.calendar-grid .day-number {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-gray-900);
+}
+
+.calendar-grid .day-cell.blocked .day-number {
+  color: var(--color-danger-700);
+}
+
+.calendar-grid .day-cell.partially-blocked .day-number {
+  color: var(--color-warning-700);
+}
+
+.calendar-grid .day-cell.past-day .day-number {
+  color: var(--color-gray-400);
+}
+
+/* Block Indicators */
+.calendar-grid .block-indicator {
+  position: absolute;
+  bottom: 0.25rem;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: var(--color-danger-600);
+}
+
+.calendar-grid .partial-indicator {
+  position: absolute;
+  bottom: 0.25rem;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: var(--color-warning-500);
+}
+
+.calendar-grid .available-indicator {
+  position: absolute;
+  bottom: 0.25rem;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: var(--color-secondary-600);
+}
+
+/* Legend */
+.calendar-legend {
+  display: flex;
+  gap: 1.5rem;
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--color-gray-200);
+}
+
+.calendar-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calendar-legend .legend-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.calendar-legend .legend-dot.blocked {
+  background-color: var(--color-danger-600);
+}
+
+.calendar-legend .legend-dot.partial {
+  background-color: var(--color-warning-500);
+}
+
+.calendar-legend .legend-dot.available {
+  background-color: var(--color-secondary-600);
+}
+
+.calendar-legend .legend-label {
+  font-size: 0.75rem;
+  color: var(--color-gray-500);
+}
+
+/* Skeleton Loading for Calendar */
+.calendar-skeleton {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.calendar-skeleton .skeleton-day {
+  aspect-ratio: 1;
+  border-radius: 0.375rem;
+  background-color: var(--color-gray-200);
+}
+
+
+/* ============================================
+   AGENDA TOOLBAR
+   Toolbar de ações rápidas da agenda
+   ============================================ */
+
+.agenda-toolbar {
+  isolation: isolate;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.agenda-toolbar-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  padding: 0 0.75rem;
+  height: 38px;
+  /* Mesma altura do input com py-2 + text-sm + border */
+  color: var(--color-gray-400);
+  border: 1px solid var(--color-gray-300);
+  margin-left: -1px;
+  transition: all 0.15s ease;
+}
+
+.agenda-toolbar-btn:hover {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-600);
+}
+
+.agenda-toolbar-btn:focus-visible {
+  z-index: 10;
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: -2px;
+}
+
+.agenda-toolbar-btn--first {
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+  margin-left: 0;
+}
+
+.agenda-toolbar-btn--last {
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+/* ============================================
+   DROPDOWN/LISTBOX STYLES - Padrão Enterprise
+   Estilos centralizados para todos os dropdowns
+   ============================================ */
+
+/* Listbox Option - Item da lista */
+.listbox-option {
+  position: relative;
+  cursor: default;
+  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+  user-select: none;
+  outline: none;
+}
+
+/* Estado normal */
+.listbox-option--default {
+  color: var(--color-gray-900);
+}
+
+/* Estado hover/active - Cinza claro suave */
+.listbox-option--active {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-900);
+}
+
+/* Texto do item */
+.listbox-option__text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listbox-option__text--normal {
+  font-weight: 400;
+}
+
+.listbox-option__text--selected {
+  font-weight: 600;
+}
+
+/* Ícone de seleção (checkmark) */
+.listbox-option__check {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding-right: 0.5rem;
+}
+
+.listbox-option__check--default {
+  color: var(--color-primary-600);
+}
+
+.listbox-option__check--active {
+  color: var(--color-gray-900);
+}
+
+/* Container da lista de opções */
+.listbox-options {
+  position: absolute;
+  z-index: 30;
+  margin-top: 0.25rem;
+  max-height: 15rem;
+  width: 100%;
+  overflow: auto;
+  border-radius: 0.375rem;
+  background-color: white;
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.listbox-options:focus {
+  outline: none;
+}
+
+/* ==========================================================================
+   Clean & Sleek Scrollbars (Ultra Clear / Transparent Track)
+   ========================================================================== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+}
+
+.dark * {
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.6);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* ==========================================================================
+   Catalog Border Radius Protection & Governance
+   Elementos que NUNCA devem receber distorções de raio de borda
+   ========================================================================== */
+
+/* Círculos e pílulas protegidos (Toggle, Radio, Close Buttons, Dots, WhatsApp, Badges) */
+.preserve-circle,
+.preserve-circle *,
+.whatsapp-float-btn,
+.whatsapp-float-btn *,
+.ui-toggle,
+.ui-toggle *,
+[role="switch"],
+[role="switch"] *,
+input[type="radio"],
+input[type="radio"]::before,
+.ui-radio,
+.ui-radio *,
+.modal-close-btn,
+.badge-pill,
+.pagination-dot,
+.gallery-dot {
+  border-radius: 9999px !important;
+}
+
+/* Botão fixo no rodapé 'FAZER PEDIDO' - Barra 100% full width reta */
+.catalog-checkout-bar-btn,
+button.catalog-checkout-bar-btn {
+  border-radius: 0px !important;
+}
+
+/* Botões do seletor de quantidade (+ e -) integrados no container */
+.stepper-btn,
+button.stepper-btn {
+  border-radius: 0px !important;
+}
+
+/* CTAs do card de produto (Adicionar ao pedido / Compra Expressa): raio fixo,
+   mais quadrado que o --catalog-btn-radius do tema — não acompanha a
+   personalização geral da loja de propósito (pedido explícito do lojista). */
+.card-cta-btn,
+button.card-cta-btn,
+div.card-cta-btn {
+  border-radius: 4px !important;
+}
+
+/* Checkbox deve manter seu formato sutil padrão */
+[role="checkbox"],
+input[type="checkbox"] {
+  border-radius: 4px !important;
+}
+
+/* Custom Border Radius para botões CTA do Catálogo quando --catalog-btn-radius está definido */
+:root[style*="--catalog-btn-radius"] button:not(.status-dot):not(.animate-spin):not(.avatar-circle):not(.whatsapp-float-btn):not(.preserve-circle):not(.ui-toggle):not([role="switch"]):not([role="checkbox"]):not(.modal-close-btn):not(.stepper-btn):not(.catalog-checkout-bar-btn):not(.card-cta-btn),
+[style*="--catalog-btn-radius"] button:not(.status-dot):not(.animate-spin):not(.avatar-circle):not(.whatsapp-float-btn):not(.preserve-circle):not(.ui-toggle):not([role="switch"]):not([role="checkbox"]):not(.modal-close-btn):not(.stepper-btn):not(.catalog-checkout-bar-btn):not(.card-cta-btn) {
+  border-radius: var(--catalog-btn-radius) !important;
+}
+
+/* Balões de Chat Estilo WhatsApp (Catálogo e Admin) */
+.chat-bubble-user {
+  border-radius: 8px 0px 8px 8px !important;
+}
+
+.chat-bubble-assistant {
+  border-radius: 0px 8px 8px 8px !important;
+}
+
+/* Custom Border Radius para cartões e containers do Catálogo */
+:root[style*="--catalog-radius"] .rounded-full:not(button):not(.avatar-circle):not(.status-dot):not(.animate-spin):not(.whatsapp-float-btn):not(.preserve-circle):not(.ui-toggle):not([role="switch"]):not(input):not(.modal-close-btn):not(.badge-pill):not(.pagination-dot):not(.gallery-dot):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+:root[style*="--catalog-radius"] .rounded-3xl:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+:root[style*="--catalog-radius"] .rounded-2xl:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+:root[style*="--catalog-radius"] .rounded-xl:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+:root[style*="--catalog-radius"] .rounded-lg:not(.whatsapp-float-btn):not(.preserve-circle):not(.stepper-container):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+:root[style*="--catalog-radius"] .rounded-md:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+:root[style*="--catalog-radius"] .rounded-sm:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+:root[style*="--catalog-radius"] .rounded:not(.whatsapp-float-btn):not(.preserve-circle):not([role="checkbox"]):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+[style*="--catalog-radius"] .rounded-full:not(button):not(.avatar-circle):not(.status-dot):not(.animate-spin):not(.whatsapp-float-btn):not(.preserve-circle):not(.ui-toggle):not([role="switch"]):not(input):not(.modal-close-btn):not(.badge-pill):not(.pagination-dot):not(.gallery-dot):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+[style*="--catalog-radius"] .rounded-3xl:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+[style*="--catalog-radius"] .rounded-2xl:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+[style*="--catalog-radius"] .rounded-xl:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+[style*="--catalog-radius"] .rounded-lg:not(.whatsapp-float-btn):not(.preserve-circle):not(.stepper-container):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+[style*="--catalog-radius"] .rounded-md:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+[style*="--catalog-radius"] .rounded-sm:not(.whatsapp-float-btn):not(.preserve-circle):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn),
+[style*="--catalog-radius"] .rounded:not(.whatsapp-float-btn):not(.preserve-circle):not([role="checkbox"]):not(.chat-bubble):not([class*="chat-bubble"]):not(.card-cta-btn) {
+  border-radius: var(--catalog-radius) !important;
+}
+
+/* Regras específicas para cantos superiores em elementos de topo (ex: imagens de capa dos cartões de produto) */
+:root[style*="--catalog-radius"] .rounded-t-2xl,
+:root[style*="--catalog-radius"] .rounded-t-xl,
+:root[style*="--catalog-radius"] .rounded-t-lg,
+:root[style*="--catalog-radius"] .rounded-t-md,
+[style*="--catalog-radius"] .rounded-t-2xl,
+[style*="--catalog-radius"] .rounded-t-xl,
+[style*="--catalog-radius"] .rounded-t-lg,
+[style*="--catalog-radius"] .rounded-t-md {
+  border-top-left-radius: var(--catalog-radius) !important;
+  border-top-right-radius: var(--catalog-radius) !important;
+  border-bottom-left-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+}
+
+/* Regras específicas para cantos inferiores em elementos de rodapé */
+:root[style*="--catalog-radius"] .rounded-b-2xl,
+:root[style*="--catalog-radius"] .rounded-b-xl,
+:root[style*="--catalog-radius"] .rounded-b-lg,
+:root[style*="--catalog-radius"] .rounded-b-md,
+[style*="--catalog-radius"] .rounded-b-2xl,
+[style*="--catalog-radius"] .rounded-b-xl,
+[style*="--catalog-radius"] .rounded-b-lg,
+[style*="--catalog-radius"] .rounded-b-md {
+  border-bottom-left-radius: var(--catalog-radius) !important;
+  border-bottom-right-radius: var(--catalog-radius) !important;
+  border-top-left-radius: 0px !important;
+  border-top-right-radius: 0px !important;
+}

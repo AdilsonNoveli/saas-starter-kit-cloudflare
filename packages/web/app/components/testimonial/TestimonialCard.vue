@@ -2,12 +2,6 @@
   <div
     class="relative p-6 bg-elevated rounded-xl border border-default"
   >
-    <!-- Typographic opening quote mark -->
-    <span
-      class="absolute -top-3 left-3 text-5xl font-serif leading-none text-primary select-none pointer-events-none"
-      aria-hidden="true"
-    >&#8220;</span>
-
     <div class="space-y-6">
       <p class="text-toned relative z-10">
         {{ testimonial }}

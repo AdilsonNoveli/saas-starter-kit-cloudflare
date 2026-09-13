@@ -5,7 +5,7 @@
       color="neutral"
       variant="outline"
       size="md"
-      class="rounded-md px-3 py-1.5 text-xs sm:text-sm text-muted hover:text-highlighted hover:border-accented transition-all cursor-pointer"
+      class="h-9 rounded-md px-3 text-xs sm:text-sm text-muted hover:text-highlighted hover:border-accented transition-all cursor-pointer"
       @click="isOpen = true"
     >
       <span class="hidden md:inline font-normal">Search docs...</span>

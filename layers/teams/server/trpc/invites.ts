@@ -21,9 +21,9 @@ import {
   isInviteAcceptable,
 } from "../utils/team-seats";
 import {
-  deleteInvite,
-  sendInvite,
-  updateInvite,
+  teamsDeleteInvite,
+  teamsSendInvite,
+  teamsUpdateInvite,
 } from "../../shared/utils/abilities";
 
 export const invitesRouter = router({
@@ -58,7 +58,7 @@ export const invitesRouter = router({
             message: "You do not have permission to invite members",
           });
         }
-        await authorize(sendInvite, team.id);
+        await authorize(teamsSendInvite, team.id);
 
         // Seats are enforced here *and* again in acceptInvite. Counting only
         // members here let the limit be bypassed outright: every pending
@@ -241,7 +241,7 @@ export const invitesRouter = router({
           message: "You do not have permission to change invite roles",
         });
       }
-      await authorize(updateInvite, team.id);
+      await authorize(teamsUpdateInvite, team.id);
 
       await useDB()
         .update(teamInvites)
@@ -291,7 +291,7 @@ export const invitesRouter = router({
           message: "You do not have permission to delete invites",
         });
       }
-      await authorize(deleteInvite, team.id);
+      await authorize(teamsDeleteInvite, team.id);
 
       const deletedInvite = await useDB()
         .delete(teamInvites)

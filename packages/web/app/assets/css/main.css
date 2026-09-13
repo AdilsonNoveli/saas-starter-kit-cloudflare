@@ -120,6 +120,30 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Variante verde do shiny-button (Nuxt / Emerald brand) */
+.shiny-button.shiny-button-green,
+.shiny-button-green {
+  --gradient-shine: #34d399;
+  --gradient-brand: #059669;
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.35);
+  color: #ffffff;
+}
+.dark .shiny-button.shiny-button-green,
+.dark .shiny-button-green {
+  background:
+    linear-gradient(var(--background, #0d0d0d), var(--background, #0d0d0d)) padding-box,
+    conic-gradient(
+      from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
+      transparent 0%,
+      #059669 5%,
+      #34d399 15%,
+      #059669 30%,
+      transparent 40%,
+      transparent 100%
+    ) border-box;
+  color: #ffffff;
+}
+
 /* Pseudo-elemento ::before - Grade de pontos animada */
 .shiny-button::before {
   content: "";

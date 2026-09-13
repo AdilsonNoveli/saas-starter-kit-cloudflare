@@ -59,30 +59,22 @@
               :delay-duration="0"
               :disabled="!isCollapsed"
             >
-              <UButton
-                icon="i-lucide-settings"
-                :label="isCollapsed ? undefined : 'Settings'"
-                color="neutral"
-                variant="ghost"
-                :block="!isCollapsed"
-                :square="isCollapsed"
-                class="group data-[state=open]:bg-elevated hover:bg-elevated/50 transition-colors"
-                :class="[
-                  isCollapsed
-                    ? 'size-9 p-1.5 justify-center'
-                    : 'justify-start px-2.5 py-1.5 gap-1.5',
-                ]"
-                :ui="{
-                  leadingIcon:
-                    'size-5 text-dimmed group-hover:text-default shrink-0',
-                  label:
-                    'font-medium text-sm text-muted group-hover:text-highlighted truncate',
-                }"
-              />
+              <button
+                type="button"
+                class="group relative w-full flex items-center gap-1.5 font-medium text-sm rounded-md font-medium text-muted hover:text-highlighted before:absolute before:z-[-1] before:rounded-md before:inset-y-px before:inset-x-0 hover:before:bg-elevated/50 transition-colors before:transition-colors focus:outline-none focus-visible:outline-none"
+                :class="isCollapsed ? 'px-1.5 py-1.5 justify-center' : 'px-2.5 py-1.5'"
+              >
+                <UIcon
+                  name="i-lucide-settings"
+                  class="shrink-0 size-5 text-dimmed group-hover:text-default transition-colors"
+                />
+                <span v-if="!isCollapsed" class="truncate">Settings</span>
+              </button>
             </UTooltip>
           </UDropdownMenu>
         </div>
       </template>
+
     </UDashboardSidebar>
 
     <slot />

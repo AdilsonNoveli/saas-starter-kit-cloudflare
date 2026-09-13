@@ -4,7 +4,14 @@ describe("event ledger", () => {
   const store = new Map<string, unknown>();
   const mockKV = {
     get: vi.fn((key: string) => Promise.resolve(store.get(key))),
-    set: vi.fn((key: string, value: unknown) => {
+    // The third parameter is declared because the production code actually
+    // passes it (`hubKV().set(key, true, { ttl })`) and the TTL assertion below
+    // reads it back. Stubbing only two parameters typed `mock.calls[0]` as a
+    // 2-tuple, so reading index 2 off it was a type error — latent since this
+    // suite was written, because `nuxt typecheck` only checks the app program
+    // and never `server/tsconfig.json`. Surfaced (not introduced) by the move
+    // into this layer in Fase 3 passo 2a; the assertions are unchanged.
+    set: vi.fn((key: string, value: unknown, _options?: { ttl: number }) => {
       store.set(key, value);
       return Promise.resolve();
     }),
@@ -45,7 +52,7 @@ describe("event ledger", () => {
     const { markEventProcessed } = await import("./event-ledger");
     await markEventProcessed("stripe", "evt_1");
 
-    const [, , options] = mockKV.set.mock.calls[0] ?? [];
+    const options = mockKV.set.mock.calls[0]?.[2];
     const THREE_DAYS_SECONDS = 3 * 24 * 60 * 60;
     expect((options as { ttl: number }).ttl).toBeGreaterThanOrEqual(
       THREE_DAYS_SECONDS,

@@ -1,5 +1,11 @@
 <template>
-  <UDashboardPanel id="kanban-board">
+  <UDashboardPanel
+    id="kanban-board"
+    :ui="{
+      root: 'h-svh max-h-svh overflow-hidden flex flex-col',
+      body: 'flex-1 overflow-hidden p-0 gap-0 sm:p-0 sm:gap-0',
+    }"
+  >
     <template #header>
       <UDashboardNavbar :title="board?.name ?? 'Board'">
         <template #leading>
@@ -22,7 +28,7 @@
     <template #body>
       <div
         v-if="status === 'pending'"
-        class="flex justify-center py-12 text-muted"
+        class="flex flex-1 items-center justify-center py-12 text-muted"
       >
         <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin" />
       </div>
@@ -30,6 +36,7 @@
       <KanbanBoard
         v-else-if="board"
         :board="board"
+        class="flex-1 h-full"
         @move="moveCard"
         @create-card="createCard"
         @create-column="createColumn"

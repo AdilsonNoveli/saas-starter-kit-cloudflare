@@ -8,7 +8,7 @@
       :default-size="16"
       collapsible
       resizable
-      :ui="{ root: 'border-e border-default' }"
+      :ui="{ root: 'border-e border-default', footer: 'pb-4 pt-1.5' }"
     >
       <!--
         No collapse toggle here — every page under this layout already has
@@ -36,39 +36,52 @@
       </template>
 
       <template #footer="{ collapsed: isCollapsed }">
-        <!--
-          The gear-icon-on-the-team-card at /select-team was, until now, the
-          only way into team settings — nothing inside a team itself linked
-          there. `useTeamSettingsLinks` is the same ability-gated list the
-          settings page's own toolbar renders (see its doc comment), reused
-          here instead of duplicated so this trigger can never drift from
-          which tabs a given user is actually allowed to see.
-        -->
-        <UDropdownMenu
-          v-if="currentTeam?.slug"
-          :items="settingsItems"
-          :content="{
-            align: 'center',
-            side: 'top',
-            sideOffset: 8,
-            collisionPadding: 12,
-          }"
-          :ui="{
-            content: isCollapsed
-              ? 'w-56'
-              : 'w-(--reka-dropdown-menu-trigger-width)',
-          }"
-        >
-          <UButton
-            icon="i-lucide-settings"
-            :label="isCollapsed ? undefined : 'Settings'"
-            color="neutral"
-            variant="ghost"
-            block
-            :square="isCollapsed"
-            class="data-[state=open]:bg-elevated"
-          />
-        </UDropdownMenu>
+        <div class="w-full flex" :class="isCollapsed ? 'justify-center' : ''">
+          <UDropdownMenu
+            v-if="currentTeam?.slug"
+            :items="settingsItems"
+            :content="{
+              align: isCollapsed ? 'center' : 'start',
+              side: 'top',
+              sideOffset: 8,
+              collisionPadding: 12,
+            }"
+            :class="isCollapsed ? '' : 'w-full'"
+            :ui="{
+              content: isCollapsed
+                ? 'w-56'
+                : 'w-(--reka-dropdown-menu-trigger-width)',
+            }"
+          >
+            <UTooltip
+              :text="isCollapsed ? 'Settings' : undefined"
+              :content="{ side: 'right' }"
+              :delay-duration="0"
+              :disabled="!isCollapsed"
+            >
+              <UButton
+                icon="i-lucide-settings"
+                :label="isCollapsed ? undefined : 'Settings'"
+                color="neutral"
+                variant="ghost"
+                :block="!isCollapsed"
+                :square="isCollapsed"
+                class="group data-[state=open]:bg-elevated hover:bg-elevated/50 transition-colors"
+                :class="[
+                  isCollapsed
+                    ? 'size-9 p-1.5 justify-center'
+                    : 'justify-start px-2.5 py-1.5 gap-1.5',
+                ]"
+                :ui="{
+                  leadingIcon:
+                    'size-5 text-dimmed group-hover:text-default shrink-0',
+                  label:
+                    'font-medium text-sm text-muted group-hover:text-highlighted truncate',
+                }"
+              />
+            </UTooltip>
+          </UDropdownMenu>
+        </div>
       </template>
     </UDashboardSidebar>
 
@@ -94,10 +107,6 @@ const currentTeam = useCurrentTeam();
 const baseRoute = computed(() => `/${currentTeam.value?.slug}`);
 const teamID = computed(() => currentTeam.value?.id || "");
 
-// Same ability the Billing tab in useTeamSettingsLinks already gates on —
-// reused rather than re-derived, so this shortcut can't disagree with the
-// settings page about who is allowed to see billing for this team.
-const { data: showBilling } = useGetBillingInfoAbility(teamID);
 const settingsLinks = useTeamSettingsLinks(teamID);
 const layerLinks = useLayerNavigation();
 
@@ -139,13 +148,6 @@ const closeSidebar = () => {
   open.value = false;
 };
 
-/*
- * Full team settings (General/Members/Danger Zone/Billing) stays out of this
- * primary nav — see the footer trigger below — but Plans/upgrade is content
- * navigation in its own right, the same way it sits in the primary nav of
- * most SaaS dashboards, so it gets its own entry instead of being buried a
- * click deeper in the settings dropdown.
- */
 const links = computed<NavigationMenuItem[]>(() => [
   {
     label: "Dashboard",
@@ -162,24 +164,21 @@ const links = computed<NavigationMenuItem[]>(() => [
     to: link.to.replace("{team}", currentTeam.value?.slug ?? ""),
     onSelect: closeSidebar,
   })),
-  ...(showBilling.value
-    ? [
-        {
-          label: "Plans",
-          icon: "i-lucide-crown",
-          to: `${baseRoute.value}/settings/billing`,
-          onSelect: closeSidebar,
-        },
-      ]
-    : []),
 ]);
 
-const settingsItems = computed<DropdownMenuItem[][]>(() => [
-  settingsLinks.value.map((link) => ({
-    label: link.label,
-    icon: link.icon,
-    to: link.to,
-    onSelect: closeSidebar,
-  })),
-]);
+const settingsItems = computed<DropdownMenuItem[][]>(() => {
+  const generalLink = settingsLinks.value.find(
+    (link) => link.to === `${baseRoute.value}/settings`,
+  );
+  return [
+    [
+      {
+        label: generalLink?.label ?? "General",
+        icon: generalLink?.icon ?? "i-lucide-settings",
+        to: `${baseRoute.value}/settings`,
+        onSelect: closeSidebar,
+      },
+    ],
+  ];
+});
 </script>

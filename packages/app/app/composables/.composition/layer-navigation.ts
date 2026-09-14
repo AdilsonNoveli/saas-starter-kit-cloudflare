@@ -5,6 +5,7 @@
 
 import billingManifest from "@nuxfire/layer-billing/manifest";
 import kanbanManifest from "@nuxfire/layer-kanban/manifest";
+import notificationsManifest from "@nuxfire/layer-notifications/manifest";
 import teamsManifest from "@nuxfire/layer-teams/manifest";
 
 import type { LayerManifest } from "@nuxfire/layer-types";
@@ -12,5 +13,6 @@ import type { LayerManifest } from "@nuxfire/layer-types";
 export const layerManifests: LayerManifest[] = [
   billingManifest,
   kanbanManifest,
+  notificationsManifest,
   teamsManifest,
 ];

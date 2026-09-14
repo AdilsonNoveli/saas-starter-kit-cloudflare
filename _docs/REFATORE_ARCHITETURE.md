@@ -245,10 +245,10 @@ export const layers = {
   // lista de nomes para `extends`: essas entradas entram no mesmo
   // `activeLayerNames` que alimenta a composição gerada de tRPC e de navegação
   // (ver §3), então uma core layer não tem import escrito à mão em lugar
-  // nenhum. Hoje `teams` (Fase 3 passo 1a/1b) e `billing` (passo 2a, backend)
-  // estão extraídas; as outras duas entram aqui conforme as fases seguintes as
-  // extraem.
-  core: ["teams", "billing"], // -> ["teams", "billing", "notifications", "admin"]
+  // nenhum. Hoje `teams` (Fase 3 passo 1a/1b), `billing` (passo 2a/2b) e
+  // `notifications` (passo 3) estão extraídas; só `admin` falta, e entra aqui
+  // no último passo da Fase 3.
+  core: ["teams", "billing", "notifications"], // -> + "admin"
 
   // Feature Layers opcionais — ativáveis por build/deploy
   features: {
@@ -389,14 +389,15 @@ export * from "./core-schema"; // User, Plan, Subscription, Job, Log, etc.
 export * from "@nuxfire/layer-kanban/server/database/schema";
 export * from "@nuxfire/layer-teams/server/database/schema"; // Team, TeamMembership, TeamInvite, Role, Permission
 export * from "@nuxfire/layer-billing/server/database/schema"; // Plan, Benefit, BenefitsOnPlan, Subscription
+export * from "@nuxfire/layer-notifications/server/database/schema"; // Notification
 ```
 
 > [!CAUTION]
 > **Achado real de deploy (não de nenhum comando de verificação): caminho relativo aqui quebra o `sst deploy` de verdade.** `packages/functions/src/cron.ts`, `jobs-consumer.ts` e `dlq-consumer.ts` importam este barrel e são publicados como `sst.cloudflare.Worker`/`Cron`/`Queue` nativos (`infra/cron.ts`, `infra/jobs.ts`), empacotados pelo `Runtime.Build` do próprio SST — um bundler diferente do Nitro/Vite que builda `packages/app`. Um `export * from "../../../../layers/teams/server/database/schema"` resolve perfeitamente em `tsc --noEmit`, `vitest`, `bunx drizzle-kit generate`, `nuxt build` e até `esbuild --bundle` puro — nenhum desses é o bundler que realmente publica esse pacote — mas falha no deploy real com `Error: Could not resolve "../../../../layers/teams/server/database/schema"`. Corrigido trocando pra especificador de pacote (`@nuxfire/layer-teams/...`) em `schema.ts` e em `core-schema.ts` (que também importa `teams` pra FKs de `Subscription`/`Job`/`DeadLetterRecord`), com `@nuxfire/layer-{kanban,teams,billing}: workspace:*` adicionados às dependências de `packages/functions/package.json`. O ciclo de dependência de workspace que isso cria (este pacote passa a depender de layers que já dependem dele via `@nuxfire/functions: workspace:*`) não é problema — `layers/teams` ⇄ `layers/billing` já fazem o mesmo e o `bun install` resolve como symlink puro, sem reclamar. **Nenhum comando disponível neste ambiente substitui um `sst deploy` de verdade pra qualquer coisa em `packages/functions` que alcance `layers/` — trate isso como gate obrigatório em toda extração futura, não como verificação opcional.**
 
 > [!IMPORTANT]
-> **Existem hoje DOIS ciclos de import de schema, ambos deliberados, e uma única
-> regra mantém os dois seguros.**
+> **Existem hoje TRÊS ciclos de import de schema, todos deliberados, e uma única
+> regra mantém os três seguros.**
 >
 > 1. `core-schema.ts` ↔ `layers/teams`: `Job` e `DeadLetterRecord` continuam em
 >    core com FK para `Team`; `TeamMembership`/`TeamInvite` estão na layer com FK
@@ -405,18 +406,26 @@ export * from "@nuxfire/layer-billing/server/database/schema"; // Plan, Benefit,
 >    `Subscription.teamId` aponta para `Team`, enquanto `Team.planId` e o
 >    `teamRelations` (`plan`, `subscriptions`) apontam de volta para
 >    `Plan`/`Subscription`.
+> 3. `core-schema.ts` ↔ `layers/notifications` (novo na Fase 3 passo 3):
+>    `usersRelations` declara `notifications: many(notifications)` alcançando a
+>    layer, e `notificationRelations` alcança `users` de volta. Este par é só
+>    **relação** do Drizzle, não FK de banco — `Notification.userId` é um
+>    `text()` sem `.references(...)`, por isso o drizzle-kit reporta
+>    `Notification ... 0 fks` antes e depois da mudança. Não "complete" isso com
+>    uma FK de verdade: geraria migration, e isto é uma relocação.
 >
 > **`core-schema.ts` ficou FORA do ciclo 2**: depois que `Plan`/`Subscription`
 > saíram dele, nada em core referencia mais essas tabelas, então core não importa
 > `layers/billing` de jeito nenhum. O ciclo 2 tem espelho em um ciclo de
-> dependência de workspace entre os dois `package.json` — o `bun install` resolve
-> como symlinks, sem reclamar.
+> dependência de workspace entre os dois `package.json`, e o ciclo 3 em outro
+> entre `packages/functions` e `layers/notifications` — o `bun install` resolve
+> os dois como symlinks, sem reclamar.
 >
-> Os dois ciclos são seguros porque **toda** referência que cruza a fronteira está
+> Os três ciclos são seguros porque **toda** referência que cruza a fronteira está
 > dentro de um callback do Drizzle — `.references(() => users.id)` e
 > `relations(t, ({ one }) => ...)` — então nenhum módulo lê um binding importado
 > enquanto o outro ainda está sendo avaliado. Regra prática: nada de
-> dereferenciar um import no topo do módulo, em nenhum dos três arquivos, ou o
+> dereferenciar um import no topo do módulo, em nenhum dos quatro arquivos, ou o
 > ciclo vira TDZ em tempo de import. Validado com `bunx drizzle-kit generate`
 > (20 tabelas, "No schema changes") antes e depois de cada extração.
 >
@@ -531,7 +540,25 @@ Ordem corrigida, base primeiro:
 
 1. **`layers/teams/`** — multi-tenancy, RBAC, convites. Extraído primeiro porque é dependência transversal de todo o resto.
 2. **`layers/billing/`** — assinaturas, Stripe/Paddle, planos. Depende só de `teams`. **Concluída.** Backend no passo 2a (schema, routers tRPC, server utils, rotas Nitro de webhook, enums e a ability `billingGetBillingInfo`); frontend no passo 2b (`settings/billing.vue`, `admin/plans/index.vue`, os seis componentes de `billing`/`pricing`/`admin/plans`, `usePayments()` e o wrapper `useGetBillingInfoAbility`, que seguiu a ability e saiu de `layers/teams`). As duas pontes temporárias que o 2a deixou de propósito foram fechadas no 2b: o re-export no fim de `packages/app/types/enums.ts` (mesmo ciclo de vida da ponte `#shared/utils/abilities` do 1a/1b) e o `srcDir: "app"` explícito no `nuxt.config.ts` da layer, desnecessário assim que `layers/billing/app/` passou a existir. `admin/plans.ts` foi para a layer mas **fora** do mapa `routers` — continua montado em `admin.plans` por import nomeado, porque `routers` é espalhado no topo do `appRouter` e mover a chave quebraria `trpc.admin.plans.*`. Diferente de `teams`, esta layer **mantém** os subdiretórios de `app/components/`: aqui o aninhamento é o que gera o nome registrado (`admin/plans/CreateEditModal.vue` → `<AdminPlansCreateEditModal>`), enquanto em `teams` ele gerava gagueira (`team/TeamSwitcher.vue` → `<TeamTeamSwitcher>`).
-3. **`layers/notifications/`** — depende de `teams` e da infra de websockets (que não muda).
+3. **`layers/notifications/`** — **Concluída (passo 3).** Backend e frontend no
+   mesmo passo, diferente de `teams`/`billing`: o domínio inteiro são ~580
+   linhas, mesma classe de escopo de um passo isolado daquelas duas. Schema
+   (`Notification` + `notificationRelations`, saídos de `core-schema.ts`), o
+   router tenant (`notifications`, montado no topo pelo mapa `routers`), o
+   sub-router cross-domain `admin-notifications.ts` (exportado **fora** do mapa,
+   pra continuar em `trpc.admin.notifications.*` — mesmo padrão de
+   `adminPlansRouter`), as três páginas, o `NotificationsSlideover`, a store
+   Pinia e o plugin `ws-notifications.client.ts`.
+   **O `requires` do manifesto ficou `[]`, contrariando a previsão desta lista**:
+   nada na layer importa `@nuxfire/layer-teams` — a única tabela referenciada é
+   `User`, em core, e o acoplamento com teams é só uma chamada tRPC em runtime
+   (`trpc.admin.teams.*`, cujo router está no Composition Root, não na layer).
+   A infra de websockets de fato não mudou: `websockets.client.ts` (transporte
+   genérico, provê `$ws`) **fica em `packages/app`** — é infraestrutura
+   transversal, e a Fase 4 já prevê um `layer-chat` que precisa dela também. Só
+   a cola de domínio (`ws-notifications.client.ts`) foi pra layer, com
+   `dependsOn: ["websockets"]` absorvendo a inversão de ordem que a fronteira de
+   layer causou (ver `_docs/AGENTS.md`).
 4. **`layers/admin/`** — extraído por último: seu próprio [admin/index.ts](file:///c:/nuxfire/packages/app/server/trpc/routers/admin/index.ts) já importa sub-routers de `plans` (billing), `notifications` e `queue` — é estruturalmente uma camada de agregação, não uma folha. Extraí-lo antes das outras três forçaria reescrever seus imports duas vezes.
 
 ---

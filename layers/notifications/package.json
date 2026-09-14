@@ -1,0 +1,26 @@
+{
+  "name": "@nuxfire/layer-notifications",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./nuxt.config.ts",
+    "./manifest": "./layer.manifest.ts",
+    "./server/trpc/router": "./server/trpc/router.ts",
+    "./server/database/schema": "./server/database/schema.ts"
+  },
+  "dependencies": {
+    "@nuxfire/functions": "workspace:*",
+    "@nuxfire/layer-types": "workspace:*",
+    "@nuxt/ui": "^4.8.1",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@trpc/server": "^10.45.4",
+    "@vueuse/core": "^14.4.0",
+    "drizzle-orm": "^0.45.2",
+    "pinia": "^2.3.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "nuxt": "^4.5.2"
+  }
+}

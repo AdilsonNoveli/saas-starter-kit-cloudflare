@@ -35,3 +35,8 @@ export * from "@nuxfire/layer-teams/server/database/schema";
 // `Subscription`, relocated out of core-schema.ts — not new tables, which is
 // why this line comes with no migration.
 export * from "@nuxfire/layer-billing/server/database/schema";
+// Core layer (Fase 3 passo 3): `Notification` and its relation, relocated out
+// of core-schema.ts — not a new table, which is why this line comes with no
+// migration. core-schema.ts still imports `notifications` back from that layer
+// for `usersRelations`, the third deliberate schema cycle.
+export * from "@nuxfire/layer-notifications/server/database/schema";

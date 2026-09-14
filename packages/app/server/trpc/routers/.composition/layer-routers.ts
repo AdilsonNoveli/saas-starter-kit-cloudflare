@@ -5,10 +5,12 @@
 
 import { routers as billingRouters } from "@nuxfire/layer-billing/server/trpc/router";
 import { routers as kanbanRouters } from "@nuxfire/layer-kanban/server/trpc/router";
+import { routers as notificationsRouters } from "@nuxfire/layer-notifications/server/trpc/router";
 import { routers as teamsRouters } from "@nuxfire/layer-teams/server/trpc/router";
 
 export const layerRouters = {
   ...billingRouters,
   ...kanbanRouters,
+  ...notificationsRouters,
   ...teamsRouters,
 };

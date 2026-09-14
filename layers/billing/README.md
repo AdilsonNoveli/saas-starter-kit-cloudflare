@@ -95,7 +95,8 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 - **The settings route family is contributed by THREE layers.** One parent
   (`layers/teams/app/pages/[[team]]/settings.vue`) with five children:
   `index`/`members`/`security` from `layers/teams`, `notifications` from
-  `packages/app` (until that layer is extracted), and `billing` from here.
+  `layers/notifications` (it lived in `packages/app` until Fase 3 passo 3), and
+  `billing` from here.
   Verified in the built route manifest, not assumed — two-way page-tree merging
   working did not guarantee three-way would.
 - **`adminPlansRouter` is exported from `server/trpc/router.ts` but is NOT in the

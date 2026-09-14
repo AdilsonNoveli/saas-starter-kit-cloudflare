@@ -1,11 +1,4 @@
-import {
-  pgTable,
-  pgEnum,
-  text,
-  boolean,
-  timestamp,
-  jsonb,
-} from "drizzle-orm/pg-core";
+import { pgTable, pgEnum, text, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
 // `Team` and the rest of the multi-tenancy/RBAC tables live in the teams layer
@@ -29,6 +22,16 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // today and `bun install` resolves it as plain symlinks with no complaint. See
 // _docs/AGENTS.md, "Nuxt Layers architecture", for the full incident.
 import { teams } from "@nuxfire/layer-teams/server/database/schema";
+// `Notification` moved to layers/notifications (Fase 3, passo 3). This file
+// still needs it for `usersRelations` below (`notifications: many(...)`), while
+// that file needs `users` from here for `notificationRelations` — the THIRD
+// deliberate schema cycle, same shape and same single safety rule as the two
+// above: BOTH references live inside a `relations()` callback body and neither
+// is dereferenced at its module's top level. (A Drizzle relation only, not a
+// database FK — `Notification.userId` carries no `.references(...)`, hence
+// drizzle-kit's `Notification ... 0 fks`.) Package specifier for the same
+// deploy reason spelled out above — never `../../../../layers/notifications/...`.
+import { notifications } from "@nuxfire/layer-notifications/server/database/schema";
 
 export const users = pgTable("User", {
   id: text("id")
@@ -127,27 +130,10 @@ export const logRelations = relations(logs, ({ one }) => ({
   }),
 }));
 
-export const notifications = pgTable("Notification", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  title: text("title").notNull(),
-  message: text("message").notNull(),
-  userId: text("userId").notNull(),
-  data: jsonb("data"),
-  read: boolean("read").default(false).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-});
-
-export const notificationRelations = relations(notifications, ({ one }) => ({
-  user: one(users, {
-    fields: [notifications.userId],
-    references: [users.id],
-  }),
-}));
+// `Notification` and `notificationRelations` moved to
+// layers/notifications/server/database/schema.ts (Fase 3, passo 3) — see the
+// import at the top of this file. They are still exported from
+// `@nuxfire/functions/schema`, which aggregates both.
 
 // Platform authority — deliberately NOT an extension of the per-team
 // Role/Permission RBAC above. A row here means "owner/operator of the SaaS

@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { platformAdminProcedure, router } from "../../trpc";
+// See the note in notifications.ts: layers reach the Composition Root's tRPC
+// primitives and server utils by explicit import, never by Nitro's merge.
+// `platformAdminProcedure` in particular is built on `protectedProcedure`, NOT
+// on `abilityProcedure` — platform authority never routes through the tenant
+// ability layer (see _docs/AGENTS.md, "Platform Admin").
+import { platformAdminProcedure, router } from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
 import { notifications } from "@nuxfire/functions/schema";
 
 /**
@@ -13,7 +19,7 @@ import { notifications } from "@nuxfire/functions/schema";
  * delivery is intentionally not built here — it needs a real role check
  * this app doesn't have yet.
  */
-export default router({
+export const adminNotificationsRouter = router({
   send: platformAdminProcedure
     .input(
       z.object({

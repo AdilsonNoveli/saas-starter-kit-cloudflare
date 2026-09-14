@@ -5,46 +5,50 @@
   >
     <!-- ===== RECOLHIDA ===== -->
     <template v-if="isCollapsed">
-      <div class="flex flex-col items-center gap-2 w-full py-2.5 h-full bg-[#f8f8f8]">
+      <div
+        class="kanban-column-header flex-1 rounded-t flex flex-col items-center gap-2.5 py-2.5 select-none transition-colors"
+        :style="headerStyle"
+      >
         <!-- Botão Expandir -->
         <button
           type="button"
-          class="p-1 rounded text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none"
-          title="Expand column"
-          aria-label="Expand column"
+          class="p-1 rounded hover:bg-white/40 transition-colors focus:outline-none cursor-pointer"
+          :title="`Abrir coluna ${column.name}`"
+          :aria-label="`Abrir coluna ${column.name}`"
           @click="toggleCollapse"
         >
           <UIcon name="i-lucide-chevron-last" class="size-4" />
         </button>
 
-        <!-- Nome vertical -->
-        <span
-          class="text-xs font-bold uppercase tracking-wider whitespace-nowrap [writing-mode:vertical-rl] py-2 text-muted"
-        >
-          {{ column.name }}
+        <!-- Contador -->
+        <span class="text-[10px] font-extrabold tabular-nums leading-none">
+          {{ column.cards.length }}
         </span>
 
-        <!-- Contador -->
+        <!-- Nome vertical -->
         <span
-          class="text-xs font-extrabold tabular-nums bg-white px-1.5 py-0.5 rounded border border-default mt-auto"
+          class="text-xs font-bold uppercase tracking-wider whitespace-nowrap [writing-mode:vertical-rl] py-1"
         >
-          {{ column.cards.length }}
+          {{ column.name }}
         </span>
       </div>
     </template>
 
     <!-- ===== EXPANDIDA ===== -->
     <template v-else>
-      <!-- Header -->
+      <!-- Header com recolher, título, contador, editar e excluir -->
       <KanbanColumnHeader
         :name="column.name"
         :card-count="column.cards.length"
+        :position="column.position"
         @collapse="toggleCollapse"
+        @rename="emit('updateColumn', { columnId: column.id, name: $event })"
+        @delete="emit('deleteColumn', column.id)"
       />
 
       <!-- Sub-header -->
       <div
-        class="px-3 py-1.5 bg-[#f8f8f8]/40 border-b border-default/50 flex items-center justify-between text-[11px] text-muted select-none"
+        class="px-3 py-1.5 bg-[#f8f8f8]/50 border-b border-default/50 flex items-center justify-between text-[11px] text-muted select-none"
       >
         <span>{{ column.cards.length }} card(s)</span>
       </div>
@@ -86,7 +90,7 @@
           />
           <button
             type="submit"
-            class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-[#f8f8f8] text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+            class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-[#f8f8f8] text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             :disabled="!cardState.title.trim()"
             aria-label="Add card"
           >
@@ -115,7 +119,32 @@ const emit = defineEmits<{
   move: [payload: { cardId: string; toColumnId: string; position: number }];
   createCard: [payload: { columnId: string; title: string }];
   deleteCard: [cardId: string];
+  updateColumn: [payload: { columnId: string; name: string }];
+  deleteColumn: [columnId: string];
 }>();
+
+const CORES_PREDEFINIDAS = [
+  "#EC4899",
+  "#3B82F6",
+  "#F59E0B",
+  "#8B5CF6",
+  "#06B6D4",
+  "#10B981",
+  "#EF4444",
+  "#6B7280",
+];
+
+const headerStyle = computed(() => {
+  const cor =
+    CORES_PREDEFINIDAS[(props.column.position ?? 0) % CORES_PREDEFINIDAS.length] ||
+    "#6B7280";
+
+  return {
+    backgroundColor: `color-mix(in srgb, ${cor} 32%, #f8f8f8)`,
+    borderColor: `color-mix(in srgb, ${cor} 55%, #e6e6e6)`,
+    color: `color-mix(in srgb, ${cor} 65%, #1a1a1a)`,
+  };
+});
 
 // Drag state compartilhado via provide/inject
 const draggedCardId = inject<Ref<string | null>>("kanban:draggedCardId", ref(null));

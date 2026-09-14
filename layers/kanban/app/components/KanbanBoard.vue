@@ -59,15 +59,27 @@
           @move="emit('move', $event)"
           @create-card="emit('createCard', $event)"
           @delete-card="emit('deleteCard', $event)"
+          @update-column="emit('updateColumn', $event)"
+          @delete-column="emit('deleteColumn', $event)"
         />
 
-        <!-- Adicionar nova coluna -->
+        <!-- Adicionar nova coluna (estilo quadrado tracejado com circle-plus do template) -->
         <div
-          class="flex w-64 shrink-0 flex-col rounded border border-dashed border-default bg-white p-3 self-start shadow-xs transition-colors hover:border-[--color-night-400]"
+          v-if="isAddingColumn"
+          class="flex w-64 shrink-0 flex-col rounded border border-dashed border-default bg-white p-3 self-start shadow-xs transition-colors"
         >
-          <div class="flex items-center gap-1.5 mb-2.5 text-xs font-bold uppercase tracking-wider text-muted">
-            <UIcon name="i-lucide-columns-3" class="size-3.5" />
-            <span>Nova coluna</span>
+          <div class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-muted">
+            <div class="flex items-center gap-1.5">
+              <UIcon name="i-lucide-columns-3" class="size-3.5" />
+              <span>Nova coluna</span>
+            </div>
+            <button
+              type="button"
+              class="p-0.5 rounded hover:bg-[#f8f8f8] text-muted hover:text-highlighted transition-colors focus:outline-none cursor-pointer"
+              @click="isAddingColumn = false"
+            >
+              <UIcon name="i-lucide-x" class="size-3.5" />
+            </button>
           </div>
 
           <form
@@ -75,21 +87,33 @@
             @submit.prevent="submitColumn"
           >
             <input
+              ref="newColumnInputRef"
               v-model="columnState.name"
               type="text"
               placeholder="Nome da coluna..."
               class="flex-1 h-8 px-2 border border-default rounded bg-white text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
-            >
+            />
             <button
               type="submit"
-              class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-[#f8f8f8] text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+              class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-[#f8f8f8] text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               :disabled="!columnState.name.trim()"
-              aria-label="Add column"
+              aria-label="Salvar coluna"
             >
               <UIcon name="i-lucide-plus" class="size-4" />
             </button>
           </form>
         </div>
+
+        <button
+          v-else
+          type="button"
+          class="flex flex-col items-center justify-center size-11 shrink-0 self-start rounded border border-dashed border-default text-muted hover:text-highlighted hover:border-[--color-night-400] hover:bg-white transition-colors cursor-pointer"
+          aria-label="Adicionar coluna"
+          title="Adicionar coluna"
+          @click="startAddColumn"
+        >
+          <UIcon name="i-lucide-circle-plus" class="size-5" />
+        </button>
       </div>
     </div>
   </div>
@@ -97,7 +121,7 @@
 
 <script setup lang="ts">
 import type { KanbanBoardDetail, KanbanColumnItem } from "../../shared/types";
-import { provide, ref, computed, reactive, onUnmounted } from "vue";
+import { provide, ref, computed, reactive, onUnmounted, nextTick } from "vue";
 
 const props = defineProps<{ board: KanbanBoardDetail }>();
 
@@ -105,6 +129,8 @@ const emit = defineEmits<{
   move: [payload: { cardId: string; toColumnId: string; position: number }];
   createCard: [payload: { columnId: string; title: string }];
   createColumn: [name: string];
+  updateColumn: [payload: { columnId: string; name: string }];
+  deleteColumn: [columnId: string];
   deleteCard: [cardId: string];
 }>();
 
@@ -114,6 +140,15 @@ provide("kanban:draggedCardId", draggedCardId);
 
 const searchQuery = ref("");
 const columnState = reactive({ name: "" });
+const isAddingColumn = ref(false);
+const newColumnInputRef = ref<HTMLInputElement | null>(null);
+
+function startAddColumn() {
+  isAddingColumn.value = true;
+  nextTick(() => {
+    newColumnInputRef.value?.focus();
+  });
+}
 
 const totalCardsCount = computed(() =>
   props.board.columns.reduce((sum, col) => sum + col.cards.length, 0),

@@ -35,6 +35,12 @@ export function useKanban() {
     createColumn: (boardId: string, name: string) =>
       client.kanban.createColumn.mutate({ boardId, name }),
 
+    updateColumn: (columnId: string, name: string) =>
+      client.kanban.updateColumn.mutate({ columnId, name }),
+
+    deleteColumn: (columnId: string) =>
+      client.kanban.deleteColumn.mutate({ columnId }),
+
     createCard: (columnId: string, title: string) =>
       client.kanban.createCard.mutate({ columnId, title }),
 

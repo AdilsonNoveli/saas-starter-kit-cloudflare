@@ -40,6 +40,8 @@
         @move="moveCard"
         @create-card="createCard"
         @create-column="createColumn"
+        @update-column="updateColumn"
+        @delete-column="deleteColumn"
         @delete-card="deleteCard"
       />
     </template>
@@ -102,6 +104,20 @@ function createColumn(name: string) {
   return run(
     () => kanban.createColumn(boardId.value, name),
     "Failed to create column",
+  );
+}
+
+function updateColumn(payload: { columnId: string; name: string }) {
+  return run(
+    () => kanban.updateColumn(payload.columnId, payload.name),
+    "Failed to rename column",
+  );
+}
+
+function deleteColumn(columnId: string) {
+  return run(
+    () => kanban.deleteColumn(columnId),
+    "Failed to delete column",
   );
 }
 

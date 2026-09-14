@@ -180,6 +180,45 @@ const kanbanRouter = router({
       return column;
     }),
 
+  updateColumn: abilityProcedure
+    .input(
+      z.object({
+        columnId: z.string(),
+        name: z
+          .string()
+          .min(1, "Column name is required")
+          .max(80, "Column name must be max 80 characters"),
+      }),
+    )
+    .mutation(async ({ ctx: { authorize, user }, input }) => {
+      const { column, board } = await requireColumn(user.id, input.columnId);
+      await authorize(kanbanUpdateBoard, board.teamId);
+
+      const [updated] = await useDB()
+        .update(kanbanColumns)
+        .set({ name: input.name })
+        .where(eq(kanbanColumns.id, input.columnId))
+        .returning();
+
+      return updated;
+    }),
+
+  deleteColumn: abilityProcedure
+    .input(z.object({ columnId: z.string() }))
+    .mutation(async ({ ctx: { authorize, user }, input }) => {
+      const { column, board } = await requireColumn(user.id, input.columnId);
+      await authorize(kanbanUpdateBoard, board.teamId);
+
+      await useDB()
+        .delete(kanbanCards)
+        .where(eq(kanbanCards.columnId, input.columnId));
+      await useDB()
+        .delete(kanbanColumns)
+        .where(eq(kanbanColumns.id, input.columnId));
+
+      return { id: input.columnId };
+    }),
+
   createCard: abilityProcedure
     .input(
       z.object({

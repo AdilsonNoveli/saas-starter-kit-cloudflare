@@ -1,4 +1,4 @@
-import { defineLayerManifest } from "@nuxfire/layer-types";
+import { defineLayerManifest } from "@nuxfire/manifest";
 
 export default defineLayerManifest({
   name: "billing",

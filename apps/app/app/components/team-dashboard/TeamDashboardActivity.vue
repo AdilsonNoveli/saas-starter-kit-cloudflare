@@ -16,7 +16,7 @@
 import { formatTimeAgo } from "@vueuse/core";
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
-import { enterpriseTableUi } from "@nuxfire/design-tokens";
+import { enterpriseTableUi } from "@nuxfire/tokens";
 
 const UAvatar = resolveComponent("UAvatar");
 const UBadge = resolveComponent("UBadge");

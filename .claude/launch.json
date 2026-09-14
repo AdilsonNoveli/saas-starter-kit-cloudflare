@@ -18,10 +18,10 @@
       "autoPort": true
     },
     {
-      "name": "auth-frontend",
+      "name": "login",
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "apps/auth-frontend",
+      "cwd": "apps/login",
       "port": 3002,
       "autoPort": true
     }

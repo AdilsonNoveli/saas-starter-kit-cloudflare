@@ -1,5 +1,5 @@
 {
-  "name": "@nuxfire/auth-frontend",
+  "name": "@nuxfire/login",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@nuxfire/design-tokens": "workspace:*",
+    "@nuxfire/tokens": "workspace:*",
     "@nuxt/ui": "^4.8.1",
     "nuxt": "^4.5.2",
     "unenv": "1.10.0",

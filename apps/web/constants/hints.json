@@ -4,7 +4,7 @@
   "package.json": "bun workspace setup",
   "apps/": "deployable applications and services (one browsable UI or worker set each)",
   "apps/app/": "the main app (dashboard) - deployed to app.domain.com",
-  "apps/auth-frontend/": "nuxt app with login/signup/etc.",
+  "apps/login/": "nuxt app with login/signup/etc.",
   "apps/functions/": "cloudflare workers for: auth, websockets, emails, jobs, cron",
   "apps/web/": "landing page, docs and blog - deployed to domain.com",
   "packages/": "shared libraries, not independently deployable",

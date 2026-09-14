@@ -420,7 +420,7 @@ function getIssuer(env: Env) {
   // empty client secret still constructs a working-looking provider that
   // fails at OAuth-exchange time, not at startup, so a truthy check here
   // is the only thing that keeps a misconfigured provider from ever being
-  // offered. The auth-frontend UI mirrors this same truthiness via
+  // offered. The apps/login UI mirrors this same truthiness via
   // NUXT_PUBLIC_GITHUB_AUTH_ENABLED/NUXT_PUBLIC_GOOGLE_AUTH_ENABLED (see
   // infra/auth.ts) so the buttons only render when this branch is taken.
   const githubEnabled = Boolean(

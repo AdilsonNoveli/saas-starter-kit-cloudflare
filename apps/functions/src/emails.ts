@@ -2,17 +2,17 @@ import { Emails } from "@nuxfire/emails";
 import type { EmailProps } from "@nuxfire/emails/props";
 import { Resource } from "sst/resource";
 import { flags } from "#nuxfire/config";
-import { generateMailer } from "@tanayvk/mailer/generate";
+import { generateMailer } from "@nuxfire/emails/mailer";
 import { render } from "@react-email/render";
 import { WorkerEntrypoint } from "cloudflare:workers";
 import type { EmailsWorker as EmailsWorkerContract } from "./emails-types";
 
 // TODO: import and set up email providers that you want to use
-import { ResendTransport } from "@tanayvk/mailer/transports/resend";
-// import { MailgunTransport } from "@tanayvk/mailer/transports/mailgun";
-// import { SESTransport } from "@tanayvk/mailer/transports/ses";
-// import { SparkPostTransport } from "@tanayvk/mailer/transports/sparkpost";
-// import { SMTPTransport } from "@tanayvk/mailer/transports/smtp";
+import { ResendTransport } from "@nuxfire/emails/mailer/transports/resend";
+// import { MailgunTransport } from "@nuxfire/emails/mailer/transports/mailgun";
+// import { SESTransport } from "@nuxfire/emails/mailer/transports/ses";
+// import { SparkPostTransport } from "@nuxfire/emails/mailer/transports/sparkpost";
+// import { SMTPTransport } from "@nuxfire/emails/mailer/transports/smtp";
 
 let mailer: Awaited<ReturnType<typeof generateMailer>>;
 

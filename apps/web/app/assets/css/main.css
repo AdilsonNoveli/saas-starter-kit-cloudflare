@@ -1,10 +1,10 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
-@import "@nuxfire/design-tokens/theme.css";
+@import "@nuxfire/tokens/theme.css";
 
 /*
  * Local to this component only (the animated shiny CTA button below) —
- * not design tokens, so they stay out of @nuxfire/design-tokens. Brand
+ * not design tokens, so they stay out of @nuxfire/tokens. Brand
  * hues reference the shared flame/fire palette instead of repeating hex.
  */
 :root {

@@ -1,6 +1,6 @@
 /**
  * Standard toast surface for this app. Mirrors the composable of the same name
- * in `apps/auth-frontend` so a notification looks and reads identically on
+ * in `apps/login` so a notification looks and reads identically on
  * both sides of the sign-in boundary — callers pick a severity and never
  * restate the colour/icon pairing that goes with it.
  */

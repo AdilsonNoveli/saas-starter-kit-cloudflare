@@ -39,12 +39,11 @@
   },
   "patchedDependencies": {
     "nodemailer@9.1.1": "patches/nodemailer@9.1.1.patch",
-    "@tanayvk/mailer@9.5.6": "patches/@tanayvk%2Fmailer@9.5.6.patch",
     "@openauthjs/openauth@0.3.9": "patches/@openauthjs%2Fopenauth@0.3.9.patch"
   },
   "trustedDependencies": [
     "@nuxfire/app",
-    "@nuxfire/auth-frontend",
+    "@nuxfire/login",
     "@nuxfire/web",
     "@parcel/watcher",
     "better-sqlite3",

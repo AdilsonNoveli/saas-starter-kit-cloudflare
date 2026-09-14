@@ -7,18 +7,18 @@ Plano para transformar o NuxFire na arquitetura fullstack Nuxt mais robusta e mo
 ---
 
 > [!NOTE]
-> **Decisão final, tomada em 2026-09-14, executada depois do fim da Fase 3: `apps/{app, web, auth-frontend, functions}`, `packages/{emails, design-tokens, layer-types}`.**
+> **Decisão final, tomada em 2026-09-14, executada depois do fim da Fase 3: `apps/{app, web, login, functions}`, `packages/{emails, tokens, manifest}`.**
 >
-> Primeira tentativa desta nota usou "é uma UI navegada diretamente por um humano" como critério — o que teria deixado `functions` em `packages/`. **Corrigido**: essa não é a definição real do Turborepo, que é a fonte citada como referência. A documentação oficial define **Application Package = deployável independentemente** vs. **Library Package = não deployável independentemente, só consumido por outra coisa** — nada sobre ter UI. `functions` tem 6 recursos com deploy independente de verdade (Worker de auth, Worker de emails, consumer de jobs, consumer de DLQ, cron, websockets); por essa definição real, é Application Package, não biblioteca — ter ou não tela é irrelevante. Mantê-lo em `packages/` ao lado de bibliotecas de verdade (`emails`, `design-tokens`) seria uma classificação estranha pra qualquer pessoa que já conhece a convenção Turborepo, exatamente o tipo de ambiguidade que este projeto (um template replicado) não pode ter.
+> Primeira tentativa desta nota usou "é uma UI navegada diretamente por um humano" como critério — o que teria deixado `functions` em `packages/`. **Corrigido**: essa não é a definição real do Turborepo, que é a fonte citada como referência. A documentação oficial define **Application Package = deployável independentemente** vs. **Library Package = não deployável independentemente, só consumido por outra coisa** — nada sobre ter UI. `functions` tem 6 recursos com deploy independente de verdade (Worker de auth, Worker de emails, consumer de jobs, consumer de DLQ, cron, websockets); por essa definição real, é Application Package, não biblioteca — ter ou não tela é irrelevante. Mantê-lo em `packages/` ao lado de bibliotecas de verdade (`emails`, `tokens`) seria uma classificação estranha pra qualquer pessoa que já conhece a convenção Turborepo, exatamente o tipo de ambiguidade que este projeto (um template replicado) não pode ter.
 >
 > `functions` continua como **um único** workspace package com múltiplos entrypoints/deploys (não foi dividido em 6 pacotes, um por Worker) — os 6 Workers compartilham schema Drizzle, utils e são fortemente acoplados por design; dividir criaria bibliotecas extras só pra isso sem ganho real.
 >
-> `auth-frontend` foi investigado com zero suposição antes de decidir se seria um `package` reutilizável. A investigação mostrou que não há mecanismo de reuso por import de código:
-> - `infra/auth.ts` builda `auth-frontend` (`nuxt generate`) como os **assets estáticos do mesmo Worker** que roda o issuer OpenAuth.js — uma unidade de deploy só, API dinâmica + UI estática juntas em `auth.<domínio>`.
-> - `packages/app` **não importa nada** de `auth-frontend`. Autentica via SDK cliente do `@openauthjs/openauth`, redirecionando o navegador (`client.authorize(callback, "code")` + `navigateTo(url, {external:true})`) pro `auth.<domínio>` já rodando — fluxo OAuth-style, não import de código.
-> - `auth-frontend/package.json` não tem `exports`, é `"private": true`, zero estrutura de biblioteca. Grep no resto do repo por imports reais de `auth-frontend`: zero.
+> `apps/login` (renomeado de `auth-frontend` em 2026-09-14, mesma pasta/pacote) foi investigado com zero suposição antes de decidir se seria um `package` reutilizável. A investigação mostrou que não há mecanismo de reuso por import de código:
+> - `infra/auth.ts` builda `apps/login` (`nuxt generate`) como os **assets estáticos do mesmo Worker** que roda o issuer OpenAuth.js — uma unidade de deploy só, API dinâmica + UI estática juntas em `auth.<domínio>`.
+> - `apps/app` **não importa nada** de `apps/login`. Autentica via SDK cliente do `@openauthjs/openauth`, redirecionando o navegador (`client.authorize(callback, "code")` + `navigateTo(url, {external:true})`) pro `auth.<domínio>` já rodando — fluxo OAuth-style, não import de código.
+> - `apps/login/package.json` não tem `exports`, é `"private": true`, zero estrutura de biblioteca. Grep no resto do repo por imports reais dele: zero.
 >
-> Uma aplicação futura que precise "reutilizar autenticação" faz exatamente o que `packages/app` já faz — instala `@openauthjs/openauth` (pacote npm externo) e aponta pro mesmo `auth.<domínio>`. O reuso é por protocolo (redirect), não por import — mas isso não muda a classificação `apps/` vs `packages/`: `auth-frontend` também é deployável independentemente (mesmo compartilhando a unidade de deploy física com o Worker de `functions`), então fica em `apps/` de qualquer forma, pela mesma régua de todo o resto.
+> Uma aplicação futura que precise "reutilizar autenticação" faz exatamente o que `apps/app` já faz — instala `@openauthjs/openauth` (pacote npm externo) e aponta pro mesmo `auth.<domínio>`. O reuso é por protocolo (redirect), não por import — mas isso não muda a classificação `apps/` vs `packages/`: `apps/login` também é deployável independentemente (mesmo compartilhando a unidade de deploy física com o Worker de `functions`), então fica em `apps/` de qualquer forma, pela mesma régua de todo o resto.
 
 ---
 
@@ -58,13 +58,13 @@ nuxfire/                              ← Monorepo raiz (Bun workspaces)
 │   │                                    "Application Package", não "tem UI" — ver [!NOTE] no topo)
 │   ├── app/                          ← Composition Root (shell fino da aplicação)
 │   ├── web/                          ← Site público de marketing/docs
-│   ├── auth-frontend/                ← UI de autenticação estática
+│   ├── login/                        ← UI de autenticação estática
 │   └── functions/                    ← Workers (auth issuer, emails, jobs, WS) + schema agregador
 │
 ├── packages/                         ← Bibliotecas compartilhadas, sem deploy próprio
 │   ├── emails/                       ← Templates React Email
-│   ├── design-tokens/                ← Tokens visuais compartilhados
-│   └── layer-types/                  ← Contrato defineLayerManifest()
+│   ├── tokens/                       ← Tokens visuais compartilhados
+│   └── manifest/                     ← Contrato defineLayerManifest()
 │
 ├── layers/                           ← Nuxt 4 Feature Layers (Domínios de Negócio)
 │   ├── teams/                        ← @nuxfire/layer-teams        [core — sempre ativa]

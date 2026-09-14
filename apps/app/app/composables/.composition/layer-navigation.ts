@@ -9,7 +9,7 @@ import kanbanManifest from "@nuxfire/layer-kanban/manifest";
 import notificationsManifest from "@nuxfire/layer-notifications/manifest";
 import teamsManifest from "@nuxfire/layer-teams/manifest";
 
-import type { LayerManifest } from "@nuxfire/layer-types";
+import type { LayerManifest } from "@nuxfire/manifest";
 
 export const layerManifests: LayerManifest[] = [
   adminManifest,

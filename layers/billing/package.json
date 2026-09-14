@@ -15,7 +15,7 @@
   "dependencies": {
     "@nuxfire/functions": "workspace:*",
     "@nuxfire/layer-teams": "workspace:*",
-    "@nuxfire/layer-types": "workspace:*",
+    "@nuxfire/manifest": "workspace:*",
     "@nuxt/ui": "^4.8.1",
     "@paddle/paddle-js": "^1.3.3",
     "@paddle/paddle-node-sdk": "^2.4.0",

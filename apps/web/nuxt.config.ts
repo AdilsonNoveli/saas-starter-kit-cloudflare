@@ -1,6 +1,13 @@
 import { readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
+import { generatePaths } from "../../scripts/generate-paths";
+
+// Regenerates constants/paths.json (the docs "project structure" tree, see
+// generate-paths.ts) from the real repo tree every time this config loads —
+// no separate step to remember, and no way for it to go stale like the
+// hand-maintained version it replaced.
+generatePaths();
 
 // `crawlLinks: true` only finds routes reachable through an <a href> that's
 // actually in the server-rendered HTML — the docs sidebar's nested sections

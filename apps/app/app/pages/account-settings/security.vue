@@ -107,7 +107,7 @@
       v-model:open, not v-model — @nuxt/ui v4's Modal takes an `open` prop
       with an `update:open` emit rather than the usual modelValue pair, so a
       bare v-model silently binds to nothing (same class of v2-vs-v4 mismatch
-      already found in the auth-frontend's UForm loading-auto default).
+      already found in apps/login's UForm loading-auto default).
     -->
     <UModal v-model:open="showDeleteConfirm" :dismissible="!deleting">
       <template #content>
@@ -172,8 +172,8 @@ const runtimeConfig = useRuntimeConfig();
 
 /**
  * There is no "change password while signed in" endpoint — the auth Worker
- * only knows the email-OTP reset flow (apps/auth-frontend's
- * forgot-password.vue), so a password change is that flow, pre-filled.
+ * only knows the email-OTP reset flow (apps/login's forgot-password.vue),
+ * so a password change is that flow, pre-filled.
  */
 function goToChangePassword() {
   const url = new URL(`${runtimeConfig.public.authUrl}/forgot-password`);

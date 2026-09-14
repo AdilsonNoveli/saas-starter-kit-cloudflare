@@ -1,4 +1,4 @@
-import type { LayerNavigationItem } from "@nuxfire/layer-types";
+import type { LayerNavigationItem } from "@nuxfire/manifest";
 import { layerManifests } from "./.composition/layer-navigation";
 
 /**

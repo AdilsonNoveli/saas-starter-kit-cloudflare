@@ -1,6 +1,6 @@
-import { template as WelcomeEmail } from "./emails/Welcome";
-import { template as VerificationCodeEmail } from "./emails/VerificationCode";
-import { template as InvitationEmail } from "./emails/Invitation";
+import { template as WelcomeEmail } from "./templates/Welcome";
+import { template as VerificationCodeEmail } from "./templates/VerificationCode";
+import { template as InvitationEmail } from "./templates/Invitation";
 
 export namespace Emails {
   export const Welcome = WelcomeEmail;

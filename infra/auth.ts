@@ -22,8 +22,8 @@ export const adminSecret = new random.RandomUuid("AuthAdminSecret");
 // doesn't mean a value has actually been loaded via `sst secret load` yet.
 // apps/functions/src/auth.ts checks the exact same truthiness at
 // request time to decide whether to register the provider at all — this
-// is that same decision, made at build time, so the static auth-frontend
-// UI can hide a button that would otherwise error the moment it's clicked.
+// is that same decision, made at build time, so the static login UI can
+// hide a button that would otherwise error the moment it's clicked.
 // command.local.Command's `environment` is string-valued only (real
 // process env vars) — stringify the boolean explicitly rather than let
 // Pulumi coerce it implicitly.
@@ -40,12 +40,12 @@ const googleAuthEnabled = flags.googleAuth
     ]).apply(([id, secretValue]) => String(!!id && !!secretValue))
   : "false";
 
-// auth-frontend is a static build (`nuxt generate`) served as this Worker's
+// apps/login is a static build (`nuxt generate`) served as this Worker's
 // static assets — the OpenAuth issuer itself (apps/functions/src/auth.ts)
 // handles every dynamic route, falling through to the static files for the
 // login/signup/forgot-password pages.
 const built = await build("AuthFrontend", {
-  dir: "apps/auth-frontend",
+  dir: "apps/login",
   environment: {
     NUXT_PUBLIC_GITHUB_AUTH_ENABLED: githubAuthEnabled,
     NUXT_PUBLIC_GOOGLE_AUTH_ENABLED: googleAuthEnabled,
@@ -60,7 +60,7 @@ export const auth = new sst.cloudflare.Worker(
     domain: authDomain,
     compatibility: COMPATIBILITY,
     assets: {
-      directory: path.resolve("apps/auth-frontend", ".output/public"),
+      directory: path.resolve("apps/login", ".output/public"),
     },
     link: [
       kv,

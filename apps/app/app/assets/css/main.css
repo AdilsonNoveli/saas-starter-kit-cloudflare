@@ -1,3 +1,3 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
-@import "@nuxfire/design-tokens/theme.css";
+@import "@nuxfire/tokens/theme.css";

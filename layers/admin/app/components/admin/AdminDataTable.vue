@@ -72,7 +72,7 @@ import type {
   VisibilityState,
 } from "@tanstack/table-core";
 import { getPaginationRowModel } from "@tanstack/table-core";
-import { enterpriseTableUi } from "@nuxfire/design-tokens";
+import { enterpriseTableUi } from "@nuxfire/tokens";
 
 /**
  * The one table every `/admin` listing screen is built from — search bar,

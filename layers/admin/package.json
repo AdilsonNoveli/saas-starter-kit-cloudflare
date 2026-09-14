@@ -10,11 +10,11 @@
     "./server/database/schema": "./server/database/schema.ts"
   },
   "dependencies": {
-    "@nuxfire/design-tokens": "workspace:*",
+    "@nuxfire/tokens": "workspace:*",
     "@nuxfire/functions": "workspace:*",
     "@nuxfire/layer-billing": "workspace:*",
     "@nuxfire/layer-notifications": "workspace:*",
-    "@nuxfire/layer-types": "workspace:*",
+    "@nuxfire/manifest": "workspace:*",
     "@nuxt/ui": "^4.8.1",
     "@paralleldrive/cuid2": "^2.2.2",
     "@tanstack/table-core": "^8.21.3",

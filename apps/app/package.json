@@ -13,14 +13,14 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@nuxfire/design-tokens": "workspace:*",
+    "@nuxfire/tokens": "workspace:*",
     "@nuxfire/functions": "workspace:*",
     "@nuxfire/layer-admin": "workspace:*",
     "@nuxfire/layer-billing": "workspace:*",
     "@nuxfire/layer-kanban": "workspace:*",
     "@nuxfire/layer-notifications": "workspace:*",
     "@nuxfire/layer-teams": "workspace:*",
-    "@nuxfire/layer-types": "workspace:*",
+    "@nuxfire/manifest": "workspace:*",
     "@nuxt/eslint": "0.7.3",
     "@nuxt/fonts": "0.10.3",
     "@nuxt/image": "^2.1.0",

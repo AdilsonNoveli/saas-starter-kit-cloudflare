@@ -23,7 +23,6 @@
     "@nuxfire/layer-teams": "workspace:*",
     "@openauthjs/openauth": "^0.3.6",
     "@paralleldrive/cuid2": "^2.2.2",
-    "@tanayvk/mailer": "^9.5.6",
     "drizzle-orm": "^0.45.2",
     "ofetch": "^1.4.1",
     "postgres": "^3.4.5",

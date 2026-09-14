@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
-import { enterpriseTableUi } from "@nuxfire/design-tokens";
+import { enterpriseTableUi } from "@nuxfire/tokens";
 
 definePageMeta({
   layout: "admin",

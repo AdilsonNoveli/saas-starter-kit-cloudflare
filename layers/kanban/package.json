@@ -13,7 +13,7 @@
   "dependencies": {
     "@nuxfire/functions": "workspace:*",
     "@nuxfire/layer-teams": "workspace:*",
-    "@nuxfire/layer-types": "workspace:*",
+    "@nuxfire/manifest": "workspace:*",
     "@paralleldrive/cuid2": "^2.2.2",
     "@trpc/server": "^10.45.4",
     "@vueuse/integrations": "^14.4.0",

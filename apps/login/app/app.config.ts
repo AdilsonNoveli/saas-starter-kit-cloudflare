@@ -1,4 +1,4 @@
-import { sharedUiConfig } from "@nuxfire/design-tokens";
+import { sharedUiConfig } from "@nuxfire/tokens";
 
 export default defineAppConfig({
   ui: {

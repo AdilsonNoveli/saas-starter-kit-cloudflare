@@ -38,7 +38,7 @@ interface DiscoveredLayer {
   hasRouter: boolean;
 }
 
-// The manifest is TypeScript importing `@nuxfire/layer-types`, so it can't be
+// The manifest is TypeScript importing `@nuxfire/manifest`, so it can't be
 // `import()`ed here without resolving the whole workspace just to read one
 // string field. The `name` field is a string literal by contract — read it
 // textually, and fall back to the directory name, which the naming
@@ -166,7 +166,7 @@ function composeLayerNavigation(root: string, layers: DiscoveredLayer[]) {
     outFile,
     `${GENERATED_HEADER}
 ${imports ? `\n${imports}\n` : ""}
-import type { LayerManifest } from "@nuxfire/layer-types";
+import type { LayerManifest } from "@nuxfire/manifest";
 
 export const layerManifests: LayerManifest[] = [${
       entries ? `\n${entries}\n` : ""

@@ -1,0 +1,203 @@
+/*
+ * @adonisjs/mail
+ *
+ * (c) AdonisJS
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+import ky from "ky";
+import { createTransport, type Transport } from "nodemailer";
+import type { Address } from "nodemailer/lib/mailer/index.js";
+import type MailMessage from "nodemailer/lib/mailer/mail-message.js";
+
+import debug from "../debug";
+import { normalizeBaseUrl, extractMessageHeaders, resolveAttachmentContent } from "../utils";
+import { MailResponse } from "../mail-response";
+import { E_MAIL_TRANSPORT_ERROR } from "../errors";
+import { BaseApiTransport } from "./base-api-transport";
+
+import type {
+  BrevoConfig,
+  NodeMailerMessage,
+  BrevoRuntimeConfig,
+  BrevoSentMessageInfo,
+} from "../types";
+
+/**
+ * Transport for Nodemailer
+ */
+class NodeMailerTransport implements Transport {
+  name = "brevo";
+  version = "1.0.0";
+
+  #config: BrevoConfig;
+
+  constructor(config: BrevoConfig) {
+    this.#config = config;
+  }
+
+  /**
+   * Format the address to be accepted by the Brevo API
+   */
+  #formatAddress(rawAddress: string | Address | undefined) {
+    if (!rawAddress) {
+      throw new Error("Missing recipient address");
+    }
+
+    if (typeof rawAddress === "string") {
+      return { email: rawAddress };
+    }
+
+    const address: Record<string, string> = {};
+    if (rawAddress.name) {
+      address.name = rawAddress.name;
+    }
+    if (rawAddress.address) {
+      address.email = rawAddress.address;
+    }
+
+    return address;
+  }
+
+  /**
+   * Format a list of addresses
+   */
+  #formatAddresses(rawAddresses: string | Address | Array<string | Address> | undefined) {
+    const addresses = Array.isArray(rawAddresses) ? rawAddresses : [rawAddresses];
+    return addresses.map((address) => this.#formatAddress(address));
+  }
+
+  /**
+   * Convert the Mail message to the format accepted by the Brevo API
+   */
+  async #preparePayload(mail: MailMessage) {
+    let payload: Record<string, any> = {
+      sender: this.#formatAddresses(mail.data.from)[0],
+      to: this.#formatAddresses(mail.data.to),
+      subject: mail.data.subject,
+    };
+
+    if (mail.data.html) {
+      payload.htmlContent = mail.data.html;
+    }
+
+    if (mail.data.text) {
+      payload.textContent = mail.data.text;
+    }
+
+    if (mail.data.replyTo) {
+      payload.replyTo = this.#formatAddress(
+        Array.isArray(mail.data.replyTo) ? mail.data.replyTo[0] : mail.data.replyTo,
+      );
+    }
+
+    if (mail.data.cc) {
+      payload.cc = this.#formatAddresses(mail.data.cc);
+    }
+
+    if (mail.data.bcc) {
+      payload.bcc = this.#formatAddresses(mail.data.bcc);
+    }
+
+    if (this.#config.tags) {
+      payload.tags = this.#config.tags;
+    }
+
+    if (this.#config.scheduledAt) {
+      payload.scheduledAt = this.#config.scheduledAt;
+    }
+
+    /**
+     * Brevo's transactional API has no support for inline (cid) images, so
+     * embedded attachments are sent as regular attachments instead.
+     */
+    if (mail.data.attachments) {
+      payload.attachment = await Promise.all(
+        mail.data.attachments.map(async (attachment, index) => {
+          const content = await resolveAttachmentContent(mail, index);
+          return {
+            name: attachment.filename,
+            content: content.toString("base64"),
+          };
+        }),
+      );
+    }
+
+    const headers = extractMessageHeaders(mail);
+    if (headers) {
+      payload.headers = headers;
+    }
+
+    return payload;
+  }
+
+  /**
+   * Returns base url for sending emails
+   */
+  #getBaseUrl(): string {
+    return normalizeBaseUrl(this.#config.baseUrl);
+  }
+
+  /**
+   * Send mail
+   */
+  async send(mail: MailMessage, callback: (err: Error | null, info: BrevoSentMessageInfo) => void) {
+    try {
+      const url = `${this.#getBaseUrl()}/smtp/email`;
+      const envelope = mail.message.getEnvelope();
+      const payload = await this.#preparePayload(mail);
+
+      debug("brevo email url %s", url);
+      debug("brevo email payload %O", payload);
+
+      const response = await ky.post<{ messageId: string }>(url, {
+        headers: {
+          Accept: "application/json",
+          "Api-Key": this.#config.key,
+          "Content-type": "application/json",
+        },
+        json: payload,
+      });
+
+      const body = await response.json();
+      const brevoMessageId = body.messageId;
+      const messageId = brevoMessageId
+        ? brevoMessageId.replace(/^<|>$/g, "")
+        : mail.message.messageId();
+
+      callback(null, { envelope, messageId });
+    } catch (error) {
+      callback(
+        new E_MAIL_TRANSPORT_ERROR("Unable to send email using the brevo transport", {
+          cause: error,
+        }),
+        undefined as any,
+      );
+    }
+  }
+}
+
+/**
+ * Transport for sending emails using the Brevo `/emails/send` API.
+ */
+export class BrevoTransport extends BaseApiTransport<BrevoConfig> {
+  constructor(config: BrevoConfig) {
+    super("brevo", config);
+  }
+
+  /**
+   * Send message
+   */
+  async send(
+    message: NodeMailerMessage,
+    config?: BrevoRuntimeConfig,
+  ): Promise<MailResponse<BrevoSentMessageInfo>> {
+    const brevoTransport = new NodeMailerTransport({ ...this.config, ...config });
+    const transporter = createTransport(brevoTransport);
+
+    const brevoResponse = await transporter.sendMail(message);
+    return new MailResponse(brevoResponse.messageId, brevoResponse.envelope, brevoResponse);
+  }
+}

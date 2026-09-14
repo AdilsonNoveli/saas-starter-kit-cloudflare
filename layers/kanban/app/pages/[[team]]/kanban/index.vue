@@ -53,20 +53,22 @@
           </p>
         </div>
 
-        <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <UCard
+        <div v-else class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <NuxtLink
             v-for="board in boards"
             :key="board.id"
-            variant="subtle"
-            class="transition hover:ring-2 hover:ring-primary"
+            :to="`${baseRoute}/kanban/${board.id}`"
+            class="group flex items-center gap-3 rounded border border-default bg-white p-4 shadow-xs hover:shadow-md hover:border-[--color-night-400] transition-all"
           >
-            <NuxtLink :to="`${baseRoute}/kanban/${board.id}`" class="block">
-              <div class="flex items-center gap-3">
-                <UIcon name="i-lucide-kanban" class="size-5 text-primary" />
-                <span class="truncate font-medium">{{ board.name }}</span>
-              </div>
-            </NuxtLink>
-          </UCard>
+            <div class="flex items-center justify-center size-9 rounded border border-default bg-[#f8f8f8] shrink-0">
+              <UIcon name="i-lucide-kanban" class="size-5 text-muted" />
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-semibold text-highlighted">{{ board.name }}</p>
+              <p class="text-xs text-muted">Abrir board</p>
+            </div>
+            <UIcon name="i-lucide-arrow-right" class="size-4 text-muted/60 group-hover:text-muted shrink-0 transition-colors" />
+          </NuxtLink>
         </div>
       </div>
     </template>

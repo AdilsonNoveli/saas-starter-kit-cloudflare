@@ -1,57 +1,57 @@
 <template>
-  <div class="flex flex-col h-full overflow-hidden select-none">
-    <!-- Top Sub-Header / Board Toolbar -->
+  <div class="flex flex-col h-full overflow-hidden select-none bg-white text-highlighted font-sans">
+    <!-- Toolbar do board -->
     <div
-      class="shrink-0 h-14 border-b border-default bg-surface px-4 sm:px-6 flex items-center justify-between gap-3 select-none"
+      class="shrink-0 h-14 border-b border-default bg-white px-4 sm:px-6 flex items-center justify-between gap-3 select-none"
     >
       <div class="flex items-center gap-3 flex-1 min-w-0">
-        <!-- Search Input -->
+        <!-- Search -->
         <div class="relative w-full max-w-xs h-9 shrink-0">
-          <UInput
+          <label for="board-search" class="sr-only">Pesquisar</label>
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <UIcon name="i-lucide-search" class="w-4 h-4 text-muted" />
+          </div>
+          <input
+            id="board-search"
             v-model="searchQuery"
-            icon="i-lucide-search"
-            placeholder="Search cards..."
-            size="sm"
-            class="w-full"
-            :ui="{ trailing: 'pr-1.5' }"
+            type="text"
+            class="block w-full h-full pl-9 pr-8 border border-default rounded bg-white text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            placeholder="Pesquisar cards..."
           >
-            <template v-if="searchQuery" #trailing>
-              <UButton
-                icon="i-lucide-x"
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                square
-                aria-label="Clear search"
-                @click="searchQuery = ''"
-              />
-            </template>
-          </UInput>
+          <button
+            v-if="searchQuery"
+            type="button"
+            class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-muted hover:text-highlighted"
+            @click="searchQuery = ''"
+          >
+            <UIcon name="i-lucide-x" class="w-3.5 h-3.5" />
+          </button>
         </div>
 
-        <!-- Meta Counters -->
+        <!-- Counters -->
         <div class="hidden sm:flex items-center gap-1.5 text-xs text-muted">
-          <span class="rounded bg-elevated/70 px-2 py-0.5 font-semibold text-highlighted border border-default/50 tabular-nums">
-            {{ board.columns.length }} column(s)
+          <span class="rounded bg-[#f8f8f8] px-2 py-0.5 font-semibold text-highlighted border border-default tabular-nums">
+            {{ board.columns.length }} coluna(s)
           </span>
-          <span class="rounded bg-elevated/70 px-2 py-0.5 font-semibold text-highlighted border border-default/50 tabular-nums">
+          <span class="rounded bg-[#f8f8f8] px-2 py-0.5 font-semibold text-highlighted border border-default tabular-nums">
             {{ totalCardsCount }} card(s)
           </span>
-          <span v-if="searchQuery.trim()" class="text-xs text-primary font-medium">
-            (filtering)
+          <span v-if="searchQuery.trim()" class="text-xs text-muted font-medium">
+            (filtrando)
           </span>
         </div>
       </div>
     </div>
 
-    <!-- Main Kanban Board Wrapper (Grab to Scroll) -->
+
+    <!-- Board: área de scroll lateral (grab-to-scroll) -->
     <div
       ref="boardWrapper"
-      class="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab active:cursor-grabbing"
+      class="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab active:cursor-grabbing bg-white"
       @mousedown="onMouseDown"
     >
-      <div class="flex items-start gap-3 h-full min-w-max pb-2">
-        <!-- Columns List -->
+      <div class="flex items-start gap-2.5 h-full min-w-max pb-2">
+        <!-- Colunas -->
         <KanbanColumn
           v-for="col in columnsWithFilteredCards"
           :key="col.id"
@@ -61,37 +61,34 @@
           @delete-card="emit('deleteCard', $event)"
         />
 
-        <!-- Add Column Card -->
+        <!-- Adicionar nova coluna -->
         <div
-          class="flex w-72 shrink-0 flex-col rounded-lg border border-dashed border-default bg-elevated/20 p-3 self-start shadow-xs transition-colors hover:border-default/80"
+          class="flex w-64 shrink-0 flex-col rounded border border-dashed border-default bg-white p-3 self-start shadow-xs transition-colors hover:border-[--color-night-400]"
         >
           <div class="flex items-center gap-1.5 mb-2.5 text-xs font-bold uppercase tracking-wider text-muted">
             <UIcon name="i-lucide-columns-3" class="size-3.5" />
-            <span>New column</span>
+            <span>Nova coluna</span>
           </div>
 
-          <UForm
-            :state="columnState"
+          <form
             class="flex items-center gap-1.5"
-            @submit="submitColumn"
+            @submit.prevent="submitColumn"
           >
-            <UInput
+            <input
               v-model="columnState.name"
-              placeholder="Column title..."
-              size="sm"
-              class="flex-1"
-            />
-            <UButton
+              type="text"
+              placeholder="Nome da coluna..."
+              class="flex-1 h-8 px-2 border border-default rounded bg-white text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+            >
+            <button
               type="submit"
-              icon="i-lucide-plus"
-              color="neutral"
-              variant="subtle"
-              size="sm"
-              square
+              class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-[#f8f8f8] text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
               :disabled="!columnState.name.trim()"
               aria-label="Add column"
-            />
-          </UForm>
+            >
+              <UIcon name="i-lucide-plus" class="size-4" />
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -100,6 +97,7 @@
 
 <script setup lang="ts">
 import type { KanbanBoardDetail, KanbanColumnItem } from "../../shared/types";
+import { provide, ref, computed, reactive, onUnmounted } from "vue";
 
 const props = defineProps<{ board: KanbanBoardDetail }>();
 
@@ -111,7 +109,6 @@ const emit = defineEmits<{
 }>();
 
 // Estado de drag partilhado com KanbanColumn e KanbanCard via provide/inject.
-// KanbanColumn.onStart seta o id; KanbanColumn.onEnd limpa.
 const draggedCardId = ref<string | null>(null);
 provide("kanban:draggedCardId", draggedCardId);
 
@@ -153,7 +150,6 @@ const scrollLeftStart = ref(0);
 function onMouseDown(e: MouseEvent): void {
   const target = e.target as HTMLElement;
 
-  // Don't activate grab-to-scroll when clicking on cards, inputs, buttons, etc.
   if (
     target.closest(".kanban-card") ||
     target.closest("button") ||

@@ -1,15 +1,15 @@
 <template>
   <div
-    class="flex flex-col h-full bg-elevated/40 rounded-lg border border-default shrink-0 shadow-xs select-none transition-all duration-200 overflow-hidden"
-    :class="isCollapsed ? 'w-11' : 'w-72'"
+    class="flex flex-col h-full rounded border border-default shadow-xs select-none transition-all duration-200 overflow-hidden bg-white"
+    :class="isCollapsed ? 'w-11' : 'w-64'"
   >
     <!-- ===== RECOLHIDA ===== -->
     <template v-if="isCollapsed">
-      <div class="flex flex-col items-center gap-2 w-full py-2.5 h-full bg-elevated/60">
+      <div class="flex flex-col items-center gap-2 w-full py-2.5 h-full bg-[#f8f8f8]">
         <!-- Botão Expandir -->
         <button
           type="button"
-          class="p-1 rounded-md text-muted hover:text-highlighted hover:bg-elevated/50 transition-colors focus:outline-none"
+          class="p-1 rounded text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none"
           title="Expand column"
           aria-label="Expand column"
           @click="toggleCollapse"
@@ -24,9 +24,9 @@
           {{ column.name }}
         </span>
 
-        <!-- Contador de cards -->
+        <!-- Contador -->
         <span
-          class="text-xs font-extrabold tabular-nums bg-default px-1.5 py-0.5 rounded border border-default mt-auto"
+          class="text-xs font-extrabold tabular-nums bg-white px-1.5 py-0.5 rounded border border-default mt-auto"
         >
           {{ column.cards.length }}
         </span>
@@ -35,7 +35,7 @@
 
     <!-- ===== EXPANDIDA ===== -->
     <template v-else>
-      <!-- Header (componente extraído) -->
+      <!-- Header -->
       <KanbanColumnHeader
         :name="column.name"
         :card-count="column.cards.length"
@@ -44,7 +44,7 @@
 
       <!-- Sub-header -->
       <div
-        class="px-3 py-1.5 bg-elevated/30 border-b border-default/50 flex items-center justify-between text-[11px] text-muted select-none"
+        class="px-3 py-1.5 bg-[#f8f8f8]/40 border-b border-default/50 flex items-center justify-between text-[11px] text-muted select-none"
       >
         <span>{{ column.cards.length }} card(s)</span>
       </div>
@@ -53,14 +53,14 @@
       <div
         ref="listEl"
         :data-column-id="column.id"
-        class="flex-1 p-2.5 overflow-y-auto flex flex-col gap-2 min-h-0 [scrollbar-gutter:stable] transition-colors duration-150"
+        class="flex-1 p-2.5 overflow-y-auto flex flex-col gap-2.5 min-h-0 [scrollbar-gutter:stable] transition-colors duration-150"
         :class="isDropTarget ? 'bg-primary/5 ring-1 ring-inset ring-primary/20' : ''"
       >
         <div
           v-if="column.cards.length === 0"
           class="text-center text-xs text-muted/60 italic py-8 select-none"
         >
-          No cards
+          Nenhum card
         </div>
 
         <div
@@ -73,27 +73,26 @@
       </div>
 
       <!-- Adicionar card -->
-      <div class="p-2.5 pt-0 shrink-0">
-        <UForm
-          :state="cardState"
-          class="flex items-center gap-1.5"
-          @submit="submitCard"
+      <div class="p-2.5 pt-0 shrink-0 border-t border-default/50 mt-auto bg-white">
+        <form
+          class="flex items-center gap-1.5 pt-2"
+          @submit.prevent="submitCard"
         >
-          <UInput
+          <input
             v-model="cardState.title"
-            placeholder="Add a card..."
-            size="xs"
-            class="flex-1"
+            type="text"
+            placeholder="Adicionar card..."
+            class="flex-1 h-8 px-2 border border-default rounded bg-white text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
           />
           <button
             type="submit"
-            class="shrink-0 p-1.5 rounded-md border border-default bg-elevated/60 text-muted hover:text-highlighted hover:bg-elevated transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+            class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-[#f8f8f8] text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
             :disabled="!cardState.title.trim()"
             aria-label="Add card"
           >
             <UIcon name="i-lucide-plus" class="size-4" />
           </button>
-        </UForm>
+        </form>
       </div>
     </template>
   </div>
@@ -101,6 +100,7 @@
 
 <script setup lang="ts">
 import type { Ref } from "vue";
+import { ref, reactive, inject, computed, onMounted } from "vue";
 import type { SortableEvent } from "sortablejs";
 import {
   insertNodeAt,
@@ -117,12 +117,8 @@ const emit = defineEmits<{
   deleteCard: [cardId: string];
 }>();
 
-// ── Drag state partilhado ────────────────────────────────────────────────────
-// O KanbanBoard fornece este ref via provide("kanban:draggedCardId").
-// Esta coluna é drop target quando existe um card sendo arrastado que não
-// pertence a ela (para destacar visualmente a zona de soltura).
+// Drag state compartilhado via provide/inject
 const draggedCardId = inject<Ref<string | null>>("kanban:draggedCardId", ref(null));
-
 const isDropTarget = computed(() => {
   if (!draggedCardId.value) return false;
   return !props.column.cards.some((c) => c.id === draggedCardId.value);
@@ -136,52 +132,37 @@ onMounted(() => {
   try {
     const saved = localStorage.getItem(storageKey.value);
     if (saved !== null) isCollapsed.value = JSON.parse(saved);
-  } catch {
-    // Ignora erros de parse
-  }
+  } catch { /* ignora */ }
 });
 
 function toggleCollapse() {
   isCollapsed.value = !isCollapsed.value;
   try {
     localStorage.setItem(storageKey.value, JSON.stringify(isCollapsed.value));
-  } catch {
-    // Sem localStorage
-  }
+  } catch { /* sem localStorage */ }
 }
 
 // ── SortableJS ───────────────────────────────────────────────────────────────
 const listEl = ref<HTMLElement | null>(null);
 const cardState = reactive({ title: "" });
 
-// `list` vazio propositalmente: o handler padrão (splice) é sobrescrito abaixo
-// e o estado real vem do servidor após cada mutação.
 useSortable(listEl, [], {
   group: "kanban-cards",
   animation: 150,
   onUpdate: () => {},
   onStart: (event: SortableEvent) => {
-    // Registra qual card está sendo arrastado para que todas as colunas
-    // possam exibir o destaque de drop zone.
     const cardId = (event.item as HTMLElement).dataset.cardId;
     if (cardId) draggedCardId.value = cardId;
   },
   onEnd: (event: SortableEvent) => {
-    // Limpa o estado de drag independentemente do resultado.
     draggedCardId.value = null;
-
     const { item, from, to, oldIndex, newIndex } = event;
-
-    // Sortable já moveu o nó no DOM; Vue ainda não reconciliou.
-    // Desfaz a mutação para deixar o Vue aplicar o patch correto após refresh.
     removeNode(item);
     insertNodeAt(from, item, oldIndex ?? 0);
-
     const cardId = item.dataset.cardId;
     const toColumnId = (to as HTMLElement).dataset.columnId;
     if (!cardId || !toColumnId) return;
     if (from === to && oldIndex === newIndex) return;
-
     emit("move", { cardId, toColumnId, position: newIndex ?? 0 });
   },
 });

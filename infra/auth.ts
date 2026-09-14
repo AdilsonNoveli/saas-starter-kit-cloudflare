@@ -10,7 +10,7 @@ export const clientID = new random.RandomUuid("AppAuthClientID");
 const kv = new sst.cloudflare.Kv("AuthKV");
 
 // Authorises the app Worker's account-deletion call into this Worker's
-// IDENTITY_DELETE_PATH (packages/functions/src/auth.ts). AuthKV is bound
+// IDENTITY_DELETE_PATH (apps/functions/src/auth.ts). AuthKV is bound
 // only here, so erasing credentials and sessions has to be asked for rather
 // than done directly — and since this Worker answers on a public domain,
 // arriving over the service binding proves nothing on its own. Generated
@@ -20,7 +20,7 @@ export const adminSecret = new random.RandomUuid("AuthAdminSecret");
 // Whether real credentials exist, not just "the flag is on" — flags.ts only
 // says the developer wants a provider available once it's set up, it
 // doesn't mean a value has actually been loaded via `sst secret load` yet.
-// packages/functions/src/auth.ts checks the exact same truthiness at
+// apps/functions/src/auth.ts checks the exact same truthiness at
 // request time to decide whether to register the provider at all — this
 // is that same decision, made at build time, so the static auth-frontend
 // UI can hide a button that would otherwise error the moment it's clicked.
@@ -41,11 +41,11 @@ const googleAuthEnabled = flags.googleAuth
   : "false";
 
 // auth-frontend is a static build (`nuxt generate`) served as this Worker's
-// static assets — the OpenAuth issuer itself (packages/functions/src/auth.ts)
+// static assets — the OpenAuth issuer itself (apps/functions/src/auth.ts)
 // handles every dynamic route, falling through to the static files for the
 // login/signup/forgot-password pages.
 const built = await build("AuthFrontend", {
-  dir: "packages/auth-frontend",
+  dir: "apps/auth-frontend",
   environment: {
     NUXT_PUBLIC_GITHUB_AUTH_ENABLED: githubAuthEnabled,
     NUXT_PUBLIC_GOOGLE_AUTH_ENABLED: googleAuthEnabled,
@@ -56,11 +56,11 @@ export const auth = new sst.cloudflare.Worker(
   "Auth",
   {
     // relative — see infra/emails.ts for why
-    handler: "packages/functions/src/auth.ts",
+    handler: "apps/functions/src/auth.ts",
     domain: authDomain,
     compatibility: COMPATIBILITY,
     assets: {
-      directory: path.resolve("packages/auth-frontend", ".output/public"),
+      directory: path.resolve("apps/auth-frontend", ".output/public"),
     },
     link: [
       kv,

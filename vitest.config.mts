@@ -16,6 +16,6 @@ import { defineConfig } from "vitest/config";
 // loader warns on ESM syntax in a plain `.ts` file here.
 export default defineConfig({
   test: {
-    projects: ["packages/app", "layers/*"],
+    projects: ["apps/app", "layers/*"],
   },
 });

@@ -6,7 +6,7 @@ import { adminSecret, auth, clientID } from "./auth";
 import { wsTicketSecret } from "./websockets";
 
 await deployWorker("App", {
-  root: "packages/app",
+  root: "apps/app",
   domain: appDomain,
   app: true,
   // A plain fetch() from this Worker to Auth's own public Custom Domain
@@ -17,7 +17,7 @@ await deployWorker("App", {
   // developers.cloudflare.com/workers/best-practices/workers-best-practices.
   // Linking the Worker resource itself (same pattern as `emails` below)
   // sets up a zero-network-hop service binding (env.Auth), which
-  // packages/app/server/utils/auth.ts's getClient() uses instead of the
+  // apps/app/server/utils/auth.ts's getClient() uses instead of the
   // global fetch() for calls to the OpenAuth issuer.
   link: [auth],
   vars: {

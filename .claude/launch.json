@@ -5,7 +5,7 @@
       "name": "web",
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "packages/web",
+      "cwd": "apps/web",
       "port": 3000,
       "autoPort": true
     },
@@ -13,7 +13,7 @@
       "name": "app",
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "packages/app",
+      "cwd": "apps/app",
       "port": 3001,
       "autoPort": true
     },
@@ -21,7 +21,7 @@
       "name": "auth-frontend",
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "packages/auth-frontend",
+      "cwd": "apps/auth-frontend",
       "port": 3002,
       "autoPort": true
     }

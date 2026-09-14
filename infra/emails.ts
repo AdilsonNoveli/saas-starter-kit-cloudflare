@@ -15,6 +15,6 @@ import { secret } from "./secret";
 // bumps nodemailer's resolved version, the patch key must be updated to
 // match (bun's patch matching is exact-version) — see lessons-learned.md.
 export const emails = new sst.cloudflare.Worker("Emails", {
-  handler: "packages/functions/src/emails.ts",
+  handler: "apps/functions/src/emails.ts",
   link: [secret.ResendApiKey, secret.MailgunApiKey].filter(Boolean),
 });

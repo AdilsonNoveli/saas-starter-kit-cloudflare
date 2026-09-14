@@ -16,8 +16,8 @@ export const authEmailDomain = "nuxfire.com";
 
 // Path on the auth Worker that erases an identity — credentials and every
 // session. It lives here because both sides have to agree on it: the auth
-// Worker serves it (packages/functions/src/auth.ts) and the app Worker calls
-// it over its service binding (packages/app/server/trpc/routers/account.ts).
+// Worker serves it (apps/functions/src/auth.ts) and the app Worker calls
+// it over its service binding (apps/app/server/trpc/routers/account.ts).
 export const identityDeletePath = "/internal/identity/delete";
 
 // Path on the auth Worker that revokes every refresh token for an identity
@@ -28,11 +28,11 @@ export const signOutOthersPath = "/internal/identity/sign-out-others";
 // Path on the auth Worker that creates (or resets) an identity with a known
 // password. Same reasoning as the two paths above: AuthKV is bound only to the
 // auth Worker, so anything outside it — here, the manual demo-account seed
-// script (packages/functions/src/database/seed-demo-accounts.ts) — has to ask
+// script (apps/functions/src/database/seed-demo-accounts.ts) — has to ask
 // for the credential to be written rather than write it itself.
 export const seedAccountPath = "/internal/identity/seed";
 
-// Nuxt Layers the Composition Root (packages/app/nuxt.config.ts) extends.
+// Nuxt Layers the Composition Root (apps/app/nuxt.config.ts) extends.
 // Deliberately separate from `flags` below: `flags` provisions Cloudflare
 // resources in infra/*.ts, this decides which domain layers are compiled into
 // the app at all. See _docs/REFATORE_ARCHITETURE.md, "Composição".
@@ -43,7 +43,7 @@ export const layers = {
   // generated tRPC composition and the generated sidebar navigation. A core
   // layer needs no hand-written import anywhere; adding its name here is all.
   // With `admin` (Fase 3 passo 4, the last extraction) this list is complete:
-  // packages/app holds no domain logic any more, only the Composition Root.
+  // apps/app holds no domain logic any more, only the Composition Root.
   core: ["teams", "billing", "notifications", "admin"] as string[],
 
   // Feature layers — toggleable per build/deploy. `false` drops the layer's

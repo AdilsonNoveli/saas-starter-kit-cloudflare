@@ -11,6 +11,7 @@
     "app-remote": "sst shell -- bun scripts/dev.ts app remote"
   },
   "workspaces": [
+    "apps/*",
     "packages/*",
     "layers/*"
   ],

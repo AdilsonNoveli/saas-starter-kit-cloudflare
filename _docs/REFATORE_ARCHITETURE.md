@@ -7,7 +7,18 @@ Plano para transformar o NuxFire na arquitetura fullstack Nuxt mais robusta e mo
 ---
 
 > [!NOTE]
-> **Decisão pendente, fora do escopo desta migração: `apps/` vs `packages/`.** A convenção moderna de monorepo (Turborepo e a maioria dos monorepos Nuxt/Bun/pnpm de referência) separa `apps/` — coisas com deploy próprio, entrypoint independente — de `packages/` — bibliotecas compartilhadas, sem deploy próprio. Não é regra do Bun (workspaces do Bun são só glob, agnóstico de nome de pasta), é convenção de ecossistema. Por essa definição, `packages/app`, `packages/web`, `packages/auth-frontend` e `packages/functions` são todos apps (cada um vira um Worker Cloudflare com deploy próprio via SST) — só `emails`, `design-tokens` e `layer-types` são bibliotecas de verdade. `functions` é o caso mais ambíguo: não é um app único, é um feixe de 6 Workers pequenos (auth, emails, jobs, DLQ, cron, websockets), mas cada um tem deploy independente, então se enquadra melhor em `apps/functions` do que em `packages/`. Puramente estrutural/nomenclatura, zero ganho funcional — mas quanto antes for feito, menos arquivo toca (cada extração de Fase 3 aumenta a superfície de imports entre pacotes que precisariam ser recalculados se a profundidade de diretório mudasse depois). O usuário optou por terminar a Fase 3 inteira primeiro; revisitar isso depois.
+> **Decisão final, tomada em 2026-09-14, executada depois do fim da Fase 3: `apps/{app, web, auth-frontend, functions}`, `packages/{emails, design-tokens, layer-types}`.**
+>
+> Primeira tentativa desta nota usou "é uma UI navegada diretamente por um humano" como critério — o que teria deixado `functions` em `packages/`. **Corrigido**: essa não é a definição real do Turborepo, que é a fonte citada como referência. A documentação oficial define **Application Package = deployável independentemente** vs. **Library Package = não deployável independentemente, só consumido por outra coisa** — nada sobre ter UI. `functions` tem 6 recursos com deploy independente de verdade (Worker de auth, Worker de emails, consumer de jobs, consumer de DLQ, cron, websockets); por essa definição real, é Application Package, não biblioteca — ter ou não tela é irrelevante. Mantê-lo em `packages/` ao lado de bibliotecas de verdade (`emails`, `design-tokens`) seria uma classificação estranha pra qualquer pessoa que já conhece a convenção Turborepo, exatamente o tipo de ambiguidade que este projeto (um template replicado) não pode ter.
+>
+> `functions` continua como **um único** workspace package com múltiplos entrypoints/deploys (não foi dividido em 6 pacotes, um por Worker) — os 6 Workers compartilham schema Drizzle, utils e são fortemente acoplados por design; dividir criaria bibliotecas extras só pra isso sem ganho real.
+>
+> `auth-frontend` foi investigado com zero suposição antes de decidir se seria um `package` reutilizável. A investigação mostrou que não há mecanismo de reuso por import de código:
+> - `infra/auth.ts` builda `auth-frontend` (`nuxt generate`) como os **assets estáticos do mesmo Worker** que roda o issuer OpenAuth.js — uma unidade de deploy só, API dinâmica + UI estática juntas em `auth.<domínio>`.
+> - `packages/app` **não importa nada** de `auth-frontend`. Autentica via SDK cliente do `@openauthjs/openauth`, redirecionando o navegador (`client.authorize(callback, "code")` + `navigateTo(url, {external:true})`) pro `auth.<domínio>` já rodando — fluxo OAuth-style, não import de código.
+> - `auth-frontend/package.json` não tem `exports`, é `"private": true`, zero estrutura de biblioteca. Grep no resto do repo por imports reais de `auth-frontend`: zero.
+>
+> Uma aplicação futura que precise "reutilizar autenticação" faz exatamente o que `packages/app` já faz — instala `@openauthjs/openauth` (pacote npm externo) e aponta pro mesmo `auth.<domínio>`. O reuso é por protocolo (redirect), não por import — mas isso não muda a classificação `apps/` vs `packages/`: `auth-frontend` também é deployável independentemente (mesmo compartilhando a unidade de deploy física com o Worker de `functions`), então fica em `apps/` de qualquer forma, pela mesma régua de todo o resto.
 
 ---
 
@@ -43,13 +54,17 @@ Isso é um **monorepo Bun** com 6 workspace packages. O que falta é a **arquite
 ```text
 nuxfire/                              ← Monorepo raiz (Bun workspaces)
 │
-├── packages/                         ← Aplicações & pacotes de infraestrutura fixa
+├── apps/                             ← Deployáveis independentes (critério real do Turborepo:
+│   │                                    "Application Package", não "tem UI" — ver [!NOTE] no topo)
 │   ├── app/                          ← Composition Root (shell fino da aplicação)
 │   ├── web/                          ← Site público de marketing/docs
 │   ├── auth-frontend/                ← UI de autenticação estática
-│   ├── functions/                    ← Workers (auth issuer, emails, jobs, WS) + schema agregador
+│   └── functions/                    ← Workers (auth issuer, emails, jobs, WS) + schema agregador
+│
+├── packages/                         ← Bibliotecas compartilhadas, sem deploy próprio
 │   ├── emails/                       ← Templates React Email
-│   └── design-tokens/                ← Tokens visuais compartilhados
+│   ├── design-tokens/                ← Tokens visuais compartilhados
+│   └── layer-types/                  ← Contrato defineLayerManifest()
 │
 ├── layers/                           ← Nuxt 4 Feature Layers (Domínios de Negócio)
 │   ├── teams/                        ← @nuxfire/layer-teams        [core — sempre ativa]
@@ -68,7 +83,7 @@ nuxfire/                              ← Monorepo raiz (Bun workspaces)
 **Workspaces configurados** no `package.json` raiz:
 
 ```json
-"workspaces": ["packages/*", "layers/*"]
+"workspaces": ["apps/*", "packages/*", "layers/*"]
 ```
 
 ---
@@ -258,12 +273,12 @@ export const layers = {
 };
 ```
 
-### 2. Composition Root — `packages/app/nuxt.config.ts`
+### 2. Composition Root — `apps/app/nuxt.config.ts`
 
 Verificado na Fase 2: `#nuxfire/config` **não resolve aqui**. `nuxt.config.ts` é carregado por `c12`/`jiti` antes de o Nuxt (e o alias de `tsconfig.json` que ele lê) existir — o import precisa ser relativo. A mesma correção vale para o import de `scripts/compose-layers.ts`.
 
 ```typescript
-// packages/app/nuxt.config.ts (real, pós Fase 2)
+// apps/app/nuxt.config.ts (real, pós Fase 2 — hoje em apps/app, ver decisão de apps/ vs packages/ no topo do doc)
 import { layers } from "../../config"; // relativo — #nuxfire/config não resolve aqui (c12/jiti)
 import { composeLayers } from "../../scripts/compose-layers";
 
@@ -365,8 +380,8 @@ export type RouterOutput = inferRouterOutputs<AppRouter>;
 > entradas de `layers.core` alimentam o mesmo `activeLayerNames` que
 > `composeLayers()` recebe, então elas são compostas automaticamente igual às
 > feature layers. Não existe lista de imports mantida à mão para core layers.
-> O que `packages/app/server/trpc/routers/index.ts` ainda tem escrito à mão são
-> só os routers que continuam morando dentro de `packages/app`. Desde o passo 4
+> O que `apps/app/server/trpc/routers/index.ts` ainda tem escrito à mão são
+> só os routers que continuam morando dentro de `apps/app`. Desde o passo 4
 > isso são **exatamente dois**: `account` e `public`. `admin` era o último a
 > ainda ter import à mão (`import admin from "./admin"`) e saiu junto com a
 > layer; hoje ele chega pelo `...layerRouters` igual a todo o resto.
@@ -451,10 +466,10 @@ export * from "@nuxfire/layer-admin/server/database/schema"; // platform_role, P
 > [!WARNING]
 > Esta exportação é **incondicional de propósito** — nunca gated pelas flags de `layers.features`. Desativar uma feature layer no `config.ts` remove suas páginas/componentes do bundle Nuxt (via `extends`); nunca remove suas tabelas do schema Drizzle nem do client tipado. "Desativado" significa "fora da UI", não "apagado" — ver a nota de dado órfão logo abaixo.
 
-`packages/app/server/utils/db.ts` **não muda uma linha** — continua fazendo `import * as schema from "@nuxfire/functions/schema"`.
+`apps/app/server/utils/db.ts` **não muda uma linha** — continua fazendo `import * as schema from "@nuxfire/functions/schema"`.
 
 ```typescript
-// packages/functions/drizzle.config.ts (modificado)
+// apps/functions/drizzle.config.ts (modificado)
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
@@ -469,7 +484,7 @@ export default defineConfig({
 ```
 
 > [!IMPORTANT]
-> **Uma única cadeia linear de migrações**, gerada de forma centralizada em `packages/functions`, exatamente como no plano original — isso não muda.
+> **Uma única cadeia linear de migrações**, gerada de forma centralizada em `apps/functions`, exatamente como no plano original — isso não muda.
 >
 > **Dado órfão ao desativar uma layer em produção:** desligar `features.kanban = false` depois de a layer já ter tabelas populadas **não gera DROP automático** — é comportamento intencional (segurança de dado), não um bug a corrigir. "Desativar" significa "sai da UI e do bundle", não "apaga dado". Uma limpeza de tabelas de uma layer descontinuada é uma migration manual, decidida caso a caso.
 
@@ -497,20 +512,20 @@ Todo nome de ability é prefixado pelo nome da layer, sem exceção — mesma di
 
 `app/middleware/*.global.*` é coletado **por layer**, ordenado por nome de arquivo apenas _dentro_ de cada layer, e as layers são concatenadas com o Composition Root **por último**. Ou seja: `packages/app/app/middleware/0.auth.global.ts` sempre roda **depois** de qualquer middleware global de layer, e os prefixos `0.`/`1.` só ordenam arquivos do mesmo diretório.
 
-Consequência concreta, encontrada na Fase 3 passo 1b: `1.teams.global.ts` **fica em `packages/app`**. Dentro de `layers/teams` ele passava a rodar antes do guard de autenticação e um deep link deslogado para `/{team}/dashboard` era redirecionado para `/select-team` antes de `0.auth.global.ts` registrar o destino pós-login — o usuário voltava no seletor de times em vez da página pedida. Para verificar qualquer mexida aqui, extraia o array de middleware global do bundle de `nuxt build` (`dist/server/chunks/virtual/entry.mjs`); `nuxt prepare` não materializa esse array. Middleware **nomeado** (`definePageMeta({ middleware: "invite" })`) não tem esse problema — roda sempre depois de todos os globais — e por isso `invite.ts` foi para a layer normalmente. O passo 4 levou isso um passo além: `middleware/admin.ts` e `layouts/admin.vue` saíram do Composition Root **para dentro** de `layers/admin`, enquanto páginas em `layers/billing` e `layers/notifications` continuam pedindo `middleware: "admin"` e `layout: "admin"` pelo nome, sem edição nenhuma — resolução por nome atravessa a fronteira de layer nas duas direções, porque o Nuxt junta layouts e middleware nomeado num registro único e plano antes de qualquer página resolver um nome. Prove sempre no `nuxt build` (os dois mapas são literais em `dist/server/chunks/virtual/entry.mjs`, e o `.map` de cada chunk aponta o arquivo-fonte real), nunca no `nuxt prepare`.
+Consequência concreta, encontrada na Fase 3 passo 1b: `1.teams.global.ts` **fica em `apps/app`** (era `packages/app` à época). Dentro de `layers/teams` ele passava a rodar antes do guard de autenticação e um deep link deslogado para `/{team}/dashboard` era redirecionado para `/select-team` antes de `0.auth.global.ts` registrar o destino pós-login — o usuário voltava no seletor de times em vez da página pedida. Para verificar qualquer mexida aqui, extraia o array de middleware global do bundle de `nuxt build` (`dist/server/chunks/virtual/entry.mjs`); `nuxt prepare` não materializa esse array. Middleware **nomeado** (`definePageMeta({ middleware: "invite" })`) não tem esse problema — roda sempre depois de todos os globais — e por isso `invite.ts` foi para a layer normalmente. O passo 4 levou isso um passo além: `middleware/admin.ts` e `layouts/admin.vue` saíram do Composition Root **para dentro** de `layers/admin`, enquanto páginas em `layers/billing` e `layers/notifications` continuam pedindo `middleware: "admin"` e `layout: "admin"` pelo nome, sem edição nenhuma — resolução por nome atravessa a fronteira de layer nas duas direções, porque o Nuxt junta layouts e middleware nomeado num registro único e plano antes de qualquer página resolver um nome. Prove sempre no `nuxt build` (os dois mapas são literais em `dist/server/chunks/virtual/entry.mjs`, e o `.map` de cada chunk aponta o arquivo-fonte real), nunca no `nuxt prepare`.
 
 ### 6. Limite aceito: contexto tRPC continua centralizado
 
-`packages/app/server/trpc/context.ts` mantém uma lista fixa de campos (`session`, `sendEmail`, `sendWebsocketsEvent`, `jobsQueue`, etc.). Layers **não adicionam campos ao contexto** — se uma procedure de layer precisa de algo, ela chama os utils compartilhados diretamente (`useDB()`, `getUser()`, etc.), do jeito que o código já faz hoje. Isso é uma decisão de escopo, não um problema a resolver: manter o contexto centralizado evita que cada layer precise editar um arquivo do Composition Root, mas também significa que "zero toque na base" não é literal para o backend — é "zero toque no roteamento e nos schemas", não no `context.ts`.
+`apps/app/server/trpc/context.ts` mantém uma lista fixa de campos (`session`, `sendEmail`, `sendWebsocketsEvent`, `jobsQueue`, etc.). Layers **não adicionam campos ao contexto** — se uma procedure de layer precisa de algo, ela chama os utils compartilhados diretamente (`useDB()`, `getUser()`, etc.), do jeito que o código já faz hoje. Isso é uma decisão de escopo, não um problema a resolver: manter o contexto centralizado evita que cada layer precise editar um arquivo do Composition Root, mas também significa que "zero toque na base" não é literal para o backend — é "zero toque no roteamento e nos schemas", não no `context.ts`.
 
 ### 7. Composição é automática, não um script manual
 
-`scripts/compose-layers.ts` exporta `composeLayers()`, chamada no topo de `packages/app/nuxt.config.ts`, antes de `defineNuxtConfig(...)`. Isso roda em **todo** `nuxt dev`/`build`/`generate`/`typecheck`/`prepare` — não existe passo manual para lembrar de rodar, e não há como `.composition/layer-routers.ts` ficar dessincronizado do que existe em `layers/`. Verificado apagando o arquivo gerado e confirmando que `nuxt prepare` (o mesmo comando que já roda em `postinstall`) o recria sozinho, sem qualquer intervenção manual.
+`scripts/compose-layers.ts` exporta `composeLayers()`, chamada no topo de `apps/app/nuxt.config.ts`, antes de `defineNuxtConfig(...)`. Isso roda em **todo** `nuxt dev`/`build`/`generate`/`typecheck`/`prepare` — não existe passo manual para lembrar de rodar, e não há como `.composition/layer-routers.ts` ficar dessincronizado do que existe em `layers/`. Verificado apagando o arquivo gerado e confirmando que `nuxt prepare` (o mesmo comando que já roda em `postinstall`) o recria sozinho, sem qualquer intervenção manual.
 
 ### 8. Navegação Dinâmica via Layers
 
 ```typescript
-// packages/app/app/composables/useLayerNavigation.ts
+// apps/app/app/composables/useLayerNavigation.ts
 export function useLayerNavigation() {
   const layerEntries = useState<NavigationEntry[]>("layer-nav", () => []);
 
@@ -568,7 +583,7 @@ Ordem corrigida, base primeiro:
    `User`, em core, e o acoplamento com teams é só uma chamada tRPC em runtime
    (`trpc.admin.teams.*`, cujo router está no Composition Root, não na layer).
    A infra de websockets de fato não mudou: `websockets.client.ts` (transporte
-   genérico, provê `$ws`) **fica em `packages/app`** — é infraestrutura
+   genérico, provê `$ws`) **fica em `apps/app`** — é infraestrutura
    transversal, e a Fase 4 já prevê um `layer-chat` que precisa dela também. Só
    a cola de domínio (`ws-notifications.client.ts`) foi pra layer, com
    `dependsOn: ["websockets"]` absorvendo a inversão de ordem que a fronteira de
@@ -603,7 +618,7 @@ Ordem corrigida, base primeiro:
    `middleware: "admin"` sem uma linha editada (provado no `nuxt build`, nos
    mapas de layouts e de middleware nomeado do bundle).
    `mfa-crypto.ts`, `audit-log.ts` e `AccountMfaSetupModal.vue` ficaram em
-   `packages/app` de propósito: são compartilhados com o 2FA self-service do
+   `apps/app` de propósito: são compartilhados com o 2FA self-service do
    usuário comum e com `layers/billing`, não são do domínio admin.
 
 ---

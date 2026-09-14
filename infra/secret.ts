@@ -63,7 +63,7 @@ if (flags.paddle) {
   secretList.PaddleClientToken = new sst.Secret("PADDLE_CLIENT_TOKEN", "");
 }
 
-// Platform admin console (packages/app/server/utils/platform-*.ts). Both are
+// Platform admin console (apps/app/server/utils/platform-*.ts). Both are
 // operator-managed rather than generated per stage, because they outlive any
 // single deploy: the encryption key in particular guards TOTP seeds already
 // written to the database, and losing it would force every platform admin to
@@ -79,7 +79,7 @@ secretList.PlatformAdminEncryptionKey = new sst.Secret(
 );
 
 // Self-service two-factor authentication for regular users
-// (packages/app/server/utils/user-mfa-session.ts, .../mfa-crypto.ts).
+// (apps/app/server/utils/user-mfa-session.ts, .../mfa-crypto.ts).
 // Deliberately separate secrets from the platform-admin pair above, even
 // though the mechanism is the same: rotating one must never invalidate MFA
 // (or force a re-challenge) for the other population, and a deploy that only

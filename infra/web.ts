@@ -2,7 +2,7 @@ import { webUrl, appUrl, webDomain } from "./dns";
 import { deployWorker } from "./utils/nuxt";
 
 /**
- * @nuxt/content's `cloudflare` preset (packages/web/nuxt.config.ts's nitro
+ * @nuxt/content's `cloudflare` preset (apps/web/nuxt.config.ts's nitro
  * preset) hard-requires a D1 binding named exactly `DB` once deployed there
  * — without it, every runtime content query (the docs/blog search box,
  * `queryCollection*`) throws, since there is nothing on the Worker to query.
@@ -15,7 +15,7 @@ import { deployWorker } from "./utils/nuxt";
 const contentDatabase = new sst.cloudflare.D1("DB");
 
 await deployWorker("Web", {
-  root: "packages/web",
+  root: "apps/web",
   domain: webDomain,
   link: [contentDatabase],
   vars: {

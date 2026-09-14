@@ -32,7 +32,7 @@ if (flags.jobsQueue) {
   jobsQueue!.subscribe(
     {
       // relative — see infra/emails.ts for why
-      handler: "packages/functions/src/jobs-consumer.ts",
+      handler: "apps/functions/src/jobs-consumer.ts",
       compatibility: COMPATIBILITY,
       link: [database],
     },
@@ -56,7 +56,7 @@ if (flags.jobsQueue) {
   // a DeadLetterRecord row and acks, so there is nothing left to retry and
   // nowhere further for a message to fall.
   jobsDeadLetterQueue!.subscribe({
-    handler: "packages/functions/src/dlq-consumer.ts",
+    handler: "apps/functions/src/dlq-consumer.ts",
     compatibility: COMPATIBILITY,
     link: [database],
   });

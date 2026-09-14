@@ -43,7 +43,7 @@ export async function deployWorker(
 
   const link: any[] = [...extraLink];
   if (app) {
-    // NuxtHub's self-hosted mode (packages/app/nuxt.config.ts's `hub:` block)
+    // NuxtHub's self-hosted mode (apps/app/nuxt.config.ts's `hub:` block)
     // expects these bindings named exactly BLOB/KV/CACHE — that's fixed by
     // NuxtHub itself, not something `link` can rename, so the resources are
     // named to match directly instead of being prefixed per-app.
@@ -92,7 +92,7 @@ export async function deployWorker(
     const migrations = new command.local.Command(
       `${name}Migrations`,
       {
-        dir: path.resolve("packages/functions"),
+        dir: path.resolve("apps/functions"),
         create: "bunx drizzle-kit migrate",
         triggers: [new Date().toString()],
         environment: databaseEnvironment,
@@ -106,11 +106,11 @@ export async function deployWorker(
     // a safety net for a database reset independently of a deploy). Runs
     // directly against Postgres the same way migrations do, right after
     // them so the tables it writes to already exist. Idempotent: see
-    // packages/functions/src/database/seed.ts.
+    // apps/functions/src/database/seed.ts.
     new command.local.Command(
       `${name}Seed`,
       {
-        dir: path.resolve("packages/functions"),
+        dir: path.resolve("apps/functions"),
         create: "bun run src/database/seed.ts",
         triggers: [new Date().toString()],
         environment: databaseEnvironment,

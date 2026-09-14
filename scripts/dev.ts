@@ -14,7 +14,7 @@ proc = Bun.spawn(
     ? process.argv.slice(4)
     : ["bun", "run", "dev", ...(isRemote ? ["--remote"] : [])],
   {
-    cwd: resolve(process.cwd(), `packages/${packageName}`),
+    cwd: resolve(process.cwd(), `apps/${packageName}`),
     stdio: ["inherit", "inherit", "inherit"],
     env: {
       NUXT_HUB_PROJECT_URL:

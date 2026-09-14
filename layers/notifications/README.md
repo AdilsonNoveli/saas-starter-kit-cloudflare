@@ -71,12 +71,17 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   layer's own `notifications` key. Its content is Notification-domain logic
   (insert a row, push it over the WebSocket) that merely happens to be
   `platformAdminProcedure`-gated, but its mount point belongs to
-  `packages/app/server/trpc/routers/admin/index.ts`, which imports it from here
-  by name and keeps it at `admin.notifications` until `admin` is itself
-  extracted. Same shape `layers/billing` uses for `adminPlansRouter`. Verified
-  in the built bundle, not assumed: the admin router literal is
-  `{teams,plans,queue,auditLog,notifications}` and the top-level one is
-  `{account,public,admin,...{billing,stripe},...{kanban},...{notifications},...{teams,invites}}`.
+  `@nuxfire/layer-admin/server/trpc/router`, which imports it from here by name
+  and keeps it at `admin.notifications`. (That aggregator was
+  `packages/app/server/trpc/routers/admin/index.ts` until Fase 3 passo 4 moved
+  it into `layers/admin`; the import needed no change, because it was always a
+  package specifier.) Same shape `layers/billing` uses for `adminPlansRouter`.
+  Verified in the built bundle, not assumed: the admin router literal is
+  `{teams,plans,queue,auditLog,notifications}` and the top-level one was
+  `{account,public,admin,...{billing,stripe},...{kanban},...{notifications},...{teams,invites}}`
+  at the time — after passo 4 `admin` moved inside the spread, to
+  `{account,public,...{{admin},{billing,stripe},{kanban},{notifications},{teams,invites}}}`,
+  with every client-facing path unchanged.
 - **This layer's schema and `packages/functions`' `core-schema.ts` import each
   other.** The THIRD deliberate cycle in this codebase, after
   `core-schema.ts` ↔ `layers/teams` and `layers/teams` ↔ `layers/billing`.

@@ -1,7 +1,16 @@
 import { TRPCError } from "@trpc/server";
 import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { platformAdminProcedure, router } from "../../trpc";
+// See admin-teams.ts: layers import the Composition Root's tRPC primitives and
+// server utils explicitly.
+import { platformAdminProcedure, router } from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
+import { recordAuditLog } from "~~/server/utils/audit-log";
+// `Job`, `Log` and `DeadLetterRecord` stay in packages/functions core-schema and
+// did NOT move with this router: they are generic async-job-processing
+// infrastructure, written by src/jobs-consumer.ts and src/dlq-consumer.ts, not
+// admin-domain data. This module only reads them — same reasoning that kept
+// them in core through every prior extraction.
 import {
   deadLetterRecords,
   jobs,

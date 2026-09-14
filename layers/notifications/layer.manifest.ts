@@ -16,8 +16,10 @@ export default defineLayerManifest({
   // all. The only
   // teams-shaped coupling is in `app/pages/admin/notifications.vue`, which CALLS
   // `trpc.admin.teams.*` at runtime to populate its team/member pickers — and
-  // that router lives in the Composition Root
-  // (`packages/app/server/trpc/routers/admin/teams.ts`), not in the teams layer.
+  // that router lives in the admin layer
+  // (`layers/admin/server/trpc/admin-teams.ts` since Fase 3 passo 4; it was
+  // `packages/app/server/trpc/routers/admin/teams.ts` when this was written),
+  // not in the teams layer.
   // A runtime tRPC call is not a layer dependency; `requires` documents the
   // `extends`/import direction, so listing `teams` here would be a claim the
   // source does not support.

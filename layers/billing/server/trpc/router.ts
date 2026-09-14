@@ -30,14 +30,17 @@ export const routers = {
  *
  * `routers` is spread into `appRouter` at the top level by the generated
  * `.composition/layer-routers.ts`. This router is not a top-level namespace: it
- * is mounted by `packages/app/server/trpc/routers/admin/index.ts` under
- * `admin.plans`, which is the path the client already calls
- * (`trpc.admin.plans.listPlans`). Adding it to the map above would silently
- * republish it as `trpc.plans.*` and break every existing call site.
+ * is mounted by `@nuxfire/layer-admin/server/trpc/router` under `admin.plans`,
+ * which is the path the client already calls (`trpc.admin.plans.listPlans`).
+ * Adding it to the map above would silently republish it as `trpc.plans.*` and
+ * break every existing call site.
  *
  * So the code lives in this layer (it is Plan/Benefit CRUD and Stripe catalog
- * sync — billing domain, merely admin-gated) while its mount point stays with
- * the admin aggregator until `admin` is extracted in its own step. A named
- * export is how a layer offers a router it does not own the mount point for.
+ * sync — billing domain, merely admin-gated) while the admin layer owns the
+ * mount point. A named export is how a layer offers a router it does not own
+ * the mount point for. (That aggregator lived in
+ * `packages/app/server/trpc/routers/admin/index.ts` when this comment was first
+ * written; Fase 3 passo 4 moved it into `layers/admin` — and this import needed
+ * no change at all, because it was always a package specifier.)
  */
 export { adminPlansRouter } from "./admin-plans";

@@ -104,9 +104,12 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   putting it there would republish a live `trpc.admin.plans.listPlans` call as
   `trpc.plans.listPlans`. Its content is billing-domain (Plan/Benefit CRUD,
   Stripe catalog sync — merely `platformAdminProcedure`-gated, not admin-domain
-  logic), but its mount point belongs to `packages/app/server/trpc/routers/admin/index.ts`,
-  which imports it from here by name and keeps it at `admin.plans` until `admin`
-  is itself extracted. Extracting a domain must never reshape the public API.
+  logic), but its mount point belongs to
+  `@nuxfire/layer-admin/server/trpc/router`, which imports it from here by name
+  and keeps it at `admin.plans`. (That aggregator was
+  `packages/app/server/trpc/routers/admin/index.ts` until Fase 3 passo 4 moved
+  it into `layers/admin`; the import needed no change, because it was always a
+  package specifier.) Extracting a domain must never reshape the public API.
 - **This layer's schema and `layers/teams`' schema import each other.** The
   second deliberate cycle in this codebase, after `core-schema.ts` ↔
   `layers/teams`. `Subscription.teamId` → `Team` here; `Team.planId` and

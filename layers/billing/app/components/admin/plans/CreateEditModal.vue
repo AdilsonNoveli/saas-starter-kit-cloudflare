@@ -326,7 +326,7 @@ function removeFeature(index: number) {
   features.value.splice(index, 1);
 }
 
-// Mirrors `planFieldsSchema` in `server/trpc/routers/admin/plans.ts` — the
+// Mirrors `planFieldsSchema` in this layer's `server/trpc/admin-plans.ts` — the
 // backend stays the authority, this only keeps the user from round-tripping to
 // learn that a field is required. `price`/`amount`+`currency` are required
 // only conditionally on `provider`, which is why that check lives in

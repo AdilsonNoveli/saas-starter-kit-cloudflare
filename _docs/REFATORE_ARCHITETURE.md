@@ -17,7 +17,7 @@ A primeira versão deste documento foi confrontada com o código real (schema Dr
 
 1. **Infraestrutura por layer (Durable Objects, Queues, Cron) fica fora da v1.** Layers novas usam apenas o que já existe (Postgres via Hyperdrive, KV, R2). O campo `infrastructure` do manifesto original não tinha nenhum código lendo ele em `infra/*.ts` — era decorativo. Provisionamento condicional de recursos Cloudflare continua sendo feito do jeito que já funciona hoje: pelas `flags` de `config.ts`, direto nos arquivos `infra/*.ts`. Quando uma layer realmente precisar de infra própria (ex: `layer-chat` com Durable Object), isso é tratado como projeto à parte, não como parte deste plano.
 2. **Schema Drizzle: barrel file agregador condicional.** `packages/functions/src/database/schema.ts` deixa de ser um arquivo só com todas as tabelas — passa a reexportar (`export *`) o schema de cada layer, condicionado pelas mesmas flags que controlam o build. Isso mantém `useDB()` funcionando sem mudança (continua importando um módulo `schema` único), enquanto cada layer é dona do arquivo-fonte das suas tabelas.
-3. **Ordem de extração da Fase 3: `teams` primeiro.** `teams` é dependência transversal de billing, notifications e admin — extraí-lo por último obrigaria as outras layers a apontar temporariamente para `packages/app` e depois serem re-cabeadas. Dentro da nova ordem, `admin` continua saindo por último: seu próprio router ([admin/index.ts](file:///c:/nuxfire/packages/app/server/trpc/routers/admin/index.ts)) já importa `plans`, `queue`, `notifications` e `auditLog` como sub-routers — ou seja, admin é estruturalmente uma camada de agregação/consumo de outros domínios, não uma folha. Extraí-lo cedo forçaria reescrever seus imports duas vezes.
+3. **Ordem de extração da Fase 3: `teams` primeiro.** `teams` é dependência transversal de billing, notifications e admin — extraí-lo por último obrigaria as outras layers a apontar temporariamente para `packages/app` e depois serem re-cabeadas. Dentro da nova ordem, `admin` continua saindo por último: seu próprio router (hoje [layers/admin/server/trpc/router.ts](file:///c:/nuxfire/layers/admin/server/trpc/router.ts), à época `packages/app/server/trpc/routers/admin/index.ts`) já importa `plans`, `queue`, `notifications` e `auditLog` como sub-routers — ou seja, admin é estruturalmente uma camada de agregação/consumo de outros domínios, não uma folha. Extraí-lo cedo forçaria reescrever seus imports duas vezes. **Confirmado na prática no passo 4**: os dois imports cross-layer (`adminPlansRouter`, `adminNotificationsRouter`) atravessaram a mudança sem uma única edição.
 
 Outros ajustes menores incorporados ao plano abaixo: convenção de nomenclatura para _abilities_ (evita colisão de auto-import entre layers), separação clara entre `core` (sempre ativo) e `features` (toggleable) em `config.ts`, e documentação explícita dos dois limites aceitos: dado órfão quando uma layer é desativada em produção, e contexto tRPC (`createContext()`) permanecendo centralizado.
 
@@ -34,7 +34,7 @@ O [package.json](file:///c:/nuxfire/package.json) declara:
 Isso é um **monorepo Bun** com 6 workspace packages. O que falta é a **arquitetura de domínios plugáveis** dentro desse monorepo. No ecossistema oficial do Nuxt 4, o padrão nativo para criar essas fatias completas de aplicação (UI, rotas, regras de negócio) chama-se **Nuxt Layers**.
 
 > [!IMPORTANT]
-> **Layers cuidam do frontend (Nuxt `extends`); o backend usa import explícito entre workspace packages.** Isso é uma decisão consciente, não uma limitação escondida: o merge automático de `server/` do Nitro entre layers existe, mas compor tipos de tRPC (routers, contexto) e o client único do Drizzle funciona melhor com import explícito — é o mesmo padrão que [admin/index.ts](file:///c:/nuxfire/packages/app/server/trpc/routers/admin/index.ts) já usa hoje, só que entre pacotes em vez de arquivos vizinhos.
+> **Layers cuidam do frontend (Nuxt `extends`); o backend usa import explícito entre workspace packages.** Isso é uma decisão consciente, não uma limitação escondida: o merge automático de `server/` do Nitro entre layers existe, mas compor tipos de tRPC (routers, contexto) e o client único do Drizzle funciona melhor com import explícito — é o mesmo padrão que o agregador de admin ([layers/admin/server/trpc/router.ts](file:///c:/nuxfire/layers/admin/server/trpc/router.ts)) já usa, só que entre pacotes em vez de arquivos vizinhos.
 
 ---
 
@@ -246,9 +246,9 @@ export const layers = {
   // `activeLayerNames` que alimenta a composição gerada de tRPC e de navegação
   // (ver §3), então uma core layer não tem import escrito à mão em lugar
   // nenhum. Hoje `teams` (Fase 3 passo 1a/1b), `billing` (passo 2a/2b) e
-  // `notifications` (passo 3) estão extraídas; só `admin` falta, e entra aqui
-  // no último passo da Fase 3.
-  core: ["teams", "billing", "notifications"], // -> + "admin"
+  // `notifications` (passo 3) e `admin` (passo 4) estão extraídas — a lista
+  // está completa, a Fase 3 acabou.
+  core: ["teams", "billing", "notifications", "admin"],
 
   // Feature Layers opcionais — ativáveis por build/deploy
   features: {
@@ -366,18 +366,19 @@ export type RouterOutput = inferRouterOutputs<AppRouter>;
 > `composeLayers()` recebe, então elas são compostas automaticamente igual às
 > feature layers. Não existe lista de imports mantida à mão para core layers.
 > O que `packages/app/server/trpc/routers/index.ts` ainda tem escrito à mão são
-> só os routers que continuam morando dentro de `packages/app` (`account`,
-> `public`, e — até as fases seguintes — `billing`, `notifications`, `admin`,
-> `stripe`).
+> só os routers que continuam morando dentro de `packages/app`. Desde o passo 4
+> isso são **exatamente dois**: `account` e `public`. `admin` era o último a
+> ainda ter import à mão (`import admin from "./admin"`) e saiu junto com a
+> layer; hoje ele chega pelo `...layerRouters` igual a todo o resto.
 
 ### 4. Composição de Banco de Dados (Drizzle ORM)
 
 Cada layer define seus modelos de dados em `server/database/schema.ts`. O ponto novo em relação à primeira versão do plano: **`packages/functions/src/database/schema.ts` vira um barrel file condicional**, para que o `schema` único que `useDB()` importa continue existindo de fato:
 
 ```typescript
-// packages/functions/src/database/schema.ts (real, pós Fase 3 passo 1a —
-// billing/notifications/admin ainda não são layers, ver Fase 3)
-export * from "./core-schema"; // User, Plan, Subscription, Job, Log, etc.
+// packages/functions/src/database/schema.ts (real, pós Fase 3 passo 4 — a Fase
+// 3 inteira está concluída, as cinco layers estão aqui)
+export * from "./core-schema"; // User, WaitlistEmail, Job, Log, DeadLetterRecord
 
 // Layer schemas. Sem import de `layers`/config.ts — deliberadamente
 // incondicional, nunca gated por flag (ver aviso abaixo). Cada layer nova
@@ -390,10 +391,11 @@ export * from "@nuxfire/layer-kanban/server/database/schema";
 export * from "@nuxfire/layer-teams/server/database/schema"; // Team, TeamMembership, TeamInvite, Role, Permission
 export * from "@nuxfire/layer-billing/server/database/schema"; // Plan, Benefit, BenefitsOnPlan, Subscription
 export * from "@nuxfire/layer-notifications/server/database/schema"; // Notification
+export * from "@nuxfire/layer-admin/server/database/schema"; // platform_role, PlatformAdmin, AuditLog
 ```
 
 > [!CAUTION]
-> **Achado real de deploy (não de nenhum comando de verificação): caminho relativo aqui quebra o `sst deploy` de verdade.** `packages/functions/src/cron.ts`, `jobs-consumer.ts` e `dlq-consumer.ts` importam este barrel e são publicados como `sst.cloudflare.Worker`/`Cron`/`Queue` nativos (`infra/cron.ts`, `infra/jobs.ts`), empacotados pelo `Runtime.Build` do próprio SST — um bundler diferente do Nitro/Vite que builda `packages/app`. Um `export * from "../../../../layers/teams/server/database/schema"` resolve perfeitamente em `tsc --noEmit`, `vitest`, `bunx drizzle-kit generate`, `nuxt build` e até `esbuild --bundle` puro — nenhum desses é o bundler que realmente publica esse pacote — mas falha no deploy real com `Error: Could not resolve "../../../../layers/teams/server/database/schema"`. Corrigido trocando pra especificador de pacote (`@nuxfire/layer-teams/...`) em `schema.ts` e em `core-schema.ts` (que também importa `teams` pra FKs de `Subscription`/`Job`/`DeadLetterRecord`), com `@nuxfire/layer-{kanban,teams,billing}: workspace:*` adicionados às dependências de `packages/functions/package.json`. O ciclo de dependência de workspace que isso cria (este pacote passa a depender de layers que já dependem dele via `@nuxfire/functions: workspace:*`) não é problema — `layers/teams` ⇄ `layers/billing` já fazem o mesmo e o `bun install` resolve como symlink puro, sem reclamar. **Nenhum comando disponível neste ambiente substitui um `sst deploy` de verdade pra qualquer coisa em `packages/functions` que alcance `layers/` — trate isso como gate obrigatório em toda extração futura, não como verificação opcional.**
+> **Achado real de deploy (não de nenhum comando de verificação): caminho relativo aqui quebra o `sst deploy` de verdade.** `packages/functions/src/cron.ts`, `jobs-consumer.ts` e `dlq-consumer.ts` importam este barrel e são publicados como `sst.cloudflare.Worker`/`Cron`/`Queue` nativos (`infra/cron.ts`, `infra/jobs.ts`), empacotados pelo `Runtime.Build` do próprio SST — um bundler diferente do Nitro/Vite que builda `packages/app`. Um `export * from "../../../../layers/teams/server/database/schema"` resolve perfeitamente em `tsc --noEmit`, `vitest`, `bunx drizzle-kit generate`, `nuxt build` e até `esbuild --bundle` puro — nenhum desses é o bundler que realmente publica esse pacote — mas falha no deploy real com `Error: Could not resolve "../../../../layers/teams/server/database/schema"`. Corrigido trocando pra especificador de pacote (`@nuxfire/layer-teams/...`) em `schema.ts` e em `core-schema.ts` (que também importa `teams` pra FKs de `Subscription`/`Job`/`DeadLetterRecord`), com `@nuxfire/layer-{kanban,teams,billing}: workspace:*` adicionados às dependências de `packages/functions/package.json` (hoje, pós passo 4, são cinco: `+notifications,admin`). Na ausência de um `sst deploy` real, o proxy mais próximo — e usado como gate obrigatório em cada passo desde então — é `bunx esbuild packages/functions/src/{cron,jobs-consumer,dlq-consumer}.ts --bundle --platform=node`, um por vez, com grep explícito por `Could not resolve` (zero ocorrências exigidas). O ciclo de dependência de workspace que isso cria (este pacote passa a depender de layers que já dependem dele via `@nuxfire/functions: workspace:*`) não é problema — `layers/teams` ⇄ `layers/billing` já fazem o mesmo e o `bun install` resolve como symlink puro, sem reclamar. **Nenhum comando disponível neste ambiente substitui um `sst deploy` de verdade pra qualquer coisa em `packages/functions` que alcance `layers/` — trate isso como gate obrigatório em toda extração futura, não como verificação opcional.**
 
 > [!IMPORTANT]
 > **Existem hoje TRÊS ciclos de import de schema, todos deliberados, e uma única
@@ -413,6 +415,18 @@ export * from "@nuxfire/layer-notifications/server/database/schema"; // Notifica
 >    `text()` sem `.references(...)`, por isso o drizzle-kit reporta
 >    `Notification ... 0 fks` antes e depois da mudança. Não "complete" isso com
 >    uma FK de verdade: geraria migration, e isto é uma relocação.
+>
+> **A Fase 3 passo 4 (`layers/admin`) NÃO acrescentou um quarto ciclo** — e essa
+> é a primeira extração aqui em que isso aconteceu.
+> `layers/admin/server/database/schema.ts` importa `users` de
+> `@nuxfire/functions/database/core-schema` (FK real de `PlatformAdmin.userId`),
+> e core não importa nada de volta: nada que ficou em `core-schema.ts` jamais
+> referenciou `platformAdmins` ou `auditLogs` — `usersRelations` declara só
+> `notifications`, e `AuditLog.actorUserId` é deliberadamente sem FK, pra a
+> trilha sobreviver à exclusão do usuário que ela nomeia. Verificado por grep em
+> `core-schema.ts` depois da mudança: só sobra menção em comentário, nenhuma em
+> código. Não "restaure a simetria" com uma relação `platformAdmin` em
+> `usersRelations`: fabricaria o quarto ciclo sem ganho nenhum.
 >
 > **`core-schema.ts` ficou FORA do ciclo 2**: depois que `Plan`/`Subscription`
 > saíram dele, nada em core referencia mais essas tabelas, então core não importa
@@ -483,7 +497,7 @@ Todo nome de ability é prefixado pelo nome da layer, sem exceção — mesma di
 
 `app/middleware/*.global.*` é coletado **por layer**, ordenado por nome de arquivo apenas _dentro_ de cada layer, e as layers são concatenadas com o Composition Root **por último**. Ou seja: `packages/app/app/middleware/0.auth.global.ts` sempre roda **depois** de qualquer middleware global de layer, e os prefixos `0.`/`1.` só ordenam arquivos do mesmo diretório.
 
-Consequência concreta, encontrada na Fase 3 passo 1b: `1.teams.global.ts` **fica em `packages/app`**. Dentro de `layers/teams` ele passava a rodar antes do guard de autenticação e um deep link deslogado para `/{team}/dashboard` era redirecionado para `/select-team` antes de `0.auth.global.ts` registrar o destino pós-login — o usuário voltava no seletor de times em vez da página pedida. Para verificar qualquer mexida aqui, extraia o array de middleware global do bundle de `nuxt build` (`dist/server/chunks/virtual/entry.mjs`); `nuxt prepare` não materializa esse array. Middleware **nomeado** (`definePageMeta({ middleware: "invite" })`) não tem esse problema — roda sempre depois de todos os globais — e por isso `invite.ts` foi para a layer normalmente.
+Consequência concreta, encontrada na Fase 3 passo 1b: `1.teams.global.ts` **fica em `packages/app`**. Dentro de `layers/teams` ele passava a rodar antes do guard de autenticação e um deep link deslogado para `/{team}/dashboard` era redirecionado para `/select-team` antes de `0.auth.global.ts` registrar o destino pós-login — o usuário voltava no seletor de times em vez da página pedida. Para verificar qualquer mexida aqui, extraia o array de middleware global do bundle de `nuxt build` (`dist/server/chunks/virtual/entry.mjs`); `nuxt prepare` não materializa esse array. Middleware **nomeado** (`definePageMeta({ middleware: "invite" })`) não tem esse problema — roda sempre depois de todos os globais — e por isso `invite.ts` foi para a layer normalmente. O passo 4 levou isso um passo além: `middleware/admin.ts` e `layouts/admin.vue` saíram do Composition Root **para dentro** de `layers/admin`, enquanto páginas em `layers/billing` e `layers/notifications` continuam pedindo `middleware: "admin"` e `layout: "admin"` pelo nome, sem edição nenhuma — resolução por nome atravessa a fronteira de layer nas duas direções, porque o Nuxt junta layouts e middleware nomeado num registro único e plano antes de qualquer página resolver um nome. Prove sempre no `nuxt build` (os dois mapas são literais em `dist/server/chunks/virtual/entry.mjs`, e o `.map` de cada chunk aponta o arquivo-fonte real), nunca no `nuxt prepare`.
 
 ### 6. Limite aceito: contexto tRPC continua centralizado
 
@@ -559,7 +573,38 @@ Ordem corrigida, base primeiro:
    a cola de domínio (`ws-notifications.client.ts`) foi pra layer, com
    `dependsOn: ["websockets"]` absorvendo a inversão de ordem que a fronteira de
    layer causou (ver `_docs/AGENTS.md`).
-4. **`layers/admin/`** — extraído por último: seu próprio [admin/index.ts](file:///c:/nuxfire/packages/app/server/trpc/routers/admin/index.ts) já importa sub-routers de `plans` (billing), `notifications` e `queue` — é estruturalmente uma camada de agregação, não uma folha. Extraí-lo antes das outras três forçaria reescrever seus imports duas vezes.
+4. **`layers/admin/`** — **Concluída (passo 4, o último).** Extraído por último
+   porque seu próprio agregador já importava sub-routers de `plans` (billing) e
+   `notifications` — é estruturalmente uma camada de agregação, não uma folha, e
+   extraí-lo antes das outras três forçaria reescrever seus imports duas vezes.
+   **O retorno desse ordenamento foi medido: os dois imports cross-layer
+   precisaram de ZERO mudanças** ao sair de
+   `packages/app/server/trpc/routers/admin/index.ts` para
+   `layers/admin/server/trpc/router.ts` — já eram especificadores de pacote, já
+   eram portáveis. Backend e frontend no mesmo passo (como `notifications`):
+   schema (`platform_role`, `PlatformAdmin`, `AuditLog`), os quatro módulos
+   tRPC, os dois server utils específicos de plataforma, as quatro rotas Nitro
+   `/api/admin/mfa/*`, o layout `admin`, o middleware **nomeado** `admin`, as
+   cinco páginas e os quatro componentes.
+   **Três diferenças em relação a todos os passos anteriores**, todas
+   verificadas e não assumidas:
+   (a) o agregador deixou de ser um `export default` importado à mão pelo
+   Composition Root e passou a exportar o mapa `routers = { admin: adminRouter }`
+   como toda outra layer — `admin` era a última exceção à regra "core e feature
+   são o mesmo mecanismo", e `packages/app/server/trpc/routers/index.ts` perdeu
+   seu `import admin from "./admin"`;
+   (b) é a **primeira extração sem ciclo de import de schema** — nada que ficou
+   em `core-schema.ts` referenciava `platformAdmins`/`auditLogs`, então a seta é
+   unidirecional (layer → core) e continuam sendo três ciclos, não quatro;
+   (c) o padrão "layout/middleware por nome entre layers" rodou pela primeira vez
+   na direção **inversa** — o layout e o middleware saíram do Composition Root
+   para dentro de uma layer, e páginas em `layers/billing` e
+   `layers/notifications` continuam resolvendo `layout: "admin"` /
+   `middleware: "admin"` sem uma linha editada (provado no `nuxt build`, nos
+   mapas de layouts e de middleware nomeado do bundle).
+   `mfa-crypto.ts`, `audit-log.ts` e `AccountMfaSetupModal.vue` ficaram em
+   `packages/app` de propósito: são compartilhados com o 2FA self-service do
+   usuário comum e com `layers/billing`, não são do domínio admin.
 
 ---
 

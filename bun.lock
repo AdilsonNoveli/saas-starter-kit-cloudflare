@@ -16,6 +16,29 @@
         "vitest": "^5.0.0",
       },
     },
+    "layers/admin": {
+      "name": "@nuxfire/layer-admin",
+      "version": "1.0.0",
+      "dependencies": {
+        "@nuxfire/design-tokens": "workspace:*",
+        "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-billing": "workspace:*",
+        "@nuxfire/layer-notifications": "workspace:*",
+        "@nuxfire/layer-types": "workspace:*",
+        "@nuxt/ui": "^4.8.1",
+        "@paralleldrive/cuid2": "^2.2.2",
+        "@tanstack/table-core": "^8.21.3",
+        "@trpc/server": "^10.45.4",
+        "drizzle-orm": "^0.45.2",
+        "h3": "^1.15.11",
+        "otpauth": "^9.5.2",
+        "vue": "latest",
+        "zod": "^3.24.1",
+      },
+      "devDependencies": {
+        "nuxt": "^4.5.2",
+      },
+    },
     "layers/billing": {
       "name": "@nuxfire/layer-billing",
       "version": "1.0.0",
@@ -104,7 +127,10 @@
       "dependencies": {
         "@nuxfire/design-tokens": "workspace:*",
         "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-admin": "workspace:*",
         "@nuxfire/layer-billing": "workspace:*",
+        "@nuxfire/layer-kanban": "workspace:*",
+        "@nuxfire/layer-notifications": "workspace:*",
         "@nuxfire/layer-teams": "workspace:*",
         "@nuxfire/layer-types": "workspace:*",
         "@nuxt/eslint": "0.7.3",
@@ -185,6 +211,7 @@
       "dependencies": {
         "@cloudflare/workers-types": "^4.20241230.0",
         "@nuxfire/emails": "workspace:*",
+        "@nuxfire/layer-admin": "workspace:*",
         "@nuxfire/layer-billing": "workspace:*",
         "@nuxfire/layer-kanban": "workspace:*",
         "@nuxfire/layer-notifications": "workspace:*",
@@ -664,6 +691,8 @@
     "@nuxfire/emails": ["@nuxfire/emails@workspace:packages/emails"],
 
     "@nuxfire/functions": ["@nuxfire/functions@workspace:packages/functions"],
+
+    "@nuxfire/layer-admin": ["@nuxfire/layer-admin@workspace:layers/admin"],
 
     "@nuxfire/layer-billing": ["@nuxfire/layer-billing@workspace:layers/billing"],
 

@@ -1,0 +1,31 @@
+{
+  "name": "@nuxfire/layer-admin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./nuxt.config.ts",
+    "./manifest": "./layer.manifest.ts",
+    "./server/trpc/router": "./server/trpc/router.ts",
+    "./server/database/schema": "./server/database/schema.ts"
+  },
+  "dependencies": {
+    "@nuxfire/design-tokens": "workspace:*",
+    "@nuxfire/functions": "workspace:*",
+    "@nuxfire/layer-billing": "workspace:*",
+    "@nuxfire/layer-notifications": "workspace:*",
+    "@nuxfire/layer-types": "workspace:*",
+    "@nuxt/ui": "^4.8.1",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@tanstack/table-core": "^8.21.3",
+    "@trpc/server": "^10.45.4",
+    "drizzle-orm": "^0.45.2",
+    "h3": "^1.15.11",
+    "otpauth": "^9.5.2",
+    "vue": "latest",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "nuxt": "^4.5.2"
+  }
+}

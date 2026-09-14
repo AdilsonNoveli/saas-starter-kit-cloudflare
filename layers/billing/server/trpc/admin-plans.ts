@@ -202,15 +202,17 @@ async function resolvePlanPricing(
  * Its content is Plan/Benefit CRUD plus Stripe product/price catalog sync —
  * billing-domain logic that happens to be admin-*gated*, not admin-domain
  * logic — so the code belongs here. Its mount point does not: it is a
- * sub-router of `packages/app/server/trpc/routers/admin/index.ts`, reached by
+ * sub-router of `@nuxfire/layer-admin/server/trpc/router`, reached by
  * the client as `trpc.admin.plans.*`. `routers` maps are spread into
  * `appRouter` at the TOP level, so putting this in there would turn a live
  * `trpc.admin.plans.listPlans` call into `trpc.plans.listPlans` — exactly the
  * kind of public-surface reshape the teams extraction was careful never to do
  * (see the `teams`/`invites` note in ./router.ts). So it is exported from
- * ./router.ts as an extra NAMED export alongside `routers`, and admin/index.ts
- * — which stays in packages/app until `admin` is itself extracted, the step
- * after next — imports it from there instead of from a neighbouring file.
+ * ./router.ts as an extra NAMED export alongside `routers`, and the admin
+ * layer's own `server/trpc/router.ts` imports it from there instead of from a
+ * neighbouring file. (When this was written that aggregator still lived in
+ * packages/app; Fase 3 passo 4 moved it into `layers/admin` without touching
+ * this import, which was already a package specifier.)
  */
 export const adminPlansRouter = router({
   listPlans: platformAdminProcedure

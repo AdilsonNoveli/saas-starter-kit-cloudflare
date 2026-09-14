@@ -3,6 +3,7 @@
 // packages/app/nuxt.config.ts); `bun scripts/compose-layers.ts` also works
 // standalone if you just want to inspect the output.
 
+import adminManifest from "@nuxfire/layer-admin/manifest";
 import billingManifest from "@nuxfire/layer-billing/manifest";
 import kanbanManifest from "@nuxfire/layer-kanban/manifest";
 import notificationsManifest from "@nuxfire/layer-notifications/manifest";
@@ -11,6 +12,7 @@ import teamsManifest from "@nuxfire/layer-teams/manifest";
 import type { LayerManifest } from "@nuxfire/layer-types";
 
 export const layerManifests: LayerManifest[] = [
+  adminManifest,
   billingManifest,
   kanbanManifest,
   notificationsManifest,

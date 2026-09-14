@@ -2,7 +2,20 @@ import { TRPCError } from "@trpc/server";
 import type { H3Event } from "h3";
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 import { z } from "zod";
-import { platformAdminProcedure, router } from "../../trpc";
+// Layers reach the Composition Root's tRPC primitives and server utils by
+// explicit import, never by Nitro's server-dir merge: these router modules are
+// imported as plain modules by the generated
+// `.composition/layer-routers.ts`, outside any auto-import transform.
+import { platformAdminProcedure, router } from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
+import { recordAuditLog } from "~~/server/utils/audit-log";
+// The aggregator barrel, deliberately — NOT
+// `@nuxfire/layer-teams/server/database/schema` or
+// `@nuxfire/layer-billing/...`. Every one of these five tables now lives in
+// another layer, and going through `@nuxfire/functions/schema` is what let this
+// file move with zero import edits and keeps this layer free of a direct
+// dependency on `teams`/`billing` packages for data access alone (see
+// layer.manifest.ts's `requires`).
 import {
   jobs,
   plans,

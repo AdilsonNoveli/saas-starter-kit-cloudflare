@@ -42,9 +42,9 @@ export const layers = {
   // they feed the exact same `activeLayerNames` set that drives `extends`, the
   // generated tRPC composition and the generated sidebar navigation. A core
   // layer needs no hand-written import anywhere; adding its name here is all.
-  // `admin` is still inside packages/app — it joins this array as the last
-  // step of Fase 3 extracts it.
-  core: ["teams", "billing", "notifications"] as string[],
+  // With `admin` (Fase 3 passo 4, the last extraction) this list is complete:
+  // packages/app holds no domain logic any more, only the Composition Root.
+  core: ["teams", "billing", "notifications", "admin"] as string[],
 
   // Feature layers — toggleable per build/deploy. `false` drops the layer's
   // pages, components and Nuxt config from the bundle entirely; it does NOT

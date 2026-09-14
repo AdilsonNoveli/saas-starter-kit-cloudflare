@@ -1,4 +1,6 @@
-import { pgTable, pgEnum, text, timestamp, jsonb } from "drizzle-orm/pg-core";
+// `pgEnum` is gone from this import with `platform_role`, the only enum this
+// file ever declared — it left for layers/admin in Fase 3 passo 4.
+import { pgTable, text, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
 // `Team` and the rest of the multi-tenancy/RBAC tables live in the teams layer
@@ -41,7 +43,8 @@ export const users = pgTable("User", {
   email: text("email").unique(),
   image: text("image"),
   // Self-service TOTP, mirroring platformAdmins' own mfaSecret/mfaEnabledAt
-  // pair below — always encrypted (AES-GCM, see
+  // pair (now in layers/admin/server/database/schema.ts) — always encrypted
+  // (AES-GCM, see
   // packages/app/server/utils/mfa-crypto.ts), never plaintext, never
   // selected by getUser()'s client-facing session query.
   mfaSecret: text("mfaSecret"),
@@ -135,70 +138,13 @@ export const logRelations = relations(logs, ({ one }) => ({
 // import at the top of this file. They are still exported from
 // `@nuxfire/functions/schema`, which aggregates both.
 
-// Platform authority — deliberately NOT an extension of the per-team
-// Role/Permission RBAC above. A row here means "owner/operator of the SaaS
-// itself", which is a different question from "what may this user do inside
-// team X", and mixing the two would let a tenant-scoped role escalate into
-// platform scope. Rows are only ever created by
-// src/database/grant-platform-admin.ts (manual, never over HTTP, never on
-// deploy).
-export const platformRoleEnum = pgEnum("platform_role", [
-  "SUPER_ADMIN",
-  "SUPPORT",
-]);
-
-export const platformAdmins = pgTable("PlatformAdmin", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  // Unique: one platform-admin record per user. Revocation is a soft
-  // `revokedAt`, so re-granting reactivates the existing row instead of
-  // inserting a second one that would silently shadow the first.
-  userId: text("userId")
-    .notNull()
-    .unique()
-    .references(() => users.id),
-  role: platformRoleEnum("role").notNull(),
-  // TOTP secret, always stored encrypted (AES-GCM, see
-  // packages/app/server/utils/mfa-crypto.ts) — never plaintext,
-  // and never serialised to any client.
-  mfaSecret: text("mfaSecret"),
-  // null = MFA setup still pending; blocks platformAdminProcedure entirely.
-  mfaEnabledAt: timestamp("mfaEnabledAt", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-  // Soft-revoke instead of delete, so the audit trail keeps pointing at a
-  // row that still exists.
-  revokedAt: timestamp("revokedAt", { withTimezone: true }),
-});
-
-export const platformAdminRelations = relations(platformAdmins, ({ one }) => ({
-  user: one(users, {
-    fields: [platformAdmins.userId],
-    references: [users.id],
-  }),
-}));
-
-// Append-only trail of every platform-admin mutation. `actorUserId` is
-// intentionally not a foreign key: the log has to survive the deletion of the
-// user it refers to, which is the whole point of keeping it.
-export const auditLogs = pgTable("AuditLog", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  actorUserId: text("actorUserId").notNull(),
-  action: text("action").notNull(),
-  targetType: text("targetType").notNull(),
-  targetId: text("targetId"),
-  metadata: jsonb("metadata"),
-  ip: text("ip"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-});
+// `platformRoleEnum`, `PlatformAdmin`, `platformAdminRelations` and `AuditLog`
+// moved to layers/admin/server/database/schema.ts (Fase 3, passo 4 — the last
+// one). Unlike `Team`, `Notification` and the billing tables before them, they
+// left NO import behind in this file: nothing here referenced either table, so
+// this file does not import layers/admin at all and the extraction added no
+// fourth schema cycle. They are still exported from `@nuxfire/functions/schema`,
+// which aggregates every file.
 
 // What lands in the JobDLQ after JobQueue exhausts its retries. Written only
 // by src/dlq-consumer.ts, read only by the platform-admin queue module — the

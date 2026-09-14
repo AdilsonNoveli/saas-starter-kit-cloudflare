@@ -40,3 +40,9 @@ export * from "@nuxfire/layer-billing/server/database/schema";
 // migration. core-schema.ts still imports `notifications` back from that layer
 // for `usersRelations`, the third deliberate schema cycle.
 export * from "@nuxfire/layer-notifications/server/database/schema";
+// Core layer (Fase 3 passo 4, the last extraction): `platform_role`,
+// `PlatformAdmin` and `AuditLog`, relocated out of core-schema.ts — not new
+// tables, which is why this line comes with no migration. Unlike the three
+// lines above it, this one created NO cycle: core-schema.ts does not import
+// layers/admin back, because nothing left in it referenced either table.
+export * from "@nuxfire/layer-admin/server/database/schema";

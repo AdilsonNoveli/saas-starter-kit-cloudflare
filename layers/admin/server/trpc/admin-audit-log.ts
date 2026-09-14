@@ -1,6 +1,12 @@
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { platformAdminProcedure, router } from "../../trpc";
+// See admin-teams.ts: layers import the Composition Root's tRPC primitives and
+// server utils explicitly.
+import { platformAdminProcedure, router } from "~~/server/trpc/trpc";
+import { useDB } from "~~/server/utils/db";
+// `auditLogs` is this layer's own table now (server/database/schema.ts); `users`
+// stays in core. Both still arrive through the one aggregator barrel, so this
+// import is unchanged by the move.
 import { auditLogs, users } from "@nuxfire/functions/schema";
 
 /**

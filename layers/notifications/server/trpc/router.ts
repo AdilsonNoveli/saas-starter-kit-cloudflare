@@ -27,7 +27,7 @@ export const routers = {
  *
  * `routers` is spread into `appRouter` at the TOP level by the generated
  * `.composition/layer-routers.ts`. This router is not a top-level namespace: it
- * is mounted by `packages/app/server/trpc/routers/admin/index.ts` under
+ * is mounted by `@nuxfire/layer-admin/server/trpc/router` under
  * `admin.notifications`, which is the path the client already calls
  * (`trpc.admin.notifications.send`, from `app/pages/admin/notifications.vue`).
  * Adding it to the map above would silently republish it as
@@ -35,9 +35,12 @@ export const routers = {
  * key — and break that call site.
  *
  * So the code lives in this layer (it is Notification-domain logic, merely
- * `platformAdminProcedure`-gated) while its mount point stays with the admin
- * aggregator until `admin` is itself extracted, the step right after this one.
- * A named export is how a layer offers a router it does not own the mount point
- * for — exactly the shape `layers/billing` uses for `adminPlansRouter`.
+ * `platformAdminProcedure`-gated) while the admin layer owns the mount point. A
+ * named export is how a layer offers a router it does not own the mount point
+ * for — exactly the shape `layers/billing` uses for `adminPlansRouter`. (That
+ * aggregator lived in `packages/app/server/trpc/routers/admin/index.ts` when
+ * this comment was first written; Fase 3 passo 4, the step right after this
+ * one, moved it into `layers/admin` — and this import needed no change at all,
+ * because it was always a package specifier.)
  */
 export { adminNotificationsRouter } from "./admin-notifications";

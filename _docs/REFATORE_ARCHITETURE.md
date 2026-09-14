@@ -6,6 +6,11 @@ Plano para transformar o NuxFire na arquitetura fullstack Nuxt mais robusta e mo
 
 ---
 
+> [!NOTE]
+> **Decisão pendente, fora do escopo desta migração: `apps/` vs `packages/`.** A convenção moderna de monorepo (Turborepo e a maioria dos monorepos Nuxt/Bun/pnpm de referência) separa `apps/` — coisas com deploy próprio, entrypoint independente — de `packages/` — bibliotecas compartilhadas, sem deploy próprio. Não é regra do Bun (workspaces do Bun são só glob, agnóstico de nome de pasta), é convenção de ecossistema. Por essa definição, `packages/app`, `packages/web`, `packages/auth-frontend` e `packages/functions` são todos apps (cada um vira um Worker Cloudflare com deploy próprio via SST) — só `emails`, `design-tokens` e `layer-types` são bibliotecas de verdade. `functions` é o caso mais ambíguo: não é um app único, é um feixe de 6 Workers pequenos (auth, emails, jobs, DLQ, cron, websockets), mas cada um tem deploy independente, então se enquadra melhor em `apps/functions` do que em `packages/`. Puramente estrutural/nomenclatura, zero ganho funcional — mas quanto antes for feito, menos arquivo toca (cada extração de Fase 3 aumenta a superfície de imports entre pacotes que precisariam ser recalculados se a profundidade de diretório mudasse depois). O usuário optou por terminar a Fase 3 inteira primeiro; revisitar isso depois.
+
+---
+
 ## Registro de Decisões da Auditoria
 
 A primeira versão deste documento foi confrontada com o código real (schema Drizzle, `useDB()`, `context.ts`, `config.ts`/`flags`, `infra/*.ts`, o módulo `nuxt-authorization`, o router de admin já existente). Três decisões foram tomadas para fechar os gaps encontrados:
@@ -378,15 +383,16 @@ export * from "./core-schema"; // User, Plan, Subscription, Job, Log, etc.
 // incondicional, nunca gated por flag (ver aviso abaixo). Cada layer nova
 // soma UMA linha aqui à mão; isto não é gerado como a composição de tRPC.
 //
-// Quatro níveis acima, não três: este arquivo fica em
-// packages/functions/src/database/, então `../../..` é `packages/`, não a
-// raiz do repo. (Erro real da v1 deste doc — pego pelo `tsc --noEmit` do
-// pacote functions, não pelo drizzle-kit, cujo próprio glob acha o arquivo
-// direto.)
-export * from "../../../../layers/kanban/server/database/schema";
-export * from "../../../../layers/teams/server/database/schema"; // Team, TeamMembership, TeamInvite, Role, Permission
-export * from "../../../../layers/billing/server/database/schema"; // Plan, Benefit, BenefitsOnPlan, Subscription
+// Especificador de pacote, NUNCA caminho relativo — achado real de deploy,
+// não de tsc/drizzle-kit/vitest (todos aceitam o relativo de boa). Ver aviso
+// abaixo.
+export * from "@nuxfire/layer-kanban/server/database/schema";
+export * from "@nuxfire/layer-teams/server/database/schema"; // Team, TeamMembership, TeamInvite, Role, Permission
+export * from "@nuxfire/layer-billing/server/database/schema"; // Plan, Benefit, BenefitsOnPlan, Subscription
 ```
+
+> [!CAUTION]
+> **Achado real de deploy (não de nenhum comando de verificação): caminho relativo aqui quebra o `sst deploy` de verdade.** `packages/functions/src/cron.ts`, `jobs-consumer.ts` e `dlq-consumer.ts` importam este barrel e são publicados como `sst.cloudflare.Worker`/`Cron`/`Queue` nativos (`infra/cron.ts`, `infra/jobs.ts`), empacotados pelo `Runtime.Build` do próprio SST — um bundler diferente do Nitro/Vite que builda `packages/app`. Um `export * from "../../../../layers/teams/server/database/schema"` resolve perfeitamente em `tsc --noEmit`, `vitest`, `bunx drizzle-kit generate`, `nuxt build` e até `esbuild --bundle` puro — nenhum desses é o bundler que realmente publica esse pacote — mas falha no deploy real com `Error: Could not resolve "../../../../layers/teams/server/database/schema"`. Corrigido trocando pra especificador de pacote (`@nuxfire/layer-teams/...`) em `schema.ts` e em `core-schema.ts` (que também importa `teams` pra FKs de `Subscription`/`Job`/`DeadLetterRecord`), com `@nuxfire/layer-{kanban,teams,billing}: workspace:*` adicionados às dependências de `packages/functions/package.json`. O ciclo de dependência de workspace que isso cria (este pacote passa a depender de layers que já dependem dele via `@nuxfire/functions: workspace:*`) não é problema — `layers/teams` ⇄ `layers/billing` já fazem o mesmo e o `bun install` resolve como symlink puro, sem reclamar. **Nenhum comando disponível neste ambiente substitui um `sst deploy` de verdade pra qualquer coisa em `packages/functions` que alcance `layers/` — trate isso como gate obrigatório em toda extração futura, não como verificação opcional.**
 
 > [!IMPORTANT]
 > **Existem hoje DOIS ciclos de import de schema, ambos deliberados, e uma única

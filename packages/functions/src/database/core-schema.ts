@@ -18,13 +18,17 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // module reads the other's exports while it is still evaluating. Never
 // dereference `teams` at this file's top level.
 //
-// Relative, not `@nuxfire/layer-teams/...`, for the same reason schema.ts's
-// barrel lines are relative: this package is the aggregator that reaches *down*
-// into layers, so it must not gain a package.json dependency on each of them —
-// layers already depend on `@nuxfire/functions`, and declaring the reverse
-// would add one workspace dependency cycle per extracted layer. Four levels up,
-// not three: this file sits in packages/functions/src/database/.
-import { teams } from "../../../../layers/teams/server/database/schema";
+// Package specifier, NOT relative — a relative `../../../../layers/teams/...`
+// resolves fine under tsc/vitest/drizzle-kit/plain esbuild, but fails SST's own
+// Cloudflare Worker bundler at actual deploy time ("Could not resolve
+// ../../../../layers/teams/server/database/schema"), since cron.ts/
+// jobs-consumer.ts/dlq-consumer.ts import this file and are bundled by SST
+// directly, not by Nitro/Vite. A workspace-dependency cycle here (this package
+// gaining a dependency on a layer that already depends on it) is NOT the
+// problem it looks like — `layers/teams` <-> `layers/billing` already do this
+// today and `bun install` resolves it as plain symlinks with no complaint. See
+// _docs/AGENTS.md, "Nuxt Layers architecture", for the full incident.
+import { teams } from "@nuxfire/layer-teams/server/database/schema";
 
 export const users = pgTable("User", {
   id: text("id")

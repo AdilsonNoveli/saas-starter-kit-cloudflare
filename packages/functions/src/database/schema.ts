@@ -11,17 +11,27 @@ export * from "./core-schema";
 //
 // Unlike the tRPC composition (server/trpc/routers/.composition/), this file is
 // hand-maintained: each new layer appends exactly one line here.
-// Four levels up, not three: this file sits at
-// packages/functions/src/database/, so `../../..` is `packages/`, not the repo
-// root. (_docs/REFATORE_ARCHITETURE.md §4 shows three — that example is wrong;
-// `tsc --noEmit` in this package is what catches it.)
-export * from "../../../../layers/kanban/server/database/schema";
+//
+// Package specifier (`@nuxfire/layer-<name>/...`), NEVER a relative path
+// (`../../../../layers/<name>/...`): a relative path resolves fine under tsc,
+// vitest, drizzle-kit AND plain esbuild, but SST's own Cloudflare Worker
+// bundler (`Runtime.Build`, used to deploy packages/functions/src/cron.ts,
+// jobs-consumer.ts, dlq-consumer.ts — all of which import this barrel) fails
+// it with "Could not resolve ../../../../layers/teams/server/database/schema"
+// at deploy time. Real deploy failure, not caught by any check that runs
+// short of an actual `sst deploy` — see _docs/AGENTS.md, "Nuxt Layers
+// architecture", for the full incident. `layers/kanban`'s OWN schema file
+// already used the package-specifier form to import `Team` from
+// `@nuxfire/layer-teams` and never hit this — only this aggregator (and
+// core-schema.ts's own cross-layer import) used the relative form. Requires
+// `@nuxfire/layer-<name>: workspace:*` in this package's own package.json.
+export * from "@nuxfire/layer-kanban/server/database/schema";
 // Core layer (config.ts `layers.core`), not a feature layer — same one-line
 // treatment either way: `Team`, `TeamMembership`, `TeamInvite`, `Role` and
 // `Permission` live here now, and every consumer keeps importing them from
 // `@nuxfire/functions/schema` exactly as before.
-export * from "../../../../layers/teams/server/database/schema";
+export * from "@nuxfire/layer-teams/server/database/schema";
 // Core layer (Fase 3 passo 2a): `Plan`, `Benefit`, `BenefitsOnPlan` and
 // `Subscription`, relocated out of core-schema.ts — not new tables, which is
 // why this line comes with no migration.
-export * from "../../../../layers/billing/server/database/schema";
+export * from "@nuxfire/layer-billing/server/database/schema";

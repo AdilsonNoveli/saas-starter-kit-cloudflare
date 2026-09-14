@@ -3,26 +3,28 @@
     class="flex flex-col h-full bg-elevated/40 rounded-lg border border-default shrink-0 shadow-xs select-none transition-all duration-200 overflow-hidden"
     :class="isCollapsed ? 'w-11' : 'w-72'"
   >
-    <!-- Collapsed Column View -->
+    <!-- ===== RECOLHIDA ===== -->
     <template v-if="isCollapsed">
-      <div class="flex flex-col items-center gap-3 w-full py-2.5 h-full bg-elevated/60">
-        <UButton
-          icon="i-lucide-chevron-last"
-          color="neutral"
-          variant="ghost"
-          size="xs"
-          square
+      <div class="flex flex-col items-center gap-2 w-full py-2.5 h-full bg-elevated/60">
+        <!-- Botão Expandir -->
+        <button
+          type="button"
+          class="p-1 rounded-md text-muted hover:text-highlighted hover:bg-elevated/50 transition-colors focus:outline-none"
           title="Expand column"
           aria-label="Expand column"
           @click="toggleCollapse"
-        />
+        >
+          <UIcon name="i-lucide-chevron-last" class="size-4" />
+        </button>
 
+        <!-- Nome vertical -->
         <span
           class="text-xs font-bold uppercase tracking-wider whitespace-nowrap [writing-mode:vertical-rl] py-2 text-muted"
         >
           {{ column.name }}
         </span>
 
+        <!-- Contador de cards -->
         <span
           class="text-xs font-extrabold tabular-nums bg-default px-1.5 py-0.5 rounded border border-default mt-auto"
         >
@@ -31,49 +33,28 @@
       </div>
     </template>
 
-    <!-- Expanded Column View -->
+    <!-- ===== EXPANDIDA ===== -->
     <template v-else>
-      <!-- Column Header -->
-      <div
-        class="shrink-0 px-3 py-2.5 flex items-center justify-between gap-2 border-b border-default bg-elevated/80 select-none rounded-t-lg"
-      >
-        <div class="flex items-center gap-2 min-w-0 flex-1">
-          <span class="text-xs font-bold uppercase tracking-wider truncate text-highlighted">
-            {{ column.name }}
-          </span>
-          <span
-            class="text-xs font-extrabold tabular-nums bg-default px-1.5 py-0.5 rounded border border-default shrink-0"
-          >
-            {{ column.cards.length }}
-          </span>
-        </div>
+      <!-- Header (componente extraído) -->
+      <KanbanColumnHeader
+        :name="column.name"
+        :card-count="column.cards.length"
+        @collapse="toggleCollapse"
+      />
 
-        <div class="flex items-center gap-1 shrink-0">
-          <UButton
-            icon="i-lucide-chevron-first"
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            square
-            title="Collapse column"
-            aria-label="Collapse column"
-            @click="toggleCollapse"
-          />
-        </div>
-      </div>
-
-      <!-- Column Sub-header -->
+      <!-- Sub-header -->
       <div
         class="px-3 py-1.5 bg-elevated/30 border-b border-default/50 flex items-center justify-between text-[11px] text-muted select-none"
       >
         <span>{{ column.cards.length }} card(s)</span>
       </div>
 
-      <!-- Column Cards List -->
+      <!-- Lista de cards (drop zone) -->
       <div
         ref="listEl"
         :data-column-id="column.id"
-        class="flex-1 p-2.5 overflow-y-auto flex flex-col gap-2 min-h-0 [scrollbar-gutter:stable] transition-colors"
+        class="flex-1 p-2.5 overflow-y-auto flex flex-col gap-2 min-h-0 [scrollbar-gutter:stable] transition-colors duration-150"
+        :class="isDropTarget ? 'bg-primary/5 ring-1 ring-inset ring-primary/20' : ''"
       >
         <div
           v-if="column.cards.length === 0"
@@ -91,7 +72,7 @@
         </div>
       </div>
 
-      <!-- Add Card Form -->
+      <!-- Adicionar card -->
       <div class="p-2.5 pt-0 shrink-0">
         <UForm
           :state="cardState"
@@ -104,16 +85,14 @@
             size="xs"
             class="flex-1"
           />
-          <UButton
+          <button
             type="submit"
-            icon="i-lucide-plus"
-            color="neutral"
-            variant="subtle"
-            size="xs"
-            square
+            class="shrink-0 p-1.5 rounded-md border border-default bg-elevated/60 text-muted hover:text-highlighted hover:bg-elevated transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
             :disabled="!cardState.title.trim()"
             aria-label="Add card"
-          />
+          >
+            <UIcon name="i-lucide-plus" class="size-4" />
+          </button>
         </UForm>
       </div>
     </template>
@@ -121,6 +100,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Ref } from "vue";
 import type { SortableEvent } from "sortablejs";
 import {
   insertNodeAt,
@@ -137,21 +117,27 @@ const emit = defineEmits<{
   deleteCard: [cardId: string];
 }>();
 
-const listEl = ref<HTMLElement | null>(null);
-const cardState = reactive({ title: "" });
+// ── Drag state partilhado ────────────────────────────────────────────────────
+// O KanbanBoard fornece este ref via provide("kanban:draggedCardId").
+// Esta coluna é drop target quando existe um card sendo arrastado que não
+// pertence a ela (para destacar visualmente a zona de soltura).
+const draggedCardId = inject<Ref<string | null>>("kanban:draggedCardId", ref(null));
 
-// Collapse state with local storage persistence
+const isDropTarget = computed(() => {
+  if (!draggedCardId.value) return false;
+  return !props.column.cards.some((c) => c.id === draggedCardId.value);
+});
+
+// ── Colapso ──────────────────────────────────────────────────────────────────
 const storageKey = computed(() => `kanban:col-collapsed:${props.column.id}`);
 const isCollapsed = ref(false);
 
 onMounted(() => {
   try {
     const saved = localStorage.getItem(storageKey.value);
-    if (saved !== null) {
-      isCollapsed.value = JSON.parse(saved);
-    }
+    if (saved !== null) isCollapsed.value = JSON.parse(saved);
   } catch {
-    // Ignore storage parse errors
+    // Ignora erros de parse
   }
 });
 
@@ -160,28 +146,34 @@ function toggleCollapse() {
   try {
     localStorage.setItem(storageKey.value, JSON.stringify(isCollapsed.value));
   } catch {
-    // Ignore storage errors
+    // Sem localStorage
   }
 }
 
-// The `list` argument is deliberately an empty array: it exists only for the
-// library's default `onUpdate`, which splices the array it is handed — and that
-// handler is overridden below precisely so nothing mutates the list Vue renders
-// from. `props.column.cards` stays read-only as far as Sortable is concerned.
+// ── SortableJS ───────────────────────────────────────────────────────────────
+const listEl = ref<HTMLElement | null>(null);
+const cardState = reactive({ title: "" });
+
+// `list` vazio propositalmente: o handler padrão (splice) é sobrescrito abaixo
+// e o estado real vem do servidor após cada mutação.
 useSortable(listEl, [], {
   group: "kanban-cards",
   animation: 150,
-  // Suppresses the default handler, which would splice the array Vue is
-  // rendering from. Server state is the single source of truth here: the
-  // parent runs the mutation and refetches the board.
   onUpdate: () => {},
+  onStart: (event: SortableEvent) => {
+    // Registra qual card está sendo arrastado para que todas as colunas
+    // possam exibir o destaque de drop zone.
+    const cardId = (event.item as HTMLElement).dataset.cardId;
+    if (cardId) draggedCardId.value = cardId;
+  },
   onEnd: (event: SortableEvent) => {
+    // Limpa o estado de drag independentemente do resultado.
+    draggedCardId.value = null;
+
     const { item, from, to, oldIndex, newIndex } = event;
 
-    // Sortable has already moved the DOM node by the time this fires. Vue
-    // owns this subtree, so put the node back where it was before Vue's next
-    // patch runs against a tree it never produced — the same undo the
-    // library's own `moveArrayElement` performs.
+    // Sortable já moveu o nó no DOM; Vue ainda não reconciliou.
+    // Desfaz a mutação para deixar o Vue aplicar o patch correto após refresh.
     removeNode(item);
     insertNodeAt(from, item, oldIndex ?? 0);
 

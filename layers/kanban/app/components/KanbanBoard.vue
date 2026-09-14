@@ -110,6 +110,11 @@ const emit = defineEmits<{
   deleteCard: [cardId: string];
 }>();
 
+// Estado de drag partilhado com KanbanColumn e KanbanCard via provide/inject.
+// KanbanColumn.onStart seta o id; KanbanColumn.onEnd limpa.
+const draggedCardId = ref<string | null>(null);
+provide("kanban:draggedCardId", draggedCardId);
+
 const searchQuery = ref("");
 const columnState = reactive({ name: "" });
 

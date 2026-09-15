@@ -118,7 +118,7 @@ const products = computed<ProductCard[]>(() => {
     .filter((item) => item.path !== root.path)
     .map((product) => {
       const sections: CardSection[] = (product.children ?? [])
-        .map((section) => {
+        .map((section): CardSection | null => {
           const firstPage = section.children?.[0];
           if (!firstPage) return null;
           return {

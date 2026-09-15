@@ -86,6 +86,19 @@ export const sharedUiConfig = {
    * every `body` row even though both used the exact same nav-item markup —
    * the container around it, not the item itself, was the mismatch.
    *
+   * That same container is also why centering stayed broken after the
+   * padding fix above: stock `footer` is `flex items-center` — a *row*,
+   * whose cross-axis is vertical, so `items-center` only centers a child
+   * top-to-bottom and does nothing for its horizontal position. `body` is
+   * `flex flex-col` and never sets `items-*` at all, which is what actually
+   * centers its icons: the default `items-stretch` on a column container
+   * makes every row-item span the full rail width, and the nav-item's own
+   * `mx-auto` (in the `navigationMenu` override below) centers the 44px
+   * square inside that full-width strip. `flex-col items-stretch` here
+   * copies that exact model onto `footer`, so any single-item footer content
+   * centers itself the same way — through the shared item markup, not a
+   * container-level `justify-center` some call site has to remember to add.
+   *
    * `group-data-[collapsed=true]` (paired with `group` on the root) rather
    * than a plain conditional class: DashboardSidebar.vue puts `data-collapsed`
    * on the desktop aside only, so the mobile slideover — which reuses these
@@ -105,7 +118,7 @@ export const sharedUiConfig = {
       root: "group",
       header: "group-data-[collapsed=true]:px-0",
       body: "pt-6 pb-2 group-data-[collapsed=true]:px-0",
-      footer: "group-data-[collapsed=true]:px-0",
+      footer: "flex-col items-stretch group-data-[collapsed=true]:px-0",
     },
   },
 

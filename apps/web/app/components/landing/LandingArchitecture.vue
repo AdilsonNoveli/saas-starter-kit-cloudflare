@@ -38,8 +38,8 @@
         </p>
       </div>
 
-      <!-- Nuxt & SST Logos between Callout and Comparison Table -->
-      <div class="mt-12 lg:mt-16 pt-8 border-t border-night-800/60 max-w-4xl mx-auto">
+      <!-- Enterprise Tech Stack Slanted Ribbon -->
+      <div class="mt-12 lg:mt-16 w-full">
         <LandingPageLogos />
       </div>
     </div>

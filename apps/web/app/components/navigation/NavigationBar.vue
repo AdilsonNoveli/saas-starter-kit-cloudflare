@@ -30,7 +30,7 @@
           external
           class="ml-1 inline-flex items-center justify-center h-9 px-4 rounded-md text-xs font-bold tracking-wider uppercase bg-emerald-500 hover:bg-emerald-400 text-night-950 shadow-sm shadow-emerald-500/25 transition-all duration-150 active:scale-95 cursor-pointer shrink-0"
         >
-          LOGIN TO COMMUNITY
+          LOGIN
         </NuxtLink>
       </div>
 
@@ -66,7 +66,7 @@
           external
           class="inline-flex items-center justify-center h-9 px-4 rounded-md text-xs font-bold tracking-wider uppercase bg-emerald-500 hover:bg-emerald-400 text-night-950 shadow-sm shadow-emerald-500/25 transition-all duration-150 active:scale-95 cursor-pointer"
         >
-          LOGIN TO COMMUNITY
+          LOGIN
         </NuxtLink>
       </div>
       <div v-if="useRoute().path?.startsWith('/docs')" class="pt-3">
@@ -82,6 +82,7 @@ const route = useRoute();
 const show = ref(false);
 const links = [
   { label: "Home", to: "/" },
+  { label: "Pricing", to: "/#pricing" },
   { label: "Docs", to: "/docs" },
   { label: "Blog", to: "/blog" },
 ];

@@ -11,23 +11,21 @@
       </p>
     </div>
     <CTAButton
-      :to="signupUrl"
+      :to="to || '/#pricing'"
       size="lg"
       radius="lg"
       trailing-icon="i-lucide-arrow-right"
     >
-      {{ cta || "GET STARTED TO COMMUNITY" }}
+      {{ cta || "GET STARTED NOW" }}
     </CTAButton>
   </div>
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig();
-const signupUrl = computed(() => config.public.appUrl || "/signup");
-
-const { title, description, cta } = defineProps<{
+const { title, description, cta, to } = defineProps<{
   title?: string;
   description?: string;
   cta?: string;
+  to?: string;
 }>();
 </script>

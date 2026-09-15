@@ -7,21 +7,21 @@
           <UBadge color="primary" variant="subtle" size="md">
             <div class="flex gap-2 items-center text-xs lg:text-sm">
               <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-emerald-400" />
-              <span>Oportunidades de Negócio &amp; Casos de Uso</span>
+              <span>Business Opportunities &amp; Use Cases</span>
             </div>
           </UBadge>
         </div>
 
         <h2 class="text-pretty text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight lg:leading-[1.12em] text-highlighted mb-4">
-          O Que Você Pode Construir com o NuxFire?
+          What Can You Build with NuxFire?
         </h2>
 
         <p class="text-muted text-base sm:text-lg lg:text-xl font-normal leading-relaxed">
-          A maioria dos boilerplates quebra quando você precisa de WebSockets com estado, filas assíncronas ou multi-tenancy corporativo. O NuxFire foi projetado para sustentar desde o seu primeiro assinante até milhões de requisições sem reescrever uma única linha de infraestrutura.
+          Most SaaS boilerplates break the moment you need stateful WebSockets, async job queues, or true enterprise multi-tenancy. NuxFire is engineered to carry your project from day-one MVP all the way to millions of daily requests without refactoring your core architecture.
         </p>
       </div>
 
-      <!-- Grid de 6 Arquétipos de Aplicações SaaS -->
+      <!-- Grid of 6 SaaS Application Archetypes -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-16">
         <div
           v-for="useCase in useCases"
@@ -54,7 +54,7 @@
             <!-- Examples Pill List -->
             <div class="mb-5">
               <span class="text-xs font-semibold text-neutral-400 block mb-2 font-mono uppercase tracking-wider">
-                Exemplos de Produtos:
+                Product Examples:
               </span>
               <div class="flex flex-wrap gap-1.5">
                 <span
@@ -73,7 +73,7 @@
             <div class="flex items-start gap-2">
               <UIcon name="i-lucide-check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <span class="text-xs font-semibold text-highlighted block">Superpoder Incluso:</span>
+                <span class="text-xs font-semibold text-highlighted block">Included Superpower:</span>
                 <span class="text-xs text-muted leading-tight block">{{ useCase.superpower }}</span>
               </div>
             </div>
@@ -81,19 +81,19 @@
         </div>
       </div>
 
-      <!-- Trust & ROI Value Banner (Por Que o NuxFire é a Melhor Escolha) -->
+      <!-- Trust & ROI Value Banner -->
       <div class="max-w-5xl mx-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/20 via-night-900/60 to-night-950 p-8 sm:p-10 text-center relative overflow-hidden shadow-xl shadow-emerald-500/5">
         <div class="relative z-10">
           <UBadge color="success" variant="subtle" size="md" class="mb-4">
-            <span class="font-mono text-xs uppercase tracking-wider font-semibold">Decisão de Engenharia &amp; Negócios</span>
+            <span class="font-mono text-xs uppercase tracking-wider font-semibold">Strategic Engineering Decision</span>
           </UBadge>
 
           <h3 class="text-2xl sm:text-3xl font-extrabold text-highlighted mb-4">
-            Economize de 3 a 6 Meses de Engenharia Crítica
+            Save 3 to 6 Months of Critical Engineering
           </h3>
 
           <p class="text-muted text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
-            Criar autenticação passwordless, pooling de banco no edge, controle multi-tenant por time, filas assíncronas com DLQ e checkout Stripe do zero custa mais de <strong class="text-highlighted">R$ 40.000 em horas de desenvolvedor sênior</strong>. Com o NuxFire, tudo isso roda no primeiro <code class="text-emerald-400 font-mono text-xs bg-night-800 px-1.5 py-0.5 rounded">$ bun run deploy</code>.
+            Building passwordless edge auth, relational database pooling, multi-tenant RBAC, async queues with DLQ, and Stripe billing from scratch costs upwards of <strong class="text-highlighted">$10,000+ in senior engineering hours</strong>. With NuxFire, everything runs on your first <code class="text-emerald-400 font-mono text-xs bg-night-800 px-1.5 py-0.5 rounded">$ bun run deploy</code>.
           </p>
 
           <!-- 4 Pillars of Competitive Advantage -->
@@ -103,7 +103,7 @@
                 <UIcon name="i-lucide-gauge" class="w-4 h-4 shrink-0" />
                 <span class="text-xs font-bold font-mono uppercase">&lt; 50ms Edge</span>
               </div>
-              <p class="text-[11px] text-muted leading-snug">300+ datacenters mundiais da Cloudflare com zero cold-starts.</p>
+              <p class="text-[11px] text-muted leading-snug">300+ global Cloudflare datacenters with zero cold starts.</p>
             </div>
 
             <div class="p-3.5 rounded-lg bg-night-900/80 border border-night-700/60">
@@ -111,15 +111,15 @@
                 <UIcon name="i-lucide-database" class="w-4 h-4 shrink-0" />
                 <span class="text-xs font-bold font-mono uppercase">Zero DB Crashes</span>
               </div>
-              <p class="text-[11px] text-muted leading-snug">Hyperdrive mantendo pool TCP ativo para PostgreSQL sem esgotar conexões.</p>
+              <p class="text-[11px] text-muted leading-snug">Hyperdrive pooling maintains persistent TCP connections to PostgreSQL.</p>
             </div>
 
             <div class="p-3.5 rounded-lg bg-night-900/80 border border-night-700/60">
               <div class="flex items-center gap-2 mb-1 text-amber-400">
                 <UIcon name="i-lucide-shield-alert" class="w-4 h-4 shrink-0" />
-                <span class="text-xs font-bold font-mono uppercase">SOC2 &amp; MFA</span>
+                <span class="text-xs font-bold font-mono uppercase">SOC2 &amp; MFA Ready</span>
               </div>
-              <p class="text-[11px] text-muted leading-snug">Console /admin com TOTP duplo fator e auditoria de ações no banco.</p>
+              <p class="text-[11px] text-muted leading-snug">Dedicated /admin portal with TOTP two-factor auth and audit logs.</p>
             </div>
 
             <div class="p-3.5 rounded-lg bg-night-900/80 border border-night-700/60">
@@ -127,25 +127,25 @@
                 <UIcon name="i-lucide-code" class="w-4 h-4 shrink-0" />
                 <span class="text-xs font-bold font-mono uppercase">100% Type-Safe</span>
               </div>
-              <p class="text-[11px] text-muted leading-snug">Da query Drizzle ORM aos componentes Nuxt UI através de tRPC.</p>
+              <p class="text-[11px] text-muted leading-snug">From Drizzle ORM queries to Nuxt UI components through tRPC.</p>
             </div>
           </div>
 
-          <!-- Bottom Action Button -->
+          <!-- Bottom Action Button: Strategic redirect to #pricing -->
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <NuxtLink
-              :to="signupUrl"
-              external
-              class="inline-flex items-center justify-center h-11 px-7 rounded-md text-sm font-bold tracking-wider uppercase bg-emerald-500 hover:bg-emerald-400 text-night-950 shadow-md shadow-emerald-500/25 transition-all duration-150 active:scale-95 cursor-pointer w-full sm:w-auto"
+            <CTAButton
+              to="/#pricing"
+              size="lg"
+              radius="lg"
+              trailing-icon="i-lucide-arrow-right"
             >
-              LANÇAR SEU SAAS AGORA
-              <UIcon name="i-lucide-arrow-right" class="w-4 h-4 ml-2" />
-            </NuxtLink>
+              GET STARTED NOW
+            </CTAButton>
             <NuxtLink
               to="/docs/saas-starter-kit"
               class="inline-flex items-center justify-center h-11 px-6 rounded-md text-sm font-semibold text-muted hover:text-highlighted border border-night-700 hover:border-night-600 bg-night-900/60 transition-colors w-full sm:w-auto"
             >
-              Ver Documentação Técnica
+              View Documentation
             </NuxtLink>
           </div>
         </div>
@@ -155,111 +155,108 @@
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig();
-const signupUrl = computed(() => config.public.appUrl || "/signup");
-
 const useCases = [
   {
     category: "B2B SaaS Core",
-    title: "SaaS B2B & Gestão de Equipes",
+    title: "B2B SaaS & Team Workspaces",
     icon: "i-lucide-building-2",
     iconContainerClass: "border-emerald-500/30 bg-emerald-500/10",
     iconClass: "text-emerald-400",
     description:
-      "Venda planos empresariais cobrando por assento ou assinatura recorrente. O isolamento de dados por tenant, convites por token e controle de acesso granular (RBAC) já vêm auditados e prontos para produção.",
+      "Sell subscription tiers with per-seat or workspace billing. Strict tenant isolation, tokenized team invitations, and fine-grained role-based access control (RBAC) are fully audited and production-ready on day one.",
     examples: [
-      "CRMs Verticais",
-      "Sistemas ATS / RH",
-      "Kanban & Gestão (Linear/Asana)",
-      "Helpdesks & Tickets",
+      "Vertical CRMs",
+      "ATS & Recruiting Systems",
+      "Task & Project Managers (Linear/Asana)",
+      "Helpdesks & Ticketing",
     ],
     superpower:
-      "Camada de teams nativa, nuxt-authorization, Stripe Checkout/Portal e layer Kanban inclusa.",
+      "Native teams layer, nuxt-authorization, Stripe Checkout/Portal, and integrated Kanban layer.",
   },
   {
     category: "Realtime Engine",
-    title: "Plataformas em Tempo Real",
+    title: "Stateful Realtime Applications",
     icon: "i-lucide-zap",
     iconContainerClass: "border-teal-500/30 bg-teal-500/10",
     iconClass: "text-teal-400",
     description:
-      "Crie aplicações multiplayer ultra-rápidas sem custos de Redis ou servidores dedicados. Cada sala ou canal opera em uma Cloudflare Durable Object independente com SQLite de baixa latência embutido.",
+      "Build multiplayer collaborative apps without expensive Redis clusters or dedicated Socket.io servers. Each room or channel operates in an isolated Cloudflare Durable Object backed by low-latency embedded SQLite.",
     examples: [
-      "Whiteboards Colaborativos",
-      "Dashboards Operacionais Ao Vivo",
-      "Chats de Suporte & Comunicação",
-      "Ferramentas de Telemetria",
+      "Collaborative Whiteboards",
+      "Live Telemetry Dashboards",
+      "Support Chats & Messaging",
+      "Multiplayer Canvas & Docs",
     ],
     superpower:
-      "Durable Objects com novo runtime SQLite, handshake seguro HMAC e latência sub-50ms.",
+      "Durable Objects with SQLite storage, HMAC-signed ticket handshake, and sub-50ms global edge latency.",
   },
   {
     category: "AI & Background Processing",
-    title: "Plataformas de IA & Copilotos",
+    title: "AI Platforms & Autonomous Agents",
     icon: "i-lucide-bot",
     iconContainerClass: "border-purple-500/30 bg-purple-500/10",
     iconClass: "text-purple-400",
     description:
-      "Absorva requisições demoradas de LLM sem travar a interface do usuário nem estourar timeouts HTTP. Filas assíncronas processam tarefas em background com retentativas automáticas e captura de falhas.",
+      "Execute long-running LLM completions and heavy compute without blocking the UI or hitting HTTP request timeouts. Cloudflare Queues process async jobs with exponential backoff and Dead Letter Queue capture.",
     examples: [
-      "Geradores de Mídia em Lote",
-      "Copilotos Jurídicos / Médicos",
-      "Pipelines de Transcrição / Áudio",
-      "Análise de PDFs e Contratos",
+      "Batch Media Generators",
+      "Domain-Specific AI Copilots",
+      "Audio / Video Pipelines",
+      "PDF & Contract Analyzers",
     ],
     superpower:
-      "Cloudflare Queues com DLQ, armazenamento R2 sem taxas de tráfego e retorno via WebSockets.",
+      "Cloudflare Queues with DLQ, unlimited R2 storage with zero egress fees, and live updates via WebSockets.",
   },
   {
-    category: "Monetização Rápida",
-    title: "Micro-SaaS & Comunidades Pagas",
+    category: "Rapid Monetization",
+    title: "Micro-SaaS & Membership Portals",
     icon: "i-lucide-credit-card",
     iconContainerClass: "border-sky-500/30 bg-sky-500/10",
     iconClass: "text-sky-400",
     description:
-      "Lance um negócio enxuto e lucrativo em poucos dias. Autenticação OpenAuth sem custo de banco de dados, cobrança Stripe global e Nuxt Content v3 integrado com banco D1 para páginas de alta conversão.",
+      "Ship lean, highly profitable subscription tools in a single weekend. OpenAuth.js authentication runs in Cloudflare KV with zero database connection overhead, and Nuxt Content v3 provides lightning-fast documentation and blogs.",
     examples: [
-      "Diretórios Curados Premium",
-      "Ferramentas de SEO e Automação",
-      "Comunidades de Membros",
-      "Portais de Cursos & Guias",
+      "Curated Premium Directories",
+      "SEO & Automation Tools",
+      "Paid Member Communities",
+      "Courses & Digital Product Portals",
     ],
     superpower:
-      "OpenAuth.js com sessões em KV, banco D1 SQL Full-Text Search e Stripe Billing pré-configurado.",
+      "OpenAuth with zero-DB sessions, D1 SQL Full-Text Search, and pre-configured Stripe Billing.",
   },
   {
     category: "Enterprise & Governance",
-    title: "Portais B2B & Ferramentas Internas",
+    title: "Client Portals & Internal Backoffices",
     icon: "i-lucide-shield-check",
     iconContainerClass: "border-amber-500/30 bg-amber-500/10",
     iconClass: "text-amber-400",
     description:
-      "Entregue portais de autoatendimento para clientes corporativos ou backoffices operacionais. Console Super-Admin com proteção TOTP MFA, impersonation de usuários e registro detalhado de auditoria.",
+      "Deliver self-service portals and operational backoffices that pass stringent corporate security audits. Comes standard with a dedicated Super-Admin console, TOTP Multi-Factor Authentication, and full audit logging.",
     examples: [
-      "Portais de Clientes de Agências",
-      "Backoffices Financeiros",
-      "Painéis de Compliance & Auditoria",
-      "Ferramentas de Operações Internas",
+      "Agency Client Portals",
+      "Financial Backoffices",
+      "Compliance & Audit Dashboards",
+      "Internal Operations Consoles",
     ],
     superpower:
-      "Módulo /admin isolado com TOTP MFA, tabela audit_logs no PostgreSQL e tRPC seguro ponta a ponta.",
+      "Isolated /admin portal with TOTP MFA, audit_logs table in PostgreSQL, and end-to-end type safety.",
   },
   {
     category: "High-Throughput APIs",
-    title: "APIs e Microsserviços de Alta Escala",
+    title: "High-Scale APIs & Event Pipelines",
     icon: "i-lucide-activity",
     iconContainerClass: "border-orange-500/30 bg-orange-500/10",
     iconClass: "text-orange-400",
     description:
-      "Processe milhões de webhooks e eventos transacionais com custo quase zero quando ocioso. O Hyperdrive elimina o gargalo de conexões com o PostgreSQL e o pipeline de e-mails garante entrega com fallback.",
+      "Process millions of webhooks and background jobs with near-zero idle infrastructure cost. Hyperdrive connection pooling accelerates PostgreSQL queries without connection exhaustion, and transactional emails handle failovers.",
     examples: [
-      "Motores de Webhooks & Eventos",
-      "Disparadores Transacionais de E-mail",
-      "Pipelines de Ingestão de Métricas",
-      "Rotinas Agendadas & Crons",
+      "Webhook Dispatchers",
+      "Transactional Notification Engines",
+      "Metric Ingestion Pipelines",
+      "Scheduled Hourly Crons",
     ],
     superpower:
-      "Cloudflare Hyperdrive connection pooling, React Email multi-provedor (Resend/Brevo/SES) e Crons.",
+      "Cloudflare Hyperdrive TCP connection pooling, multi-provider React Email (Resend/Brevo/SES), and edge Crons.",
   },
 ];
 </script>

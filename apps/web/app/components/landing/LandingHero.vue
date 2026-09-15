@@ -45,12 +45,12 @@ const heroSubtitle = ref(
       <!-- CTA Buttons -->
       <div class="flex flex-col sm:flex-row items-center gap-4 justify-center">
         <CTAButton
-          :to="signupUrl"
+          to="/#pricing"
           size="lg"
           radius="lg"
           trailing-icon="i-lucide-arrow-right"
         >
-          GET STARTED TO COMMUNITY
+          GET STARTED NOW
         </CTAButton>
 
         <UButton

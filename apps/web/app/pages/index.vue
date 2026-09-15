@@ -12,11 +12,7 @@
       />
     </div>
     <LandingTestimonials />
-    <LandingCTA
-      title="Sign Up and Join the Community"
-      description="Connect with fellow developers, access production-tested architectures, and launch your SaaS faster together."
-      cta="GET STARTED TO COMMUNITY"
-    />
+    <LandingPricing />
   </div>
 </template>
 

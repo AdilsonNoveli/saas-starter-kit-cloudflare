@@ -80,20 +80,8 @@ const localePath = useLocalePath();
           </div>
 
           <!-- Window Content: Real Monorepo Folder Tree from Docs -->
-          <div class="p-3 sm:p-4 overflow-y-auto max-h-[500px] flex-1 font-mono text-xs sm:text-[13px]">
+          <div class="p-3 sm:p-4 flex-1 font-mono text-xs sm:text-[13px]">
             <FolderTree class="!bg-transparent !p-0" />
-          </div>
-
-          <!-- Bottom Link to Docs -->
-          <div class="px-4 py-3 border-t border-default/60 bg-muted/20 flex items-center justify-between">
-            <NuxtLink
-              :to="localePath('/docs/saas-starter-kit/getting-started/project-structure#folder-structure')"
-              class="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1.5 transition-colors"
-            >
-              <span>{{ $t("landing.showcase.viewStructure") }}</span>
-              <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5" />
-            </NuxtLink>
-            <span class="text-[10px] font-mono text-muted">15,000+ lines of code</span>
           </div>
         </div>
 

@@ -26,7 +26,7 @@
         <div
           v-for="useCase in useCases"
           :key="useCase.id"
-          class="flex flex-col justify-between rounded-xl border border-night-700/60 bg-night-900/40 p-6 sm:p-7 hover:border-night-600 transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/5 group"
+          class="flex flex-col justify-between rounded-xl border border-default bg-elevated p-6 sm:p-7 hover:border-accented transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/5 group"
         >
           <div>
             <!-- Top: Icon & Category Badge -->
@@ -37,13 +37,13 @@
               >
                 <UIcon :name="useCase.icon" class="w-6 h-6" :class="useCase.iconClass" />
               </div>
-              <span class="text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold px-2.5 py-1 rounded bg-night-800/80 border border-night-700 text-muted">
+              <span class="text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold px-2.5 py-1 rounded bg-muted border border-default text-muted">
                 {{ t(`landing.useCases.items.${useCase.id}.category`) }}
               </span>
             </div>
 
             <!-- Title & Pitch -->
-            <h3 class="text-lg sm:text-xl font-bold text-highlighted mb-2.5 group-hover:text-emerald-400 transition-colors">
+            <h3 class="text-lg sm:text-xl font-bold text-highlighted mb-2.5 group-hover:text-emerald-500 transition-colors">
               {{ t(`landing.useCases.items.${useCase.id}.title`) }}
             </h3>
 
@@ -53,14 +53,14 @@
 
             <!-- Examples Pill List -->
             <div class="mb-5">
-              <span class="text-xs font-semibold text-neutral-400 block mb-2 font-mono uppercase tracking-wider">
+              <span class="text-xs font-semibold text-dimmed block mb-2 font-mono uppercase tracking-wider">
                 {{ $t("landing.useCases.examplesLabel") }}
               </span>
               <div class="flex flex-wrap gap-1.5">
                 <span
                   v-for="example in EXAMPLE_SLOTS"
                   :key="example"
-                  class="text-xs px-2.5 py-0.5 rounded-full bg-night-800 border border-night-700/70 text-neutral-300 font-medium"
+                  class="text-xs px-2.5 py-0.5 rounded-full bg-muted border border-default text-toned font-medium"
                 >
                   {{ t(`landing.useCases.items.${useCase.id}.examples.${example}`) }}
                 </span>
@@ -69,9 +69,9 @@
           </div>
 
           <!-- Superpower Box -->
-          <div class="pt-4 border-t border-night-800 mt-auto">
+          <div class="pt-4 border-t border-default mt-auto">
             <div class="flex items-start gap-2">
-              <UIcon name="i-lucide-check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <UIcon name="i-lucide-check-circle-2" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
               <div>
                 <span class="text-xs font-semibold text-highlighted block">{{ $t("landing.useCases.superpowerLabel") }}</span>
                 <span class="text-xs text-muted leading-tight block">{{ t(`landing.useCases.items.${useCase.id}.superpower`) }}</span>
@@ -82,7 +82,7 @@
       </div>
 
       <!-- Trust & ROI Value Banner -->
-      <div class="max-w-5xl mx-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/20 via-night-900/60 to-night-950 p-8 sm:p-10 text-center relative overflow-hidden shadow-xl shadow-emerald-500/5">
+      <div class="max-w-5xl mx-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/5 via-elevated to-elevated dark:from-emerald-950/20 dark:via-night-900/60 dark:to-night-950 p-8 sm:p-10 text-center relative overflow-hidden shadow-xl shadow-emerald-500/5">
         <div class="relative z-10">
           <UBadge color="success" variant="subtle" size="md" class="mb-4">
             <span class="font-mono text-xs uppercase tracking-wider font-semibold">{{ $t("landing.useCases.banner.badge") }}</span>
@@ -93,7 +93,7 @@
           </h3>
 
           <p class="text-muted text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
-            {{ $t("landing.useCases.banner.descriptionLead") }} <strong class="text-highlighted">{{ $t("landing.useCases.banner.descriptionCost") }}</strong>{{ $t("landing.useCases.banner.descriptionTail") }} <code class="text-emerald-400 font-mono text-xs bg-night-800 px-1.5 py-0.5 rounded">$ bun run deploy</code>.
+            {{ $t("landing.useCases.banner.descriptionLead") }} <strong class="text-highlighted">{{ $t("landing.useCases.banner.descriptionCost") }}</strong>{{ $t("landing.useCases.banner.descriptionTail") }} <code class="text-emerald-600 dark:text-emerald-400 font-mono text-xs bg-muted border border-default px-1.5 py-0.5 rounded">$ bun run deploy</code>.
           </p>
 
           <!-- 4 Pillars of Competitive Advantage -->
@@ -101,7 +101,7 @@
             <div
               v-for="pillar in pillars"
               :key="pillar.id"
-              class="p-3.5 rounded-lg bg-night-900/80 border border-night-700/60"
+              class="p-3.5 rounded-lg bg-default border border-default shadow-sm"
             >
               <div class="flex items-center gap-2 mb-1" :class="pillar.colorClass">
                 <UIcon :name="pillar.icon" class="w-4 h-4 shrink-0" />
@@ -127,7 +127,7 @@
             </CTAButton>
             <NuxtLink
               to="/docs/saas-starter-kit"
-              class="inline-flex items-center justify-center h-11 px-6 rounded-md text-sm font-semibold text-muted hover:text-highlighted border border-night-700 hover:border-night-600 bg-night-900/60 transition-colors w-full sm:w-auto"
+              class="inline-flex items-center justify-center h-11 px-6 rounded-md text-sm font-semibold text-muted hover:text-highlighted border border-default hover:border-accented bg-elevated transition-colors w-full sm:w-auto"
             >
               {{ $t("landing.useCases.banner.ctaDocs") }}
             </NuxtLink>

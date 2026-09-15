@@ -14,10 +14,10 @@ const localePath = useLocalePath();
           color="neutral"
           variant="subtle"
           size="md"
-          class="border border-night-700/70 bg-night-900/60 text-muted px-4 py-1.5 shadow-sm"
+          class="border border-default bg-elevated/80 text-muted px-4 py-1.5 shadow-sm"
         >
           <div class="flex gap-2 items-center text-xs lg:text-sm font-semibold tracking-wider uppercase">
-            <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-emerald-400" />
+            <UIcon name="i-lucide-shield-check" class="w-4 h-4 text-emerald-500" />
             <span>{{ $t("landing.hero.badge") }}</span>
           </div>
         </UBadge>
@@ -57,18 +57,34 @@ const localePath = useLocalePath();
           {{ $t("landing.hero.ctaDocs") }}
         </UButton>
       </div>
+
+      <!-- Vibe Coding & AI Builders Highlight -->
+      <div class="mt-8 max-w-2xl mx-auto">
+        <div class="inline-flex flex-col sm:flex-row items-center gap-2.5 px-4 py-3 rounded-xl border border-default bg-elevated/70 shadow-sm text-xs sm:text-sm text-center sm:text-left backdrop-blur-sm">
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="inline-flex items-center gap-1 font-mono font-bold text-[10px] sm:text-xs uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
+              <UIcon name="i-lucide-bot" class="w-3.5 h-3.5" />
+              <span>Vibe Coding &amp; AI</span>
+            </span>
+          </div>
+          <p class="text-muted leading-relaxed">
+            <strong class="font-semibold text-highlighted">{{ $t("landing.hero.vibeCodingLead") }}</strong>
+            <span> {{ $t("landing.hero.vibeCodingRest") }}</span>
+          </p>
+        </div>
+      </div>
     </section>
 
     <!-- Section 2: Centered Large Video with Fine Border -->
     <section class="container mx-auto px-4 md:px-8 pb-16 lg:pb-24 max-w-5xl">
       <!-- Fine border outer container separating from background -->
       <div
-        class="relative w-full rounded-2xl p-1.5 sm:p-2.5 bg-night-900/60 border border-night-700/80 ring-1 ring-white/10 shadow-2xl shadow-black/80"
+        class="relative w-full rounded-2xl p-1.5 sm:p-2.5 bg-elevated/80 border border-default shadow-xl shadow-black/5 dark:shadow-black/60"
       >
         <!-- Inner video player preview without green border on hover -->
         <a
           href="#"
-          class="group relative w-full aspect-video rounded-xl overflow-hidden border border-night-700/90 bg-night-950 flex flex-col justify-between p-4 sm:p-6 md:p-8 transition-all duration-300"
+          class="group relative w-full aspect-video rounded-xl overflow-hidden border border-default bg-night-950 flex flex-col justify-between p-4 sm:p-6 md:p-8 transition-all duration-300"
         >
           <!-- Background Ambient Glow & Subtle Pattern -->
           <div class="absolute inset-0 bg-gradient-to-tr from-emerald-950/20 via-night-950/80 to-sky-950/15 pointer-events-none" />
@@ -76,11 +92,11 @@ const localePath = useLocalePath();
 
           <!-- Video Top Header Bar -->
           <div class="relative z-10 flex items-center justify-between">
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-night-950/90 border border-night-700/70 backdrop-blur-md">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/80 border border-white/10 backdrop-blur-md">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span class="text-xs sm:text-sm font-medium text-night-200">{{ $t("landing.hero.videoLabel") }}</span>
+              <span class="text-xs sm:text-sm font-medium text-neutral-200">{{ $t("landing.hero.videoLabel") }}</span>
             </div>
-            <div class="flex items-center gap-1.5 text-night-400 text-xs sm:text-sm px-3 py-1 rounded-md bg-night-950/70 border border-night-800">
+            <div class="flex items-center gap-1.5 text-neutral-400 text-xs sm:text-sm px-3 py-1 rounded-md bg-black/60 border border-white/10">
               <UIcon name="i-lucide-clock" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>2:15</span>
             </div>
@@ -98,17 +114,17 @@ const localePath = useLocalePath();
                 <UIcon name="i-lucide-play" class="w-7 h-7 sm:w-9 sm:h-9 fill-night-950 ml-1" />
               </div>
             </div>
-            <span class="mt-4 text-xs sm:text-sm md:text-base font-semibold text-night-200 tracking-wide">
+            <span class="mt-4 text-xs sm:text-sm md:text-base font-semibold text-neutral-200 tracking-wide">
               {{ $t("landing.hero.videoWatch") }}
             </span>
           </div>
 
           <!-- Video Bottom Player Bar Mockup: Loading bar expands on hover -->
           <div class="relative z-10 flex items-center gap-4 pt-3">
-            <div class="h-1.5 flex-1 bg-night-800/80 rounded-full overflow-hidden border border-night-700/40">
+            <div class="h-1.5 flex-1 bg-white/10 rounded-full overflow-hidden border border-white/10">
               <div class="h-full w-1/3 bg-emerald-400 rounded-full group-hover:w-2/3 transition-all duration-700 ease-out" />
             </div>
-            <span class="text-xs sm:text-sm font-mono text-night-400">0:45 / 2:15</span>
+            <span class="text-xs sm:text-sm font-mono text-neutral-400">0:45 / 2:15</span>
           </div>
         </a>
       </div>

@@ -7,7 +7,7 @@
         color="neutral"
         variant="subtle"
         size="md"
-        class="border border-night-700/60 bg-night-900/40 text-muted hover:text-highlighted hover:border-night-600 transition-colors py-1.5 px-3"
+        class="border border-default bg-elevated/80 text-muted hover:text-highlighted hover:border-accented transition-colors py-1.5 px-3 shadow-xs"
       >
         <div class="flex gap-1.5 items-center text-xs sm:text-sm font-medium">
           <UIcon class="w-4 h-4 text-emerald-500" name="i-lucide-circle-check" />

@@ -23,16 +23,16 @@
 
       <!-- Quick Metrics Highlight Bar -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
-        <div class="p-4 rounded-lg bg-night-900/60 border border-night-800 text-center">
-          <span class="block text-2xl lg:text-3xl font-extrabold text-emerald-400">{{ $t("landing.comparison.metrics.featuresValue") }}</span>
+        <div class="p-4 rounded-lg bg-elevated border border-default text-center shadow-sm">
+          <span class="block text-2xl lg:text-3xl font-extrabold text-emerald-500">{{ $t("landing.comparison.metrics.featuresValue") }}</span>
           <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.featuresLabel") }}</span>
         </div>
-        <div class="p-4 rounded-lg bg-night-900/60 border border-night-800 text-center">
+        <div class="p-4 rounded-lg bg-elevated border border-default text-center shadow-sm">
           <span class="block text-2xl lg:text-3xl font-extrabold text-highlighted">{{ $t("landing.comparison.metrics.timeValue") }}</span>
           <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.timeLabel") }}</span>
         </div>
-        <div class="p-4 rounded-lg bg-night-900/60 border border-night-800 text-center">
-          <span class="block text-2xl lg:text-3xl font-extrabold text-amber-400">{{ $t("landing.comparison.metrics.missingValue") }}</span>
+        <div class="p-4 rounded-lg bg-elevated border border-default text-center shadow-sm">
+          <span class="block text-2xl lg:text-3xl font-extrabold text-amber-500">{{ $t("landing.comparison.metrics.missingValue") }}</span>
           <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.missingLabel") }}</span>
         </div>
       </div>
@@ -48,7 +48,7 @@
             v-model="searchQuery"
             type="text"
             :placeholder="$t('landing.comparison.searchPlaceholder')"
-            class="w-full bg-night-900/80 border border-neutral-700/90 ring-1 ring-white/10 hover:border-neutral-500/80 hover:ring-white/20 focus:border-emerald-500/80 focus:ring-2 focus:ring-emerald-500/30 rounded-lg pl-12 pr-10 py-3 text-sm sm:text-base text-highlighted placeholder:text-muted/70 transition-all outline-none shadow-sm"
+            class="w-full bg-elevated border border-default ring-1 ring-default hover:border-accented focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 rounded-lg pl-12 pr-10 py-3 text-sm sm:text-base text-highlighted placeholder:text-muted transition-all outline-none shadow-sm"
           />
           <button
             v-if="searchQuery"
@@ -72,13 +72,13 @@
             :class="[
               'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-md whitespace-nowrap transition-all cursor-pointer',
               activeCategory === category.id && !searchQuery
-                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/50 shadow-sm font-semibold'
-                : 'bg-night-900/50 text-muted hover:text-highlighted border border-night-800 hover:border-night-700'
+                ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 shadow-sm font-semibold'
+                : 'bg-elevated text-muted hover:text-highlighted border border-default hover:border-accented'
             ]"
             @click="activeCategory = category.id; searchQuery = ''"
           >
             {{ t(`landing.comparison.categories.${category.id}`) }}
-            <span class="ml-1.5 text-[11px] px-1.5 py-0.5 rounded bg-night-950/60 text-muted border border-night-800/80">
+            <span class="ml-1.5 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted border border-default">
               {{ getCategoryCount(category.id) }}
             </span>
           </button>
@@ -86,17 +86,17 @@
       </div>
 
       <!-- Comparison Table Container -->
-      <div class="overflow-hidden rounded-xl border border-night-800 bg-night-950/60 backdrop-blur-md shadow-2xl max-w-5xl mx-auto">
+      <div class="overflow-hidden rounded-xl border border-default bg-elevated shadow-xl max-w-5xl mx-auto">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="border-b border-night-800 bg-night-900/80">
+              <tr class="border-b border-default bg-muted/60">
                 <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-muted uppercase tracking-wider w-1/2">
                   {{ $t("landing.comparison.columns.feature") }}
                 </th>
-                <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/5 border-x border-emerald-500/20 w-1/4">
+                <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/5 border-x border-emerald-500/20 w-1/4">
                   <div class="flex items-center justify-center gap-1.5">
-                    <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-emerald-400" />
+                    <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-emerald-500" />
                     <span>{{ $t("landing.comparison.columns.nuxfire") }}</span>
                   </div>
                 </th>
@@ -105,13 +105,13 @@
                 </th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-night-800/60 text-sm">
+            <tbody class="divide-y divide-default text-sm">
               <template v-for="category in visibleCategories" :key="category.id">
                 <!-- Category Section Header Row -->
-                <tr class="bg-night-900/40">
-                  <td colspan="3" class="py-2.5 px-4 sm:px-6 font-bold text-xs uppercase tracking-wider text-night-400">
+                <tr class="bg-muted/40">
+                  <td colspan="3" class="py-2.5 px-4 sm:px-6 font-bold text-xs uppercase tracking-wider text-toned">
                     <div class="flex items-center gap-2">
-                      <UIcon :name="category.icon" class="w-4 h-4 text-emerald-400" />
+                      <UIcon :name="category.icon" class="w-4 h-4 text-emerald-500" />
                       <span>{{ t(`landing.comparison.categories.${category.id}`) }}</span>
                     </div>
                   </td>
@@ -121,11 +121,11 @@
                 <tr
                   v-for="item in getCategoryItems(category.id)"
                   :key="item.id"
-                  class="hover:bg-night-900/30 transition-colors group"
+                  class="hover:bg-muted/40 transition-colors group"
                 >
                   <!-- Feature Info -->
                   <td class="py-3.5 px-4 sm:px-6">
-                    <div class="font-medium text-highlighted group-hover:text-white transition-colors">
+                    <div class="font-medium text-highlighted group-hover:text-primary transition-colors">
                       {{ item.name }}
                     </div>
                     <div v-if="item.description" class="text-xs text-muted mt-0.5">
@@ -135,8 +135,8 @@
 
                   <!-- NuxFire Column -->
                   <td class="py-3.5 px-4 sm:px-6 text-center bg-emerald-500/5 border-x border-emerald-500/20">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-medium text-xs">
-                      <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-400" />
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-medium text-xs">
+                      <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-500" />
                       <span>{{ $t("landing.comparison.status.included") }}</span>
                     </div>
                   </td>
@@ -146,27 +146,27 @@
                     <!-- Ready -->
                     <div
                       v-if="item.scratch === 'ready'"
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-night-800/80 border border-night-700 text-night-300 font-medium text-xs"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted border border-default text-toned font-medium text-xs"
                     >
-                      <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-400" />
+                      <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-500" />
                       <span>{{ $t("landing.comparison.status.ready") }}</span>
                     </div>
 
                     <!-- Partial -->
                     <div
                       v-else-if="item.scratch === 'partial'"
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 font-medium text-xs"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-300 font-medium text-xs"
                     >
-                      <UIcon name="i-lucide-alert-circle" class="w-3.5 h-3.5 text-amber-400" />
+                      <UIcon name="i-lucide-alert-circle" class="w-3.5 h-3.5 text-amber-500" />
                       <span>{{ $t("landing.comparison.status.partial") }}</span>
                     </div>
 
                     <!-- Missing -->
                     <div
                       v-else
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-night-900/60 border border-night-800 text-night-500 font-medium text-xs"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/40 border border-default text-dimmed font-medium text-xs"
                     >
-                      <UIcon name="i-lucide-x" class="w-3.5 h-3.5 text-night-500" />
+                      <UIcon name="i-lucide-x" class="w-3.5 h-3.5 text-dimmed" />
                       <span>{{ $t("landing.comparison.status.missing") }}</span>
                     </div>
                   </td>
@@ -184,22 +184,22 @@
         </div>
 
         <!-- Table Legend Footer -->
-        <div class="py-3 px-6 bg-night-900/70 border-t border-night-800 flex flex-wrap items-center justify-between gap-4 text-xs text-muted">
+        <div class="py-3 px-6 bg-muted/40 border-t border-default flex flex-wrap items-center justify-between gap-4 text-xs text-muted">
           <div class="flex items-center gap-4">
             <span class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-400" />
+              <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-500" />
               <span>{{ $t("landing.comparison.legend.verified") }}</span>
             </span>
             <span class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-amber-400" />
+              <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-amber-500" />
               <span>{{ $t("landing.comparison.legend.basic") }}</span>
             </span>
             <span class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-x" class="w-4 h-4 text-night-500" />
+              <UIcon name="i-lucide-x" class="w-4 h-4 text-dimmed" />
               <span>{{ $t("landing.comparison.legend.custom") }}</span>
             </span>
           </div>
-          <span class="text-night-500 text-[11px]">{{ $t("landing.comparison.legend.source") }}</span>
+          <span class="text-dimmed text-[11px]">{{ $t("landing.comparison.legend.source") }}</span>
         </div>
       </div>
     </div>

@@ -1,8 +1,8 @@
 <template>
   <div>
     <LandingHero />
-    <LandingArchitecture />
     <LandingUseCases />
+    <LandingArchitecture />
     <LandingComparisonTable />
     <LandingFeatureBadges />
     <div class="py-8">
@@ -20,15 +20,6 @@
 definePageMeta({
   layout: "page",
   auth: false,
-  // The landing page is dark-only by design (see ColorModeSwitch being
-  // hidden on this route in NavigationBar.vue). Forcing it via route meta
-  // only overrides the *applied* color mode for this route — it does not
-  // touch `colorMode.preference`, so it never overwrites what the user
-  // actually chose (persisted to cookie/localStorage) for the rest of the
-  // site. Setting `colorMode.preference = "dark"` directly here was the bug:
-  // that write persists, so visiting "/" after picking "light" elsewhere
-  // silently forced dark mode everywhere else too.
-  colorMode: "dark",
 });
 const { t } = useI18n();
 useSeoMeta({

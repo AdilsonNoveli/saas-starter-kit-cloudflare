@@ -60,12 +60,14 @@
   "landing": {
     "seoTitle": "SaaS de demostración",
     "hero": {
-      "badge": "STARTER KITS DE NUXT DE NIVEL EMPRESARIAL",
+      "badge": "STARTER KIT NUXT PRODUCTION-GRADE",
       "title": "Deja de dedicar meses a construir lo que tu SaaS debería tener desde el primer día.",
       "subtitleLead": "Deja de perder tiempo con lo básico. Arranca tu SaaS con autenticación, pagos, base de datos, usuarios, panel e infraestructura ya resueltos. Tú te ocupas de lo que de verdad importa:",
       "subtitleStrong": "construir el producto que nadie más tiene.",
       "ctaPrimary": "EMPIEZA AHORA",
       "ctaDocs": "Documentación",
+      "vibeCodingLead": "¿Construyendo con Cursor, Claude Code o v0?",
+      "vibeCodingRest": "La base ya viene lista y probada — la IA se enfoca en la lógica de tu producto, no en reinventar autenticación, equipos y colas de tareas.",
       "videoLabel": "Arquitectura y demo",
       "videoWatch": "Ver el recorrido del producto"
     },
@@ -73,6 +75,8 @@
       "badge": "Arquitectura en el edge",
       "title": "Diseñado para escala global",
       "subtitle": "100 % serverless, sin cold starts, distribuido globalmente en Cloudflare Workers y PostgreSQL.",
+      "translationLead": "No necesitas entender cada cajita — ",
+      "translationRest": "la parte tediosa (auth, colas, base de datos, deploy) ya está resuelta y probada en producción. Quien lo desee, todos los detalles están aquí abajo.",
       "diagramAlt": "Diagrama de arquitectura de NuxFire",
       "calloutLead": "¿Complicado? Puede ser.",
       "calloutRest": "Ya resolvimos las partes difíciles para que tú te concentres en construir tu idea."
@@ -461,11 +465,11 @@
       "multiLanguage": "Multiidioma"
     },
     "testimonials": {
-      "title": "Con la confianza de equipos de todo el mundo",
-      "subtitle": "Desarrolladores y fundadores confían en NuxFire para lanzar productos de nivel de producción más rápido."
+      "title": "Probado en Producción & Early Access",
+      "subtitle": "Feedback real de desarrolladores y founders probando NuxFire en cargas de trabajo reales."
     },
     "avatars": {
-      "validated": "Validado por más de 300 desarrolladores"
+      "validated": "Early access con más de 40 devs probando en Discord & GitHub"
     },
     "faqs": {
       "title": "Tus dudas, resueltas",
@@ -480,6 +484,8 @@
       "cardTitle": "NuxFire Production Kit",
       "cardSubtitle": "Código SaaS full-stack de nivel empresarial e infraestructura en la nube",
       "lifetimeAccess": "Acceso de por vida",
+      "earlyBirdBadge": "Lote de Lanzamiento",
+      "earlyBirdNote": "Precio especial de early access ($79 precio regular posterior)",
       "oneTimePayment": "Pago único",
       "neverMonthly": "Nunca más pagues una mensualidad por código",
       "includedTitle": "Todo lo que incluye tu licencia:",

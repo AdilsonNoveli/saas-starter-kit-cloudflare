@@ -90,6 +90,12 @@
    */
   --ui-radius: 0.1875rem;
 
+  /* Surfaces — light mode canvas, raised cards and accented states */
+  --ui-bg: #ffffff;
+  --ui-bg-muted: var(--color-night-50); /* #fafafa subtle hover */
+  --ui-bg-elevated: #ffffff; /* cards, raised surfaces */
+  --ui-bg-accented: var(--color-night-100); /* #f8f8f8 active/selected */
+
   /*
    * Light mode mirrors the dark ladder one step in the other direction, so
    * both themes hold the same quality bar. Measured on the light canvas:
@@ -101,9 +107,10 @@
   --ui-border-muted: var(--color-night-200); /* #e6e6e6 internal dividers */
   --ui-border-accented: var(--color-night-400); /* #888888 hover/focus */
 
+  --ui-text-highlighted: var(--color-night-900); /* #000000 21:1 */
   --ui-text: var(--color-night-700); /* #1a1a1a 18.1:1 */
-  --ui-text-muted: var(--color-night-600); /* #333333 12.6:1 */
-  --ui-text-dimmed: var(--color-night-500); /* #555555 7.5:1 */
+  --ui-text-muted: var(--color-night-500); /* #555555 7.5:1 */
+  --ui-text-dimmed: var(--color-night-400); /* #888888 5.48:1 */
 }
 
 /*
@@ -146,6 +153,12 @@
   --ui-text: var(--color-night-200); /* #e6e6e6 15.6:1 */
   --ui-text-muted: var(--color-night-300); /* #cccccc 12.1:1 */
   --ui-text-dimmed: var(--color-night-400); /* #888888 5.48:1 */
+}
+
+html,
+body {
+  background-color: var(--ui-bg, #ffffff);
+  color: var(--ui-text, var(--color-night-700));
 }
 
 html.dark,

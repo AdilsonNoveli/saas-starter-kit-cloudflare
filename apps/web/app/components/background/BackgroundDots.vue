@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div id="dots" class="fixed bg-default w-screen h-screen z-[-2]">
+  <div class="overflow-x-clip min-h-screen">
+    <div id="dots" class="fixed inset-0 w-full h-full bg-default z-[-2] pointer-events-none">
       <div
         id="overlay"
         :style="overlayVars"

@@ -27,7 +27,7 @@
 
       <!-- Right: ColorMode + Language + Search + Login button -->
       <div class="hidden lg:flex items-center justify-end gap-2.5 shrink-0">
-        <ColorModeSwitch v-if="route.path !== '/'" />
+        <ColorModeSwitch />
         <UDropdownMenu :items="localeItems">
           <UButton
             color="neutral"
@@ -50,7 +50,7 @@
 
       <!-- Mobile toggle -->
       <div class="flex items-center justify-end gap-2 lg:hidden">
-        <ColorModeSwitch v-if="route.path !== '/'" />
+        <ColorModeSwitch />
         <UDropdownMenu :items="localeItems">
           <UButton
             color="neutral"

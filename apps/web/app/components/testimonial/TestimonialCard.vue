@@ -15,6 +15,7 @@
             {{ name }}
           </h4>
           <a
+            v-if="socialLink"
             :href="socialLink"
             target="_blank"
             rel="noopener noreferrer"
@@ -22,6 +23,9 @@
           >
             {{ socialHandle }}
           </a>
+          <span v-else class="text-sm text-muted">
+            {{ socialHandle }}
+          </span>
         </div>
       </div>
     </div>

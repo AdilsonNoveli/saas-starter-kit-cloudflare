@@ -21,12 +21,27 @@
         </p>
       </div>
 
-      <!-- Diagram SVG Container (Transparent, Clean, Responsive) -->
-      <div class="w-full overflow-hidden flex justify-center items-center py-2">
+      <!-- Translation / Reassuring Note for Vibe Coders & Senior Devs -->
+      <div class="max-w-3xl mx-auto mb-8">
+        <div class="rounded-xl border border-default bg-elevated/70 backdrop-blur-sm p-4 sm:p-5 flex items-start gap-3.5 shadow-sm">
+          <UIcon name="i-lucide-sparkles" class="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <div class="text-sm sm:text-base leading-relaxed">
+            <span class="font-semibold text-highlighted">
+              {{ $t("landing.architecture.translationLead") }}
+            </span>
+            <span class="text-muted">
+              {{ $t("landing.architecture.translationRest") }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagram SVG Container (Clean, Elevated, Responsive) -->
+      <div class="w-full overflow-hidden flex justify-center items-center py-4 px-2 sm:px-6 rounded-2xl border border-default bg-elevated/40 shadow-sm">
         <img
           src="/svg/architecture_diagram.svg"
           :alt="$t('landing.architecture.diagramAlt')"
-          class="w-full h-auto max-h-[900px] object-contain block mx-auto"
+          class="w-full h-auto max-h-[700px] object-contain block mx-auto"
           loading="lazy"
         />
       </div>

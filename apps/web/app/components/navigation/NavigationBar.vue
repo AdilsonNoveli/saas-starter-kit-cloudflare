@@ -34,8 +34,9 @@
             variant="ghost"
             size="sm"
             icon="i-lucide-languages"
+            :label="currentLocaleCode"
             :aria-label="$t('nav.language')"
-            class="cursor-pointer"
+            class="cursor-pointer font-semibold tracking-wide"
           />
         </UDropdownMenu>
         <NuxtLink
@@ -56,8 +57,9 @@
             variant="ghost"
             size="sm"
             icon="i-lucide-languages"
+            :label="currentLocaleCode"
             :aria-label="$t('nav.language')"
-            class="cursor-pointer"
+            class="cursor-pointer font-semibold tracking-wide"
           />
         </UDropdownMenu>
         <UButton
@@ -120,6 +122,13 @@ const links = computed(() => [
 ]);
 
 const mobileLinks = computed(() => [...links.value]);
+
+// Short, uppercase code shown next to the language icon (EN/PT/ES) so the
+// current language is visible at a glance instead of just an unlabeled icon.
+// Locale codes aren't translated text, so no $t() key needed here.
+const currentLocaleCode = computed(() =>
+  (locale.value.split("-")[0] ?? locale.value).toUpperCase(),
+);
 
 const localeItems = computed(() =>
   locales.value.map((l) => ({

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 780" width="100%" height="100%" style="background: transparent; max-width: 100%; height: auto; display: block; margin: 0 auto;" font-family="'Geist', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
   <defs>
-    <!-- Luminous Glow Filters (Matching the shiny button illuminated border) -->
+    <!-- Luminous Glow Filters -->
     <filter id="glowDotGreen" x="-150%" y="-150%" width="400%" height="400%">
       <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#00dc82" flood-opacity="1"/>
       <feDropShadow dx="0" dy="0" stdDeviation="5.5" flood-color="#00dc82" flood-opacity="0.8"/>
@@ -24,6 +24,39 @@
       <feDropShadow dx="0" dy="0" stdDeviation="5.5" flood-color="#0284c7" flood-opacity="0.8"/>
       <feDropShadow dx="0" dy="0" stdDeviation="9" flood-color="#0284c7" flood-opacity="0.4"/>
     </filter>
+
+    <!-- Standard and Flow-Matched Arrowhead Markers (Requirement 1) -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#737373"/>
+    </marker>
+
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#00dc82"/>
+    </marker>
+
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#a855f7"/>
+    </marker>
+
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#f6821f"/>
+    </marker>
+
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#38bdf8"/>
+    </marker>
+
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#f59e0b"/>
+    </marker>
+
+    <marker id="arrow-indigo" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#818cf8"/>
+    </marker>
+
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#ef4444"/>
+    </marker>
   </defs>
 
   <!-- ================= TIER BOUNDARY GROUPS ================= -->
@@ -39,57 +72,63 @@
   <rect x="1050" y="40" width="510" height="695" rx="4" fill="#141414" fill-opacity="0.4" stroke="#262626" stroke-width="1" stroke-dasharray="4 4"/>
   <text x="1068" y="68" font-size="11" font-weight="700" letter-spacing="1.5" fill="#737373" font-family="'Geist Mono', monospace">DATA, STORAGE &amp; SERVICES</text>
 
-  <!-- ================= CLEAN CONNECTION LINES (NO ARROWHEADS) ================= -->
-  <!-- Client -> Web Worker -->
-  <path d="M 190 320 C 230 320 230 145 270 145" fill="none" stroke="#333333" stroke-width="1.5"/>
-  
-  <!-- Client -> Auth Worker -->
-  <path d="M 190 370 C 230 370 230 300 270 300" fill="none" stroke="#333333" stroke-width="1.5"/>
+  <!-- ================= DIRECTIONAL CONNECTION PATHS (ALL WITH ARROWHEADS) ================= -->
 
-  <!-- Auth Worker -> AuthKV -->
-  <path d="M 405 370 L 405 630" fill="none" stroke="#333333" stroke-width="1.5"/>
+  <!-- 1. Client -> Web Worker (landing page / docs) -->
+  <path id="flowClientToWeb" d="M 190 300 C 230 300 230 135 264 135" fill="none" stroke="#00dc82" stroke-width="1.6" stroke-opacity="0.65" marker-end="url(#arrow)"/>
 
-  <!-- Auth Worker -> Email Worker (Zero-hop Service Binding) -->
-  <path d="M 540 280 C 780 280 850 512 1070 512" fill="none" stroke="#2a2a2a" stroke-width="1.4" stroke-dasharray="4 4"/>
+  <!-- 2. Client -> Auth Worker (login / signup) -->
+  <path id="flowClientToAuth" d="M 190 380 C 230 380 230 290 264 290" fill="none" stroke="#818cf8" stroke-width="1.6" stroke-opacity="0.65" marker-end="url(#arrow)"/>
 
-  <!-- App Worker -> Auth Worker (Internal Service Binding) -->
-  <path d="M 340 395 L 340 370" fill="none" stroke="#2a2a2a" stroke-width="1.4" stroke-dasharray="4 4"/>
+  <!-- 3. Client -> App Worker (main app dashboard) -->
+  <path id="flowClientToApp" d="M 190 425 C 230 425 230 480 264 480" fill="none" stroke="#00dc82" stroke-width="1.8" marker-end="url(#arrow)"/>
 
-  <!-- Consumer Worker -> JobDLQ (Retry Failures) -->
-  <path d="M 815 500 L 815 525" fill="none" stroke="#333333" stroke-width="1.5"/>
+  <!-- 4. Client -> Websocket Worker (subscribe to real-time events) -->
+  <path id="flowClientToWS" d="M 190 340 C 230 340 230 217 350 217 L 540 217 C 590 217 610 109 644 109" fill="none" stroke="#a855f7" stroke-width="1.6" stroke-opacity="0.75" marker-end="url(#arrow)"/>
 
-  <!-- Web Worker -> Content D1 Database -->
-  <path d="M 540 145 C 780 145 880 395 1070 395" fill="none" stroke="#333333" stroke-width="1.5"/>
+  <!-- 5. Websocket Worker -> Durable Object (Requirement 3: routes connection to DO instance) -->
+  <path id="flowWSToDO" d="M 815 138 L 815 156" fill="none" stroke="#a855f7" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
 
-  <!-- Cron Trigger/Worker -> JobQueue / Maintenance -->
-  <path d="M 740 640 L 740 355" fill="none" stroke="#2a2a2a" stroke-width="1.4" stroke-dasharray="4 4"/>
+  <!-- 6. App Worker -> Durable Object (send real-time events) -->
+  <path id="flowAppToDO" d="M 540 450 C 585 450 595 191 644 191" fill="none" stroke="#a855f7" stroke-width="1.8" stroke-opacity="0.75" marker-end="url(#arrow)"/>
 
-  <!-- Consumer Worker -> Email Worker -->
-  <path d="M 980 442 C 1020 442 1030 512 1070 512" fill="none" stroke="#333333" stroke-width="1.5"/>
+  <!-- 7. App Worker -> Auth Worker (Zero-hop Service Binding: verify user) -->
+  <path id="flowAppToAuth" d="M 340 395 L 340 376" fill="none" stroke="#818cf8" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
 
-  <!-- App Worker -> Stripe Payments -->
-  <path d="M 540 560 C 780 560 880 650 1070 650" fill="none" stroke="#333333" stroke-width="1.5"/>
+  <!-- 8. Auth Worker -> AuthKV (Credentials & session storage) -->
+  <path id="flowAuthToKV" d="M 270 340 L 258 340 L 258 645 L 264 645" fill="none" stroke="#818cf8" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- ================= CONSTANT ACTIVE FLOW PATHS (NO ARROWHEADS) ================= -->
-  <!-- 1. Client -> App Worker (HTTP/tRPC API requests) -->
-  <path id="flowClientToApp" d="M 190 425 C 230 425 230 500 270 500" fill="none" stroke="#2e3b33" stroke-width="1.8"/>
+  <!-- 9. Auth Worker -> Email Worker (Requirement 5: send verification & welcome emails) -->
+  <path id="flowAuthToEmail" d="M 540 260 C 580 260 590 236 630 236 L 980 236 C 1020 236 1040 480 1064 480" fill="none" stroke="#818cf8" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
 
-  <!-- 2. App Worker -> Durable Object (Realtime Broadcast) -->
-  <path id="flowAppToDO" d="M 540 460 C 590 460 600 147 650 147" fill="none" stroke="#372847" stroke-width="1.8"/>
+  <!-- 10. App Worker -> Email Worker (Requirement 5: send transactional emails) -->
+  <path id="flowAppToEmail" d="M 540 420 C 580 420 590 375 630 375 L 980 375 C 1020 375 1040 510 1064 510" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
 
-  <!-- 3. Durable Object -> Client (WebSocket Stream wss://) -->
-  <path id="flowDOToClient" d="M 650 120 C 400 70 230 180 190 460" fill="none" stroke="#3d225c" stroke-width="1.8" stroke-dasharray="5 4"/>
+  <!-- 11. App Worker -> JobQueue (push async jobs to queue) -->
+  <path id="flowAppToQueue" d="M 540 480 C 585 480 595 307 644 307" fill="none" stroke="#f6821f" stroke-width="1.8" marker-end="url(#arrow)"/>
 
-  <!-- 4. App Worker -> JobQueue (Enqueue background work) -->
-  <path id="flowAppToQueue" d="M 540 510 C 590 510 600 297 650 297" fill="none" stroke="#423021" stroke-width="1.8"/>
+  <!-- 12. JobQueue -> Consumer Worker (pull jobs in batches) -->
+  <path id="flowQueueToConsumer" d="M 730 367 L 730 382" fill="none" stroke="#f6821f" stroke-width="1.8" marker-end="url(#arrow)"/>
 
-  <!-- 5. JobQueue -> Consumer Worker (Batch polling & execution) -->
-  <path id="flowQueueToConsumer" d="M 815 355 L 815 385" fill="none" stroke="#423021" stroke-width="1.8"/>
+  <!-- 13. Consumer Worker -> JobDLQ (Requirement 6: after retry exhaustion) -->
+  <path id="flowConsumerToDLQ" d="M 815 503 L 815 522" fill="none" stroke="#ef4444" stroke-width="1.6" marker-end="url(#arrow)"/>
 
-  <!-- 6. App Worker -> Hyperdrive Postgres (Active DB queries) -->
-  <path id="flowAppToDB" d="M 540 430 C 780 430 880 157 1070 157" fill="none" stroke="#1c374d" stroke-width="2"/>
+  <!-- 14. Consumer Worker -> Email Worker (dispatch async emails) -->
+  <path id="flowConsumerToEmail" d="M 980 442 C 1020 442 1030 535 1064 535" fill="none" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- ================= ILLUMINATED SHINY GLOWING DASHES (ANIMATED LINES FOLLOWING PATH TANGENT) ================= -->
+  <!-- 15. Web Worker -> Content D1 Database (Requirement 6: query docs & blog index) -->
+  <path id="flowWebToD1" d="M 540 115 C 580 115 590 25 640 25 L 980 25 C 1030 25 1045 395 1064 395" fill="none" stroke="#00dc82" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 16. App Worker -> Hyperdrive Postgres (pool & query SQL) -->
+  <path id="flowAppToDB" d="M 540 430 C 780 430 880 157 1064 157" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 17. App Worker -> Stripe Payments (billing & checkouts via clear corridor) -->
+  <path id="flowAppToStripe" d="M 540 560 C 580 560 590 630 630 630 L 980 630 C 1020 630 1040 650 1064 650" fill="none" stroke="#818cf8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 18. Cron Trigger -> JobQueue (Scheduled Maintenance via outer corridor) -->
+  <path id="flowCronToQueue" d="M 980 665 C 1015 665 1015 335 986 335" fill="none" stroke="#a855f7" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+
+  <!-- ================= ILLUMINATED SHINY GLOWING DASHES (ANIMATED MOTIONS) ================= -->
   <!-- Flow 1: Client -> App (Green Glow Dash) -->
   <g>
     <animateMotion dur="2.2s" repeatCount="indefinite" rotate="auto"><mpath href="#flowClientToApp"/></animateMotion>
@@ -102,7 +141,19 @@
     <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
   </g>
 
-  <!-- Flow 2: App -> Durable Object (Purple Glow Dash) -->
+  <!-- Flow 2: Client -> Websocket Worker (Purple Glow Dash) -->
+  <g>
+    <animateMotion dur="3.0s" repeatCount="indefinite" rotate="auto"><mpath href="#flowClientToWS"/></animateMotion>
+    <rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#c084fc" filter="url(#glowDotPurple)"/>
+    <rect x="-6" y="-1" width="12" height="2" rx="1" fill="#ffffff"/>
+  </g>
+  <g>
+    <animateMotion dur="3.0s" begin="1.5s" repeatCount="indefinite" rotate="auto"><mpath href="#flowClientToWS"/></animateMotion>
+    <rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#c084fc" filter="url(#glowDotPurple)"/>
+    <rect x="-6" y="-1" width="12" height="2" rx="1" fill="#ffffff"/>
+  </g>
+
+  <!-- Flow 3: App -> Durable Object (Purple Glow Dash) -->
   <g>
     <animateMotion dur="2.4s" repeatCount="indefinite" rotate="auto"><mpath href="#flowAppToDO"/></animateMotion>
     <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#a855f7" filter="url(#glowDotPurple)"/>
@@ -112,18 +163,6 @@
     <animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" rotate="auto"><mpath href="#flowAppToDO"/></animateMotion>
     <rect x="-8" y="-2" width="16" height="4" rx="2" fill="#a855f7" filter="url(#glowDotPurple)"/>
     <rect x="-5" y="-1" width="10" height="2" rx="1" fill="#ffffff"/>
-  </g>
-
-  <!-- Flow 3: Durable Object -> Client (Purple Glow Stream Dash) -->
-  <g>
-    <animateMotion dur="3.2s" repeatCount="indefinite" rotate="auto"><mpath href="#flowDOToClient"/></animateMotion>
-    <rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#c084fc" filter="url(#glowDotPurple)"/>
-    <rect x="-6" y="-1" width="12" height="2" rx="1" fill="#ffffff"/>
-  </g>
-  <g>
-    <animateMotion dur="3.2s" begin="1.6s" repeatCount="indefinite" rotate="auto"><mpath href="#flowDOToClient"/></animateMotion>
-    <rect x="-9" y="-2.5" width="18" height="5" rx="2.5" fill="#c084fc" filter="url(#glowDotPurple)"/>
-    <rect x="-6" y="-1" width="12" height="2" rx="1" fill="#ffffff"/>
   </g>
 
   <!-- Flow 4: App -> JobQueue (Orange Glow Dash) -->
@@ -232,7 +271,7 @@
     <text x="14" y="100" font-size="10" fill="#d4d4d4">• Type-safe End-to-End tRPC APIs</text>
     <text x="14" y="116" font-size="10" fill="#d4d4d4">• Platform Admin (/admin) with TOTP MFA</text>
     <text x="14" y="132" font-size="10" fill="#d4d4d4">• Stripe Billing &amp; Subscriptions</text>
-    <text x="14" y="148" font-size="10" fill="#d4d4d4">• Zero-hop Service Binding to Auth &amp; Email</text>
+    <text x="14" y="148" font-size="10" fill="#d4d4d4">• Service Bindings to Auth &amp; Emails Workers</text>
 
     <line x1="14" y1="162" x2="256" y2="162" stroke="#262626" stroke-width="1"/>
     <g transform="translate(14, 174)">
@@ -258,23 +297,32 @@
 
   <!-- ================= TIER 2 COMPONENTS (REALTIME & QUEUES) ================= -->
 
-  <!-- WebSockets Durable Object -->
-  <g transform="translate(650, 85)">
-    <rect x="0" y="0" width="330" height="125" rx="4" fill="#171717" stroke="#a855f7" stroke-width="1.2"/>
-    <rect x="14" y="14" width="28" height="28" rx="3" fill="#a855f7" fill-opacity="0.1" stroke="#a855f7" stroke-width="1"/>
-    <path d="M 29 19 L 23 28 L 28 28 L 26 37 L 34 26 L 29 26 Z" fill="none" stroke="#a855f7" stroke-width="1.6" stroke-linejoin="round"/>
+  <!-- Requirement 3: Websocket Worker (Separate Card) -->
+  <g transform="translate(650, 80)">
+    <rect x="0" y="0" width="330" height="58" rx="4" fill="#171717" stroke="#a855f7" stroke-width="1.2"/>
+    <rect x="12" y="12" width="24" height="24" rx="3" fill="#a855f7" fill-opacity="0.1" stroke="#a855f7" stroke-width="1"/>
+    <path d="M 24 16 L 20 23 L 24 23 L 22 30 L 28 22 L 24 22 Z" fill="none" stroke="#a855f7" stroke-width="1.4" stroke-linejoin="round"/>
 
-    <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">Websockets (Durable Object)</text>
-    <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#c084fc">websockets.nuxfire.com</text>
+    <text x="44" y="23" font-size="13" font-weight="700" fill="#fafafa">Websocket Worker</text>
+    <text x="44" y="34" font-size="9.5" font-family="'Geist Mono', monospace" fill="#c084fc">websockets.nuxfire.com</text>
+    <text x="12" y="49" font-size="10" fill="#a3a3a3">WSS Connection Terminator · HMAC ticket handshake</text>
+  </g>
 
-    <text x="14" y="66" font-size="11" fill="#d4d4d4">Stateful Realtime Hub (new_sqlite_classes)</text>
-    <text x="14" y="82" font-size="10" fill="#737373">Private topic authorization per user (user.id)</text>
-    <text x="14" y="98" font-size="10" fill="#737373">Short-lived HMAC ticket carried in Sec-WebSocket-Protocol</text>
+  <!-- Requirement 3: Durable Object (Separate Card) -->
+  <g transform="translate(650, 162)">
+    <rect x="0" y="0" width="330" height="58" rx="4" fill="#171717" stroke="#a855f7" stroke-width="1.2"/>
+    <rect x="12" y="12" width="24" height="24" rx="3" fill="#a855f7" fill-opacity="0.1" stroke="#a855f7" stroke-width="1"/>
+    <rect x="18" y="18" width="12" height="12" rx="1.5" fill="none" stroke="#a855f7" stroke-width="1.4"/>
+    <circle cx="24" cy="24" r="2" fill="#a855f7"/>
+
+    <text x="44" y="23" font-size="13" font-weight="700" fill="#fafafa">Durable Object</text>
+    <text x="44" y="34" font-size="9.5" font-family="'Geist Mono', monospace" fill="#c084fc">class Websockets (new_sqlite_classes)</text>
+    <text x="12" y="49" font-size="10" fill="#a3a3a3">Stateful Realtime Hub · Topic authorization per user</text>
   </g>
 
   <!-- Cloudflare Queues (JobQueue) -->
-  <g transform="translate(650, 240)">
-    <rect x="0" y="0" width="330" height="115" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
+  <g transform="translate(650, 252)">
+    <rect x="0" y="0" width="330" height="110" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
     <rect x="14" y="14" width="28" height="28" rx="3" fill="#f6821f" fill-opacity="0.1" stroke="#f6821f" stroke-width="1"/>
     <path d="M 28 20 L 20 24 L 28 28 L 36 24 Z" fill="none" stroke="#f6821f" stroke-width="1.6"/>
     <path d="M 20 28 L 28 32 L 36 28" fill="none" stroke="#f6821f" stroke-width="1.6"/>
@@ -284,12 +332,12 @@
     <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#f6821f">Cloudflare Queue</text>
 
     <text x="14" y="66" font-size="11" fill="#d4d4d4">Asynchronous Job Buffer</text>
-    <text x="14" y="82" font-size="10" fill="#737373">Max Concurrency: 5 · Batch Size: 10 msg / 5s</text>
-    <text x="14" y="98" font-size="10" fill="#737373">Automatic retry with 60s backoff</text>
+    <text x="14" y="81" font-size="10" fill="#737373">Max Concurrency: 5 · Batch Size: 10 msg / 5s</text>
+    <text x="14" y="96" font-size="10" fill="#737373">Automatic retry with 60s backoff</text>
   </g>
 
   <!-- Consumer Worker (jobs-consumer.ts) -->
-  <g transform="translate(650, 385)">
+  <g transform="translate(650, 388)">
     <rect x="0" y="0" width="330" height="115" rx="4" fill="#171717" stroke="#2d2d2d" stroke-width="1"/>
     <rect x="14" y="14" width="28" height="28" rx="3" fill="#f6821f" fill-opacity="0.1" stroke="#f6821f" stroke-width="1"/>
     <rect x="21" y="21" width="14" height="14" rx="2" fill="none" stroke="#f6821f" stroke-width="1.6"/>
@@ -307,8 +355,8 @@
   </g>
 
   <!-- Dead Letter Queue (JobDLQ + dlq-consumer.ts) -->
-  <g transform="translate(650, 525)">
-    <rect x="0" y="0" width="330" height="95" rx="4" fill="#171717" stroke="#7f1d1d" stroke-width="1"/>
+  <g transform="translate(650, 528)">
+    <rect x="0" y="0" width="330" height="92" rx="4" fill="#171717" stroke="#7f1d1d" stroke-width="1"/>
     <rect x="14" y="14" width="28" height="28" rx="3" fill="#ef4444" fill-opacity="0.1" stroke="#ef4444" stroke-width="1"/>
     <path d="M 28 20 L 36 34 L 20 34 Z" fill="none" stroke="#ef4444" stroke-width="1.6"/>
     <line x1="28" y1="25" x2="28" y2="29" stroke="#ef4444" stroke-width="1.4"/>
@@ -317,8 +365,8 @@
     <text x="50" y="27" font-size="13" font-weight="700" fill="#fafafa">JobDLQ &amp; Consumer</text>
     <text x="50" y="39" font-size="10" font-family="'Geist Mono', monospace" fill="#f87171">dlq-consumer.ts</text>
 
-    <text x="14" y="64" font-size="11" fill="#d4d4d4">Dead-Letter Capture (Retry Exhaustion)</text>
-    <text x="14" y="80" font-size="10" fill="#737373">Stores DeadLetterRecord in Postgres for operator inspection</text>
+    <text x="14" y="63" font-size="11" fill="#d4d4d4">Dead-Letter Capture (Retry Exhaustion)</text>
+    <text x="14" y="78" font-size="10" fill="#737373">Stores DeadLetterRecord in Postgres for operator inspection</text>
   </g>
 
   <!-- Cron Trigger & Worker -->
@@ -335,18 +383,20 @@
 
   <!-- ================= TIER 3 COMPONENTS (STORAGE, DATA & SERVICES) ================= -->
 
-  <!-- 1. PostgreSQL via Hyperdrive -->
+  <!-- Requirement 4: PostgreSQL via Hyperdrive (Amber Dashed Border + External DB badge) -->
   <g transform="translate(1070, 85)">
-    <rect x="0" y="0" width="470" height="145" rx="4" fill="#171717" stroke="#38bdf8" stroke-width="1.2"/>
-    <rect x="16" y="16" width="32" height="32" rx="3" fill="#38bdf8" fill-opacity="0.1" stroke="#38bdf8" stroke-width="1"/>
-    <ellipse cx="32" cy="26" rx="9" ry="3" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
-    <path d="M 23 26 V 38 C 23 40 41 40 41 38 V 26" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
-    <path d="M 23 32 C 23 34 41 34 41 32" fill="none" stroke="#38bdf8" stroke-width="1.6"/>
+    <rect x="0" y="0" width="470" height="145" rx="4" fill="#171717" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <rect x="16" y="16" width="32" height="32" rx="3" fill="#f59e0b" fill-opacity="0.12" stroke="#f59e0b" stroke-width="1"/>
+    <ellipse cx="32" cy="26" rx="9" ry="3" fill="none" stroke="#f59e0b" stroke-width="1.6"/>
+    <path d="M 23 26 V 38 C 23 40 41 40 41 38 V 26" fill="none" stroke="#f59e0b" stroke-width="1.6"/>
+    <path d="M 23 32 C 23 34 41 34 41 32" fill="none" stroke="#f59e0b" stroke-width="1.6"/>
 
-    <text x="56" y="29" font-size="14" font-weight="700" fill="#fafafa">PostgreSQL Database</text>
-    <text x="56" y="42" font-size="10" font-family="'Geist Mono', monospace" fill="#38bdf8">Cloudflare Hyperdrive (AppDB)</text>
+    <!-- External DB Note (Requirement 4) -->
+    <text x="56" y="22" font-size="8.5" font-weight="700" letter-spacing="1.2" fill="#f59e0b" font-family="'Geist Mono', monospace">EXTERNAL DB VIA HYPERDRIVE</text>
+    <text x="56" y="38" font-size="14" font-weight="700" fill="#fafafa">PostgreSQL Database</text>
+    <text x="56" y="51" font-size="10" font-family="'Geist Mono', monospace" fill="#38bdf8">Cloudflare Hyperdrive (AppDB)</text>
 
-    <text x="16" y="70" font-size="11" font-weight="600" fill="#e5e5e5">Edge Connection Pooling &amp; Zero Cold-Start TCP Acceleration</text>
+    <text x="16" y="72" font-size="11" font-weight="600" fill="#e5e5e5">Edge Connection Pooling &amp; Zero Cold-Start TCP Acceleration</text>
     <text x="16" y="88" font-size="10.5" fill="#a3a3a3">Drizzle ORM (postgres-js client scoped per request)</text>
     <text x="16" y="104" font-size="10.5" fill="#737373">Supabase (Direct Connection) · AWS RDS · Neon · Self-Hosted</text>
     <rect x="16" y="116" width="438" height="20" rx="2" fill="#202020"/>
@@ -441,7 +491,7 @@
       <text x="14" y="86" font-size="9" font-family="'Geist Mono', monospace" fill="#525252">Per-stage API secrets</text>
     </g>
 
-    <!-- SST Deploy -->
+    <!-- SST Deploy (Requirement 4: Clarified note on 100% Cloudflare Workers vs External Postgres) -->
     <g transform="translate(240, 0)">
       <rect x="0" y="0" width="230" height="110" rx="4" fill="#171717" stroke="#f59e0b" stroke-width="1"/>
       <rect x="14" y="12" width="24" height="24" rx="2" fill="#f59e0b" fill-opacity="0.1"/>
@@ -450,10 +500,121 @@
 
       <text x="44" y="22" font-size="12" font-weight="700" fill="#fafafa">Infrastructure as Code</text>
       <text x="44" y="32" font-size="9" font-family="'Geist Mono', monospace" fill="#fbbf24">SST v4 (infra/*.ts)</text>
-      <text x="14" y="54" font-size="10" font-family="'Geist Mono', monospace" fill="#fde68a">$ bun run deploy</text>
-      <text x="14" y="70" font-size="10" fill="#a3a3a3">Automated drizzle migrations</text>
-      <text x="14" y="86" font-size="9" font-family="'Geist Mono', monospace" fill="#10b981">100% Cloudflare Workers</text>
+      <text x="14" y="52" font-size="10" font-family="'Geist Mono', monospace" fill="#fde68a">$ bun run deploy</text>
+      <text x="14" y="68" font-size="9.5" fill="#a3a3a3">Automated drizzle migrations</text>
+      <text x="14" y="84" font-size="9" font-family="'Geist Mono', monospace" fill="#10b981">100% Cloudflare Workers*</text>
+      <text x="14" y="98" font-size="7.5" font-family="'Geist Mono', monospace" fill="#737373">*External Postgres pooled via Hyperdrive</text>
     </g>
+  </g>
+
+  <!-- ================= FLOW LABELS (CLEAR VERB LABELS WITH SUBTLE CONTRAST PILLS) ================= -->
+
+  <!-- Label 1: Client -> Web Worker -->
+  <g class="connector-label">
+    <rect x="132" y="162" width="128" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="196" y="173.5" font-size="8" font-family="'Geist Mono', monospace" fill="#d4d4d4" text-anchor="middle">landing page/blog/docs</text>
+  </g>
+
+  <!-- Label 2: Client -> Auth Worker -->
+  <g class="connector-label">
+    <rect x="194" y="326" width="72" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="230" y="337.5" font-size="8.5" font-family="'Geist Mono', monospace" fill="#d4d4d4" text-anchor="middle">login/signup</text>
+  </g>
+
+  <!-- Label 3: Client -> App Worker -->
+  <g class="connector-label">
+    <rect x="200" y="442" width="60" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="230" y="453.5" font-size="8.5" font-family="'Geist Mono', monospace" fill="#d4d4d4" text-anchor="middle">main app</text>
+  </g>
+
+  <!-- Label 4: Client -> Websocket Worker -->
+  <g class="connector-label">
+    <rect x="330" y="209" width="168" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="414" y="220.5" font-size="8.5" font-family="'Geist Mono', monospace" fill="#c084fc" text-anchor="middle">subscribe to real-time event</text>
+  </g>
+
+  <!-- Label 5: Websocket Worker -> Durable Object (Requirement 3) -->
+  <g class="connector-label">
+    <rect x="714" y="143" width="202" height="15" rx="3" fill="#141414" fill-opacity="0.95" stroke="#a855f7" stroke-width="0.8"/>
+    <text x="815" y="154" font-size="8.5" font-family="'Geist Mono', monospace" fill="#c084fc" text-anchor="middle">routes connection to DO instance</text>
+  </g>
+
+  <!-- Label 6: App Worker -> Durable Object (send real-time events) -->
+  <g class="connector-label">
+    <rect x="544" y="318" width="102" height="15" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="595" y="329" font-size="7.5" font-family="'Geist Mono', monospace" fill="#c084fc" text-anchor="middle">send real-time events</text>
+  </g>
+
+  <!-- Label 7: App Worker -> Auth Worker (verify user) -->
+  <g class="connector-label">
+    <rect x="303" y="378" width="74" height="14" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="340" y="388.5" font-size="8" font-family="'Geist Mono', monospace" fill="#818cf8" text-anchor="middle">verify user</text>
+  </g>
+
+  <!-- Label 8: Auth Worker -> AuthKV (store credentials) -->
+  <g class="connector-label">
+    <rect x="274" y="612" width="116" height="14" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="332" y="622.5" font-size="8" font-family="'Geist Mono', monospace" fill="#818cf8" text-anchor="middle">store credentials</text>
+  </g>
+
+  <!-- Label 9: Auth Worker -> Email Worker (Requirement 5) -->
+  <g class="connector-label">
+    <rect x="690" y="228" width="220" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="800" y="239.5" font-size="8.5" font-family="'Geist Mono', monospace" fill="#818cf8" text-anchor="middle">send verification &amp; welcome emails</text>
+  </g>
+
+  <!-- Label 10: App Worker -> Email Worker (Requirement 5) -->
+  <g class="connector-label">
+    <rect x="880" y="367" width="150" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="955" y="378.5" font-size="8.5" font-family="'Geist Mono', monospace" fill="#38bdf8" text-anchor="middle">send transactional emails</text>
+  </g>
+
+  <!-- Label 11: App Worker -> JobQueue (push async jobs) -->
+  <g class="connector-label">
+    <rect x="548" y="386" width="96" height="15" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="596" y="397" font-size="7.5" font-family="'Geist Mono', monospace" fill="#f6821f" text-anchor="middle">push async jobs</text>
+  </g>
+
+  <!-- Label 12: JobQueue -> Consumer Worker (pull job batch) -->
+  <g class="connector-label">
+    <rect x="672" y="367" width="116" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="730" y="378.5" font-size="8" font-family="'Geist Mono', monospace" fill="#f6821f" text-anchor="middle">pull jobs in batches</text>
+  </g>
+
+  <!-- Label 13: Consumer Worker -> JobDLQ (Requirement 6) -->
+  <g class="connector-label">
+    <rect x="745" y="508" width="140" height="15" rx="3" fill="#141414" fill-opacity="0.95" stroke="#ef4444" stroke-width="0.8"/>
+    <text x="815" y="519" font-size="8.5" font-family="'Geist Mono', monospace" fill="#f87171" text-anchor="middle">after retry exhaustion</text>
+  </g>
+
+  <!-- Label 14: Consumer Worker -> Email Worker (dispatch async emails) -->
+  <g class="connector-label">
+    <rect x="975" y="475" width="84" height="15" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="1017" y="486" font-size="7.5" font-family="'Geist Mono', monospace" fill="#38bdf8" text-anchor="middle">async dispatch</text>
+  </g>
+
+  <!-- Label 15: Web Worker -> Content D1 (Requirement 6) -->
+  <g class="connector-label">
+    <rect x="736" y="17" width="158" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="815" y="28.5" font-size="8.5" font-family="'Geist Mono', monospace" fill="#00dc82" text-anchor="middle">query docs &amp; blog index</text>
+  </g>
+
+  <!-- Label 16: App Worker -> Hyperdrive Postgres -->
+  <g class="connector-label">
+    <rect x="965" y="149" width="85" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#38bdf8" stroke-width="0.8"/>
+    <text x="1007.5" y="160.5" font-size="7.5" font-family="'Geist Mono', monospace" fill="#38bdf8" text-anchor="middle">pool &amp; query SQL</text>
+  </g>
+
+  <!-- Label 17: App Worker -> Stripe Payments -->
+  <g class="connector-label">
+    <rect x="745" y="622" width="120" height="16" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="805" y="633.5" font-size="8" font-family="'Geist Mono', monospace" fill="#818cf8" text-anchor="middle">billing &amp; checkouts</text>
+  </g>
+
+  <!-- Label 18: Cron Trigger -> Scheduled Maintenance -->
+  <g class="connector-label">
+    <rect x="965" y="525" width="100" height="15" rx="3" fill="#141414" fill-opacity="0.95" stroke="#262626" stroke-width="0.8"/>
+    <text x="1015" y="536" font-size="7.5" font-family="'Geist Mono', monospace" fill="#c084fc" text-anchor="middle">hourly cron task</text>
   </g>
 
 </svg>

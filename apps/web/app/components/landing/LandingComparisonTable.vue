@@ -62,15 +62,15 @@
         </div>
       </div>
 
-      <!-- Group Menus in a Single Line -->
-      <div class="w-full max-w-5xl mx-auto mb-8 overflow-x-auto no-scrollbar">
-        <div class="flex flex-nowrap items-center justify-start md:justify-center gap-2 min-w-max px-2 py-1">
+      <!-- Group Filter Tabs -->
+      <div class="w-full max-w-5xl mx-auto mb-8">
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 px-2 py-1">
           <button
             v-for="category in categories"
             :key="category.id"
             type="button"
             :class="[
-              'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-md whitespace-nowrap transition-all cursor-pointer',
+              'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg whitespace-nowrap transition-all cursor-pointer',
               activeCategory === category.id && !searchQuery
                 ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 shadow-sm font-semibold'
                 : 'bg-elevated text-muted hover:text-highlighted border border-default hover:border-accented'
@@ -78,7 +78,14 @@
             @click="activeCategory = category.id; searchQuery = ''"
           >
             {{ t(`landing.comparison.categories.${category.id}`) }}
-            <span class="ml-1.5 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted border border-default">
+            <span
+              :class="[
+                'ml-1.5 text-[11px] px-1.5 py-0.5 rounded border transition-colors',
+                activeCategory === category.id && !searchQuery
+                  ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-semibold'
+                  : 'bg-muted text-muted border-default'
+              ]"
+            >
               {{ getCategoryCount(category.id) }}
             </span>
           </button>

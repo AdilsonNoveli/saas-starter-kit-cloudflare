@@ -97,6 +97,8 @@ const emit = defineEmits<{
 
 const headerStyle = computed(() => kanbanColumnAccentStyle(props.position));
 
+const notification = useNotification();
+
 const isEditing = ref(false);
 const draftName = ref("");
 const inputRef = ref<HTMLInputElement | null>(null);
@@ -122,9 +124,12 @@ function cancelEdit() {
   isEditing.value = false;
 }
 
-function confirmDelete() {
-  if (window.confirm(`Deseja realmente excluir a coluna "${props.name}" e seus cards?`)) {
-    emit("delete");
-  }
+async function confirmDelete() {
+  const confirmed = await notification.confirm({
+    title: "Excluir coluna",
+    description: `Deseja realmente excluir a coluna "${props.name}" e seus cards? Esta ação não pode ser desfeita.`,
+    confirmLabel: "Excluir",
+  });
+  if (confirmed) emit("delete");
 }
 </script>

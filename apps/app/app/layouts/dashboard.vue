@@ -36,49 +36,23 @@
       </template>
 
       <template #footer="{ collapsed: isCollapsed }">
-        <div class="w-full flex" :class="isCollapsed ? 'justify-center' : ''">
-          <UDropdownMenu
-            v-if="currentTeam?.slug"
-            :items="settingsItems"
-            :content="{
-              align: isCollapsed ? 'center' : 'start',
-              side: 'top',
-              sideOffset: 8,
-              collisionPadding: 12,
-            }"
-            :class="isCollapsed ? '' : 'w-full'"
-            :ui="{
-              content: isCollapsed
-                ? 'w-56'
-                : 'w-(--reka-dropdown-menu-trigger-width)',
-            }"
-          >
-            <UTooltip
-              :text="isCollapsed ? 'Settings' : undefined"
-              :content="{ side: 'right' }"
-              :delay-duration="0"
-              :disabled="!isCollapsed"
-            >
-              <button
-                type="button"
-                class="group relative flex items-center gap-1.5 font-medium text-sm rounded-lg before:absolute before:z-[-1] before:rounded-lg before:inset-y-px before:inset-x-0 transition-colors before:transition-colors focus:outline-none focus-visible:outline-none"
-                :class="[
-                  isCollapsed ? 'justify-center px-0 gap-0 mx-auto size-11' : 'w-full px-3 py-3',
-                  isSettingsActive
-                    ? 'text-primary before:bg-primary/15 ring ring-inset ring-primary/25'
-                    : 'text-muted hover:text-highlighted hover:before:bg-elevated/50',
-                ]"
-              >
-                <UIcon
-                  name="i-lucide-settings"
-                  class="shrink-0 size-6 transition-colors"
-                  :class="isSettingsActive ? 'text-primary' : 'text-dimmed group-hover:text-default'"
-                />
-                <span v-if="!isCollapsed" class="truncate">Settings</span>
-              </button>
-            </UTooltip>
-          </UDropdownMenu>
-        </div>
+        <!--
+          Same `UNavigationMenu` the body list above renders with — not a
+          hand-rolled button. A second, independently hardcoded copy of the
+          nav-link classes (padding, collapsed size, active ring) is exactly
+          what previously drifted out of sync with `packages/tokens` and left
+          this icon a different width than every other row; routing it
+          through the same component guarantees it always resolves the same
+          `navigationMenu` theme tokens, with nothing to keep in sync by hand.
+        -->
+        <UNavigationMenu
+          v-if="currentTeam?.slug"
+          :collapsed="isCollapsed"
+          :items="settingsItems"
+          orientation="vertical"
+          tooltip
+          popover
+        />
       </template>
 
     </UDashboardSidebar>
@@ -97,19 +71,13 @@
 </template>
 
 <script setup lang="ts">
-import type { DropdownMenuItem, NavigationMenuItem } from "@nuxt/ui";
+import type { NavigationMenuItem } from "@nuxt/ui";
 
 const open = ref(false);
 const collapsed = ref(true);
-const route = useRoute();
 const currentTeam = useCurrentTeam();
 const baseRoute = computed(() => `/${currentTeam.value?.slug}`);
-const teamID = computed(() => currentTeam.value?.id || "");
-const isSettingsActive = computed(() =>
-  route.path.startsWith(`${baseRoute.value}/settings`),
-);
 
-const settingsLinks = useTeamSettingsLinks(teamID);
 const layerLinks = useLayerNavigation();
 
 useDashboard();
@@ -168,19 +136,20 @@ const links = computed<NavigationMenuItem[]>(() => [
   })),
 ]);
 
-const settingsItems = computed<DropdownMenuItem[][]>(() => {
-  const generalLink = settingsLinks.value.find(
-    (link) => link.to === `${baseRoute.value}/settings`,
-  );
-  return [
-    [
-      {
-        label: generalLink?.label ?? "General",
-        icon: generalLink?.icon ?? "i-lucide-settings",
-        to: `${baseRoute.value}/settings`,
-        onSelect: closeSidebar,
-      },
-    ],
-  ];
-});
+/**
+ * A single-item menu rather than a `settingsLinks`-driven list: the footer
+ * trigger only ever opened "General" (Members/Billing/Danger Zone are
+ * ability-gated tabs inside the settings page itself, not sidebar shortcuts),
+ * so the extra lookup was indirection around a fixed destination. No `exact`
+ * flag — unlike the settings page's own tab bar — so this stays highlighted
+ * for every settings sub-route, not just the exact `/settings` path.
+ */
+const settingsItems = computed<NavigationMenuItem[]>(() => [
+  {
+    label: "Settings",
+    icon: "i-lucide-settings",
+    to: `${baseRoute.value}/settings`,
+    onSelect: closeSidebar,
+  },
+]);
 </script>

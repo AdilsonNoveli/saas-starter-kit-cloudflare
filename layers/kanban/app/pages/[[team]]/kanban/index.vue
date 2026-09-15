@@ -36,15 +36,18 @@
           :to="`${baseRoute}/kanban/${board.id}`"
           class="group relative flex flex-col justify-between gap-4 min-h-[164px] rounded-lg bg-elevated ring ring-default hover:ring-accented p-5 transition-colors"
         >
-          <button
-            type="button"
-            class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1.5 rounded text-muted hover:text-error hover:bg-muted transition-all focus:outline-none"
-            aria-label="Excluir board"
-            title="Excluir board"
-            @click.stop.prevent="onDeleteBoard(board)"
+          <UDropdownMenu
+            :items="boardMenuItems(board)"
+            :content="{ align: 'end' }"
+            class="absolute top-3 right-3"
+            @click.stop.prevent
           >
-            <UIcon name="i-lucide-trash-2" class="size-3.5" />
-          </button>
+            <UButton
+              color="neutral"
+              icon="i-lucide-ellipsis-vertical"
+              aria-label="Opções do board"
+            />
+          </UDropdownMenu>
 
           <div class="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary shrink-0">
             <UIcon name="i-lucide-kanban" class="size-5" />
@@ -68,6 +71,8 @@
 </template>
 
 <script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
+
 definePageMeta({
   layout: "dashboard",
 });
@@ -80,10 +85,38 @@ const notification = useNotification();
 const { data, status, refresh } = await kanban.useBoardList();
 const boards = computed(() => data.value ?? []);
 
+/**
+ * "Settings" is disabled — a placeholder for per-board configuration that
+ * doesn't exist yet. It's listed now so the menu doesn't need reshaping the
+ * moment that lands; only `onSelect` wiring changes then.
+ */
+function boardMenuItems(board: { id: string; name: string }): DropdownMenuItem[][] {
+  return [
+    [
+      {
+        label: "Settings",
+        icon: "i-lucide-settings",
+        disabled: true,
+      },
+    ],
+    [
+      {
+        label: "Delete",
+        icon: "i-lucide-trash-2",
+        color: "error" as const,
+        onSelect: () => onDeleteBoard(board),
+      },
+    ],
+  ];
+}
+
 async function onDeleteBoard(board: { id: string; name: string }) {
-  if (!window.confirm(`Deseja realmente excluir o board "${board.name}" e todo o seu conteúdo?`)) {
-    return;
-  }
+  const confirmed = await notification.confirm({
+    title: "Excluir board",
+    description: `Deseja realmente excluir o board "${board.name}" e todo o seu conteúdo? Esta ação não pode ser desfeita.`,
+    confirmLabel: "Excluir",
+  });
+  if (!confirmed) return;
 
   try {
     await kanban.deleteBoard(board.id);

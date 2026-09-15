@@ -72,13 +72,19 @@ export const sharedUiConfig = {
   },
 
   /**
-   * The dashboard/admin sidebar shell. The stock `header` and `body` slots
-   * both carry `px-4`, which is right for the expanded panel but leaves only
-   * 23px of usable width on the 72px collapsed rail — far narrower than the
-   * 44px icon chip below, so the chip overflowed its own box and `mx-auto`
-   * had nothing left to center with (measured: chips landed at x-center 46
-   * against a rail center of 36). Dropping the gutter while collapsed puts
-   * the logo, the team switcher and every icon back on one axis.
+   * The dashboard/admin sidebar shell. The stock `header`, `body` and
+   * `footer` slots all carry `px-4`, which is right for the expanded panel
+   * but leaves only 23px of usable width on the 72px collapsed rail — far
+   * narrower than the 44px icon chip below, so the chip overflowed its own
+   * box and `mx-auto` had nothing left to center with (measured: chips
+   * landed at x-center 46 against a rail center of 36). Dropping the gutter
+   * while collapsed puts the logo, the team switcher and every icon —
+   * including whatever a `#footer` slot places there — back on one axis.
+   * `footer` was missing from this override for a while: any sidebar footer
+   * content (e.g. the dashboard layout's own Settings entry) kept the stock
+   * `px-4` while collapsed, so it rendered narrower and off-center from
+   * every `body` row even though both used the exact same nav-item markup —
+   * the container around it, not the item itself, was the mismatch.
    *
    * `group-data-[collapsed=true]` (paired with `group` on the root) rather
    * than a plain conditional class: DashboardSidebar.vue puts `data-collapsed`
@@ -99,6 +105,7 @@ export const sharedUiConfig = {
       root: "group",
       header: "group-data-[collapsed=true]:px-0",
       body: "pt-6 pb-2 group-data-[collapsed=true]:px-0",
+      footer: "group-data-[collapsed=true]:px-0",
     },
   },
 

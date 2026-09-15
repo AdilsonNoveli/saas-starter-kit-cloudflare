@@ -38,10 +38,18 @@
 
       <!-- Diagram SVG Container (Clean, Elevated, Responsive) -->
       <div class="w-full overflow-hidden flex justify-center items-center py-4 px-2 sm:px-6 rounded-2xl border border-default bg-elevated/40 shadow-sm">
+        <!-- Light Mode Diagram -->
         <img
-          src="/svg/architecture_diagram.svg"
+          src="/svg/architecture_diagram_white.svg"
           :alt="$t('landing.architecture.diagramAlt')"
-          class="w-full h-auto max-h-[700px] object-contain block mx-auto"
+          class="w-full h-auto max-h-[700px] object-contain block dark:hidden mx-auto"
+          loading="lazy"
+        />
+        <!-- Dark Mode Diagram -->
+        <img
+          src="/svg/architecture_diagram_darck.svg"
+          :alt="$t('landing.architecture.diagramAlt')"
+          class="w-full h-auto max-h-[700px] object-contain hidden dark:block mx-auto"
           loading="lazy"
         />
       </div>

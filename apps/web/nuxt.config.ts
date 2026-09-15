@@ -132,7 +132,12 @@ export default defineNuxtConfig({
       { name: "English (US)", code: "en", language: "en-US", file: "en.json" },
       {
         name: "Português (Brasil)",
-        code: "pt-BR",
+        // Lowercase on purpose: `code` drives the URL prefix
+        // (prefix_except_default -> /pt-br/...), and Nuxt Link Checker's
+        // no-uppercase-chars rule flags any uppercase in a URL path. `language`
+        // stays properly-cased "pt-BR" since that's the BCP-47 tag used for
+        // hreflang/SEO, a separate field from `code`.
+        code: "pt-br",
         language: "pt-BR",
         file: "pt-BR.json",
       },

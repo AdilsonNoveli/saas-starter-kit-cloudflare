@@ -85,7 +85,7 @@ definePageMeta({
   // prerender comment in nuxt.config.ts), so every docs URL has to be
   // prerendered from the explicit `docsRoutes()` list or it fails at runtime
   // rather than falling back to a dynamic query. A catch-all route can't be
-  // expanded into concrete /pt-BR/... and /es/... URLs by that list, so
+  // expanded into concrete /pt-br/... and /es/... URLs by that list, so
   // localizing it would create prefixed routes with nothing prerendered
   // behind them. `i18n: false` is read by @nuxtjs/i18n via Nuxt's
   // `experimental.extraPageMetaExtractionKeys` (the module registers the

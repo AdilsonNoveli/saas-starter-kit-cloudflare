@@ -147,7 +147,12 @@ export default defineNuxtConfig({
       { name: "English (US)", code: "en", language: "en-US", file: "en.json" },
       {
         name: "Português (Brasil)",
-        code: "pt-BR",
+        // Lowercase on purpose — see apps/web/nuxt.config.ts for why `code`
+        // and `language` differ in casing (URL-safety vs BCP-47 hreflang tag).
+        // Kept consistent across all 3 apps even though this one uses
+        // no_prefix (no URL impact here), so the locale identifier/cookie
+        // value means the same thing everywhere in the monorepo.
+        code: "pt-br",
         language: "pt-BR",
         file: "pt-BR.json",
       },

@@ -1,8 +1,8 @@
 <template>
-  <!-- Header Bar constrained to comfortable landing page width -->
+  <!-- Header Bar expanded to match natural container width -->
   <div class="w-full backdrop-blur-xl bg-default/90 border-b border-default">
     <div
-      class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between"
+      class="container mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between"
     >
       <!-- Left: Brand Logo -->
       <div class="flex items-center shrink-0">
@@ -53,7 +53,7 @@
     class="block lg:hidden overflow-hidden transition-all duration-300 bg-default/95 border-b border-default backdrop-blur-xl"
     :class="[show ? 'h-auto py-4' : 'h-0 py-0']"
   >
-    <div class="container mx-auto max-w-5xl px-4">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <Search class="mb-3" />
       <UNavigationMenu
         orientation="vertical"

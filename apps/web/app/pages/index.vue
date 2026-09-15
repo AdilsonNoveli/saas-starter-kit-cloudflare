@@ -2,6 +2,7 @@
   <div>
     <LandingHero />
     <LandingArchitecture />
+    <LandingUseCases />
     <LandingComparisonTable />
     <LandingFeatureBadges />
     <div class="py-8">

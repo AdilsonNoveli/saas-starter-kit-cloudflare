@@ -16,9 +16,9 @@
           />
           <UIcon class="w-5 h-5" :name="getItemIcon" />
         </template>
-        <div class="flex items-center gap-4 w-full">
+        <div class="flex items-center gap-3 w-full">
           <span>{{ name }}</span>
-          <span class="text-xs text-muted">
+          <span v-if="showHints && hint" class="text-xs text-muted">
             {{ hint }}
           </span>
         </div>
@@ -30,6 +30,7 @@
         :key="child.path"
         v-bind="child"
         :hints="hints"
+        :show-hints="showHints"
       />
     </div>
   </div>
@@ -40,9 +41,12 @@ export interface FolderTreeItemProps {
   path: string;
   children?: FolderTreeItemProps[];
   hints: Record<string, string>;
+  showHints?: boolean;
 }
 
-const props = defineProps<FolderTreeItemProps>();
+const props = withDefaults(defineProps<FolderTreeItemProps>(), {
+  showHints: false,
+});
 
 const isExpanded = ref(false);
 const isDirectory = computed(() => props.path.endsWith("/"));

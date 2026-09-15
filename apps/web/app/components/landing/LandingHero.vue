@@ -62,30 +62,7 @@ const localePath = useLocalePath();
     <!-- Section 2: Enterprise Monorepo Codebase Showcase (2 Columns) -->
     <section class="container mx-auto px-4 md:px-8 pb-16 lg:pb-24 max-w-6xl">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
-        <!-- Left: Interactive Folder Structure IDE Window -->
-        <div class="lg:col-span-6 flex flex-col rounded-2xl border border-default bg-elevated/90 shadow-xl overflow-hidden backdrop-blur-md">
-          <!-- Window Header Bar -->
-          <div class="flex items-center justify-between px-4 py-3 border-b border-default bg-muted/40 select-none">
-            <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
-              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
-              <span class="ml-2 font-mono text-xs text-muted font-medium">nuxfire — Bun Monorepo</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <UBadge color="neutral" variant="subtle" size="xs" class="font-mono text-[10px]">
-                Nuxt 4 + SST v4
-              </UBadge>
-            </div>
-          </div>
-
-          <!-- Window Content: Real Monorepo Folder Tree from Docs -->
-          <div class="p-3 sm:p-4 flex-1 font-mono text-xs sm:text-[13px]">
-            <FolderTree class="!bg-transparent !p-0" />
-          </div>
-        </div>
-
-        <!-- Right: Persuasive Enterprise Delivery Copy -->
+        <!-- Left: Persuasive Enterprise Delivery Copy -->
         <div class="lg:col-span-6 flex flex-col justify-between space-y-6">
           <div class="space-y-4">
             <!-- Badge -->
@@ -163,14 +140,37 @@ const localePath = useLocalePath();
             </CTAButton>
           </div>
         </div>
+
+        <!-- Right: Interactive Folder Structure IDE Window -->
+        <div class="lg:col-span-6 flex flex-col rounded-2xl border border-default bg-elevated/90 shadow-xl overflow-hidden backdrop-blur-md">
+          <!-- Window Header Bar -->
+          <div class="flex items-center justify-between px-4 py-3 border-b border-default bg-muted/40 select-none">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
+              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+              <span class="ml-2 font-mono text-xs text-muted font-medium">nuxfire — Bun Monorepo</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <UBadge color="neutral" variant="subtle" size="xs" class="font-mono text-[10px]">
+                Nuxt 4 + SST v4
+              </UBadge>
+            </div>
+          </div>
+
+          <!-- Window Content: Real Monorepo Folder Tree from Docs -->
+          <div class="p-3 sm:p-4 flex-1 font-mono text-xs sm:text-[13px]">
+            <FolderTree class="!bg-transparent !p-0" />
+          </div>
+        </div>
       </div>
 
       <!-- Editorial copy on AI Builders & Vibe Coding -->
-      <div class="mt-12 lg:mt-16 max-w-4xl space-y-3">
-        <h3 class="text-xl sm:text-2xl font-bold text-highlighted tracking-tight">
+      <div class="mt-12 lg:mt-16 max-w-4xl mx-auto text-center space-y-4">
+        <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-highlighted tracking-tight">
           {{ $t("landing.ai.title") }}
         </h3>
-        <p class="text-muted text-base sm:text-lg leading-relaxed">
+        <p class="text-muted text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
           {{ $t("landing.ai.description") }}
         </p>
       </div>

@@ -8,6 +8,7 @@
       :path="path.path"
       :children="path.children"
       :hints="hints"
+      :show-hints="showHints"
     />
   </div>
 </template>
@@ -16,7 +17,10 @@
 import hints from "~~/constants/hints.json";
 import paths from "~~/constants/paths.json";
 
-const { filter = "" } = defineProps<{ filter?: string }>();
+const { filter = "", showHints = false } = defineProps<{
+  filter?: string;
+  showHints?: boolean;
+}>();
 
 const processedPaths = computed(() => {
   const pathMap = new Map<string, any>();

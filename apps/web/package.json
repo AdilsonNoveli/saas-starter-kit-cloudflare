@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
+    "build": "bun run clean:build-cache && nuxt build",
+    "clean:build-cache": "bun ../../scripts/clean-nuxt-build-cache.ts",
     "dev": "nuxt dev",
-    "generate": "nuxt generate",
+    "generate": "bun run clean:build-cache && nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "format": "prettier . --write",

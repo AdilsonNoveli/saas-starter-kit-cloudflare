@@ -140,21 +140,20 @@ export default defineNuxtConfig({
     userMfaEncryptionKey: "",
   },
   i18n: {
-    vueI18n: "../i18n.config.ts",
+    restructureDir: "i18n",
     defaultLocale: "en",
     strategy: "no_prefix",
     locales: [
+      { name: "English (US)", code: "en", language: "en-US", file: "en.json" },
       {
-        name: "English (US)",
-        code: "en",
-        language: "en-US",
+        name: "Português (Brasil)",
+        code: "pt-BR",
+        language: "pt-BR",
+        file: "pt-BR.json",
       },
-      {
-        name: "French",
-        code: "fr",
-        language: "fr",
-      },
+      { name: "Español", code: "es", language: "es-ES", file: "es.json" },
     ],
+    experimental: { typedOptionsAndMessages: "default" },
   },
   typescript: {
     shim: false,

@@ -27,7 +27,27 @@ export default defineNuxtConfig({
     "/forgot-password/**": { ssr: false },
   },
   css: ["~/css/main.css"],
-  modules: ["@nuxt/ui"],
+  modules: ["@nuxt/ui", "@nuxtjs/i18n"],
+  // `no_prefix`: these routes already force `ssr: false` (see routeRules
+  // above) because of the OpenAuth query-string hydration mismatch —
+  // multiplying them by three prefixed variants would widen that fragility
+  // for no SEO gain, since this is an unindexed utility flow.
+  i18n: {
+    restructureDir: "i18n",
+    defaultLocale: "en",
+    strategy: "no_prefix",
+    locales: [
+      { name: "English (US)", code: "en", language: "en-US", file: "en.json" },
+      {
+        name: "Português (Brasil)",
+        code: "pt-BR",
+        language: "pt-BR",
+        file: "pt-BR.json",
+      },
+      { name: "Español", code: "es", language: "es-ES", file: "es.json" },
+    ],
+    experimental: { typedOptionsAndMessages: "default" },
+  },
   // Set from infra/auth.ts at build time (NUXT_PUBLIC_GITHUB_AUTH_ENABLED /
   // NUXT_PUBLIC_GOOGLE_AUTH_ENABLED), based on whether real OAuth
   // credentials are actually loaded — not just whether the feature flag in

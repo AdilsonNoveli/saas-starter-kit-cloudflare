@@ -60,9 +60,39 @@
 | ID | Tarefa / User Story | Prioridade | Esforço Est. | Descrição |
 |---|---|---|---|---|
 | **CNT-01** | Busca Unificada (Docs + Blog) | **P0** | Baixo | Integrar a coleção `blog` ao modal `Search.vue` do `@nuxt/content` v3. |
-| **CNT-02** | Internacionalização Completa do Site e App | **P1** | Alto | Extrair strings estáticas para arquivos JSON/TS de i18n suportando `pt-BR` e `es` nativamente. |
+| **CNT-02** | Internacionalização Completa do Site e App | **P1** | Alto | **Fundação concluída** (ver detalhamento abaixo); extração das strings ainda pendente. Config reestruturada para a convenção oficial do `@nuxtjs/i18n` v10 (`restructureDir: "i18n"`, `i18n/i18n.config.ts`, `i18n/locales/*.json`), com `pt-BR` e `es` habilitados em `apps/app`, `apps/web` e `apps/login` (o `fr` placeholder foi removido). Convenção de prefixo de chave por layer travada. |
 | **CNT-03** | RSS Feed Automatizado para o Blog | **P2** | Baixo | Rota Nitro gerando feed XML RSS/Atom para os posts do blog. |
 | **CNT-04** | Componente de Tabela de Preços Dinâmica no Site | **P2** | Médio | Fazer com que a página `/pricing` pública consuma os planos ativos direto do banco em vez de cards estáticos. |
+
+### CNT-02 — estado da internacionalização
+
+**Feito (fundação):**
+
+- `apps/app` (`strategy: "no_prefix"`), `apps/web` (`strategy: "prefix_except_default"`, por SEO) e `apps/login` (`strategy: "no_prefix"`; este app já força `ssr: false` no fluxo OpenAuth, prefixar rotas só ampliaria essa fragilidade sem ganho de indexação) com locales `en` / `pt-BR` / `es`.
+- `@nuxtjs/i18n` adicionado ao `apps/login` (antes só existia em `apps/app` e `apps/web`).
+- Esqueletos `i18n/locales/{en,pt-BR,es}.json` criados nos 5 layers, contendo apenas a raiz do namespace.
+- `scripts/check-i18n-completeness.ts` + `bun run check:i18n`: compara o conjunto de chaves de cada locale contra o `en.json` da mesma pasta e falha (exit ≠ 0) em qualquer chave faltante ou sobrando.
+
+**Ainda NÃO feito (rodadas futuras):**
+
+- Extração das strings de `apps/app` (hoje só a chave `welcome`).
+- Extração de `apps/web` — landing, docs, blog e meta de SEO (piloto, tarefa imediatamente seguinte).
+- Extração de `apps/login` (login / signup / forgot-password) além do stub `common.*`.
+- Extração dos 5 layers, incluindo o bug já identificado de strings em português hardcoded em `layers/kanban/app/components/KanbanBoard.vue`.
+- Localização dos templates de e-mail (`packages/emails/templates/*.tsx`, hoje 100% em inglês).
+- Persistência de idioma no banco de dados (hoje só o cookie nativo do módulo).
+
+**Prefixo de chave por layer (convenção travada):**
+
+| Layer | Prefixo de chave | Arquivos |
+|---|---|---|
+| `kanban` | `kanban.*` | `layers/kanban/i18n/locales/{en,pt-BR,es}.json` |
+| `teams` | `teams.*` | `layers/teams/i18n/locales/{en,pt-BR,es}.json` |
+| `billing` | `billing.*` | `layers/billing/i18n/locales/{en,pt-BR,es}.json` |
+| `notifications` | `notifications.*` | `layers/notifications/i18n/locales/{en,pt-BR,es}.json` |
+| `admin` | `admin.*` | `layers/admin/i18n/locales/{en,pt-BR,es}.json` |
+
+Regra oficial da v10: mensagens do projeto principal (`apps/app/i18n/locales/*.json`) sempre sobrescrevem mensagens de um layer em caso de colisão de chave — por isso o prefixo por layer não é opcional.
 
 ---
 

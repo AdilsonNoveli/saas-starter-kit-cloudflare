@@ -130,7 +130,7 @@ const signupUrl = computed(() => config.public.appUrl || "/signup");
 const includedFeatures = [
   {
     highlight: "Full Monorepo Source Code",
-    text: "Nuxt 3, Nitro, tRPC, and declarative SST v4 IaC.",
+    text: "Nuxt 4, Nitro, tRPC, and declarative SST v4 IaC.",
   },
   {
     highlight: "B2B Multi-Tenancy & Teams",

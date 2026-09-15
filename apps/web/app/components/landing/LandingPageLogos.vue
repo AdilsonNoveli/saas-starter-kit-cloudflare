@@ -20,11 +20,20 @@
       </div>
 
       <!-- Google -->
-      <div class="flex items-center opacity-80 hover:opacity-100 transition-opacity duration-200">
+      <div class="flex items-center opacity-70 hover:opacity-100 transition-opacity duration-200">
         <img
           src="/svg/google.svg"
           alt="Google"
-          class="h-6 sm:h-7 w-auto object-contain"
+          class="h-5.5 sm:h-6.5 w-auto object-contain dark:brightness-0 dark:invert"
+        />
+      </div>
+
+      <!-- Stripe -->
+      <div class="flex items-center opacity-70 hover:opacity-100 transition-opacity duration-200">
+        <img
+          src="/svg/stripe.svg"
+          alt="Stripe"
+          class="h-6 sm:h-7 w-auto object-contain dark:brightness-0 dark:invert"
         />
       </div>
     </div>
@@ -32,5 +41,5 @@
 </template>
 
 <script setup lang="ts">
-// In-line brand wordmarks: Cloudflare, GitHub, Google
+// In-line brand wordmarks: Cloudflare, GitHub, Google, Stripe
 </script>

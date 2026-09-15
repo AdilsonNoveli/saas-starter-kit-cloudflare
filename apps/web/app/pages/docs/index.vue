@@ -1,18 +1,22 @@
 <template>
   <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
-    <div class="mb-10 max-w-2xl">
-      <h1 class="text-3xl font-bold text-highlighted sm:text-4xl">
+    <div class="mb-10 w-full">
+      <h1 class="text-3xl font-bold text-highlighted sm:text-4xl lg:text-5xl">
         {{ page?.title || docsConfig.name }}
       </h1>
-      <p class="mt-3 text-lg text-muted">
+      <p class="mt-3 text-lg sm:text-xl text-muted max-w-3xl">
         {{ page?.description || docsConfig.description }}
       </p>
-      <Search class="mt-6" />
+      <!-- Full-width Search Bar -->
+      <div class="mt-8 w-full">
+        <Search />
+      </div>
     </div>
 
+    <!-- 3 columns grid for wider, larger cards -->
     <div
       v-if="products.length"
-      class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+      class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
     >
       <DocsProductCard
         v-for="product in products"

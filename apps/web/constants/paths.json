@@ -788,6 +788,7 @@
   "patches/nodemailer@9.1.1.patch",
   "scripts/",
   "scripts/check-i18n-completeness.ts",
+  "scripts/clean-nuxt-build-cache.ts",
   "scripts/compose-layers.ts",
   "scripts/dev.ts",
   "scripts/generate-paths.ts",

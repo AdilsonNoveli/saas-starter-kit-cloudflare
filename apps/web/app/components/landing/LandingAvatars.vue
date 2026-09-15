@@ -2,10 +2,10 @@
   <div class="flex flex-wrap justify-center items-center gap-3 pt-3">
     <UAvatarGroup size="sm">
       <UAvatar src="/static/N4aA96n.jpg" alt="David Kim" />
-      <UAvatar src="/static/AVQ0V28X.jpg" alt="Lisa Thompson" />
+      <UAvatar src="/static/AVQ0V28X.jpeg" alt="Lisa Thompson" />
       <UAvatar src="/static/VUMBKh1U.jpg" alt="James Wilson" />
-      <UAvatar src="/static/xZ4wg2Xj.jpg" alt="Sarah Johnson" />
-      <UAvatar src="/static/FJkauyEa.jpg" alt="Michael Chen" />
+      <UAvatar src="/static/xZ4wg2Xj.jpeg" alt="Sarah Johnson" />
+      <UAvatar src="/static/FJkauyEa.jpeg" alt="Michael Chen" />
     </UAvatarGroup>
     <div class="flex flex-col items-start justify-center">
       <div class="flex items-center gap-1 text-amber-400">

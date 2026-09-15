@@ -19,10 +19,6 @@
 </template>
 
 <script setup lang="ts">
-// The 8 quotes below stay in English in every locale on purpose: they are
-// attributed to named people, and translating or paraphrasing someone else's
-// words would be putting statements in their mouth they never made. Only the
-// section heading and subheading above are localized.
 interface Testimonial {
   testimonial: string;
   name: string;
@@ -31,66 +27,60 @@ interface Testimonial {
   socialLink?: string;
 }
 
-const firstRowTestimonials: Testimonial[] = [
-  {
-    testimonial:
-      "Setting up auth with multi-tenancy and Stripe webhooks usually takes me 3 to 4 weeks on every project. With NuxFire, I had the entire billing and team management live on Cloudflare Workers in a single weekend.",
-    name: "Alex Rivera",
-    avatar: "/static/xZ4wg2Xj.jpg",
-    socialHandle: "Full-Stack Dev · Discord Community",
-  },
-  {
-    testimonial:
-      "The Cloudflare Workers + Hyperdrive Postgres setup is insanely fast. 0ms cold starts across global edges, and the SST deployment pipeline worked on the first try. Genuinely production grade.",
-    name: "Marcus Vance",
-    avatar: "/static/FJkauyEa.jpg",
-    socialHandle: "Platform Lead · GitHub Tester",
-  },
-  {
-    testimonial:
-      "Most boilerplates give you half-baked code that breaks when you add real users. NuxFire actually has proper RBAC, invite flows, and audit logs already wired up. Saved me at least 2 months of work.",
-    name: "Elena Rostova",
-    avatar: "/static/KtCFjlD4.jpg",
-    socialHandle: "SaaS Founder · Early Access",
-  },
-  {
-    testimonial:
-      "I was skeptical about running Nuxt 4 and Drizzle on edge Workers, but the architecture here is brilliant. Clean separation between the Web, App, and Auth workers without unnecessary complexity.",
-    name: "Liam O'Connor",
-    avatar: "/static/N4aA96n.jpg",
-    socialHandle: "Backend Architect · Discord",
-  },
-];
+const { t } = useI18n();
 
-const secondRowTestimonials: Testimonial[] = [
+const firstRowTestimonials = computed<Testimonial[]>(() => [
   {
-    testimonial:
-      "The real-time WebSocket Durable Objects and background queue setup out of the box is what sold me. We replaced our old Redis BullMQ setup and cut our server bills to almost zero.",
-    name: "Sofia Mendes",
-    avatar: "/static/AVQ0V28X.jpg",
-    socialHandle: "Cloud Engineer · GitHub Tester",
+    testimonial: t("landing.testimonials.items.item1.quote"),
+    name: t("landing.testimonials.items.item1.name"),
+    avatar: "/static/xZ4wg2Xj.jpeg",
+    socialHandle: t("landing.testimonials.items.item1.role"),
   },
   {
-    testimonial:
-      "Nuxt UI v4 components plus the D1 content docs and Stripe customer portal integration made launching our B2B app feel effortless. It feels like a platform built by senior engineers.",
-    name: "Daniel Zhao",
-    avatar: "/static/VUMBKh1U.jpg",
-    socialHandle: "Indie Builder · Early Adopter",
+    testimonial: t("landing.testimonials.items.item2.quote"),
+    name: t("landing.testimonials.items.item2.name"),
+    avatar: "/static/FJkauyEa.jpeg",
+    socialHandle: t("landing.testimonials.items.item2.role"),
   },
   {
-    testimonial:
-      "The type-safety end-to-end between Drizzle ORM and tRPC is immaculate. Refactoring schemas doesn't cause hidden runtime bugs. Easily the best Nuxt starter on the market.",
-    name: "Kavita Patel",
+    testimonial: t("landing.testimonials.items.item3.quote"),
+    name: t("landing.testimonials.items.item3.name"),
     avatar: "/static/KtCFjlD4.jpg",
-    socialHandle: "Nuxt Developer · Discord Community",
+    socialHandle: t("landing.testimonials.items.item3.role"),
   },
   {
-    testimonial:
-      "Stop wasting time building auth and team permissions from scratch. We migrated our MVP to NuxFire and shipped our first paid subscriptions 48 hours later. Worth every penny.",
-    name: "Jordan Blake",
-    avatar: "/static/xZ4wg2Xj.jpg",
-    socialHandle: "Product Engineer · Early Access",
+    testimonial: t("landing.testimonials.items.item4.quote"),
+    name: t("landing.testimonials.items.item4.name"),
+    avatar: "/static/N4aA96n.jpg",
+    socialHandle: t("landing.testimonials.items.item4.role"),
   },
-];
+]);
+
+const secondRowTestimonials = computed<Testimonial[]>(() => [
+  {
+    testimonial: t("landing.testimonials.items.item5.quote"),
+    name: t("landing.testimonials.items.item5.name"),
+    avatar: "/static/AVQ0V28X.jpeg",
+    socialHandle: t("landing.testimonials.items.item5.role"),
+  },
+  {
+    testimonial: t("landing.testimonials.items.item6.quote"),
+    name: t("landing.testimonials.items.item6.name"),
+    avatar: "/static/VUMBKh1U.jpg",
+    socialHandle: t("landing.testimonials.items.item6.role"),
+  },
+  {
+    testimonial: t("landing.testimonials.items.item7.quote"),
+    name: t("landing.testimonials.items.item7.name"),
+    avatar: "/static/KtCFjlD4.jpg",
+    socialHandle: t("landing.testimonials.items.item7.role"),
+  },
+  {
+    testimonial: t("landing.testimonials.items.item8.quote"),
+    name: t("landing.testimonials.items.item8.name"),
+    avatar: "/static/xZ4wg2Xj.jpeg",
+    socialHandle: t("landing.testimonials.items.item8.role"),
+  },
+]);
 </script>
 

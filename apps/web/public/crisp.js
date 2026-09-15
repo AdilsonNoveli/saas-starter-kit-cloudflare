@@ -1,5 +1,7 @@
+// https://crisp.chat/
+
 window.$crisp = [];
-window.CRISP_WEBSITE_ID = "bb1221b9-ce76-4ce7-8264-a1351289bfd4";
+window.CRISP_WEBSITE_ID = "NEW_ID";
 (() => {
   d = document;
   s = d.createElement("script");

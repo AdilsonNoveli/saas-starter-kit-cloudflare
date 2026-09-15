@@ -1,21 +1,21 @@
 <template>
-  <div>
-    <UButton
-      icon="i-lucide-search"
-      color="neutral"
-      variant="outline"
-      size="md"
-      class="h-9 rounded-md px-3 text-xs sm:text-sm text-muted hover:text-highlighted hover:border-accented transition-all cursor-pointer"
+  <div class="w-full">
+    <button
+      type="button"
+      class="w-full h-12 sm:h-14 rounded-2xl px-4 sm:px-5 text-sm sm:text-base text-muted hover:text-highlighted bg-elevated/70 hover:bg-elevated border border-default hover:border-primary/50 shadow-sm transition-all cursor-pointer flex items-center justify-between group backdrop-blur-sm"
       @click="isOpen = true"
     >
-      <span class="hidden md:inline font-normal">{{ $t("search.trigger") }}</span>
-      <template #trailing>
-        <div class="hidden sm:flex items-center gap-1 ml-1.5">
-          <UKbd value="Ctrl" size="sm" class="text-[10px] py-0.5 px-1 rounded bg-elevated text-muted" />
-          <UKbd value="K" size="sm" class="text-[10px] py-0.5 px-1 rounded bg-elevated text-muted" />
-        </div>
-      </template>
-    </UButton>
+      <div class="flex items-center gap-3.5">
+        <UIcon name="i-lucide-search" class="w-5 h-5 text-muted group-hover:text-primary transition-colors shrink-0" />
+        <span class="font-normal text-muted group-hover:text-highlighted transition-colors">
+          {{ $t("search.placeholder") }}
+        </span>
+      </div>
+      <div class="flex items-center gap-1.5 ml-auto shrink-0">
+        <UKbd value="Ctrl" size="md" class="text-xs py-1 px-2.5 rounded-lg bg-default border border-default text-muted font-mono" />
+        <UKbd value="K" size="md" class="text-xs py-1 px-2.5 rounded-lg bg-default border border-default text-muted font-mono" />
+      </div>
+    </button>
 
 
     <UModal v-model:open="isOpen">

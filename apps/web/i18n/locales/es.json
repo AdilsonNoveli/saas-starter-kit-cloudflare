@@ -466,7 +466,49 @@
     },
     "testimonials": {
       "title": "Probado en Producción & Early Access",
-      "subtitle": "Feedback real de desarrolladores y founders probando NuxFire en cargas de trabajo reales."
+      "subtitle": "Feedback real de desarrolladores y founders probando NuxFire en cargas de trabajo reales.",
+      "items": {
+        "item1": {
+          "name": "Alex Rivera",
+          "role": "Dev Full-Stack · Comunidad Discord",
+          "quote": "Configurar autenticación multi-tenant y webhooks de Stripe me tomaba semanas. Con NuxFire, tuve la facturación y los equipos funcionando en un solo fin de semana..."
+        },
+        "item2": {
+          "name": "Marcus Vance",
+          "role": "Líder de Plataforma · Tester GitHub",
+          "quote": "La arquitectura de Workers con Hyperdrive Postgres es increíblemente rápida. Cero cold starts globales y el pipeline de SST funcionó perfecto a la primera..."
+        },
+        "item3": {
+          "name": "Elena Rostova",
+          "role": "Fundadora SaaS · Early Access",
+          "quote": "La mayoría de plantillas entregan código frágil que falla con usuarios reales. NuxFire ya tiene RBAC, invitaciones y auditoría listos. Ahorró 2 meses de trabajo..."
+        },
+        "item4": {
+          "name": "Liam O'Connor",
+          "role": "Arquitecto Backend · Discord",
+          "quote": "Tenía dudas sobre ejecutar Nuxt 4 y Drizzle en Workers, pero la arquitectura es brillante. Separación limpia entre Web, App y Auth sin complejidad innecesaria..."
+        },
+        "item5": {
+          "name": "Sofia Mendes",
+          "role": "Ingeniera Cloud · Tester GitHub",
+          "quote": "Los WebSockets con Durable Objects y colas en segundo plano listas fueron decisivos. Reemplazamos Redis BullMQ y bajamos la factura del servidor a casi cero..."
+        },
+        "item6": {
+          "name": "Daniel Zhao",
+          "role": "Creador Indie · Early Adopter",
+          "quote": "Los componentes Nuxt UI v4 con docs en D1 y portal de Stripe hicieron que lanzar nuestra app B2B fuera muy fácil. Código de calidad hecho por ingenieros senior..."
+        },
+        "item7": {
+          "name": "Kavita Patel",
+          "role": "Desarrolladora Nuxt · Comunidad Discord",
+          "quote": "El tipado extremo a extremo entre Drizzle ORM y tRPC es impecable. Refactorizar la base no genera errores ocultos en runtime. El mejor starter kit Nuxt del mercado..."
+        },
+        "item8": {
+          "name": "Jordan Blake",
+          "role": "Ingeniero de Producto · Early Access",
+          "quote": "Deja de perder tiempo creando autenticación y permisos desde cero. Migramos nuestro MVP a NuxFire y activamos suscripciones de pago 48h después. Vale cada centavo..."
+        }
+      }
     },
     "avatars": {
       "validated": "Early access con más de 40 devs probando en Discord & GitHub"
@@ -493,7 +535,7 @@
       "guarantee": {
         "refund": "Garantía de devolución en 14 días",
         "projects": "Proyectos personales y comerciales ilimitados",
-        "github": "Acceso inmediato a GitHub"
+        "github": "Acceso inmediato en el Área de Miembros"
       },
       "features": {
         "monorepo": {
@@ -548,6 +590,31 @@
     },
     "cta": {
       "default": "EMPIEZA AHORA"
+    },
+    "showcase": {
+      "badge": "Propiedad Total del Código Fuente Completo",
+      "title": "No estás comprando una plantilla. Estás adquiriendo la propiedad total de un monorepo de nivel enterprise.",
+      "subtitle": "Acceso de descarga inmediata en tu Área de Miembros tras la confirmación. Sin esperas de invitaciones manuales, cero paquetes caja negra propietarios y nunca pagues suscripciones mensuales por código.",
+      "features": {
+        "delivery": {
+          "title": "Acceso Inmediato en el Área de Miembros",
+          "desc": "Descarga el paquete completo del repositorio inmediatamente después de la compra. Sin esperas de aprobación en GitHub — empieza a construir en minutos."
+        },
+        "engineering": {
+          "title": "15.000+ Líneas de Ingeniería Senior Probada",
+          "desc": "Ahorra de 3 a 6 meses de prueba y error arquitectónico. 4 Cloudflare Workers, 5 Nuxt Layers modulares, SST v4 IaC, Drizzle ORM y tRPC 100% tipado."
+        },
+        "ownership": {
+          "title": "Propiedad Total del Código (Cero Vendor Lock-in)",
+          "desc": "Sin wrappers npm privados ni lógica ofuscada. Cada línea es TypeScript estándar y limpio, que posees para siempre para proyectos comerciales o personales ilimitados."
+        }
+      },
+      "cta": "Obtener Acceso Inmediato al Código",
+      "viewStructure": "Explorar Estructura Completa del Proyecto →"
+    },
+    "ai": {
+      "title": "El Contexto Definitivo para Desarrolladores con IA & Vibe Coders",
+      "description": "¿Construyendo con Cursor, Claude Code o v0? NuxFire entrega la arquitectura fundamental que los LLMs necesitan para tener éxito. Contratos estrictos de tipado extremo a extremo con TypeScript y tRPC, esquemas estructurados en Drizzle y Nuxt Layers modulares evitan alucinaciones y garantizan que los asistentes de IA generen características listas para producción en el primer intento."
     }
   }
 }

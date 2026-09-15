@@ -114,11 +114,31 @@ const localePath = useLocalePath();
 // the current route's equivalent path in the target locale.
 const switchLocalePath = useSwitchLocalePath();
 
+const isHome = computed(() => route.path === localePath("/"));
+
 const links = computed(() => [
-  { label: t("nav.home"), to: localePath("/") },
-  { label: t("nav.pricing"), to: `${localePath("/")}#pricing` },
-  { label: t("nav.docs"), to: localePath("/docs") },
-  { label: t("nav.blog"), to: localePath("/blog") },
+  {
+    label: t("nav.home"),
+    to: localePath("/"),
+    exact: true,
+    active: isHome.value && route.hash !== "#pricing",
+  },
+  {
+    label: t("nav.pricing"),
+    to: `${localePath("/")}#pricing`,
+    exact: true,
+    active: isHome.value && route.hash === "#pricing",
+  },
+  {
+    label: t("nav.docs"),
+    to: localePath("/docs"),
+    active: route.path.startsWith(localePath("/docs")),
+  },
+  {
+    label: t("nav.blog"),
+    to: localePath("/blog"),
+    active: route.path.startsWith(localePath("/blog")),
+  },
 ]);
 
 const mobileLinks = computed(() => [...links.value]);

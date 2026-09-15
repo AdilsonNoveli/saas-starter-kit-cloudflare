@@ -49,7 +49,7 @@
   "blog": {
     "seoTitle": "Blog",
     "title": "Blog",
-    "subtitle": "Blog"
+    "subtitle": "Artigos, tutoriais e guias de arquitetura para construir e escalar seu SaaS com Nuxt 4 e Cloudflare Workers."
   },
   "signup": {
     "seoTitle": "Cadastro - Registro na Comunidade",
@@ -517,7 +517,37 @@
       "title": "Suas dúvidas, respondidas",
       "subtitle": "Tudo o que você precisa saber sobre o nosso SaaS",
       "homeTitle": "Perguntas frequentes",
-      "homeSubtitle": "Saiba mais sobre este starter kit de SaaS e como adaptá-lo às suas necessidades."
+      "homeSubtitle": "Saiba mais sobre este starter kit de SaaS e como adaptá-lo às suas necessidades.",
+      "items": {
+        "item1": {
+          "question": "Como acesso e começo a usar o NuxFire?",
+          "answer": "Imediatamente após a compra, você recebe acesso instantâneo para baixar o código-fonte completo diretamente dentro da sua Área de Membros exclusiva. Não há espera por convites manuais de repositório ou aprovações de acesso.\n\nO código vem acompanhado de um guia de início rápido de 5 minutos, scripts de configuração e documentação passo a passo para deploy na Cloudflare, permitindo colocar seu SaaS em produção logo no primeiro dia."
+        },
+        "item2": {
+          "question": "Posso testar a demonstração ao vivo antes de comprar?",
+          "answer": "Sim! Toda esta aplicação ao vivo está rodando exatamente a mesma base de código do monorepo de nível enterprise que você recebe após a compra.\n\nCrie uma conta de teste para experimentar a autenticação OpenAuth, workspaces de equipe, fluxos de convite, permissões RBAC granulares e o console de administração da plataforma. O que você vê e testa aqui é exatamente o que você terá e implantará."
+        },
+        "item3": {
+          "question": "De qual stack técnica e experiência eu preciso?",
+          "answer": "O NuxFire é construído com TypeScript moderno, Nuxt 4, Vue 3 e SST v4 declarativo para a Cloudflare.\n\n• Para Desenvolvedores Sênior: Você tem layers modulares limpos, tipagem ponta a ponta com tRPC e Drizzle ORM — com zero dependência proprietária e sem peso desnecessário de framework.\n• Para Construtores com IA & Vibe Coders: Se você constrói usando Cursor, Claude Code ou v0, o NuxFire oferece o contexto arquitetural ideal. Contratos estritos de TypeScript, schemas tipados e Nuxt Layers isolados permitem que os modelos de IA gerem funcionalidades prontas para produção na primeira tentativa, sem quebrar a lógica existente."
+        },
+        "item4": {
+          "question": "Quão customizável é o starter kit?",
+          "answer": "O NuxFire oferece 100% de posse total do código-fonte. Você recebe o código limpo, sem wrappers proprietários de CLI, pacotes npm ocultos ou dependências caixa-preta.\n\n• Customize ou rebrandize livremente todo o design system e tokens do Tailwind CSS.\n• Adicione, altere ou remova layers modulares (admin, billing, teams, notifications, kanban).\n• Estenda o schema do banco de dados no Drizzle ORM e gere migrações automaticamente.\n• Implemente suas próprias regras de negócio com total liberdade arquitetural."
+        },
+        "item5": {
+          "question": "Qual suporte e comunidade estão inclusos?",
+          "answer": "Toda licença inclui:\n\n• Documentação completa e pesquisável cobrindo arquitetura, secrets e configuração da Cloudflare.\n• Guias detalhados para desenvolvimento local, migrações e deploy.\n• Acesso direto à nossa comunidade no Discord para colaboração e dúvidas.\n• Suporte dedicado por e-mail para dúvidas de configuração e onboarding."
+        },
+        "item6": {
+          "question": "Receberei atualizações e novas funcionalidades?",
+          "answer": "Sim! Sua licença inclui acesso vitalício a todas as atualizações futuras, correções de segurança, upgrades de framework e novos layers arquiteturais diretamente na sua Área de Membros.\n\nSempre que o Nuxt, Cloudflare Workers ou SST lançarem melhorias importantes, atualizamos o starter kit para que sua base continue moderna e testada, sem nenhum custo adicional."
+        },
+        "item7": {
+          "question": "Posso construir projetos comerciais de SaaS com esta licença?",
+          "answer": "Sim! A licença concede a você direitos perpétuos para construir projetos SaaS comerciais ilimitados, ferramentas internas e projetos para clientes.\n\n• Use o código em domínios ilimitados e projetos de clientes.\n• Receba 100% da receita de assinatura dos seus clientes, com zero royalties.\n• Pague uma única vez com posse vitalícia — nunca cobramos mensalidades por código.\n\nConsulte a documentação de licença para os termos e condições completos."
+        }
+      }
     },
     "pricing": {
       "badge": "Licença vitalícia",

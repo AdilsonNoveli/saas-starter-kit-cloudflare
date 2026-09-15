@@ -111,22 +111,16 @@
 
         <!-- Trust Badges / Guarantees -->
         <div class="pt-4 border-t border-default text-center">
-          <p class="text-xs text-muted flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-            <span class="flex items-center gap-1">
-              <UIcon name="i-lucide-shield-check" class="w-3.5 h-3.5 text-emerald-500" />
-              {{ $t("landing.pricing.guarantee.refund") }}
-            </span>
-            <span class="hidden sm:inline">•</span>
-            <span class="flex items-center gap-1">
-              <UIcon name="i-lucide-code-2" class="w-3.5 h-3.5 text-emerald-500" />
+          <div class="text-xs text-muted flex flex-col items-center justify-center gap-2">
+            <span class="inline-flex items-center gap-1.5 font-medium">
+              <UIcon name="i-lucide-code-2" class="w-4 h-4 text-emerald-500 shrink-0" />
               {{ $t("landing.pricing.guarantee.projects") }}
             </span>
-            <span class="hidden sm:inline">•</span>
-            <span class="flex items-center gap-1">
-              <UIcon name="i-lucide-zap" class="w-3.5 h-3.5 text-emerald-500" />
+            <span class="inline-flex items-center gap-1.5 font-medium">
+              <UIcon name="i-lucide-zap" class="w-4 h-4 text-emerald-500 shrink-0" />
               {{ $t("landing.pricing.guarantee.github") }}
             </span>
-          </p>
+          </div>
         </div>
       </div>
     </div>

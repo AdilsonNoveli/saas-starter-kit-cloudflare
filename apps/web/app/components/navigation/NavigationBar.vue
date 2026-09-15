@@ -42,7 +42,7 @@
         <NuxtLink
           :to="useRuntimeConfig().public.appUrl || localePath('/signup')"
           external
-          class="ml-1 inline-flex items-center justify-center h-9 px-4 rounded-md text-xs font-bold tracking-wider uppercase bg-emerald-500 hover:bg-emerald-400 text-night-950 shadow-sm shadow-emerald-500/25 transition-all duration-150 active:scale-95 cursor-pointer shrink-0"
+          class="ml-1 inline-flex items-center justify-center h-9 px-4 rounded-md text-xs font-bold tracking-wider uppercase bg-[#fc444c] hover:bg-[#e03a42] text-white shadow-sm shadow-[#fc444c]/25 transition-all duration-150 active:scale-95 cursor-pointer shrink-0"
         >
           {{ $t("nav.login") }}
         </NuxtLink>
@@ -89,7 +89,7 @@
         <NuxtLink
           :to="useRuntimeConfig().public.appUrl || localePath('/signup')"
           external
-          class="inline-flex items-center justify-center h-9 px-4 rounded-md text-xs font-bold tracking-wider uppercase bg-emerald-500 hover:bg-emerald-400 text-night-950 shadow-sm shadow-emerald-500/25 transition-all duration-150 active:scale-95 cursor-pointer"
+          class="inline-flex items-center justify-center h-9 px-4 rounded-md text-xs font-bold tracking-wider uppercase bg-[#fc444c] hover:bg-[#e03a42] text-white shadow-sm shadow-[#fc444c]/25 transition-all duration-150 active:scale-95 cursor-pointer"
         >
           {{ $t("nav.login") }}
         </NuxtLink>

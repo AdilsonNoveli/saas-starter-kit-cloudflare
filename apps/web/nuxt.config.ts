@@ -43,6 +43,20 @@ function docsRoutes(): string[] {
   return routes;
 }
 
+function blogRoutes(): string[] {
+  const root = fileURLToPath(new URL("./content/blog", import.meta.url));
+  const routes: string[] = ["/blog"];
+  try {
+    for (const entry of readdirSync(root)) {
+      if (entry.endsWith(".md")) {
+        const slug = entry.replace(/\.md$/, "");
+        routes.push(`/blog/${slug}`);
+      }
+    }
+  } catch {}
+  return routes;
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -70,7 +84,7 @@ export default defineNuxtConfig({
       nodeCompat: true,
     },
     prerender: {
-      routes: ["/", ...docsRoutes()],
+      routes: ["/", ...docsRoutes(), ...blogRoutes()],
       crawlLinks: true,
     },
   },

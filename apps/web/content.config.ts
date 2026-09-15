@@ -12,6 +12,10 @@ export default defineContentConfig({
       schema: z.object({
         date: z.string(),
         author: z.string(),
+        category: z.string().optional(),
+        readTime: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        image: z.string().optional(),
       }),
     }),
     faqs: defineCollection({

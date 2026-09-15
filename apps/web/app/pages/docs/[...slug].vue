@@ -42,7 +42,34 @@
         class="docs-content"
       />
 
-      <!-- TODO: footer links, surround -->
+      <!-- Strategic Documentation CTA Banner -->
+      <div class="mt-12 pt-8 border-t border-default">
+        <div class="rounded-2xl border border-default bg-elevated/70 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 backdrop-blur-md shadow-sm">
+          <div class="space-y-1.5 flex-1">
+            <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+              <UIcon name="i-lucide-package-check" class="w-4 h-4" />
+              <span>NuxFire Production Kit</span>
+            </div>
+            <h4 class="font-extrabold text-highlighted text-lg sm:text-xl tracking-tight">
+              Pronto para construir e lançar seu SaaS?
+            </h4>
+            <p class="text-xs sm:text-sm text-muted leading-relaxed max-w-xl">
+              Tenha 100% de posse do código-fonte completo, sem wrappers proprietários, com arquitetura pronta para milhões de requisições na Cloudflare.
+            </p>
+          </div>
+          <div class="shrink-0">
+            <CTAButton
+              :to="`${localePath('/')}#pricing`"
+              size="md"
+              radius="lg"
+              trailing-icon="i-lucide-arrow-right"
+              class="whitespace-nowrap text-xs sm:text-sm font-bold tracking-wider px-6 py-3.5"
+            >
+              Garantir acesso imediato ao código
+            </CTAButton>
+          </div>
+        </div>
+      </div>
     </div>
     <div
       v-show="page?.body?.toc?.links?.length"
@@ -67,6 +94,7 @@ const {
   docs: { name },
 } = useAppConfig();
 
+const localePath = useLocalePath();
 const breadcrumbLinks = await useBreadcrumb();
 
 useSeoMeta({

@@ -7,7 +7,7 @@
       </p>
     </div>
     <UAccordion
-      :items="faqs ?? []"
+      :items="faqItems"
       class="max-w-3xl mx-auto"
       :ui="{ root: 'divide-y divide-default' }"
     >
@@ -16,46 +16,73 @@
           color="neutral"
           variant="ghost"
           :ui="{
-            base: 'rounded-none py-4 px-0 hover:bg-transparent dark:hover:bg-transparent',
+            base: 'rounded-none py-4 px-0 hover:bg-transparent dark:hover:bg-transparent text-left w-full justify-between items-center',
           }"
         >
-          <span class="truncate text-lg">{{ item.title }}</span>
+          <span class="text-left text-base sm:text-lg font-medium text-highlighted flex-1 pr-4 leading-snug">
+            {{ item.label }}
+          </span>
           <template #trailing>
             <UIcon
               v-if="open"
               name="i-lucide-minus"
-              class="w-5 h-5 ms-auto transform transition-transform duration-200"
+              class="w-5 h-5 ms-auto transform transition-transform duration-200 shrink-0 text-muted"
             />
             <UIcon
               v-else
               name="i-lucide-plus"
-              class="w-5 h-5 ms-auto transform transition-transform duration-200"
+              class="w-5 h-5 ms-auto transform transition-transform duration-200 shrink-0 text-muted"
             />
           </template>
         </UButton>
       </template>
       <template #body="{ item }">
-        <ContentRenderer :value="item" />
+        <div class="pb-6 text-muted text-sm sm:text-base leading-relaxed whitespace-pre-line">
+          {{ item.content }}
+        </div>
       </template>
     </UAccordion>
   </LayoutSection>
 </template>
 
 <script setup lang="ts">
-const { data: faqs } = await useAsyncData("home", () =>
-  queryCollection("faqs").all(),
-);
-// Only the section heading/subheading are translated here — the questions and
-// answers themselves come from the `faqs` @nuxt/content collection, which is
-// English-only until the content-translation round.
 const props = defineProps<{
   title?: string;
   subtitle?: string;
 }>();
 
-// Resolved here rather than via `withDefaults`: default values are hoisted out
-// of setup() by the SFC compiler, so they can't call `t()`.
 const { t } = useI18n();
 const heading = computed(() => props.title ?? t("landing.faqs.title"));
 const subheading = computed(() => props.subtitle ?? t("landing.faqs.subtitle"));
+
+const faqItems = computed(() => [
+  {
+    label: t("landing.faqs.items.item1.question"),
+    content: t("landing.faqs.items.item1.answer"),
+  },
+  {
+    label: t("landing.faqs.items.item2.question"),
+    content: t("landing.faqs.items.item2.answer"),
+  },
+  {
+    label: t("landing.faqs.items.item3.question"),
+    content: t("landing.faqs.items.item3.answer"),
+  },
+  {
+    label: t("landing.faqs.items.item4.question"),
+    content: t("landing.faqs.items.item4.answer"),
+  },
+  {
+    label: t("landing.faqs.items.item5.question"),
+    content: t("landing.faqs.items.item5.answer"),
+  },
+  {
+    label: t("landing.faqs.items.item6.question"),
+    content: t("landing.faqs.items.item6.answer"),
+  },
+  {
+    label: t("landing.faqs.items.item7.question"),
+    content: t("landing.faqs.items.item7.answer"),
+  },
+]);
 </script>

@@ -3,6 +3,8 @@ title: "Getting Started with TypeScript: A Beginner's Guide"
 date: "2026-09-15"
 description: "Learn the basics of TypeScript and why it's becoming the preferred choice for JavaScript developers"
 author: "Adilson Noveli"
+category: "TypeScript"
+readTime: "4 min"
 ---
 
 TypeScript has become an essential tool in modern web development. In this guide, we'll explore why TypeScript is gaining popularity and how to get started with it.

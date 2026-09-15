@@ -39,13 +39,35 @@
       :level="0"
       :class="[useLevel ? 'pt-4' : 'pt-1']"
     />
-    <div v-if="!isMobile" class="h-20" />
+
+    <!-- Sidebar CTA to Pricing -->
+    <div class="mt-6 pt-4 border-t border-default">
+      <div class="p-3.5 rounded-xl border border-primary/25 bg-gradient-to-br from-primary/10 via-elevated to-transparent space-y-2.5">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-primary">
+          <UIcon name="i-lucide-package-check" class="w-4 h-4 shrink-0" />
+          <span>NuxFire Monorepo</span>
+        </div>
+        <p class="text-xs text-muted leading-snug">
+          100% de posse do código-fonte completo na sua Área de Membros.
+        </p>
+        <NuxtLink
+          :to="`${localePath('/')}#pricing`"
+          class="inline-flex items-center justify-center w-full py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-night-950 shadow-sm transition-all duration-150 active:scale-95 text-center gap-1.5"
+        >
+          <span>Garantir acesso imediato</span>
+          <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5 shrink-0" />
+        </NuxtLink>
+      </div>
+    </div>
+
+    <div v-if="!isMobile" class="h-10" />
   </div>
 </template>
 
 <script setup lang="ts">
 defineProps<{ isMobile: boolean }>();
 
+const localePath = useLocalePath();
 const navigation = useContentNavigation();
 // queryCollectionNavigation("docs") always wraps the tree in one synthetic
 // root node for the collection itself (path "/docs"). Its own children mix

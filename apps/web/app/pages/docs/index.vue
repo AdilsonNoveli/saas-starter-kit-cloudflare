@@ -37,6 +37,31 @@
       color="neutral"
       variant="subtle"
     />
+
+    <!-- Docs Index CTA Banner -->
+    <div class="mt-14 rounded-2xl border border-default bg-elevated/70 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 backdrop-blur-md shadow-sm">
+      <div class="space-y-2 flex-1">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/25">
+          <UIcon name="i-lucide-package-check" class="w-4 h-4" />
+          <span>Posse Total do Código-Fonte</span>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-highlighted tracking-tight">
+          Pronto para construir seu SaaS com o NuxFire?
+        </h2>
+        <p class="text-sm sm:text-base text-muted leading-relaxed max-w-2xl">
+          Acesso imediato de download na sua Área de Membros logo após a confirmação. Comece hoje mesmo com autenticação, pagamentos, multi-tenancy e banco de dados prontos para produção.
+        </p>
+      </div>
+      <CTAButton
+        :to="`${localePath('/')}#pricing`"
+        size="md"
+        radius="lg"
+        trailing-icon="i-lucide-arrow-right"
+        class="whitespace-nowrap text-xs sm:text-sm font-bold tracking-wider px-6 sm:px-8 py-3.5 shrink-0"
+      >
+        Garantir acesso imediato ao código
+      </CTAButton>
+    </div>
   </div>
 </template>
 
@@ -61,6 +86,7 @@ definePageMeta({
   auth: false,
 });
 
+const localePath = useLocalePath();
 const navigation = useContentNavigation();
 const docsConfig = useAppConfig().docs;
 

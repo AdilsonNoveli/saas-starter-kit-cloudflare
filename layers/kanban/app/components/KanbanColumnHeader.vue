@@ -6,7 +6,7 @@
     <!-- Ícone de recolher coluna (lado esquerdo, igual ao modelo do template) -->
     <button
       type="button"
-      class="p-1 rounded hover:bg-white/40 transition-colors shrink-0 focus:outline-none cursor-pointer"
+      class="p-1 rounded hover:brightness-110 transition-[filter] shrink-0 focus:outline-none cursor-pointer"
       :title="`Recolher coluna ${name}`"
       :aria-label="`Recolher coluna ${name}`"
       @click="emit('collapse')"
@@ -20,13 +20,13 @@
         ref="inputRef"
         v-model="draftName"
         type="text"
-        class="w-full h-6 px-1.5 text-xs font-bold uppercase rounded bg-white text-highlighted border border-default focus:outline-none focus:ring-1 focus:ring-primary"
+        class="w-full h-6 px-1.5 text-xs font-bold uppercase rounded bg-default text-highlighted border border-default focus:outline-none focus:ring-1 focus:ring-primary"
         @keyup.enter="saveEdit"
         @keyup.escape="cancelEdit"
       />
       <button
         type="button"
-        class="p-0.5 rounded hover:bg-white/60 transition-colors shrink-0"
+        class="p-0.5 rounded hover:brightness-110 transition-[filter] shrink-0"
         title="Salvar"
         @click="saveEdit"
       >
@@ -34,7 +34,7 @@
       </button>
       <button
         type="button"
-        class="p-0.5 rounded hover:bg-white/60 transition-colors shrink-0"
+        class="p-0.5 rounded hover:brightness-110 transition-[filter] shrink-0"
         title="Cancelar"
         @click="cancelEdit"
       >
@@ -58,7 +58,7 @@
     <div v-if="!isEditing" class="flex items-center gap-0.5 shrink-0">
       <button
         type="button"
-        class="p-1 rounded hover:bg-white/40 transition-colors focus:outline-none cursor-pointer"
+        class="p-1 rounded hover:brightness-110 transition-[filter] focus:outline-none cursor-pointer"
         title="Editar nome da coluna"
         aria-label="Editar coluna"
         @click="startEdit"
@@ -68,7 +68,7 @@
 
       <button
         type="button"
-        class="p-1 rounded hover:bg-white/40 hover:text-error transition-colors focus:outline-none cursor-pointer"
+        class="p-1 rounded hover:brightness-110 hover:text-error transition-[filter,color] focus:outline-none cursor-pointer"
         title="Excluir coluna"
         aria-label="Excluir coluna"
         @click="confirmDelete"
@@ -81,12 +81,12 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from "vue";
+import { kanbanColumnAccentStyle } from "../utils/kanbanColumnAccent";
 
 const props = defineProps<{
   name: string;
   cardCount: number;
   position?: number;
-  color?: string;
 }>();
 
 const emit = defineEmits<{
@@ -95,30 +95,7 @@ const emit = defineEmits<{
   delete: [];
 }>();
 
-// Cores canônicas pré-definidas do template de referência (KanbanColumnFormModal)
-const CORES_PREDEFINIDAS = [
-  "#EC4899", // rosa (Pendente/Novo)
-  "#3B82F6", // azul (Confirmado)
-  "#F59E0B", // âmbar (Em Preparo)
-  "#8B5CF6", // violeta (Preparado)
-  "#06B6D4", // ciano (Saiu para Entrega)
-  "#10B981", // esmeralda (Entregue)
-  "#EF4444", // vermelho (Cancelado)
-  "#6B7280", // cinza (neutra)
-];
-
-const headerStyle = computed(() => {
-  const cor =
-    props.color ||
-    CORES_PREDEFINIDAS[(props.position ?? 0) % CORES_PREDEFINIDAS.length] ||
-    "#6B7280";
-
-  return {
-    backgroundColor: `color-mix(in srgb, ${cor} 32%, #f8f8f8)`,
-    borderColor: `color-mix(in srgb, ${cor} 55%, #e6e6e6)`,
-    color: `color-mix(in srgb, ${cor} 65%, #1a1a1a)`,
-  };
-});
+const headerStyle = computed(() => kanbanColumnAccentStyle(props.position));
 
 const isEditing = ref(false);
 const draftName = ref("");

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col h-full rounded border border-default shadow-xs select-none transition-all duration-200 overflow-hidden bg-white"
+    class="flex flex-col h-full rounded border border-default shadow-xs select-none transition-all duration-200 overflow-hidden bg-elevated"
     :class="isCollapsed ? 'w-11' : 'w-64'"
   >
     <!-- ===== RECOLHIDA ===== -->
@@ -12,7 +12,7 @@
         <!-- Botão Expandir -->
         <button
           type="button"
-          class="p-1 rounded hover:bg-white/40 transition-colors focus:outline-none cursor-pointer"
+          class="p-1 rounded hover:brightness-110 transition-[filter] focus:outline-none cursor-pointer"
           :title="`Abrir coluna ${column.name}`"
           :aria-label="`Abrir coluna ${column.name}`"
           @click="toggleCollapse"
@@ -48,7 +48,7 @@
 
       <!-- Sub-header -->
       <div
-        class="px-3 py-1.5 bg-[#f8f8f8]/50 border-b border-default/50 flex items-center justify-between text-[11px] text-muted select-none"
+        class="px-3 py-1.5 bg-muted/50 border-b border-default/50 flex items-center justify-between text-[11px] text-muted select-none"
       >
         <span>{{ column.cards.length }} card(s)</span>
       </div>
@@ -77,7 +77,7 @@
       </div>
 
       <!-- Adicionar card -->
-      <div class="p-2.5 pt-0 shrink-0 border-t border-default/50 mt-auto bg-white">
+      <div class="p-2.5 pt-0 shrink-0 border-t border-default/50 mt-auto bg-elevated">
         <form
           class="flex items-center gap-1.5 pt-2"
           @submit.prevent="submitCard"
@@ -86,11 +86,11 @@
             v-model="cardState.title"
             type="text"
             placeholder="Adicionar card..."
-            class="flex-1 h-8 px-2 border border-default rounded bg-white text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+            class="flex-1 h-8 px-2 border border-default rounded bg-default text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
           />
           <button
             type="submit"
-            class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-[#f8f8f8] text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-muted text-muted hover:text-highlighted hover:bg-default transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             :disabled="!cardState.title.trim()"
             aria-label="Add card"
           >
@@ -112,6 +112,7 @@ import {
   useSortable,
 } from "@vueuse/integrations/useSortable";
 import type { KanbanColumnItem } from "../../shared/types";
+import { kanbanColumnAccentStyle } from "../utils/kanbanColumnAccent";
 
 const props = defineProps<{ column: KanbanColumnItem }>();
 
@@ -123,28 +124,7 @@ const emit = defineEmits<{
   deleteColumn: [columnId: string];
 }>();
 
-const CORES_PREDEFINIDAS = [
-  "#EC4899",
-  "#3B82F6",
-  "#F59E0B",
-  "#8B5CF6",
-  "#06B6D4",
-  "#10B981",
-  "#EF4444",
-  "#6B7280",
-];
-
-const headerStyle = computed(() => {
-  const cor =
-    CORES_PREDEFINIDAS[(props.column.position ?? 0) % CORES_PREDEFINIDAS.length] ||
-    "#6B7280";
-
-  return {
-    backgroundColor: `color-mix(in srgb, ${cor} 32%, #f8f8f8)`,
-    borderColor: `color-mix(in srgb, ${cor} 55%, #e6e6e6)`,
-    color: `color-mix(in srgb, ${cor} 65%, #1a1a1a)`,
-  };
-});
+const headerStyle = computed(() => kanbanColumnAccentStyle(props.column.position));
 
 // Drag state compartilhado via provide/inject
 const draggedCardId = inject<Ref<string | null>>("kanban:draggedCardId", ref(null));

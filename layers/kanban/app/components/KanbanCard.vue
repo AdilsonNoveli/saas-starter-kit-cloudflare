@@ -1,10 +1,10 @@
 <template>
   <div
-    class="kanban-card group relative flex flex-col gap-2 rounded border p-2.5 shadow-xs transition-all duration-150 select-none cursor-grab active:cursor-grabbing bg-white"
+    class="kanban-card group relative flex flex-col gap-2 rounded border p-2.5 shadow-xs transition-all duration-150 select-none cursor-grab active:cursor-grabbing bg-elevated"
     :class="
       isDragging
         ? 'opacity-40 scale-95 border-dashed border-primary'
-        : 'border-default hover:border-[--color-night-400] hover:-translate-y-0.5 hover:shadow-md'
+        : 'border-default hover:border-accented hover:-translate-y-0.5 hover:shadow-md'
     "
   >
     <!-- Topo: ícone + título + deletar -->
@@ -24,7 +24,7 @@
 
       <button
         type="button"
-        class="opacity-0 group-hover:opacity-100 shrink-0 -my-0.5 -mr-0.5 p-1 rounded text-muted hover:text-error hover:bg-[#f8f8f8] transition-all focus:outline-none"
+        class="opacity-0 group-hover:opacity-100 shrink-0 -my-0.5 -mr-0.5 p-1 rounded text-muted hover:text-error hover:bg-muted transition-all focus:outline-none"
         aria-label="Delete card"
         title="Delete card"
         @click.stop="emit('delete', card.id)"
@@ -46,7 +46,7 @@
       class="flex items-center justify-between pt-1 border-t border-default text-[10px] text-muted font-medium"
     >
       <span
-        class="rounded border border-default bg-[#f8f8f8] px-1.5 py-0.5 font-bold tabular-nums"
+        class="rounded border border-default bg-muted px-1.5 py-0.5 font-bold tabular-nums"
       >
         #{{ card.position + 1 }}
       </span>

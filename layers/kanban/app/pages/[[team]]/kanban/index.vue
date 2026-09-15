@@ -13,76 +13,55 @@
     </template>
 
     <template #body>
-      <div class="space-y-4 sm:space-y-6">
-        <UForm
-          :schema="schema"
-          :state="state"
-          class="flex items-start gap-2"
-          @submit="createBoard"
-        >
-          <UFormField name="name" class="flex-1">
-            <UInput
-              v-model="state.name"
-              placeholder="New board name"
-              class="w-full"
-            />
-          </UFormField>
-          <UButton
-            type="submit"
-            label="New board"
-            icon="i-lucide-plus"
-            :loading="creating"
-          />
-        </UForm>
-
-        <div
-          v-if="status === 'pending'"
-          class="flex justify-center py-12 text-muted"
-        >
-          <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin" />
-        </div>
-
-        <div
-          v-else-if="!boards.length"
-          class="flex flex-col items-center justify-center rounded-lg border border-dashed border-default p-12 text-center"
-        >
-          <UIcon name="i-lucide-kanban" class="mb-4 size-12 text-dimmed" />
-          <p class="mb-1 text-lg font-semibold">No boards yet</p>
-          <p class="text-sm text-muted">
-            Create your first board to start tracking work.
-          </p>
-        </div>
-
-        <div v-else class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <NuxtLink
-            v-for="board in boards"
-            :key="board.id"
-            :to="`${baseRoute}/kanban/${board.id}`"
-            class="group flex items-center gap-3 rounded border border-default bg-white p-4 shadow-xs hover:shadow-md hover:border-[--color-night-400] transition-all"
-          >
-            <div class="flex items-center justify-center size-9 rounded border border-default bg-[#f8f8f8] shrink-0">
-              <UIcon name="i-lucide-kanban" class="size-5 text-muted" />
-            </div>
-            <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-semibold text-highlighted">{{ board.name }}</p>
-              <p class="text-xs text-muted">Abrir board</p>
-            </div>
-            <UIcon name="i-lucide-arrow-right" class="size-4 text-muted/60 group-hover:text-muted shrink-0 transition-colors" />
-          </NuxtLink>
-        </div>
+      <div
+        v-if="showInitialLoader"
+        class="flex justify-center py-12 text-muted"
+      >
+        <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin" />
       </div>
+
+      <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <button
+          type="button"
+          class="flex flex-col items-center justify-center gap-2 min-h-[164px] rounded-lg border-2 border-dashed border-default hover:border-accented text-dimmed hover:text-default transition-colors cursor-pointer"
+          @click="showCreateModal = true"
+        >
+          <UIcon name="i-lucide-circle-plus" class="size-8" />
+          <span class="text-sm font-medium">Novo board</span>
+        </button>
+
+        <NuxtLink
+          v-for="board in boards"
+          :key="board.id"
+          :to="`${baseRoute}/kanban/${board.id}`"
+          class="group flex flex-col justify-between gap-4 min-h-[164px] rounded-lg bg-elevated ring ring-default hover:ring-accented p-5 transition-colors"
+        >
+          <div class="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary shrink-0">
+            <UIcon name="i-lucide-kanban" class="size-5" />
+          </div>
+          <div class="min-w-0">
+            <p class="truncate font-semibold text-highlighted">{{ board.name }}</p>
+            <p class="flex items-center gap-1 text-xs text-muted">
+              Abrir board
+              <UIcon
+                name="i-lucide-arrow-right"
+                class="size-3.5 -translate-x-0.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all"
+              />
+            </p>
+          </div>
+        </NuxtLink>
+      </div>
+
+      <KanbanBoardCreateModal v-model:open="showCreateModal" @created="onBoardCreated" />
     </template>
   </UDashboardPanel>
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
-
 definePageMeta({
   layout: "dashboard",
 });
 
-const toast = useToast();
 const currentTeam = useCurrentTeam();
 const baseRoute = computed(() => `/${currentTeam.value?.slug ?? ""}`);
 
@@ -90,32 +69,17 @@ const kanban = useKanban();
 const { data, status, refresh } = await kanban.useBoardList();
 const boards = computed(() => data.value ?? []);
 
-const schema = z.object({
-  name: z.string().min(2, "Board name must be at least 2 characters"),
-});
-const state = reactive({ name: "" });
-const creating = ref(false);
+// Only the very first load (no boards fetched yet) shows the full-page
+// spinner — a later refresh (after creating a board) must not blank a grid
+// the user is already looking at.
+const showInitialLoader = computed(
+  () => status.value === "pending" && !data.value,
+);
 
-async function createBoard() {
-  creating.value = true;
-  try {
-    await kanban.createBoard(state.name.trim());
-    state.name = "";
-    await refresh();
-    toast.add({
-      title: "Board created",
-      color: "success",
-      icon: "i-lucide-check",
-    });
-  } catch (error: any) {
-    toast.add({
-      title: "Failed to create board",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
-  } finally {
-    creating.value = false;
-  }
+const showCreateModal = ref(false);
+
+async function onBoardCreated(board: { id: string }) {
+  await refresh();
+  navigateTo(`${baseRoute.value}/kanban/${board.id}`);
 }
 </script>

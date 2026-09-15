@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col h-full overflow-hidden select-none bg-white text-highlighted font-sans">
+  <div class="flex flex-col h-full overflow-hidden select-none bg-default text-highlighted font-sans">
     <!-- Toolbar do board -->
     <div
-      class="shrink-0 h-14 border-b border-default bg-white px-4 sm:px-6 flex items-center justify-between gap-3 select-none"
+      class="shrink-0 h-14 border-b border-default bg-default px-4 sm:px-6 flex items-center justify-between gap-3 select-none"
     >
       <div class="flex items-center gap-3 flex-1 min-w-0">
         <!-- Search -->
@@ -15,7 +15,7 @@
             id="board-search"
             v-model="searchQuery"
             type="text"
-            class="block w-full h-full pl-9 pr-8 border border-default rounded bg-white text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            class="block w-full h-full pl-9 pr-8 border border-default rounded bg-default text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             placeholder="Pesquisar cards..."
           >
           <button
@@ -30,10 +30,10 @@
 
         <!-- Counters -->
         <div class="hidden sm:flex items-center gap-1.5 text-xs text-muted">
-          <span class="rounded bg-[#f8f8f8] px-2 py-0.5 font-semibold text-highlighted border border-default tabular-nums">
+          <span class="rounded bg-muted px-2 py-0.5 font-semibold text-highlighted border border-default tabular-nums">
             {{ board.columns.length }} coluna(s)
           </span>
-          <span class="rounded bg-[#f8f8f8] px-2 py-0.5 font-semibold text-highlighted border border-default tabular-nums">
+          <span class="rounded bg-muted px-2 py-0.5 font-semibold text-highlighted border border-default tabular-nums">
             {{ totalCardsCount }} card(s)
           </span>
           <span v-if="searchQuery.trim()" class="text-xs text-muted font-medium">
@@ -47,7 +47,7 @@
     <!-- Board: área de scroll lateral (grab-to-scroll) -->
     <div
       ref="boardWrapper"
-      class="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab active:cursor-grabbing bg-white"
+      class="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab active:cursor-grabbing bg-default"
       @mousedown="onMouseDown"
     >
       <div class="flex items-start gap-2.5 h-full min-w-max pb-2">
@@ -66,7 +66,7 @@
         <!-- Adicionar nova coluna (estilo quadrado tracejado com circle-plus do template) -->
         <div
           v-if="isAddingColumn"
-          class="flex w-64 shrink-0 flex-col rounded border border-dashed border-default bg-white p-3 self-start shadow-xs transition-colors"
+          class="flex w-64 shrink-0 flex-col rounded border border-dashed border-default bg-elevated p-3 self-start shadow-xs transition-colors"
         >
           <div class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-muted">
             <div class="flex items-center gap-1.5">
@@ -75,7 +75,7 @@
             </div>
             <button
               type="button"
-              class="p-0.5 rounded hover:bg-[#f8f8f8] text-muted hover:text-highlighted transition-colors focus:outline-none cursor-pointer"
+              class="p-0.5 rounded hover:bg-muted text-muted hover:text-highlighted transition-colors focus:outline-none cursor-pointer"
               @click="isAddingColumn = false"
             >
               <UIcon name="i-lucide-x" class="size-3.5" />
@@ -91,11 +91,11 @@
               v-model="columnState.name"
               type="text"
               placeholder="Nome da coluna..."
-              class="flex-1 h-8 px-2 border border-default rounded bg-white text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+              class="flex-1 h-8 px-2 border border-default rounded bg-default text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
             />
             <button
               type="submit"
-              class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-[#f8f8f8] text-muted hover:text-highlighted hover:bg-white transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-muted text-muted hover:text-highlighted hover:bg-elevated transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               :disabled="!columnState.name.trim()"
               aria-label="Salvar coluna"
             >
@@ -107,7 +107,7 @@
         <button
           v-else
           type="button"
-          class="flex flex-col items-center justify-center size-11 shrink-0 self-start rounded border border-dashed border-default text-muted hover:text-highlighted hover:border-[--color-night-400] hover:bg-white transition-colors cursor-pointer"
+          class="flex flex-col items-center justify-center size-11 shrink-0 self-start rounded border border-dashed border-default text-muted hover:text-highlighted hover:border-accented hover:bg-elevated transition-colors cursor-pointer"
           aria-label="Adicionar coluna"
           title="Adicionar coluna"
           @click="startAddColumn"

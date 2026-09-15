@@ -7,8 +7,8 @@
     <LandingFeatureBadges />
     <div class="py-8">
       <LandingFAQs
-        title="Common Questions"
-        subtitle="Learn more about this SaaS starter kit and how to customize it for your needs."
+        :title="t('landing.faqs.homeTitle')"
+        :subtitle="t('landing.faqs.homeSubtitle')"
       />
     </div>
     <LandingTestimonials />
@@ -21,8 +21,11 @@ definePageMeta({
   layout: "page",
   auth: false,
 });
+const { t } = useI18n();
 useSeoMeta({
-  title: "Demo SaaS",
+  // Function form so the title re-resolves when the locale changes instead of
+  // being frozen at setup time.
+  title: () => t("landing.seoTitle"),
 });
 const colorMode = useColorMode();
 colorMode.preference = "dark";

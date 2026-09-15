@@ -1,12 +1,5 @@
 <script setup>
-const config = useRuntimeConfig();
-const signupUrl = computed(() => config.public.appUrl || "/signup");
-
-const badgeText = ref("ENTERPRISE GRADE NUXT STARTER KITS");
-const heroTitle = ref("Stop spending months building what your SaaS should have on day one.");
-const heroSubtitle = ref(
-  "Stop wasting time building the basics. Start your SaaS with authentication, payments, database, users, dashboard, and infrastructure already done. You take care of what matters: **building the product no one else has.**"
-);
+const localePath = useLocalePath();
 </script>
 
 <template>
@@ -25,7 +18,7 @@ const heroSubtitle = ref(
         >
           <div class="flex gap-2 items-center text-xs lg:text-sm font-semibold tracking-wider uppercase">
             <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-emerald-400" />
-            <span>{{ badgeText }}</span>
+            <span>{{ $t("landing.hero.badge") }}</span>
           </div>
         </UBadge>
       </div>
@@ -34,23 +27,23 @@ const heroSubtitle = ref(
       <h1
         class="mb-6 text-pretty text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.12em] text-highlighted max-w-4xl"
       >
-        {{ heroTitle }}
+        {{ $t("landing.hero.title") }}
       </h1>
 
       <!-- Subtitle -->
       <p class="text-muted text-base sm:text-lg lg:text-xl font-normal leading-relaxed max-w-3xl mb-8">
-        Stop wasting time building the basics. Start your SaaS with authentication, payments, database, users, dashboard, and infrastructure already done. You take care of what matters: <strong class="font-semibold text-highlighted">building the product no one else has.</strong>
+        {{ $t("landing.hero.subtitleLead") }} <strong class="font-semibold text-highlighted">{{ $t("landing.hero.subtitleStrong") }}</strong>
       </p>
 
       <!-- CTA Buttons -->
       <div class="flex flex-col sm:flex-row items-center gap-4 justify-center">
         <CTAButton
-          to="/#pricing"
+          :to="`${localePath('/')}#pricing`"
           size="lg"
           radius="lg"
           trailing-icon="i-lucide-arrow-right"
         >
-          GET STARTED NOW
+          {{ $t("landing.hero.ctaPrimary") }}
         </CTAButton>
 
         <UButton
@@ -58,10 +51,10 @@ const heroSubtitle = ref(
           variant="ghost"
           color="neutral"
           size="xl"
-          to="/docs"
+          :to="localePath('/docs')"
           class="text-muted hover:text-highlighted"
         >
-          Documentation
+          {{ $t("landing.hero.ctaDocs") }}
         </UButton>
       </div>
     </section>
@@ -85,7 +78,7 @@ const heroSubtitle = ref(
           <div class="relative z-10 flex items-center justify-between">
             <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-night-950/90 border border-night-700/70 backdrop-blur-md">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span class="text-xs sm:text-sm font-medium text-night-200">Architecture &amp; Demo</span>
+              <span class="text-xs sm:text-sm font-medium text-night-200">{{ $t("landing.hero.videoLabel") }}</span>
             </div>
             <div class="flex items-center gap-1.5 text-night-400 text-xs sm:text-sm px-3 py-1 rounded-md bg-night-950/70 border border-night-800">
               <UIcon name="i-lucide-clock" class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -106,7 +99,7 @@ const heroSubtitle = ref(
               </div>
             </div>
             <span class="mt-4 text-xs sm:text-sm md:text-base font-semibold text-night-200 tracking-wide">
-              Watch Product Walkthrough
+              {{ $t("landing.hero.videoWatch") }}
             </span>
           </div>
 

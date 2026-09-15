@@ -2,11 +2,11 @@
   <section class="w-full overflow-hidden py-16">
     <div class="container mx-auto max-w-5xl px-4 md:px-8 mb-12 text-center">
       <h2 class="text-3xl sm:text-4xl font-bold text-highlighted">
-        Trusted by Teams Worldwide
+        {{ $t("landing.testimonials.title") }}
       </h2>
       <LandingAvatars class="my-3" />
       <p class="mt-3 text-lg text-muted max-w-2xl mx-auto">
-        Developers and founders rely on NuxFire to ship production-grade products faster.
+        {{ $t("landing.testimonials.subtitle") }}
       </p>
     </div>
 
@@ -19,6 +19,10 @@
 </template>
 
 <script setup lang="ts">
+// The 8 quotes below stay in English in every locale on purpose: they are
+// attributed to named people, and translating or paraphrasing someone else's
+// words would be putting statements in their mouth they never made. Only the
+// section heading and subheading above are localized.
 interface Testimonial {
   testimonial: string;
   name: string;

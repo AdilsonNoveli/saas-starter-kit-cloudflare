@@ -1,0 +1,547 @@
+{
+  "welcome": "¡Bienvenido al panel!",
+  "nuxtSiteConfig": {
+    "name": "NuxFire",
+    "description": "Starter kit de Nuxt de nivel empresarial, listo para producción en Cloudflare."
+  },
+  "nav": {
+    "brand": "NuxFire",
+    "home": "Inicio",
+    "pricing": "Precios",
+    "docs": "Documentación",
+    "blog": "Blog",
+    "login": "INICIAR SESIÓN",
+    "openMenu": "Abrir menú",
+    "language": "Idioma"
+  },
+  "footer": {
+    "tagline": "Starter kit de Nuxt de nivel empresarial, listo para producción en Cloudflare. Lanza tu SaaS en días, no en meses.",
+    "copyright": "© {year} NuxFire. Todos los derechos reservados.",
+    "legalTitle": "Legal",
+    "navTitle": "Navegación",
+    "legal": {
+      "terms": "Términos del servicio",
+      "privacy": "Política de privacidad",
+      "license": "Licencia"
+    }
+  },
+  "search": {
+    "trigger": "Buscar en la documentación...",
+    "placeholder": "Buscar en la documentación...",
+    "groups": {
+      "pages": "Páginas"
+    }
+  },
+  "docs": {
+    "footer": {
+      "copyright": "© {year} NuxFire",
+      "privacy": "Privacidad",
+      "terms": "Términos"
+    },
+    "index": {
+      "emptyState": "Los nuevos productos aparecerán aquí a medida que se lancen"
+    },
+    "productCard": {
+      "learnMore": "Saber más",
+      "openAriaLabel": "{title} — abrir documentación"
+    }
+  },
+  "blog": {
+    "seoTitle": "Blog",
+    "title": "Blog",
+    "subtitle": "Blog"
+  },
+  "signup": {
+    "seoTitle": "Registro - Alta en la comunidad",
+    "title": "Redirigiendo al registro",
+    "description": "Te estamos llevando al panel de registro e incorporación de la comunidad...",
+    "manualLink": "Haz clic aquí si no se te redirige automáticamente"
+  },
+  "landing": {
+    "seoTitle": "SaaS de demostración",
+    "hero": {
+      "badge": "STARTER KITS DE NUXT DE NIVEL EMPRESARIAL",
+      "title": "Deja de dedicar meses a construir lo que tu SaaS debería tener desde el primer día.",
+      "subtitleLead": "Deja de perder tiempo con lo básico. Arranca tu SaaS con autenticación, pagos, base de datos, usuarios, panel e infraestructura ya resueltos. Tú te ocupas de lo que de verdad importa:",
+      "subtitleStrong": "construir el producto que nadie más tiene.",
+      "ctaPrimary": "EMPIEZA AHORA",
+      "ctaDocs": "Documentación",
+      "videoLabel": "Arquitectura y demo",
+      "videoWatch": "Ver el recorrido del producto"
+    },
+    "architecture": {
+      "badge": "Arquitectura en el edge",
+      "title": "Diseñado para escala global",
+      "subtitle": "100 % serverless, sin cold starts, distribuido globalmente en Cloudflare Workers y PostgreSQL.",
+      "diagramAlt": "Diagrama de arquitectura de NuxFire",
+      "calloutLead": "¿Complicado? Puede ser.",
+      "calloutRest": "Ya resolvimos las partes difíciles para que tú te concentres en construir tu idea."
+    },
+    "useCases": {
+      "badge": "Oportunidades de negocio y casos de uso",
+      "title": "¿Qué puedes construir con NuxFire?",
+      "subtitle": "La mayoría de los boilerplates de SaaS se rompen en cuanto necesitas WebSockets con estado, colas de trabajos asíncronos o multitenencia empresarial de verdad. NuxFire está diseñado para llevar tu proyecto desde el MVP del primer día hasta millones de solicitudes diarias sin refactorizar tu arquitectura central.",
+      "examplesLabel": "Ejemplos de producto:",
+      "superpowerLabel": "Superpoder incluido:",
+      "items": {
+        "b2b": {
+          "category": "Núcleo SaaS B2B",
+          "title": "SaaS B2B y espacios de trabajo en equipo",
+          "description": "Vende planes de suscripción con cobro por asiento o por espacio de trabajo. El aislamiento estricto entre inquilinos, las invitaciones de equipo con token y el control de acceso por roles (RBAC) granular ya están auditados y listos para producción desde el primer día.",
+          "examples": {
+            "1": "CRM verticales",
+            "2": "Sistemas de ATS y reclutamiento",
+            "3": "Gestores de tareas y proyectos (Linear/Asana)",
+            "4": "Centros de soporte y ticketing"
+          },
+          "superpower": "Capa nativa de equipos, nuxt-authorization, Stripe Checkout/Portal y capa de Kanban integrada."
+        },
+        "realtime": {
+          "category": "Motor en tiempo real",
+          "title": "Aplicaciones en tiempo real con estado",
+          "description": "Crea aplicaciones colaborativas multiusuario sin clústeres de Redis costosos ni servidores Socket.io dedicados. Cada sala o canal funciona en un Durable Object aislado de Cloudflare, respaldado por SQLite embebido de baja latencia.",
+          "examples": {
+            "1": "Pizarras colaborativas",
+            "2": "Paneles de telemetría en vivo",
+            "3": "Chats de soporte y mensajería",
+            "4": "Lienzos y documentos multiusuario"
+          },
+          "superpower": "Durable Objects con almacenamiento SQLite, handshake por ticket firmado con HMAC y latencia global por debajo de 50 ms."
+        },
+        "ai": {
+          "category": "IA y procesamiento en segundo plano",
+          "title": "Plataformas de IA y agentes autónomos",
+          "description": "Ejecuta completions de LLM de larga duración y cargas de cómputo intensas sin bloquear la interfaz ni chocar con los tiempos de espera de las solicitudes HTTP. Cloudflare Queues procesa trabajos asíncronos con backoff exponencial y captura en Dead Letter Queue.",
+          "examples": {
+            "1": "Generadores de medios por lotes",
+            "2": "Copilotos de IA para sectores específicos",
+            "3": "Pipelines de audio y vídeo",
+            "4": "Analizadores de PDF y contratos"
+          },
+          "superpower": "Cloudflare Queues con DLQ, almacenamiento R2 ilimitado sin costes de salida y actualizaciones en vivo por WebSockets."
+        },
+        "micro": {
+          "category": "Monetización rápida",
+          "title": "Micro-SaaS y portales de membresía",
+          "description": "Lanza herramientas de suscripción ligeras y muy rentables en un solo fin de semana. La autenticación con OpenAuth.js corre en Cloudflare KV sin ninguna sobrecarga de conexión a la base de datos, y Nuxt Content v3 ofrece documentación y blogs ultrarrápidos.",
+          "examples": {
+            "1": "Directorios premium curados",
+            "2": "Herramientas de SEO y automatización",
+            "3": "Comunidades de miembros de pago",
+            "4": "Portales de cursos y productos digitales"
+          },
+          "superpower": "OpenAuth con sesiones sin base de datos, búsqueda de texto completo en D1 SQL y Stripe Billing preconfigurado."
+        },
+        "enterprise": {
+          "category": "Empresa y gobernanza",
+          "title": "Portales de clientes y backoffices internos",
+          "description": "Entrega portales de autoservicio y backoffices operativos capaces de superar auditorías corporativas de seguridad exigentes. Incluye de serie una consola de Super-Admin dedicada, autenticación multifactor TOTP y registro de auditoría completo.",
+          "examples": {
+            "1": "Portales de clientes para agencias",
+            "2": "Backoffices financieros",
+            "3": "Paneles de cumplimiento y auditoría",
+            "4": "Consolas de operaciones internas"
+          },
+          "superpower": "Portal /admin aislado con MFA por TOTP, tabla audit_logs en PostgreSQL y seguridad de tipos de extremo a extremo."
+        },
+        "api": {
+          "category": "API de alto volumen",
+          "title": "API a gran escala y pipelines de eventos",
+          "description": "Procesa millones de webhooks y trabajos en segundo plano con un coste de infraestructura inactiva casi nulo. El pooling de conexiones de Hyperdrive acelera las consultas a PostgreSQL sin agotar las conexiones, y los correos transaccionales gestionan los failovers.",
+          "examples": {
+            "1": "Despachadores de webhooks",
+            "2": "Motores de notificaciones transaccionales",
+            "3": "Pipelines de ingesta de métricas",
+            "4": "Crons programados cada hora"
+          },
+          "superpower": "Pooling de conexiones TCP con Cloudflare Hyperdrive, React Email multiproveedor (Resend/Brevo/SES) y Crons en el edge."
+        }
+      },
+      "banner": {
+        "badge": "Decisión estratégica de ingeniería",
+        "title": "Ahorra de 3 a 6 meses de ingeniería crítica",
+        "descriptionLead": "Construir desde cero autenticación sin contraseña en el edge, pooling de base de datos relacional, RBAC multiinquilino, colas asíncronas con DLQ y cobros con Stripe cuesta más de",
+        "descriptionCost": "10.000 USD en horas de ingeniería sénior",
+        "descriptionTail": ". Con NuxFire, todo eso funciona desde tu primer",
+        "pillars": {
+          "edge": {
+            "title": "Edge < 50 ms",
+            "description": "Más de 300 centros de datos globales de Cloudflare, sin cold starts."
+          },
+          "database": {
+            "title": "Cero caídas de base de datos",
+            "description": "El pooling de Hyperdrive mantiene conexiones TCP persistentes con PostgreSQL."
+          },
+          "security": {
+            "title": "Listo para SOC2 y MFA",
+            "description": "Portal /admin dedicado con autenticación en dos pasos por TOTP y registros de auditoría."
+          },
+          "types": {
+            "title": "100 % type-safe",
+            "description": "Desde las consultas de Drizzle ORM hasta los componentes de Nuxt UI, pasando por tRPC."
+          }
+        },
+        "ctaPrimary": "EMPIEZA AHORA",
+        "ctaDocs": "Ver documentación"
+      }
+    },
+    "comparison": {
+      "badge": "NuxFire frente a construirlo desde cero",
+      "title": "Todo lo que te llevaría meses construir — listo el primer día",
+      "subtitle": "52 funcionalidades verificadas en producción y auditadas en nuestro código. Deja de reconstruir autenticación, multitenencia, cobros e infraestructura en el edge desde cero.",
+      "metrics": {
+        "featuresValue": "52 / 52",
+        "featuresLabel": "Funcionalidades listas para producción en NuxFire",
+        "timeValue": "3+ meses",
+        "timeLabel": "De ingeniería ahorrados",
+        "missingValue": "36 funcionalidades",
+        "missingLabel": "Que suelen faltar en proyectos en fase inicial"
+      },
+      "searchPlaceholder": "Busca entre 52 funcionalidades listas para producción (p. ej., Stripe, RBAC, Passkey, Queue)...",
+      "clearSearch": "Limpiar búsqueda",
+      "columns": {
+        "feature": "Funcionalidad / capacidad",
+        "nuxfire": "NuxFire",
+        "scratch": "SaaS desde cero"
+      },
+      "status": {
+        "included": "Incluido",
+        "ready": "Habitual",
+        "partial": "Parcial / básico",
+        "missing": "Construir desde cero"
+      },
+      "empty": "No se encontró ninguna funcionalidad para \"{query}\".",
+      "legend": {
+        "verified": "Verificado en producción",
+        "basic": "Básico o improvisado",
+        "custom": "Requiere ingeniería a medida",
+        "source": "Fuente: auditoría verificada del código (septiembre de 2026)"
+      },
+      "categories": {
+        "auth": "Autenticación y seguridad",
+        "teams": "Equipos y RBAC",
+        "admin": "Administración de la plataforma",
+        "billing": "Pagos y facturación",
+        "realtime": "Tiempo real y colas",
+        "content": "CMS y documentación",
+        "infra": "Infraestructura en el edge"
+      },
+      "features": {
+        "authPassword": {
+          "name": "Autenticación por correo y contraseña",
+          "description": "Hash de contraseñas con Argon2 / scrypt gestionado de forma segura por OpenAuth.js"
+        },
+        "authOtp": {
+          "name": "Códigos OTP por correo, sin contraseña",
+          "description": "Inicio de sesión con código de un solo uso y correos de verificación"
+        },
+        "authOauth": {
+          "name": "OAuth social (GitHub + Google)",
+          "description": "Vinculación de cuenta OAuth en un clic, con activación condicional por proveedor"
+        },
+        "authRateLimit": {
+          "name": "Límite de intentos persistente contra fuerza bruta",
+          "description": "Límite de ventana fija en Cloudflare KV que protege el inicio de sesión y el MFA"
+        },
+        "authSessions": {
+          "name": "Jerarquía de sesiones en varios niveles",
+          "description": "Tokens de acceso, tokens de refresco y sesiones MFA elevadas selladas, todos separados"
+        },
+        "authRevoke": {
+          "name": "Cierre remoto de sesiones",
+          "description": "Cierra todas las demás sesiones activas mediante un endpoint de revocación dedicado"
+        },
+        "authTotp": {
+          "name": "MFA / 2FA por TOTP en autoservicio",
+          "description": "Generación del código QR en el cliente con secretos cifrados en reposo mediante AES-GCM"
+        },
+        "authDeletion": {
+          "name": "Eliminación completa de cuenta e identidad",
+          "description": "Borrado en cascada en KV y Postgres, conforme al RGPD / LGPD"
+        },
+        "teamsMultiTenancy": {
+          "name": "Multitenencia por slug de espacio de trabajo / subruta",
+          "description": "Rutas limpias (/slug-del-equipo/dashboard) con resolución automática del inquilino"
+        },
+        "teamsSwitcher": {
+          "name": "Interfaz para cambiar de espacio de trabajo",
+          "description": "Menú fluido para cambiar de equipo y modal de creación de equipos"
+        },
+        "teamsCrud": {
+          "name": "CRUD completo de espacios de trabajo",
+          "description": "Actualiza el nombre, el slug, la descripción y los metadatos del espacio de trabajo"
+        },
+        "teamsLogo": {
+          "name": "Subida y almacenamiento del logo del equipo",
+          "description": "Subida de avatares dedicada con Cloudflare R2 a través de NuxtHub blob"
+        },
+        "teamsDeletion": {
+          "name": "Barrera de eliminación segura del espacio de trabajo",
+          "description": "Eliminación de equipos protegida por confirmación del nombre y limpieza en cascada"
+        },
+        "teamsInvites": {
+          "name": "Invitaciones por correo con roles y caducidad",
+          "description": "Invitaciones enviadas por correo transaccional con token válido durante 7 días"
+        },
+        "teamsInviteLifecycle": {
+          "name": "Gestión completa del ciclo de vida de las invitaciones",
+          "description": "Acepta, rechaza, reenvía y revoca invitaciones en tiempo real"
+        },
+        "teamsMemberRoles": {
+          "name": "Cambio de rol y eliminación de miembros",
+          "description": "Gestiona los permisos de los colaboradores y elimina a los miembros inactivos"
+        },
+        "teamsSeatLimits": {
+          "name": "Validación del límite de asientos del plan al invitar",
+          "description": "Bloquea las invitaciones cuando el equipo supera los asientos contratados"
+        },
+        "teamsRbac": {
+          "name": "RBAC estructurado (abilities y bouncer)",
+          "description": "Permisos granulares comprobados con defineAbility en tRPC y en el componente Can de Vue"
+        },
+        "teamsSystemRoles": {
+          "name": "Roles de sistema aprovisionados automáticamente",
+          "description": "Los roles OWNER y MEMBER se crean automáticamente con sus conjuntos de permisos"
+        },
+        "adminConsole": {
+          "name": "Consola de administración de la plataforma dedicada (/admin)",
+          "description": "Totalmente aislada del RBAC de los inquilinos para evitar la escalada de privilegios"
+        },
+        "adminGate": {
+          "name": "Barrera de seguridad de triple capa",
+          "description": "Exige registro de administrador activo + TOTP habilitado + sesión elevada válida"
+        },
+        "adminMetrics": {
+          "name": "Panel ejecutivo de métricas del operador",
+          "description": "Ingresos en vivo, total de usuarios, espacios de trabajo activos y distribución por plan"
+        },
+        "adminAccounts": {
+          "name": "Gestión global de cuentas y equipos",
+          "description": "Suspende, reactiva o inspecciona al instante la cuenta de cualquier inquilino"
+        },
+        "adminPlans": {
+          "name": "CRUD de planes de precios dentro de la app",
+          "description": "Crea, edita y elimina lógicamente planes con sincronización en vivo con Stripe"
+        },
+        "adminJobs": {
+          "name": "Consola de trabajos en segundo plano y DLQ",
+          "description": "Supervisa el estado de la cola, consulta los errores de dead letter y relanza los trabajos"
+        },
+        "adminAudit": {
+          "name": "Registro de auditoría inmutable del operador",
+          "description": "Tabla AuditLog que registra cada acción crítica del operador con fecha, hora e IP"
+        },
+        "adminAnnouncements": {
+          "name": "Anuncios globales en tiempo real",
+          "description": "Envía notificaciones del sistema a los usuarios activos por WebSockets"
+        },
+        "billingProviders": {
+          "name": "Arquitectura con dos proveedores (Stripe + Paddle)",
+          "description": "Motor de pagos conectable, con cambio de proveedor mediante flags de configuración"
+        },
+        "billingPlanSync": {
+          "name": "Sincronización automática de planes con Stripe",
+          "description": "Crea y actualiza los Products y Prices de Stripe directamente desde el panel de administración"
+        },
+        "billingDbPlans": {
+          "name": "Planes de precios gestionados en la base de datos",
+          "description": "Modifica precios, días de prueba y beneficios en PostgreSQL sin volver a desplegar"
+        },
+        "billingQuotas": {
+          "name": "Límites de asientos y cuotas personalizadas por plan (JSONB)",
+          "description": "Límites de beneficios flexibles asociados al plan y aplicados en el código"
+        },
+        "billingCheckout": {
+          "name": "Checkout inteligente con reutilización del ID de cliente",
+          "description": "Evita registros de cliente duplicados en Stripe en suscripciones repetidas"
+        },
+        "billingWebhooks": {
+          "name": "Manejadores de webhooks resilientes",
+          "description": "Gestionan altas de suscripción, pagos fallidos, mejoras de plan y cancelaciones"
+        },
+        "billingIdempotency": {
+          "name": "Idempotencia de los eventos de webhook",
+          "description": "Deduplica los reintentos de webhook para evitar cobros dobles o condiciones de carrera"
+        },
+        "billingPortal": {
+          "name": "Portal de facturación de autoservicio para el cliente",
+          "description": "Permite al cliente gestionar tarjetas, descargar facturas y cancelar cuando quiera"
+        },
+        "realtimeWebsockets": {
+          "name": "WebSockets nativos en el edge (Durable Objects)",
+          "description": "Hub de conexiones en tiempo real con estado, construido sobre Cloudflare Durable Objects"
+        },
+        "realtimeTickets": {
+          "name": "Autenticación por ticket firmado con HMAC",
+          "description": "Los tickets de corta duración en Sec-WebSocket-Protocol evitan exponer el token de sesión"
+        },
+        "realtimeNotifications": {
+          "name": "Notificaciones push en tiempo real en el panel",
+          "description": "Avisos emergentes y actualización de badges instantáneos por WebSockets"
+        },
+        "realtimeQueues": {
+          "name": "Cloudflare Queues con control de concurrencia",
+          "description": "Búfer asíncrono de trabajos en segundo plano (lotes de 10, concurrencia máxima de 5)"
+        },
+        "realtimeDlq": {
+          "name": "Dead Letter Queue (JobDLQ) y relanzamiento por el operador",
+          "description": "Captura los reintentos fallidos en DeadLetterRecord para su inspección manual"
+        },
+        "realtimeCrons": {
+          "name": "Trabajos cron programados con registros de ejecución",
+          "description": "Disparadores de mantenimiento cada hora que ejecutan trabajos serverless con registro en la base de datos"
+        },
+        "contentCms": {
+          "name": "CMS en Markdown con varias colecciones",
+          "description": "Nuxt Content v3 gestionando las colecciones de documentación, blog, FAQ y páginas legales"
+        },
+        "contentSearch": {
+          "name": "Búsqueda de texto completo en la documentación (Ctrl+K)",
+          "description": "Búsqueda instantánea en el cliente, con índice en la base de datos SQL D1 de Cloudflare"
+        },
+        "contentBlog": {
+          "name": "Blog en Markdown con esquema validado",
+          "description": "Esquema de frontmatter obligatorio para autores, fechas, etiquetas y tiempo de lectura"
+        },
+        "contentLegal": {
+          "name": "Páginas legales listas para producción",
+          "description": "Plantillas de Términos del servicio y Política de privacidad ya integradas en el layout"
+        },
+        "contentLanding": {
+          "name": "Landing page de alta conversión",
+          "description": "Hero, diagrama de arquitectura, comparativa de funcionalidades, testimonios y precios"
+        },
+        "infraServerless": {
+          "name": "Arquitectura en el edge 100 % serverless",
+          "description": "Desplegado por completo en Cloudflare Workers, sin ninguna sobrecarga de contenedores"
+        },
+        "infraIac": {
+          "name": "Infraestructura como código declarativa (SST v4)",
+          "description": "Despliegues reproducibles entre los entornos de desarrollo y producción con bun run deploy"
+        },
+        "infraDrizzle": {
+          "name": "Drizzle ORM con migraciones automatizadas",
+          "description": "Consultas a PostgreSQL con seguridad de tipos y migraciones de drizzle-kit automáticas en el despliegue"
+        },
+        "infraSeeding": {
+          "name": "Seeding idempotente tras la migración",
+          "description": "El plan gratuito y los permisos de sistema se crean automáticamente, sin duplicados"
+        },
+        "infraTypes": {
+          "name": "Capa de API con seguridad de tipos de extremo a extremo",
+          "description": "Inferencia completa de TypeScript desde el esquema de PostgreSQL hasta tRPC y los componentes de Vue"
+        },
+        "infraPooling": {
+          "name": "Pooling de conexiones en el edge sin cold start",
+          "description": "Cloudflare Hyperdrive agrupa y acelera las conexiones a Postgres en el edge"
+        }
+      }
+    },
+    "badges": {
+      "modernStack": "Stack moderno",
+      "typeSafe": "Type-safe",
+      "paymentReady": "Listo para pagos",
+      "cloudReady": "Listo para la nube",
+      "authentication": "Autenticación",
+      "teamFeatures": "Funciones de equipo",
+      "emailSystem": "Sistema de correo",
+      "testingSetup": "Pruebas configuradas",
+      "flexibleDeployment": "Despliegue flexible",
+      "databaseReady": "Base de datos lista",
+      "backgroundJobs": "Trabajos en segundo plano",
+      "apiFramework": "Framework de API",
+      "ormIncluded": "ORM incluido",
+      "emailTemplates": "Plantillas de correo",
+      "socialAuth": "Inicio de sesión social",
+      "roleBasedAccess": "Acceso por roles",
+      "teamManagement": "Gestión de equipos",
+      "subscriptionSystem": "Sistema de suscripciones",
+      "modernUi": "UI moderna",
+      "seoReady": "Listo para SEO",
+      "multiLanguage": "Multiidioma"
+    },
+    "testimonials": {
+      "title": "Con la confianza de equipos de todo el mundo",
+      "subtitle": "Desarrolladores y fundadores confían en NuxFire para lanzar productos de nivel de producción más rápido."
+    },
+    "avatars": {
+      "validated": "Validado por más de 300 desarrolladores"
+    },
+    "faqs": {
+      "title": "Tus dudas, resueltas",
+      "subtitle": "Todo lo que necesitas saber sobre nuestro SaaS",
+      "homeTitle": "Preguntas frecuentes",
+      "homeSubtitle": "Conoce mejor este starter kit de SaaS y cómo adaptarlo a tus necesidades."
+    },
+    "pricing": {
+      "badge": "Licencia de por vida",
+      "title": "Precios simples y transparentes",
+      "subtitle": "Un solo pago. Propiedad total. Sin cuotas mensuales recurrentes ni comisiones ocultas de plataforma.",
+      "cardTitle": "NuxFire Production Kit",
+      "cardSubtitle": "Código SaaS full-stack de nivel empresarial e infraestructura en la nube",
+      "lifetimeAccess": "Acceso de por vida",
+      "oneTimePayment": "Pago único",
+      "neverMonthly": "Nunca más pagues una mensualidad por código",
+      "includedTitle": "Todo lo que incluye tu licencia:",
+      "cta": "EMPIEZA AHORA",
+      "guarantee": {
+        "refund": "Garantía de devolución en 14 días",
+        "projects": "Proyectos personales y comerciales ilimitados",
+        "github": "Acceso inmediato a GitHub"
+      },
+      "features": {
+        "monorepo": {
+          "highlight": "Código fuente completo del monorepo",
+          "text": "Nuxt 4, Nitro, tRPC e IaC declarativa con SST v4."
+        },
+        "multiTenancy": {
+          "highlight": "Multitenencia B2B y equipos",
+          "text": "Cambio de organización, invitaciones con token y RBAC granular."
+        },
+        "auth": {
+          "highlight": "Autenticación en el edge con OpenAuth.js",
+          "text": "Caché de sesión en KV sin base de datos, OAuth de Google y GitHub, contraseña y OTP."
+        },
+        "realtime": {
+          "highlight": "Motor en tiempo real con estado",
+          "text": "Cloudflare Durable Objects con SQLite embebido y WebSockets con HMAC."
+        },
+        "queues": {
+          "highlight": "Colas de trabajos en segundo plano y DLQ",
+          "text": "Cloudflare Queues con reintentos automáticos y captura de dead letter."
+        },
+        "billing": {
+          "highlight": "Facturación y suscripciones con Stripe",
+          "text": "Sesiones de checkout, Customer Portal y desbloqueo de beneficios por nivel de plan."
+        },
+        "email": {
+          "highlight": "Sistema de correo transaccional",
+          "text": "Plantillas de React Email con failover entre proveedores (Resend/Brevo/SES)."
+        },
+        "admin": {
+          "highlight": "Portal de Super-Admin dedicado",
+          "text": "Protegido con MFA por TOTP, suplantación de usuarios y registros de auditoría."
+        },
+        "database": {
+          "highlight": "Drizzle ORM y Postgres con Hyperdrive",
+          "text": "Pooling de conexiones TCP en el edge sin cold start, para cualquier PostgreSQL."
+        },
+        "storage": {
+          "highlight": "Almacenamiento de objetos y base de datos D1",
+          "text": "Cloudflare R2 sin costes de salida y búsqueda de texto completo en SQL con D1."
+        },
+        "kanban": {
+          "highlight": "Aplicación Kanban de producción",
+          "text": "Capa de Kanban lista para producción, con tarjetas de arrastrar y soltar."
+        },
+        "updates": {
+          "highlight": "Actualizaciones de por vida y documentación",
+          "text": "Documentación completa, futuras actualizaciones y comunidad privada de desarrolladores."
+        }
+      }
+    },
+    "cta": {
+      "default": "EMPIEZA AHORA"
+    }
+  }
+}

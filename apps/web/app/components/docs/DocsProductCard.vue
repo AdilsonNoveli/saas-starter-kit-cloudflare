@@ -3,7 +3,7 @@
     class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-default bg-elevated/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer"
     role="link"
     tabindex="0"
-    :aria-label="`${title} — open documentation`"
+    :aria-label="$t('docs.productCard.openAriaLabel', { title })"
     @click="navigateTo(path)"
     @keydown.enter.prevent="navigateTo(path)"
     @keydown.space.prevent="navigateTo(path)"
@@ -76,7 +76,7 @@
       <div
         class="mt-4 flex items-center border-t border-default pt-4 text-sm font-medium text-primary"
       >
-        Learn more
+        {{ $t("docs.productCard.learnMore") }}
         <UIcon
           name="i-lucide-arrow-right"
           class="ml-1 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"

@@ -21,7 +21,7 @@
           />
         </svg>
       </div>
-      <span class="text-xs sm:text-sm font-medium text-muted">Validated by 300+ developers</span>
+      <span class="text-xs sm:text-sm font-medium text-muted">{{ $t("landing.avatars.validated") }}</span>
     </div>
   </div>
 </template>

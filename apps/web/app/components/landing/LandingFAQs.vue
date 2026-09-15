@@ -1,9 +1,9 @@
 <template>
   <LayoutSection>
     <div class="w-full text-center pb-8">
-      <span class="text-3xl font-semibold text-highlighted">{{ title }}</span>
-      <p v-if="subtitle" class="mt-2 text-muted">
-        {{ subtitle }}
+      <span class="text-3xl font-semibold text-highlighted">{{ heading }}</span>
+      <p v-if="subheading" class="mt-2 text-muted">
+        {{ subheading }}
       </p>
     </div>
     <UAccordion
@@ -45,14 +45,17 @@
 const { data: faqs } = await useAsyncData("home", () =>
   queryCollection("faqs").all(),
 );
-defineProps({
-  title: {
-    type: String,
-    default: "Your Questions, Answered",
-  },
-  subtitle: {
-    type: String,
-    default: "Everything you need to know about our SaaS",
-  },
-});
+// Only the section heading/subheading are translated here — the questions and
+// answers themselves come from the `faqs` @nuxt/content collection, which is
+// English-only until the content-translation round.
+const props = defineProps<{
+  title?: string;
+  subtitle?: string;
+}>();
+
+// Resolved here rather than via `withDefaults`: default values are hoisted out
+// of setup() by the SFC compiler, so they can't call `t()`.
+const { t } = useI18n();
+const heading = computed(() => props.title ?? t("landing.faqs.title"));
+const subheading = computed(() => props.subtitle ?? t("landing.faqs.subtitle"));
 </script>

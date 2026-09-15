@@ -7,17 +7,17 @@
           <UBadge color="primary" variant="subtle" size="md">
             <div class="flex gap-2 items-center text-xs lg:text-sm">
               <UIcon name="i-lucide-layers" class="w-4 h-4" />
-              <span>Edge Architecture</span>
+              <span>{{ $t("landing.architecture.badge") }}</span>
             </div>
           </UBadge>
         </div>
 
         <h2 class="text-pretty text-3xl font-bold lg:text-5xl lg:leading-[1.1em] text-highlighted mb-4">
-          Engineered for Global Scale
+          {{ $t("landing.architecture.title") }}
         </h2>
 
         <p class="text-muted text-lg lg:text-xl">
-          100% serverless, zero cold-starts, globally distributed on Cloudflare Workers and PostgreSQL.
+          {{ $t("landing.architecture.subtitle") }}
         </p>
       </div>
 
@@ -25,7 +25,7 @@
       <div class="w-full overflow-hidden flex justify-center items-center py-2">
         <img
           src="/svg/architecture_diagram.svg"
-          alt="NuxFire Architecture Diagram"
+          :alt="$t('landing.architecture.diagramAlt')"
           class="w-full h-auto max-h-[900px] object-contain block mx-auto"
           loading="lazy"
         />
@@ -34,7 +34,7 @@
       <!-- Callout -->
       <div class="mt-8 lg:mt-12 text-center max-w-3xl mx-auto">
         <p class="text-lg sm:text-xl lg:text-2xl font-medium tracking-tight text-highlighted">
-          Complicated? Perhaps. <span class="text-muted font-normal">We've already handled the hard parts so you can focus on building your idea.</span>
+          {{ $t("landing.architecture.calloutLead") }} <span class="text-muted font-normal">{{ $t("landing.architecture.calloutRest") }}</span>
         </p>
       </div>
 

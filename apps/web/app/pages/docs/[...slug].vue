@@ -80,5 +80,18 @@ useSeoMeta({
 definePageMeta({
   layout: "docs",
   auth: false,
+  // English-only, deliberately excluded from locale prefixing. @nuxt/content
+  // has no live backend on Cloudflare here (no D1/Postgres — see the
+  // prerender comment in nuxt.config.ts), so every docs URL has to be
+  // prerendered from the explicit `docsRoutes()` list or it fails at runtime
+  // rather than falling back to a dynamic query. A catch-all route can't be
+  // expanded into concrete /pt-BR/... and /es/... URLs by that list, so
+  // localizing it would create prefixed routes with nothing prerendered
+  // behind them. `i18n: false` is read by @nuxtjs/i18n via Nuxt's
+  // `experimental.extraPageMetaExtractionKeys` (the module registers the
+  // `i18n` key itself) and short-circuits route localization for this page in
+  // every `customRoutes` mode. The docs body is English-only for now anyway —
+  // translating @nuxt/content markdown is a separate round.
+  i18n: false,
 });
 </script>

@@ -2,8 +2,8 @@
   <LayoutSection>
     <main class="space-y-3">
       <div class="flex flex-col">
-        <span class="text-4xl font-semibold">Blog</span>
-        <span class="text-muted">Blog</span>
+        <span class="text-4xl font-semibold">{{ $t("blog.title") }}</span>
+        <span class="text-muted">{{ $t("blog.subtitle") }}</span>
       </div>
       <USeparator />
       <div v-if="posts?.length" class="divide-y divide-default">
@@ -27,8 +27,9 @@ definePageMeta({
   layout: "page",
   auth: false,
 });
+const { t } = useI18n();
 useSeoMeta({
-  title: "Blog",
+  title: () => t("blog.seoTitle"),
 });
 
 const { data: posts } = await useAsyncData("blog-list", () =>

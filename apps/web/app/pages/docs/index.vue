@@ -28,7 +28,7 @@
     <UAlert
       v-else
       icon="i-lucide-info"
-      title="More products land here as they ship"
+      :title="$t('docs.index.emptyState')"
       color="neutral"
       variant="subtle"
     />

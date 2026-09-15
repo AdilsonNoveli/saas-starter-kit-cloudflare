@@ -13,7 +13,21 @@ const { data: navigation } = await useAsyncData("navigation", () =>
 );
 provide("navigation", navigation);
 
-useHead({
-  link: [{ href: "/favicon.ico", rel: "icon", type: "image/x-icon" }],
-});
+// `useLocaleHead()` (the current @nuxtjs/i18n v10 API — `$localeHead` is
+// deprecated in favour of it) returns a reactive bag of `htmlAttrs` (lang/dir),
+// `link` (canonical + one `rel="alternate" hreflang="..."` per locale) and
+// `meta` (`og:locale` / `og:locale:alternate`). Wiring it here, in the single
+// root entry point, means every route in every locale emits them without each
+// page repeating the call. Passing the ref through a getter keeps `useHead()`
+// tracking it when the locale changes.
+const localeHead = useLocaleHead({ seo: true });
+
+useHead(() => ({
+  htmlAttrs: localeHead.value.htmlAttrs,
+  link: [
+    { href: "/favicon.ico", rel: "icon", type: "image/x-icon" },
+    ...(localeHead.value.link ?? []),
+  ],
+  meta: localeHead.value.meta ?? [],
+}));
 </script>

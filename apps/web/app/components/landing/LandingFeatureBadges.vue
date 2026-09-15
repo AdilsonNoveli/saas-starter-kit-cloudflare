@@ -2,8 +2,8 @@
   <div class="container mx-auto max-w-5xl px-4 md:px-8 py-8">
     <div class="flex flex-wrap justify-center items-center gap-2 sm:gap-3 max-w-4xl mx-auto">
       <UBadge
-        v-for="(badge, index) in featureBadges"
-        :key="index"
+        v-for="badge in featureBadges"
+        :key="badge"
         color="neutral"
         variant="subtle"
         size="md"
@@ -11,7 +11,7 @@
       >
         <div class="flex gap-1.5 items-center text-xs sm:text-sm font-medium">
           <UIcon class="w-4 h-4 text-emerald-500" name="i-lucide-circle-check" />
-          <span>{{ badge.text }}</span>
+          <span>{{ t(`landing.badges.${badge}`) }}</span>
         </div>
       </UBadge>
     </div>
@@ -19,27 +19,31 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
+// Key suffixes under `landing.badges.*` — the display text lives in the locale
+// files so the order here stays the single place that controls the layout.
 const featureBadges = [
-  { text: "Modern Stack" },
-  { text: "Type-Safe" },
-  { text: "Payment Ready" },
-  { text: "Cloud Ready" },
-  { text: "Authentication" },
-  { text: "Team Features" },
-  { text: "Email System" },
-  { text: "Testing Setup" },
-  { text: "Flexible Deployment" },
-  { text: "Database Ready" },
-  { text: "Background Jobs" },
-  { text: "API Framework" },
-  { text: "ORM Included" },
-  { text: "Email Templates" },
-  { text: "Social Auth" },
-  { text: "Role-Based Access" },
-  { text: "Team Management" },
-  { text: "Subscription System" },
-  { text: "Modern UI" },
-  { text: "SEO Ready" },
-  { text: "Multi-language" },
+  "modernStack",
+  "typeSafe",
+  "paymentReady",
+  "cloudReady",
+  "authentication",
+  "teamFeatures",
+  "emailSystem",
+  "testingSetup",
+  "flexibleDeployment",
+  "databaseReady",
+  "backgroundJobs",
+  "apiFramework",
+  "ormIncluded",
+  "emailTemplates",
+  "socialAuth",
+  "roleBasedAccess",
+  "teamManagement",
+  "subscriptionSystem",
+  "modernUi",
+  "seoReady",
+  "multiLanguage",
 ];
 </script>

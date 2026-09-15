@@ -7,17 +7,17 @@
           <UBadge color="primary" variant="subtle" size="md">
             <div class="flex gap-2 items-center text-xs lg:text-sm">
               <UIcon name="i-lucide-tag" class="w-4 h-4 text-emerald-400" />
-              <span>Lifetime License</span>
+              <span>{{ $t("landing.pricing.badge") }}</span>
             </div>
           </UBadge>
         </div>
 
         <h2 class="text-pretty text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight lg:leading-[1.12em] text-highlighted mb-4">
-          Simple, Transparent Pricing
+          {{ $t("landing.pricing.title") }}
         </h2>
 
         <p class="text-muted text-base sm:text-lg lg:text-xl font-normal leading-relaxed">
-          One payment. Complete ownership. No recurring monthly fees or hidden platform tax.
+          {{ $t("landing.pricing.subtitle") }}
         </p>
       </div>
 
@@ -30,14 +30,14 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
           <div>
             <h3 class="text-2xl font-black text-highlighted tracking-tight">
-              NuxFire Production Kit
+              {{ $t("landing.pricing.cardTitle") }}
             </h3>
             <p class="text-sm text-muted mt-1">
-              Full-stack enterprise SaaS codebase &amp; cloud infrastructure
+              {{ $t("landing.pricing.cardSubtitle") }}
             </p>
           </div>
           <span class="inline-flex items-center text-[11px] font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shrink-0">
-            Lifetime Access
+            {{ $t("landing.pricing.lifetimeAccess") }}
           </span>
         </div>
 
@@ -56,10 +56,10 @@
           </div>
           <div class="text-left sm:text-right">
             <span class="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold block">
-              One-Time Payment
+              {{ $t("landing.pricing.oneTimePayment") }}
             </span>
             <span class="text-[11px] text-muted block">
-              Never pay monthly for code
+              {{ $t("landing.pricing.neverMonthly") }}
             </span>
           </div>
         </div>
@@ -67,12 +67,12 @@
         <!-- What You Get (Clean, High-Value Checklist) -->
         <div class="space-y-3.5 mb-8">
           <span class="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 block mb-4">
-            Everything Included in Your License:
+            {{ $t("landing.pricing.includedTitle") }}
           </span>
 
           <div
             v-for="feature in includedFeatures"
-            :key="feature.text"
+            :key="feature"
             class="flex items-start gap-3"
           >
             <UIcon
@@ -80,8 +80,8 @@
               class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"
             />
             <span class="text-sm text-neutral-200 font-medium leading-tight">
-              <strong class="text-highlighted font-semibold">{{ feature.highlight }}</strong>
-              <span class="text-neutral-300 font-normal"> — {{ feature.text }}</span>
+              <strong class="text-highlighted font-semibold">{{ t(`landing.pricing.features.${feature}.highlight`) }}</strong>
+              <span class="text-neutral-300 font-normal"> — {{ t(`landing.pricing.features.${feature}.text`) }}</span>
             </span>
           </div>
         </div>
@@ -95,7 +95,7 @@
             block
             trailing-icon="i-lucide-arrow-right"
           >
-            GET STARTED NOW
+            {{ $t("landing.pricing.cta") }}
           </CTAButton>
         </div>
 
@@ -104,17 +104,17 @@
           <p class="text-xs text-muted flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <span class="flex items-center gap-1">
               <UIcon name="i-lucide-shield-check" class="w-3.5 h-3.5 text-emerald-400" />
-              14-Day Money-Back Guarantee
+              {{ $t("landing.pricing.guarantee.refund") }}
             </span>
             <span class="hidden sm:inline">•</span>
             <span class="flex items-center gap-1">
               <UIcon name="i-lucide-code-2" class="w-3.5 h-3.5 text-emerald-400" />
-              Unlimited Personal &amp; Commercial Projects
+              {{ $t("landing.pricing.guarantee.projects") }}
             </span>
             <span class="hidden sm:inline">•</span>
             <span class="flex items-center gap-1">
               <UIcon name="i-lucide-zap" class="w-3.5 h-3.5 text-emerald-400" />
-              Instant GitHub Access
+              {{ $t("landing.pricing.guarantee.github") }}
             </span>
           </p>
         </div>
@@ -124,57 +124,25 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+const localePath = useLocalePath();
 const config = useRuntimeConfig();
-const signupUrl = computed(() => config.public.appUrl || "/signup");
+const signupUrl = computed(() => config.public.appUrl || localePath("/signup"));
 
+// Key suffixes under `landing.pricing.features.*`; each resolves to a
+// `{ highlight, text }` pair in the locale files.
 const includedFeatures = [
-  {
-    highlight: "Full Monorepo Source Code",
-    text: "Nuxt 4, Nitro, tRPC, and declarative SST v4 IaC.",
-  },
-  {
-    highlight: "B2B Multi-Tenancy & Teams",
-    text: "Organization switching, tokenized invites, and granular RBAC.",
-  },
-  {
-    highlight: "OpenAuth.js Edge Authentication",
-    text: "Zero-DB KV session caching, Google & GitHub OAuth, password & OTP.",
-  },
-  {
-    highlight: "Stateful Realtime Engine",
-    text: "Cloudflare Durable Objects with embedded SQLite & HMAC WebSockets.",
-  },
-  {
-    highlight: "Background Job Queues & DLQ",
-    text: "Cloudflare Queues with automatic retries and dead-letter capture.",
-  },
-  {
-    highlight: "Stripe Billing & Subscriptions",
-    text: "Checkout sessions, Customer Portal, and multi-tier benefits gating.",
-  },
-  {
-    highlight: "Transactional Email System",
-    text: "React Email templates with multi-provider fallback (Resend/Brevo/SES).",
-  },
-  {
-    highlight: "Dedicated Super-Admin Portal",
-    text: "Protected with TOTP MFA, user impersonation, and audit logs.",
-  },
-  {
-    highlight: "Drizzle ORM & Hyperdrive Postgres",
-    text: "Zero cold-start edge TCP connection pooling for any PostgreSQL.",
-  },
-  {
-    highlight: "Object Storage & D1 Database",
-    text: "Cloudflare R2 with zero egress fees and D1 SQL full-text search.",
-  },
-  {
-    highlight: "Production Kanban Application",
-    text: "Included production-ready Kanban layer with drag & drop cards.",
-  },
-  {
-    highlight: "Lifetime Updates & Documentation",
-    text: "Complete docs, future updates, and private developer community.",
-  },
+  "monorepo",
+  "multiTenancy",
+  "auth",
+  "realtime",
+  "queues",
+  "billing",
+  "email",
+  "admin",
+  "database",
+  "storage",
+  "kanban",
+  "updates",
 ];
 </script>

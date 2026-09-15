@@ -7,33 +7,33 @@
           <UBadge color="primary" variant="subtle" size="md">
             <div class="flex gap-2 items-center text-xs lg:text-sm">
               <UIcon name="i-lucide-scale" class="w-4 h-4 text-emerald-400" />
-              <span>NuxFire vs. Building from Scratch</span>
+              <span>{{ $t("landing.comparison.badge") }}</span>
             </div>
           </UBadge>
         </div>
 
         <h2 class="text-pretty text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight lg:leading-[1.12em] text-highlighted mb-4">
-          Everything You'd Spend Months Building — Ready on Day One
+          {{ $t("landing.comparison.title") }}
         </h2>
 
         <p class="text-muted text-base sm:text-lg lg:text-xl font-normal leading-relaxed">
-          52 production-verified features audit-tested in our codebase. Stop rebuilding auth, multi-tenancy, billing, and edge infrastructure from scratch.
+          {{ $t("landing.comparison.subtitle") }}
         </p>
       </div>
 
       <!-- Quick Metrics Highlight Bar -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
         <div class="p-4 rounded-lg bg-night-900/60 border border-night-800 text-center">
-          <span class="block text-2xl lg:text-3xl font-extrabold text-emerald-400">52 / 52</span>
-          <span class="text-xs sm:text-sm text-muted">Production-ready features in NuxFire</span>
+          <span class="block text-2xl lg:text-3xl font-extrabold text-emerald-400">{{ $t("landing.comparison.metrics.featuresValue") }}</span>
+          <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.featuresLabel") }}</span>
         </div>
         <div class="p-4 rounded-lg bg-night-900/60 border border-night-800 text-center">
-          <span class="block text-2xl lg:text-3xl font-extrabold text-highlighted">3+ Months</span>
-          <span class="text-xs sm:text-sm text-muted">Engineering time saved</span>
+          <span class="block text-2xl lg:text-3xl font-extrabold text-highlighted">{{ $t("landing.comparison.metrics.timeValue") }}</span>
+          <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.timeLabel") }}</span>
         </div>
         <div class="p-4 rounded-lg bg-night-900/60 border border-night-800 text-center">
-          <span class="block text-2xl lg:text-3xl font-extrabold text-amber-400">36 Features</span>
-          <span class="text-xs sm:text-sm text-muted">Typically missing from early-stage builds</span>
+          <span class="block text-2xl lg:text-3xl font-extrabold text-amber-400">{{ $t("landing.comparison.metrics.missingValue") }}</span>
+          <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.missingLabel") }}</span>
         </div>
       </div>
 
@@ -47,13 +47,14 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Search among 52 production-ready features (e.g., Stripe, RBAC, Passkey, Queue)..."
+            :placeholder="$t('landing.comparison.searchPlaceholder')"
             class="w-full bg-night-900/80 border border-neutral-700/90 ring-1 ring-white/10 hover:border-neutral-500/80 hover:ring-white/20 focus:border-emerald-500/80 focus:ring-2 focus:ring-emerald-500/30 rounded-lg pl-12 pr-10 py-3 text-sm sm:text-base text-highlighted placeholder:text-muted/70 transition-all outline-none shadow-sm"
           />
           <button
             v-if="searchQuery"
             type="button"
             class="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted hover:text-highlighted p-1 cursor-pointer"
+            :aria-label="$t('landing.comparison.clearSearch')"
             @click="searchQuery = ''"
           >
             <UIcon name="i-lucide-x" class="w-4 h-4" />
@@ -76,7 +77,7 @@
             ]"
             @click="activeCategory = category.id; searchQuery = ''"
           >
-            {{ category.label }}
+            {{ t(`landing.comparison.categories.${category.id}`) }}
             <span class="ml-1.5 text-[11px] px-1.5 py-0.5 rounded bg-night-950/60 text-muted border border-night-800/80">
               {{ getCategoryCount(category.id) }}
             </span>
@@ -91,16 +92,16 @@
             <thead>
               <tr class="border-b border-night-800 bg-night-900/80">
                 <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-muted uppercase tracking-wider w-1/2">
-                  Feature / Capability
+                  {{ $t("landing.comparison.columns.feature") }}
                 </th>
                 <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/5 border-x border-emerald-500/20 w-1/4">
                   <div class="flex items-center justify-center gap-1.5">
                     <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-emerald-400" />
-                    <span>NuxFire</span>
+                    <span>{{ $t("landing.comparison.columns.nuxfire") }}</span>
                   </div>
                 </th>
                 <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-muted uppercase tracking-wider text-center w-1/4">
-                  SaaS from Scratch
+                  {{ $t("landing.comparison.columns.scratch") }}
                 </th>
               </tr>
             </thead>
@@ -111,7 +112,7 @@
                   <td colspan="3" class="py-2.5 px-4 sm:px-6 font-bold text-xs uppercase tracking-wider text-night-400">
                     <div class="flex items-center gap-2">
                       <UIcon :name="category.icon" class="w-4 h-4 text-emerald-400" />
-                      <span>{{ category.label }}</span>
+                      <span>{{ t(`landing.comparison.categories.${category.id}`) }}</span>
                     </div>
                   </td>
                 </tr>
@@ -119,7 +120,7 @@
                 <!-- Feature Rows -->
                 <tr
                   v-for="item in getCategoryItems(category.id)"
-                  :key="item.name"
+                  :key="item.id"
                   class="hover:bg-night-900/30 transition-colors group"
                 >
                   <!-- Feature Info -->
@@ -136,7 +137,7 @@
                   <td class="py-3.5 px-4 sm:px-6 text-center bg-emerald-500/5 border-x border-emerald-500/20">
                     <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-medium text-xs">
                       <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Included</span>
+                      <span>{{ $t("landing.comparison.status.included") }}</span>
                     </div>
                   </td>
 
@@ -148,7 +149,7 @@
                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-night-800/80 border border-night-700 text-night-300 font-medium text-xs"
                     >
                       <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Common</span>
+                      <span>{{ $t("landing.comparison.status.ready") }}</span>
                     </div>
 
                     <!-- Partial -->
@@ -157,7 +158,7 @@
                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 font-medium text-xs"
                     >
                       <UIcon name="i-lucide-alert-circle" class="w-3.5 h-3.5 text-amber-400" />
-                      <span>Partial / Basic</span>
+                      <span>{{ $t("landing.comparison.status.partial") }}</span>
                     </div>
 
                     <!-- Missing -->
@@ -166,7 +167,7 @@
                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-night-900/60 border border-night-800 text-night-500 font-medium text-xs"
                     >
                       <UIcon name="i-lucide-x" class="w-3.5 h-3.5 text-night-500" />
-                      <span>Build from Scratch</span>
+                      <span>{{ $t("landing.comparison.status.missing") }}</span>
                     </div>
                   </td>
                 </tr>
@@ -175,7 +176,7 @@
               <!-- Empty State when filtering returns nothing -->
               <tr v-if="filteredItemsCount === 0">
                 <td colspan="3" class="py-12 text-center text-muted">
-                  No features matching "{{ searchQuery }}" found.
+                  {{ $t("landing.comparison.empty", { query: searchQuery }) }}
                 </td>
               </tr>
             </tbody>
@@ -187,18 +188,18 @@
           <div class="flex items-center gap-4">
             <span class="flex items-center gap-1.5">
               <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-400" />
-              <span>Production verified</span>
+              <span>{{ $t("landing.comparison.legend.verified") }}</span>
             </span>
             <span class="flex items-center gap-1.5">
               <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-amber-400" />
-              <span>Basic or improvised</span>
+              <span>{{ $t("landing.comparison.legend.basic") }}</span>
             </span>
             <span class="flex items-center gap-1.5">
               <UIcon name="i-lucide-x" class="w-4 h-4 text-night-500" />
-              <span>Requires custom engineering</span>
+              <span>{{ $t("landing.comparison.legend.custom") }}</span>
             </span>
           </div>
-          <span class="text-night-500 text-[11px]">Source: Verified codebase audit (September 2026)</span>
+          <span class="text-night-500 text-[11px]">{{ $t("landing.comparison.legend.source") }}</span>
         </div>
       </div>
     </div>
@@ -207,363 +208,121 @@
 
 <script setup lang="ts">
 interface FeatureItem {
+  id: string;
   name: string;
-  description?: string;
+  description: string;
   category: string;
   scratch: "ready" | "partial" | "missing";
 }
+
+const { t } = useI18n();
 
 const activeCategory = ref("auth");
 const searchQuery = ref("");
 
 const categories = [
-  { id: "auth", label: "Auth & Security", icon: "i-lucide-shield-check" },
-  { id: "teams", label: "Teams & RBAC", icon: "i-lucide-users" },
-  { id: "admin", label: "Platform Admin", icon: "i-lucide-crown" },
-  { id: "billing", label: "Payments & Billing", icon: "i-lucide-credit-card" },
-  { id: "realtime", label: "Realtime & Queues", icon: "i-lucide-zap" },
-  { id: "content", label: "CMS & Docs", icon: "i-lucide-file-text" },
-  { id: "infra", label: "Edge Infra", icon: "i-lucide-cpu" },
+  { id: "auth", icon: "i-lucide-shield-check" },
+  { id: "teams", icon: "i-lucide-users" },
+  { id: "admin", icon: "i-lucide-crown" },
+  { id: "billing", icon: "i-lucide-credit-card" },
+  { id: "realtime", icon: "i-lucide-zap" },
+  { id: "content", icon: "i-lucide-file-text" },
+  { id: "infra", icon: "i-lucide-cpu" },
 ];
 
-const features: FeatureItem[] = [
+// Structure only: which category a feature belongs to and how hard it is to
+// build from scratch. The visible name and description for each `id` live
+// under `landing.comparison.features.<id>.{name,description}` in the locale
+// files, so the 52 rows here stay a single flat list instead of 52 * 3
+// duplicated copies of the same marketing copy.
+const featureMeta: Omit<FeatureItem, "name" | "description">[] = [
   // 1. Auth & Security
-  {
-    name: "Email & Password Authentication",
-    description: "Argon2 / scrypt password hashing managed securely via OpenAuth.js",
-    category: "auth",
-    scratch: "ready",
-  },
-  {
-    name: "Passwordless Email OTP Codes",
-    description: "One-time passcode login and verification emails",
-    category: "auth",
-    scratch: "partial",
-  },
-  {
-    name: "Social OAuth (GitHub + Google)",
-    description: "One-click OAuth account linkage with conditional provider toggle",
-    category: "auth",
-    scratch: "partial",
-  },
-  {
-    name: "Persistent Anti-Brute-Force Rate Limiting",
-    description: "Fixed-window rate limiting on Cloudflare KV protecting login & MFA",
-    category: "auth",
-    scratch: "missing",
-  },
-  {
-    name: "Multi-Tiered Session Hierarchy",
-    description: "Separated access tokens, refresh tokens, and sealed elevated MFA sessions",
-    category: "auth",
-    scratch: "missing",
-  },
-  {
-    name: "Remote Session Termination",
-    description: "Sign out of all other active sessions with dedicated revocation endpoint",
-    category: "auth",
-    scratch: "missing",
-  },
-  {
-    name: "Self-Service TOTP MFA / 2FA",
-    description: "Client-side QR generation with AES-GCM encrypted secrets at rest",
-    category: "auth",
-    scratch: "missing",
-  },
-  {
-    name: "Full Account & Identity Deletion",
-    description: "GDPR / LGPD compliant cascading deletion across KV and Postgres",
-    category: "auth",
-    scratch: "missing",
-  },
+  { id: "authPassword", category: "auth", scratch: "ready" },
+  { id: "authOtp", category: "auth", scratch: "partial" },
+  { id: "authOauth", category: "auth", scratch: "partial" },
+  { id: "authRateLimit", category: "auth", scratch: "missing" },
+  { id: "authSessions", category: "auth", scratch: "missing" },
+  { id: "authRevoke", category: "auth", scratch: "missing" },
+  { id: "authTotp", category: "auth", scratch: "missing" },
+  { id: "authDeletion", category: "auth", scratch: "missing" },
 
   // 2. Teams, Workspaces & RBAC
-  {
-    name: "Multi-Tenancy by Workspace Slug / Sub-route",
-    description: "Clean URL routing (/team-slug/dashboard) with automatic tenant resolution",
-    category: "teams",
-    scratch: "missing",
-  },
-  {
-    name: "Workspace Switcher UI",
-    description: "Seamless team switching dropdown and team creation modal",
-    category: "teams",
-    scratch: "missing",
-  },
-  {
-    name: "Complete Team Workspace CRUD",
-    description: "Update team name, slug, description, and workspace metadata",
-    category: "teams",
-    scratch: "missing",
-  },
-  {
-    name: "Team Logo Upload & Storage",
-    description: "Dedicated avatar uploads powered by Cloudflare R2 via NuxtHub blob",
-    category: "teams",
-    scratch: "missing",
-  },
-  {
-    name: "Safe Workspace Deletion Gate",
-    description: "Protected team removal with name confirmation and cascading cleanup",
-    category: "teams",
-    scratch: "partial",
-  },
-  {
-    name: "Email Invitations with Roles & Expiration",
-    description: "Invites delivered via transactional email with 7-day token expiration",
-    category: "teams",
-    scratch: "partial",
-  },
-  {
-    name: "Full Invite Lifecycle Management",
-    description: "Accept, decline, resend, and revoke invitations in real-time",
-    category: "teams",
-    scratch: "missing",
-  },
-  {
-    name: "Member Role Changes & Removal",
-    description: "Manage collaborator permissions and remove inactive members",
-    category: "teams",
-    scratch: "partial",
-  },
-  {
-    name: "Plan Seat Limit Validation on Invite",
-    description: "Blocks invitations when team exceeds subscription seat capacity",
-    category: "teams",
-    scratch: "missing",
-  },
-  {
-    name: "Structured RBAC (Abilities & Bouncer)",
-    description: "Granular permissions checked via defineAbility in tRPC and Vue Can component",
-    category: "teams",
-    scratch: "partial",
-  },
-  {
-    name: "Auto-Provisioned System Roles",
-    description: "Default OWNER and MEMBER roles seeded automatically with permission sets",
-    category: "teams",
-    scratch: "missing",
-  },
+  { id: "teamsMultiTenancy", category: "teams", scratch: "missing" },
+  { id: "teamsSwitcher", category: "teams", scratch: "missing" },
+  { id: "teamsCrud", category: "teams", scratch: "missing" },
+  { id: "teamsLogo", category: "teams", scratch: "missing" },
+  { id: "teamsDeletion", category: "teams", scratch: "partial" },
+  { id: "teamsInvites", category: "teams", scratch: "partial" },
+  { id: "teamsInviteLifecycle", category: "teams", scratch: "missing" },
+  { id: "teamsMemberRoles", category: "teams", scratch: "partial" },
+  { id: "teamsSeatLimits", category: "teams", scratch: "missing" },
+  { id: "teamsRbac", category: "teams", scratch: "partial" },
+  { id: "teamsSystemRoles", category: "teams", scratch: "missing" },
 
   // 3. Platform Admin Console
-  {
-    name: "Dedicated Platform Admin Console (/admin)",
-    description: "Completely isolated from tenant RBAC to prevent privilege escalation",
-    category: "admin",
-    scratch: "missing",
-  },
-  {
-    name: "Triple-Barrier Security Gate",
-    description: "Requires active admin record + TOTP enrollment + valid elevated session",
-    category: "admin",
-    scratch: "missing",
-  },
-  {
-    name: "Operator Executive Metrics Dashboard",
-    description: "Live revenue metrics, total users, active workspaces, and plan distribution",
-    category: "admin",
-    scratch: "missing",
-  },
-  {
-    name: "Global Account & Team Management",
-    description: "Suspend, reactivate, or inspect any tenant account instantly",
-    category: "admin",
-    scratch: "missing",
-  },
-  {
-    name: "In-App Pricing Plan CRUD",
-    description: "Create, edit, and soft-delete subscription plans with live Stripe syncing",
-    category: "admin",
-    scratch: "missing",
-  },
-  {
-    name: "Background Jobs & DLQ Console",
-    description: "Monitor queue processing status, view dead-letter errors, and trigger replay",
-    category: "admin",
-    scratch: "missing",
-  },
-  {
-    name: "Immutable Operator Audit Trail",
-    description: "AuditLog table tracking every critical operator action with timestamp and IP",
-    category: "admin",
-    scratch: "missing",
-  },
-  {
-    name: "Realtime Global Announcements",
-    description: "Broadcast system notifications to active users via WebSockets",
-    category: "admin",
-    scratch: "missing",
-  },
+  { id: "adminConsole", category: "admin", scratch: "missing" },
+  { id: "adminGate", category: "admin", scratch: "missing" },
+  { id: "adminMetrics", category: "admin", scratch: "missing" },
+  { id: "adminAccounts", category: "admin", scratch: "missing" },
+  { id: "adminPlans", category: "admin", scratch: "missing" },
+  { id: "adminJobs", category: "admin", scratch: "missing" },
+  { id: "adminAudit", category: "admin", scratch: "missing" },
+  { id: "adminAnnouncements", category: "admin", scratch: "missing" },
 
   // 4. Payments & Billing
-  {
-    name: "Dual Provider Architecture (Stripe + Paddle)",
-    description: "Pluggable payment engine with provider toggle via configuration flags",
-    category: "billing",
-    scratch: "missing",
-  },
-  {
-    name: "Automatic Plan Sync with Stripe",
-    description: "Creates and updates Stripe Products and Prices directly from admin panel",
-    category: "billing",
-    scratch: "missing",
-  },
-  {
-    name: "Database-Driven Pricing Plans",
-    description: "Modify pricing, trial days, and benefits in PostgreSQL without redeploying",
-    category: "billing",
-    scratch: "missing",
-  },
-  {
-    name: "Seat Limits & Custom Plan Quotas (JSONB)",
-    description: "Flexible benefit limits attached to plan records and enforced in code",
-    category: "billing",
-    scratch: "missing",
-  },
-  {
-    name: "Smart Checkout with Customer ID Reuse",
-    description: "Prevents duplicate Stripe customer records across repeat subscriptions",
-    category: "billing",
-    scratch: "partial",
-  },
-  {
-    name: "Resilient Webhook Handlers",
-    description: "Handles subscription creation, payment failures, upgrades, and cancellations",
-    category: "billing",
-    scratch: "partial",
-  },
-  {
-    name: "Webhook Event Idempotency",
-    description: "Deduplicates webhook retries to prevent double billing or race conditions",
-    category: "billing",
-    scratch: "missing",
-  },
-  {
-    name: "Self-Service Customer Billing Portal",
-    description: "Allows customers to manage cards, download invoices, and cancel anytime",
-    category: "billing",
-    scratch: "partial",
-  },
+  { id: "billingProviders", category: "billing", scratch: "missing" },
+  { id: "billingPlanSync", category: "billing", scratch: "missing" },
+  { id: "billingDbPlans", category: "billing", scratch: "missing" },
+  { id: "billingQuotas", category: "billing", scratch: "missing" },
+  { id: "billingCheckout", category: "billing", scratch: "partial" },
+  { id: "billingWebhooks", category: "billing", scratch: "partial" },
+  { id: "billingIdempotency", category: "billing", scratch: "missing" },
+  { id: "billingPortal", category: "billing", scratch: "partial" },
 
   // 5. Realtime & Background Queues
-  {
-    name: "Native Edge WebSockets (Durable Objects)",
-    description: "Stateful realtime connection hub built on Cloudflare Durable Objects",
-    category: "realtime",
-    scratch: "missing",
-  },
-  {
-    name: "HMAC-Signed Ticket Authentication",
-    description: "Short-lived tickets in Sec-WebSocket-Protocol prevent session token exposure",
-    category: "realtime",
-    scratch: "missing",
-  },
-  {
-    name: "Realtime Dashboard Push Notifications",
-    description: "Instant in-app notification toasts and badge updates over WebSockets",
-    category: "realtime",
-    scratch: "missing",
-  },
-  {
-    name: "Cloudflare Queues with Concurrency Control",
-    description: "Asynchronous background job buffer (batch size 10, max concurrency 5)",
-    category: "realtime",
-    scratch: "missing",
-  },
-  {
-    name: "Dead Letter Queue (JobDLQ) & Operator Replay",
-    description: "Captures failed retries into DeadLetterRecord for manual inspection",
-    category: "realtime",
-    scratch: "missing",
-  },
-  {
-    name: "Scheduled Cron Jobs with Execution Logs",
-    description: "Hourly maintenance triggers running serverless jobs with database logs",
-    category: "realtime",
-    scratch: "partial",
-  },
+  { id: "realtimeWebsockets", category: "realtime", scratch: "missing" },
+  { id: "realtimeTickets", category: "realtime", scratch: "missing" },
+  { id: "realtimeNotifications", category: "realtime", scratch: "missing" },
+  { id: "realtimeQueues", category: "realtime", scratch: "missing" },
+  { id: "realtimeDlq", category: "realtime", scratch: "missing" },
+  { id: "realtimeCrons", category: "realtime", scratch: "partial" },
 
   // 6. CMS, Blog & Documentation
-  {
-    name: "Multi-Collection Markdown CMS",
-    description: "Nuxt Content v3 managing docs, blog, faq, and legal collections",
-    category: "content",
-    scratch: "missing",
-  },
-  {
-    name: "Full-Text Documentation Search (Ctrl+K)",
-    description: "Instant client search powered by Cloudflare D1 SQL database index",
-    category: "content",
-    scratch: "missing",
-  },
-  {
-    name: "Schema-Validated Markdown Blog",
-    description: "Enforced frontmatter schema for authors, dates, tags, and reading time",
-    category: "content",
-    scratch: "partial",
-  },
-  {
-    name: "Production-Ready Legal Pages",
-    description: "Terms of Service and Privacy Policy templates pre-wired in layout",
-    category: "content",
-    scratch: "partial",
-  },
-  {
-    name: "High-Converting Landing Page",
-    description: "Hero, architecture diagram, feature comparison, testimonials, and pricing",
-    category: "content",
-    scratch: "ready",
-  },
+  { id: "contentCms", category: "content", scratch: "missing" },
+  { id: "contentSearch", category: "content", scratch: "missing" },
+  { id: "contentBlog", category: "content", scratch: "partial" },
+  { id: "contentLegal", category: "content", scratch: "partial" },
+  { id: "contentLanding", category: "content", scratch: "ready" },
 
   // 7. Engineering & Edge Infrastructure
-  {
-    name: "100% Serverless Edge Architecture",
-    description: "Deployed entirely to Cloudflare Workers with zero container overhead",
-    category: "infra",
-    scratch: "missing",
-  },
-  {
-    name: "Declarative Infrastructure as Code (SST v4)",
-    description: "Reproducible deployments across dev and production stages via bun run deploy",
-    category: "infra",
-    scratch: "missing",
-  },
-  {
-    name: "Drizzle ORM with Automated Migrations",
-    description: "Type-safe PostgreSQL queries with automatic drizzle-kit migrations on deploy",
-    category: "infra",
-    scratch: "partial",
-  },
-  {
-    name: "Idempotent Post-Migration Seeding",
-    description: "Free plan and system permissions seeded automatically without duplication",
-    category: "infra",
-    scratch: "missing",
-  },
-  {
-    name: "End-to-End Type-Safe API Layer",
-    description: "Full TypeScript inference from PostgreSQL schema to tRPC and Vue components",
-    category: "infra",
-    scratch: "partial",
-  },
-  {
-    name: "Zero Cold-Start Edge Connection Pooling",
-    description: "Cloudflare Hyperdrive pools and accelerates Postgres connections at the edge",
-    category: "infra",
-    scratch: "missing",
-  },
+  { id: "infraServerless", category: "infra", scratch: "missing" },
+  { id: "infraIac", category: "infra", scratch: "missing" },
+  { id: "infraDrizzle", category: "infra", scratch: "partial" },
+  { id: "infraSeeding", category: "infra", scratch: "missing" },
+  { id: "infraTypes", category: "infra", scratch: "partial" },
+  { id: "infraPooling", category: "infra", scratch: "missing" },
 ];
+
+// Resolved against the active locale so the free-text search below matches
+// what the visitor actually sees, not the English source strings.
+const features = computed<FeatureItem[]>(() =>
+  featureMeta.map((meta) => ({
+    ...meta,
+    name: t(`landing.comparison.features.${meta.id}.name`),
+    description: t(`landing.comparison.features.${meta.id}.description`),
+  })),
+);
 
 const filteredFeatures = computed(() => {
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase().trim();
-    return features.filter(
+    return features.value.filter(
       (f) =>
         f.name.toLowerCase().includes(q) ||
-        (f.description && f.description.toLowerCase().includes(q))
+        f.description.toLowerCase().includes(q),
     );
   }
-  return features.filter((f) => f.category === activeCategory.value);
+  return features.value.filter((f) => f.category === activeCategory.value);
 });
 
 const filteredItemsCount = computed(() => filteredFeatures.value.length);
@@ -580,6 +339,6 @@ function getCategoryItems(categoryId: string) {
 }
 
 function getCategoryCount(categoryId: string) {
-  return features.filter((f) => f.category === categoryId).length;
+  return featureMeta.filter((f) => f.category === categoryId).length;
 }
 </script>

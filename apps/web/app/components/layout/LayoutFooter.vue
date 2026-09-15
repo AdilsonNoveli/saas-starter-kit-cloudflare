@@ -4,22 +4,27 @@
       <div class="grid gap-8 grid-cols-2 md:grid-cols-4">
         <!-- Brand -->
         <div class="col-span-2 flex flex-col gap-4">
-          <NuxtLink to="/" aria-label="NuxFire" class="flex items-center">
+          <NuxtLink
+            :to="localePath('/')"
+            :aria-label="$t('nav.brand')"
+            class="flex items-center"
+          >
             <img src="/nuxfire.svg" alt="NuxFire" class="h-7 w-auto dark:hidden" />
             <img src="/nuxfire-white.svg" alt="NuxFire" class="h-7 w-auto hidden dark:block" />
           </NuxtLink>
           <p class="text-sm text-muted max-w-xs leading-relaxed">
-            Production-ready enterprise-grade Nuxt starter kit for Cloudflare.
-            Launch your SaaS in days, not months.
+            {{ $t("footer.tagline") }}
           </p>
           <p class="text-xs text-muted">
-            &copy; {{ currentYear }} NuxFire. All rights reserved.
+            {{ $t("footer.copyright", { year: currentYear }) }}
           </p>
         </div>
 
         <!-- Legal -->
         <div class="flex flex-col gap-3">
-          <span class="text-xs font-semibold uppercase tracking-widest text-muted">Legal</span>
+          <span class="text-xs font-semibold uppercase tracking-widest text-muted">
+            {{ $t("footer.legalTitle") }}
+          </span>
           <div v-for="link in legal" :key="link.to">
             <NuxtLink
               :to="link.to"
@@ -32,7 +37,9 @@
 
         <!-- Links -->
         <div class="flex flex-col gap-3">
-          <span class="text-xs font-semibold uppercase tracking-widest text-muted">Navigation</span>
+          <span class="text-xs font-semibold uppercase tracking-widest text-muted">
+            {{ $t("footer.navTitle") }}
+          </span>
           <div v-for="link in links" :key="link.to">
             <NuxtLink
               :to="link.to"
@@ -50,15 +57,18 @@
 <script setup>
 const currentYear = new Date().getFullYear();
 
-const legal = [
-  { label: "Terms of Service", to: "/terms-of-service" },
-  { label: "Privacy Policy", to: "/privacy-policy" },
-  { label: "License", to: "/license" },
-];
-const links = [
-  { label: "Home", to: "/" },
-  { label: "Docs", to: "/docs" },
-  { label: "Blog", to: "/blog" },
-];
+const { t } = useI18n();
+const localePath = useLocalePath();
+
+const legal = computed(() => [
+  { label: t("footer.legal.terms"), to: localePath("/terms-of-service") },
+  { label: t("footer.legal.privacy"), to: localePath("/privacy-policy") },
+  { label: t("footer.legal.license"), to: localePath("/license") },
+]);
+const links = computed(() => [
+  { label: t("nav.home"), to: localePath("/") },
+  { label: t("nav.docs"), to: localePath("/docs") },
+  { label: t("nav.blog"), to: localePath("/blog") },
+]);
 </script>
 

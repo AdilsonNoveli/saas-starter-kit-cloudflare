@@ -11,17 +11,19 @@
       </p>
     </div>
     <CTAButton
-      :to="to || '/#pricing'"
+      :to="to || `${localePath('/')}#pricing`"
       size="lg"
       radius="lg"
       trailing-icon="i-lucide-arrow-right"
     >
-      {{ cta || "GET STARTED NOW" }}
+      {{ cta || $t("landing.cta.default") }}
     </CTAButton>
   </div>
 </template>
 
 <script setup lang="ts">
+const localePath = useLocalePath();
+
 const { title, description, cta, to } = defineProps<{
   title?: string;
   description?: string;

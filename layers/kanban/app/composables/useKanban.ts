@@ -32,6 +32,9 @@ export function useKanban() {
         name,
       }),
 
+    deleteBoard: (boardId: string) =>
+      client.kanban.deleteBoard.mutate({ boardId }),
+
     createColumn: (boardId: string, name: string) =>
       client.kanban.createColumn.mutate({ boardId, name }),
 

@@ -1,10 +1,10 @@
 <template>
   <div
-    class="kanban-card group relative flex flex-col gap-2 rounded border p-2.5 shadow-xs transition-all duration-150 select-none cursor-grab active:cursor-grabbing bg-elevated"
+    class="kanban-card group relative flex flex-col gap-2 rounded border p-2.5 shadow-xs transition-all duration-150 select-none cursor-grab active:cursor-grabbing bg-secondary-50 dark:bg-secondary-400/10"
     :class="
       isDragging
         ? 'opacity-40 scale-95 border-dashed border-primary'
-        : 'border-default hover:border-accented hover:-translate-y-0.5 hover:shadow-md'
+        : 'border-secondary-200 dark:border-secondary-400/20 hover:border-secondary-300 dark:hover:border-secondary-400/40 hover:-translate-y-0.5 hover:shadow-md'
     "
   >
     <!-- Topo: ícone + título + deletar -->

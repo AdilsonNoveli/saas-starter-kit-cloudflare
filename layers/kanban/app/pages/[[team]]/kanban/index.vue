@@ -20,7 +20,7 @@
         <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin" />
       </div>
 
-      <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <button
           type="button"
           class="flex flex-col items-center justify-center gap-2 min-h-[164px] rounded-lg border-2 border-dashed border-default hover:border-accented text-dimmed hover:text-default transition-colors cursor-pointer"
@@ -34,8 +34,18 @@
           v-for="board in boards"
           :key="board.id"
           :to="`${baseRoute}/kanban/${board.id}`"
-          class="group flex flex-col justify-between gap-4 min-h-[164px] rounded-lg bg-elevated ring ring-default hover:ring-accented p-5 transition-colors"
+          class="group relative flex flex-col justify-between gap-4 min-h-[164px] rounded-lg bg-elevated ring ring-default hover:ring-accented p-5 transition-colors"
         >
+          <button
+            type="button"
+            class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1.5 rounded text-muted hover:text-error hover:bg-muted transition-all focus:outline-none"
+            aria-label="Excluir board"
+            title="Excluir board"
+            @click.stop.prevent="onDeleteBoard(board)"
+          >
+            <UIcon name="i-lucide-trash-2" class="size-3.5" />
+          </button>
+
           <div class="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary shrink-0">
             <UIcon name="i-lucide-kanban" class="size-5" />
           </div>
@@ -66,8 +76,22 @@ const currentTeam = useCurrentTeam();
 const baseRoute = computed(() => `/${currentTeam.value?.slug ?? ""}`);
 
 const kanban = useKanban();
+const notification = useNotification();
 const { data, status, refresh } = await kanban.useBoardList();
 const boards = computed(() => data.value ?? []);
+
+async function onDeleteBoard(board: { id: string; name: string }) {
+  if (!window.confirm(`Deseja realmente excluir o board "${board.name}" e todo o seu conteúdo?`)) {
+    return;
+  }
+
+  try {
+    await kanban.deleteBoard(board.id);
+    await refresh();
+  } catch (error: any) {
+    notification.error("Erro ao excluir board", error?.message || "Algo deu errado");
+  }
+}
 
 // Only the very first load (no boards fetched yet) shows the full-page
 // spinner — a later refresh (after creating a board) must not blank a grid

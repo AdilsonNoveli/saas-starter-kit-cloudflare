@@ -8,7 +8,7 @@
       :default-size="16"
       collapsible
       resizable
-      :ui="{ root: 'border-e border-default', footer: 'pb-4 pt-1.5' }"
+      :ui="{ root: 'border-e border-default', footer: 'pb-8 pt-1.5' }"
     >
       <!--
         No collapse toggle here — every page under this layout already has
@@ -61,12 +61,18 @@
             >
               <button
                 type="button"
-                class="group relative w-full flex items-center gap-1.5 font-medium text-sm rounded-md font-medium text-muted hover:text-highlighted before:absolute before:z-[-1] before:rounded-md before:inset-y-px before:inset-x-0 hover:before:bg-elevated/50 transition-colors before:transition-colors focus:outline-none focus-visible:outline-none"
-                :class="isCollapsed ? 'px-1.5 py-1.5 justify-center' : 'px-2.5 py-1.5'"
+                class="group relative flex items-center gap-1.5 font-medium text-sm rounded-lg before:absolute before:z-[-1] before:rounded-lg before:inset-y-px before:inset-x-0 transition-colors before:transition-colors focus:outline-none focus-visible:outline-none"
+                :class="[
+                  isCollapsed ? 'justify-center px-0 gap-0 mx-auto size-11' : 'w-full px-3 py-3',
+                  isSettingsActive
+                    ? 'text-primary before:bg-primary/15 ring ring-inset ring-primary/25'
+                    : 'text-muted hover:text-highlighted hover:before:bg-elevated/50',
+                ]"
               >
                 <UIcon
                   name="i-lucide-settings"
-                  class="shrink-0 size-5 text-dimmed group-hover:text-default transition-colors"
+                  class="shrink-0 size-6 transition-colors"
+                  :class="isSettingsActive ? 'text-primary' : 'text-dimmed group-hover:text-default'"
                 />
                 <span v-if="!isCollapsed" class="truncate">Settings</span>
               </button>
@@ -95,9 +101,13 @@ import type { DropdownMenuItem, NavigationMenuItem } from "@nuxt/ui";
 
 const open = ref(false);
 const collapsed = ref(true);
+const route = useRoute();
 const currentTeam = useCurrentTeam();
 const baseRoute = computed(() => `/${currentTeam.value?.slug}`);
 const teamID = computed(() => currentTeam.value?.id || "");
+const isSettingsActive = computed(() =>
+  route.path.startsWith(`${baseRoute.value}/settings`),
+);
 
 const settingsLinks = useTeamSettingsLinks(teamID);
 const layerLinks = useLayerNavigation();

@@ -13,6 +13,7 @@ import { kanbanBoards, kanbanCards, kanbanColumns } from "../database/schema";
 import {
   kanbanCreateBoard,
   kanbanCreateCard,
+  kanbanDeleteBoard,
   kanbanDeleteCard,
   kanbanListBoards,
   kanbanMoveCard,
@@ -135,6 +136,27 @@ const kanbanRouter = router({
         .returning();
 
       return board;
+    }),
+
+  deleteBoard: abilityProcedure
+    .input(z.object({ boardId: z.string() }))
+    .mutation(async ({ ctx: { authorize, user }, input }) => {
+      const board = await requireBoard(user.id, input.boardId);
+      await authorize(kanbanDeleteBoard, board.teamId);
+
+      const columns = await useDB().query.kanbanColumns.findMany({
+        where: eq(kanbanColumns.boardId, board.id),
+      });
+
+      await Promise.all(
+        columns.map((column) =>
+          useDB().delete(kanbanCards).where(eq(kanbanCards.columnId, column.id)),
+        ),
+      );
+      await useDB().delete(kanbanColumns).where(eq(kanbanColumns.boardId, board.id));
+      await useDB().delete(kanbanBoards).where(eq(kanbanBoards.id, board.id));
+
+      return { id: board.id };
     }),
 
   listColumns: abilityProcedure

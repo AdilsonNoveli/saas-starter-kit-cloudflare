@@ -7,6 +7,7 @@
       <p class="mt-3 text-lg text-muted">
         {{ page?.description || docsConfig.description }}
       </p>
+      <Search class="mt-6" />
     </div>
 
     <div

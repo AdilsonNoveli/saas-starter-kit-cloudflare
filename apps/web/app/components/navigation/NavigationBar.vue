@@ -38,7 +38,6 @@
             class="cursor-pointer"
           />
         </UDropdownMenu>
-        <Search />
         <NuxtLink
           :to="useRuntimeConfig().public.appUrl || localePath('/signup')"
           external
@@ -79,7 +78,6 @@
     :class="[show ? 'h-auto py-4' : 'h-0 py-0']"
   >
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-      <Search class="mb-3" />
       <UNavigationMenu
         orientation="vertical"
         :items="mobileLinks"

@@ -45,13 +45,13 @@ const firstRowTestimonials = computed<Testimonial[]>(() => [
   {
     testimonial: t("landing.testimonials.items.item3.quote"),
     name: t("landing.testimonials.items.item3.name"),
-    avatar: "/static/KtCFjlD4.jpg",
+    avatar: "/static/KtCFjlD4.jpeg",
     socialHandle: t("landing.testimonials.items.item3.role"),
   },
   {
     testimonial: t("landing.testimonials.items.item4.quote"),
     name: t("landing.testimonials.items.item4.name"),
-    avatar: "/static/N4aA96n.jpg",
+    avatar: "/static/N4aA96n.jpeg",
     socialHandle: t("landing.testimonials.items.item4.role"),
   },
 ]);
@@ -66,13 +66,13 @@ const secondRowTestimonials = computed<Testimonial[]>(() => [
   {
     testimonial: t("landing.testimonials.items.item6.quote"),
     name: t("landing.testimonials.items.item6.name"),
-    avatar: "/static/VUMBKh1U.jpg",
+    avatar: "/static/VUMBKh1U.jpeg",
     socialHandle: t("landing.testimonials.items.item6.role"),
   },
   {
     testimonial: t("landing.testimonials.items.item7.quote"),
     name: t("landing.testimonials.items.item7.name"),
-    avatar: "/static/KtCFjlD4.jpg",
+    avatar: "/static/KtCFjlD4.jpeg",
     socialHandle: t("landing.testimonials.items.item7.role"),
   },
   {

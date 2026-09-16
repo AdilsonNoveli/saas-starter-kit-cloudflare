@@ -4,6 +4,7 @@
     <LandingUseCases />
     <LandingArchitecture />
     <LandingComparisonTable />
+    <LandingFolderStructure />
     <LandingFeatureBadges />
     <LandingFAQs
       :title="t('landing.faqs.homeTitle')"

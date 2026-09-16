@@ -81,6 +81,13 @@
         </div>
       </div>
 
+      <!-- Pre-banner Strategic Question -->
+      <div class="max-w-3xl mx-auto text-center mb-8 sm:mb-10">
+        <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-highlighted leading-snug">
+          {{ $t("landing.useCases.banner.preTitle") }}
+        </h3>
+      </div>
+
       <!-- Trust & ROI Value Banner -->
       <div class="max-w-5xl mx-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/5 via-elevated to-elevated dark:from-emerald-950/20 dark:via-night-900/60 dark:to-night-950 p-8 sm:p-10 text-center relative overflow-hidden shadow-xl shadow-emerald-500/5">
         <div class="relative z-10">
@@ -97,41 +104,68 @@
             <code class="text-emerald-600 dark:text-emerald-400 font-mono text-xs bg-muted border border-default px-2 py-0.5 rounded whitespace-nowrap">$ bun run deploy</code>.
           </p>
 
-          <!-- 4 Pillars of Competitive Advantage -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-left mb-8">
-            <div
-              v-for="pillar in pillars"
-              :key="pillar.id"
-              class="p-3.5 rounded-lg bg-default border border-default shadow-sm"
-            >
-              <div class="flex items-center gap-2 mb-1" :class="pillar.colorClass">
-                <UIcon :name="pillar.icon" class="w-4 h-4 shrink-0" />
-                <span class="text-xs font-bold font-mono uppercase">
-                  {{ t(`landing.useCases.banner.pillars.${pillar.id}.title`) }}
-                </span>
+          <!-- 2 Columns: Modo Stage vs. Modo Production (Clear & Clean) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 text-left mb-8 max-w-4xl mx-auto">
+            <!-- Coluna 1: Modo Stage -->
+            <div class="p-5 sm:p-6 rounded-xl bg-default/80 border border-default shadow-xs flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                    <h4 class="text-base font-bold text-highlighted font-mono">
+                      {{ $t("landing.useCases.banner.environments.stage.title") }}
+                    </h4>
+                  </div>
+                  <span class="text-[11px] font-mono text-amber-500/90 font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                    {{ $t("landing.useCases.banner.environments.stage.badge") }}
+                  </span>
+                </div>
+                <p class="text-xs sm:text-sm text-muted leading-relaxed mb-4">
+                  {{ $t("landing.useCases.banner.environments.stage.description") }}
+                </p>
               </div>
-              <p class="text-[11px] text-muted leading-snug">
-                {{ t(`landing.useCases.banner.pillars.${pillar.id}.description`) }}
-              </p>
+              <div class="pt-3 border-t border-default/60 flex items-center gap-2 text-[11px] font-mono text-muted">
+                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <code>{{ $t("landing.useCases.banner.environments.stage.command") }}</code>
+              </div>
+            </div>
+
+            <!-- Coluna 2: Modo Production -->
+            <div class="p-5 sm:p-6 rounded-xl bg-default/80 border border-emerald-500/30 shadow-xs flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                    <h4 class="text-base font-bold text-highlighted font-mono">
+                      {{ $t("landing.useCases.banner.environments.prod.title") }}
+                    </h4>
+                  </div>
+                  <span class="text-[11px] font-mono text-emerald-500/90 font-semibold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                    {{ $t("landing.useCases.banner.environments.prod.badge") }}
+                  </span>
+                </div>
+                <p class="text-xs sm:text-sm text-muted leading-relaxed mb-4">
+                  {{ $t("landing.useCases.banner.environments.prod.description") }}
+                </p>
+              </div>
+              <div class="pt-3 border-t border-default/60 flex items-center gap-2 text-[11px] font-mono text-muted">
+                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <code>{{ $t("landing.useCases.banner.environments.prod.command") }}</code>
+              </div>
             </div>
           </div>
 
-          <!-- Bottom Action Button: Strategic redirect to #pricing -->
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <!-- Bottom Action Button: Single prominent CTA to #pricing -->
+          <div class="flex items-center justify-center">
             <CTAButton
               :to="`${localePath('/')}#pricing`"
               size="lg"
               radius="lg"
               trailing-icon="i-lucide-arrow-right"
+              class="w-full sm:w-auto px-8"
             >
               {{ $t("landing.useCases.banner.ctaPrimary") }}
             </CTAButton>
-            <NuxtLink
-              to="/docs/saas-starter-kit"
-              class="inline-flex items-center justify-center h-11 px-6 rounded-md text-sm font-semibold text-muted hover:text-highlighted border border-default hover:border-accented bg-elevated transition-colors w-full sm:w-auto"
-            >
-              {{ $t("landing.useCases.banner.ctaDocs") }}
-            </NuxtLink>
           </div>
         </div>
       </div>
@@ -188,11 +222,4 @@ const useCases = [
 // (`examples.1` … `examples.4`) rather than a JSON array so that
 // scripts/check-i18n-completeness.ts can diff them key-by-key across locales.
 const EXAMPLE_SLOTS = ["1", "2", "3", "4"];
-
-const pillars = [
-  { id: "edge", icon: "i-lucide-gauge", colorClass: "text-emerald-400" },
-  { id: "database", icon: "i-lucide-database", colorClass: "text-sky-400" },
-  { id: "security", icon: "i-lucide-shield-alert", colorClass: "text-amber-400" },
-  { id: "types", icon: "i-lucide-code", colorClass: "text-purple-400" },
-];
 </script>

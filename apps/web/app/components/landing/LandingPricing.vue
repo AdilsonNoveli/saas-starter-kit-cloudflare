@@ -123,6 +123,13 @@
           </div>
         </div>
       </div>
+
+      <!-- Post-Pricing Strategic Headline -->
+      <div class="mt-12 lg:mt-16 text-center max-w-3xl mx-auto px-4">
+        <p class="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-highlighted leading-relaxed">
+          {{ $t("landing.pricing.closingHeadline") }}
+        </p>
+      </div>
     </div>
   </section>
 </template>

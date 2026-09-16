@@ -177,26 +177,22 @@
         "descriptionLead": "Construir do zero autenticação passwordless no edge, pooling de banco relacional, RBAC multi-tenant, filas assíncronas com DLQ e cobrança via Stripe ",
         "descriptionCost": "exige de 3 a 6 meses de trabalho em horas de engenharia sênior",
         "descriptionTail": ". Com o Nuxfire, tudo isso roda já no seu primeiro ",
-        "pillars": {
-          "edge": {
-            "title": "Edge < 50 ms",
-            "description": "Mais de 300 datacenters globais da Cloudflare, sem cold starts."
-          },
-          "database": {
-            "title": "Zero quedas de banco",
-            "description": "O pooling do Hyperdrive mantém conexões TCP persistentes com o PostgreSQL."
-          },
-          "security": {
-            "title": "Pronto para SOC2 & MFA",
-            "description": "Portal /admin dedicado com autenticação em dois fatores por TOTP e logs de auditoria."
-          },
-          "types": {
-            "title": "100% type-safe",
-            "description": "Das consultas do Drizzle ORM aos componentes do Nuxt UI, passando pelo tRPC."
-          }
-        },
         "ctaPrimary": "COMECE AGORA",
-        "ctaDocs": "Ver documentação"
+        "preTitle": "Por que passar três meses construindo a base quando você pode começar com ela pronta?",
+        "environments": {
+          "stage": {
+            "title": "Modo Stage",
+            "badge": "Homologação & Testes",
+            "description": "Ambiente 100% isolado na Cloudflare (ex: stage.dev.nuxfire.com). Valide novas features, migrations no banco Drizzle e fluxos de webhook com total segurança antes de subir para clientes reais.",
+            "command": "$ bun run deploy (stage)"
+          },
+          "prod": {
+            "title": "Modo Production",
+            "badge": "Produção Enterprise",
+            "description": "Infraestrutura global de alta disponibilidade no seu domínio raiz. Mais de 300 data centers da Cloudflare, pooling Hyperdrive para PostgreSQL, SSL automático e zero servidores para gerenciar.",
+            "command": "$ bun run deploy --stage production"
+          }
+        }
       }
     },
     "comparison": {
@@ -626,7 +622,8 @@
           "highlight": "Atualizações vitalícias & documentação",
           "text": "Documentação completa, atualizações futuras e comunidade privada de desenvolvedores."
         }
-      }
+      },
+      "closingHeadline": "Você pode passar três meses reconstruindo o que já existe. Ou começar com uma estrutura enterprise-grade desde o primeiro dia."
     },
     "cta": {
       "default": "COMECE AGORA"

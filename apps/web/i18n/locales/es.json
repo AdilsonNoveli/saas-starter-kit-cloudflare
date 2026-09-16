@@ -177,26 +177,22 @@
         "descriptionLead": "Construir desde cero autenticación sin contraseña en el edge, pooling de base de datos relacional, RBAC multiinquilino, colas asíncronas con DLQ y cobros con Stripe ",
         "descriptionCost": "requiere más de 3 a 6 meses de esfuerzo en horas de ingeniería senior",
         "descriptionTail": ". Con Nuxfire, todo eso funciona desde tu primer ",
-        "pillars": {
-          "edge": {
-            "title": "Edge < 50 ms",
-            "description": "Más de 300 centros de datos globales de Cloudflare, sin cold starts."
-          },
-          "database": {
-            "title": "Cero caídas de base de datos",
-            "description": "El pooling de Hyperdrive mantiene conexiones TCP persistentes con PostgreSQL."
-          },
-          "security": {
-            "title": "Listo para SOC2 y MFA",
-            "description": "Portal /admin dedicado con autenticación en dos pasos por TOTP y registros de auditoría."
-          },
-          "types": {
-            "title": "100 % type-safe",
-            "description": "Desde las consultas de Drizzle ORM hasta los componentes de Nuxt UI, pasando por tRPC."
-          }
-        },
         "ctaPrimary": "EMPIEZA AHORA",
-        "ctaDocs": "Ver documentación"
+        "preTitle": "¿Por qué pasar tres meses construyendo la base cuando puedes empezar con ella lista?",
+        "environments": {
+          "stage": {
+            "title": "Modo Stage",
+            "badge": "Homologación y Pruebas",
+            "description": "Entorno 100% aislado en Cloudflare (ej. stage.dev.nuxfire.com). Valida nuevas funciones, migraciones de Drizzle y flujos de webhooks con total seguridad antes de lanzarlos a clientes reales.",
+            "command": "$ bun run deploy (stage)"
+          },
+          "prod": {
+            "title": "Modo Production",
+            "badge": "Producción Enterprise",
+            "description": "Infraestructura global de alta disponibilidad en tu dominio raíz. Más de 300 centros de datos de Cloudflare, pooling Hyperdrive para PostgreSQL, SSL automático y cero servidores que mantener.",
+            "command": "$ bun run deploy --stage production"
+          }
+        }
       }
     },
     "comparison": {
@@ -626,7 +622,8 @@
           "highlight": "Actualizaciones de por vida y documentación",
           "text": "Documentación completa, futuras actualizaciones y comunidad privada de desarrolladores."
         }
-      }
+      },
+      "closingHeadline": "Puedes pasar tres meses reconstruyendo lo que ya existe. O comenzar con una estructura de nivel empresarial desde el primer día."
     },
     "cta": {
       "default": "EMPIEZA AHORA"

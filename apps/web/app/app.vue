@@ -25,7 +25,7 @@ const localeHead = useLocaleHead({ seo: true });
 useHead(() => ({
   htmlAttrs: localeHead.value.htmlAttrs,
   link: [
-    { href: "/favicon.ico", rel: "icon", type: "image/x-icon" },
+    { href: "/svg/nuxfire.svg", rel: "icon", type: "image/svg+xml" },
     ...(localeHead.value.link ?? []),
   ],
   meta: localeHead.value.meta ?? [],

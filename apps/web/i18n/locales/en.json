@@ -177,26 +177,22 @@
         "descriptionLead": "Building passwordless edge auth, relational database pooling, multi-tenant RBAC, async queues with DLQ, and Stripe billing from scratch ",
         "descriptionCost": "takes more than 3 to 6 months of senior engineering effort",
         "descriptionTail": ". With Nuxfire, everything runs on your very first ",
-        "pillars": {
-          "edge": {
-            "title": "< 50ms Edge",
-            "description": "300+ global Cloudflare datacenters with zero cold starts."
-          },
-          "database": {
-            "title": "Zero DB Crashes",
-            "description": "Hyperdrive pooling maintains persistent TCP connections to PostgreSQL."
-          },
-          "security": {
-            "title": "SOC2 & MFA Ready",
-            "description": "Dedicated /admin portal with TOTP two-factor auth and audit logs."
-          },
-          "types": {
-            "title": "100% Type-Safe",
-            "description": "From Drizzle ORM queries to Nuxt UI components through tRPC."
-          }
-        },
         "ctaPrimary": "GET STARTED NOW",
-        "ctaDocs": "View Documentation"
+        "preTitle": "Why spend three months building the foundation when you can start with it already finished?",
+        "environments": {
+          "stage": {
+            "title": "Stage Mode",
+            "badge": "Staging & Testing",
+            "description": "100% isolated environment on Cloudflare (e.g. stage.dev.nuxfire.com). Safely validate new features, Drizzle migrations, and webhook flows without affecting live customers.",
+            "command": "$ bun run deploy (stage)"
+          },
+          "prod": {
+            "title": "Production Mode",
+            "badge": "Enterprise Production",
+            "description": "High-availability global infrastructure on your apex domain. 300+ Cloudflare data centers, Hyperdrive connection pooling for PostgreSQL, automatic SSL, and zero server maintenance.",
+            "command": "$ bun run deploy --stage production"
+          }
+        }
       }
     },
     "comparison": {
@@ -626,7 +622,8 @@
           "highlight": "Lifetime Updates & Documentation",
           "text": "Complete docs, future updates, and private developer community."
         }
-      }
+      },
+      "closingHeadline": "You can spend three months rebuilding what already exists. Or start with an enterprise-grade architecture from day one."
     },
     "cta": {
       "default": "GET STARTED NOW"

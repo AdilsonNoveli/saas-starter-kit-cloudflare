@@ -11,8 +11,8 @@
           :aria-label="$t('nav.brand')"
           class="flex items-center shrink-0"
         >
-          <img src="/nuxfire.svg" alt="Nuxfire" class="h-8 w-auto dark:hidden" />
-          <img src="/nuxfire-white.svg" alt="Nuxfire" class="h-8 w-auto hidden dark:block" />
+          <img src="/svg/nuxfire.svg" alt="Nuxfire" class="h-8 w-auto dark:hidden" />
+          <img src="/svg/nuxfire-white.svg" alt="Nuxfire" class="h-8 w-auto hidden dark:block" />
         </NuxtLink>
       </div>
 
@@ -106,12 +106,21 @@
 const route = useRoute();
 const show = ref(false);
 
-const { t, locale, locales } = useI18n();
+const { t, locale, locales, setLocale } = useI18n();
 const localePath = useLocalePath();
 // `prefix_except_default` puts the locale in the URL, so switching languages
-// has to be a real navigation to the prefixed route — `setLocale()` alone
-// would leave the browser on the old prefix. `switchLocalePath()` resolves
-// the current route's equivalent path in the target locale.
+// has to be a real navigation to the prefixed route. `switchLocalePath()` is
+// still used to compute the href shown/right-clickable on each item, but the
+// actual click goes through `setLocale()` (see `onSelect` below) — a plain
+// `<NuxtLink :to="switchLocalePath('en')">` (i.e. `to: "/"`, the default
+// locale's unprefixed URL) is ambiguous to the module's own global route
+// middleware: a bare "/" carries no explicit locale, so on a real user click
+// it falls back through cookie/route detection to the *current* locale
+// instead of the default one, silently redirecting back to where you started
+// — reproduced empirically, only breaks switching TO the default locale,
+// non-default targets ("/pt-br", "/es") are self-describing and unaffected.
+// `setLocale(code)` sets the locale state first and navigates using that
+// explicit value, so the target is never ambiguous.
 const switchLocalePath = useSwitchLocalePath();
 
 const isHome = computed(() => route.path === localePath("/"));
@@ -159,6 +168,7 @@ const localeItems = computed(() =>
     // locale's home page instead of rendering a link to nowhere.
     to: switchLocalePath(l.code) || localePath("/", l.code),
     icon: locale.value === l.code ? "i-lucide-check" : undefined,
+    onSelect: () => setLocale(l.code),
   })),
 );
 </script>

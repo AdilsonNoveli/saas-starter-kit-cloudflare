@@ -235,3 +235,30 @@
   transform: translateY(1px);
 }
 
+/* ==========================================================================
+   Pricing Card Animated Border Glow
+   ========================================================================== */
+.pricing-card-animated {
+  --gradient-angle: 0deg;
+  position: relative;
+  border-radius: 1.5rem;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    transparent 0%,
+    #10b981 12%,
+    #34d399 22%,
+    #fbbf24 35%,
+    #f59e0b 45%,
+    transparent 60%,
+    transparent 100%
+  );
+  animation: border-spin 5s linear infinite;
+  box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.12);
+}
+
+.dark .pricing-card-animated {
+  box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.2), 0 0 35px -5px rgba(245, 158, 11, 0.1);
+}
+
+

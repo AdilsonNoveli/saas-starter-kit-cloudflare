@@ -5,71 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1788297486276,
-      "tag": "0000_ordinary_wildside",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1788706658153,
-      "tag": "0001_add_missing_foreign_keys",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1788707417679,
-      "tag": "0002_abnormal_korg",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1788708581911,
-      "tag": "0003_magical_misty_knight",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1788710296638,
-      "tag": "0004_kind_barracuda",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1788712149786,
-      "tag": "0005_awesome_gambit",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1788820250992,
-      "tag": "0006_lying_longshot",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1789085391313,
-      "tag": "0007_dazzling_viper",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1789140335780,
-      "tag": "0008_polite_kabuki",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1789312614843,
-      "tag": "0009_lively_mother_askani",
+      "when": 1789556325839,
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]

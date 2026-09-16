@@ -1,5 +1,16 @@
 # Database migrations
 
+> **2026-09-16:** the history up to `0009_lively_mother_askani` was consolidated
+> into a single `0000_init.sql` — regenerated with `drizzle-kit generate` from
+> `schema.ts` (not hand-merged), after confirming zero drift between the old
+> migration history and the current schema. The old numbered files, their
+> `meta/*_snapshot.json` and `_journal.json` entries are gone; git history has
+> the original sequence if you need it. Any environment that already applied
+> the old history must have its `public`/`drizzle` schemas reset before the
+> next `drizzle-kit migrate` — done for the local dev stage as part of this
+> change; `production` had no `DATABASE_HOST` configured yet, so it wasn't
+> affected.
+
 Migrations are generated with Drizzle Kit from `schema.ts` and applied
 against Postgres through `drizzle-kit migrate` (see
 `infra/utils/nuxt.ts` — it runs automatically after every `App` deploy,
@@ -9,7 +20,7 @@ using the `DatabaseHost`/`DatabasePort`/`DatabaseUser`/`DatabasePassword`/
 ## Generating a new migration
 
 ```bash
-cd packages/functions
+cd apps/functions
 DATABASE_HOST=... DATABASE_PORT=5432 DATABASE_USER=... DATABASE_PASSWORD=... DATABASE_NAME=... \
   bunx drizzle-kit generate
 ```

@@ -6,6 +6,7 @@ author: "Equipe NuxFire"
 category: "Sistemas Distribuídos"
 readTime: "7 min"
 tags: ["Cloudflare Queues", "Background Jobs", "DLQ", "Assíncrono"]
+image: "/images/blog/cloudflare-queues-background-jobs.svg"
 ---
 
 No desenvolvimento de aplicações web modernas, nada degrada mais a experiência do usuário do que telas travadas esperando operações demoradas.

@@ -6,7 +6,7 @@ const localePath = useLocalePath();
   <div class="relative overflow-hidden">
     <!-- Section 1: Centered Headline & Actions -->
     <section
-      class="container mx-auto flex flex-col justify-center items-center text-center pt-14 pb-8 lg:pt-20 lg:pb-12 px-4 md:px-8 max-w-5xl"
+      class="container mx-auto flex flex-col justify-center items-center text-center pt-12 pb-10 lg:pt-18 lg:pb-14 px-4 md:px-8 max-w-5xl"
     >
       <!-- Badge -->
       <div class="flex items-center justify-center mb-6">
@@ -57,10 +57,15 @@ const localePath = useLocalePath();
           {{ $t("landing.hero.ctaDocs") }}
         </UButton>
       </div>
+
+      <!-- Brand Logos below CTA -->
+      <div class="mt-12 sm:mt-14 w-full max-w-2xl mx-auto">
+        <LandingPageLogos class="!py-0 !my-0" />
+      </div>
     </section>
 
     <!-- Section 2: Enterprise Monorepo Codebase Showcase (2 Columns) -->
-    <section class="container mx-auto px-4 md:px-8 pb-16 lg:pb-24 max-w-6xl">
+    <section class="container mx-auto px-4 md:px-8 pt-6 lg:pt-10 pb-16 lg:pb-24 max-w-6xl">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
         <!-- Left: Persuasive Enterprise Delivery Copy -->
         <div class="lg:col-span-6 flex flex-col justify-between space-y-6">
@@ -166,10 +171,11 @@ const localePath = useLocalePath();
       </div>
 
       <!-- Editorial copy on AI Builders & Vibe Coding -->
-      <div class="mt-12 lg:mt-16 max-w-4xl mx-auto text-center space-y-4">
-        <h3 class="text-xl sm:text-2xl lg:text-3xl font-bold text-highlighted tracking-tight">
-          {{ $t("landing.ai.title") }}
-        </h3>
+      <div class="mt-24 lg:mt-36 max-w-4xl mx-auto text-center space-y-4">
+        <h3
+          class="text-xl sm:text-2xl lg:text-3xl font-bold text-highlighted tracking-tight leading-snug"
+          v-html="$t('landing.ai.title')"
+        />
         <p class="text-muted text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
           {{ $t("landing.ai.description") }}
         </p>

@@ -5,12 +5,10 @@
     <LandingArchitecture />
     <LandingComparisonTable />
     <LandingFeatureBadges />
-    <div class="py-8">
-      <LandingFAQs
-        :title="t('landing.faqs.homeTitle')"
-        :subtitle="t('landing.faqs.homeSubtitle')"
-      />
-    </div>
+    <LandingFAQs
+      :title="t('landing.faqs.homeTitle')"
+      :subtitle="t('landing.faqs.homeSubtitle')"
+    />
     <LandingTestimonials />
     <LandingPricing />
   </div>

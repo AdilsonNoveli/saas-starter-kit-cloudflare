@@ -49,7 +49,11 @@
   "blog": {
     "seoTitle": "Blog",
     "title": "Blog",
-    "subtitle": "Articles, tutorials, and architecture guides to build and scale your SaaS with Nuxt 4 and Cloudflare Workers."
+    "subtitle": "Articles, tutorials, and architecture guides to build and scale your SaaS with Nuxt 4 and Cloudflare Workers.",
+    "readArticle": "Read article",
+    "defaultCategory": "Engineering",
+    "emptyTitle": "No articles published yet",
+    "emptyDescription": "New articles will be published soon."
   },
   "signup": {
     "seoTitle": "Sign Up - Community Registration",
@@ -643,7 +647,7 @@
       "viewStructure": "Explore full Project Structure →"
     },
     "ai": {
-      "title": "The Ultimate Context for AI Builders & Vibe Coders",
+      "title": "The Definitive Context for<br class=\"hidden sm:inline\" /> AI Developers & Vibe Coders",
       "description": "Building with Cursor, Claude Code, or v0? NuxFire provides the foundational architecture LLMs need to succeed. Strict end-to-end TypeScript contracts, typed Drizzle schemas, and modular Nuxt Layers prevent hallucination and ensure AI assistants write correct, production-grade features on the first attempt."
     }
   }

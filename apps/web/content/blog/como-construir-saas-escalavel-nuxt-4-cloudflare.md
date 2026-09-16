@@ -6,6 +6,7 @@ author: "Equipe NuxFire"
 category: "Arquitetura Edge"
 readTime: "7 min"
 tags: ["Nuxt 4", "Cloudflare Workers", "SaaS", "Serverless", "SST v4"]
+image: "/images/blog/nuxt4-cloudflare-saas.svg"
 ---
 
 Lançar um produto SaaS em 2026 exige muito mais do que apenas criar uma interface bonita. Usuários esperam respostas instantâneas em qualquer lugar do mundo, investidores exigem custos operacionais previsíveis e desenvolvedores não querem perder fins de semana gerenciando pods do Kubernetes ou pagando contas astronômicas de servidores dedicados ociosos.

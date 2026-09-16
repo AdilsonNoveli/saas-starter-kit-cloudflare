@@ -9,6 +9,9 @@
         </div>
         <slot />
       </div>
+      <div v-if="isBlogPost(doc) && doc.image" class="overflow-hidden rounded-2xl border border-default aspect-video my-4">
+        <img :src="doc.image" :alt="doc.title" class="w-full h-full object-cover" />
+      </div>
       <USeparator />
       <ContentRenderer :value="doc" />
     </article>

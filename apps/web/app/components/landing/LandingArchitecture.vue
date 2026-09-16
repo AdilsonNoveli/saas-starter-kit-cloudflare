@@ -1,5 +1,5 @@
 <template>
-  <section id="architecture" class="py-12 md:py-20 px-4 sm:px-6 lg:px-8 xl:px-40">
+  <section id="architecture" class="py-16 md:py-24 px-4 sm:px-6 lg:px-8 xl:px-40">
     <div class="mx-auto w-full">
       <!-- Section Header -->
       <div class="text-center max-w-3xl mx-auto mb-8 lg:mb-12">
@@ -59,11 +59,6 @@
         <p class="text-lg sm:text-xl lg:text-2xl font-medium tracking-tight text-highlighted">
           {{ $t("landing.architecture.calloutLead") }} <span class="text-muted font-normal">{{ $t("landing.architecture.calloutRest") }}</span>
         </p>
-      </div>
-
-      <!-- Enterprise Tech Stack Slanted Ribbon -->
-      <div class="mt-12 lg:mt-16 w-full">
-        <LandingPageLogos />
       </div>
     </div>
   </section>

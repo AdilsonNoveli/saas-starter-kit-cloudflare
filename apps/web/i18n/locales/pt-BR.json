@@ -623,7 +623,32 @@
           "text": "Documentação completa, atualizações futuras e comunidade privada de desenvolvedores."
         }
       },
-      "closingHeadline": "Você pode passar três meses reconstruindo o que já existe. Ou começar com uma estrutura enterprise-grade desde o primeiro dia."
+      "closingHeadline": "Você pode passar três meses reconstruindo o que já existe. Ou começar com uma estrutura enterprise-grade desde o primeiro dia.",
+      "bonus": {
+        "badge": "Bônus Exclusivo",
+        "title": "E TEM MAIS: 1 ANO DE CLUB NUXFIRE",
+        "subtitle": "O Nuxfire não termina no download.",
+        "descriptionLead": "Você também recebe ",
+        "descriptionStrong": "1 ano de acesso ao Club Nuxfire",
+        "descriptionTail": " — um ecossistema em constante evolução, criado para continuar acelerando seus projetos depois que você começar a usar o Nuxfire.",
+        "accessTitle": "Você terá acesso a:",
+        "items": {
+          "modules": "Novos módulos",
+          "updates": "Atualizações e melhorias",
+          "apps": "Aplicações prontas e em produção",
+          "prompts": "Hacks de prompts para Vibe Coding",
+          "templates": "Templates prontos",
+          "uiux": "Banco de UI/UX",
+          "resources": "Novos recursos e materiais",
+          "more": "E muito mais."
+        },
+        "bestPart": "E o melhor:",
+        "ongoingTitle": "O conteúdo do Club continua sendo construído.",
+        "ongoingDesc": "Enquanto você utiliza o Nuxfire, nós continuamos desenvolvendo o ecossistema.",
+        "timeline": "Você entra hoje e acompanha 12 meses de evolução.",
+        "closingLead": "Não é apenas um produto entregue e encerrado. ",
+        "closingStrong": "É uma base que continua crescendo."
+      }
     },
     "cta": {
       "default": "COMECE AGORA"

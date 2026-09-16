@@ -25,18 +25,14 @@
       <div class="pricing-card-animated max-w-6xl mx-auto">
         <div class="rounded-[22px] bg-elevated/95 dark:bg-night-950/95 backdrop-blur-xl p-6 sm:p-8 lg:p-10 w-full">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
-            <!-- Left Column: Product Value, Feature Matrix & Embedded Club Bonus (lg:col-span-7) -->
-            <div class="lg:col-span-7 flex flex-col justify-between space-y-6">
+            <!-- Left Column: Product Value & Feature Matrix (lg:col-span-7) -->
+            <div class="lg:col-span-7 flex flex-col justify-between">
               <div>
                 <!-- Top Badges -->
                 <div class="flex flex-wrap items-center gap-2 mb-4">
                   <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                     <UIcon name="i-lucide-shield-check" class="w-3.5 h-3.5" />
                     <span>Monorepo Enterprise</span>
-                  </span>
-                  <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                    <UIcon name="i-lucide-crown" class="w-3.5 h-3.5 text-amber-500" />
-                    <span>Club Nuxfire Incluso</span>
                   </span>
                 </div>
 
@@ -72,60 +68,16 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Embedded Club Nuxfire Golden Bonus Box (Seamless, Clean & Integrated) -->
-              <div class="rounded-2xl border border-amber-500/35 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent p-5 sm:p-6 relative overflow-hidden shadow-xs">
-                <!-- Subtle gold ambient glow -->
-                <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-
-                <div class="relative z-10">
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
-                    <div class="flex items-center gap-2">
-                      <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
-                        <UIcon name="i-lucide-crown" class="w-4 h-4 text-amber-500" />
-                      </span>
-                      <h4 class="text-sm sm:text-base font-black text-highlighted uppercase tracking-wide">
-                        {{ $t("landing.pricing.bonus.title") }}
-                      </h4>
-                    </div>
-                    <span class="inline-flex items-center text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 self-start sm:self-auto">
-                      {{ $t("landing.pricing.bonus.badge") }} • 12 Meses
-                    </span>
-                  </div>
-
-                  <p class="text-xs sm:text-sm text-muted leading-relaxed mb-3.5">
-                    {{ $t("landing.pricing.bonus.descriptionLead") }}<strong class="text-highlighted">{{ $t("landing.pricing.bonus.descriptionStrong") }}</strong>{{ $t("landing.pricing.bonus.descriptionTail") }}
-                  </p>
-
-                  <!-- Bonus Deliverables (Tags / Chips) -->
-                  <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-3.5">
-                    <span
-                      v-for="itemKey in bonusItems"
-                      :key="itemKey"
-                      class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-elevated/80 border border-amber-500/25 text-highlighted flex items-center gap-1.5 shadow-2xs"
-                    >
-                      <span class="text-amber-500 text-[10px] font-bold">→</span>
-                      <span :class="itemKey === 'more' ? 'text-amber-600 dark:text-amber-400 font-semibold' : ''">{{ t(`landing.pricing.bonus.items.${itemKey}`) }}</span>
-                    </span>
-                  </div>
-
-                  <!-- Footer Note: Ongoing Build -->
-                  <div class="pt-2.5 border-t border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-muted">
-                    <span>{{ $t("landing.pricing.bonus.ongoingDesc") }}</span>
-                    <strong class="text-amber-600 dark:text-amber-400 font-semibold">{{ $t("landing.pricing.bonus.closingStrong") }}</strong>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            <!-- Right Column: Checkout Box, Pricing, Solid Green CTA (lg:col-span-5) -->
-            <div class="lg:col-span-5 rounded-2xl border border-emerald-500/30 bg-default/60 dark:bg-night-900/70 p-6 sm:p-8 flex flex-col justify-between shadow-xl relative overflow-hidden">
+            <!-- Right Column: Checkout Box, Pricing, Bonus Callout & Darker Green CTA (lg:col-span-5) -->
+            <div class="lg:col-span-5 rounded-2xl border border-emerald-500/30 bg-default/60 dark:bg-night-900/70 p-6 sm:p-7 flex flex-col justify-between shadow-xl relative overflow-hidden">
               <!-- Top decorative accent line -->
               <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500/20 via-emerald-400 to-emerald-500/20" />
 
               <div>
                 <!-- Checkout Header -->
-                <div class="flex items-center justify-between gap-2 mb-4">
+                <div class="flex items-center justify-between gap-2 mb-3">
                   <span class="inline-flex items-center text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                     {{ $t("landing.pricing.earlyBirdBadge") }}
                   </span>
@@ -135,7 +87,7 @@
                 </div>
 
                 <!-- Price Numbers -->
-                <div class="mb-6">
+                <div class="mb-4">
                   <div class="flex items-baseline gap-3">
                     <span class="text-2xl sm:text-3xl text-neutral-400 dark:text-neutral-500 line-through font-bold">
                       $79
@@ -147,7 +99,7 @@
                       USD
                     </span>
                   </div>
-                  <p class="text-xs text-muted mt-1.5 font-medium">
+                  <p class="text-xs text-muted mt-1 font-medium">
                     {{ $t("landing.pricing.oneTimePayment") }} • <span class="text-highlighted font-semibold">{{ $t("landing.pricing.neverMonthly") }}</span>
                   </p>
                   <p class="text-[11px] text-dimmed mt-0.5">
@@ -155,37 +107,83 @@
                   </p>
                 </div>
 
+                <!-- High-Converting Clear & Optimized Bonus Callout Box -->
+                <div class="mb-4 rounded-xl border border-amber-500/35 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent p-3 sm:p-3.5 transition-all shadow-2xs">
+                  <div class="flex flex-wrap items-center justify-between gap-1.5">
+                    <div class="flex items-center gap-1.5">
+                      <UIcon name="i-lucide-crown" class="w-4 h-4 text-amber-500 shrink-0" />
+                      <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-highlighted">
+                        {{ $t("landing.pricing.bonusCallout.title") }}
+                      </span>
+                    </div>
+                    <span class="inline-flex items-center text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 shrink-0">
+                      {{ $t("landing.pricing.bonusCallout.badge") }}
+                    </span>
+                  </div>
+
+                  <!-- Indicator button that opens the information -->
+                  <button
+                    type="button"
+                    @click="isBonusInfoOpen = !isBonusInfoOpen"
+                    class="mt-2.5 pt-2 border-t border-amber-500/20 w-full flex items-center justify-between text-left text-xs text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 font-medium transition-colors cursor-pointer select-none group"
+                    :aria-expanded="isBonusInfoOpen"
+                  >
+                    <span class="flex items-center gap-1.5 text-[11px] sm:text-xs">
+                      <UIcon name="i-lucide-sparkles" class="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>{{ $t("landing.pricing.bonusCallout.label") }}</span>
+                    </span>
+                    <span class="flex items-center gap-1 text-[10px] sm:text-[11px] text-muted group-hover:text-default">
+                      <span>{{ isBonusInfoOpen ? $t("landing.pricing.bonusCallout.hide") : $t("landing.pricing.bonusCallout.details") }}</span>
+                      <UIcon
+                        name="i-lucide-chevron-down"
+                        class="w-3.5 h-3.5 transition-transform duration-200"
+                        :class="{ 'rotate-180': isBonusInfoOpen }"
+                      />
+                    </span>
+                  </button>
+
+                  <!-- Expandable Bonus Details -->
+                  <div
+                    v-show="isBonusInfoOpen"
+                    class="mt-2 pt-2 border-t border-amber-500/15 text-[11px] sm:text-xs text-muted leading-relaxed"
+                  >
+                    <p>
+                      {{ $t("landing.pricing.bonusCallout.info") }}
+                    </p>
+                  </div>
+                </div>
+
                 <!-- Immediate Value Highlights -->
-                <div class="space-y-2.5 py-4 border-y border-default mb-6 text-xs text-muted">
+                <div class="space-y-2 py-3 border-y border-default mb-4 text-xs text-muted">
                   <div class="flex items-center gap-2.5">
                     <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span class="text-highlighted font-medium">Acesso vitalício ao código-fonte completo</span>
+                    <span class="text-highlighted font-medium">{{ $t("landing.pricing.checkmarks.sourceCode") }}</span>
                   </div>
                   <div class="flex items-center gap-2.5">
                     <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span class="text-highlighted font-medium">1 ano de Club Nuxfire ativado automaticamente</span>
+                    <span class="text-highlighted font-medium">{{ $t("landing.pricing.checkmarks.instantDownload") }}</span>
                   </div>
                   <div class="flex items-center gap-2.5">
                     <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span class="text-highlighted font-medium">Download imediato na Área de Membros</span>
+                    <span class="text-highlighted font-medium">{{ $t("landing.pricing.checkmarks.noSubscription") }}</span>
                   </div>
                 </div>
               </div>
 
-              <!-- Solid Green CTA Button + Guarantees -->
+              <!-- Solid Darker Green CTA Button + Guarantees -->
               <div>
-                <!-- Solid Green CTA Button -->
+                <!-- Solid Darker Green CTA Button -->
                 <NuxtLink
                   :to="signupUrl"
-                  class="group w-full py-4 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-extrabold uppercase tracking-wider text-sm sm:text-base text-center shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/35 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2.5 select-none"
+                  class="group w-full py-3.5 sm:py-4 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold uppercase tracking-wider text-sm sm:text-base text-center shadow-lg shadow-emerald-700/25 hover:shadow-emerald-700/35 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2.5 select-none"
                 >
                   <span>{{ $t("landing.pricing.cta") }}</span>
                   <UIcon name="i-lucide-arrow-right" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
                 </NuxtLink>
 
                 <!-- Guarantees -->
-                <div class="mt-4 pt-3.5 border-t border-default text-center">
-                  <div class="text-xs text-muted flex flex-col items-center justify-center gap-2">
+                <div class="mt-3.5 pt-3 border-t border-default text-center">
+                  <div class="text-xs text-muted flex flex-col items-center justify-center gap-1.5">
                     <span class="inline-flex items-center gap-1.5 font-medium">
                       <UIcon name="i-lucide-code-2" class="w-4 h-4 text-emerald-500 shrink-0" />
                       {{ $t("landing.pricing.guarantee.projects") }}
@@ -218,17 +216,7 @@ const localePath = useLocalePath();
 const config = useRuntimeConfig();
 const signupUrl = computed(() => config.public.appUrl || localePath("/signup"));
 
-// Keys for bonus list
-const bonusItems = [
-  "modules",
-  "updates",
-  "apps",
-  "prompts",
-  "templates",
-  "uiux",
-  "resources",
-  "more",
-];
+const isBonusInfoOpen = ref(false);
 
 // Key suffixes under `landing.pricing.features.*`; each resolves to a
 // `{ highlight, text }` pair in the locale files.

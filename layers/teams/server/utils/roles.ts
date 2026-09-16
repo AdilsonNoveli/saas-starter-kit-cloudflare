@@ -38,7 +38,7 @@ async function insertSystemRole(
  * Reactive safety net: creates Owner/Admin/Member the first time anything
  * needs one, in case Role is found empty at request time.
  *
- * The deterministic path is packages/functions/src/database/seed.ts, which
+ * The deterministic path is apps/functions/src/database/seed/index.ts, which
  * runs as part of every deploy with `app: true` (infra/utils/nuxt.ts), fresh
  * installs included — this only matters for the gap that leaves open: a
  * database reset independently of an app deploy (swapped instance, dropped

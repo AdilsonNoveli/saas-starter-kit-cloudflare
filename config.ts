@@ -28,7 +28,7 @@ export const signOutOthersPath = "/internal/identity/sign-out-others";
 // Path on the auth Worker that creates (or resets) an identity with a known
 // password. Same reasoning as the two paths above: AuthKV is bound only to the
 // auth Worker, so anything outside it — here, the manual demo-account seed
-// script (apps/functions/src/database/seed-demo-accounts.ts) — has to ask
+// script (apps/functions/src/database/seed/demo-accounts.ts) — has to ask
 // for the credential to be written rather than write it itself.
 export const seedAccountPath = "/internal/identity/seed";
 

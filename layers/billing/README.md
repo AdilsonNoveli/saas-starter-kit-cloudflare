@@ -146,7 +146,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   `billingGetBillingInfo` per the layer-prefix rule (the prefix is the layer's,
   not the permission's).
 - **`Plan`s are DB rows, not a hardcoded object.** Only the Free plan is seeded
-  (`packages/functions/src/database/seed-data.ts`); everything else is created by
+  (`apps/functions/src/database/seed/data.ts`); everything else is created by
   the platform owner at `/admin/plans`. Do not reintroduce a plan constant.
 - **Moving a `pgTable` between files generates no migration.** drizzle-kit diffs
   table/column identity against the snapshot, not the source file. This whole

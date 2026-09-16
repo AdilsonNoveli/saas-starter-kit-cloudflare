@@ -10,12 +10,12 @@
 // exist as a reactive safety net for the case this file doesn't cover: a
 // database reset independently of an app deploy (swapped instance, dropped
 // and re-migrated) between two deploys. Both paths import the same data
-// from ./seed-data.ts so they can't drift apart.
+// from ./data.ts so they can't drift apart.
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import * as schema from "./schema";
-import { FREE_PLAN, SYSTEM_ROLES } from "./seed-data";
+import * as schema from "../schema";
+import { FREE_PLAN, SYSTEM_ROLES } from "./data";
 
 async function main() {
   const sql = postgres({

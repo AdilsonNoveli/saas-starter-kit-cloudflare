@@ -215,7 +215,7 @@ async function signOutOtherSessions(
  *
  * The mirror image of deleteIdentity, and it exists for the same structural
  * reason: AuthKV is bound to this Worker and nowhere else, so the demo-account
- * seed script (apps/functions/src/database/seed-demo-accounts.ts) — which
+ * seed script (apps/functions/src/database/seed/demo-accounts.ts) — which
  * runs as a plain `bun run` process with only Postgres credentials — cannot
  * write a credential itself. It asks here instead.
  *

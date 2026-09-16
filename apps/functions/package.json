@@ -11,7 +11,7 @@
     "./sender": "./src/sender.ts",
     "./schema": "./src/database/schema.ts",
     "./database/core-schema": "./src/database/core-schema.ts",
-    "./database/seed-data": "./src/database/seed-data.ts"
+    "./database/seed-data": "./src/database/seed/data.ts"
   },
   "dependencies": {
     "@cloudflare/workers-types": "^4.20241230.0",

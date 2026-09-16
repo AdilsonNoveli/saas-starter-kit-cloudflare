@@ -32,7 +32,7 @@ import { users } from "@nuxfire/functions/database/core-schema";
 // SaaS itself", which is a different question from "what may this user do
 // inside team X", and mixing the two would let a tenant-scoped role escalate
 // into platform scope. Rows are only ever created by
-// packages/functions/src/database/grant-platform-admin.ts (manual, never over
+// apps/functions/src/database/grant-platform-admin.ts (manual, never over
 // HTTP, never on deploy).
 export const platformRoleEnum = pgEnum("platform_role", [
   "SUPER_ADMIN",

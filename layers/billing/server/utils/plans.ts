@@ -7,7 +7,7 @@ export { FREE_PLAN };
 /**
  * Reactive safety net — see the matching doc comment on ensureSystemRoles()
  * in layers/teams/server/utils/roles.ts. The deterministic path is
- * packages/functions/src/database/seed.ts, which runs on every deploy with
+ * apps/functions/src/database/seed/index.ts, which runs on every deploy with
  * `app: true` (infra/utils/nuxt.ts, right after migrations); this only
  * covers a database reset independently of an app deploy.
  */

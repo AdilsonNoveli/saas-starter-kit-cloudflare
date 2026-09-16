@@ -403,6 +403,7 @@
   "apps/web/public/",
   "apps/web/public/apple-touch-icon-180x180.png",
   "apps/web/public/crisp.js",
+  "apps/web/public/favicon.ico",
   "apps/web/public/icon-nuxfire.svg",
   "apps/web/public/images/",
   "apps/web/public/images/blog/",

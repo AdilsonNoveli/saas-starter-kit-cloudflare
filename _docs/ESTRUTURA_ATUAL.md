@@ -95,10 +95,11 @@ nuxfire/
 │       │       ├── schema.ts        # Barrel agregador — reexporta core-schema + uma linha por layer
 │       │       ├── core-schema.ts   # Tabelas sem domínio: User, WaitlistEmail, Job, Log, DeadLetterRecord
 │       │       ├── migrations/      # Fonte única de verdade: 0000_init.sql + meta/ (ver seção Database)
-│       │       ├── seed-data.ts     # Dados determinísticos (Free plan, system roles)
-│       │       ├── seed.ts          # Roda a cada deploy (idempotente)
-│       │       ├── grant-platform-admin.ts   # Manual — concede platform admin a um user existente
-│       │       └── seed-demo-accounts.ts     # Manual — apenas dev/demo local
+│       │       ├── grant-platform-admin.ts   # Manual — concede platform admin a um user existente (NÃO é seed)
+│       │       └── seed/            # Tudo que popula dados, agrupado (2026-09-16)
+│       │           ├── index.ts     # Roda a cada deploy (idempotente) — era seed.ts
+│       │           ├── data.ts      # Dados determinísticos: Free plan, system roles — era seed-data.ts
+│       │           └── demo-accounts.ts   # Manual, dev/demo local — era seed-demo-accounts.ts
 │       ├── drizzle.config.ts
 │       └── package.json             # @nuxfire/functions
 │
@@ -213,10 +214,11 @@ nuxfire/
 - Aplicadas automaticamente a cada deploy via `infra/utils/nuxt.ts` (`bunx drizzle-kit migrate`), nunca à mão. Sem down-migrations — rollback é expand/contract (ver `apps/functions/src/database/MIGRATIONS.md`).
 - **Importante para quem já tinha um banco com o histórico antigo aplicado:** como o `0000_init.sql` consolidado tem um hash diferente de qualquer uma das 10 migrations antigas, o `drizzle-kit migrate` não vai reconhecer as tabelas existentes como já migradas. Um banco com o histórico antigo precisa ser resetado (schema `public` e `drizzle` derrubados e recriados) antes do próximo deploy aplicar a migration única — feito e verificado ponta-a-ponta no stage local (`desktop-h6uunuvadilson`) nesta consolidação. `production` ainda não tem `DATABASE_HOST` configurado, então não é afetado.
 
-**Seeds:**
-- `seed.ts` — Seed principal (Free plan + system roles), roda a cada deploy, idempotente
-- `seed-demo-accounts.ts` — Contas demo (manual, apenas dev/demo local)
-- `grant-platform-admin.ts` — Concede platform admin a um user existente (manual)
+**Seeds:** `apps/functions/src/database/seed/` — agrupados em subpasta própria em 2026-09-16 (mesmo princípio de `migrations/`: dados de bootstrap isolados do resto de `database/`). Export público do pacote (`@nuxfire/functions/database/seed-data`, usado por `layers/teams` e `layers/billing`) mantido estável — só o alvo interno mudou, nenhum import externo precisou mudar.
+- `seed/index.ts` — Seed principal (Free plan + system roles), roda a cada deploy, idempotente. Era `seed.ts`.
+- `seed/data.ts` — Fonte de dados compartilhada entre `seed/index.ts` e os fallbacks reativos (`ensureSystemRoles()`/`ensureFreePlan()`). Era `seed-data.ts`.
+- `seed/demo-accounts.ts` — Contas demo (manual, apenas dev/demo local). Era `seed-demo-accounts.ts`.
+- `grant-platform-admin.ts` — **fica fora de `seed/`**, de propósito: não popula dados, promove um user já existente a platform admin (operação administrativa, não seeding).
 
 ## 🚀 Infrastructure (SST)
 

@@ -10,7 +10,7 @@
 //
 // It straddles two systems, so it needs both sets of variables:
 //
-//  - Postgres, the same DATABASE_* variables as seed.ts and drizzle.config.ts.
+//  - Postgres, the same DATABASE_* variables as seed/index.ts and drizzle.config.ts.
 //  - The auth Worker, because credentials live in AuthKV, which is bound to
 //    that Worker and nowhere else. This script POSTs to seedAccountPath
 //    (config.ts) instead of writing the credential itself:
@@ -26,7 +26,7 @@
 //                          deployed app Worker's variables.
 //
 //   cd apps/functions
-//   bun run src/database/seed-demo-accounts.ts \
+//   bun run src/database/seed/demo-accounts.ts \
 //     --owner-email=owner@nuxfire.com --owner-password=owner@12345678 \
 //     --client-email=client@nuxfire.com --client-password=client@12345678
 //
@@ -35,8 +35,8 @@
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import * as schema from "./schema";
-import { seedAccountPath } from "../../../../config";
+import * as schema from "../schema";
+import { seedAccountPath } from "../../../../../config";
 
 const DEMO_TEAM_NAME = "Demo Company";
 const DEMO_TEAM_SLUG = "demo-company";
@@ -156,7 +156,7 @@ async function main() {
       .where(eq(schema.plans.tier, "FREE"));
     if (!freePlan) {
       throw new Error(
-        "no FREE plan found — run src/database/seed.ts first (it runs on every deploy)",
+        "no FREE plan found — run src/database/seed/index.ts first (it runs on every deploy)",
       );
     }
     const [ownerRole] = await db
@@ -170,7 +170,7 @@ async function main() {
       );
     if (!ownerRole) {
       throw new Error(
-        "no system Owner role found — run src/database/seed.ts first",
+        "no system Owner role found — run src/database/seed/index.ts first",
       );
     }
 

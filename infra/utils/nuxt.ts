@@ -106,12 +106,12 @@ export async function deployWorker(
     // a safety net for a database reset independently of a deploy). Runs
     // directly against Postgres the same way migrations do, right after
     // them so the tables it writes to already exist. Idempotent: see
-    // apps/functions/src/database/seed.ts.
+    // apps/functions/src/database/seed/index.ts.
     new command.local.Command(
       `${name}Seed`,
       {
         dir: path.resolve("apps/functions"),
-        create: "bun run src/database/seed.ts",
+        create: "bun run src/database/seed/index.ts",
         triggers: [new Date().toString()],
         environment: databaseEnvironment,
       },

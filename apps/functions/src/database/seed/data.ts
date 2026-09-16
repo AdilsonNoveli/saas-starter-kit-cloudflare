@@ -1,4 +1,4 @@
-import type { permissions, plans, roles } from "./schema";
+import type { permissions, plans, roles } from "../schema";
 
 type InsertRole = typeof roles.$inferInsert;
 type InsertPermission = typeof permissions.$inferInsert;
@@ -44,7 +44,7 @@ export const FREE_PLAN: InsertPlan = {
  *  - layers/teams/server/utils/roles.ts's ensureSystemRoles(), the reactive
  *    path that self-heals if Role is ever found empty at request time (e.g. a
  *    database swapped or reset independently of a full app deploy).
- *  - database/seed.ts, the deploy-time path that guarantees these exist
+ *  - database/seed/index.ts, the deploy-time path that guarantees these exist
  *    deterministically on every deploy, fresh installs included, rather
  *    than waiting for the first request that happens to need one.
  */

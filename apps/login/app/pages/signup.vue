@@ -4,7 +4,7 @@
     :subtitle="
       state === 'code'
         ? 'Enter the 6-digit verification code sent to your inbox'
-        : 'Get started with NuxFire in just a few minutes'
+        : 'Get started with Nuxfire in just a few minutes'
     "
   >
     <!-- Status Alerts -->

@@ -45,7 +45,7 @@
       <div class="p-3.5 rounded-xl border border-primary/25 bg-gradient-to-br from-primary/10 via-elevated to-transparent space-y-2.5">
         <div class="flex items-center gap-1.5 text-xs font-bold text-primary">
           <UIcon name="i-lucide-package-check" class="w-4 h-4 shrink-0" />
-          <span>NuxFire Monorepo</span>
+          <span>Nuxfire Monorepo</span>
         </div>
         <p class="text-xs text-muted leading-snug">
           100% de posse do código-fonte completo na sua Área de Membros.

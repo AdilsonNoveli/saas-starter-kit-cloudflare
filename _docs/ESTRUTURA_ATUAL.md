@@ -1,4 +1,4 @@
-# Estrutura Real da Aplicação NuxFire
+# Estrutura Real da Aplicação Nuxfire
 
 ## 📁 Estrutura de Diretórios (Estado Atual)
 

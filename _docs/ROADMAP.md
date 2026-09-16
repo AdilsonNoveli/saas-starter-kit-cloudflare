@@ -1,4 +1,4 @@
-# NuxFire — Product Roadmap (Única Fonte da Verdade)
+# Nuxfire — Product Roadmap (Única Fonte da Verdade)
 
 > **Documento Oficial de Direção Estratégica e Evolução do Produto**  
 > **Localização canônica:** `_docs/ROADMAP.md`  
@@ -11,7 +11,7 @@
 
 ## 1. Visão do Produto (Target State / To-Be)
 
-O objetivo do **NuxFire** é ser a **referência definitiva de SaaS Starter Kit Serverless na Borda (Cloudflare Edge)**, combinando:
+O objetivo do **Nuxfire** é ser a **referência definitiva de SaaS Starter Kit Serverless na Borda (Cloudflare Edge)**, combinando:
 
 1. **Custo Fixo Praticamente Zero:** Arquitetura 100% serverless edge (Cloudflare Workers, Hyperdrive, KV, R2, D1, Queues, Durable Objects) escalando de zero a milhões de requisições sem servidores dedicados ociosos.
 2. **Pronto para Produção Enterprise:** Autenticação robusta (OpenAuth.js + OAuth + MFA TOTP com chaves AES-GCM), isolamento estrito de autoridade (RBAC tenant vs. Platform Admin com barreira tripla) e conformidade LGPD/privacidade.
@@ -48,7 +48,7 @@ A priorização de desenvolvimento obedece à metodologia de três horizontes:
 ```
 
 ### 🔴 NOW — Prioridade Imediata (Produção, Credibilidade & Gaps Críticos)
-> Foco em fechar as lacunas operacionais mais urgentes para que qualquer projeto derivado do NuxFire possa ir a público com processos automatizados.
+> Foco em fechar as lacunas operacionais mais urgentes para que qualquer projeto derivado do Nuxfire possa ir a público com processos automatizados.
 
 1. **Pipeline de CI/CD Oficial (`OPS-01`, `OPS-02`):**
    * Workflows no GitHub Actions para validação de tipagem (`vue-tsc`), linter e testes no Vitest em cada Pull Request.

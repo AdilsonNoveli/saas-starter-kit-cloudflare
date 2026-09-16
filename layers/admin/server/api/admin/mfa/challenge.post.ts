@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
 
   const { platformAdminEncryptionKey } = useRuntimeConfig(event);
   const totp = new TOTP({
-    issuer: "NuxFire",
+    issuer: "Nuxfire",
     label: user.email ?? user.id,
     secret: Secret.fromBase32(
       await decryptSecret(admin.mfaSecret, platformAdminEncryptionKey),

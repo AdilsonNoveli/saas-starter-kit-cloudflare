@@ -18,12 +18,12 @@
       <template #header="{ collapsed: isCollapsed }">
         <div class="flex items-center gap-2 w-full py-2" :class="isCollapsed && 'justify-center'">
           <template v-if="isCollapsed">
-            <img src="/nuxfire-icon.svg" alt="NuxFire" class="h-6 w-auto dark:hidden" />
-            <img src="/nuxfire-icon-white.svg" alt="NuxFire" class="h-6 w-auto hidden dark:block" />
+            <img src="/nuxfire-icon.svg" alt="Nuxfire" class="h-6 w-auto dark:hidden" />
+            <img src="/nuxfire-icon-white.svg" alt="Nuxfire" class="h-6 w-auto hidden dark:block" />
           </template>
           <template v-else>
-            <img src="/nuxfire.svg" alt="NuxFire" class="h-5 w-auto dark:hidden" />
-            <img src="/nuxfire-white.svg" alt="NuxFire" class="h-5 w-auto hidden dark:block" />
+            <img src="/nuxfire.svg" alt="Nuxfire" class="h-5 w-auto dark:hidden" />
+            <img src="/nuxfire-white.svg" alt="Nuxfire" class="h-5 w-auto hidden dark:block" />
             <UBadge label="Admin" color="warning" variant="subtle" size="sm" />
           </template>
         </div>

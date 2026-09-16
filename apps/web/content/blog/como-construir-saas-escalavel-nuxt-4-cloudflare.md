@@ -2,7 +2,7 @@
 title: "Como Construir um SaaS Escalável com Nuxt 4 e Cloudflare Workers: O Guia Definitivo"
 date: "2026-09-15"
 description: "Aprenda a estruturar um SaaS moderno em 2026 com Nuxt 4, SST v4 e Cloudflare Workers. Cold starts zero, latência global sub-50ms e economia massiva de infraestrutura."
-author: "Equipe NuxFire"
+author: "Equipe Nuxfire"
 category: "Arquitetura Edge"
 readTime: "7 min"
 tags: ["Nuxt 4", "Cloudflare Workers", "SaaS", "Serverless", "SST v4"]
@@ -11,7 +11,7 @@ image: "/images/blog/nuxt4-cloudflare-saas.svg"
 
 Lançar um produto SaaS em 2026 exige muito mais do que apenas criar uma interface bonita. Usuários esperam respostas instantâneas em qualquer lugar do mundo, investidores exigem custos operacionais previsíveis e desenvolvedores não querem perder fins de semana gerenciando pods do Kubernetes ou pagando contas astronômicas de servidores dedicados ociosos.
 
-Neste guia completo, exploramos a arquitetura do **NuxFire**: uma base de código pronta para produção baseada em **Nuxt 4**, **SST v4** e **Cloudflare Workers**.
+Neste guia completo, exploramos a arquitetura do **Nuxfire**: uma base de código pronta para produção baseada em **Nuxt 4**, **SST v4** e **Cloudflare Workers**.
 
 ---
 
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
 
 ## O Monorepo Bun: Estrutura Profissional de um SaaS Enterprise
 
-Muitos boilerplates empacotam código como um bloco monolítico e desordenado. No **NuxFire**, adotamos um monorepo orquestrado com **Bun Workspaces**:
+Muitos boilerplates empacotam código como um bloco monolítico e desordenado. No **Nuxfire**, adotamos um monorepo orquestrado com **Bun Workspaces**:
 
 - **`apps/app`**: O dashboard principal do SaaS, com layouts de equipe, tRPC ponta a ponta e configurações de conta.
 - **`apps/web`**: O portal público de marketing com documentação completa, landing page de alta conversão e blog.
@@ -88,11 +88,11 @@ export function createDatabaseClient(connectionString: string) {
 
 ---
 
-## Comece com o NuxFire: Economize Meses de Desenvolvimento
+## Comece com o Nuxfire: Economize Meses de Desenvolvimento
 
-Em vez de gastar de 3 a 6 meses configurando autenticação, WebSockets, filas de background, faturamento Stripe e permissões multi-tenant do zero, o **NuxFire** entrega todo esse código pronto, testado e com tipagem estrita de ponta a ponta.
+Em vez de gastar de 3 a 6 meses configurando autenticação, WebSockets, filas de background, faturamento Stripe e permissões multi-tenant do zero, o **Nuxfire** entrega todo esse código pronto, testado e com tipagem estrita de ponta a ponta.
 
-- **Posse Total do Código-Fonte**: Sem pacotes privados fechados ou mensalidades por desenvolvedor.
+- **Acesso Completo ao Código-Fonte**: Sem pacotes privados fechados ou mensalidades por desenvolvedor.
 - **Entrega Imediata**: Baixe o repositório na sua Área de Membros logo após a confirmação.
 - **Licença Perpétua**: Crie projetos comerciais ilimitados.
 

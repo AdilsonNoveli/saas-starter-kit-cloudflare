@@ -1,8 +1,8 @@
-# NuxFire — Arquitetura Enterprise-Grade baseada em Nuxt 4 Layers
+# Nuxfire — Arquitetura Enterprise-Grade baseada em Nuxt 4 Layers
 
 > **Status:** Plano auditado e validado em 2026-09-13. Ver [Registro de Decisões](#registro-de-decisões-da-auditoria) para o que mudou em relação à primeira versão e por quê.
 
-Plano para transformar o NuxFire na arquitetura fullstack Nuxt mais robusta e modular do mercado, utilizando **Nuxt 4 Layers** como unidades autônomas de domínio de negócio (Kanban, Calendar, Billing, etc.), ativáveis ou desativáveis no deploy.
+Plano para transformar o Nuxfire na arquitetura fullstack Nuxt mais robusta e modular do mercado, utilizando **Nuxt 4 Layers** como unidades autônomas de domínio de negócio (Kanban, Calendar, Billing, etc.), ativáveis ou desativáveis no deploy.
 
 ---
 
@@ -34,7 +34,7 @@ Outros ajustes menores incorporados ao plano abaixo: convenção de nomenclatura
 
 ---
 
-## Esclarecimento: NuxFire **já é** um monorepo
+## Esclarecimento: Nuxfire **já é** um monorepo
 
 O [package.json](file:///c:/nuxfire/package.json) declara:
 

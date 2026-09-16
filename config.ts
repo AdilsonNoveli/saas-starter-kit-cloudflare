@@ -9,7 +9,7 @@ export const devDomain = "dev.nuxfire.com";
 // this email is used by the auth service for
 // sending codes, welcome email, and invitations
 export const authEmail = {
-  name: "NuxFire",
+  name: "Nuxfire",
   address: "contato@nuxfire.com",
 };
 export const authEmailDomain = "nuxfire.com";

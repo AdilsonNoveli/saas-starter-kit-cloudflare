@@ -2,7 +2,7 @@
 title: "Vibe Coding com IA: Como Tipagem Estrita e Nuxt Layers Potencializam o Cursor e Claude Code"
 date: "2026-09-15"
 description: "Por que o segredo de construir produtos com IA não é o prompt, mas a arquitetura. Veja como contratos TypeScript e schemas tRPC eliminam alucinações de LLMs."
-author: "Equipe NuxFire"
+author: "Equipe Nuxfire"
 category: "Desenvolvimento com IA"
 readTime: "8 min"
 tags: ["Cursor", "Claude Code", "v0", "Vibe Coding", "TypeScript"]
@@ -15,7 +15,7 @@ No entanto, quase todo mundo que tenta criar um SaaS complexo apenas com prompts
 
 Após algumas iterações, a IA começa a alucinar variáveis que não existem, recria funções já implementadas em outros arquivos, quebra telas inteiras e introduz vulnerabilidades silenciosas de banco de dados.
 
-Por que isso acontece? E como a arquitetura do **NuxFire** resolve esse problema?
+Por que isso acontece? E como a arquitetura do **Nuxfire** resolve esse problema?
 
 ---
 
@@ -23,11 +23,11 @@ Por que isso acontece? E como a arquitetura do **NuxFire** resolve esse problema
 
 Grandes modelos de linguagem (LLMs) são tão bons quanto o contexto que recebem na janela de atenção. Se o seu projeto é um monólito confuso com centenas de arquivos interdependentes sem tipagem estrita, o modelo precisa "adivinhar" as relações entre as partes.
 
-O **NuxFire** foi projetado especificamente para ser a fundação ideal para ferramentas de IA, combinando três pilares arquiteturais:
+O **Nuxfire** foi projetado especificamente para ser a fundação ideal para ferramentas de IA, combinando três pilares arquiteturais:
 
 ### 1. Tipagem Estrita de Ponta a Ponta com TypeScript & tRPC
 
-No NuxFire, não existem objetos `any` ou payloads não tipados. Cada rota de API define seu input e output com esquemas **Zod** através do **tRPC**:
+No Nuxfire, não existem objetos `any` ou payloads não tipados. Cada rota de API define seu input e output com esquemas **Zod** através do **tRPC**:
 
 ```typescript
 export const billingRouter = router({
@@ -82,4 +82,4 @@ Ao combinar a velocidade da IA gerativa com uma base arquitetural sólida de ní
 
 Chega de lutar contra alucinações da IA. Comece seu projeto sobre uma base profissional e testada.
 
-[**Garanta seu acesso imediato ao código-fonte do NuxFire na Área de Membros →**](/#pricing)
+[**Garanta seu acesso imediato ao código-fonte do Nuxfire na Área de Membros →**](/#pricing)

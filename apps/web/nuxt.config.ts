@@ -97,7 +97,7 @@ export default defineNuxtConfig({
     head: {
       // No charset/viewport here — Nuxt already sets these exact defaults;
       // repeating them just trips nuxt-seo-utils's "repeats a default" check.
-      title: "NuxFire Docs | NuxFire",
+      title: "Nuxfire Docs | Nuxfire",
     },
   },
   runtimeConfig: {
@@ -116,7 +116,7 @@ export default defineNuxtConfig({
     // overridden per-stage at build time by infra/web.ts (falls back to the
     // production domain for local `nuxt dev`/`nuxt build`)
     url: process.env.SITE_URL || "https://nuxfire.com",
-    name: "NuxFire",
+    name: "Nuxfire",
   },
 
   // Auto-generated OG image previews need the satori/resvg native image

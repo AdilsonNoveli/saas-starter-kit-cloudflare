@@ -93,7 +93,8 @@
           </h3>
 
           <p class="text-muted text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
-            {{ $t("landing.useCases.banner.descriptionLead") }} <strong class="text-highlighted">{{ $t("landing.useCases.banner.descriptionCost") }}</strong>{{ $t("landing.useCases.banner.descriptionTail") }} <code class="text-emerald-600 dark:text-emerald-400 font-mono text-xs bg-muted border border-default px-1.5 py-0.5 rounded">$ bun run deploy</code>.
+            {{ $t("landing.useCases.banner.descriptionLead") }}<strong class="text-highlighted">{{ $t("landing.useCases.banner.descriptionCost") }}</strong>{{ $t("landing.useCases.banner.descriptionTail") }}<br class="hidden sm:inline" />
+            <code class="text-emerald-600 dark:text-emerald-400 font-mono text-xs bg-muted border border-default px-2 py-0.5 rounded whitespace-nowrap">$ bun run deploy</code>.
           </p>
 
           <!-- 4 Pillars of Competitive Advantage -->

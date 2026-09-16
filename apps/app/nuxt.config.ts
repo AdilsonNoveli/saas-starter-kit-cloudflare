@@ -83,7 +83,7 @@ export default defineNuxtConfig({
       // No charset/viewport here — Nuxt already sets these exact values by
       // default (see apps/web/nuxt.config.ts, where nuxt-seo-utils flags
       // the same two lines as dead config).
-      title: "NuxFire",
+      title: "Nuxfire",
     },
   },
   fonts: {

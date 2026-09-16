@@ -15,12 +15,12 @@
         <slot name="brand">
           <NuxtLink
             to="/"
-            aria-label="NuxFire"
+            aria-label="Nuxfire"
             class="transition-opacity hover:opacity-90 inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-1"
           >
             <img
               src="/nuxfire-white.svg"
-              alt="NuxFire"
+              alt="Nuxfire"
               class="h-8 w-auto block"
             />
           </NuxtLink>
@@ -60,7 +60,7 @@
       <!-- Bottom sub-footer -->
       <footer class="w-full text-center text-xs text-dimmed mt-5">
         <slot name="subfooter">
-          <span>NuxFire Enterprise Security</span>
+          <span>Nuxfire Enterprise Security</span>
         </slot>
       </footer>
     </div>

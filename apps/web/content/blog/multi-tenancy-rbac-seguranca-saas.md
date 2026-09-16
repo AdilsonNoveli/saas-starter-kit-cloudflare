@@ -2,7 +2,7 @@
 title: "Multi-Tenancy Corporativo e RBAC Granular no PostgreSQL com Drizzle ORM"
 date: "2026-09-15"
 description: "Como implementar isolamento estrito entre equipes, permissões granulares e convites seguros por token sem brechas de segurança no seu SaaS B2B."
-author: "Equipe NuxFire"
+author: "Equipe Nuxfire"
 category: "Segurança & Banco de Dados"
 readTime: "9 min"
 tags: ["Multi-Tenancy", "RBAC", "PostgreSQL", "Drizzle ORM", "Segurança"]
@@ -13,7 +13,7 @@ O maior divisor de águas entre um projeto amador e um produto de software corpo
 
 Se um cliente corporativo descobrir que um usuário de outra empresa conseguiu visualizar dados do seu workspace, a reputação da sua startup é destruída no primeiro dia.
 
-Neste artigo, mostramos como a camada `layers/teams` do **NuxFire** implementa isolamento de dados à prova de falhas com **PostgreSQL** e **Drizzle ORM**.
+Neste artigo, mostramos como a camada `layers/teams` do **Nuxfire** implementa isolamento de dados à prova de falhas com **PostgreSQL** e **Drizzle ORM**.
 
 ---
 
@@ -24,7 +24,7 @@ Existem três formas clássicas de multi-tenancy:
 2. Schema separado por cliente (limitações de conexões e complexidade no ORM).
 3. **Tabelas compartilhadas com coluna discriminadora (`team_id`)** — O padrão moderno da indústria adotado por gigantes como Stripe, Slack e Linear.
 
-No NuxFire, todas as entidades pertencem a uma equipe:
+No Nuxfire, todas as entidades pertencem a uma equipe:
 
 ```typescript
 // layers/teams/server/database/schema.ts
@@ -94,8 +94,8 @@ Convites para novos membros seguem um fluxo seguro de dupla confirmação:
 
 ## Logs de Auditoria para Conformidade Corporativa
 
-Para clientes B2B exigentes, o NuxFire já inclui uma tabela dedicada de **Audit Logs** (`/admin/audit-log`). Todas as alterações críticas — mudanças de permissões, remoção de membros, trocas de plano e downloads de dados — são registradas de forma imutável com timestamp, IP e identificador do autor.
+Para clientes B2B exigentes, o Nuxfire já inclui uma tabela dedicada de **Audit Logs** (`/admin/audit-log`). Todas as alterações críticas — mudanças de permissões, remoção de membros, trocas de plano e downloads de dados — são registradas de forma imutável com timestamp, IP e identificador do autor.
 
 Construa seu SaaS sobre uma fundação que atende aos mais altos padrões de segurança corporativa desde o primeiro commit.
 
-[**Adquira sua licença do NuxFire e obtenha o código completo na Área de Membros →**](/#pricing)
+[**Adquira sua licença do Nuxfire e obtenha o código completo na Área de Membros →**](/#pricing)

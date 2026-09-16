@@ -1,5 +1,5 @@
 /**
- * Single source of truth for design tokens across every NuxFire Nuxt app
+ * Single source of truth for design tokens across every Nuxfire Nuxt app
  * (app, web, login). Import this AFTER `@import "@nuxt/ui";` in
  * each app's main.css so these overrides win over Nuxt UI's own defaults.
  *

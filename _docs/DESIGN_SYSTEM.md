@@ -1,4 +1,4 @@
-# Design System NuxFire
+# Design System Nuxfire
 
 > Histórico: este arquivo começou como um *prompt* para um agente de IDE implementar o design system do
 > zero. O sistema descrito abaixo já está implementado — em `packages/design-tokens` — então este arquivo
@@ -8,7 +8,7 @@
 
 ## 1. Identidade da marca
 
-NuxFire é um hub de código/aplicações. A personalidade visual é:
+Nuxfire é um hub de código/aplicações. A personalidade visual é:
 
 > Fogo + engenharia + execução. Uma plataforma técnica, rápida e confiável, com energia de quem constrói
 > e entrega.
@@ -31,7 +31,7 @@ combinação que escorrega fácil para estética de gaming/esports/energético. 
 
 ## 2. Onde os tokens vivem: `packages/design-tokens`
 
-Todo token de design do NuxFire está centralizado em **um único pacote de workspace**,
+Todo token de design do Nuxfire está centralizado em **um único pacote de workspace**,
 `@nuxfire/design-tokens`, consumido pelos três apps Nuxt (`packages/app`, `packages/web`,
 `packages/auth-frontend`). Antes desse pacote existir, cada app duplicava seu próprio `app.config.ts` e
 seu próprio `main.css` — risco real de um app divergir do outro sem ninguém perceber. Agora, mudar uma cor

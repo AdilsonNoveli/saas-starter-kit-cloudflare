@@ -6,12 +6,12 @@ export default defineAppConfig({
   },
   site: {
     url: "https://app.nuxfire.com",
-    name: "NuxFire",
+    name: "Nuxfire",
     description: "Production-ready enterprise-grade Nuxt starter kit for Cloudflare.",
   },
   docs: {
     name: "Docs",
-    description: "NuxFire Documentation",
+    description: "Nuxfire Documentation",
     sidebar: {
       useLevel: false,
       collapse: false,

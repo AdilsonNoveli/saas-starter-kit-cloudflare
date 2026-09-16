@@ -1,4 +1,4 @@
-# NuxFire — Estado Atual da Aplicação (Current State / As-Is)
+# Nuxfire — Estado Atual da Aplicação (Current State / As-Is)
 
 > **Documento de Referência Técnica (As-Is)**  
 > **Última verificação:** Setembro/2026  
@@ -8,7 +8,7 @@
 
 ## 1. Visão Geral da Arquitetura
 
-O **NuxFire** é um SaaS starter kit multi-tenant desenvolvido em monorepo com Bun workspaces, projetado especificamente para rodar **100% serverless na borda da Cloudflare**, orquestrado via **SST v4** (`sst.cloudflare.*`).
+O **Nuxfire** é um SaaS starter kit multi-tenant desenvolvido em monorepo com Bun workspaces, projetado especificamente para rodar **100% serverless na borda da Cloudflare**, orquestrado via **SST v4** (`sst.cloudflare.*`).
 
 ```
                               [ Cloudflare Global Edge ]

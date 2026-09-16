@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
   // 160 bits, the size RFC 4226 specifies for HOTP/TOTP seeds.
   const secret = new Secret({ size: 20 });
   const totp = new TOTP({
-    issuer: "NuxFire",
+    issuer: "Nuxfire",
     label: user.email ?? user.id,
     secret,
   });

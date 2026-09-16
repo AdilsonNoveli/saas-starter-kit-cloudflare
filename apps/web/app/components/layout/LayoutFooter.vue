@@ -9,8 +9,8 @@
             :aria-label="$t('nav.brand')"
             class="flex items-center"
           >
-            <img src="/nuxfire.svg" alt="NuxFire" class="h-7 w-auto dark:hidden" />
-            <img src="/nuxfire-white.svg" alt="NuxFire" class="h-7 w-auto hidden dark:block" />
+            <img src="/nuxfire.svg" alt="Nuxfire" class="h-7 w-auto dark:hidden" />
+            <img src="/nuxfire-white.svg" alt="Nuxfire" class="h-7 w-auto hidden dark:block" />
           </NuxtLink>
           <p class="text-sm text-muted max-w-xs leading-relaxed">
             {{ $t("footer.tagline") }}

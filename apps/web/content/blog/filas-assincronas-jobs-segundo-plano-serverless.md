@@ -2,7 +2,7 @@
 title: "Processamento Assíncrono no Serverless: Cloudflare Queues e Dead Letter Queues"
 date: "2026-09-15"
 description: "Como executar tarefas demoradas, chamadas de IA e disparos de e-mails em lote sem travar a interface e sem estourar timeouts HTTP na Cloudflare."
-author: "Equipe NuxFire"
+author: "Equipe Nuxfire"
 category: "Sistemas Distribuídos"
 readTime: "7 min"
 tags: ["Cloudflare Queues", "Background Jobs", "DLQ", "Assíncrono"]
@@ -13,7 +13,7 @@ No desenvolvimento de aplicações web modernas, nada degrada mais a experiênci
 
 Seja aguardando uma resposta de 15 segundos de um modelo de linguagem (LLM como Claude ou GPT-4), gerando um relatório em PDF ou disparando centenas de e-mails transacionais, processar tarefas pesadas de forma síncrona dentro da requisição HTTP é uma receita garantida para timeouts e falhas de conexão.
 
-No **NuxFire**, todo o processamento em segundo plano é gerenciado de forma resiliente por **Cloudflare Queues** e **Dead Letter Queues (DLQ)**.
+No **Nuxfire**, todo o processamento em segundo plano é gerenciado de forma resiliente por **Cloudflare Queues** e **Dead Letter Queues (DLQ)**.
 
 ---
 
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
 
 E se uma API externa de IA ou um provedor de e-mail estiver temporariamente fora do ar?
 
-No NuxFire, as filas são configuradas no SST com política estrita de tolerância a falhas:
+No Nuxfire, as filas são configuradas no SST com política estrita de tolerância a falhas:
 - **Tentativas automáticas**: O consumidor tenta reprocessar a mensagem até 3 vezes com intervalos graduais (Backoff Exponencial).
 - **Dead Letter Queue (DLQ)**: Caso a falha persista após as tentativas máximas, a mensagem não é perdida! Ela é enviada automaticamente para uma fila de quarentena (DLQ).
 - **Inspeção e Alerta**: A equipe de suporte pode inspecionar mensagens na DLQ, corrigir o problema de integração e reenfileirar as mensagens com segurança.
@@ -72,8 +72,8 @@ Além de filas orientadas a eventos, muitos SaaS precisam de rotinas agendadas:
 - Limpar tokens de convite expirados.
 - Consolidar métricas de uso diário de tokens de IA.
 
-O NuxFire inclui um **CRON Worker** nativo configurado em `apps/functions`, disparado a cada hora sem depender de serviços externos como Cronhook ou instâncias de cron no Linux.
+O Nuxfire inclui um **CRON Worker** nativo configurado em `apps/functions`, disparado a cada hora sem depender de serviços externos como Cronhook ou instâncias de cron no Linux.
 
 Construa sistemas distribuídos profissionais sem surpresas operacionais.
 
-[**Acesse o monorepo do NuxFire agora mesmo com entrega imediata na Área de Membros →**](/#pricing)
+[**Acesse o monorepo do Nuxfire agora mesmo com entrega imediata na Área de Membros →**](/#pricing)

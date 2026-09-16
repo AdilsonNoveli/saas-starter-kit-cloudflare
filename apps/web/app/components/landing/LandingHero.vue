@@ -57,15 +57,10 @@ const localePath = useLocalePath();
           {{ $t("landing.hero.ctaDocs") }}
         </UButton>
       </div>
-
-      <!-- Brand Logos below CTA -->
-      <div class="mt-12 sm:mt-14 w-full max-w-2xl mx-auto">
-        <LandingPageLogos class="!py-0 !my-0" />
-      </div>
     </section>
 
     <!-- Section 2: Enterprise Monorepo Codebase Showcase (2 Columns) -->
-    <section class="container mx-auto px-4 md:px-8 pt-6 lg:pt-10 pb-16 lg:pb-24 max-w-6xl">
+    <section class="container mx-auto px-4 md:px-8 pt-8 lg:pt-14 pb-16 lg:pb-24 max-w-6xl">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
         <!-- Left: Persuasive Enterprise Delivery Copy -->
         <div class="lg:col-span-6 flex flex-col justify-between space-y-6">
@@ -87,48 +82,51 @@ const localePath = useLocalePath();
             </p>
           </div>
 
-          <!-- Feature Bullets / High Value Pillars -->
-          <div class="space-y-3.5">
-            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-default bg-elevated/50">
-              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                <UIcon name="i-lucide-zap" class="w-4 h-4" />
-              </div>
-              <div>
-                <h4 class="text-sm font-bold text-highlighted">
-                  {{ $t("landing.showcase.features.delivery.title") }}
+          <!-- Feature List: Clean Checkpoints without bulky cards -->
+          <div class="space-y-6 pt-1">
+            <!-- Item 1: Acesso imediato à sua Área de Membros -->
+            <div class="space-y-2.5">
+              <div class="flex items-center gap-2.5">
+                <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-emerald-500 shrink-0" />
+                <h4 class="text-base font-bold text-highlighted">
+                  {{ $t("landing.showcase.features.membersArea.title") }}
                 </h4>
-                <p class="text-xs sm:text-sm text-muted mt-0.5 leading-relaxed">
-                  {{ $t("landing.showcase.features.delivery.desc") }}
-                </p>
               </div>
+              <ul class="pl-7 space-y-1.5 text-xs sm:text-sm text-muted leading-relaxed">
+                <li class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-muted shrink-0" />
+                  <span>{{ $t("landing.showcase.features.membersArea.point1") }}</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-muted shrink-0" />
+                  <span>{{ $t("landing.showcase.features.membersArea.point2") }}</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-muted shrink-0" />
+                  <span>{{ $t("landing.showcase.features.membersArea.point3") }}</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-muted shrink-0" />
+                  <span>{{ $t("landing.showcase.features.membersArea.point4") }}</span>
+                </li>
+                <li class="flex items-center gap-2 font-medium text-highlighted">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span>{{ $t("landing.showcase.features.membersArea.point5") }}</span>
+                </li>
+              </ul>
             </div>
 
-            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-default bg-elevated/50">
-              <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                <UIcon name="i-lucide-layers" class="w-4 h-4" />
-              </div>
-              <div>
-                <h4 class="text-sm font-bold text-highlighted">
+            <!-- Item 2: 15.000+ Linhas de Engenharia Sênior Testada -->
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-2.5">
+                <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-emerald-500 shrink-0" />
+                <h4 class="text-base font-bold text-highlighted">
                   {{ $t("landing.showcase.features.engineering.title") }}
                 </h4>
-                <p class="text-xs sm:text-sm text-muted mt-0.5 leading-relaxed">
-                  {{ $t("landing.showcase.features.engineering.desc") }}
-                </p>
               </div>
-            </div>
-
-            <div class="flex items-start gap-3 p-3.5 rounded-xl border border-default bg-elevated/50">
-              <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                <UIcon name="i-lucide-shield-check" class="w-4 h-4" />
-              </div>
-              <div>
-                <h4 class="text-sm font-bold text-highlighted">
-                  {{ $t("landing.showcase.features.ownership.title") }}
-                </h4>
-                <p class="text-xs sm:text-sm text-muted mt-0.5 leading-relaxed">
-                  {{ $t("landing.showcase.features.ownership.desc") }}
-                </p>
-              </div>
+              <p class="pl-7 text-xs sm:text-sm text-muted leading-relaxed">
+                {{ $t("landing.showcase.features.engineering.desc") }}
+              </p>
             </div>
           </div>
 
@@ -168,17 +166,6 @@ const localePath = useLocalePath();
             <FolderTree class="!bg-transparent !p-0" />
           </div>
         </div>
-      </div>
-
-      <!-- Editorial copy on AI Builders & Vibe Coding -->
-      <div class="mt-24 lg:mt-36 max-w-4xl mx-auto text-center space-y-4">
-        <h3
-          class="text-xl sm:text-2xl lg:text-3xl font-bold text-highlighted tracking-tight leading-snug"
-          v-html="$t('landing.ai.title')"
-        />
-        <p class="text-muted text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
-          {{ $t("landing.ai.description") }}
-        </p>
       </div>
     </section>
 

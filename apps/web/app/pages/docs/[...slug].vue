@@ -48,7 +48,7 @@
           <div class="space-y-1.5 flex-1">
             <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
               <UIcon name="i-lucide-package-check" class="w-4 h-4" />
-              <span>NuxFire Production Kit</span>
+              <span>Nuxfire Production Kit</span>
             </div>
             <h4 class="font-extrabold text-highlighted text-lg sm:text-xl tracking-tight">
               Pronto para construir e lançar seu SaaS?

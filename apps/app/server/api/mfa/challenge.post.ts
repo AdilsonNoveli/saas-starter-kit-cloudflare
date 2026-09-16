@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
   const { userMfaEncryptionKey } = useRuntimeConfig(event);
   const totp = new TOTP({
-    issuer: "NuxFire",
+    issuer: "Nuxfire",
     label: user.email ?? user.id,
     secret: Secret.fromBase32(
       await decryptSecret(record.mfaSecret, userMfaEncryptionKey),

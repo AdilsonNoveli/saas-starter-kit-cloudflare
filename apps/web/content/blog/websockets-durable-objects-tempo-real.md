@@ -2,7 +2,7 @@
 title: "WebSockets em Tempo Real sem Redis: Usando Cloudflare Durable Objects no Nuxt 4"
 date: "2026-09-15"
 description: "Descubra como criar notificações instantâneas e colaboração multiusuário sem servidores Socket.io dedicados nem instâncias caras de Redis, usando Durable Objects."
-author: "Equipe NuxFire"
+author: "Equipe Nuxfire"
 category: "Tempo Real & WebSockets"
 readTime: "6 min"
 tags: ["WebSockets", "Durable Objects", "Cloudflare", "Tempo Real"]
@@ -16,7 +16,7 @@ Tradicionalmente, a receita para suportar WebSockets exigia:
 2. Um cluster Redis com Pub/Sub para sincronizar mensagens entre instâncias.
 3. Um balanceador de carga configurado para conexões persistentes (Sticky Sessions).
 
-O custo mensal dessa infraestrutura mínima raramente ficava abaixo de centenas de dólares. O **NuxFire** resolve esse desafio utilizando **Cloudflare Durable Objects**.
+O custo mensal dessa infraestrutura mínima raramente ficava abaixo de centenas de dólares. O **Nuxfire** resolve esse desafio utilizando **Cloudflare Durable Objects**.
 
 ---
 
@@ -38,7 +38,7 @@ Além disso, cada Durable Object possui seu próprio banco **SQLite embarcado**,
 
 ## Segurança Robusta: Handshake com Tickets Assinados por HMAC
 
-Conexões WebSockets não transmitem headers HTTP normais após o handshake inicial. Para garantir segurança máxima contra conexões forjadas, o NuxFire utiliza tickets assinados criptograficamente:
+Conexões WebSockets não transmitem headers HTTP normais após o handshake inicial. Para garantir segurança máxima contra conexões forjadas, o Nuxfire utiliza tickets assinados criptograficamente:
 
 1. O cliente faz uma requisição HTTP autenticada solicitando um ticket de conexão.
 2. O servidor gera um token com HMAC assinado usando a chave secreta da aplicação e com validade de 60 segundos.
@@ -88,6 +88,6 @@ function handleNotify() {
 
 Com os Durable Objects, você elimina completamente os custos de servidores Redis e Socket.io, aproveitando a rede global da Cloudflare para entregar uma experiência ultra-rápida aos seus usuários.
 
-Todo esse fluxo — desde os workers de backend até os composables reativos do Nuxt — já vem 100% implementado e testado no **NuxFire**.
+Todo esse fluxo — desde os workers de backend até os composables reativos do Nuxt — já vem 100% implementado e testado no **Nuxfire**.
 
 [**Garanta sua licença vitalícia e baixe o código agora mesmo →**](/#pricing)

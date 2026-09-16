@@ -1,4 +1,4 @@
-# NuxFire — Product Backlog (Lista de Funcionalidades & Tarefas)
+# Nuxfire — Product Backlog (Lista de Funcionalidades & Tarefas)
 
 > **Documento Operacional de Tarefas e Funcionalidades Planejadas**  
 > **Classificação de Prioridades:**  

@@ -10,7 +10,7 @@ image: "/images/blog/typescript-end-to-end-typesafety.svg"
 
 O **TypeScript** tornou-se um requisito indispensável no desenvolvimento moderno de software, especialmente na construção de aplicações SaaS críticas onde erros em tempo de execução custam clientes e reputação.
 
-No ecossistema do **NuxFire**, o TypeScript não é apenas um linter ou uma checagem superficial de tipos: ele atua como o alicerce fundamental que conecta o banco de dados PostgreSQL ao cliente Vue 3, passando pela camada de APIs com tRPC e pela infraestrutura com SST v4.
+No ecossistema do **Nuxfire**, o TypeScript não é apenas um linter ou uma checagem superficial de tipos: ele atua como o alicerce fundamental que conecta o banco de dados PostgreSQL ao cliente Vue 3, passando pela camada de APIs com tRPC e pela infraestrutura com SST v4.
 
 ---
 
@@ -25,9 +25,9 @@ Construir um software escalável exige previsibilidade. Quando múltiplos desenv
 
 ---
 
-## O Fluxo de Tipagem Ponta a Ponta no NuxFire
+## O Fluxo de Tipagem Ponta a Ponta no Nuxfire
 
-A arquitetura do NuxFire implementa uma esteira completa de inferência de tipos em 3 camadas:
+A arquitetura do Nuxfire implementa uma esteira completa de inferência de tipos em 3 camadas:
 
 ```typescript
 // 1. Schema do Banco de Dados (Drizzle ORM)
@@ -81,4 +81,4 @@ Ao desenvolver com Cursor, GitHub Copilot ou Claude Code, as definições de tip
 
 Adotar TypeScript desde o dia zero no seu SaaS economiza semanas de depuração e viabiliza um crescimento sustentável da base de código. 
 
-Se você quer pular a configuração manual de TypeScript, tRPC, Drizzle e Nuxt Layers e começar diretamente com uma arquitetura de nível enterprise pronta para produção, conheça o [NuxFire](/#pricing) e garanta acesso imediato ao código-fonte completo.
+Se você quer pular a configuração manual de TypeScript, tRPC, Drizzle e Nuxt Layers e começar diretamente com uma arquitetura de nível enterprise pronta para produção, conheça o [Nuxfire](/#pricing) e garanta acesso imediato ao código-fonte completo.

@@ -1,5 +1,5 @@
 /**
- * Shared Nuxt UI `app.config.ts` fragment for every NuxFire Nuxt app.
+ * Shared Nuxt UI `app.config.ts` fragment for every Nuxfire Nuxt app.
  * Spread into each app's own `ui` block: `ui: { ...sharedUiConfig, ... }`.
  *
  * Literals that select a variant carry their own `as const`; the object as a

@@ -31,7 +31,7 @@ export const WelcomeEmail = ({ username }: WelcomeProps) => {
             <Section className="mt-[32px]">
               <Img
                 src="https://nuxfire.com/pwa-192x192.png"
-                alt="NuxFire"
+                alt="Nuxfire"
                 className="my-0 mx-auto"
               />
             </Section>
@@ -57,6 +57,6 @@ export const WelcomeEmail = ({ username }: WelcomeProps) => {
 export default WelcomeEmail;
 
 export const template = (props: WelcomeProps) => ({
-  subject: `Welcome to NuxFire ${props.username}!`,
+  subject: `Welcome to Nuxfire ${props.username}!`,
   body: <WelcomeEmail {...props} />,
 });

@@ -1,11 +1,11 @@
 {
   "welcome": "¡Bienvenido al panel!",
   "nuxtSiteConfig": {
-    "name": "NuxFire",
+    "name": "Nuxfire",
     "description": "Starter kit de Nuxt de nivel empresarial, listo para producción en Cloudflare."
   },
   "nav": {
-    "brand": "NuxFire",
+    "brand": "Nuxfire",
     "home": "Inicio",
     "pricing": "Precios",
     "docs": "Documentación",
@@ -16,7 +16,7 @@
   },
   "footer": {
     "tagline": "Starter kit de Nuxt de nivel empresarial, listo para producción en Cloudflare. Lanza tu SaaS en días, no en meses.",
-    "copyright": "© {year} NuxFire. Todos los derechos reservados.",
+    "copyright": "© {year} Nuxfire. Todos los derechos reservados.",
     "legalTitle": "Legal",
     "navTitle": "Navegación",
     "legal": {
@@ -34,7 +34,7 @@
   },
   "docs": {
     "footer": {
-      "copyright": "© {year} NuxFire",
+      "copyright": "© {year} Nuxfire",
       "privacy": "Privacidad",
       "terms": "Términos"
     },
@@ -81,14 +81,14 @@
       "subtitle": "100 % serverless, sin cold starts, distribuido globalmente en Cloudflare Workers y PostgreSQL.",
       "translationLead": "No necesitas entender cada cajita — ",
       "translationRest": "la parte tediosa (auth, colas, base de datos, deploy) ya está resuelta y probada en producción. Quien lo desee, todos los detalles están aquí abajo.",
-      "diagramAlt": "Diagrama de arquitectura de NuxFire",
+      "diagramAlt": "Diagrama de arquitectura de Nuxfire",
       "calloutLead": "¿Complicado? Puede ser.",
       "calloutRest": "Ya resolvimos las partes difíciles para que tú te concentres en construir tu idea."
     },
     "useCases": {
       "badge": "Oportunidades de negocio y casos de uso",
-      "title": "¿Qué puedes construir con NuxFire?",
-      "subtitle": "La mayoría de los boilerplates de SaaS se rompen en cuanto necesitas WebSockets con estado, colas de trabajos asíncronos o multitenencia empresarial de verdad. NuxFire está diseñado para llevar tu proyecto desde el MVP del primer día hasta millones de solicitudes diarias sin refactorizar tu arquitectura central.",
+      "title": "¿Qué puedes construir con Nuxfire?",
+      "subtitle": "La mayoría de los boilerplates de SaaS se rompen en cuanto necesitas WebSockets con estado, colas de trabajos asíncronos o multitenencia empresarial de verdad. Nuxfire está diseñado para llevar tu proyecto desde el MVP del primer día hasta millones de solicitudes diarias sin refactorizar tu arquitectura central.",
       "examplesLabel": "Ejemplos de producto:",
       "superpowerLabel": "Superpoder incluido:",
       "items": {
@@ -168,9 +168,9 @@
       "banner": {
         "badge": "Decisión estratégica de ingeniería",
         "title": "Ahorra de 3 a 6 meses de ingeniería crítica",
-        "descriptionLead": "Construir desde cero autenticación sin contraseña en el edge, pooling de base de datos relacional, RBAC multiinquilino, colas asíncronas con DLQ y cobros con Stripe cuesta más de",
-        "descriptionCost": "10.000 USD en horas de ingeniería sénior",
-        "descriptionTail": ". Con NuxFire, todo eso funciona desde tu primer",
+        "descriptionLead": "Construir desde cero autenticación sin contraseña en el edge, pooling de base de datos relacional, RBAC multiinquilino, colas asíncronas con DLQ y cobros con Stripe ",
+        "descriptionCost": "requiere más de 3 a 6 meses de esfuerzo en horas de ingeniería senior",
+        "descriptionTail": ". Con Nuxfire, todo eso funciona desde tu primer ",
         "pillars": {
           "edge": {
             "title": "Edge < 50 ms",
@@ -194,12 +194,12 @@
       }
     },
     "comparison": {
-      "badge": "NuxFire frente a construirlo desde cero",
+      "badge": "Nuxfire frente a construirlo desde cero",
       "title": "Todo lo que te llevaría meses construir — listo el primer día",
       "subtitle": "52 funcionalidades verificadas en producción y auditadas en nuestro código. Deja de reconstruir autenticación, multitenencia, cobros e infraestructura en el edge desde cero.",
       "metrics": {
         "featuresValue": "52 / 52",
-        "featuresLabel": "Funcionalidades listas para producción en NuxFire",
+        "featuresLabel": "Funcionalidades listas para producción en Nuxfire",
         "timeValue": "3+ meses",
         "timeLabel": "De ingeniería ahorrados",
         "missingValue": "36 funcionalidades",
@@ -209,7 +209,7 @@
       "clearSearch": "Limpiar búsqueda",
       "columns": {
         "feature": "Funcionalidad / capacidad",
-        "nuxfire": "NuxFire",
+        "nuxfire": "Nuxfire",
         "scratch": "SaaS desde cero"
       },
       "status": {
@@ -470,12 +470,12 @@
     },
     "testimonials": {
       "title": "Probado en Producción & Early Access",
-      "subtitle": "Feedback real de desarrolladores y founders probando NuxFire en cargas de trabajo reales.",
+      "subtitle": "Feedback real de desarrolladores y founders probando Nuxfire en cargas de trabajo reales.",
       "items": {
         "item1": {
           "name": "Alex Rivera",
           "role": "Dev Full-Stack · Comunidad Discord",
-          "quote": "Configurar autenticación multi-tenant y webhooks de Stripe me tomaba semanas. Con NuxFire, tuve la facturación y los equipos funcionando en un solo fin de semana..."
+          "quote": "Configurar autenticación multi-tenant y webhooks de Stripe me tomaba semanas. Con Nuxfire, tuve la facturación y los equipos funcionando en un solo fin de semana..."
         },
         "item2": {
           "name": "Marcus Vance",
@@ -485,7 +485,7 @@
         "item3": {
           "name": "Elena Rostova",
           "role": "Fundadora SaaS · Early Access",
-          "quote": "La mayoría de plantillas entregan código frágil que falla con usuarios reales. NuxFire ya tiene RBAC, invitaciones y auditoría listos. Ahorró 2 meses de trabajo..."
+          "quote": "La mayoría de plantillas entregan código frágil que falla con usuarios reales. Nuxfire ya tiene RBAC, invitaciones y auditoría listos. Ahorró 2 meses de trabajo..."
         },
         "item4": {
           "name": "Liam O'Connor",
@@ -510,7 +510,7 @@
         "item8": {
           "name": "Jordan Blake",
           "role": "Ingeniero de Producto · Early Access",
-          "quote": "Deja de perder tiempo creando autenticación y permisos desde cero. Migramos nuestro MVP a NuxFire y activamos suscripciones de pago 48h después. Vale cada centavo..."
+          "quote": "Deja de perder tiempo creando autenticación y permisos desde cero. Migramos nuestro MVP a Nuxfire y activamos suscripciones de pago 48h después. Vale cada centavo..."
         }
       }
     },
@@ -524,7 +524,7 @@
       "homeSubtitle": "Conoce mejor este starter kit de SaaS y cómo adaptarlo a tus necesidades.",
       "items": {
         "item1": {
-          "question": "¿Cómo accedo y comienzo a usar NuxFire?",
+          "question": "¿Cómo accedo y comienzo a usar Nuxfire?",
           "answer": "Inmediatamente después de la compra, recibes acceso instantáneo para descargar el código fuente completo directamente dentro de tu exclusiva Área de Miembros. Sin esperas de invitaciones manuales de repositorio ni aprobaciones de acceso.\n\nEl código incluye una guía de inicio rápido de 5 minutos, scripts de configuración y documentación paso a paso para despliegue en Cloudflare para poner tu SaaS en producción desde el primer día."
         },
         "item2": {
@@ -533,11 +533,11 @@
         },
         "item3": {
           "question": "¿Qué stack técnico y experiencia necesito?",
-          "answer": "NuxFire está construido con TypeScript moderno, Nuxt 4, Vue 3 y SST v4 declarativo para Cloudflare.\n\n• Para Desarrolladores Senior: Obtienes capas modulares limpias, tipado de extremo a extremo con tRPC y Drizzle ORM — sin dependencia de proveedores ni sobrecarga de frameworks.\n• Para Creadores con IA & Vibe Coders: Si construyes usando Cursor, Claude Code o v0, NuxFire proporciona el contexto arquitectónico definitivo. Contratos estrictos de TypeScript, esquemas tipados y Nuxt Layers aislados permiten a los modelos de IA generar características listas para producción al primer intento."
+          "answer": "Nuxfire está construido con TypeScript moderno, Nuxt 4, Vue 3 y SST v4 declarativo para Cloudflare.\n\n• Para Desarrolladores Senior: Obtienes capas modulares limpias, tipado de extremo a extremo con tRPC y Drizzle ORM — sin dependencia de proveedores ni sobrecarga de frameworks.\n• Para Creadores con IA & Vibe Coders: Si construyes usando Cursor, Claude Code o v0, Nuxfire proporciona el contexto arquitectónico definitivo. Contratos estrictos de TypeScript, esquemas tipados y Nuxt Layers aislados permiten a los modelos de IA generar características listas para producción al primer intento."
         },
         "item4": {
           "question": "¿Qué tan personalizable es el starter kit?",
-          "answer": "NuxFire proporciona el 100% de propiedad del código fuente. Recibes el código limpio sin wrappers de CLI propietarios, paquetes npm ocultos ni dependencias de caja negra.\n\n• Personaliza o rediseña libremente todo el sistema de diseño y tokens de Tailwind CSS.\n• Agrega, modifica o elimina capas modulares (admin, billing, teams, notifications, kanban).\n• Extiende el esquema de base de datos en Drizzle ORM y genera migraciones automáticamente.\n• Implementa tu propia lógica de negocio con total libertad arquitectónica."
+          "answer": "Nuxfire proporciona el 100% de propiedad del código fuente. Recibes el código limpio sin wrappers de CLI propietarios, paquetes npm ocultos ni dependencias de caja negra.\n\n• Personaliza o rediseña libremente todo el sistema de diseño y tokens de Tailwind CSS.\n• Agrega, modifica o elimina capas modulares (admin, billing, teams, notifications, kanban).\n• Extiende el esquema de base de datos en Drizzle ORM y genera migraciones automáticamente.\n• Implementa tu propia lógica de negocio con total libertad arquitectónica."
         },
         "item5": {
           "question": "¿Qué soporte y comunidad recibo?",
@@ -557,7 +557,7 @@
       "badge": "Licencia de por vida",
       "title": "Precios simples y transparentes",
       "subtitle": "Un solo pago. Propiedad total. Sin cuotas mensuales recurrentes ni comisiones ocultas de plataforma.",
-      "cardTitle": "NuxFire Production Kit",
+      "cardTitle": "Nuxfire Production Kit",
       "cardSubtitle": "Código SaaS full-stack de nivel empresarial e infraestructura en la nube",
       "lifetimeAccess": "Acceso de por vida",
       "earlyBirdBadge": "Lote de Lanzamiento",
@@ -626,29 +626,25 @@
       "default": "EMPIEZA AHORA"
     },
     "showcase": {
-      "badge": "Propiedad Total del Código Fuente Completo",
-      "title": "No estás comprando una plantilla. Estás adquiriendo la propiedad total de un monorepo de nivel enterprise.",
-      "subtitle": "Acceso de descarga inmediata en tu Área de Miembros tras la confirmación. Sin esperas de invitaciones manuales, cero paquetes caja negra propietarios y nunca pagues suscripciones mensuales por código.",
+      "badge": "Ten acceso al monorepo enterprise grade",
+      "title": "No estás comprando una plantilla. Estás adquiriendo la base de tu próximo SaaS.",
+      "subtitle": "Un monorepo de nivel enterprise, listo para que lo descargues, ejecutes, modifiques y transformes en tu producto — sin depender de invitaciones, plataformas propietarias o mensualidades por el código.",
       "features": {
-        "delivery": {
-          "title": "Acceso Inmediato en el Área de Miembros",
-          "desc": "Descarga el paquete completo del repositorio inmediatamente después de la compra. Sin esperas de aprobación en GitHub — empieza a construir en minutos."
+        "membersArea": {
+          "title": "Acceso inmediato a tu Área de Miembros",
+          "point1": "Sin esperar invitaciones manuales al repositorio.",
+          "point2": "Sin código atrapado en una caja negra.",
+          "point3": "Sin suscripción para seguir usando lo que ya compraste.",
+          "point4": "Actualizaciones y nuevos módulos",
+          "point5": "Pagas una vez. El código es tuyo."
         },
         "engineering": {
           "title": "15.000+ Líneas de Ingeniería Senior Probada",
           "desc": "Ahorra de 3 a 6 meses de prueba y error arquitectónico. 4 Cloudflare Workers, 5 Nuxt Layers modulares, SST v4 IaC, Drizzle ORM y tRPC 100% tipado."
-        },
-        "ownership": {
-          "title": "Propiedad Total del Código (Cero Vendor Lock-in)",
-          "desc": "Sin wrappers npm privados ni lógica ofuscada. Cada línea es TypeScript estándar y limpio, que posees para siempre para proyectos comerciales o personales ilimitados."
         }
       },
-      "cta": "Obtener Acceso Inmediato al Código",
+      "cta": "Garantizar Acceso Inmediato al Código",
       "viewStructure": "Explorar Estructura Completa del Proyecto →"
-    },
-    "ai": {
-      "title": "El Contexto Definitivo para<br class=\"hidden sm:inline\" /> Desarrolladores con IA & Vibe Coders",
-      "description": "¿Construyendo con Cursor, Claude Code o v0? NuxFire entrega la arquitectura fundamental que los LLMs necesitan para tener éxito. Contratos estrictos de tipado extremo a extremo con TypeScript y tRPC, esquemas estructurados en Drizzle y Nuxt Layers modulares evitan alucinaciones y garantizan que los asistentes de IA generen características listas para producción en el primer intento."
     }
   }
 }

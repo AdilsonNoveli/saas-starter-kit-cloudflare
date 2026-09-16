@@ -34,7 +34,7 @@ export const VerificationEmail = ({
             <Section className="mt-[32px]">
               <Img
                 src="https://nuxfire.com/pwa-192x192.png"
-                alt="NuxFire"
+                alt="Nuxfire"
                 className="my-0 mx-auto"
               />
             </Section>
@@ -60,6 +60,6 @@ export const VerificationEmail = ({
 export default VerificationEmail;
 
 export const template = ({ code, username }: VerificationEmailProps) => ({
-  subject: "Your Verification Code - NuxFire",
+  subject: "Your Verification Code - Nuxfire",
   body: <VerificationEmail code={code} username={username} />,
 });

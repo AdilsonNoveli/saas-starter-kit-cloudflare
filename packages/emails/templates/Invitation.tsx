@@ -40,7 +40,7 @@ export const InviteEmail = ({
             <Section className="mt-[32px]">
               <Img
                 src="https://nuxfire.com/pwa-192x192.png"
-                alt="NuxFire"
+                alt="Nuxfire"
                 className="my-0 mx-auto"
               />
             </Section>

@@ -11,8 +11,8 @@
           :aria-label="$t('nav.brand')"
           class="flex items-center shrink-0"
         >
-          <img src="/nuxfire.svg" alt="NuxFire" class="h-8 w-auto dark:hidden" />
-          <img src="/nuxfire-white.svg" alt="NuxFire" class="h-8 w-auto hidden dark:block" />
+          <img src="/nuxfire.svg" alt="Nuxfire" class="h-8 w-auto dark:hidden" />
+          <img src="/nuxfire-white.svg" alt="Nuxfire" class="h-8 w-auto hidden dark:block" />
         </NuxtLink>
       </div>
 

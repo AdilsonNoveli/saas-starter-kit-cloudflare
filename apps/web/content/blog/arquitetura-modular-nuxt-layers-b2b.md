@@ -2,7 +2,7 @@
 title: "Arquitetura Modular com Nuxt Layers: Organizando Recursos B2B sem Monólitos Espaguete"
 date: "2026-09-15"
 description: "Como desacoplar faturamento Stripe, workspaces multi-tenant e painel admin usando Nuxt Layers e monorepos Bun para criar SaaS limpos e sustentáveis."
-author: "Equipe NuxFire"
+author: "Equipe Nuxfire"
 category: "Engenharia de Software"
 readTime: "8 min"
 tags: ["Nuxt Layers", "Arquitetura Modular", "B2B SaaS", "Clean Code"]
@@ -11,7 +11,7 @@ image: "/images/blog/nuxt-layers-modular-b2b.svg"
 
 Conforme um produto SaaS cresce, a complexidade do código tende a explodir. Componentes de checkout misturam-se com regras de autenticação, telas de administração dividem diretórios com telas de usuários comuns e uma alteração no modelo de banco quebra três telas diferentes sem aviso prévio.
 
-A solução do **Nuxt 4** para esse dilema chama-se **Nuxt Layers**. No **NuxFire**, usamos Layers para construir módulos isolados que podem ser ativados ou desativados com uma única linha de configuração.
+A solução do **Nuxt 4** para esse dilema chama-se **Nuxt Layers**. No **Nuxfire**, usamos Layers para construir módulos isolados que podem ser ativados ou desativados com uma única linha de configuração.
 
 ---
 
@@ -60,7 +60,7 @@ export default defineLayerManifest({
 
 ## Ativando e Desativando Módulos em `config.ts`
 
-Imagine que você está criando um produto enxuto e não precisa do módulo de Kanban ou do sistema de notificações complexo. No NuxFire, você controla os módulos no arquivo raiz `config.ts`:
+Imagine que você está criando um produto enxuto e não precisa do módulo de Kanban ou do sistema de notificações complexo. No Nuxfire, você controla os módulos no arquivo raiz `config.ts`:
 
 ```typescript
 export const config = {
@@ -86,4 +86,4 @@ O script de build inspeciona esse arquivo e monta a composição final em `apps/
 
 Pronto para transformar sua produtividade e construir com a arquitetura correta desde o início?
 
-[**Garanta acesso imediato ao código-fonte do NuxFire na Área de Membros →**](/#pricing)
+[**Garanta acesso imediato ao código-fonte do Nuxfire na Área de Membros →**](/#pricing)

@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <UPageCard title="Theme" description="Choose how NuxFire looks on this device." variant="subtle">
+    <UPageCard title="Theme" description="Choose how Nuxfire looks on this device." variant="subtle">
       <div class="grid grid-cols-3 gap-3">
         <button
           v-for="preference in themePreferences"
@@ -25,7 +25,7 @@
       </div>
     </UPageCard>
 
-    <UPageCard title="Language" description="Choose the language used across NuxFire." variant="subtle">
+    <UPageCard title="Language" description="Choose the language used across Nuxfire." variant="subtle">
       <div class="flex flex-col gap-1">
         <button
           v-for="item in locales"

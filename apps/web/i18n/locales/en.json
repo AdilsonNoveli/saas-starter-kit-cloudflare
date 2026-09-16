@@ -26,8 +26,14 @@
     }
   },
   "search": {
-    "trigger": "Search docs...",
-    "placeholder": "Search documentation...",
+    "docs": {
+      "trigger": "Search docs...",
+      "placeholder": "Search documentation..."
+    },
+    "blog": {
+      "trigger": "Search posts...",
+      "placeholder": "Search articles..."
+    },
     "groups": {
       "pages": "Pages"
     }

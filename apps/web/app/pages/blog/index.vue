@@ -8,6 +8,7 @@
       <p class="text-lg text-muted leading-relaxed">
         {{ $t("blog.subtitle") }}
       </p>
+      <Search collection="blog" class="mt-6" />
     </div>
 
     <!-- 3 Columns Card Grid -->

@@ -8,7 +8,7 @@
       <div class="flex items-center gap-3.5">
         <UIcon name="i-lucide-search" class="w-5 h-5 text-muted group-hover:text-primary transition-colors shrink-0" />
         <span class="font-normal text-muted group-hover:text-highlighted transition-colors">
-          {{ $t("search.placeholder") }}
+          {{ triggerLabel }}
         </span>
       </div>
       <div class="flex items-center gap-1.5 ml-auto shrink-0">
@@ -21,8 +21,10 @@
     <UModal v-model:open="isOpen">
       <template #content>
         <UCommandPalette
+          v-model:search-term="searchTerm"
           :groups="groups"
-          :placeholder="$t('search.placeholder')"
+          :placeholder="placeholderLabel"
+          :loading="searching"
         />
       </template>
     </UModal>
@@ -30,6 +32,15 @@
 </template>
 
 <script setup lang="ts">
+interface SearchProps {
+  // Which @nuxt/content collection to search — docs and blog each get their
+  // own FTS index and their own trigger/placeholder copy (search.docs.* /
+  // search.blog.*), same component either way.
+  collection?: "docs" | "blog";
+}
+
+const props = withDefaults(defineProps<SearchProps>(), { collection: "docs" });
+
 const isOpen = ref(false);
 const { t } = useI18n();
 
@@ -39,18 +50,37 @@ defineShortcuts({
   },
 });
 
+const triggerLabel = computed(() => t(`search.${props.collection}.trigger`));
+const placeholderLabel = computed(() => t(`search.${props.collection}.placeholder`));
+
 // `searchContent` was removed in @nuxt/content v3; `useSearchCollection` builds
 // the full-text index for the collection on the client and exposes `search`.
-const { search } = useSearchCollection("docs");
+const { search } = useSearchCollection(props.collection);
 
-const groups = computed(() => [
-  {
-    id: "pages",
-    label: t("search.groups.pages"),
-    items: [],
-    search: async (q: string) => {
-      const results = await search(q);
-      return results.map((result) => ({
+// UCommandPalette's `groups[].items` is a static array — there is no
+// `groups[].search` callback in its API (that key was silently ignored, which
+// is why results never appeared no matter what was typed). The documented
+// pattern for async/server-backed results is: bind `v-model:search-term`,
+// react to it yourself, and mark the group `ignoreFilter: true` so the
+// component renders `items` as-is instead of re-filtering already-filtered
+// results with its own built-in Fuse matcher.
+const searchTerm = ref("");
+const searching = ref(false);
+const items = ref<
+  { id: string; icon: string; label: string; onSelect: () => void }[]
+>([]);
+
+watchDebounced(
+  searchTerm,
+  async (query) => {
+    if (!query) {
+      items.value = [];
+      return;
+    }
+    searching.value = true;
+    try {
+      const results = await search(query);
+      items.value = results.map((result) => ({
         id: result.id,
         icon: "i-lucide-file",
         label: [...result.titles, result.title].join(" > "),
@@ -59,7 +89,28 @@ const groups = computed(() => [
           navigateTo(result.id);
         },
       }));
-    },
+    } finally {
+      searching.value = false;
+    }
+  },
+  { debounce: 200 },
+);
+
+// Reopening the palette shouldn't flash the previous query's stale results
+// before the user has typed anything new.
+watch(isOpen, (open) => {
+  if (!open) {
+    searchTerm.value = "";
+    items.value = [];
+  }
+});
+
+const groups = computed(() => [
+  {
+    id: "pages",
+    label: t("search.groups.pages"),
+    items: items.value,
+    ignoreFilter: true,
   },
 ]);
 </script>

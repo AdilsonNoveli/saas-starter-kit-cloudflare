@@ -5,7 +5,7 @@
     >
       404
     </h3>
-    <span class="scroll-m-20 px-4"> This page could not be found. </span>
+    <span class="scroll-m-20 px-4"> {{ $t("docs.notFound") }} </span>
   </div>
 
   <main
@@ -27,12 +27,16 @@
 
       <UAlert
         v-if="page?.body?.value?.length === 0"
-        title="Empty Page"
+        :title="$t('docs.emptyPage.title')"
         icon="i-lucide-circle-x"
       >
-        Start writing in
-        <ProseCodeInline>content{{ page?.path }}.md</ProseCodeInline> to see
-        this page taking shape.
+        <template #description>
+          <i18n-t keypath="docs.emptyPage.description" tag="span">
+            <template #path>
+              <ProseCodeInline>content{{ page?.path }}.md</ProseCodeInline>
+            </template>
+          </i18n-t>
+        </template>
       </UAlert>
 
       <ContentRenderer
@@ -48,13 +52,13 @@
           <div class="space-y-1.5 flex-1">
             <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
               <UIcon name="i-lucide-package-check" class="w-4 h-4" />
-              <span>Nuxfire Production Kit</span>
+              <span>{{ $t("docs.banner.badge") }}</span>
             </div>
             <h4 class="font-extrabold text-highlighted text-lg sm:text-xl tracking-tight">
-              Pronto para construir e lançar seu SaaS?
+              {{ $t("docs.banner.title") }}
             </h4>
             <p class="text-xs sm:text-sm text-muted leading-relaxed max-w-xl">
-              Tenha 100% de posse do código-fonte completo, sem wrappers proprietários, com arquitetura pronta para milhões de requisições na Cloudflare.
+              {{ $t("docs.banner.description") }}
             </p>
           </div>
           <div class="shrink-0">
@@ -65,7 +69,7 @@
               trailing-icon="i-lucide-arrow-right"
               class="whitespace-nowrap text-xs sm:text-sm font-bold tracking-wider px-6 py-3.5"
             >
-              Garantir acesso imediato ao código
+              {{ $t("docs.banner.cta") }}
             </CTAButton>
           </div>
         </div>
@@ -80,7 +84,7 @@
       >
         <div class="flex items-center gap-2 py-2">
           <UIcon name="i-lucide-align-left" />
-          <span class="text-md font-medium">On This Page</span>
+          <span class="text-md font-medium">{{ $t("docs.onThisPage") }}</span>
         </div>
         <DocsTocTree :links="page?.body?.toc?.links || []" :level="0" />
       </div>

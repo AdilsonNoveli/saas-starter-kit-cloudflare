@@ -162,11 +162,12 @@ const currentLocaleCode = computed(() =>
 const localeItems = computed(() =>
   locales.value.map((l) => ({
     label: l.name ?? l.code,
-    // On routes deliberately excluded from localization (the docs/blog
-    // catch-alls, see their definePageMeta) switchLocalePath() has no
-    // equivalent to resolve and returns an empty string — fall back to that
-    // locale's home page instead of rendering a link to nowhere.
-    to: switchLocalePath(l.code) || localePath("/", l.code),
+    // On localized routes, switchLocalePath resolves the target URL with
+    // the new locale prefix. On unlocalized routes (such as docs/blog
+    // catch-alls with i18n: false), switchLocalePath returns an empty string;
+    // fall back to route.fullPath so the user stays on their current page
+    // instead of being kicked out to the home page.
+    to: switchLocalePath(l.code) || route.fullPath,
     icon: locale.value === l.code ? "i-lucide-check" : undefined,
     onSelect: () => setLocale(l.code),
   })),

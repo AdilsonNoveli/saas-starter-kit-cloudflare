@@ -45,16 +45,16 @@
       <div class="p-3.5 rounded-xl border border-primary/25 bg-gradient-to-br from-primary/10 via-elevated to-transparent space-y-2.5">
         <div class="flex items-center gap-1.5 text-xs font-bold text-primary">
           <UIcon name="i-lucide-package-check" class="w-4 h-4 shrink-0" />
-          <span>Nuxfire Monorepo</span>
+          <span>{{ $t("docs.sidebar.badge") }}</span>
         </div>
         <p class="text-xs text-muted leading-snug">
-          100% de posse do código-fonte completo na sua Área de Membros.
+          {{ $t("docs.sidebar.description") }}
         </p>
         <NuxtLink
           :to="`${localePath('/')}#pricing`"
-          class="inline-flex items-center justify-center w-full py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-night-950 shadow-sm transition-all duration-150 active:scale-95 text-center gap-1.5"
+          class="inline-flex items-center justify-center w-full py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-night-950 shadow-sm transition-all duration-150 active:scale-95 text-center gap-1.5 whitespace-nowrap"
         >
-          <span>Garantir acesso imediato</span>
+          <span>{{ $t("docs.sidebar.cta") }}</span>
           <UIcon name="i-lucide-arrow-right" class="w-3.5 h-3.5 shrink-0" />
         </NuxtLink>
       </div>

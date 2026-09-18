@@ -45,12 +45,39 @@
       "terms": "Términos"
     },
     "index": {
-      "emptyState": "Los nuevos productos aparecerán aquí a medida que se lancen"
+      "emptyState": "Aparecerán más productos aquí a medida que se lancen"
     },
     "productCard": {
-      "learnMore": "Saber más",
+      "learnMore": "Más información",
       "openAriaLabel": "{title} — abrir documentación"
-    }
+    },
+    "badges": {
+      "saasStarterKit": "Grado Empresarial",
+      "fireskills": "Metodología Orientada a Specs"
+    },
+    "sidebar": {
+      "badge": "Nuxfire Monorepo",
+      "description": "100% de propiedad del código fuente en tu Área de Miembros.",
+      "cta": "OBTENER ACCESO"
+    },
+    "banner": {
+      "badge": "Kit de Producción Nuxfire",
+      "title": "¿Listo para construir y lanzar tu SaaS?",
+      "description": "Obtén el 100% de propiedad del código fuente completo, sin capas propietarias, con arquitectura lista para millones de solicitudes en Cloudflare.",
+      "cta": "Obtener acceso al código"
+    },
+    "indexCta": {
+      "badge": "Acceso Completo al Código Fuente",
+      "title": "¿Listo para construir tu SaaS con Nuxfire?",
+      "description": "Acceso de descarga inmediata en tu Área de Miembros tras la confirmación. Comienza hoy mismo con autenticación, pagos, multi-inquilino y base de datos listos para producción.",
+      "cta": "Obtener acceso al código"
+    },
+    "onThisPage": "En esta página",
+    "emptyPage": {
+      "title": "Página Vacía",
+      "description": "Comience a escribir en {path} para ver cómo toma forma esta página."
+    },
+    "notFound": "No se pudo encontrar esta página."
   },
   "blog": {
     "seoTitle": "Blog",

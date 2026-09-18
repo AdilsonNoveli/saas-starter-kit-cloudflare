@@ -27,6 +27,7 @@
         :icon="product.icon"
         :badge="product.badge"
         :sections="product.sections"
+        :preview-icons="product.previewIcons"
       />
     </div>
 
@@ -43,13 +44,13 @@
       <div class="space-y-2 flex-1">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/25">
           <UIcon name="i-lucide-package-check" class="w-4 h-4" />
-          <span>Acesso Completo ao Código-Fonte</span>
+          <span>{{ $t("docs.indexCta.badge") }}</span>
         </div>
         <h2 class="text-xl sm:text-2xl font-bold text-highlighted tracking-tight">
-          Pronto para construir seu SaaS com o Nuxfire?
+          {{ $t("docs.indexCta.title") }}
         </h2>
         <p class="text-sm sm:text-base text-muted leading-relaxed max-w-2xl">
-          Acesso imediato de download na sua Área de Membros logo após a confirmação. Comece hoje mesmo com autenticação, pagamentos, multi-tenancy e banco de dados prontos para produção.
+          {{ $t("docs.indexCta.description") }}
         </p>
       </div>
       <CTAButton
@@ -59,7 +60,7 @@
         trailing-icon="i-lucide-arrow-right"
         class="whitespace-nowrap text-xs sm:text-sm font-bold tracking-wider px-6 sm:px-8 py-3.5 shrink-0"
       >
-        Garantir acesso imediato ao código
+        {{ $t("docs.indexCta.cta") }}
       </CTAButton>
     </div>
   </div>
@@ -79,6 +80,7 @@ interface ProductCard {
   icon: string;
   badge?: string;
   sections: CardSection[];
+  previewIcons?: string[];
 }
 
 definePageMeta({
@@ -104,11 +106,29 @@ useSeoMeta({
 });
 defineOgImageComponent("NuxtSeo");
 
+const { t } = useI18n();
+
 // Marketing copy, not a content field — "Enterprise Grade" isn't part of any
 // page's frontmatter, so it's attached here by path instead of invented data
 // on the content side.
-const badgesByPath: Record<string, string> = {
-  "/docs/saas-starter-kit": "Enterprise Grade",
+const badgesByPath = computed<Record<string, string>>(() => ({
+  "/docs/saas-starter-kit": t("docs.badges.saasStarterKit"),
+  "/docs/fireskills": t("docs.badges.fireskills"),
+}));
+
+const previewIconsByPath: Record<string, string[]> = {
+  "/docs/saas-starter-kit": [
+    "i-lucide-shield-check",
+    "i-lucide-users",
+    "i-lucide-credit-card",
+    "i-lucide-bell",
+  ],
+  "/docs/fireskills": [
+    "i-lucide-flame",
+    "i-lucide-git-branch",
+    "i-lucide-terminal",
+    "i-lucide-check-check",
+  ],
 };
 
 const productPaths = computed(() => {
@@ -164,8 +184,9 @@ const products = computed<ProductCard[]>(() => {
         title: product.title ?? "",
         description: productDescriptions.value?.[product.path] ?? "",
         icon: product.icon ?? "i-lucide-layout-grid",
-        badge: badgesByPath[product.path],
+        badge: badgesByPath.value[product.path],
         sections,
+        previewIcons: previewIconsByPath[product.path],
       };
     });
 });

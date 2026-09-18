@@ -1,1 +1,0 @@
-export const defaultPrimaryColor = '#27AE60';

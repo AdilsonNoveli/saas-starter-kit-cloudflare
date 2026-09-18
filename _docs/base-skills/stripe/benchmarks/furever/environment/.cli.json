@@ -1,9 +1,0 @@
-{
-  "name": "stripe-connect-furever-demo",
-  "configureDotEnv": true,
-  "integrations": [
-    {
-      "name": "main"
-    }
-  ]
-}

@@ -39,10 +39,10 @@ description: Analisar o sistema atual e orientar a descoberta, o plano e a entre
 5. Registrar na seção 10 da spec a stack observada, cada tela, o fluxo, os
    formulários, a composição, os estados e a acessibilidade. Um CRUD não pode
    ficar restrito a API, banco ou serviço. Para CRUD, mapear sempre lista com
-   `PageHeader` e `DataGrid` com detalhe clicável por linha, detalhe com
+   `PageHeader` e `UTable` com detalhe clicável por linha, detalhe com
    `PageHeader` e `DetailLists`, e criar ou editar com `PageHeader` e seções de
    formulário em duas colunas responsivas. Toda tela também deve mapear
-   `Breadcrumb` com equipe, módulo e tela atual; em Laravel, reaproveitar o
+   `Breadcrumb` com equipe, módulo e tela atual; reaproveitar o
    componente já usado pelo layout. O `PageHeader` é um único componente
    reutilizável entre essas telas. A listagem ocupa a largura disponível,
    mostra o `ID` em coluna própria e oferece editar e apagar na linha, além do
@@ -50,11 +50,10 @@ description: Analisar o sistema atual e orientar a descoberta, o plano e a entre
 6. Criar na seção 14 a `Fase de interface`, com uma tarefa por tela e testes
    para navegação, formulário, validações, feedback e teclado.
 7. Chamar `$fireskill-specialist-ux-design` para jornada e
-   `$fireskill-specialist-ui-design` para composição. Em projetos React, carregar
-   `$fireskill-specialist-react-ui-components` para selecionar, reaproveitar e
-   adaptar componentes antes de escrever JSX ou TSX, além de
-   `$fireskill-specialist-react` para a implementação da stack. Para outra
-   tecnologia, carregar o especialista equivalente detectado pelo setup.
+   `$fireskill-specialist-ui-design` para composição. Antes de escrever `.vue`,
+   carregar `$fireskill-specialist-nuxt-ui` para selecionar, reaproveitar e
+   adaptar componentes `@nuxt/ui`, além de `$fireskill-specialist-nuxt` para a
+   implementação da stack (páginas, layouts, middleware, composables).
 
 ## Resultado esperado
 
@@ -69,13 +68,12 @@ preserva tudo fora do alcance registrado.
 - Preservar a stack, os componentes e os padrões de navegação já observados.
 - Registrar teclado, foco, responsividade e mensagens junto da tela afetada.
 - Renderizar `Breadcrumb` em todas as telas, mantendo o nome da equipe ativa
-  visível. Em Laravel, reutilizar `Breadcrumb` ou `Breadcrumbs` existente e sua
-  tipagem de itens.
+  visível. Reutilizar o breadcrumb existente no layout e sua tipagem de itens.
 - Aplicar `DESIGNSYSTEM.MD` como fonte macro e `INTERFACE.md` como registro local.
-- Usar `DataGrid`, `DetailLists` e `PageHeader` nas superfícies CRUD definidas;
+- Usar `UTable`, `DetailLists` e `PageHeader` nas superfícies CRUD definidas;
   a linha abre o detalhe e controles internos permanecem independentes.
 - Reutilizar o mesmo `PageHeader` componentizado em todas as telas CRUD; manter
-  `DataGrid` em largura total com `ID`, editar e apagar visíveis na linha.
+  `UTable` em largura total com `ID`, editar e apagar visíveis na linha.
 - Conferir bordas, espaçamentos, margens, padding e tipografia durante o
   desenvolvimento, mesmo sem pedido da pessoa, e registrar o resultado no
   item `VISUAL` da tarefa.
@@ -107,8 +105,8 @@ preserva tudo fora do alcance registrado.
 
 - `$fireskill-specialist-ux-design` para jornada, tarefas e conteúdo.
 - `$fireskill-specialist-ui-design` para composição visual e estados.
-- `$fireskill-specialist-react-ui-components` para selecionar e reaproveitar
-  componentes nas telas React.
+- `$fireskill-specialist-nuxt-ui` para selecionar e reaproveitar componentes
+  `@nuxt/ui` nas telas Vue.
 - `$fireskill-specialist-design-system` para regras macro, defaults e cenários
   CRUD.
 

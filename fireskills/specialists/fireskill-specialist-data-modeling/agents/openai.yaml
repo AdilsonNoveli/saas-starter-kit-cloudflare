@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy - Especialista - Modelagem de Dados"
+  display_name: "Fireskill - Especialista - Modelagem de Dados"
   short_description: "Entidades, relações e dados persistentes"
-  default_prompt: "Use $specsfy-specialist-data-modeling para analisar e modelar os dados desta entrega."
+  default_prompt: "Use $fireskill-specialist-data-modeling para analisar e modelar os dados desta entrega."

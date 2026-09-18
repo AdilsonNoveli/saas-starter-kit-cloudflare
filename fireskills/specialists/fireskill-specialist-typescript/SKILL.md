@@ -1,6 +1,6 @@
 ---
 name: fireskill-specialist-typescript
-description: Modelar e revisar TypeScript seguro com strictness, narrowing, generics, modules, declarations, validação runtime e APIs públicas. Use para tsconfig, tipos, erros de compilação, bibliotecas ou contratos TS/JS; use também para eliminar any/assertions injustificados numa área alterada; não use para lógica de framework (React, Next.js) nem confunda tipo estático com validação de dado externo — tipo não substitui parse em runtime.
+description: Modelar e revisar TypeScript seguro com strictness, narrowing, generics, modules, declarations, validação runtime e APIs públicas. Use para tsconfig, tipos, erros de compilação, bibliotecas ou contratos TS/JS; use também para eliminar any/assertions injustificados numa área alterada; não use para lógica de framework (Nuxt, Vue) nem confunda tipo estático com validação de dado externo — tipo não substitui parse em runtime.
 ---
 
 # TypeScript
@@ -11,7 +11,7 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
   de tipo, generics, módulos ou declarations de biblioteca.
 - Acionar também para revisar uma API pública TS/JS antes de publicá-la, ou
   para decidir como validar um dado que entra de fora (rede, arquivo, env).
-- Não acionar para a lógica de negócio ou de framework em si (React, hooks,
+- Não acionar para a lógica de negócio ou de framework em si (Vue, composables,
   rotas) — combine com a skill do framework e use esta para o contrato de
   tipos que ele expõe.
 - Combinar com `$fireskill-specialist-web-api-design` quando o tipo modela um
@@ -98,14 +98,9 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-react` para a lógica de componente que consome os
-  tipos modelados aqui (props, estado, union de eventos).
-- `$fireskill-specialist-nextjs` e `$fireskill-specialist-astro` consomem estes
-  tipos para params de rota, Server Actions/endpoints e content collections;
-  esta skill não decide roteamento ou fronteira server/client.
-- `$fireskill-specialist-tailwind-css` e `$fireskill-specialist-shadcn-ui` usam
-  tipos desta skill para variantes (`cva`) e schemas de formulário fortemente
-  tipados.
+- `$fireskill-specialist-nuxt-ui` e `$fireskill-specialist-trpc` usam tipos desta
+  skill (props e slots de componentes, `RouterOutput`, schemas `zod` de
+  formulário) fortemente tipados.
 - `$fireskill-specialist-web-api-design` quando o tipo espelha um contrato de
   API consumido por outro serviço — a fonte de verdade do contrato vive lá.
 - `$fireskill-specialist-code-review` para revisão ampla além de tipos, quando

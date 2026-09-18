@@ -15,13 +15,13 @@ do CLI.
 Instale a skill quando for criar ou revisar uma interface:
 
 ```bash
-specsfy skills install specsfy-specialist-design-system
+specsfy skills install fireskill-specialist-design-system
 ```
 
 Se a entrega já usa a coordenação completa de interface, instale:
 
 ```bash
-specsfy skills install specsfy-specialist-interface-experience
+specsfy skills install fireskill-specialist-interface-experience
 ```
 
 O catálogo resolve o especialista de design system junto das dependências de UX

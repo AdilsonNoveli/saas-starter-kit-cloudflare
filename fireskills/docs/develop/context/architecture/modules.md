@@ -40,10 +40,10 @@ releases do monorepo
 | Módulo | Responsabilidade |
 | --- | --- |
 | `skills/specsfy-<NN>-*/` e skills transversais | fluxo base da metodologia |
-| `skills/specsfy-setup/` | contexto persistente e blocos de agentes |
-| `skills/specsfy-documentator/` | documentação técnica do consumidor |
+| `skills/fireskill-setup/` | contexto persistente e blocos de agentes |
+| `skills/fireskill-documentator/` | documentação técnica do consumidor |
 | `skills/specsfy-aux-*/` | stack, regras e persistência do consumidor |
-| `specialists/specsfy-specialist-*/` | padrões opcionais sob demanda |
+| `specialists/fireskill-specialist-*/` | padrões opcionais sob demanda |
 | `cli/src/` | comandos TypeScript, TUI, instalação e runners |
 | `.agents/skills/specsfy-monorepo-documentator/` | documentação oficial |
 | `cli/.agents/skills/specsfy-release-cli/` | publicação de versões do CLI |

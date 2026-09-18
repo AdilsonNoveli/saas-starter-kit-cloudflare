@@ -10,7 +10,7 @@ description: Criar e manter o DESIGNSYSTEM.MD com regras macro de interface SaaS
 Esta skill governa o documento `DESIGNSYSTEM.MD` do projeto consumidor. Ela
 define linguagem visual, shell, composição de superfícies, estados e regras de
 negócio expostas na interface. O documento orienta UX, UI, experiência de
-interface e componentes React.
+interface e componentes Vue com `@nuxt/ui`.
 
 Use antes de criar ou revisar uma tela, um fluxo CRUD, uma navegação, um
 formulário ou um componente global. Use também quando o documento não existir,
@@ -60,7 +60,7 @@ os ajustes no item `VISUAL` da tarefa.
 
 Quando não houver direção visual contrária, aplique estas composições:
 
-- Lista de CRUD: `PageHeader` + resumo útil + `DataGrid`. Use busca, filtros,
+- Lista de CRUD: `PageHeader` + resumo útil + `UTable`. Use busca, filtros,
   ordenação, paginação, seleção e ações por linha quando o volume ou o domínio
   pedir.
 - Detalhe: `PageHeader` + `DetailLists`, com status, próxima ação e relações ou
@@ -75,12 +75,12 @@ Quando não houver direção visual contrária, aplique estas composições:
 - Tela: `loading`, vazio, erro, sucesso, sem permissão, conteúdo parcial e não
   salvo quando o fluxo comportar esses estados.
 - Breadcrumb: obrigatório em toda tela da aplicação, com o nome da equipe ativa
-  visível antes do módulo e do título atual. Em Laravel, reaproveitar o
-  `Breadcrumb` ou `Breadcrumbs` existente no layout e seus tipos de rota.
-- DataGrid: linha inteira clicável para abrir o detalhe, com equivalente de
+  visível antes do módulo e do título atual. Reaproveitar o
+  breadcrumb existente no layout (ou `UBreadcrumb` do `@nuxt/ui` se não houver).
+- UTable: linha inteira clicável para abrir o detalhe, com equivalente de
   teclado e controles internos protegidos por `TableRowAction` ou equivalente.
 - CRUD: todas as telas reutilizam o mesmo `PageHeader` componentizado; a lista
-  usa `DataGrid` em largura total, exibe a coluna `ID` e oferece botões de editar
+  usa `UTable` em largura total, exibe a coluna `ID` e oferece botões de editar
   e apagar na linha. O link da linha leva ao detalhe sem capturar os botões.
 - Componentes recorrentes de cabeçalho, tabela, linha, ações, formulário,
   estados e feedback entram em `INTERFACE.md` e são reaproveitados antes de uma
@@ -95,14 +95,15 @@ contraste e uso do shell. A composição deve informar e orientar a tarefa.
 Quando a entrega incluir um dashboard, use `PageHeader`, período ou escopo,
 filtros, uma faixa curta de `KPI` com valor, unidade, período, comparação e
 fonte, seguida da tendência ou distribuição principal e de uma lista detalhada
-ou `DataGrid` para investigação. Cada indicador e visualização deve declarar
+ou `UTable` para investigação. Cada indicador e visualização deve declarar
 loading, vazio, erro e atualização, além de alternativa textual ou tabular para
 gráficos.
 
-Use primitives do `shadcn/ui` para controles fundamentais e blocos gratuitos do
-ReUI para composições de CRUD e dashboard quando eles atenderem à tarefa.
-Adapte tokens, dados, permissões, acessibilidade e linguagem do produto. Registre
-origem, estados e consumidores em `INTERFACE.md`.
+Use os componentes do `@nuxt/ui` v4 (`UCard`, `UTable`, `UForm`, `UModal`,
+`UDashboard*` e demais) para controles e composições de CRUD e dashboard, com o
+tema vindo de `@nuxfire/tokens` (`sharedUiConfig`, `theme.css` e
+`enterpriseTableUi`). Adapte dados, permissões, acessibilidade e linguagem do
+produto. Registre origem, estados e consumidores em `INTERFACE.md`.
 
 ## Formulários de criar e editar
 
@@ -116,10 +117,10 @@ próximos do resultado da ação.
 
 Toda tela renderiza o `Breadcrumb` no shell global. A trilha deve mostrar a
 equipe ativa, o módulo e a tela atual, usando labels reais e links válidos nos
-itens anteriores. Em aplicações Laravel, localize e reaproveite o componente
-`Breadcrumb` ou `Breadcrumbs` já presente no layout, junto da tipagem dos itens;
+itens anteriores. Localize e reaproveite o breadcrumb já presente no layout,
+junto da tipagem dos itens (ou `UBreadcrumb` do `@nuxt/ui`, se não houver);
 adapte apenas a composição necessária para inserir a equipe sem duplicar o
-primitive. A equipe e a tela atual continuam visíveis no mobile.
+componente. A equipe e a tela atual continuam visíveis no mobile.
 
 ## Cenários que toda entrega deve cobrir
 
@@ -146,8 +147,8 @@ mensagem e próximo passo.
   desta fonte.
 - UI define tokens, hierarquia, composição visual e estados a partir desta
   fonte.
-- Componentes React escolhem primitives e composições compatíveis depois de
-  ler esta fonte e `INTERFACE.md`.
+- Componentes Vue (`@nuxt/ui`) escolhem componentes e composições compatíveis
+  depois de ler esta fonte e `INTERFACE.md`.
 - A skill de experiência de interface coordena a entrega e não deve iniciar uma
   tela sem carregar `DESIGNSYSTEM.MD`.
 
@@ -161,11 +162,12 @@ mensagem e próximo passo.
 - Tela sem `PageHeader`, sem estado vazio ou sem caminho de recuperação.
 - Dashboard que mostra números sem pergunta, período, unidade ou próxima ação.
 - Dashboard que usa uma parede de cartões sem hierarquia ou investigação.
-- Bloco de ReUI ou primitive de shadcn/ui usado sem adaptar dados, estados,
-  permissões e tokens do produto.
+- Componente do `@nuxt/ui` usado sem adaptar dados, estados, permissões e
+  tokens do produto, ou estilizado com cor de paleta bruta em vez de cor
+  semântica.
 - Novo token ou componente criado sem verificar o documento e `INTERFACE.md`.
 - Exceção visual local registrada como regra global sem alcance explícito.
-- CRUD com cabeçalhos duplicados, DataGrid estreito, ID oculto ou sem ações de
+- CRUD com cabeçalhos duplicados, UTable estreito, ID oculto ou sem ações de
   editar e apagar na linha.
 
 ## Validação
@@ -174,9 +176,9 @@ Antes do handoff, confira:
 
 - `DESIGNSYSTEM.MD` existe na raiz do projeto consumidor e tem classificação,
   política, defaults, estados, cenários e histórico.
-- A lista usa `DataGrid` e `PageHeader`.
+- A lista usa `UTable` e `PageHeader`.
 - Toda tela tem `Breadcrumb` com o nome da equipe ativa, módulo e tela atual.
-- Laravel reaproveita o `Breadcrumb` ou `Breadcrumbs` já existente no layout.
+- O breadcrumb já existente no layout é reaproveitado (ou `UBreadcrumb`).
 - O detalhe usa `DetailLists` e `PageHeader`.
 - Criar e editar usam seções, coluna de contexto, painel de campos em duas
   colunas nos breakpoints largos e uma coluna no mobile.
@@ -187,8 +189,8 @@ Antes do handoff, confira:
 - A spec e as tarefas cobrem estados, permissão, foco, mensagens e retorno.
 - O dashboard, quando existir, tem filtros, contexto dos indicadores,
   alternativa acessível para visualizações e investigação detalhada.
-- Primitives shadcn/ui e blocos ReUI têm origem, estados e consumidores
-  registrados em `INTERFACE.md`.
+- Componentes `@nuxt/ui` reaproveitados ou criados têm origem, estados e
+  consumidores registrados em `INTERFACE.md`.
 - Cada tarefa possui o item `VISUAL` concluído antes de `EVIDENCE`, com a
   conferência de bordas, espaçamentos, margens, padding e tipografia ou a
   justificativa concreta de que não há interface.
@@ -204,4 +206,4 @@ skill do Specsfy, execute `quick_validate.py` e a suíte do monorepo.
 - `fireskill-specialist-interface-experience`
 - `fireskill-specialist-ux-design`
 - `fireskill-specialist-ui-design`
-- `fireskill-specialist-react-ui-components`
+- `fireskill-specialist-nuxt-ui`

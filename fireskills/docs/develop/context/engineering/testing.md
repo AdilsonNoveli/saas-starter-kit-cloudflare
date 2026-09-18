@@ -76,7 +76,7 @@ não estiver comprovadamente separado. O setup exige `.env.testing`,
 Antes de cada comando, execute:
 
 ```bash
-node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs \
+node .agents/skills/fireskill-setup/scripts/check_database_safety.mjs \
   --project . --command "<comando>"
 ```
 
@@ -108,7 +108,7 @@ uv run --quiet --with pyyaml python \
   specsfy-<nome>
 ```
 
-O contrato de `specsfy-update-spec` comprova catálogo e metadata,
+O contrato de `fireskill-update-spec` comprova catálogo e metadata,
 roteamento de pedidos tardios e a classificação determinística de mudanças de
 definição, plano e evidência. A regressão integrada confirma a mesma entrada no
 CLI, na documentação oficial e na porta pública.

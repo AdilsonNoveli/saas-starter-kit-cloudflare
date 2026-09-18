@@ -78,7 +78,7 @@ ab -n 10000 -c 100 https://staging.exemplo.com/api/rota
 ## Profiling: escolher a ferramenta pelo boundary
 
 - CPU-bound (aplicação): profiler de amostragem da linguagem/runtime (ex.:
-  `React Profiler` para render, profiler nativo da linguagem de backend).
+  Vue Devtools (Performance) para render, profiler nativo da linguagem de backend).
 - I/O-bound (rede, disco): tracing de chamadas externas e medição de
   round-trips; frequentemente o gargalo é número de chamadas seriais, não
   velocidade de cada uma.
@@ -96,6 +96,6 @@ ab -n 10000 -c 100 https://staging.exemplo.com/api/rota
 - Navigation Timing API: https://www.w3.org/TR/navigation-timing-2/
 - k6 (teste de carga): https://grafana.com/docs/k6/latest/
 - PostgreSQL EXPLAIN: https://www.postgresql.org/docs/current/using-explain.html
-- React Profiler: https://react.dev/reference/react/Profiler
+- Vue Devtools: https://devtools.vuejs.org/
 - Brendan Gregg, USE Method: https://www.brendangregg.com/usemethod.html
 - Brendan Gregg, Systems Performance (metodologia de diagnóstico): https://www.brendangregg.com/systems-performance-2nd-edition-book.html

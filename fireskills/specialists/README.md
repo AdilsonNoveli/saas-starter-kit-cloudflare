@@ -1,72 +1,57 @@
 # Fireskills Specialists
 
-<!-- markdownlint-disable MD033 -->
-<p align="center">
-  <picture>
-    <source srcset="../brand/logo/icon.svg" type="image/svg+xml">
-    <img src="../brand/logo/icon.png" alt="Logo do Specsfy" width="128">
-  </picture>
-</p>
-<!-- markdownlint-enable MD033 -->
+Catálogo de skills técnicas do Fireskills para o Nuxfire. O prefixo
+`fireskill-specialist-` distingue contexto especializado das skills base que
+executam a metodologia (`skills/`). Cada especialista é uma pasta com
+`SKILL.md`, `agents/openai.yaml` e `references/`.
 
-Catálogo oficial de skills técnicas opcionais do Specsfy. O prefixo
-`fireskill-specialist-` distingue contexto especializado das skills
-skills base que executam a metodologia.
+`catalog.json` é a fonte de descoberta: nome, descrição, categoria, tags e
+`detect` (arquivos e dependências que indicam que o especialista se aplica).
 
-Os especialistas são instalados sob demanda no projeto consumidor:
+## Especialistas da stack Nuxfire
 
-```bash
-specsfy skills list
-specsfy skills detect
-specsfy skills install fireskill-specialist-laravel
-```
+Cada um foi escrito a partir do código real do repositório; as afirmações em
+`references/nuxfire-*.md` citam o arquivo de evidência.
 
-Para implementar interfaces React a partir de referências copiáveis, instale e
-use `fireskill-specialist-react-ui-components` em conjunto com
-`fireskill-specialist-design-system` e `fireskill-specialist-ui-design`. O CLI
-resolve e instala essas dependências declaradas no catálogo automaticamente.
+| Especialista | Cobre |
+|---|---|
+| `fireskill-specialist-nuxt` | Nuxt 4: páginas, layouts, middleware, plugins, Nitro, `runtimeConfig`, i18n, SSR |
+| `fireskill-specialist-nuxt-ui` | `@nuxt/ui` v4: componentes, tema, `packages/tokens`, formulários, tabelas |
+| `fireskill-specialist-trpc` | tRPC v10 (`trpc-nuxt`): procedures, routers por layer, contexto, cliente |
+| `fireskill-specialist-drizzle` | Drizzle + Postgres: schema por layer, barrel, migrações, seed |
+| `fireskill-specialist-cloudflare-workers` | Workers: bindings, `waitUntil`, KV, R2, Queues, DO, Cron, Hyperdrive |
+| `fireskill-specialist-sst` | SST 4: `infra/*.ts`, secrets, stages, flags, deploy |
+| `fireskill-specialist-openauth` | OpenAuth.js: emissor, sessões no KV, cookies, reset de identidade |
+| `fireskill-specialist-nuxfire-layers` | Criar, registrar e compor layers (`config.ts`, `compose-layers`) |
+| `fireskill-specialist-nuxt-authorization` | RBAC de equipe: `defineAbility`, `authorize`, `<Can>` |
+| `fireskill-specialist-pinia` | Pinia: stores, SSR e hidratação |
 
-Para criar ou alterar uma interface de sistema, use primeiro
-`fireskill-specialist-interface-experience`. Ela carrega o
-`fireskill-specialist-design-system`, examina o sistema e a stack já existentes,
-conduz as perguntas sobre telas e encaminha UX, UI e a tecnologia correta para
-a entrega.
+## Engenharia (agnósticos de stack)
 
-`fireskill-specialist-design-system` mantém `DESIGNSYSTEM.MD` no projeto
-consumidor. O `$fireskill-setup` cria o arquivo a partir do template quando ele
-está ausente. Quando a pessoa não informa direção visual, a skill aplica
-defaults para SaaS: `DataGrid` em listas com detalhe clicável por linha,
-`DetailLists` em detalhes, `PageHeader` nas superfícies e seções de formulário
-em duas colunas responsivas em criar e editar, com `Breadcrumb` em todas as
-telas e o nome da equipe ativa visível. Primitives shadcn/ui e
-blocos gratuitos ReUI podem acelerar a composição; o registro local de
-componentes e telas continua em `INTERFACE.md`.
+`typescript`, `postgres`, `tailwind-css`, `software-architecture`,
+`web-api-design`, `application-security`, `debugging`, `code-review`,
+`performance-engineering`, `observability`, `data-modeling`,
+`domain-modeling`, `prototyping`, `technical-research`, `design-system`,
+`ui-design`, `ux-design`, `interface-experience`, `web-accessibility`,
+`delivery-engineering`, `versioning`, `gitflow` e
+`merge-conflict-resolution`, todos com o prefixo `fireskill-specialist-`.
 
-O catálogo cobre a stack Promovaweb, design de interfaces, qualidade,
-arquitetura, operação e disciplinas de engenharia. A referência completa de
-instalação e uso pertence à
-[`documentação do Specsfy`](../docs/).
+Para criar ou alterar uma interface, comece por
+`fireskill-specialist-interface-experience`: ela carrega o
+`fireskill-specialist-design-system`, examina o sistema e a stack existentes,
+conduz as perguntas sobre telas e encaminha UX, UI e
+`fireskill-specialist-nuxt-ui`. O registro local de componentes e telas fica em
+`INTERFACE.md`.
 
-Para release, deploy ou inclusão de servidor, use somente
-`fireskill-specialist-deploy`. A orquestradora prepara o `SEMVER`, inspeciona a
-aplicação, mantém o inventário Ansible, testa conexões, sincroniza chaves
-públicas para a conta `deploy` e chama Docker Swarm, Ansible e os demais
-especialistas necessários. O projeto consumidor recebe o wrapper `./deploy`
-com as ações `check-hosts`, `secrets`, `sync-keys` e `run`.
+## Como usar
 
-O comando `./deploy run` mantém a senha manual no terminal. Para execução pela
-IA, prepare uma fonte externa com `./deploy configure-vault` e use
-`./deploy run --non-interactive`. Arquivos, scripts de cofre e configurações
-nativas do Ansible também são aceitos. O guia de
-[operações de deploy](../docs/user/deploy-vault.md) explica cadastro,
-permissões, troca, remoção e migração dos scripts existentes.
+O agente carrega um especialista pelo nome (`$fireskill-specialist-<nome>`)
+quando a tarefa toca a área dele; a tabela de detecção de cada skill base
+(`skills/*/references/specialists.md`) indica qual carregar. Um especialista
+orienta padrões técnicos e validação; não cria specs, não avança gates e não
+substitui a fonte normativa.
 
-Nenhuma skill deste módulo é instalada ou executada pela raiz do
-[`promovaweb/specsfy`](https://github.com/promovaweb/specsfy).
+## Licença
 
-## Validar
-
-```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
-```
+Ver [LICENSE](LICENSE). O Fireskills é derivado do Specsfy; mantenha o aviso de
+licença e a atribuição ao distribuir.

@@ -2,19 +2,19 @@
 
 Selecione pela superfície de risco:
 
-- segurança: `fireskill-specialist-application-security`;
-- dados: `-postgres`, `-supabase` ou `-redis`;
-- arquitetura/API: `-software-architecture` ou `-web-api-design`;
+- segurança: `fireskill-specialist-application-security` e `-openauth`;
+- dados: `-postgres` e `-drizzle`;
+- arquitetura/API: `-software-architecture`, `-web-api-design` ou `-trpc`;
 - experiência: `-ui-design`, `-ux-design`, `-web-accessibility`;
-- operação: `-docker-swarm`, `-ansible`, `-delivery-engineering`,
+- operação: `-sst`, `-cloudflare-workers`, `-delivery-engineering`,
   `-observability` e `-performance-engineering`;
 - revisão independente: `-code-review`.
 
-```bash
-npx skills add https://github.com/promovaweb/specsfy --skill fireskill-specialist-<nome> --agent universal --copy --full-depth
-```
+Presença da skill não é evidência de gate; evidência vem de artefatos e comandos
+do projeto.
 
-Se estiver instalado, anuncie a transição automática e carregue o especialista
-na mesma conversa. Se estiver ausente, peça autorização específica antes de
-instalar. Presença da skill não é evidência de gate; evidência vem de artefatos
-e comandos do projeto.
+Os especialistas ficam em `specialists/` deste repositório. Se o necessário não
+estiver disponível para o agente, informe nome, finalidade e dependências e peça
+autorização específica antes de instalar ou copiar; nunca carregue especialista
+sem relação com a tarefa. Se já estiver disponível, anuncie a transição
+automática e carregue-o na mesma conversa.

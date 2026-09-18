@@ -106,7 +106,7 @@ ${rows}
 - Trate a constituição como governança do projeto. Registre incompatibilidades
   com as regras do Specsfy antes de continuar e peça orientação à pessoa.
 - Preserve caminhos, conteúdo e organização de \`.specify/\` e \`specs/\`. A
-  skill \`specsfy-setup\` atualiza somente esta projeção derivada.
+  skill \`fireskill-setup\` atualiza somente esta projeção derivada.
 - Use os artefatos existentes do Spec Kit como fonte da feature correspondente.
   Não os converta silenciosamente para o formato nativo do Specsfy.
 ${END}`;

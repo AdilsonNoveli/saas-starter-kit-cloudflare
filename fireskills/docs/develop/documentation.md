@@ -120,7 +120,7 @@ resultado de um item, o trabalho ainda não está pronto.
 A skill local vive em
 [`/.agents/skills/specsfy-monorepo-documentator`](../../.agents/skills/specsfy-monorepo-documentator/)
 e não integra o catálogo instalado em consumidores. A skill
-[`specsfy-documentator`](../../skills/specsfy-documentator/) reconstrói
+[`fireskill-documentator`](../../skills/fireskill-documentator/) reconstrói
 `<projeto>/docs/` de uma aplicação consumidora.
 
 `$specsfy-release-cli` também é local ao módulo

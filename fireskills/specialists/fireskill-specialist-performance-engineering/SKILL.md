@@ -90,8 +90,6 @@ description: "Diagnosticar e melhorar performance com orçamento, medição, pro
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-astro` e `$fireskill-specialist-nextjs` aplicam budgets e
-  correções no framework depois que a medição localiza o gargalo.
 - `$fireskill-specialist-debugging` isola defeitos funcionais que aparecem sob
   carga sem confundi-los com oportunidade de otimização.
 - `$fireskill-specialist-software-architecture` trata mudança estrutural quando o
@@ -100,8 +98,9 @@ description: "Diagnosticar e melhorar performance com orçamento, medição, pro
   durante otimizações de throughput e latência.
 - `$fireskill-specialist-observability` para o sistema de sinais que detecta
   degradação em produção antes que vire incidente.
-- `$fireskill-specialist-postgres` e `$fireskill-specialist-redis` quando o
-  gargalo identificado está em query, índice ou estratégia de cache.
+- `$fireskill-specialist-postgres`, `$fireskill-specialist-drizzle` e
+  `$fireskill-specialist-cloudflare-workers` quando o gargalo identificado está
+  em query, índice, I/O do Worker ou estratégia de cache (KV/Cache).
 - `$fireskill-specialist-delivery-engineering` para transformar o guardrail de
   performance em um gate automático do pipeline.
 

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy - Especialista - Experiência de Interface"
+  display_name: "Fireskill - Especialista - Experiência de Interface"
   short_description: "Descoberta e entrega de interfaces completas"
-  default_prompt: "Use $specsfy-specialist-interface-experience para analisar o sistema atual e orientar esta interface."
+  default_prompt: "Use $fireskill-specialist-interface-experience para analisar o sistema atual e orientar esta interface."

@@ -45,7 +45,7 @@ spec e nos testes.
 
 ## Leitura integral do consumidor
 
-`specsfy-setup` executa `scripts/inspect_project.mjs` antes das demais skills.
+`fireskill-setup` executa `scripts/inspect_project.mjs` antes das demais skills.
 O relatório agrupa todas as fontes textuais relevantes fora de dependências e
 artefatos gerados: instruções, manifests, configuração, aplicação, rotas,
 persistência, integrações, interface, testes e documentação. A skill lê os
@@ -58,7 +58,7 @@ consultar, editar e apagar registros. Ele também mapeia telas recorrentes para
 os menus do sistema, com destino, permissão e comportamento responsivo. Quando
 essa cobertura não estiver clara, a conversa faz uma pergunta numerada.
 
-Toda execução completa do setup chama `specsfy-documentator` para reconstruir
+Toda execução completa do setup chama `fireskill-documentator` para reconstruir
 `docs/` e `.specsfy/PACKAGES.md` a partir do sistema existente, mesmo sem uma
 alteração recente. Uma implementação repete o documentador ao final da tarefa.
 
@@ -70,11 +70,11 @@ Antes do Ato I, a entrada possui duas camadas não normativas:
 input → specs/inbox/ → specs/backlog/
 ```
 
-`specsfy-01-inbox` preserva e pré-processa sem perguntas. O backlog adiciona
+`fireskill-01-inbox` preserva e pré-processa sem perguntas. O backlog adiciona
 refinamento dialogado. Ambas mantêm proveniência, mas somente `spec.md` governa
 o comportamento.
 
-Na descoberta de MVP, `specsfy-mvp-milestone-interviewer` preserva `MVP.md`
+Na descoberta de MVP, `fireskill-mvp-milestone-interviewer` preserva `MVP.md`
 como fonte de negócio e produto. Ele procura `MVP.md` e `BRAND.md` na raiz do
 consumidor. Se o consumidor for um submódulo Git e os arquivos locais estiverem
 ausentes, consulta a raiz do superprojeto uma única vez. `MVP.md` cria a
@@ -123,10 +123,10 @@ Responsabilidades:
 Skills principais:
 
 ```text
-specsfy-01-inbox
-specsfy-02-backlog
-specsfy-03-specify
-specsfy-04-validate
+fireskill-01-inbox
+fireskill-02-backlog
+fireskill-03-specify
+fireskill-04-validate
 ```
 
 Saída:
@@ -149,8 +149,8 @@ Responsabilidades:
 Skills principais:
 
 ```text
-specsfy-05-tasks
-specsfy-06-tdd-bdd (modo prepare)
+fireskill-05-tasks
+fireskill-06-tdd-bdd (modo prepare)
 ```
 
 Saída:
@@ -171,9 +171,9 @@ Cada tarefa executa:
 RED → GREEN → REFACTOR
 ```
 
-`specsfy-07-implement` exige predecessoras TDD e gates válidos. Depois do
+`fireskill-07-implement` exige predecessoras TDD e gates válidos. Depois do
 GREEN focal, executa regressão proporcional ao risco, atualiza evidências e
-aciona `specsfy-documentator` quando código ou persistência mudam.
+aciona `fireskill-documentator` quando código ou persistência mudam.
 
 Saída final:
 
@@ -182,7 +182,7 @@ Delivery Gate: Passed
 Status: Reviewing
 ```
 
-`specsfy-04-validate` confirma o aceite em `review/` e conclui a transição para
+`fireskill-04-validate` confirma o aceite em `review/` e conclui a transição para
 `completed/`.
 
 Quando a tarefa puder alterar a interface, a entrega inclui uma revisão visual
@@ -204,7 +204,7 @@ A suíte normal do projeto contém a prova executável. Não se cria uma segunda
 
 ## Mudança tardia
 
-`specsfy-update-spec` preserva o novo pedido, calcula o impacto e invalida
+`fireskill-update-spec` preserva o novo pedido, calcula o impacto e invalida
 somente o necessário:
 
 | Mudança | Reabre |
@@ -226,7 +226,7 @@ para ações sensíveis como push, deploy, exclusão ou alteração externa.
 
 ## Projeções
 
-CLI, TUI e `specsfy-progress` projetam o estado observado nas specs. Eles
+CLI, TUI e `fireskill-progress` projetam o estado observado nas specs. Eles
 não mantêm uma fonte paralela de progresso e não podem aprovar gates.
 
 Milestones são estados demonstráveis de produto e ficam em

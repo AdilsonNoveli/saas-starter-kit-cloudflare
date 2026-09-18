@@ -184,10 +184,10 @@ Quando a pessoa pedir aprofundamento, promoção ou criação de uma spec:
    área; ele coordena a análise do sistema atual e os especialistas seguintes.
    Carregue `$fireskill-specialist-ux-design` antes de fechar a jornada e
    `$fireskill-specialist-ui-design` antes de fechar a composição.
-   Quando a stack React e Tailwind usar ReUI, todo CRUD declarado na descoberta
-   deve registrar Data Grid ou List, Filters, Form, Dialog ou Sheet e os
-   estados ReUI aplicáveis; carregue `$fireskill-specialist-reui` antes de fechar
-   a área.
+   Quando a stack usar `@nuxt/ui`, todo CRUD declarado na descoberta deve
+   registrar `UTable` (com `enterpriseTableUi`), filtros, `UForm`, `UModal` ou
+   `USlideover` e os estados aplicáveis; carregue `$fireskill-specialist-nuxt-ui`
+   antes de fechar a área.
 6. Leia `../fireskill-03-specify/references/mcr-10.md` e faça a análise categorial
    silenciosamente antes da primeira pergunta.
 7. Leia `references/specialists.md` somente quando tecnologia ou disciplina

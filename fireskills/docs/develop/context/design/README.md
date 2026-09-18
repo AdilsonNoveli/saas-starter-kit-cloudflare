@@ -89,11 +89,11 @@ motivo concreto.
 | Fonte | Owner | Conteúdo |
 | --- | --- | --- |
 | `skills/templates/DESIGNSYSTEM.MD` | framework | defaults comuns de interface, CRUD, dashboards e cenários canônicos |
-| `specsfy-setup` | framework | criação do arquivo na raiz quando ausente e preservação do conteúdo local |
+| `fireskill-setup` | framework | criação do arquivo na raiz quando ausente e preservação do conteúdo local |
 | `DESIGNSYSTEM.MD` | projeto consumidor | linguagem, exceções e regras macro locais |
 | `INTERFACE.md` | projeto consumidor | componentes, blocos, telas e consumidores |
 | `spec.md` | projeto consumidor | comportamento e aceite da entrega |
-| `specialists/specsfy-specialist-*` | framework | orientação por etapa e tecnologia |
+| `specialists/fireskill-specialist-*` | framework | orientação por etapa e tecnologia |
 
 ## Atualize quando
 

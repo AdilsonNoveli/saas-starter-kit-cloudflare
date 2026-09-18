@@ -14,7 +14,7 @@ estar funcionando antes de seguir para o próximo marco. Não é sprint, versão
 
 ## Comece pelo MVP
 
-Use `$specsfy-mvp-milestone-interviewer` depois de apresentar a ideia do
+Use `$fireskill-mvp-milestone-interviewer` depois de apresentar a ideia do
 produto. A conversa começa com a finalidade, quem será atendido e qual jornada
 precisa funcionar. Depois de cada resposta, o agente resume o entendimento e
 faz a próxima pergunta que falta para definir o menor produto utilizável.
@@ -99,11 +99,11 @@ condição de saída foi demonstrada ou validada.
 ## Planeje o que vem depois
 
 Quando o MVP estiver aceito, use
-`$specsfy-roadmap-milestone-interviewer`. Ele parte dos limites já aprovados e
+`$fireskill-roadmap-milestone-interviewer`. Ele parte dos limites já aprovados e
 organiza evolução, integrações, automações e hipóteses que dependem de uso
 real. Se uma resposta mudar o núcleo do MVP, o agente pede confirmação e
-encaminha a alteração da spec para `$specsfy-update-spec`.
+encaminha a alteração da spec para `$fireskill-update-spec`.
 
 Para revisar o mapa existente e encontrar relações ausentes, use
-`$specsfy-milestone-governor`. Ele sincroniza a projeção, aponta lacunas e
+`$fireskill-milestone-governor`. Ele sincroniza a projeção, aponta lacunas e
 propõe ajustes; não altera objetivo ou condição de saída sem sua confirmação.

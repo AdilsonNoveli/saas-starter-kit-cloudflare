@@ -18,12 +18,11 @@ comparações ou exceções explícitas, escolha navegação orientada à tarefa
 ## Design system e CRUD
 
 Antes da composição, leia `DESIGNSYSTEM.MD` e aplique seus defaults. Para uma
-superfície CRUD, use `PageHeader` em todas as páginas, `DataGrid` na lista,
+superfície CRUD, use `PageHeader` em todas as páginas, `UTable` na lista,
 `DetailLists` no detalhe e formulários em seções com duas colunas responsivas em
 criar e editar. Labels ficam acima dos campos e a mensagem de erro aparece em
 vermelho abaixo do campo. O shell renderiza `Breadcrumb` em toda tela, com a
-equipe ativa, o módulo e a tela atual; em Laravel, reutilize o componente
-existente.
+equipe ativa, o módulo e a tela atual; reutilize o componente existente.
 
 ## Hierarquia e densidade
 
@@ -38,7 +37,7 @@ existente.
 - Permita que densidade altere espaço, não significado ou conjunto de ações.
 - Separe cada seção de formulário em coluna de contexto e painel de campos;
   use duas colunas nos breakpoints largos e uma no mobile.
-- Faça a linha do DataGrid abrir o detalhe por clique e teclado; reserve ações
+- Faça a linha do `UTable` abrir o detalhe por clique e teclado; reserve ações
   internas para uma camada acima do link da linha.
 
 ## Dados e componentes

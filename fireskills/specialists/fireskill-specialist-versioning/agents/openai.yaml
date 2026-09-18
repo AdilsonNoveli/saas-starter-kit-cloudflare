@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy - Especialista - Versionamento"
+  display_name: "Fireskill - Especialista - Versionamento"
   short_description: "SEMVER alinhado entre release e deploy"
-  default_prompt: "Use $specsfy-specialist-versioning para preparar e conferir a versão desta entrega."
+  default_prompt: "Use $fireskill-specialist-versioning para preparar e conferir a versão desta entrega."

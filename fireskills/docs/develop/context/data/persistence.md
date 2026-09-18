@@ -50,7 +50,7 @@ versionado no Git:
 
 Em projetos consumidores, `.specsfy/DATABASE.md` é um mapa derivado e tabular
 da persistência observada. Schemas e migrations continuam sendo a fonte
-executável. A skill `specsfy-aux-database` reconcilia o mapa sempre que banco,
+executável. A skill `fireskill-aux-database` reconcilia o mapa sempre que banco,
 tabela, campo, relação ou migration muda e preserva notas humanas.
 O monitor de contexto trata essa reconciliação como obrigatória na mesma
 entrega e impede o Delivery Gate enquanto `DATABASE.md` estiver pendente.

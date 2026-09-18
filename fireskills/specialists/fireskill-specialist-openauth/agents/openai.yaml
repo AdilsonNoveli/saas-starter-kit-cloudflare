@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Especialista - OpenAuth"
+  short_description: "OpenAuth.js, sessões em KV e fluxos de identidade do Nuxfire"
+  default_prompt: "Use $fireskill-specialist-openauth para orientar esta tarefa com padrões e validação especializados."

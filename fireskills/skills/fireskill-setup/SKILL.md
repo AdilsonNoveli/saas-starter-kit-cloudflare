@@ -129,17 +129,17 @@ texto humano fora dos blocos gerenciados e resolva qualquer resultado
 
 ## Proteção do banco durante o setup
 
-Quando o projeto tiver `artisan`, execute durante o setup:
+Antes de qualquer teste que acesse Postgres, execute durante o setup:
 
 ```bash
 node .agents/skills/fireskill-setup/scripts/check_database_safety.mjs \
   --project <raiz>
 ```
 
-Exija `.env.testing` com `APP_ENV=testing` e um destino de banco declarado de
-forma explícita. O banco de teste precisa ser diferente do banco indicado no
-`.env`; não aceite valor ausente que faça o Laravel herdar a configuração de
-desenvolvimento. O script não mostra credenciais nem valores de conexão.
+Exija um banco de teste explicitamente diferente do configurado nos secrets do
+stage (`DATABASE_HOST`, `DATABASE_NAME` e afins); os testes Vitest atuais
+(billing, assentos de equipe, habilidades) não acessam o banco. O script não
+mostra credenciais nem valores de conexão.
 
 Um resultado `PENDING` impede qualquer teste focal, suíte ou regressão. Corrija
 o ambiente de testes, execute a conferência novamente e só continue após
@@ -184,10 +184,10 @@ para forçar sua execução.
    ainda não existir. O mesmo comando deve ler a constituição e todos os arquivos
    regulares em `specs/` quando detectar GitHub Spec Kit, depois atualizar o
    bloco gerenciado de `.specsfy/SPECKIT.md`.
-   O setup inicial não cria `SEMVER`, `Dockerfile`, `compose.yaml`,
-   `stack.yaml`, `deploy` nem `ansible/`. O versionamento e o deploy começam
-   somente quando a pessoa pedir esse processo de forma explícita; nesse caso,
-   anuncie o handoff para `$fireskill-specialist-deploy`.
+   O setup inicial não cria `SEMVER` nem altera `infra/`. O versionamento e o
+   deploy começam somente quando a pessoa pedir esse processo de forma
+   explícita; nesse caso, anuncie o handoff para `$fireskill-specialist-sst`
+   (com `$fireskill-specialist-versioning` para a versão).
    Toda execução deve ser idempotente: repetir o setup com as mesmas entradas
    não altera arquivos já reconciliados, não duplica blocos e não inicia outra
    etapa.
@@ -197,7 +197,8 @@ para forçar sua execução.
    node scripts/monitor_context.mjs --project <raiz> --check
    ```
 
-   Em Laravel, executar também `check_database_safety.mjs --project <raiz>` e
+   Antes de testes que acessem o banco, executar também
+   `check_database_safety.mjs --project <raiz>` e
    manter toda execução de testes suspensa até o resultado `SAFE`.
 
 8. Inspecionar os arquivos iniciais, incluindo `.specsfy/USER-PROFILE.md`, e
@@ -217,11 +218,11 @@ para forçar sua execução.
    incompleto. Em `AGENTS.md`, `CLAUDE.md` e `.specsfy/SPECKIT.md`, atualizar
    somente o bloco delimitado do framework e preservar tudo fora dele. Nunca
    escrever, mover, renomear ou remover arquivos em `.specify/` e `specs/`.
-10. Depois de ler a stack, instale primeiro o núcleo essencial do Specsfy:
+10. Depois de ler a stack, instale primeiro o núcleo essencial do Fireskills:
    `fireskill-specialist-data-modeling`,
-   `fireskill-specialist-domain-modeling` e
-   `fireskill-specialist-software-architecture`, `fireskill-specialist-shadcn-ui`
-   e `fireskill-specialist-reui`.
+   `fireskill-specialist-domain-modeling`,
+   `fireskill-specialist-software-architecture` e
+   `fireskill-specialist-nuxt-ui`.
    Em seguida, executar
    `specsfy skills detect --project <raiz>`. Apresente a tabela de
    correspondência abaixo com o núcleo e os especialistas detectados, avisando
@@ -276,21 +277,19 @@ pendente.
 
 | Stack observada | Especialista instalado |
 | --- | --- |
-| Laravel | `fireskill-specialist-laravel` |
-| Pacote Laravel recebido por URL GitHub | `fireskill-specialist-laravel-package-manager` |
-| Supabase | `fireskill-specialist-supabase` |
+| Nuxt (`nuxt.config.ts`) | `fireskill-specialist-nuxt` |
+| `@nuxt/ui` | `fireskill-specialist-nuxt-ui` |
+| Layers do Nuxfire (`layers/`, `layer.manifest.ts`) | `fireskill-specialist-nuxfire-layers` |
+| tRPC (`trpc-nuxt`) | `fireskill-specialist-trpc` |
+| Drizzle (`drizzle.config.ts`) | `fireskill-specialist-drizzle` |
 | PostgreSQL | `fireskill-specialist-postgres` |
-| Redis | `fireskill-specialist-redis` |
-| React | `fireskill-specialist-react` e `fireskill-specialist-react-ui-components` |
-| Astro | `fireskill-specialist-astro` |
-| Next.js | `fireskill-specialist-nextjs` |
+| SST (`sst.config.ts`, `infra/`) | `fireskill-specialist-sst` |
+| Cloudflare Workers (`apps/functions`) | `fireskill-specialist-cloudflare-workers` |
+| OpenAuth.js | `fireskill-specialist-openauth` |
+| `nuxt-authorization` | `fireskill-specialist-nuxt-authorization` |
+| Pinia | `fireskill-specialist-pinia` |
 | TypeScript | `fireskill-specialist-typescript` |
 | Tailwind CSS | `fireskill-specialist-tailwind-css` |
-| shadcn/ui | `fireskill-specialist-shadcn-ui` |
-| Docker ou Compose | `fireskill-specialist-docker` |
-| Release ou deploy completo | `fireskill-specialist-deploy` |
-| Docker Swarm | `fireskill-specialist-docker-swarm` |
-| Ansible | `fireskill-specialist-ansible` |
 | OpenAPI | `fireskill-specialist-web-api-design` |
 | OpenTelemetry ou Prometheus | `fireskill-specialist-observability` |
 | CI/CD | `fireskill-specialist-delivery-engineering` |
@@ -300,20 +299,17 @@ pendente.
 | `fireskill-specialist-data-modeling` | dados, entidades, relações e ciclo de vida |
 | `fireskill-specialist-domain-modeling` | linguagem, regras e limites de domínio |
 | `fireskill-specialist-software-architecture` | módulos, dependências e estrutura técnica |
-| `fireskill-specialist-reui` | base ReUI para interfaces e CRUDs React/Tailwind |
-| `fireskill-specialist-shadcn-ui` | primitives, tema e registry para o ReUI |
+| `fireskill-specialist-nuxt-ui` | componentes `@nuxt/ui`, tema e padrões de interface e CRUD |
 
-Para todo projeto Laravel com React, o setup instala shadcn/ui e ReUI juntos.
-Não trate essa dupla como opcional: shadcn/ui prepara a base e ReUI cria CRUDs
-e interfaces sobre ela.
+Para todo projeto Nuxfire, o setup instala `fireskill-specialist-nuxt-ui`: o
+`@nuxt/ui` v4 é a base de todas as interfaces e CRUDs. Não trate como opcional.
 
-Para toda aplicação Laravel, Laravel Octane com Open Swoole é obrigatório.
-Confira `laravel/octane` em `composer.json` e `composer.lock`, a extensão
-`openswoole` na imagem e `--server=swoole` no runtime. Registre essa combinação
-em `.specsfy/STACK.md` e encaminhe a instalação ou correção ausente para uma
-spec antes de aprovar o setup.
+Confira o runtime real antes de aprovar o setup: Cloudflare Workers via SST
+(`sst.config.ts`, `infra/`), Postgres por Hyperdrive e Drizzle. Registre essa
+combinação em `.specsfy/STACK.md` e encaminhe qualquer divergência para uma spec
+antes de aprovar o setup.
 
-Depois de instalar a dupla, o setup registra em `INTERFACE.md` que telas React
-são compostas por componentes. Cada nova tela deve consultar o mapa, reutilizar
-o que já existe e registrar componentes próprios, primitives shadcn/ui e
-composições ReUI com arquivos e consumidores reais.
+Depois de instalar o especialista, o setup registra em `INTERFACE.md` que as
+telas são compostas por Vue SFC com componentes `@nuxt/ui`. Cada nova tela deve
+consultar o mapa, reutilizar o que já existe e registrar componentes próprios e
+componentes `@nuxt/ui` com arquivos e consumidores reais.

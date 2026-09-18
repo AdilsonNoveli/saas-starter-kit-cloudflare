@@ -37,7 +37,7 @@ specsfy install --project apps/portal
 specsfy doctor --project apps/portal
 ```
 
-Depois, informe `apps/portal` ao `$specsfy-setup`. O agente cria contexto,
+Depois, informe `apps/portal` ao `$fireskill-setup`. O agente cria contexto,
 specs, testes e código apenas nesse diretório. Ele não usa a raiz Git do Hub
 como destino por dedução. Antes de cada skill seguinte, o framework executa o
 setup novamente para verificar essa consistência, reutilizando o caminho já
@@ -45,11 +45,11 @@ confirmado na conversa.
 
 ## Capture uma entrada
 
-Use `$specsfy-01-inbox` para guardar a formulação original em
+Use `$fireskill-01-inbox` para guardar a formulação original em
 `specs/inbox/`. A captura não inicia perguntas nem altera o código:
 
 ```text
-Use $specsfy-01-inbox para capturar:
+Use $fireskill-01-inbox para capturar:
 criar uma página /boas-vindas que cumprimente o visitante pelo nome.
 ```
 
@@ -66,11 +66,11 @@ Ela ainda não cria backlog, spec, tarefas ou código.
 ## Refine a proposta no backlog
 
 Quando a ideia merecer refinamento, envie o arquivo para
-`$specsfy-02-backlog`. A skill lê a captura preservada, procura relações e
+`$fireskill-02-backlog`. A skill lê a captura preservada, procura relações e
 cria um item numerado:
 
 ```text
-Use $specsfy-02-backlog para refinar
+Use $fireskill-02-backlog para refinar
 specs/inbox/2026-07-28-143205-pagina-boas-vindas.md
 ```
 
@@ -86,11 +86,11 @@ O backlog organiza uma possibilidade de entrega, mas não autoriza alteração n
 código. Essa separação permite comparar e priorizar ideias antes de criar uma
 especificação normativa.
 
-Use `$specsfy-02-backlog` para aprofundar o item. A conversa pergunta uma
+Use `$fireskill-02-backlog` para aprofundar o item. A conversa pergunta uma
 lacuna aplicável por vez e retorna um brief:
 
 ```text
-Use $specsfy-02-backlog em
+Use $fireskill-02-backlog em
 specs/backlog/0001-pagina-boas-vindas.md
 ```
 
@@ -108,10 +108,10 @@ uma segunda fonte normativa nem modifica o backlog.
 ## Crie a especificação única
 
 Depois de resolver as dúvidas materiais, promova o backlog com
-`$specsfy-03-specify`:
+`$fireskill-03-specify`:
 
 ```text
-Use $specsfy-03-specify para promover
+Use $fireskill-03-specify para promover
 specs/backlog/0001-pagina-boas-vindas.md
 ```
 
@@ -128,12 +128,12 @@ separada.
 
 ## Comprove a definição
 
-Use `$specsfy-04-validate` para auditar a spec. A skill informa a localização
+Use `$fireskill-04-validate` para auditar a spec. A skill informa a localização
 de cada falha e só aprova o Definition Gate quando a definição estiver
 completa:
 
 ```text
-Use $specsfy-04-validate em
+Use $fireskill-04-validate em
 specs/<estado>/0001-pagina-boas-vindas/spec.md
 ```
 
@@ -151,12 +151,12 @@ aprovar o gate.
 
 ## Organize as tarefas
 
-Use `$specsfy-05-tasks` para manter o plano e as tarefas dentro da mesma
+Use `$fireskill-05-tasks` para manter o plano e as tarefas dentro da mesma
 `spec.md`. O arquivo deve mostrar os requisitos cobertos e a dependência entre
 o teste em RED e cada tarefa de produção:
 
 ```text
-Use $specsfy-05-tasks em
+Use $fireskill-05-tasks em
 specs/<estado>/0001-pagina-boas-vindas/spec.md
 ```
 
@@ -166,10 +166,10 @@ dependências e liga cada tarefa aos requisitos correspondentes. Ela não cria
 
 ## Prove que o teste detecta a ausência da página
 
-Use `$specsfy-06-tdd-bdd` no modo de preparação:
+Use `$fireskill-06-tdd-bdd` no modo de preparação:
 
 ```text
-Use $specsfy-06-tdd-bdd em
+Use $fireskill-06-tdd-bdd em
 specs/<estado>/0001-pagina-boas-vindas/spec.md para preparar o TDD.
 ```
 
@@ -188,10 +188,10 @@ coerentes, o `Plan Gate` pode chegar a `Passed`.
 ## Implemente e valide
 
 Com os gates de definição e plano aprovados, use
-`$specsfy-07-implement`:
+`$fireskill-07-implement`:
 
 ```text
-Use $specsfy-07-implement em
+Use $fireskill-07-implement em
 specs/<estado>/0001-pagina-boas-vindas/spec.md
 ```
 
@@ -200,7 +200,7 @@ tarefa de código, a skill exige um predecessor TDD com RED registrado, cria a
 menor mudança capaz de deixar o teste verde e executa a regressão aplicável.
 Os comandos, os resultados e os IDs cobertos entram como evidência na spec.
 
-Depois de cada tarefa de código, o agente chama `$specsfy-documentator`. Essa
+Depois de cada tarefa de código, o agente chama `$fireskill-documentator`. Essa
 skill reconstrói a documentação técnica em `docs/` a partir do sistema
 existente e executa o modo `--check`. O fluxo só retoma a implementação quando
 a documentação representar o código atual.
@@ -216,10 +216,10 @@ Status: Reviewing
 ## Incorpore uma mudança posterior
 
 Imagine que, depois da primeira entrega, o nome precise aceitar no máximo 80
-caracteres. Use `$specsfy-update-spec` na spec existente:
+caracteres. Use `$fireskill-update-spec` na spec existente:
 
 ```text
-Use $specsfy-update-spec em
+Use $fireskill-update-spec em
 specs/<estado>/0001-pagina-boas-vindas/spec.md:
 o nome deve ter no máximo 80 caracteres.
 ```
@@ -227,7 +227,7 @@ o nome deve ter no máximo 80 caracteres.
 Essa skill preserva a nova instrução, atualiza a `spec.md` e invalida somente
 as provas afetadas. Como o limite muda comportamento, o fluxo reabre desde o
 Ato I, percorre validação, tarefas e TDD/BDD, e só então retoma
-`$specsfy-07-implement`. A skill de atualização não altera código de
+`$fireskill-07-implement`. A skill de atualização não altera código de
 produção automaticamente.
 
 Uma alteração restrita ao plano técnico reabre os Atos II e III. Uma correção
@@ -236,10 +236,10 @@ todos os casos, o histórico continua na mesma spec.
 
 ## Consulte o estado final
 
-Use `$specsfy-progress` para projetar o estado sem editar arquivos:
+Use `$fireskill-progress` para projetar o estado sem editar arquivos:
 
 ```text
-Use $specsfy-progress para mostrar o resultado final.
+Use $fireskill-progress para mostrar o resultado final.
 ```
 
 O relatório mostra specs, gates, tarefas, checklists, pendências e o próximo
@@ -255,10 +255,10 @@ Depois do aceite final, a entrega pronta aparece como `Complete` em
 `completed/`, com os três gates aprovados e sem pendência documental. Capturas em `specs/inbox/` e itens em
 `specs/backlog/` não entram nesse cálculo.
 
-## Converse sobre a próxima escolha — `$specsfy-interviewer`
+## Converse sobre a próxima escolha — `$fireskill-interviewer`
 
 Quando uma lacuna puder alterar escopo, plano, execução ou aceite, use
-`$specsfy-interviewer` na mesma spec. Ele registra respostas confirmadas e
+`$fireskill-interviewer` na mesma spec. Ele registra respostas confirmadas e
 recalibra Effort, sem aprovar gates nem substituir a skill da etapa.
 
 ## Continue na mesma conversa

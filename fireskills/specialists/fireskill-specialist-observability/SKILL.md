@@ -98,10 +98,9 @@ description: "Projetar e revisar logs, métricas, traces, correlação, SLOs, al
 
 - `$fireskill-specialist-debugging` consome os sinais para isolar causa e pede
   instrumentação adicional quando a evidência é insuficiente.
-- `$fireskill-specialist-docker` e `$fireskill-specialist-docker-swarm` expõem
-  runtime, service e node signals; esta skill define correlação e decisão.
-- `$fireskill-specialist-postgres` e `$fireskill-specialist-redis` produzem sinais
-  de dados/cache com cardinalidade e retenção controladas aqui.
+- `$fireskill-specialist-postgres` e `$fireskill-specialist-cloudflare-workers`
+  produzem sinais de dados, filas e cache (Workers Logs/Traces) com
+  cardinalidade e retenção controladas aqui.
 - `$fireskill-specialist-web-api-design` define correlação e erro no contrato;
   esta skill mede o comportamento do endpoint em operação.
 - `$fireskill-specialist-performance-engineering` para diagnóstico de causa

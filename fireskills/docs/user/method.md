@@ -282,7 +282,7 @@ O Specsfy reabre somente as provas que perderam validade:
 - Uma evidência desatualizada exige somente a repetição da validação
   correspondente.
 
-Use [`specsfy-update-spec`](skills/specsfy-update-spec.md) para
+Use [`fireskill-update-spec`](skills/fireskill-update-spec.md) para
 incorporar a nova instrução. A skill informa quais gates perderam validade e
 retoma a primeira etapa afetada.
 
@@ -314,7 +314,7 @@ teste, tarefa e evidência:
 - a documentação reflete o sistema implementado.
 
 Para consultar esse estado sem alterar arquivos, use
-[`specsfy-progress`](skills/specsfy-progress.md).
+[`fireskill-progress`](skills/fireskill-progress.md).
 
 ## Limites do método
 

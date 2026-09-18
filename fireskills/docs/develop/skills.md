@@ -61,7 +61,7 @@ Conteúdo extenso, padrões externos e matrizes de decisão ficam em
 Scripts automatizam transformações determinísticas. Eles retornam códigos úteis,
 não instalam globalmente e não realizam ações destrutivas por padrão.
 
-O especialista `specsfy-specialist-versioning` inclui
+O especialista `fireskill-specialist-versioning` inclui
 `scripts/semver.mjs`. O utilitário cria, consulta, incrementa e confere o
 arquivo `SEMVER` na raiz do projeto consumidor. Ele também gera a referência
 Docker com essa versão e recusa uma tag diferente.
@@ -72,7 +72,7 @@ de tarefas exige um arquivo versionado em um diretório de migrations. No Ato
 III, `verify_evidence.mjs` só aceita a conclusão depois de encontrar o arquivo,
 o comando que aplicou a migration e uma consulta posterior do estado.
 
-`specsfy-specialist-deploy` é a entrada para o fluxo completo de release ou
+`fireskill-specialist-deploy` é a entrada para o fluxo completo de release ou
 deploy. Seu catálogo instala Versioning, Docker, Debian Server, Ansible e Docker
 Swarm como dependências. O gerador cria `compose.yaml` para desenvolvimento,
 `stack.yaml` para produção e os arquivos Ansible que preparam o usuário `deploy`,
@@ -176,8 +176,8 @@ conversacional.
 <!-- markdownlint-disable MD013 -->
 | Modo | Skills |
 | --- | --- |
-| perguntas | `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-tdd-bdd`, `specsfy-07-implement`, `specsfy-aux-rules`, `specsfy-interviewer`, `specsfy-milestone-governor`, `specsfy-mvp-milestone-interviewer`, `specsfy-data-discovery`, `specsfy-roadmap-milestone-interviewer`, `specsfy-setup`, `specsfy-update-spec` |
-| sem perguntas | `specsfy-01-inbox`, `specsfy-aux-database`, `specsfy-aux-stack`, `specsfy-documentator`, `specsfy-progress` |
+| perguntas | `fireskill-02-backlog`, `fireskill-03-specify`, `fireskill-04-validate`, `fireskill-05-tasks`, `fireskill-06-tdd-bdd`, `fireskill-07-implement`, `fireskill-aux-rules`, `fireskill-interviewer`, `fireskill-milestone-governor`, `fireskill-mvp-milestone-interviewer`, `fireskill-data-discovery`, `fireskill-roadmap-milestone-interviewer`, `fireskill-setup`, `fireskill-update-spec` |
+| sem perguntas | `fireskill-01-inbox`, `fireskill-aux-database`, `fireskill-aux-stack`, `fireskill-documentator`, `fireskill-progress` |
 <!-- markdownlint-enable MD013 -->
 
 ## Handoff
@@ -193,11 +193,11 @@ O handoff é usado quando a responsabilidade muda. A skill de origem não execut
 silenciosamente o trabalho da vizinha. A skill de destino relê a spec e valida
 suas próprias pré-condições.
 
-`specsfy-01-inbox` é a exceção de entrada: ela registra a entrada antes de
+`fireskill-01-inbox` é a exceção de entrada: ela registra a entrada antes de
 qualquer handoff, não pergunta e apenas sugere a próxima etapa. Esse limite
 impede que uma anotação simples se transforme em refinamento implícito.
 
-`specsfy-mvp-milestone-interviewer` combina conversa e captura: ele lê
+`fireskill-mvp-milestone-interviewer` combina conversa e captura: ele lê
 `MVP.md` e `BRAND.md` na raiz do consumidor e, quando o consumidor é um
 submódulo Git sem os arquivos locais, na raiz do superprojeto. O arquivo local
 tem prioridade. Ele importa `MVP.md` como `M01`, classifica o que representa
@@ -208,14 +208,14 @@ backlog lê o trecho importado, aplica
 respostas já declaradas e defaults inequívocos e cobre somente lacunas,
 ambiguidades ou contradições. Ao terminar cada backlog, a skill cria sua spec
 Draft, marca o que não foi respondido como `Pendente` e não implementa código
-nem passa gates. Quando necessário, chama `$specsfy-data-discovery`; depois
+nem passa gates. Quando necessário, chama `$fireskill-data-discovery`; depois
 sincroniza milestones, sem sobrescrever arquivos existentes.
 
-`specsfy-data-discovery` traduz a conversa de produto em informações a guardar
+`fireskill-data-discovery` traduz a conversa de produto em informações a guardar
 no `DATABASE.md`. Ela não escolhe estrutura interna; backlog, descoberta de MVP
 e especificação a carregam quando a jornada depender de dados persistidos.
 
-`specsfy-02-backlog` é a responsável exclusiva pelas perguntas de escolha
+`fireskill-02-backlog` é a responsável exclusiva pelas perguntas de escolha
 material. `specify`, `update-spec` e `validate` fazem handoff para seu ciclo e
 retomam depois. O ciclo reanalisa cada rodada, faz no máximo oito perguntas por
 área e oferece `Avançar` desde a primeira pergunta. A rodada seguinte
@@ -256,7 +256,7 @@ pelas skills segue `custom/<Nome>.md`, template gerenciado e, somente no
 monorepo, `skills/templates/<Nome>.md`.
 
 `DESIGNSYSTEM.MD` é o template das regras macro do produto consumidor. A skill
-`specsfy-specialist-design-system` cria ou atualiza o arquivo na raiz do
+`fireskill-specialist-design-system` cria ou atualiza o arquivo na raiz do
 consumidor. `Interface.md` registra componentes e telas locais, sem repetir as
 regras macro.
 
@@ -267,7 +267,7 @@ profundidade das perguntas, preservando o contrato numerado.
 
 ### Ponte com GitHub Spec Kit
 
-`specsfy-setup/scripts/sync_speckit_context.mjs` ativa a integração somente
+`fireskill-setup/scripts/sync_speckit_context.mjs` ativa a integração somente
 quando encontra `.specify/memory/constitution.md`. O script lê essa fonte como
 bytes, percorre recursivamente os arquivos regulares em `specs/` e atualiza o
 bloco `specsfy:speckit` de `.specsfy/SPECKIT.md`. Cada linha registra caminho,
@@ -295,22 +295,22 @@ o trabalho para a raiz Git do Hub.
 
 ## Inventário de pacotes do consumidor
 
-`specsfy-documentator/scripts/build_documentation.mjs` percorre os manifests npm
+`fireskill-documentator/scripts/build_documentation.mjs` percorre os manifests npm
 e Composer fora de árvores geradas. O script combina dependências diretas com
 entradas transitivas de `package-lock.json` e `composer.lock`, usa descrições
 locais quando disponíveis e escreve o bloco reconstruível de
 `.specsfy/PACKAGES.md`. O modo `--check` trata esse arquivo como parte do mesmo
 contrato de atualização de `docs/`.
 
-`specsfy-setup/scripts/monitor_context.mjs` encaminha mudanças em manifests ou
+`fireskill-setup/scripts/monitor_context.mjs` encaminha mudanças em manifests ou
 lockfiles para o documentador. O inventário é derivado e não substitui os
 manifests nem autoriza instalar, atualizar ou remover dependências.
 
-Em projetos Laravel, `specsfy-specialist-laravel-package-manager` amplia esse
+Em projetos Laravel, `fireskill-specialist-laravel-package-manager` amplia esse
 fluxo para pacotes recebidos por URL GitHub. Ele consulta os pacotes atuais,
 instala somente após autorização e mantém `docs/packages/README.md` mais uma
-ficha por pacote. `specsfy-03-specify` consulta essas fontes antes de registrar
-uma dependência na spec; `specsfy-07-implement` faz a mesma leitura antes de
+ficha por pacote. `fireskill-03-specify` consulta essas fontes antes de registrar
+uma dependência na spec; `fireskill-07-implement` faz a mesma leitura antes de
 alterar Composer e carrega o especialista quando a tarefa envolve pacote.
 
 ## Validação

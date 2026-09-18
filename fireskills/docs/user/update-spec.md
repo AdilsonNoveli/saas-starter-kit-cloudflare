@@ -1,7 +1,7 @@
 # Atualizar uma especificação
 
 Quando uma entrega já definida precisar mudar, use
-`specsfy-update-spec`. A skill incorpora a nova instrução na mesma
+`fireskill-update-spec`. A skill incorpora a nova instrução na mesma
 `spec.md` e reconcilia as partes afetadas sem exigir que você escolha atos ou
 gates manualmente.
 
@@ -13,7 +13,7 @@ skill usará esse arquivo para encontrar os requisitos, testes e tarefas
 afetados:
 
 ```text
-Use $specsfy-update-spec em
+Use $fireskill-update-spec em
 specs/<estado>/0001-pagina-boas-vindas/spec.md:
 esqueci de pedir que o nome tenha no máximo 80 caracteres.
 ```
@@ -79,6 +79,6 @@ depois de existir novo RED válido e os gates necessários voltarem a `Passed`.
 - editar código quando a spec continua correta.
 
 Depois da atualização, consulte
-[`specsfy-progress`](skills/specsfy-progress.md) para conferir o
+[`fireskill-progress`](skills/fireskill-progress.md) para conferir o
 estado geral. A spec atualizada permanece como única fonte normativa do
 projeto.

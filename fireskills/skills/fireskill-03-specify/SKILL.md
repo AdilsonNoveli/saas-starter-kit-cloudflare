@@ -20,11 +20,11 @@ Antes de formular qualquer pergunta, leia e aplique o
 
 Crie ou atualize o pacote `specs/draft/<NNNN>-<slug>/`, no qual `spec.md` é a única fonte normativa de todo o fluxo SDD. Somente o diretório recebe o número; mantenha o arquivo sempre como `spec.md`. Consolide descoberta, research, esclarecimentos, produto, plano técnico, modelo de dados, contratos, TDD, BDD, validações, tarefas, decisões e conclusão em três atos explícitos. Evidências externas consultadas vivem em `research/`; não gere `plan.md`, `research.md`, `data-model.md`, `tasks.md`, checklists ou uma segunda especificação.
 
-Antes de consolidar uma spec Laravel, leia `.specsfy/PACKAGES.md`,
-`docs/packages/README.md` e as fichas de `docs/packages/`. Se a solicitação
-trouxer uma URL GitHub de pacote ou depender de uma biblioteca Composer,
-carregue `$fireskill-specialist-laravel-package-manager` para conferir se o
-pacote já existe e registrar a necessidade sem duplicar dependências.
+Antes de consolidar uma spec que dependa de biblioteca, leia
+`.specsfy/PACKAGES.md`, `docs/packages/README.md` e as fichas de
+`docs/packages/`. Se a solicitação trouxer uma URL GitHub de pacote ou depender
+de uma biblioteca npm, confira se o pacote já existe no workspace e registre a
+necessidade sem duplicar dependências.
 
 ## Orquestrar a conversa
 
@@ -135,7 +135,7 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
 - Quando o cabeçalho declarar `Interface para pessoas: Sim`, preencha na seção
   10 as nove partes do template com stack e convenções locais, telas, fluxo de
   informação, menus e navegação principal, formulários e ações, composição,
-  blocos React e componentes shadcn/ui/ReUI, estados e acessibilidade. Use
+  componentes Vue e componentes `@nuxt/ui`, estados e acessibilidade. Use
   `INTERFACE.md`, `.specsfy/STACK.md`, manifests, telas e código existente como fonte da stack
   e do sistema atual; registre o que será preservado e alterado. Não proponha
   biblioteca incompatível nem reestruture uma tela existente sem esse exame.
@@ -143,9 +143,10 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
   `$fireskill-specialist-ux-design`, `$fireskill-specialist-ui-design` e o
   especialista da stack de interface. Não aceite uma descrição de CRUD que
   tenha somente API, banco ou serviço.
-  Em Laravel com React, registre explicitamente shadcn/ui e ReUI, todos os
-  blocos React previstos, suas responsabilidades, arquivos, componentes de
-  origem e regra de reuso. A página apenas compõe esses blocos.
+  No Nuxfire, registre explicitamente os componentes `@nuxt/ui` usados
+  (`UTable`, `UForm`, `UModal` e demais), todos os componentes Vue previstos, suas
+  responsabilidades, arquivos, componentes de origem e regra de reuso. A página
+  apenas compõe esses componentes.
 - Quando não houver interface, declare `Interface para pessoas: Não` e explique
   por que a entrega não será usada por uma pessoa em uma tela.
 - Mantenha a seção técnica concreta o bastante para permitir tarefas com caminhos de arquivo, sem confundir escolha interna com resultado do usuário.

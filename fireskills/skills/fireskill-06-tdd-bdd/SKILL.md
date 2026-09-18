@@ -32,18 +32,19 @@ node .agents/skills/fireskill-setup/scripts/check_database_safety.mjs \
   --project <raiz> --command "<comando-de-teste>"
 ```
 
-Em Laravel, a conferência exige `.env.testing`, `APP_ENV=testing` e um banco
-explicitamente diferente do banco de desenvolvimento registrado no `.env`.
-Não execute nenhum teste enquanto o resultado for `PENDING`. Corrija o ambiente
+Para testes que acessem Postgres, a conferência exige um banco de teste
+explicitamente diferente do configurado nos secrets do stage (`DATABASE_*`); os
+testes Vitest atuais não acessam o banco. Não execute nenhum teste enquanto o resultado for `PENDING`. Corrija o ambiente
 de testes, repita a conferência e prossiga somente depois de `SAFE`.
 
 Trate `IGNORED` como descarte obrigatório do comando. Não execute, não adapte
 com `--force` e não peça autorização para rodar `migrate:fresh`,
 `migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`,
-`schema:drop`, `prisma migrate reset`, `DROP DATABASE`, `DROP SCHEMA`,
+`schema:drop`, `prisma migrate reset`, `drizzle-kit push --force`,
+`drizzle-kit drop`, `DROP DATABASE`, `DROP SCHEMA`,
 `DROP TABLE`, `TRUNCATE` ou equivalentes. Não use `RefreshDatabase` nem
-`DatabaseMigrations`; em Laravel, prefira `DatabaseTransactions` e factories
-que criem somente os registros usados pelo caso.
+`DatabaseMigrations`; em testes com banco, prefira transação revertida e
+fixtures que criem somente os registros usados pelo caso.
 
 ## Orquestrar a conversa
 
@@ -75,15 +76,15 @@ Se o usuário não indicar o modo, use `prepare` quando a seção 14 ainda não 
    use `Status: Planned` ou `Implementing`.
 3. Selecione uma fatia vertical pequena: um `AC` Gherkin e seus `FR/NFR`.
 4. Resolva o runner de testes pela stack antes de escrever testes:
-   - projeto PHP (`composer.json` ou `artisan`), inclusive PHP + Node: use Pest;
-   - projeto Node sem PHP: pergunte ao usuário qual runner adotar antes de
-     instalar ou configurar; recomende Vitest por padrão;
+   - Nuxfire (Node/Bun): use Vitest (`bun run test`; agregador `vitest.config.mts`
+     e um `vitest.config.ts` por layer);
    - outra stack: preserve o runner de testes existente ou pergunte quando não houver
      decisão reproduzível.
 5. Confira o ambiente e o comando com `check_database_safety.mjs`. Se o estado
    não for `SAFE`, não execute teste algum e mantenha a etapa pendente.
-6. Em Node, considere a decisão materializada quando `package.json` expuser o
-   script `test:tdd`; não escolha nem instale dependência silenciosamente.
+6. Considere a decisão materializada quando `package.json` expuser o script
+   `test:tdd` (hoje ausente no Nuxfire: criar como `vitest run`); não instale
+   dependência silenciosamente.
 7. Leia `references/test-levels.md` para escolher o nível mais baixo que ainda prova o comportamento.
 
 ## Usar o BDD para escrever TDD
@@ -92,16 +93,13 @@ Se o usuário não indicar o modo, use `prepare` quando a seção 14 ainda não 
   seu significado.
 - Não crie, copie nem execute arquivos `.feature` ou step definitions. Os termos
   Given/When/Then permanecem apenas na `spec.md`.
-- Em PHP, escreva o teste TDD com Pest em `tests/Feature/` ou `tests/Unit/`, no
-  menor nível que prova o comportamento. Marque cada caso executável,
-  imediatamente junto à sua definição, com:
+- Escreva o teste TDD com Vitest ao lado do código (`shared/**/*.test.ts` ou
+  `server/**/*.test.ts` da layer), no menor nível que prova o comportamento.
+  Marque cada caso executável, imediatamente junto à sua definição, com:
 
-```php
+```ts
 // SPECSFY: US-001 FR-001 AC-001
 ```
-
-- Em Node, depois da resposta do usuário, escreva o teste TDD no runner
-  escolhido e use `SPECSFY: US-001 FR-001 AC-001`.
 - Materialize no mínimo três casos TDD distintos para a feature inteira e para
   cada `US`, `FR` e `NFR`: caminho feliz, regra/variação crítica e falha ou
   limite material. Um único marcador `SPECSFY:` compartilhado pelo arquivo

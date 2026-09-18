@@ -140,9 +140,9 @@ O contrato do catálogo exige as quatorze skills base, `fireskill-setup`,
 as três `fireskill-aux-*`; também valida cada `fireskill-specialist-*` instalada,
 sem impor um total máximo de especialistas.
 O Gherkin BDD é referência exclusiva da `spec.md`: o enforcement nunca executa
-`.feature`. Ele executa os testes derivados com Pest em projetos PHP, inclusive
-PHP + Node. Em projeto Node sem PHP, exige um script `test:tdd`; quando ausente,
-falha orientando a skill a perguntar ao usuário e sugerir Vitest.
+`.feature`. Ele executa os testes derivados com Vitest por meio do script
+`test:tdd` do projeto; quando ausente, falha orientando a criar o script
+(`vitest run`).
 
 ## Especialistas sob demanda
 

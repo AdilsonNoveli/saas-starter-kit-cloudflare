@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy - Especialista - Arquitetura de software"
+  display_name: "Fireskill - Especialista - Arquitetura de software"
   short_description: "Boundaries, decisões e evolução arquitetural"
-  default_prompt: "Use $specsfy-specialist-software-architecture para orientar esta tarefa com padrões e validação especializados."
+  default_prompt: "Use $fireskill-specialist-software-architecture para orientar esta tarefa com padrões e validação especializados."

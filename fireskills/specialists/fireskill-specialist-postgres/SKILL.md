@@ -1,6 +1,6 @@
 ---
 name: fireskill-specialist-postgres
-description: Modelar, consultar, migrar e operar PostgreSQL com integridade, índices, concorrência, segurança, performance e recuperação. Use para schemas, SQL, EXPLAIN, locks, isolation levels, migrations, roles, backup ou tuning em Postgres; não use para outro banco relacional sem confirmar a semântica específica, e não use para RLS/Auth/Realtime de Supabase — combine com `fireskill-specialist-supabase` nesse caso.
+description: Modelar, consultar, migrar e operar PostgreSQL com integridade, índices, concorrência, segurança, performance e recuperação. Use para schemas, SQL, EXPLAIN, locks, isolation levels, migrations, roles, backup ou tuning em Postgres; não use para outro banco relacional sem confirmar a semântica específica, e combine com `fireskill-specialist-drizzle` para schema, migrações e queries via Drizzle no Nuxfire.
 ---
 
 # PostgreSQL
@@ -10,13 +10,10 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
 - Acionar para desenhar schema, escrever ou revisar SQL, escolher índice,
   analisar plano (`EXPLAIN`), diagnosticar lock/deadlock, planejar migration
   ou dimensionar backup/restore em Postgres.
-- Acionar também quando um ORM (Eloquent, Prisma, Drizzle) gerar SQL
+- Acionar também quando um ORM (Drizzle) gerar SQL
   ineficiente e a causa raiz for modelagem ou índice, não a API do ORM.
-- Não acionar para decisões específicas de Supabase (RLS, Auth, Realtime,
-  Edge Functions) — usar `$fireskill-specialist-supabase`, que aplica Postgres
-  por baixo com essas camadas adicionais.
-- Combinar com `$fireskill-specialist-laravel` quando o ponto de entrada for
-  Eloquent e com `$fireskill-specialist-performance-engineering` quando o
+- Combinar com `$fireskill-specialist-drizzle` quando o ponto de entrada for o
+  schema/queries Drizzle e com `$fireskill-specialist-performance-engineering` quando o
   gargalo abranger além do banco (aplicação, rede, cache).
 
 ## Fluxo
@@ -105,20 +102,10 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
   antes dos detalhes específicos do Postgres.
 - `$fireskill-specialist-application-security` define ameaça, autorização e
   isolamento que constraints, roles e RLS materializam no banco.
-- `$fireskill-specialist-supabase` quando o Postgres for gerenciado por
-  Supabase (RLS, Auth, Realtime, pooling específico).
-- `$fireskill-specialist-laravel` quando o ponto de entrada for Eloquent e a
-  correção precisar refletir em migration/model.
 - `$fireskill-specialist-performance-engineering` quando o gargalo não se
   resolver só com índice/plano (rede, cache, aplicação).
 - `$fireskill-specialist-observability` para métricas e alertas de banco em
   produção (conexões, locks, replicação, lag).
-- `$fireskill-specialist-redis` quando parte do estado consultado estiver em
-  cache fora do banco — o Postgres continua sendo a fonte de verdade que o
-  Redis nunca substitui.
-- `$fireskill-specialist-docker` para empacotar e operar o servidor Postgres
-  em container (imagem oficial, volume de dados, healthcheck) — decisão de
-  schema, índice e plano continuam aqui.
 
 Leia [references/standards.md](references/standards.md) para tipos, índices,
 concorrência, segurança, migrations, operação e fontes oficiais.

@@ -1,16 +1,19 @@
 ---
 name: fireskill-specialist-versioning
-description: Gerenciar a versão do sistema pelo SEMVER da raiz e validar tags Docker. Use como apoio focal da `$fireskill-specialist-deploy`.
+description: Gerenciar a versão do sistema pelo SEMVER da raiz e validar tags de release. Use como apoio focal de release e deploy, junto de `$fireskill-specialist-delivery-engineering` e `$fireskill-specialist-sst`.
 ---
 
 # Versionamento
 
 ## Quando usar
 
-- Acionar pela `$fireskill-specialist-deploy` ao preparar release, imagem
-  destinada a deploy, tag Git ou promoção entre ambientes.
+- Acionar ao preparar release, tag Git ou promoção entre stages; no Nuxfire o
+  deploy é `bun run deploy -- --stage <stage>` (`$fireskill-specialist-sst`) e
+  **não há imagem OCI/Docker**: os comandos `docker-tag`/`verify-docker-tag`
+  abaixo só se aplicam se o time passar a publicar imagens.
 - Em pedido completo de release ou deploy, devolver a coordenação para
-  `$fireskill-specialist-deploy` depois de preparar e conferir a versão.
+  `$fireskill-specialist-delivery-engineering` depois de preparar e conferir a
+  versão.
 - Não publicar imagem, tag, GitHub Release nem executar deploy sem autorização
   explícita. A preparação local pode criar ou atualizar `SEMVER`.
 
@@ -80,16 +83,10 @@ skills do agente.
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-deploy` é a única responsável por coordenar o fluxo
-  completo de release ou deploy.
-- `$fireskill-specialist-docker` constrói e publica a imagem identificada pela
-  versão preparada aqui.
-- `$fireskill-specialist-docker-swarm` aplica no cluster a imagem e o digest
-  conferidos por esta skill.
-- `$fireskill-specialist-ansible` transporta os manifestos versionados e executa
-  o preflight nos hosts.
 - `$fireskill-specialist-delivery-engineering` coordena testes, promoção, tag e
   GitHub Release.
+- `$fireskill-specialist-sst` executa o deploy do stage com a versão preparada
+  aqui.
 
 Leia [references/standards.md](references/standards.md) para a correspondência
 entre SemVer, Git, imagens OCI e a sequência de publicação.

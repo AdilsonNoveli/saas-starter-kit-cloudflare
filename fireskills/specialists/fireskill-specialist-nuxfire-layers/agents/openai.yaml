@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Especialista - Nuxfire Layers"
+  short_description: "Criar, registrar e compor Nuxt Layers no monorepo Nuxfire"
+  default_prompt: "Use $fireskill-specialist-nuxfire-layers para orientar esta tarefa com padrões e validação especializados."

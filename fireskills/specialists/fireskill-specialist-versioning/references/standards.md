@@ -43,4 +43,4 @@ Qualquer ação remota exige autorização explícita.
 
 - [Semantic Versioning 2.0.0](https://semver.org/)
 - [Open Container Initiative: image annotations](https://github.com/opencontainers/image-spec/blob/main/annotations.md)
-- [Docker: tags and digests](https://docs.docker.com/dhi/core-concepts/digests/)
+- [Docker: tags and digests](https://docs.docker.com/dhi/core-concepts/digests/) (só se o time passar a publicar imagens OCI)

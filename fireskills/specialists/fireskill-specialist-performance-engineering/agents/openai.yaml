@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy - Especialista - Engenharia de desempenho"
+  display_name: "Fireskill - Especialista - Engenharia de desempenho"
   short_description: "Performance medida, explicada e protegida"
-  default_prompt: "Use $specsfy-specialist-performance-engineering para orientar esta tarefa com padrões e validação especializados."
+  default_prompt: "Use $fireskill-specialist-performance-engineering para orientar esta tarefa com padrões e validação especializados."

@@ -37,7 +37,7 @@ documento registra somente finalidade, política e restrições. Na ausência de
 manifest, comandos explícitos revelam dependências efêmeras.
 
 Nos projetos consumidores, `.specsfy/PACKAGES.md` é a projeção reconstruível
-dessas fontes. `$specsfy-documentator` lista dependências npm e Composer
+dessas fontes. `$fireskill-documentator` lista dependências npm e Composer
 diretas e transitivas, acrescenta a descrição local disponível e declara a
 ausência de finalidade quando nenhum metadado confiável existir. Esse
 inventário não redefine a política nem substitui manifests e lockfiles.
@@ -74,7 +74,7 @@ aplicativo, não um catálogo de pacotes obrigatórios para usar o Specsfy.
 ## Pacotes Laravel no projeto consumidor
 
 Quando uma tarefa receber uma URL GitHub de pacote Laravel, o especialista
-`specsfy-specialist-laravel-package-manager` lê a documentação e compara o
+`fireskill-specialist-laravel-package-manager` lê a documentação e compara o
 nome e a versão com `composer.json`, `composer.lock`, `vendor/` e as fontes de
 contexto do projeto. Pacote já instalado é reutilizado; pacote novo só entra
 após autorização para executar `composer require`.

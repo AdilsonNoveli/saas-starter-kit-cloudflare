@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Especialista - Nuxt"
+  short_description: "Nuxt 4: páginas, middleware, plugins, SSR e Nitro no Nuxfire"
+  default_prompt: "Use $fireskill-specialist-nuxt para orientar esta tarefa com padrões e validação especializados."

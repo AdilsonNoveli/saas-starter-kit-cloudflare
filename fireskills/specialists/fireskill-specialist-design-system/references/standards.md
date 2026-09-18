@@ -12,13 +12,13 @@ composições de CRUD. Se o arquivo não existir, use
 
 | Superfície | Composição mínima |
 | --- | --- |
-| lista de CRUD | `PageHeader` compartilhado + resumo útil + `DataGrid` em largura total, com `ID` e ações por linha |
+| lista de CRUD | `PageHeader` compartilhado + resumo útil + `UTable` em largura total, com `ID` e ações por linha |
 | detalhe | `PageHeader` + `DetailLists` + status e próxima ação |
 | criar e editar | `PageHeader` + seções com contexto e campos em duas colunas |
 | dashboard | período ou escopo + filtros + `KPI` + tendência ou distribuição + detalhe |
 | toda tela | `Breadcrumb` com equipe, módulo e tela atual |
 
-Em Laravel, reutilize o `Breadcrumb` ou `Breadcrumbs` já presente no layout.
+Reutilize o breadcrumb já presente no layout; se não houver, use `UBreadcrumb` do `@nuxt/ui`.
 
 Todas as telas CRUD reutilizam o mesmo `PageHeader`, configurado por props ou
 configuração, sem duplicar markup. A linha da listagem é link para o detalhe e

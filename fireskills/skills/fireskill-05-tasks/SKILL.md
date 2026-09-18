@@ -20,12 +20,12 @@ Antes de formular qualquer pergunta, leia e aplique o
 
 ## Proteção do banco no plano
 
-Em projeto Laravel, execute
+Execute
 `.agents/skills/fireskill-setup/scripts/check_database_safety.mjs --project
-<raiz>` antes de
-planejar ou liberar qualquer tarefa `[TEST]`. O plano precisa manter
-`.env.testing`, `APP_ENV=testing` e um banco de teste explicitamente diferente
-do banco do `.env`.
+<raiz>` antes de planejar ou liberar qualquer tarefa `[TEST]` que acesse
+Postgres. O plano precisa manter um banco de teste explicitamente diferente do
+configurado nos secrets do stage (`DATABASE_*`); os testes Vitest atuais não
+acessam o banco.
 
 Enquanto o resultado for `PENDING`, nenhuma tarefa de teste fica pronta e a
 skill não chama o runner. Quando o resultado for `IGNORED`, descarte o comando
@@ -58,9 +58,9 @@ exigindo autorização específica.
    `Planned` ou `Implementing`. Aceite os dois últimos somente para
    replanejamento automático de uma pendência detectada em etapa posterior.
 2. Execute a validação da especificação quando o gate ainda não estiver comprovado.
-3. Inspecione o repositório para usar stack, comandos e caminhos reais. Em PHP,
-   use Pest para TDD; em Node sem PHP, pergunte qual runner adotar e recomende
-   Vitest antes de gerar caminhos ou comandos.
+3. Inspecione o repositório para usar stack, comandos e caminhos reais. No
+   Nuxfire o runner é o Vitest (`bun run test`); use os caminhos reais de
+   `layers/*/` e `apps/*/` antes de gerar caminhos ou comandos.
 4. Execute o monitor antes de planejar:
 
 ```bash
@@ -97,12 +97,12 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
   API. Inclua testes de comportamento da interface para navegação, envio,
   validação, recuperação de erro e o padrão de abertura escolhido, como painel
   lateral ou modal. Use somente os componentes, convenções e runners da stack
-  de interface registrada; cada tarefa aponta os blocos React, componentes
-  shadcn/ui e ReUI ou rotas reais. Inclua uma tarefa para atualizar
+  de interface registrada; cada tarefa aponta os componentes Vue, componentes
+  `@nuxt/ui` ou rotas reais. Inclua uma tarefa para atualizar
   `INTERFACE.md` com finalidade, arquivo, API, estados, consumidores e regra
   de reaproveitamento de todos os blocos criados ou alterados.
-  Em projetos React, cada tarefa de tela deve registrar no `PREP` o uso de
-  `$fireskill-specialist-react-ui-components` antes da implementação. A skill
+  Em toda tarefa de tela (`.vue` com componentes `U*`), registre no `PREP` o uso
+  de `$fireskill-specialist-nuxt-ui` antes da implementação. A skill
   orienta a busca, o reaproveitamento e a adaptação dos componentes reais do
   projeto. Se ela não estiver instalada, retorne ao `$fireskill-setup` para
   instalar o especialista detectado antes de liberar a tarefa `[CODE]`.
@@ -115,8 +115,9 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
   e `NFR`.
 - Nunca crie tarefa para arquivo `.feature` ou step definition e nunca execute
   o Gherkin da spec.
-- Em PHP, a tarefa TDD aponta para teste Pest e exige marcador `SPECSFY`; em
-  Node, usa o runner confirmado pelo usuário e o script `test:tdd`.
+- A tarefa TDD aponta para teste Vitest e exige marcador `SPECSFY`, usando o
+  script `test:tdd` do projeto (não existe hoje no `package.json` da raiz: criar
+  como `vitest run` quando a primeira spec chegar a esta etapa).
 - Faça cada tarefa `[CODE]` depender do predecessor TDD da mesma fatia com RED.
 - Sempre que uma tarefa criar ou alterar schema, tabela, coluna, índice,
   relação ou model persistente, crie uma tarefa `[CODE] [MIGRATION]` separada.
@@ -139,8 +140,8 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
   `.specsfy/RULES.md`.
 - Dê a cada tarefa um resultado único, caminho exato e critério verificável.
 - Use a tag `[MIGRATION]` somente junto de `[CODE]` ou `[OPS]`. O caminho deve
-  ficar em `database/migrations/`, `migrations/`, `prisma/migrations/` ou
-  `supabase/migrations/`, conforme a stack encontrada.
+  ficar em `apps/functions/src/database/migrations/` (gerada por
+  `drizzle-kit generate`), conforme `$fireskill-specialist-drizzle`.
 - Uma leitura, consulta ou uso de tabela existente não exige `[MIGRATION]` por
   si só. A tag é obrigatória quando o plano cria ou altera a estrutura.
 - Anexe a cada tarefa, exatamente nesta ordem, os itens `PREP`, `EXECUTE`,
@@ -165,8 +166,8 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
 Formato canônico:
 
 ```markdown
-- [ ] T001 [TEST] [TDD] [US-001] Derivar teste Pest do BDD da spec em tests/Feature/AuthTest.php — Refs: FR-002, AC-003 — Depends: none
-- [ ] T002 [CODE] [US-001] Implementar validação em app/Services/AuthService.php — Refs: FR-002, AC-003 — Depends: T001
+- [ ] T001 [TEST] [TDD] [US-001] Derivar teste Vitest do BDD da spec em layers/teams/shared/utils/abilities.test.ts — Refs: FR-002, AC-003 — Depends: none
+- [ ] T002 [CODE] [US-001] Implementar validação em layers/teams/server/trpc/teams.ts — Refs: FR-002, AC-003 — Depends: T001
 ```
 
 Tags permitidas após o ID: `[P]`, `[TEST]`, `[TDD]`, `[CODE]`,

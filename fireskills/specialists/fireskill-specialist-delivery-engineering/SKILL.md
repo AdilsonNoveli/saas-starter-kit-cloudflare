@@ -11,8 +11,8 @@ description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrat
   release, promoção entre ambientes ou plano de rollout/rollback.
 - Acionar também para escolher entre rolling, blue-green, canary ou feature
   flag diante de uma mudança específica.
-- Não acionar para a implantação de baixo nível dentro de um cluster Swarm
-  (use `$fireskill-specialist-docker-swarm`) nem para decidir qual sinal prova
+- Não acionar para a definição dos recursos de infraestrutura e o deploy em si
+  (use `$fireskill-specialist-sst`) nem para decidir qual sinal prova
   que o rollout está saudável (use `$fireskill-specialist-observability`) —
   aqui o foco é o desenho do pipeline e da estratégia de promoção.
 - Combinar com `$fireskill-specialist-application-security` quando o pipeline
@@ -20,9 +20,10 @@ description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrat
 
 ## Fluxo
 
-1. Em release ou deploy completo, trabalhar sob
-   `$fireskill-specialist-deploy` e usar o `SEMVER` preparado pela
-   `$fireskill-specialist-versioning` para artefato, changelog e tag.
+1. Em release ou deploy completo, executar o deploy pelo
+   `$fireskill-specialist-sst` (`bun run deploy -- --stage <stage>`) e usar o
+   `SEMVER` preparado pela `$fireskill-specialist-versioning` para changelog e
+   tag.
 1. Mapear commit, artefato, ambientes, aprovações necessárias e owner de cada
    promoção antes de desenhar o pipeline.
 1. Tornar build e testes reproduzíveis a partir de lockfiles versionados —
@@ -63,11 +64,12 @@ description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrat
 
 ## Antipadrões
 
-- Pipeline que builda a imagem de novo em cada ambiente (`build` no job de
+- Pipeline que builda o artefato de novo em cada ambiente (`build` no job de
   staging e outro `build` no job de produção): o artefato testado em
-  staging não é garantidamente o mesmo que vai para produção, mesmo com o
-  mesmo Dockerfile — dependências resolvidas "latest" ou cache diferente
-  produzem binários diferentes.
+  staging não é garantidamente o mesmo que vai para produção — dependências
+  resolvidas "latest" ou cache diferente produzem bundles diferentes. (No
+  Nuxfire cada stage roda seu próprio `sst deploy`/build; sem lockfile e cache
+  limpo por stage, a mesma regra vale.)
 - Feature flag sem owner nem expiração: acumula flags mortas que ninguém
   lembra o propósito, aumentando a superfície de combinações não testadas.
 - Migration de schema aplicada no mesmo deploy que remove a coluna antiga:
@@ -96,19 +98,12 @@ description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrat
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-deploy` coordena o release e o deploy completos; esta
-  skill cuida do pipeline e das promoções.
 - `$fireskill-specialist-versioning` prepara `SEMVER` e mantém o número alinhado
   entre artefato, changelog, tag e promoção.
-- `$fireskill-specialist-ansible` aplica configuração idempotente em hosts;
-  esta skill governa promoção, aprovação e proveniência da entrega.
 - `$fireskill-specialist-software-architecture` define boundaries e restrições
   estruturais que o pipeline materializa entre ambientes.
 - `$fireskill-specialist-observability` para os sinais objetivos (erro,
   latência, saturação) que decidem continuar, pausar ou reverter um rollout.
-- `$fireskill-specialist-docker-swarm` quando o alvo do deploy é um cluster
-  Swarm — esta skill desenha o pipeline até o ponto de promoção, a outra
-  executa o rollout dentro do cluster.
 - `$fireskill-specialist-application-security` para hardening de credenciais de
   pipeline, supply chain e assinatura de artefato.
 - `$fireskill-specialist-performance-engineering` quando o rollout precisa de

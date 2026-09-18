@@ -11,10 +11,10 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
   classe utilitária, tema, variante, responsividade ou dark mode.
 - Acionar também para decidir se um padrão visual repetido deve virar token,
   `@apply` local ou componente extraído.
-- Não acionar para a escolha da biblioteca de componentes em si (Radix,
-  shadcn/ui); usar `$fireskill-specialist-shadcn-ui` ou
-  `$fireskill-specialist-react-ui-components` para isso e voltar aqui para o
-  sistema de tokens e classes que os sustenta.
+- Não acionar para a escolha e o uso dos componentes prontos em si (`@nuxt/ui`,
+  Reka UI); usar `$fireskill-specialist-nuxt-ui` para isso e voltar aqui para o
+  sistema de tokens e classes que os sustenta. No Nuxfire os tokens vivem em
+  `packages/tokens/theme.css` (`@theme static`), não em `tailwind.config`.
 - Combinar com `$fireskill-specialist-web-accessibility` para contraste, zoom e
   `prefers-reduced-motion`.
 
@@ -84,8 +84,7 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
   desde a primeira versão.
 - Confundir a responsabilidade desta skill com a escolha de biblioteca de
   componentes prontos — Tailwind é a camada de utilitários/tema; a escolha
-  de "qual Data Table usar" pertence a
-  `$fireskill-specialist-shadcn-ui`/`$fireskill-specialist-react-ui-components`.
+  de "qual tabela usar" pertence a `$fireskill-specialist-nuxt-ui`.
 
 ## Validação
 
@@ -105,19 +104,15 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-reui` para composições React e Tailwind do catálogo
-  gratuito.
-- `$fireskill-specialist-shadcn-ui` para o sistema de componentes construído
-  sobre Tailwind + Radix; este especialista cobre o token/utilitário que o
-  sustenta.
-- `$fireskill-specialist-react`, `$fireskill-specialist-nextjs` e
-  `$fireskill-specialist-astro` fornecem o componente/framework onde as classes
-  Tailwind são aplicadas; esta skill não decide estrutura de componente nem
-  fronteira server/client.
-- `$fireskill-specialist-typescript` tipa variantes `cva` quando o projeto
-  expõe props de estilo fortemente tipadas.
-- `$fireskill-specialist-react-ui-components` e `$fireskill-specialist-ui-design`
-  para a escolha e composição visual da página.
+- `$fireskill-specialist-nuxt-ui` para o sistema de componentes construído sobre
+  Tailwind + Reka UI (e o `app.config.ts`/tema do Nuxfire); este especialista
+  cobre o token/utilitário que o sustenta.
+- `$fireskill-specialist-nuxt` fornece o framework onde as classes Tailwind são
+  aplicadas; esta skill não decide estrutura de página nem fronteira SSR/cliente.
+- `$fireskill-specialist-typescript` tipa variantes quando o projeto expõe props
+  de estilo fortemente tipadas.
+- `$fireskill-specialist-ui-design` para a escolha e composição visual da
+  página.
 - `$fireskill-specialist-web-accessibility` para contraste, zoom, reflow e
   `prefers-reduced-motion` em profundidade.
 

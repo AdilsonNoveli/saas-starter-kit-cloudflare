@@ -61,7 +61,7 @@ visual).
   mouse), `active:`, `disabled:`.
 - Estado de dado/aria: `aria-selected:`, `aria-expanded:`,
   `data-[state=open]:` quando o componente expõe atributo de estado (comum
-  em Radix/shadcn).
+  em Reka UI/`@nuxt/ui`).
 - Preferência do usuário: `dark:` (tema), `motion-reduce:`/`motion-safe:`
   (`prefers-reduced-motion`), `contrast-more:` (`prefers-contrast`),
   `forced-colors:` (Windows High Contrast Mode) — tratar como parte do
@@ -73,7 +73,7 @@ visual).
   seletor de baixo nível (ex.: um reset local, uma classe de terceiros que
   não pode receber classes Tailwind diretamente).
 - Não aceitável como estratégia geral de componentização — nesse caso, um
-  componente do framework (React/Vue/Astro) com as classes inline resolve
+  componente do framework (Vue SFC) com as classes inline resolve
   melhor: mantém colocation, permite variantes por prop e não recria uma
   folha de estilo paralela.
 
@@ -82,8 +82,8 @@ visual).
 - `npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify` gera o
   CSS final fora de um framework com build step próprio; inspecionar o
   arquivo gerado para confirmar que nenhuma classe usada ficou ausente.
-- Em projetos com framework (Next.js, Astro, Vite), o build do próprio
-  framework (`next build`, `astro build`, `vite build`) já invoca o
+- Em projetos com framework (Nuxt, Vite), o build do próprio
+  framework (`nuxt build`, `vite build`) já invoca o
   PostCSS/Tailwind configurado — rodar esse build é a validação real, não
   apenas o servidor de desenvolvimento.
 - `npx tailwindcss --help`/documentação do CLI lista as flags de watch e

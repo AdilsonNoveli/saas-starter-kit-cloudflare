@@ -72,17 +72,12 @@ description: Implementar e auditar acessibilidade web com WCAG, HTML semântico,
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-react-ui-components` e
-  `$fireskill-specialist-shadcn-ui` fornecem componentes que esta skill audita
-  por semântica, foco, teclado e nome acessível.
 - `$fireskill-specialist-tailwind-css` implementa contraste, forced colors,
   reflow e reduced motion nos utilitários e tokens observados.
 - `$fireskill-specialist-ui-design` governa hierarquia, tokens e estados visuais
   que precisam satisfazer contraste, reflow e foco.
 - `$fireskill-specialist-ux-design` pesquisa compreensão e sucesso de tarefa,
   inclusive com pessoas que usam tecnologias assistivas.
-- `$fireskill-specialist-react` e `$fireskill-specialist-astro` ou
-  `$fireskill-specialist-nextjs` implementam a correção no framework observado.
 - `$fireskill-specialist-code-review` amplia a revisão para riscos além do recorte
   de acessibilidade.
 

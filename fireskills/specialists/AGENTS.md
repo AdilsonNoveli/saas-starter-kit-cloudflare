@@ -1,42 +1,43 @@
-# Guia do catálogo Specsfy Specialists
+# Guia do catálogo Fireskills Specialists
 
-Este módulo publica skills opcionais. Nenhuma delas integra o método base,
-cria specs, avança gates ou é instalada automaticamente na raiz do monorepo.
+Este módulo publica skills técnicas. Nenhuma delas integra o método base, cria
+specs ou avança gates.
 
 ## Contrato
 
 - Toda pasta usa `fireskill-specialist-<responsabilidade>`.
-- `SKILL.md`, frontmatter, pasta e `agents/openai.yaml` usam o mesmo nome.
-- Todo `SKILL.md` segue [templates/SKILL.template.md](templates/SKILL.template.md)
-  e o padrão de qualidade descrito em [templates/GUIDE.md](templates/GUIDE.md):
-  `Quando usar`, `Fluxo`, `Padrões`, `Antipadrões`, `Validação` e
-  `Skills relacionadas`, todas verificáveis e específicas do domínio.
-- Detalhes extensos ficam em `references/`, a um nível da skill;
-  `references/standards.md` é o mínimo e cresce em arquivos adicionais quando
-  o domínio exigir catálogo, checklist ou matriz de decisão próprios.
+- `SKILL.md` (frontmatter `name`), pasta e `agents/openai.yaml` usam o mesmo
+  nome; `name` do frontmatter é idêntico ao nome da pasta.
+- Todo `SKILL.md` segue as seções `Quando usar`, `Fluxo`, `Padrões` (ou
+  `Regras principais`), `Antipadrões`, `Validação` e `Skills relacionadas`,
+  todas verificáveis e específicas do domínio.
+- Detalhes extensos ficam em `references/`, a um nível da skill. Especialistas da
+  stack Nuxfire trazem um `references/nuxfire-*.md` com **o que existe de fato no
+  código**, cada afirmação com arquivo de evidência, e uma seção "o que NÃO
+  existe".
 - Fontes técnicas externas são oficiais ou padrões primários.
-- Versões são descobertas em manifests e lockfiles do projeto consumidor.
-- Skills relacionadas apontam umas para as outras sem duplicar normas.
-- `catalog.json` é a fonte executável de descoberta e instalação.
+- Versões são descobertas em manifests e lockfiles do projeto, não assumidas.
+- Skills relacionadas apontam umas para as outras sem duplicar normas; toda
+  referência `$fireskill-specialist-<nome>` deve apontar para uma pasta que
+  existe.
+- `catalog.json` é a fonte de descoberta; toda pasta tem entrada e vice-versa.
 
 ## Limites
 
 - Não criar `specs/`, `plan.md`, `tasks.md` ou fonte normativa paralela.
 - Não instalar pacotes, alterar infraestrutura ou executar deploy sem autorização.
-- Não copiar conteúdo, identidade, configuração ou referências de outros catálogos.
-- Não usar uma recomendação genérica contra o estado observado do projeto.
+- Não copiar conteúdo, identidade ou configuração de outros catálogos sem
+  registrar a origem e a licença.
+- Não usar uma recomendação genérica contra o estado observado do projeto: o
+  código do Nuxfire vence a documentação, inclusive esta.
+- Não afirmar o que não foi verificado no código; quando o código contradiz um
+  comentário ou documento, registrar a discrepância.
 
-## Desenvolvimento
+## Ao adicionar ou alterar um especialista
 
-Inicialize novas skills com `init_skill.py`, escreva o contrato em
-`tests/`, observe RED, implemente e valide:
-
-```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  fireskill-specialist-<nome>
-```
-
-Use `python3 -B` para não criar caches. Revise o diff do módulo a partir da raiz Git única.
+1. Leia o código real da área e registre a evidência (arquivo) no
+   `references/nuxfire-*.md`.
+2. Escreva o `SKILL.md` no formato acima e o `agents/openai.yaml`.
+3. Atualize `catalog.json` e `README.md`.
+4. Confira: `name` == pasta, nenhuma referência `$fireskill-*` quebrada, nenhum
+   termo de stack que não existe no Nuxfire.

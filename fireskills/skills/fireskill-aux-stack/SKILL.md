@@ -1,6 +1,6 @@
 ---
 name: fireskill-aux-stack
-description: Monitorar manifests e arquivos estruturais para criar ou atualizar .specsfy/STACK.md de forma aditiva. Use quando o monitor de contexto apontar stack pendente; quando framework, linguagem, runtime, pacote estrutural, ferramenta de teste ou persistência mudar; quando a documentação técnica estiver incompleta; ou após adicionar Laravel, Next.js, Astro ou dependências relevantes. Preserva conteúdo humano existente.
+description: Monitorar manifests e arquivos estruturais para criar ou atualizar .specsfy/STACK.md de forma aditiva. Use quando o monitor de contexto apontar stack pendente; quando framework, linguagem, runtime, pacote estrutural, ferramenta de teste ou persistência mudar; quando a documentação técnica estiver incompleta; ou após adicionar um framework, uma biblioteca estrutural ou dependências relevantes. Preserva conteúdo humano existente.
 ---
 
 # Manter o stack

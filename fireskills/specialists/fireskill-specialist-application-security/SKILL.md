@@ -15,8 +15,11 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 - Não acionar como substituto de revisão de credenciais de pipeline/deploy —
   usar `$fireskill-specialist-delivery-engineering` para isso; aqui o foco é a
   aplicação e seus dados, não a esteira de entrega.
-- Combinar com `$fireskill-specialist-postgres`/`$fireskill-specialist-supabase`
-  quando o risco envolve modelagem de acesso a dado por linha ou tenant.
+- Combinar com `$fireskill-specialist-postgres`, `$fireskill-specialist-trpc` e
+  `$fireskill-specialist-nuxt-authorization` quando o risco envolve acesso a dado
+  por equipe (tenant) ou autorização de procedure.
+- Combinar com `$fireskill-specialist-openauth` para sessão, cookies, MFA e
+  credenciais, e com `$fireskill-specialist-sst` para secrets por stage.
 
 ## Fluxo
 
@@ -99,18 +102,12 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-ansible` e `$fireskill-specialist-docker` implementam
-  hardening de host, container e runtime; esta skill define ameaça, privilégio
-  e controle que a configuração precisa provar.
-- `$fireskill-specialist-laravel`, `$fireskill-specialist-nextjs` e
-  `$fireskill-specialist-shadcn-ui` implementam superfícies de aplicação;
-  autorização, validação server-side e exposição de dados permanecem aqui.
 - `$fireskill-specialist-code-review` aplica a revisão ampla e
   `$fireskill-specialist-observability` registra sinais de abuso sem vazar dados
   sensíveis.
-- `$fireskill-specialist-postgres` e `$fireskill-specialist-supabase` para
-  modelagem de autorização por linha/tenant no nível de dado (RLS,
-  constraints).
+- `$fireskill-specialist-postgres` e `$fireskill-specialist-drizzle` para
+  modelagem de isolamento por tenant no nível de dado (constraints, chaves,
+  filtros por `teamId`).
 - `$fireskill-specialist-delivery-engineering` para hardening de credenciais
   de pipeline, assinatura de artefato e supply chain.
 - `$fireskill-specialist-web-api-design` quando o risco nasce do desenho do

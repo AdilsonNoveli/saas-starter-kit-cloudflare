@@ -27,6 +27,7 @@ const destructiveCommands = [
   /\bsequelize\s+db:drop\b/iu,
   /\btypeorm\s+schema:drop\b/iu,
   /\bdrizzle-kit\s+drop\b/iu,
+  /\bdrizzle-kit\s+push\b[^\n]*--force\b/iu,
   /\bdropDatabase\s*\(/u,
   /\bDROP\s+(?:DATABASE|SCHEMA|TABLE)\b/iu,
   /\bTRUNCATE(?:\s+TABLE)?\b/iu,

@@ -1,6 +1,6 @@
 ---
 name: specsfy-monorepo-documentator
-description: Manter a documentação oficial do próprio projeto Specsfy no monorepo promovaweb/specsfy. Use somente na raiz oficial quando o pedido for documentar o Specsfy, reconciliar mudanças transversais, revisar docs/develop/context/ ou atualizar guias em docs/user/. Não use em projetos consumidores; para reconstruir a documentação de uma aplicação, use specsfy-documentator.
+description: Manter a documentação oficial do próprio projeto Specsfy no monorepo promovaweb/specsfy. Use somente na raiz oficial quando o pedido for documentar o Specsfy, reconciliar mudanças transversais, revisar docs/develop/context/ ou atualizar guias em docs/user/. Não use em projetos consumidores; para reconstruir a documentação de uma aplicação, use fireskill-documentator.
 ---
 
 # Documentar o monorepo Specsfy
@@ -53,7 +53,7 @@ python3 -B \
 
 Esta skill documenta a metodologia, a arquitetura do monorepo e seus guias
 oficiais. Para `<projeto>/docs/` de uma aplicação consumidora, carregue
-`$specsfy-documentator`.
+`$fireskill-documentator`.
 
 ## Exclusividade local
 

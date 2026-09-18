@@ -1,6 +1,6 @@
 ---
 name: fireskill-documentator
-description: Construir a documentação técnica em docs/ e o inventário npm/Composer em .specsfy/PACKAGES.md. Use ao documentar sistemas ou após implementações.
+description: Construir a documentação técnica em docs/ e o inventário de pacotes npm/Bun em .specsfy/PACKAGES.md. Use ao documentar sistemas ou após implementações.
 ---
 
 # Documentar o sistema
@@ -53,7 +53,7 @@ Manter em `docs/`:
 - banco e entidades com `erDiagram`;
 - fluxos com `flowchart` e `sequenceDiagram`;
 - guia e resumo dos testes;
-- frontend, views, React e Tailwind;
+- frontend, páginas, componentes Vue, `@nuxt/ui` e Tailwind;
 - bibliotecas e pacotes nativos, de framework, integrados e terceiros, com
   versão, fonte e referência GitHub;
 - integrações e variáveis de configuração sem valores sensíveis;
@@ -61,15 +61,15 @@ Manter em `docs/`:
 
 Manter em `.specsfy/PACKAGES.md`:
 
-- todos os pacotes npm e Composer encontrados nos manifests e lockfiles do
+- todos os pacotes npm (Bun workspaces) encontrados nos manifests e lockfiles do
   projeto, inclusive dependências transitivas registradas localmente;
 - gerenciador, escopo, nome, versão, finalidade curta e fonte de cada pacote;
 - descrição declarada no lockfile ou pacote instalado quando existir;
 - aviso explícito quando os metadados locais não comprovarem a finalidade.
 
-Para Laravel, mapear rotas, controllers, models, services, jobs, policies,
-Blade, migrations e Pest/PHPUnit. Para Node, Next.js, React ou Astro, mapear
-páginas, rotas de API, componentes, módulos, scripts e Vitest/Jest/Node Test.
+Para o Nuxfire (Nuxt/Vue), mapear páginas, layouts, middleware, rotas de servidor
+(`server/api`), routers tRPC, layers (`layers/*`), schema e migrações Drizzle,
+Workers (`apps/functions`), recursos SST (`infra/*.ts`), scripts e Vitest.
 
 ## Limites
 

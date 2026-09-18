@@ -64,10 +64,10 @@ campo, ausência de permissão e falha de carregamento.
 - Projetar onboarding como caminho para valor, não tour obrigatório.
 - Não usar dark patterns, urgência artificial ou consentimento ambíguo.
 - Usar a hierarquia de dados e linguagem do produto para dar personalidade à
-  experiência, mantendo `PageHeader`, `DataGrid`, `DetailLists` e formulários
+  experiência, mantendo `PageHeader`, `UTable`, `DetailLists` e formulários
   em seções de duas colunas responsivas nos defaults do sistema.
 - Manter `Breadcrumb` em todas as telas, com a equipe ativa, o módulo e a tela
-  atual. Em Laravel, reaproveitar o componente que o shell já renderiza.
+  atual. Reaproveitar o componente que o shell já renderiza.
 
 ## Antipadrões
 
@@ -97,8 +97,8 @@ campo, ausência de permissão e falha de carregamento.
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-reui` para a composição React depois de validar jornada
-  e tarefas.
+- `$fireskill-specialist-nuxt-ui` para a composição com `@nuxt/ui` depois de
+  validar jornada e tarefas.
 - `$fireskill-specialist-interface-experience` para organizar telas, ações e
   estados da interface durante a descoberta.
 - `$fireskill-specialist-ui-design` materializa hierarquia visual e estados

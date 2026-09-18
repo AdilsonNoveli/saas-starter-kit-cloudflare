@@ -10,13 +10,13 @@ interação do setup.
 As regras macro de interface ficam em `DESIGNSYSTEM.MD`, na raiz do projeto, e
 seguem um ciclo próprio com a skill especialista de design system.
 
-Execute `$specsfy-setup` depois de instalar o framework. Depois disso, o
+Execute `$fireskill-setup` depois de instalar o framework. Depois disso, o
 framework a executa obrigatoriamente antes de iniciar cada skill, inclusive em
 transições automáticas, para verificar e reconciliar os contextos iniciais e os
 blocos reservados de agentes. Na mesma conversa, a raiz confirmada é
 reaproveitada sem perguntar de novo. A skill detecta Laravel, Next.js e Astro
 pelos manifests e sugere o modelo correspondente.
-`$specsfy-documentator` acrescenta e atualiza `PACKAGES.md`. Juntas, as skills
+`$fireskill-documentator` acrescenta e atualiza `PACKAGES.md`. Juntas, as skills
 mantêm esta estrutura:
 
 ```text
@@ -39,20 +39,20 @@ mantêm esta estrutura:
 O setup também reserva blocos delimitados para as diretrizes do Specsfy em
 `AGENTS.md` e `CLAUDE.md`. Conteúdo fora desses blocos pertence ao usuário e é
 preservado. A referência publicável das diretrizes vive em
-[`specsfy-setup`](../../skills/specsfy-setup/).
+[`fireskill-setup`](../../skills/fireskill-setup/).
 
 | Arquivo | Conteúdo | Skill mantenedora |
 | --- | --- | --- |
-| `PROJECT.md` | finalidade e capacidades | `$specsfy-setup` cria o modelo |
-| `.specsfy/STACK.md` | stack e evidências | `$specsfy-aux-stack` |
-| `.specsfy/RULES.md` | regras explícitas confirmadas | `$specsfy-aux-rules` |
-| `.specsfy/DATABASE.md` | persistência e relações | `$specsfy-aux-database` |
-| `.specsfy/PACKAGES.md` | pacotes npm e Composer com finalidade | `$specsfy-documentator` |
-| `docs/packages/README.md` | índice dos pacotes Composer diretos e links para fichas de uso | `$specsfy-specialist-laravel-package-manager` |
-| `docs/packages/<vendor>-<nome>.md` | instalação, configuração, uso local e testes do pacote | `$specsfy-specialist-laravel-package-manager` |
-| `.specsfy/USER-PROFILE.md` | nível de conhecimento, respostas confirmadas e fontes do setup | `$specsfy-setup` |
-| `.specsfy/SPECKIT.md` | constituição e fontes preservadas do GitHub Spec Kit | `$specsfy-setup` |
-| `DESIGNSYSTEM.MD` | defaults comuns de interface, CRUD, dashboards, estados e exceções | `$specsfy-setup` cria; `$specsfy-specialist-design-system` mantém |
+| `PROJECT.md` | finalidade e capacidades | `$fireskill-setup` cria o modelo |
+| `.specsfy/STACK.md` | stack e evidências | `$fireskill-aux-stack` |
+| `.specsfy/RULES.md` | regras explícitas confirmadas | `$fireskill-aux-rules` |
+| `.specsfy/DATABASE.md` | persistência e relações | `$fireskill-aux-database` |
+| `.specsfy/PACKAGES.md` | pacotes npm e Composer com finalidade | `$fireskill-documentator` |
+| `docs/packages/README.md` | índice dos pacotes Composer diretos e links para fichas de uso | `$fireskill-specialist-laravel-package-manager` |
+| `docs/packages/<vendor>-<nome>.md` | instalação, configuração, uso local e testes do pacote | `$fireskill-specialist-laravel-package-manager` |
+| `.specsfy/USER-PROFILE.md` | nível de conhecimento, respostas confirmadas e fontes do setup | `$fireskill-setup` |
+| `.specsfy/SPECKIT.md` | constituição e fontes preservadas do GitHub Spec Kit | `$fireskill-setup` |
+| `DESIGNSYSTEM.MD` | defaults comuns de interface, CRUD, dashboards, estados e exceções | `$fireskill-setup` cria; `$fireskill-specialist-design-system` mantém |
 
 Os modelos ficam em `.specsfy/templates/Project.md`, `Stack.md`, `Rules.md`,
 `Database.md` e `UserProfile.md`, junto dos demais templates do framework. Para
@@ -81,11 +81,11 @@ podem ficar fora do menu. Quando o destino ou a presença do link estiverem
 abertos, você escolhe em uma pergunta numerada antes da continuação.
 
 Ao terminar a preparação dos contextos e especialistas, o setup executa
-`$specsfy-documentator`. Essa etapa reconstrói a documentação técnica de todo o
+`$fireskill-documentator`. Essa etapa reconstrói a documentação técnica de todo o
 sistema existente em `docs/` e atualiza `.specsfy/PACKAGES.md`, mesmo quando a
 execução não começou por uma alteração recente no código.
 
-Use `$specsfy-data-discovery` antes de implementar quando ainda faltar explicar
+Use `$fireskill-data-discovery` antes de implementar quando ainda faltar explicar
 o que o produto precisa guardar, quem consulta cada informação e quando ela
 deixa de ser necessária. A skill registra as respostas confirmadas em uma
 seção própria de `DATABASE.md`, separada do que o código detectar depois.
@@ -108,10 +108,10 @@ Você pode acrescentar notas próprias fora do bloco
 o bloco delimitado. Se a constituição divergir de `.specsfy/RULES.md`, preserve
 os dois textos e resolva a divergência antes de alterar a feature.
 
-Execute `$specsfy-aux-stack` após alterar frameworks, runtimes, ferramentas
-estruturais ou persistência. Execute `$specsfy-aux-database` sempre que criar ou
+Execute `$fireskill-aux-stack` após alterar frameworks, runtimes, ferramentas
+estruturais ou persistência. Execute `$fireskill-aux-database` sempre que criar ou
 alterar banco, schema, tabela, coleção, model persistente, campo, relação,
-índice ou migration. Use `$specsfy-aux-rules` para formular e acrescentar uma
+índice ou migration. Use `$fireskill-aux-rules` para formular e acrescentar uma
 regra confirmada sem duplicar ou apagar regras anteriores.
 
 ## Monitoramento durante mudanças
@@ -121,18 +121,18 @@ arquivos staged, unstaged e untracked do Git para descobrir qual documento
 precisa ser revisto, mas não permanece como daemon em segundo plano:
 
 ```bash
-node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
+node .agents/skills/fireskill-setup/scripts/monitor_context.mjs \
   --project . --check
 ```
 
 | Sinal observado | Obrigação |
 | --- | --- |
-| manifest, lockfile ou configuração | `$specsfy-aux-stack` revisa `STACK.md` |
-| manifest ou lockfile npm/Composer | `$specsfy-documentator` reconstrói `PACKAGES.md` e `docs/` |
-| schema, model ou migration | `$specsfy-aux-database` revisa `DATABASE.md` |
+| manifest, lockfile ou configuração | `$fireskill-aux-stack` revisa `STACK.md` |
+| manifest ou lockfile npm/Composer | `$fireskill-documentator` reconstrói `PACKAGES.md` e `docs/` |
+| schema, model ou migration | `$fireskill-aux-database` revisa `DATABASE.md` |
 | código da aplicação | revisar `PROJECT.md` |
-| aplicação ou persistência | `$specsfy-documentator` reconstrói `docs/` e `PACKAGES.md` |
-| instrução ou convenção | `$specsfy-aux-rules` revisa `RULES.md` |
+| aplicação ou persistência | `$fireskill-documentator` reconstrói `docs/` e `PACKAGES.md` |
+| instrução ou convenção | `$fireskill-aux-rules` revisa `RULES.md` |
 
 `PENDING` impede a conclusão da tarefa e do Delivery Gate. Quando uma mudança
 de aplicação não altera história, finalidade, capacidades ou limites, registre

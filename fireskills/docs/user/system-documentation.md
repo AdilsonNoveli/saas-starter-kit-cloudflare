@@ -1,6 +1,6 @@
 # Documentação técnica do sistema
 
-`$specsfy-documentator` reconstrói a visão técnica de uma aplicação em
+`$fireskill-documentator` reconstrói a visão técnica de uma aplicação em
 `<projeto>/docs/` e o inventário de dependências em
 `<projeto>/.specsfy/PACKAGES.md`. Esses arquivos explicam o código e os pacotes
 do projeto consumidor e não se confundem com a documentação oficial da
@@ -35,9 +35,9 @@ mas não a apresenta como escolha humana confirmada. Escolhas explícitas do
 projeto continuam em PROJECT.md, RULES.md, na spec aplicável ou em um ADR,
 conforme o alcance da escolha.
 
-Execute `$specsfy-documentator` livremente para documentar um sistema legado ou
+Execute `$fireskill-documentator` livremente para documentar um sistema legado ou
 atualizar sua visão técnica. Depois de cada tarefa de código concluída por
-`$specsfy-07-implement`, a transição para o documentador é obrigatória. A
+`$fireskill-07-implement`, a transição para o documentador é obrigatória. A
 implementação só continua quando `docs/` representar o código atual.
 
 A skill lê o código completo e as fontes que descrevem a aplicação. Isso inclui
@@ -89,7 +89,7 @@ Depois de uma tarefa de código, a implementação chama o documentador. Você
 também pode executá-lo para iniciar a documentação de um sistema legado ou
 reconciliar uma alteração feita fora do fluxo:
 
-    node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs \
+    node .agents/skills/fireskill-documentator/scripts/build_documentation.mjs \
       --project .
 
 Leia primeiro o portal, o arquivo diretamente relacionado à alteração e o
@@ -101,7 +101,7 @@ que a próxima execução voltará a produzir.
 Em seguida, execute o modo de conferência. Ele não escreve arquivos: compara a
 projeção atual com os blocos publicados.
 
-    node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs \
+    node .agents/skills/fireskill-documentator/scripts/build_documentation.mjs \
       --project . --check
 
 O resultado aprovado mostra que a documentação corresponde às fontes atuais. Um
@@ -145,7 +145,7 @@ Depois da reconstrução, a própria skill executa o modo `--check`. O comando
 compara os blocos gerados com o estado atual e falha quando `docs/` está
 desatualizado:
 
-    node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs \
+    node .agents/skills/fireskill-documentator/scripts/build_documentation.mjs \
       --project . --check
 
 O monitor do setup também retorna `PENDING` quando o código da aplicação, a

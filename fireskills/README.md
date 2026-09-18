@@ -55,9 +55,13 @@ Tres gates:
 | `fireskill-update-spec` | Gerencia mudança tardia |
 | `fireskill-progress` | Projeta estado global |
 | `fireskill-interviewer` | Conversa com a spec |
-| `fireskill-aux-stack` | Mantém .fireskills/STACK.md |
-| `fireskill-aux-rules` | Mantém .fireskills/RULES.md |
-| `fireskill-aux-database` | Mantém .fireskills/DATABASE.md |
+| `fireskill-mvp-milestone-interviewer` | Define o MVP por estados demonstráveis |
+| `fireskill-roadmap-milestone-interviewer` | Planeja a evolução após o MVP aceito |
+| `fireskill-milestone-governor` | Mantém relações e a projeção `specs.md` |
+| `fireskill-data-discovery` | Descobre dados que o produto precisa guardar |
+| `fireskill-aux-stack` | Mantém `.specsfy/STACK.md` |
+| `fireskill-aux-rules` | Mantém `.specsfy/RULES.md` |
+| `fireskill-aux-database` | Mantém `.specsfy/DATABASE.md` |
 
 ## Especialistas Técnicos
 
@@ -108,14 +112,19 @@ Especialistas são skills opcionais que adicionam conhecimento técnico profundo
 
 ## Arquivos de Contexto
 
-O fireskills-setup cria e mantém estes arquivos na raiz do projeto:
+O `fireskill-setup` cria e mantém estes arquivos na raiz do projeto:
 
 | Arquivo | Propósito |
 |---|---|
 | `PROJECT.md` | Visão do produto, objetivos, público-alvo |
 | `INTERFACE.md` | Contratos de interface (@nuxt/ui, padrões visuais) |
 | `DESIGNSYSTEM.MD` | Tokens, cores, tipografia, componentes |
-| `.fireskills/STACK.md` | Stack técnica completa (autenticidade é tudo) |
-| `.fireskills/RULES.md` | Regras obrigatórias do projeto |
-| `.fireskills/DATABASE.md` | Schema Drizzle, tabelas, relações |
-| `.fireskills/PACKAGES.md` | Pacotes instalados por workspace |
+| `.specsfy/STACK.md` | Stack técnica completa (autenticidade é tudo) |
+| `.specsfy/RULES.md` | Regras obrigatórias do projeto |
+| `.specsfy/DATABASE.md` | Schema Drizzle, tabelas, relações |
+| `.specsfy/PACKAGES.md` | Pacotes instalados por workspace |
+
+> O diretório de contexto chama-se `.specsfy/` porque é o que os scripts das
+> skills leem e escrevem hoje. Renomeá-lo para `.fireskills/` exige alterar as
+> skills, os scripts e o `Spec.md` de uma vez (pendência de decisão em
+> `PLANO-REFATORACAO.md`).

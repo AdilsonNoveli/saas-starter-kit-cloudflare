@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Especialista - Cloudflare Workers"
+  short_description: "Workers, bindings e regras de I/O do Nuxfire"
+  default_prompt: "Use $fireskill-specialist-cloudflare-workers para orientar esta tarefa com padrões e validação especializados."

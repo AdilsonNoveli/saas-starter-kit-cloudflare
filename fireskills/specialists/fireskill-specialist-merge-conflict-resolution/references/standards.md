@@ -31,7 +31,7 @@ comportamento depois da resolução "limpa":
 - Assinatura de função alterada em um lado e um novo caller adicionado no
   outro lado usando a assinatura antiga.
 - Lockfile resolvido automaticamente (ou por `-X ours`) sem os manifests
-  (`package.json`, `composer.json`) ficarem coerentes com ele.
+  (`package.json`, `bun.lock`) ficarem coerentes com ele.
 - Testes adicionados independentemente por ambos os lados que, juntos,
   agora interagem (mesmo fixture, mesmo dado global, mesma porta).
 

@@ -85,7 +85,7 @@ aquele que reduz a ambiguidade e permite verificar a entrega.
 
 ### Captura mínima e conversa
 
-Ao receber a ideia, `$specsfy-02-backlog` reaproveita a descrição original e
+Ao receber a ideia, `$fireskill-02-backlog` reaproveita a descrição original e
 confirma:
 
 - problema percebido.
@@ -169,13 +169,13 @@ do escopo. “Criar uma tela de login” não cobre esse comportamento.
 input → inbox → backlog → spec
 ```
 
-1. Use `$specsfy-02-backlog` quando a entrada ainda for geral. A skill pesquisa
+1. Use `$fireskill-02-backlog` quando a entrada ainda for geral. A skill pesquisa
    material relacionado, conversa até a captura mínima ficar clara e produz
    `specs/backlog/<NNNN>-<slug>.md`. A mesma skill pode organizar, priorizar e
    refinar o item progressivamente.
 2. A mesma skill apresenta uma pergunta numerada por rodada e
    produz um brief enquanto houver escolhas materiais abertas.
-3. Use `$specsfy-03-specify` somente quando houver intenção explícita de
+3. Use `$fireskill-03-specify` somente quando houver intenção explícita de
    promover o material. A fonte normativa é criada em
    `specs/<estado>/<NNNN>-<slug>/spec.md`.
 4. Depois da promoção, mantenha o backlog como proveniência, marque-o
@@ -228,6 +228,6 @@ spec, mas ainda não autoriza desenvolvimento.
 ## Próximo passo
 
 Quando o item estiver claro o bastante para uma conversa aprofundada, use
-[`specsfy-02-backlog`](skills/specsfy-02-backlog.md). A promoção para
+[`fireskill-02-backlog`](skills/fireskill-02-backlog.md). A promoção para
 `spec.md` só acontece depois de refinamento suficiente e de uma instrução
 explícita para criar a especificação.

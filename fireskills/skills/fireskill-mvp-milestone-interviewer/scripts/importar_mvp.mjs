@@ -15,8 +15,8 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 const skillRoot = dirname(fileURLToPath(import.meta.url));
-const backlogScript = resolve(skillRoot, "../../specsfy-02-backlog/scripts/iniciar_backlog.mjs");
-const specScript = resolve(skillRoot, "../../specsfy-03-specify/scripts/iniciar_spec.mjs");
+const backlogScript = resolve(skillRoot, "../../fireskill-02-backlog/scripts/iniciar_backlog.mjs");
+const specScript = resolve(skillRoot, "../../fireskill-03-specify/scripts/iniciar_spec.mjs");
 
 function fail(message) { throw new Error(message); }
 
@@ -184,7 +184,7 @@ function automaticDefaults(defaults) {
     "",
     ...defaults.map(({ field, value, reason }) => `- **${field}**: ${value} _(base: ${reason})_`),
     "",
-    "Lacunas não preenchidas continuam abertas para `$specsfy-02-backlog`.",
+    "Lacunas não preenchidas continuam abertas para `$fireskill-02-backlog`.",
     "",
   ].join("\n");
 }
@@ -378,7 +378,7 @@ async function main() {
     const backlogRelative = relative(root, backlog);
     await writeFile(backlog, backlogContent.replace(
       "## Referências relacionadas\n\n- Nenhuma referência relevante encontrada.",
-      `${automaticDefaults(extracted.defaults)}${mvpEvidence(theme)}\n## Referências relacionadas\n\n- Fonte de origem: \`MVP.md\`.\n- Milestone de origem: \`specs/milestones/M01.md\`.\n- Refinamento obrigatório: \`$specsfy-02-backlog\` somente para lacunas, ambiguidades ou contradições antes de promoção.`,
+      `${automaticDefaults(extracted.defaults)}${mvpEvidence(theme)}\n## Referências relacionadas\n\n- Fonte de origem: \`MVP.md\`.\n- Milestone de origem: \`specs/milestones/M01.md\`.\n- Refinamento obrigatório: \`$fireskill-02-backlog\` somente para lacunas, ambiguidades ou contradições antes de promoção.`,
     ), "utf8");
     const specPath = await createDraftSpec(
       root,

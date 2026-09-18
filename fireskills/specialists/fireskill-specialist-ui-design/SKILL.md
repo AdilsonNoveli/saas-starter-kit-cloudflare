@@ -13,8 +13,8 @@ description: Projetar e revisar interfaces visuais de sistemas, dashboards e apl
   comparação, priorização ou recuperação de erros.
 - Não acionar para descobrir se o fluxo resolve a necessidade da pessoa; usar
   `$fireskill-specialist-ux-design` para pesquisa, jornada e teste de tarefa.
-- Combinar com `$fireskill-specialist-react-ui-components` quando a implementação
-  React puder partir de uma referência TSX copiável.
+- Combinar com `$fireskill-specialist-nuxt-ui` quando a implementação Vue puder
+  partir de componentes `@nuxt/ui` já usados no projeto.
 
 ## Fluxo
 
@@ -33,7 +33,7 @@ description: Projetar e revisar interfaces visuais de sistemas, dashboards e apl
    oferecer uma base identificável.
 3. Identificar pessoa, tarefa principal, frequência, dispositivo, densidade e
    consequência do erro; ordenar conteúdo e ações por essa prioridade.
-4. Para CRUD, aplicar a matriz macro: lista com `PageHeader` e `DataGrid`,
+4. Para CRUD, aplicar a matriz macro: lista com `PageHeader` e `UTable`,
    detalhe com `PageHeader` e `DetailLists`, criar e editar com `PageHeader` e
    seções de formulário em duas colunas responsivas. Cada seção tem coluna de
    contexto e painel de campos; registrar a justificativa apenas para uma
@@ -53,10 +53,10 @@ description: Projetar e revisar interfaces visuais de sistemas, dashboards e apl
    consistência com comprovação visual e comportamental. Registrar o resultado
    no item `VISUAL` da tarefa.
 
-Quando a implementação usar React, carregar
-`$fireskill-specialist-react-ui-components` depois de definir a composição para
-escolher referências TSX sem transferir a escolha visual para o catálogo de
-exemplos.
+Quando a implementação usar componentes Vue, carregar
+`$fireskill-specialist-nuxt-ui` depois de definir a composição para escolher os
+componentes `@nuxt/ui` sem transferir a escolha visual para o catálogo de
+componentes.
 
 ## Padrões
 
@@ -72,14 +72,13 @@ exemplos.
 - Exibir labels acima dos campos e erro de campo em vermelho abaixo do campo.
 - Usar duas colunas para campos relacionados nos breakpoints largos, uma coluna
   no mobile e largura total para campos longos, ajuda, upload e erros.
-- Tornar a linha inteira do `DataGrid` a navegação do detalhe; manter botões,
+- Tornar a linha inteira do `UTable` a navegação do detalhe; manter botões,
   checkboxes e menus internos acima do link da linha.
 - Manter `Breadcrumb` em todas as telas, com a equipe ativa, o módulo e a tela
-  atual. Em Laravel, adaptar o `Breadcrumb` ou `Breadcrumbs` já renderizado
-  pelo shell existente.
+  atual. Adaptar o breadcrumb já renderizado pelo shell existente.
 - Usar um único `PageHeader` componentizado e reutilizável em lista, detalhe,
   criação e edição do CRUD.
-- Usar `DataGrid` em largura total na lista, mostrar sempre a coluna `ID`,
+- Usar `UTable` em largura total na lista, mostrar sempre a coluna `ID`,
   transformar a linha em link para o detalhe e manter botões de editar e apagar
   independentes dentro da linha.
 
@@ -96,17 +95,16 @@ exemplos.
 - Usar cards para uma lista que pede comparação ou substituir `PageHeader` por
   um título solto.
 - Duplicar o markup do `PageHeader` por tela, esconder o `ID`, estreitar o
-  `DataGrid` ou deixar editar e apagar fora da linha do registro.
+  `UTable` ou deixar editar e apagar fora da linha do registro.
 
 ## Validação
 
 - Comparar cenários nominal, loading, empty, partial, error, offline e
   permission denied na mesma composição.
-- Conferir `DataGrid`, `DetailLists`, `PageHeader` e formulários em seções com
+- Conferir `UTable`, `DetailLists`, `PageHeader` e formulários em seções com
   duas colunas responsivas conforme a superfície CRUD.
 - Conferir `Breadcrumb` em cada tela, com o nome da equipe visível e o item atual
-  marcado como página. Em Laravel, confirmar o reaproveitamento do componente
-  já existente.
+  marcado como página. Confirmar o reaproveitamento do componente já existente.
 - Conferir que uma exceção ao `DESIGNSYSTEM.MD` tem alcance registrado.
 - Exercitar conteúdo curto/longo, números extremos, tradução expandida e
   preferências de data, moeda e timezone.
@@ -117,27 +115,23 @@ exemplos.
 - Conferir bordas, espaçamentos, margens, padding e tipografia nos estados e
   viewports relevantes durante a implementação, registrando o resultado no
   item `VISUAL`.
-- Revisão final conjunta com `$fireskill-specialist-react-ui-components` quando
-  algum asset React tiver sido adaptado.
+- Revisão final conjunta com `$fireskill-specialist-nuxt-ui` quando algum
+  componente `@nuxt/ui` tiver sido adaptado.
 - Não declarar a interface consistente ou responsiva sem screenshots ou
   inspeção equivalente nos estados e viewports críticos.
 
 ## Skills relacionadas
 
-- `$fireskill-specialist-reui` para composições React e Tailwind já definidas no
-  catálogo gratuito.
 - `$fireskill-specialist-interface-experience` para mapear telas, ações e estados
   antes da composição visual.
-- `$fireskill-specialist-nextjs` governa a fronteira server/client e o roteamento
-  da interface; esta skill governa composição e estados visuais.
+- `$fireskill-specialist-nuxt` governa páginas, layouts, middleware e SSR da
+  interface; esta skill governa composição e estados visuais.
 - `$fireskill-specialist-prototyping` testa alternativas de composição no menor
   nível de fidelidade necessário antes da implementação definitiva.
-- `$fireskill-specialist-shadcn-ui` fornece primitives e variantes; esta skill
-  decide hierarquia e coerência do sistema que os utiliza.
+- `$fireskill-specialist-nuxt-ui` fornece os componentes `@nuxt/ui` e o tema;
+  esta skill decide hierarquia e coerência do sistema que os utiliza.
 - `$fireskill-specialist-ux-design` governa pesquisa, jornada, arquitetura da
   informação e validação de tarefas.
-- `$fireskill-specialist-react-ui-components` fornece exemplos TSX depois que a
-  composição e a hierarquia estão definidas.
 - `$fireskill-specialist-design-system` fornece regras macro, defaults e cenários
   canônicos antes da composição visual.
 - `$fireskill-specialist-web-accessibility` conduz auditoria WCAG, teclado e

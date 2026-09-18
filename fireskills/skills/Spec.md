@@ -188,7 +188,8 @@ da superfície. O `PageHeader` deve ser um componente único e reutilizável par
 lista, detalhe, criação e edição, com variações recebidas por props ou
 configuração. Não replique o markup do cabeçalho em cada página.
 
-- A listagem usa um `DataGrid` que ocupa toda a largura disponível.
+- A listagem usa um `UTable` do `@nuxt/ui` com `:ui="enterpriseTableUi"`
+  (de `@nuxfire/tokens`) que ocupa toda a largura disponível.
 - A coluna `ID` fica visível em toda listagem, inclusive quando a tela também
   mostra nome, status ou outras informações do registro.
 - A linha inteira funciona como link para o detalhe por mouse e teclado.
@@ -227,8 +228,9 @@ permite fazer, o que precisa ser preservado e o que a entrega vai mudar.
 Registre a camada de interface observada, incluindo framework,
 roteamento, componentes, estilos, formulários e testes quando essas fontes
 existirem. Proponha caminhos que respeitem e sigam a stack, o sistema atual e
-os padrões locais; não introduza React, Tailwind, shadcn/ui ou outra biblioteca
-por suposição. Quando as fontes não definirem uma escolha, informe a lacuna e
+os padrões locais; não introduza framework, biblioteca de componentes ou de
+estilo por suposição. No Nuxfire a base é Vue 3 com `@nuxt/ui` v4 (Tailwind
+vem por ele). Quando as fontes não definirem uma escolha, informe a lacuna e
 pergunte à pessoa antes de sugerir uma base nova.
 
 Use o `Contrato de perguntas numeradas`: uma pergunta por rodada, opções
@@ -242,21 +244,22 @@ conter telas, fluxo de informação, menus e navegação principal, formulários
 ações, composição, estados e acessibilidade. Uma entrega com interface inclui
 suas telas e formulários: não se resume a rota, serviço ou persistência.
 
-Em projeto React, toda interface deve ser composta por componentes React.
-shadcn/ui fornece as primitives e ReUI fornece as composições gratuitas; para
-Laravel com React, a dupla é obrigatória. A página ou rota limita-se a obter
-dados e compor componentes de domínio. Formulários, tabelas, filtros, ações em
-lote, diálogos, painéis laterais, estados visuais e partes repetidas ficam em
-componentes próprios. Antes de criar uma peça, leia `INTERFACE.md`, localize
-algo reutilizável e registre nela cada arquivo criado ou reaproveitado, sua
-origem, seus consumidores e o componente shadcn/ui ou ReUI correspondente.
+Toda interface usa Vue Single-File Components (SFC) com `@nuxt/ui` v4, que
+fornece todos os componentes (`UButton`, `UModal`, `UTable`, `UForm`,
+`UFormField` e demais). A página ou rota limita-se a obter dados e compor
+componentes de domínio. Formulários, tabelas, filtros, ações em lote, diálogos,
+painéis laterais, estados visuais e partes repetidas ficam em componentes
+próprios. Antes de criar uma peça, leia `INTERFACE.md`, localize algo
+reutilizável e registre nela cada arquivo criado ou reaproveitado, sua origem,
+seus consumidores e o componente `@nuxt/ui` correspondente (para tabelas, o
+`enterpriseTableUi`).
 
 Orquestre `$fireskill-specialist-interface-experience` para analisar o sistema
 atual e conduzir a descoberta; depois use `$fireskill-specialist-ux-design` para jornada e fluxo,
-`$fireskill-specialist-ui-design` para composição e estados e o especialista da
-stack de interface detectada, como `$fireskill-specialist-react` somente em
-projetos React, para materializar o que foi especificado. Esses especialistas
-não substituem a conversa com a pessoa.
+`$fireskill-specialist-ui-design` para composição e estados e
+`$fireskill-specialist-nuxt-ui` (com `$fireskill-specialist-nuxt` para páginas,
+middleware e composables) para materializar o que foi especificado. Esses
+especialistas não substituem a conversa com a pessoa.
 O resultado deve ser simples, funcional e completo para a tarefa proposta.
 
 Um backlog não autoriza implementação nem cria uma segunda fonte normativa. A
@@ -382,19 +385,22 @@ sem mudança observável, pare o ciclo e relate o impasse.
 
 ### Proteção do banco de desenvolvimento
 
-Nenhuma etapa executa testes usando o banco de desenvolvimento. Em Laravel, o
-setup e cada skill que roda testes exigem `.env.testing`, `APP_ENV=testing` e
-um destino de banco explicitamente diferente do `.env`. Enquanto essa
-separação não estiver comprovada, nenhum teste focal, suíte ou regressão pode
-ser executado.
+Nenhuma etapa executa testes usando o banco de desenvolvimento. No Nuxfire, o
+setup e cada skill que roda testes que acessam Postgres exigem um destino de
+banco de teste explicitamente diferente do configurado nos secrets do stage
+(`DATABASE_HOST`, `DATABASE_NAME` e afins). Enquanto essa separação não estiver
+comprovada, nenhum teste que toque o banco pode ser executado. Os testes
+Vitest atuais (billing, assentos de equipe, habilidades) não acessam o banco:
+substituem `useDB`.
 
 Comandos que apagam, recriam ou zeram banco e schema são sempre ignorados. A
 recusa inclui `migrate:fresh`, `migrate:refresh`, `migrate:reset`,
 `migrate:rollback`, `db:wipe`, `schema:drop`, `prisma migrate reset`,
-`DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`, `TRUNCATE`,
-`RefreshDatabase`, `DatabaseMigrations` e equivalentes. Autorização da pessoa
-não remove essa proteção. Em Laravel, use `DatabaseTransactions` e factories
-restritas aos registros do caso.
+`drizzle-kit push --force`, `drizzle-kit drop`, `DROP DATABASE`, `DROP SCHEMA`,
+`DROP TABLE`, `TRUNCATE`, `RefreshDatabase`, `DatabaseMigrations` e
+equivalentes. Autorização da pessoa não remove essa proteção. Em testes que
+precisem de banco, use transação revertida ou registros de fixture restritos ao
+caso, sempre no banco de teste dedicado.
 
 ## Três atos e estado
 
@@ -434,9 +440,9 @@ os Atos II–III. Gate posterior não permanece aprovado sobre entrada invalidad
   `EVIDENCE` e `IMPROVE`, nessa ordem. O item `VISUAL` registra a conferência
   de bordas, espaçamentos, margens, padding e tipografia ou a justificativa
   concreta para uma tarefa sem interface.
-- Em projeto PHP, execute os testes derivados com Pest. Em projeto Node sem PHP,
-  pergunte qual runner de testes adotar e recomende Vitest; não instale nem
-  escolha silenciosamente. Em projeto misto PHP + Node, prevalece Pest.
+- Execute os testes derivados com Vitest (`bun run test`; o agregador da raiz é
+  `vitest.config.mts` e cada layer traz o próprio `vitest.config.ts`). Não há
+  PHP no Nuxfire.
 - Mantenha tarefas, checklists, gates e evidência na própria `spec.md`.
 - Preserve alterações preexistentes e instruções locais do projeto.
 - Instale especialistas somente sob demanda; eles orientam padrões técnicos e

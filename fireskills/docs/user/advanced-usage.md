@@ -29,8 +29,8 @@ bases e ignora as recomendações que não foram escolhidas:
 
 ```bash
 specsfy install --project . \
-  --specialist specsfy-specialist-laravel \
-  --specialist specsfy-specialist-postgres
+  --specialist fireskill-specialist-laravel \
+  --specialist fireskill-specialist-postgres
 ```
 
 Em um projeto já preparado, acrescente somente os especialistas escolhidos com
@@ -38,7 +38,7 @@ Em um projeto já preparado, acrescente somente os especialistas escolhidos com
 
 ```bash
 npx skills add https://github.com/promovaweb/specsfy \
-  --skill specsfy-specialist-laravel --agent universal --copy --full-depth
+  --skill fireskill-specialist-laravel --agent universal --copy --full-depth
 ```
 
 A detecção usa manifests, dependências e arquivos reconhecidos pelo catálogo.
@@ -100,7 +100,7 @@ chmod +x "$HOME/.local/bin/specsfy"
 Quando lembrar de algo depois da definição, use a entrada explícita:
 
 ```text
-Use $specsfy-update-spec em
+Use $fireskill-update-spec em
 specs/<estado>/<NNNN>-<slug>/spec.md:
 quero adicionar, remover, corrigir ou mudar esta especificação.
 ```

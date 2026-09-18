@@ -20,11 +20,11 @@ Antes de formular qualquer pergunta, leia e aplique o
 
 Execute a seção `14. Tarefas` de `spec.md` em ordem de dependência, mantendo a fonte única, testes, código, evidências e checkboxes coerentes.
 
-Para Laravel, consulte `.specsfy/PACKAGES.md`, `docs/packages/README.md` e as
-fichas existentes antes de adicionar ou substituir uma dependência. Se a
-tarefa trouxer uma URL GitHub ou mudar Composer, carregue
-`$fireskill-specialist-laravel-package-manager` e reutilize pacotes já instalados
-quando eles atenderem ao requisito.
+Consulte `.specsfy/PACKAGES.md`, `docs/packages/README.md` e as fichas
+existentes antes de adicionar ou substituir uma dependência. Se a tarefa trouxer
+uma URL GitHub ou mudar `package.json`/`bun.lock`, reutilize pacotes já
+instalados quando eles atenderem ao requisito e declare no `package.json` de
+cada pacote do workspace tudo o que o código dele importa diretamente.
 
 ## Proteção obrigatória do banco
 
@@ -35,15 +35,16 @@ node .agents/skills/fireskill-setup/scripts/check_database_safety.mjs \
   --project <raiz> --command "<comando-pretendido>"
 ```
 
-Em Laravel, exija `.env.testing`, `APP_ENV=testing` e um banco explicitamente
-diferente do banco de desenvolvimento definido no `.env`. Enquanto o estado
-for `PENDING`, não execute teste algum. Corrija o ambiente, repita a
+Para testes que acessem Postgres, exija um banco de teste explicitamente
+diferente do configurado nos secrets do stage (`DATABASE_*`); os testes Vitest
+atuais não acessam o banco. Enquanto o estado for `PENDING`, não execute teste algum. Corrija o ambiente, repita a
 conferência e continue somente após `SAFE`.
 
 Ignore todo comando classificado como `IGNORED`. Não execute, não transforme em
 tarefa e não peça autorização para rodar `migrate:fresh`, `migrate:refresh`,
 `migrate:reset`, `migrate:rollback`, `db:wipe`, `schema:drop`,
-`prisma migrate reset`, `DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`,
+`prisma migrate reset`, `drizzle-kit push --force`, `drizzle-kit drop`,
+`DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`,
 `TRUNCATE` ou equivalentes. A mesma recusa vale para scripts indiretos e para
 testes com `RefreshDatabase` ou `DatabaseMigrations`. Use isolamento
 transacional e fixtures mínimas sem apagar o banco.
@@ -104,7 +105,7 @@ exigindo autorização específica.
    retorne ao `$fireskill-setup` para instalar o especialista e não implemente a
    tela até concluir esse preparo.
    Para um CRUD, confirme também um único `PageHeader` reutilizável em todas as
-   telas, `UTable` (ou DataGrid) em largura total, coluna `ID` sempre visível,
+   telas, `UTable` com `enterpriseTableUi` em largura total, coluna `ID` sempre visível,
    link da linha para o detalhe e botões de editar e apagar independentes na linha.
 4. Execute os validadores contra `specs/<estado>/<NNNN>-<slug>/spec.md`. Se um gate
    falhar por tarefa, predecessor TDD ou RED ausente em um plano antes aprovado,

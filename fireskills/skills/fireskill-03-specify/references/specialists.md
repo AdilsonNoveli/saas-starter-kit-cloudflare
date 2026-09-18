@@ -1,24 +1,23 @@
 # Especialistas para especificação
 
-Use o catálogo de especialistas distribuído pelo CLI para aprofundar:
+Use os especialistas de `specialists/` para aprofundar:
 
-- dados: `fireskill-specialist-postgres`, `-supabase` e `-redis`;
-- segurança e APIs: `-application-security` e `-web-api-design`;
-- arquitetura e operação: `-software-architecture`, `-observability`,
-  `-performance-engineering` e `-delivery-engineering`;
+- dados: `fireskill-specialist-postgres`, `-drizzle` e `-data-modeling`;
+- segurança e APIs: `-application-security`, `-web-api-design`, `-trpc` e
+  `-nuxt-authorization`;
+- arquitetura e operação: `-software-architecture`, `-nuxfire-layers`,
+  `-observability`, `-performance-engineering`, `-cloudflare-workers`, `-sst` e
+  `-delivery-engineering`;
 - experiência: `-interface-experience`, `-ui-design`, `-ux-design`,
-  `-web-accessibility` e o
-  especialista da stack de interface, como `-react`;
+  `-web-accessibility` e o especialista da stack de interface (`-nuxt-ui`,
+  com `-nuxt`);
 - stack: o especialista com o nome da tecnologia detectada.
-- pacotes Laravel recebidos por URL GitHub: `fireskill-specialist-laravel-package-manager`.
-
-Quando estiver ausente, proponha este comando e peça autorização específica:
-
-```bash
-npx skills add https://github.com/promovaweb/specsfy --skill fireskill-specialist-<nome> --agent universal --copy --full-depth
-```
 
 Especialista informa padrões; a fonte normativa continua sendo
 `specs/<estado>/<NNNN>-<slug>/spec.md` do projeto consumidor.
-Se já estiver instalado, anuncie a transição automática e carregue-o na mesma
-conversa.
+
+Os especialistas ficam em `specialists/` deste repositório. Se o necessário não
+estiver disponível para o agente, informe nome, finalidade e dependências e peça
+autorização específica antes de instalar ou copiar; nunca carregue especialista
+sem relação com a tarefa. Se já estiver disponível, anuncie a transição
+automática e carregue-o na mesma conversa.

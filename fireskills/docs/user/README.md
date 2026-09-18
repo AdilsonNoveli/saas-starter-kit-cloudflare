@@ -87,20 +87,20 @@ entradas:
 O índice de [Skills base](skills/README.md) apresenta o fluxo completo. Leia
 cada etapa nesta ordem:
 
-1. [Capturar uma entrada](skills/specsfy-01-inbox.md).
-2. [Refinar no backlog](skills/specsfy-02-backlog.md).
-3. [Criar a especificação](skills/specsfy-03-specify.md).
-4. [Validar a definição](skills/specsfy-04-validate.md).
-5. [Preparar as tarefas](skills/specsfy-05-tasks.md).
-6. [Preparar TDD e BDD](skills/specsfy-06-tdd-bdd.md).
-7. [Implementar](skills/specsfy-07-implement.md).
-8. [Atualizar a especificação](skills/specsfy-update-spec.md).
-9. [Consultar o progresso](skills/specsfy-progress.md).
-10. [Conversar com a spec](skills/specsfy-interviewer.md).
-11. [Entrevistar o MVP](skills/specsfy-mvp-milestone-interviewer.md).
-12. [Descobrir informações a guardar](skills/specsfy-data-discovery.md).
-13. [Planejar o roadmap](skills/specsfy-roadmap-milestone-interviewer.md).
-14. [Governar milestones](skills/specsfy-milestone-governor.md).
+1. [Capturar uma entrada](skills/fireskill-01-inbox.md).
+2. [Refinar no backlog](skills/fireskill-02-backlog.md).
+3. [Criar a especificação](skills/fireskill-03-specify.md).
+4. [Validar a definição](skills/fireskill-04-validate.md).
+5. [Preparar as tarefas](skills/fireskill-05-tasks.md).
+6. [Preparar TDD e BDD](skills/fireskill-06-tdd-bdd.md).
+7. [Implementar](skills/fireskill-07-implement.md).
+8. [Atualizar a especificação](skills/fireskill-update-spec.md).
+9. [Consultar o progresso](skills/fireskill-progress.md).
+10. [Conversar com a spec](skills/fireskill-interviewer.md).
+11. [Entrevistar o MVP](skills/fireskill-mvp-milestone-interviewer.md).
+12. [Descobrir informações a guardar](skills/fireskill-data-discovery.md).
+13. [Planejar o roadmap](skills/fireskill-roadmap-milestone-interviewer.md).
+14. [Governar milestones](skills/fireskill-milestone-governor.md).
 
 Essas páginas explicam quando usar cada skill, como descrever a tarefa em
 linguagem natural, o resultado esperado, os erros comuns e o próximo passo.

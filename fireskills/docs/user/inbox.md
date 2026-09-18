@@ -7,7 +7,7 @@ perguntas e sem transformá-lo em compromisso de entrega.
 ## Capturar
 
 ```text
-Use $specsfy-01-inbox para guardar esta entrada:
+Use $fireskill-01-inbox para guardar esta entrada:
 quero permitir que a pessoa continue um formulário em outro dispositivo.
 ```
 
@@ -40,7 +40,7 @@ inventada.
 
 Quando o texto indicar que o sistema precisa guardar, consultar, compartilhar
 ou apagar informações, a Inbox registra o sinal sem perguntar. No backlog,
-`$specsfy-data-discovery` conversa sobre essas informações antes de o item ser
+`$fireskill-data-discovery` conversa sobre essas informações antes de o item ser
 considerado pronto.
 
 O texto será versionado no Git. Não inclua senhas, tokens, chaves privadas ou
@@ -58,11 +58,11 @@ captura sem perguntas → backlog refinável → spec normativa
 - `specs/<estado>/<NNNN>-<slug>/spec.md` governa comportamento e entrega.
 
 Uma captura pode permanecer indefinidamente na Inbox. Quando quiser avançar,
-use `$specsfy-02-backlog` com o caminho do arquivo.
+use `$fireskill-02-backlog` com o caminho do arquivo.
 
 ## Sessões de descoberta do MVP
 
-`$specsfy-mvp-milestone-interviewer` pode usar Inboxes para capturar respostas
+`$fireskill-mvp-milestone-interviewer` pode usar Inboxes para capturar respostas
 novas durante a conversa. Isso não se aplica à importação de `MVP.md`: nela a
 skill cria `M01` e seleciona somente requisitos de desenvolvimento para gerar
 backlog e spec Draft diretamente. Os temas de negócio e produto permanecem no

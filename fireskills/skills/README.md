@@ -1,21 +1,11 @@
 # Fireskills Skills
 
-<!-- markdownlint-disable MD033 -->
-<p align="center">
-  <picture>
-    <source srcset="../brand/logo/icon.svg" type="image/svg+xml">
-    <img src="../brand/logo/icon.png" alt="Logo do Specsfy" width="128">
-  </picture>
-</p>
-<!-- markdownlint-enable MD033 -->
-
-Este módulo do monorepo mantém a metodologia executável do
-Specsfy: skills, scripts determinísticos, referências, assets e metadata para
+Este módulo mantém a metodologia executável do Fireskills (derivada do
+Specsfy): skills, scripts determinísticos, referências, assets e metadata para
 agentes.
 
-A visão geral para o usuário final está em
-[`specsfy/`](../specsfy/). A documentação de uso
-está em [`docs/`](../docs/).
+A visão geral está em [`README.md`](../README.md) e a documentação de uso em
+[`docs/`](../docs/).
 
 ## Responsabilidade
 
@@ -23,19 +13,17 @@ Este módulo possui:
 
 - as instruções operacionais das quatorze skills base, do setup, do
   documentador e das três auxiliares.
-- os templates de ideia, backlog, spec, tarefas e interface em `templates/`.
-- um documento preenchido e não normativo em `examples/Spec.md`.
+- **(ausente neste repositório)** os templates de inbox, backlog, spec, tarefas,
+  projeto, stack, regras, banco e interface em `templates/`, e o exemplo em
+  `examples/Spec.md`: os scripts que os leem falham até que sejam restaurados
+  (ver `PLANO-REFATORACAO.md`, "Pendências").
 - o MCR-10 e referências dos gates.
 - scripts de validação, rastreabilidade, evidência e progresso.
 - metadata de descoberta em `agents/openai.yaml`.
 - BDD, testes e fixtures que validam as próprias skills.
 
-Specs pertencem a cada projeto consumidor. A raiz do monorepo
-[`promovaweb/specsfy`](https://github.com/promovaweb/specsfy) não instala nem
-executa este catálogo. A identidade pertence a [`brand/`](../brand/).
-Conhecimento técnico opcional pertence a
-[`specialists/`](../specialists/) e é instalado
-por [`cli/`](../cli/).
+Specs pertencem ao projeto consumidor (aqui, o Nuxfire). Conhecimento técnico
+pertence a [`specialists/`](../specialists/).
 
 ## Metodologia executável
 
@@ -159,7 +147,7 @@ obrigatório após cada tarefa de implementação. Em toda execução, ele reava
 código existente e reconstrói arquitetura, aplicação, banco, fluxos, testes,
 frontend, pacotes, integrações e decisões dentro dos blocos gerenciados de
 `docs/`. A mesma execução preenche `.specsfy/PACKAGES.md` com todos os pacotes
-npm e Composer observados, diretos ou transitivos, e suas finalidades locais,
+npm/Bun observados, diretos ou transitivos, e suas finalidades locais,
 preservando texto humano externo.
 
 ## Capacidades nativas
@@ -260,9 +248,9 @@ Testes e fixtures das skills permanecem neste módulo e criam specs somente
 em diretórios temporários.
 
 Nos projetos consumidores, o runner dos testes derivados do BDD é selecionado
-pela stack. Projetos PHP, inclusive Laravel com frontend Node, usam Pest. Em
-projetos exclusivamente Node, o agente pergunta qual runner adotar antes de
-criar ou executar testes e sugere Vitest como padrão. O Gherkin permanece
+pela stack. No Nuxfire o runner é o Vitest (`bun run test`). Em outras stacks,
+o agente preserva o runner existente ou pergunta qual adotar antes de criar ou
+executar testes. O Gherkin permanece
 somente na `spec.md` como referência: agentes derivam testes executáveis dele,
 sem criar ou executar `.feature`. A decisão Node é materializada no script
 `test:tdd`. Cada feature, história e requisito recebe no mínimo três cenários

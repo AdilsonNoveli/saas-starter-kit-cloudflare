@@ -64,7 +64,6 @@ precisa guardar quando o sistema atual não responder.
 
 - `$fireskill-aux-database` para manter o mapa persistente do projeto.
 - `$fireskill-specialist-postgres` para detalhes próprios do Postgres.
-- `$fireskill-specialist-laravel` para migrations e models Laravel.
 
 Leia [references/standards.md](references/standards.md) para fontes de
 modelagem, migrations e contratos persistentes.

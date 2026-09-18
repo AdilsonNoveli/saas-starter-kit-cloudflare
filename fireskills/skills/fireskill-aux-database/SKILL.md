@@ -1,6 +1,6 @@
 ---
 name: fireskill-aux-database
-description: Monitorar e manter a documentação completa da persistência em .specsfy/DATABASE.md, com inventário tabular de bancos, schemas, tabelas, campos, relações e migrations. Use quando o monitor de contexto apontar persistência pendente, sempre que banco, tabela, coleção, model persistente, coluna, índice, relação, schema ou migration for criado ou alterado, e ao auditar se o mapa de dados corresponde ao código. Preserva notas e decisões humanas fora do inventário detectado.
+description: Monitorar e manter a documentação completa da persistência em .fireskills/DATABASE.md, com inventário tabular de bancos, schemas, tabelas, campos, relações e migrations. Use quando o monitor de contexto apontar persistência pendente, sempre que banco, tabela, coleção, model persistente, coluna, índice, relação, schema ou migration for criado ou alterado, e ao auditar se o mapa de dados corresponde ao código. Preserva notas e decisões humanas fora do inventário detectado.
 ---
 
 # Manter o mapa de dados
@@ -18,7 +18,7 @@ Modo de interação: `sem perguntas`.
 Não formule perguntas nesta skill. Quando faltar informação confirmada,
 sinalize o campo pendente para a etapa conversacional responsável.
 
-1. Ler instruções locais, `.specsfy/PROJECT.md`, `STACK.md` e todo o `DATABASE.md`.
+1. Ler instruções locais, `.fireskills/PROJECT.md`, `STACK.md` e todo o `DATABASE.md`.
 2. Inspecionar schemas, migrations, models persistentes e configurações sem
    revelar valores de ambiente ou credenciais.
 3. Executar `node scripts/update_database.mjs --project <raiz>`.
@@ -30,7 +30,7 @@ sinalize o campo pendente para a etapa conversacional responsável.
 7. Considerar a mudança de dados incompleta até `DATABASE.md` refletir a nova
    estrutura e os testes relevantes estarem verdes.
 8. Executar `$fireskill-setup` em modo de monitoramento antes de devolver o
-   handoff e exigir que `.specsfy/DATABASE.md` deixe de aparecer como pendência.
+   handoff e exigir que `.fireskills/DATABASE.md` deixe de aparecer como pendência.
 
 Quando `$fireskill-data-discovery` registrar respostas confirmadas, preserve a
 seção `Informações a guardar confirmadas` e compare-a com o que o código

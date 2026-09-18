@@ -79,5 +79,5 @@ verificado ausente no código em 2026-09-18):
 Nuxt 4 + Vue 3 + `@nuxt/ui` v4, tRPC v10, Drizzle + PostgreSQL (Hyperdrive),
 OpenAuth.js, `nuxt-authorization`, Pinia, Cloudflare Workers via SST 4, Bun
 workspaces (`apps/*`, `packages/*`, `layers/*`). Detalhes verificáveis:
-`.specsfy/STACK.md` e `.specsfy/DATABASE.md`. Para trabalhar em cada área, carregue
+`.fireskills/STACK.md` e `.fireskills/DATABASE.md`. Para trabalhar em cada área, carregue
 o especialista correspondente em `fireskills/specialists/` (ver `AGENTS.md`).

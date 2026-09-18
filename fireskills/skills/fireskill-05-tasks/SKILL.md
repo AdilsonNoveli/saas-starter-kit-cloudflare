@@ -77,8 +77,8 @@ node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
 
 ## Gerar
 
-Use `.specsfy/templates/custom/Tasks.md` como contrato quando existir e recorra
-a `.specsfy/templates/Tasks.md` caso contrário. Substitua somente o conteúdo
+Use `.fireskills/templates/custom/Tasks.md` como contrato quando existir e recorra
+a `.fireskills/templates/Tasks.md` caso contrário. Substitua somente o conteúdo
 das seções `14. Tarefas` e `15. Ordem de execução` em
 `<raiz>/specs/<estado>/<NNNN>-<slug>/spec.md`; preserve todas as outras seções.
 
@@ -99,7 +99,7 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
   lateral ou modal. Use somente os componentes, convenções e runners da stack
   de interface registrada; cada tarefa aponta os componentes Vue, componentes
   `@nuxt/ui` ou rotas reais. Inclua uma tarefa para atualizar
-  `.specsfy/INTERFACE.md` com finalidade, arquivo, API, estados, consumidores e regra
+  `.fireskills/INTERFACE.md` com finalidade, arquivo, API, estados, consumidores e regra
   de reaproveitamento de todos os blocos criados ou alterados.
   Em toda tarefa de tela (`.vue` com componentes `U*`), registre no `PREP` o uso
   de `$fireskill-specialist-nuxt-ui` antes da implementação. A skill
@@ -127,17 +127,17 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
   `check_database_safety.mjs`: um aplica a migration no banco de teste e outro
   consulta o estado das migrations. Não aprove o Plan Gate sem essa tarefa.
 - Quando a fatia alterar manifests ou configuração estrutural, crie uma tarefa
-  `[DOC]` para `.specsfy/STACK.md`. Quando alterar banco, schema, model
+  `[DOC]` para `.fireskills/STACK.md`. Quando alterar banco, schema, model
   persistente, tabela, campo, relação ou migration, crie uma tarefa `[DOC]`
-  obrigatória para `.specsfy/DATABASE.md`.
-- Para mudança de aplicação, inclua a revisão de `.specsfy/PROJECT.md` no fechamento da
+  obrigatória para `.fireskills/DATABASE.md`.
+- Para mudança de aplicação, inclua a revisão de `.fireskills/PROJECT.md` no fechamento da
   tarefa. Se não houver impacto material, exija justificativa na evidência em
   vez de criar conteúdo artificial.
 - Faça toda tarefa `[CODE]` exigir a reconstrução independente de `docs/` por
   `$fireskill-documentator` antes de `EXECUTE`, inclusive quando a documentação
   já existia antes da mudança.
 - Quando uma convenção virar regra confirmada, crie tarefa `[DOC]` para
-  `.specsfy/RULES.md`.
+  `.fireskills/RULES.md`.
 - Dê a cada tarefa um resultado único, caminho exato e critério verificável.
 - Use a tag `[MIGRATION]` somente junto de `[CODE]` ou `[OPS]`. O caminho deve
   ficar em `apps/functions/src/database/migrations/` (gerada por

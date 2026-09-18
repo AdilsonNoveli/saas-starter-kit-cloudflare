@@ -15,7 +15,7 @@ modelos de dados, guias, pesquisas e anexos próprios de cada feature.
 
 ## Projeção do Specsfy
 
-O setup escreve `.specsfy/SPECKIT.md`. O bloco delimitado por
+O setup escreve `.fireskills/SPECKIT.md`. O bloco delimitado por
 `specsfy:speckit` registra caminho, tipo, título e SHA-256 de cada fonte. Notas
 humanas fora do bloco permanecem intactas em execuções posteriores.
 
@@ -31,5 +31,5 @@ Uma feature nova pode seguir o fluxo nativo do Specsfy sem modificar as
 features anteriores.
 
 A constituição continua sendo a governança do projeto. Quando uma regra dela
-for incompatível com `.specsfy/RULES.md` ou com o fluxo do Specsfy, registre os
+for incompatível com `.fireskills/RULES.md` ou com o fluxo do Specsfy, registre os
 dois textos e peça orientação antes de alterar a feature.

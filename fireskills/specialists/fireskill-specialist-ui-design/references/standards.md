@@ -17,7 +17,7 @@ comparações ou exceções explícitas, escolha navegação orientada à tarefa
 
 ## Design system e CRUD
 
-Antes da composição, leia `.specsfy/DESIGNSYSTEM.MD` e aplique seus defaults. Para uma
+Antes da composição, leia `.fireskills/DESIGNSYSTEM.MD` e aplique seus defaults. Para uma
 superfície CRUD, use `PageHeader` em todas as páginas, `UTable` na lista,
 `DetailLists` no detalhe e formulários em seções com duas colunas responsivas em
 criar e editar. Labels ficam acima dos campos e a mensagem de erro aparece em

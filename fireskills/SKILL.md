@@ -75,7 +75,7 @@ arquitetura, UX/UI, TypeScript, Postgres, Tailwind, revisão, depuração…) es
 ## Fontes de verdade (em conflito, vence a de cima)
 
 1. O código e os testes.
-2. `.specsfy/*` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `INTERFACE`, `DESIGNSYSTEM`),
+2. `.fireskills/*` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `INTERFACE`, `DESIGNSYSTEM`),
    conferido contra o código.
 3. Os `references/nuxfire-*.md` dos especialistas.
 
@@ -96,7 +96,7 @@ arquitetura, UX/UI, TypeScript, Postgres, Tailwind, revisão, depuração…) es
 ## Manter o Fireskills vivo
 
 - Terminou uma entrega: `fireskill-documentator` e o monitor sem `PENDING`.
-- Mudou regra, tela ou tabela: atualize `.specsfy/RULES.md`, `INTERFACE.md` ou
+- Mudou regra, tela ou tabela: atualize `.fireskills/RULES.md`, `INTERFACE.md` ou
   `DATABASE.md` (as skills `fireskill-aux-*` fazem isso sem apagar texto humano).
 - Mudou a doc pública do Fireskills (`apps/web/content/docs/2.fireskills`): atualize a
   tradução em `content/pt-br/docs/2.fireskills` e `content/es/docs/2.fireskills`, com os

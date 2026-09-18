@@ -24,6 +24,6 @@ Explique o que o sistema deliberadamente não faz.
 ## Contexto técnico
 
 Modelo inicial sugerido a partir de: **{{STACK_LABEL}}**. Detalhes verificáveis
-ficam em `.specsfy/STACK.md` e `.specsfy/DATABASE.md`.
+ficam em `.fireskills/STACK.md` e `.fireskills/DATABASE.md`.
 
 {{STACK_GUIDANCE}}

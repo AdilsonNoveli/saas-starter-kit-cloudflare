@@ -62,9 +62,9 @@ node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<es
    `references/review-lenses.md`, registre findings na seção 13 e execute
    `scripts/review_findings.mjs`. `P1 Open` mantém o gate pendente.
 5. Se a definição alterar stack ou persistência, exija que a Definition of Done
-   cite respectivamente `.specsfy/STACK.md` ou `.specsfy/DATABASE.md`. Para
-   mudança material de finalidade ou capacidade, exija revisão de `.specsfy/PROJECT.md`;
-   para regra nova confirmada, exija `.specsfy/RULES.md`.
+   cite respectivamente `.fireskills/STACK.md` ou `.fireskills/DATABASE.md`. Para
+   mudança material de finalidade ou capacidade, exija revisão de `.fireskills/PROJECT.md`;
+   para regra nova confirmada, exija `.fireskills/RULES.md`.
 6. No aceite final, procure tarefas `[MIGRATION]` e execute
    `verify_evidence.mjs --delivery` para cada uma. Mantenha o Delivery Gate
    pendente quando a tarefa estiver aberta ou quando o arquivo, o comando de

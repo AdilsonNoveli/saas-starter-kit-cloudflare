@@ -10,7 +10,7 @@ que conduz o projeto.
   essa escolha de uma tarefa anterior.
 - Ao carregar, registrar a convenção confirmada (branches permanentes,
   prefixos de `feature/`, `release/`, `hotfix/` e política de merge) em
-  `.specsfy/RULES.md` via `$fireskill-aux-rules`, para que o setup não precise
+  `.fireskills/RULES.md` via `$fireskill-aux-rules`, para que o setup não precise
   perguntar de novo na próxima execução.
 - Se a pessoa não mencionar Gitflow nem indicar essa preferência, seguir o
   setup normalmente sem branch model nenhum declarado. A ausência de menção

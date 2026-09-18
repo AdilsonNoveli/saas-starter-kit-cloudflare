@@ -21,7 +21,7 @@ Antes de formular qualquer pergunta, leia e aplique o
 Crie ou atualize o pacote `specs/draft/<NNNN>-<slug>/`, no qual `spec.md` é a única fonte normativa de todo o fluxo SDD. Somente o diretório recebe o número; mantenha o arquivo sempre como `spec.md`. Consolide descoberta, research, esclarecimentos, produto, plano técnico, modelo de dados, contratos, TDD, BDD, validações, tarefas, decisões e conclusão em três atos explícitos. Evidências externas consultadas vivem em `research/`; não gere `plan.md`, `research.md`, `data-model.md`, `tasks.md`, checklists ou uma segunda especificação.
 
 Antes de consolidar uma spec que dependa de biblioteca, leia
-`.specsfy/PACKAGES.md`, `docs/packages/README.md` e as fichas de
+`.fireskills/PACKAGES.md`, `docs/packages/README.md` e as fichas de
 `docs/packages/`. Se a solicitação trouxer uma URL GitHub de pacote ou depender
 de uma biblioteca npm, confira se o pacote já existe no workspace e registre a
 necessidade sem duplicar dependências.
@@ -54,10 +54,10 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
 ```
 
 3. Use o caminho absoluto impresso pelo script. Ele aloca o próximo ID local,
-   prefere `.specsfy/templates/custom/Spec.md`, recorre ao template gerenciado
-   `.specsfy/templates/Spec.md` e cria somente
+   prefere `.fireskills/templates/custom/Spec.md`, recorre ao template gerenciado
+   `.fireskills/templates/Spec.md` e cria somente
    `specs/draft/<NNNN>-<slug>/spec.md`; nunca renomeie o arquivo para incluir o ID.
-   Sem customização em `.specsfy/templates/`, o script usa
+   Sem customização em `.fireskills/templates/`, o script usa
    `fireskills/skills/templates/Spec.md`.
 4. Ao atualizar, use o caminho da spec existente fornecido ou descoberto sob a
    raiz atual; não execute o inicializador novamente.
@@ -70,7 +70,7 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
    ou parcial produzido.
 7. Leia `references/mcr-10.md` ao receber relato, história, transcrição ou
    especificação a refinar.
-8. Leia `.specsfy/DATABASE.md` quando existir. Se a jornada depender de
+8. Leia `.fireskills/DATABASE.md` quando existir. Se a jornada depender de
    informações guardadas e o arquivo não explicar o que o produto precisa
    lembrar, quem usa essas informações ou quando elas deixam de ser
    necessárias, carregue `$fireskill-data-discovery` e retome esta skill depois
@@ -114,8 +114,8 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
 - Na tabela, declare `ID` como `SPEC-NNNN` e `Slug` como
   `<NNNN>-<slug>` e mantenha o slug igual ao diretório pai.
 - Preserve exatamente os três atos e as 18 seções do template resolvido:
-  `.specsfy/templates/custom/Spec.md` quando existir ou
-  `.specsfy/templates/Spec.md` caso contrário.
+  `.fireskills/templates/custom/Spec.md` quando existir ou
+  `.fireskills/templates/Spec.md` caso contrário.
 - Substitua o conteúdo editorial restante do modelo durante o refinamento; não
   deixe seus exemplos ou placeholders na spec promovida para `Defined`.
 - Ao atualizar, edite o arquivo existente e preserve IDs e decisões ainda válidas.
@@ -136,7 +136,7 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
   10 as nove partes do template com stack e convenções locais, telas, fluxo de
   informação, menus e navegação principal, formulários e ações, composição,
   componentes Vue e componentes `@nuxt/ui`, estados e acessibilidade. Use
-  `.specsfy/INTERFACE.md`, `.specsfy/STACK.md`, manifests, telas e código existente como fonte da stack
+  `.fireskills/INTERFACE.md`, `.fireskills/STACK.md`, manifests, telas e código existente como fonte da stack
   e do sistema atual; registre o que será preservado e alterado. Não proponha
   biblioteca incompatível nem reestruture uma tela existente sem esse exame.
   Carregue

@@ -59,13 +59,13 @@ Tres gates:
 | `fireskill-roadmap-milestone-interviewer` | Planeja a evolução após o MVP aceito |
 | `fireskill-milestone-governor` | Mantém relações e a projeção `specs.md` |
 | `fireskill-data-discovery` | Descobre dados que o produto precisa guardar |
-| `fireskill-lessons` | Sistema auto-evolutivo de lições aprendidas (`.specsfy/LESSONS.md`) |
+| `fireskill-lessons` | Sistema auto-evolutivo de lições aprendidas (`.fireskills/LESSONS.md`) |
 | `fireskill-the-jury` | Deliberação colegiada com rodada cega para decisões de alto impacto |
 | `fireskill-the-fool` | Ataque adversarial, pre-mortem e estresse de premissas fracas |
 | `fireskill-the-judge` | Code review determinístico e rigoroso em PRs/diffs com evidências |
-| `fireskill-aux-stack` | Mantém `.specsfy/STACK.md` |
-| `fireskill-aux-rules` | Mantém `.specsfy/RULES.md` |
-| `fireskill-aux-database` | Mantém `.specsfy/DATABASE.md` |
+| `fireskill-aux-stack` | Mantém `.fireskills/STACK.md` |
+| `fireskill-aux-rules` | Mantém `.fireskills/RULES.md` |
+| `fireskill-aux-database` | Mantém `.fireskills/DATABASE.md` |
 
 ## Especialistas Técnicos
 
@@ -121,15 +121,15 @@ O `fireskill-setup` cria e mantém estes arquivos na raiz do projeto:
 
 | Arquivo | Propósito |
 |---|---|
-| `.specsfy/PROJECT.md` | Visão do produto, objetivos, público-alvo |
-| `.specsfy/INTERFACE.md` | Contratos de interface (@nuxt/ui, padrões visuais) |
-| `.specsfy/DESIGNSYSTEM.MD` | Tokens, cores, tipografia, componentes |
-| `.specsfy/STACK.md` | Stack técnica completa (autenticidade é tudo) |
-| `.specsfy/RULES.md` | Regras obrigatórias do projeto |
-| `.specsfy/DATABASE.md` | Schema Drizzle, tabelas, relações |
-| `.specsfy/PACKAGES.md` | Pacotes instalados por workspace |
+| `.fireskills/PROJECT.md` | Visão do produto, objetivos, público-alvo |
+| `.fireskills/INTERFACE.md` | Contratos de interface (@nuxt/ui, padrões visuais) |
+| `.fireskills/DESIGNSYSTEM.MD` | Tokens, cores, tipografia, componentes |
+| `.fireskills/STACK.md` | Stack técnica completa (autenticidade é tudo) |
+| `.fireskills/RULES.md` | Regras obrigatórias do projeto |
+| `.fireskills/DATABASE.md` | Schema Drizzle, tabelas, relações |
+| `.fireskills/PACKAGES.md` | Pacotes instalados por workspace |
 
-> O diretório de contexto chama-se `.specsfy/`: é o caminho que os scripts das
+> O diretório de contexto chama-se `.fireskills/`: é o caminho que os scripts das
 > skills leem e escrevem, e o nome é mantido.
 
 ## Motor do fluxo (CLI `fireskill`)
@@ -146,7 +146,7 @@ motor do fluxo, sem instalador nem TUI). Da raiz do repositório:
 | `bun run fireskill migrate` | Migra specs do layout antigo para as pastas de estado |
 | `bun run fireskill test` | Executa `bun run test` (Vitest) |
 | `bun run fireskill validate <id> [--strict]` | Linter rápido da spec (metadados, seções, BDD, tarefas). **Não** é o Definition Gate: o gate é `validate_spec.mjs` da skill `fireskill-04-validate` |
-| `bun run fireskill lesson add/list/status/prune` | Gerencia o playbook auto-evolutivo de lições aprendidas (`.specsfy/LESSONS.md`) |
+| `bun run fireskill lesson add/list/status/prune` | Gerencia o playbook auto-evolutivo de lições aprendidas (`.fireskills/LESSONS.md`) |
 | `bun run fireskill config show\|set` | Configuração do CLI |
 
 Testes do CLI: `bun run test` dentro de `fireskills/cli/`.

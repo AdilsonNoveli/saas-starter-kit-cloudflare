@@ -18,11 +18,11 @@ fixo nem pergunta novamente algo que já esteja confirmado.
 
 Antes de formular qualquer pergunta, leia, nesta ordem:
 
-1. `.specsfy/USER-PROFILE.md`, quando existir;
+1. `.fireskills/USER-PROFILE.md`, quando existir;
 2. a conversa atual e as respostas já dadas;
-3. `.specsfy/PROJECT.md`, `.specsfy/DESIGNSYSTEM.MD`, `.specsfy/STACK.md`,
-   `.specsfy/RULES.md`, `.specsfy/DATABASE.md` e `.specsfy/PACKAGES.md`;
-4. `AGENTS.md`, `CLAUDE.md`, `.specsfy/SPECKIT.md` e as fontes relacionadas
+3. `.fireskills/PROJECT.md`, `.fireskills/DESIGNSYSTEM.MD`, `.fireskills/STACK.md`,
+   `.fireskills/RULES.md`, `.fireskills/DATABASE.md` e `.fireskills/PACKAGES.md`;
+4. `AGENTS.md`, `CLAUDE.md`, `.fireskills/SPECKIT.md` e as fontes relacionadas
    listadas por ele, quando existirem;
 5. Inbox, backlog e specs aplicáveis, sem alterar esses arquivos.
 
@@ -46,7 +46,7 @@ Pergunta 1. Como você prefere receber as orientações deste setup?
 ```
 
 Normalize a resposta para `iniciante`, `intermediário` ou `experiente` e grave-a
-em `.specsfy/USER-PROFILE.md`, com a fonte e a data. Se o perfil já tiver um
+em `.fireskills/USER-PROFILE.md`, com a fonte e a data. Se o perfil já tiver um
 nível confirmado, use-o sem perguntar. Se a conversa ou o perfil apresentarem
 níveis diferentes, faça somente uma pergunta para resolver esse conflito e
 registre a atualização.
@@ -96,7 +96,7 @@ deploy e contratos de integração ainda ausentes.
 Cada rodada apresenta uma pergunta, opções numeradas, `Escrever outra resposta`,
 `Gere outras opções` e `Avançar`, conforme o contrato de `fireskills/skills/Spec.md`.
 Após a resposta, normalize o conteúdo, registre área, assunto, resposta, fonte,
-data e alcance em `.specsfy/USER-PROFILE.md`, e só então avance.
+data e alcance em `.fireskills/USER-PROFILE.md`, e só então avance.
 
 ## Cobertura funcional obrigatória no setup
 
@@ -110,7 +110,7 @@ antes de registrar a cobertura.
 
 Para cada tela de uso recorrente, identifique como a pessoa chega até ela pelos
 menus do sistema e registre o item, o destino, a permissão e o comportamento
-responsivo em `.specsfy/INTERFACE.md`. Uma rota técnica, callback ou etapa acessada
+responsivo em `.fireskills/INTERFACE.md`. Uma rota técnica, callback ou etapa acessada
 somente por redirecionamento pode ficar fora do menu quando a própria jornada
 comprovar esse acesso. Se não estiver claro se a tela recebe um link ou em qual
 menu ela aparece, confirme com a pessoa em uma única rodada antes de seguir.
@@ -122,7 +122,7 @@ o CRUD e os links confirmados, com tarefas e testes próprios.
 
 Em toda execução completa do setup, carregue `$fireskill-documentator` depois de
 reconciliar os contextos e especialistas. Reconstrua a documentação técnica de
-todo o sistema existente em `docs/` e `.specsfy/PACKAGES.md`, mesmo quando não
+todo o sistema existente em `docs/` e `.fireskills/PACKAGES.md`, mesmo quando não
 houver mudança recente em aplicação, persistência ou dependências. Preserve
 texto humano fora dos blocos gerenciados e resolva qualquer resultado
 `PENDING` antes de encerrar.
@@ -173,17 +173,17 @@ para forçar sua execução.
    scripts `.mjs`), Bun (`bun run fireskill`), Git e acesso de escrita ao
    projeto. Corrija cada requisito ausente.
 6. Executar `node scripts/setup_context.mjs --project <raiz>`.
-   Renderizar `.specsfy/PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`,
-   `.specsfy/INTERFACE.md`, `.specsfy/DESIGNSYSTEM.MD` e `.specsfy/USER-PROFILE.md` a partir de
-   `.specsfy/templates/custom/<Nome>.md` quando existir ou dos arquivos
-   gerenciados `.specsfy/templates/Project.md`, `Stack.md`, `Rules.md`,
-   `Database.md`, `Interface.md`, `.specsfy/DESIGNSYSTEM.MD` e `UserProfile.md` caso
+   Renderizar `.fireskills/PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`,
+   `.fireskills/INTERFACE.md`, `.fireskills/DESIGNSYSTEM.MD` e `.fireskills/USER-PROFILE.md` a partir de
+   `.fireskills/templates/custom/<Nome>.md` quando existir ou dos arquivos
+   gerenciados `.fireskills/templates/Project.md`, `Stack.md`, `Rules.md`,
+   `Database.md`, `Interface.md`, `.fireskills/DESIGNSYSTEM.MD` e `UserProfile.md` caso
    contrário; não manter
-   modelos paralelos embutidos no script. O `.specsfy/DESIGNSYSTEM.MD` fica na raiz do
+   modelos paralelos embutidos no script. O `.fireskills/DESIGNSYSTEM.MD` fica na raiz do
    projeto, nasce com defaults de interface comuns e é criado somente quando
    ainda não existir. O mesmo comando deve ler a constituição e todos os arquivos
    regulares em `specs/` quando detectar GitHub Spec Kit, depois atualizar o
-   bloco gerenciado de `.specsfy/SPECKIT.md`.
+   bloco gerenciado de `.fireskills/SPECKIT.md`.
    O setup inicial não cria `SEMVER` nem altera `infra/`. O versionamento e o
    deploy começam somente quando a pessoa pedir esse processo de forma
    explícita; nesse caso, anuncie o handoff para `$fireskill-specialist-sst`
@@ -201,9 +201,9 @@ para forçar sua execução.
    `check_database_safety.mjs --project <raiz>` e
    manter toda execução de testes suspensa até o resultado `SAFE`.
 
-8. Inspecionar os arquivos iniciais, incluindo `.specsfy/USER-PROFILE.md`, e
-   `.specsfy/PACKAGES.md` quando
-   gerado e a fonte de stack usada pelo script. Quando `.specsfy/SPECKIT.md`
+8. Inspecionar os arquivos iniciais, incluindo `.fireskills/USER-PROFILE.md`, e
+   `.fireskills/PACKAGES.md` quando
+   gerado e a fonte de stack usada pelo script. Quando `.fireskills/SPECKIT.md`
    existir, abrir a constituição e cada fonte original listada na projeção.
    Antes de qualquer descoberta de interface, executar também
    `node scripts/inspect_interface.mjs --project <raiz>` e abrir as rotas,
@@ -215,7 +215,7 @@ para forçar sua execução.
    fontes foram lidas antes de propor qualquer alteração; não trate a ausência
    de leitura como permissão para substituir convenções.
 9. Nunca substituir um arquivo de contexto existente, mesmo com conteúdo
-   incompleto. Em `AGENTS.md`, `CLAUDE.md` e `.specsfy/SPECKIT.md`, atualizar
+   incompleto. Em `AGENTS.md`, `CLAUDE.md` e `.fireskills/SPECKIT.md`, atualizar
    somente o bloco delimitado do framework e preservar tudo fora dele. Nunca
    escrever, mover, renomear ou remover arquivos em `.specify/` e `specs/`.
 10. Depois de ler a stack, instale primeiro o núcleo essencial do Fireskills:
@@ -232,7 +232,7 @@ para forçar sua execução.
    carregar respectivamente `$fireskill-aux-stack`, `$fireskill-aux-rules` ou
    `$fireskill-aux-database`.
 12. Em toda execução completa do setup, carregar `$fireskill-documentator`
-   depois das auxiliares e reconstruir `docs/` e `.specsfy/PACKAGES.md` a
+   depois das auxiliares e reconstruir `docs/` e `.fireskills/PACKAGES.md` a
    partir de todo o projeto. Quando aplicação, persistência ou dependências
    mudar durante outra etapa, repetir o documentador ao fim da implementação.
 13. Somente quando a pessoa solicitar ou indicar explicitamente o uso de
@@ -250,9 +250,9 @@ ou finalidade, registrar essa avaliação nas fontes da tarefa e repetir com
 `--acknowledge-rules-no-change`; nunca usar o reconhecimento para ocultar uma
 mudança documental real.
 
-Manter `.specsfy/PROJECT.md`, `.specsfy/INTERFACE.md` e `.specsfy/DESIGNSYSTEM.MD` na raiz. Manter
+Manter `.fireskills/PROJECT.md`, `.fireskills/INTERFACE.md` e `.fireskills/DESIGNSYSTEM.MD` na raiz. Manter
 `STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md`, `USER-PROFILE.md` e a
-projeção opcional `SPECKIT.md` em `.specsfy/`. Tratar esses
+projeção opcional `SPECKIT.md` em `.fireskills/`. Tratar esses
 documentos como contexto derivado do projeto, não como spec, gate ou
 autorização de implementação.
 
@@ -295,10 +295,10 @@ Para todo projeto Nuxfire, o setup carrega `fireskill-specialist-nuxt-ui`: o
 
 Confira o runtime real antes de aprovar o setup: Cloudflare Workers via SST
 (`sst.config.ts`, `infra/`), Postgres por Hyperdrive e Drizzle. Registre essa
-combinação em `.specsfy/STACK.md` e encaminhe qualquer divergência para uma spec
+combinação em `.fireskills/STACK.md` e encaminhe qualquer divergência para uma spec
 antes de aprovar o setup.
 
-Depois de carregar o especialista, o setup registra em `.specsfy/INTERFACE.md` que as
+Depois de carregar o especialista, o setup registra em `.fireskills/INTERFACE.md` que as
 telas são compostas por Vue SFC com componentes `@nuxt/ui`. Cada nova tela deve
 consultar o mapa, reutilizar o que já existe e registrar componentes próprios e
 componentes `@nuxt/ui` com arquivos e consumidores reais.

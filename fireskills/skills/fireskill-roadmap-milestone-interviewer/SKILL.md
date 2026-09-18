@@ -18,7 +18,7 @@ Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
 `Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
-Leia `.specsfy/PROJECT.md`, `specs.md`, os arquivos em `specs/milestones/` e as specs
+Leia `.fireskills/PROJECT.md`, `specs.md`, os arquivos em `specs/milestones/` e as specs
 relacionadas. Comece pelo MVP aprovado e explique qual parte da conversa será
 planejada agora.
 

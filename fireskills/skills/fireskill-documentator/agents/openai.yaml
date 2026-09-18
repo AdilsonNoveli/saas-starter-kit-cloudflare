@@ -1,4 +1,4 @@
 interface:
   display_name: "Fireskill - Documentador"
   short_description: "Reconstrói documentação e inventário de pacotes"
-  default_prompt: "Use $fireskill-documentator para reconstruir a documentação técnica em docs/ e o inventário .specsfy/PACKAGES.md."
+  default_prompt: "Use $fireskill-documentator para reconstruir a documentação técnica em docs/ e o inventário .fireskills/PACKAGES.md."

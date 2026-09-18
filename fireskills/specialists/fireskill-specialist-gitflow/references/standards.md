@@ -34,7 +34,7 @@ equivalente e não exige a extensão instalada:
 - `git config --get-regexp '^gitflow\.'` retorna as chaves de prefixo
   (`gitflow.prefix.feature`, `.release`, `.hotfix`, `.branch.master`,
   `.branch.develop`) gravadas pela extensão `git flow init`.
-- `.specsfy/RULES.md`, `AGENTS.md`, `CLAUDE.md` ou `CONTRIBUTING.md`
+- `.fireskills/RULES.md`, `AGENTS.md`, `CLAUDE.md` ou `CONTRIBUTING.md`
   descrevem explicitamente o fluxo `main`/`develop`/`feature`/`release`/
   `hotfix`.
 - Nenhum desses sinais substitui o pedido direto da pessoa; na ausência de

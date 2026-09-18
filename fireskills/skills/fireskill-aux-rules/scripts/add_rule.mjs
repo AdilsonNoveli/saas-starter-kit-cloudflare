@@ -31,12 +31,12 @@ try {
   const project = resolve(argument("project"));
   const section = argument("section");
   const rule = argument("rule");
-  const target = join(project, ".specsfy", "RULES.md");
+  const target = join(project, ".fireskills", "RULES.md");
   let existing = "";
   try { existing = await readFile(target, "utf8"); } catch (error) { if (error?.code !== "ENOENT") throw error; }
   const updated = addRule(existing, section, rule);
   if (updated !== existing) {
-    await mkdir(join(project, ".specsfy"), { recursive: true });
+    await mkdir(join(project, ".fireskills"), { recursive: true });
     await writeFile(target, updated, "utf8");
     console.log(target);
   }

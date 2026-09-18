@@ -15,16 +15,16 @@ describe("configuração", () => {
     expect((await loadConfig(project)).watch_interval).toBe(
       DEFAULT_WATCH_INTERVAL,
     );
-    await mkdir(join(project, ".specsfy"), { recursive: true });
+    await mkdir(join(project, ".fireskills"), { recursive: true });
     await writeFile(
-      join(project, ".specsfy/config.json"),
+      join(project, ".fireskills/config.json"),
       JSON.stringify({ schema_version: 1, extension: true }),
     );
 
     await updateConfig(project, 0.5);
 
     const payload = JSON.parse(
-      await readFile(join(project, ".specsfy/config.json"), "utf8"),
+      await readFile(join(project, ".fireskills/config.json"), "utf8"),
     ) as Record<string, unknown>;
     expect(payload).toMatchObject({
       schema_version: 1,

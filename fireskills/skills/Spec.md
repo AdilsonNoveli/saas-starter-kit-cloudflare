@@ -60,23 +60,23 @@ ou pendente.
 
 ## Contexto persistente do projeto
 
-- `.specsfy/PROJECT.md`, na raiz, mantém a história, a finalidade, as capacidades e os
+- `.fireskills/PROJECT.md`, na raiz, mantém a história, a finalidade, as capacidades e os
   limites gerais do projeto.
-- `.specsfy/STACK.md` mantém tecnologias estruturais e suas evidências.
-- `.specsfy/RULES.md` mantém regras explícitas confirmadas pela pessoa
+- `.fireskills/STACK.md` mantém tecnologias estruturais e suas evidências.
+- `.fireskills/RULES.md` mantém regras explícitas confirmadas pela pessoa
   responsável.
-- `.specsfy/DATABASE.md` mantém o quadro tabular completo de persistência.
-- `.specsfy/INTERFACE.md`, na raiz, é o mapa canônico do design system: stack de
+- `.fireskills/DATABASE.md` mantém o quadro tabular completo de persistência.
+- `.fireskills/INTERFACE.md`, na raiz, é o mapa canônico do design system: stack de
   interface, tokens, componentes @nuxt/ui v4 usados, composições Vue SFC,
   arquivos-fonte, componentes reutilizáveis e telas que os consomem.
-- `.specsfy/DESIGNSYSTEM.MD`, na raiz, mantém os defaults macro de interface, padrões
+- `.fireskills/DESIGNSYSTEM.MD`, na raiz, mantém os defaults macro de interface, padrões
   comuns de CRUD e dashboard, estados e exceções com alcance.
-- `.specsfy/PACKAGES.md` mantém o inventário de pacotes derivado dos
+- `.fireskills/PACKAGES.md` mantém o inventário de pacotes derivado dos
   manifests, lockfiles e metadados locais, com uma finalidade curta por pacote.
-- `.specsfy/USER-PROFILE.md` mantém o nível de conhecimento confirmado, as
+- `.fireskills/USER-PROFILE.md` mantém o nível de conhecimento confirmado, as
   respostas já dadas durante o setup e as fontes dessas respostas. O setup lê
   esse arquivo antes de perguntar e não repete assuntos já confirmados.
-- `.specsfy/SPECKIT.md` aparece quando o projeto possui
+- `.fireskills/SPECKIT.md` aparece quando o projeto possui
   `.specify/memory/constitution.md`. Essa projeção lista a constituição e todos
   os arquivos regulares encontrados em `specs/`, sem alterar as fontes do
   GitHub Spec Kit.
@@ -102,10 +102,10 @@ ou pendente.
   no início, após cada tarefa de implementação e antes do Delivery Gate.
 - Executar `$fireskill-documentator` depois de cada tarefa de implementação e
   sempre que o usuário pedir uma reconstrução técnica. A skill lê todo o
-  projeto e mantém a projeção completa em `docs/` e `.specsfy/PACKAGES.md`,
+  projeto e mantém a projeção completa em `docs/` e `.fireskills/PACKAGES.md`,
   sem depender de uma spec.
 - Não concluir uma tarefa enquanto o monitor exigir `STACK.md` ou `DATABASE.md`.
-  Toda mudança de aplicação revisa `.specsfy/PROJECT.md`; quando não houver impacto
+  Toda mudança de aplicação revisa `.fireskills/PROJECT.md`; quando não houver impacto
   material, registrar a justificativa na evidência da tarefa antes do
   reconhecimento explícito.
 - Preservar conteúdo humano existente. Os blocos delimitados por
@@ -135,7 +135,7 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
    corrigir ou mudar algo depois de a spec já ter sido definida. A skill
    incorpora o pedido na fonte normativa e reabre somente os atos afetados.
 8. Use `fireskill-documentator` para reconstruir `docs/` e
-   `.specsfy/PACKAGES.md` a partir do sistema existente após cada implementação
+   `.fireskills/PACKAGES.md` a partir do sistema existente após cada implementação
    ou por acionamento livre.
 9. Use `fireskill-progress` somente para projetar o estado existente.
 10. Use `fireskill-interviewer` para conversar com a spec nas fases `draft`,
@@ -147,7 +147,7 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
 12. Use `fireskill-data-discovery` quando uma Inbox, backlog, descoberta de MVP
     ou spec indicar informações que o produto precisa guardar. A conversa usa
     linguagem cotidiana e registra respostas confirmadas em
-    `.specsfy/DATABASE.md`.
+    `.fireskills/DATABASE.md`.
 
 ## Contrato de runtime Cloudflare Workers
 
@@ -197,7 +197,7 @@ configuração. Não replique o markup do cabeçalho em cada página.
 - Cada linha oferece ações independentes de editar e apagar. O botão de apagar
   respeita a permissão e confirma a consequência antes de executar.
 - Componentes recorrentes de cabeçalho, tabela, linha, ações, formulário,
-  estados e feedback são registrados em `.specsfy/INTERFACE.md` e reaproveitados antes
+  estados e feedback são registrados em `.fireskills/INTERFACE.md` e reaproveitados antes
   de uma nova implementação.
 
 ### Revisão visual durante o desenvolvimento
@@ -207,7 +207,7 @@ alterar uma interface, mesmo sem pedido da pessoa. O item `VISUAL` da tarefa
 fica entre `VERIFY` e `EVIDENCE` para impedir o registro da entrega sem a
 conferência.
 
-Leia `.specsfy/DESIGNSYSTEM.MD`, `.specsfy/INTERFACE.md` e os componentes afetados. Compare a
+Leia `.fireskills/DESIGNSYSTEM.MD`, `.fireskills/INTERFACE.md` e os componentes afetados. Compare a
 interface renderizada ou inspecionada nos viewports e estados relevantes com o
 sistema do projeto. A conferência precisa cobrir bordas, espaçamentos, margens,
 padding e tipografia, incluindo família, peso, tamanho, altura de linha e
@@ -220,8 +220,8 @@ marque o item `VISUAL` com `Não aplicável` e o motivo concreto. Essa análise
 ocorre durante a implementação e novamente no fechamento do Delivery Gate;
 pedido do usuário não é condição para acioná-la.
 
-Antes da primeira pergunta dessa área, leia `.specsfy/STACK.md`,
-`.specsfy/PACKAGES.md` quando existir, manifests, configurações e telas já
+Antes da primeira pergunta dessa área, leia `.fireskills/STACK.md`,
+`.fireskills/PACKAGES.md` quando existir, manifests, configurações e telas já
 publicadas. Execute `node fireskills/skills/fireskill-setup/scripts/inspect_interface.mjs --project <raiz>` e use a saída para localizar as fontes relevantes. Quando houver sistema atual, percorra os fluxos e telas afetados,
 incluindo navegação, conteúdo, componentes, permissões, estados e limites já
 visíveis. Analise antes de sugerir ou escrever: descreva o que cada tela atual
@@ -250,7 +250,7 @@ fornece todos os componentes (`UButton`, `UModal`, `UTable`, `UForm`,
 `UFormField` e demais). A página ou rota limita-se a obter dados e compor
 componentes de domínio. Formulários, tabelas, filtros, ações em lote, diálogos,
 painéis laterais, estados visuais e partes repetidas ficam em componentes
-próprios. Antes de criar uma peça, leia `.specsfy/INTERFACE.md`, localize algo
+próprios. Antes de criar uma peça, leia `.fireskills/INTERFACE.md`, localize algo
 reutilizável e registre nela cada arquivo criado ou reaproveitado, sua origem,
 seus consumidores e o componente `@nuxt/ui` correspondente (para tabelas, o
 `enterpriseTableUi`).
@@ -452,14 +452,14 @@ os Atos II–III. Gate posterior não permanece aprovado sobre entrada invalidad
 No Nuxfire o Fireskills vive dentro do repositório, em `fireskills/`. As skills
 ficam em `fireskills/skills/`, os templates em `fireskills/skills/templates/` e
 o exemplo não normativo em `fireskills/skills/examples/Spec.md`. Este contrato é
-lido diretamente de `fireskills/skills/Spec.md`; não há cópia em `.specsfy/`. A
+lido diretamente de `fireskills/skills/Spec.md`; não há cópia em `.fireskills/`. A
 criação de um artefato resolve seu template nesta ordem:
 
-1. `.specsfy/templates/custom/<Nome>.md`, customização do projeto.
-2. `.specsfy/templates/<Nome>.md`, cópia local opcional.
+1. `.fireskills/templates/custom/<Nome>.md`, customização do projeto.
+2. `.fireskills/templates/<Nome>.md`, cópia local opcional.
 3. `fireskills/skills/templates/<Nome>.md`, fonte padrão.
 
-O diretório `.specsfy/templates/custom/` pertence ao projeto e nunca é
+O diretório `.fireskills/templates/custom/` pertence ao projeto e nunca é
 sobrescrito. A criação de uma spec copia e renderiza o template resolvido em
 `specs/<estado>/<NNNN>-<slug>/spec.md`; o exemplo existe para inspeção, testes e
 compreensão da arquitetura, nunca como fonte de uma feature.

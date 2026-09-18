@@ -15,11 +15,11 @@ description: Analisar o sistema atual e orientar a descoberta, o plano e a entre
 
 ## Fluxo
 
-1. Carregar `$fireskill-setup` e ler `.specsfy/STACK.md`,
-   `.specsfy/PACKAGES.md`, manifests, instruções locais e documentação atual.
-   Carregar `$fireskill-specialist-design-system` e ler `.specsfy/DESIGNSYSTEM.MD` antes
+1. Carregar `$fireskill-setup` e ler `.fireskills/STACK.md`,
+   `.fireskills/PACKAGES.md`, manifests, instruções locais e documentação atual.
+   Carregar `$fireskill-specialist-design-system` e ler `.fireskills/DESIGNSYSTEM.MD` antes
    de propor qualquer tela. Se o arquivo não existir, criar a fonte a partir de
-   `.specsfy/templates/DESIGNSYSTEM.MD`.
+   `.fireskills/templates/DESIGNSYSTEM.MD`.
    Executar `node fireskills/skills/fireskill-setup/scripts/inspect_interface.mjs
    --project <raiz>` para localizar rotas, componentes e tecnologias antes da
    leitura detalhada.
@@ -32,7 +32,7 @@ description: Analisar o sistema atual e orientar a descoberta, o plano e a entre
 4. Aplicar o contrato central de perguntas somente para lacunas reais:
    perguntar uma lacuna por rodada sobre telas, fluxo de informação, formulário,
    formato de ação e composição. Quando a pessoa não informa direção visual,
-   aplicar os defaults de `.specsfy/DESIGNSYSTEM.MD` e registrar a direção padrão. Só
+   aplicar os defaults de `.fireskills/DESIGNSYSTEM.MD` e registrar a direção padrão. Só
    perguntar sobre composição quando o pedido contrariar uma regra existente.
    Oferecer opções textuais compatíveis com o sistema atual, `Escrever outra
    resposta`, `Gere outras opções` e `Avançar`.
@@ -69,7 +69,7 @@ preserva tudo fora do alcance registrado.
 - Registrar teclado, foco, responsividade e mensagens junto da tela afetada.
 - Renderizar `Breadcrumb` em todas as telas, mantendo o nome da equipe ativa
   visível. Reutilizar o breadcrumb existente no layout e sua tipagem de itens.
-- Aplicar `.specsfy/DESIGNSYSTEM.MD` como fonte macro e `.specsfy/INTERFACE.md` como registro local.
+- Aplicar `.fireskills/DESIGNSYSTEM.MD` como fonte macro e `.fireskills/INTERFACE.md` como registro local.
 - Usar `UTable`, `DetailLists` e `PageHeader` nas superfícies CRUD definidas;
   a linha abre o detalhe e controles internos permanecem independentes.
 - Reutilizar o mesmo `PageHeader` componentizado em todas as telas CRUD; manter
@@ -94,7 +94,7 @@ preserva tudo fora do alcance registrado.
 - Confirmar que a pessoa recebeu pergunta sobre as telas em toda entrega que
   cria ou altera uma interface.
 - Conferir que a seção 10 registra a stack e o sistema atual antes da proposta.
-- Confirmar que `.specsfy/DESIGNSYSTEM.MD` foi lido ou criado e que a direção padrão ou
+- Confirmar que `.fireskills/DESIGNSYSTEM.MD` foi lido ou criado e que a direção padrão ou
   exceção está registrada com alcance.
 - Executar `validate_spec.mjs`, `validate_tasks.mjs` e
   `validate_interface_tasks.mjs` conforme a etapa.

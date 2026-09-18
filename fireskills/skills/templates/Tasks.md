@@ -76,7 +76,7 @@ O comentário é obrigatório para tarefa `[CODE]` concluída quando a spec decl
 
 - [ ] T006 [CODE] [US-001] Implementar a tela de [responsabilidade] em layers/recurso/app/components/RecursoLista.vue — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T005
   - [ ] **PREP**: Confirmar stack, tela atual, fluxo, formulário e estados definidos na seção 10; carregar `$fireskill-specialist-nuxt-ui` antes de escrever `.vue` com componentes `U*`.
-  - [ ] **EXECUTE**: Implementar os componentes Vue, tela, ações e formulário conforme a composição acordada; registrar cada bloco e componente em `.specsfy/INTERFACE.md`.
+  - [ ] **EXECUTE**: Implementar os componentes Vue, tela, ações e formulário conforme a composição acordada; registrar cada bloco e componente em `.fireskills/INTERFACE.md`.
   - [ ] **VERIFY**: Exercitar menus, navegação, validações, feedback e teclado.
   - [ ] **VISUAL**: Conferir PageHeader reutilizado, `UTable` (`enterpriseTableUi`) em largura total, coluna `ID`, link da linha, ações de editar e apagar, bordas, espaçamentos, margens, padding e tipografia nos estados e viewports relevantes.
   - [ ] **EVIDENCE**: Registrar arquivos, comando e resultado da interação.

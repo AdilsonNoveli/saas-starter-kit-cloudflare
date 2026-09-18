@@ -13,7 +13,7 @@ import { basename, dirname, join, relative, resolve, sep } from "node:path";
 const START = "<!-- specsfy:speckit:start -->";
 const END = "<!-- specsfy:speckit:end -->";
 const CONSTITUTION = ".specify/memory/constitution.md";
-const TARGET = ".specsfy/SPECKIT.md";
+const TARGET = ".fireskills/SPECKIT.md";
 
 /**
  * Atualiza somente o bloco gerenciado da ponte e devolve o caminho alterado.

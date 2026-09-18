@@ -1,6 +1,6 @@
 ---
 name: fireskill-aux-stack
-description: Monitorar manifests e arquivos estruturais para criar ou atualizar .specsfy/STACK.md de forma aditiva. Use quando o monitor de contexto apontar stack pendente; quando framework, linguagem, runtime, pacote estrutural, ferramenta de teste ou persistência mudar; quando a documentação técnica estiver incompleta; ou após adicionar um framework, uma biblioteca estrutural ou dependências relevantes. Preserva conteúdo humano existente.
+description: Monitorar manifests e arquivos estruturais para criar ou atualizar .fireskills/STACK.md de forma aditiva. Use quando o monitor de contexto apontar stack pendente; quando framework, linguagem, runtime, pacote estrutural, ferramenta de teste ou persistência mudar; quando a documentação técnica estiver incompleta; ou após adicionar um framework, uma biblioteca estrutural ou dependências relevantes. Preserva conteúdo humano existente.
 ---
 
 # Manter o stack
@@ -18,7 +18,7 @@ Modo de interação: `sem perguntas`.
 Não formule perguntas nesta skill. Quando faltar informação confirmada,
 sinalize o campo pendente para a etapa conversacional responsável.
 
-1. Ler instruções locais, `.specsfy/PROJECT.md` e o `STACK.md` existente.
+1. Ler instruções locais, `.fireskills/PROJECT.md` e o `STACK.md` existente.
 2. Executar `node scripts/update_stack.mjs --project <raiz>`.
 3. Conferir cada linha contra manifests, lockfiles e configurações presentes.
 4. Manter decisões, notas e linhas humanas fora do bloco
@@ -28,7 +28,7 @@ sinalize o campo pendente para a etapa conversacional responsável.
 6. Se a mudança também alterar persistência, carregar
    `$fireskill-aux-database`.
 7. Executar `$fireskill-setup` em modo de monitoramento e não devolver o handoff
-   enquanto `.specsfy/STACK.md` continuar pendente.
+   enquanto `.fireskills/STACK.md` continuar pendente.
 
 Não copiar árvores inteiras de dependências. Registrar tecnologias estruturais,
 suas responsabilidades e evidências úteis para agentes compreenderem o sistema.

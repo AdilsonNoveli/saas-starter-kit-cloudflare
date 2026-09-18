@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node build_documentation.mjs [--project <raiz>] [--check]  Reconstrói docs/ e .specsfy/PACKAGES.md; --check só verifica."); process.exit(0); }
+if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node build_documentation.mjs [--project <raiz>] [--check]  Reconstrói docs/ e .fireskills/PACKAGES.md; --check só verifica."); process.exit(0); }
 /** Reconstrói documentação técnica a partir do código existente, sem sobrescrever notas humanas. */
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
@@ -112,9 +112,9 @@ if (!existsSync(project)) {
     "frontend.md": ["Frontend e design system", `## Superfícies observadas\n\n- Componentes, páginas ou views: ${frontendFiles.length}.\n- Tailwind: ${tailwind ? "detectado" : "não identificado"}.\n- Tokens CSS: ${tokens.join(", ") || "não identificados"}.\n\n${table(["Arquivo"], frontendFiles.map((path) => [relative(project, path)]).concat(frontendFiles.length ? [] : [["Nenhuma superfície frontend identificada"]]))}`],
     "packages.md": ["Pacotes e bibliotecas", `## Inventário\n\n${table(["Categoria", "Escopo", "Pacote", "Versão", "Finalidade", "Fonte", "GitHub"], packages.map((row) => [row[0] === "npm" ? "Terceiro" : row[0], row[1], row[2], row[3], row[4], row[5], row[5].includes("github.com") ? row[5] : "—"]))}`],
     "integrations.md": ["Integrações", "## Configuração\n\nValores de ambiente e integrações são documentados apenas pelos nomes declarados localmente, sem segredos."],
-    "decisions.md": ["Decisões técnicas", "## Política\n\nDecisões explícitas em `PROJECT.md` e `.specsfy/` prevalecem sobre inferências deste documento."],
+    "decisions.md": ["Decisões técnicas", "## Política\n\nDecisões explícitas em `PROJECT.md` e `.fireskills/` prevalecem sobre inferências deste documento."],
   };
-  const targets = {...Object.fromEntries(Object.entries(docData).map(([name, [title]]) => [join(project, "docs", name), [title, docData[name][1]]])), [join(project, ".specsfy", "PACKAGES.md")]: ["Pacotes e bibliotecas", `# Pacotes e bibliotecas\n\n${table(["Gerenciador", "Escopo", "Pacote", "Versão", "Finalidade", "Fonte"], packages)}`]};
+  const targets = {...Object.fromEntries(Object.entries(docData).map(([name, [title]]) => [join(project, "docs", name), [title, docData[name][1]]])), [join(project, ".fireskills", "PACKAGES.md")]: ["Pacotes e bibliotecas", `# Pacotes e bibliotecas\n\n${table(["Gerenciador", "Escopo", "Pacote", "Versão", "Finalidade", "Fonte"], packages)}`]};
   const stale = [];
   for (const [path, [title, generated]] of Object.entries(targets)) {
     const current = await text(path);

@@ -217,7 +217,7 @@ export function buildProgram(): Command {
       }
     });
 
-  const lesson = program.command("lesson").description("gerencia o playbook de lições aprendidas (.specsfy/LESSONS.md)");
+  const lesson = program.command("lesson").description("gerencia o playbook de lições aprendidas (.fireskills/LESSONS.md)");
 
   lesson
     .command("add")

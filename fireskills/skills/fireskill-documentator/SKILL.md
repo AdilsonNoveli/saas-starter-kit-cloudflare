@@ -1,6 +1,6 @@
 ---
 name: fireskill-documentator
-description: Construir a documentação técnica em docs/ e o inventário de pacotes npm/Bun em .specsfy/PACKAGES.md. Use ao documentar sistemas ou após implementações.
+description: Construir a documentação técnica em docs/ e o inventário de pacotes npm/Bun em .fireskills/PACKAGES.md. Use ao documentar sistemas ou após implementações.
 ---
 
 # Documentar o sistema
@@ -18,12 +18,12 @@ Modo de interação: `sem perguntas`.
 Não formule perguntas nesta skill. Registre como não identificado todo dado
 que as fontes executáveis não sustentarem.
 
-1. Ler instruções locais, `.specsfy/PROJECT.md`, `.specsfy/STACK.md`,
-   `.specsfy/RULES.md`, `.specsfy/DATABASE.md`, manifests, lockfiles,
+1. Ler instruções locais, `.fireskills/PROJECT.md`, `.fireskills/STACK.md`,
+   `.fireskills/RULES.md`, `.fireskills/DATABASE.md`, manifests, lockfiles,
    metadados instalados e código existente.
 2. Ler [o padrão documental](references/documentation-standard.md) antes de
    alterar a topologia publicada.
-3. Construir toda a documentação e `.specsfy/PACKAGES.md`, mesmo quando a
+3. Construir toda a documentação e `.fireskills/PACKAGES.md`, mesmo quando a
    skill for acionada sem uma spec ou implementação recente:
 
    ```bash
@@ -39,7 +39,7 @@ que as fontes executáveis não sustentarem.
    ```
 
 6. Preservar conteúdo humano fora dos blocos `specsfy:documentator`, inclusive
-   em `.specsfy/PACKAGES.md`. Tratar o bloco como projeção reconstruível das
+   em `.fireskills/PACKAGES.md`. Tratar o bloco como projeção reconstruível das
    fontes locais.
 7. Registrar na evidência da tarefa o comando, resultado e arquivos atualizados.
 
@@ -59,7 +59,7 @@ Manter em `docs/`:
 - integrações e variáveis de configuração sem valores sensíveis;
 - decisões explícitas e suas fontes.
 
-Manter em `.specsfy/PACKAGES.md`:
+Manter em `.fireskills/PACKAGES.md`:
 
 - todos os pacotes npm (Bun workspaces) encontrados nos manifests e lockfiles do
   projeto, inclusive dependências transitivas registradas localmente;
@@ -75,7 +75,7 @@ Workers (`apps/functions`), recursos SST (`infra/*.ts`), scripts e Vitest.
 
 - Não copiar segredos, valores de `.env`, dados de produção ou código inteiro.
 - Não apresentar heurística como decisão confirmada.
-- Não substituir specs, `.specsfy/PROJECT.md` ou arquivos humanos em `.specsfy/`.
+- Não substituir specs, `.fireskills/PROJECT.md` ou arquivos humanos em `.fireskills/`.
   `PACKAGES.md` é a única projeção reconstruída pela skill nesse diretório e
   preserva conteúdo fora do bloco gerado.
 - Não exigir rede para construir. Quando o repositório GitHub de um pacote não

@@ -1,6 +1,6 @@
 ---
 name: fireskill-lessons
-description: Sistema auto-evolutivo de lições aprendidas do Fireskills. Registra regras preventivas a partir de falhas de teste, regressões, mutantes sobreviventes e desvios de especificação, mantendo o playbook (.specsfy/LESSONS.md) ativo para prevenir a repetição de erros passados.
+description: Sistema auto-evolutivo de lições aprendidas do Fireskills. Registra regras preventivas a partir de falhas de teste, regressões, mutantes sobreviventes e desvios de especificação, mantendo o playbook (.fireskills/LESSONS.md) ativo para prevenir a repetição de erros passados.
 ---
 
 # Fireskill Lessons: Sistema Auto-Evolutivo de Lições
@@ -58,5 +58,5 @@ bun run fireskill lesson prune
 
 ## Arquivos Gerados e Mantidos
 
-- **`.specsfy/lessons.json`**: Base canônica serializada em JSON, de propriedade do motor.
-- **`.specsfy/LESSONS.md`**: Playbook formatado em Markdown, consumido diretamente por agentes antes de redigir especificações ou tarefas.
+- **`.fireskills/lessons.json`**: Base canônica serializada em JSON, de propriedade do motor.
+- **`.fireskills/LESSONS.md`**: Playbook formatado em Markdown, consumido diretamente por agentes antes de redigir especificações ou tarefas.

@@ -4,9 +4,9 @@
 
 ## Fonte macro
 
-Leia `.specsfy/DESIGNSYSTEM.MD` antes de propor tokens, shell, componentes globais ou
+Leia `.fireskills/DESIGNSYSTEM.MD` antes de propor tokens, shell, componentes globais ou
 composições de CRUD. Se o arquivo não existir, use
-`.specsfy/templates/DESIGNSYSTEM.MD` e registre somente o contexto confirmado.
+`.fireskills/templates/DESIGNSYSTEM.MD` e registre somente o contexto confirmado.
 
 ## Superfícies comuns
 

@@ -73,8 +73,8 @@ async function existingNumbers(root) {
 
 async function template(root) {
   const candidates = [
-    join(root, ".specsfy/templates/custom/Spec.md"),
-    join(root, ".specsfy/templates/Spec.md"),
+    join(root, ".fireskills/templates/custom/Spec.md"),
+    join(root, ".fireskills/templates/Spec.md"),
     sourceTemplate,
   ];
   for (const path of candidates) {
@@ -109,7 +109,7 @@ async function initialize(root, title, slug) {
   const destinationRoot = join(root, "specs", "draft");
   await mkdir(destinationRoot, { recursive: true });
   const content = await template(root);
-  const allocationLock = join(root, "specs", ".specsfy-allocation.lock");
+  const allocationLock = join(root, "specs", ".fireskills-allocation.lock");
   for (let attempt = 0; attempt < 500; attempt += 1) {
     try {
       await mkdir(allocationLock);

@@ -137,8 +137,8 @@ node <diretório-da-skill>/scripts/iniciar_backlog.mjs \
 ```
 
 5. Use o caminho absoluto impresso pelo script. Ele prefere
-   `.specsfy/templates/custom/Backlog.md` e recorre a
-   `.specsfy/templates/Backlog.md`.
+   `.fireskills/templates/custom/Backlog.md` e recorre a
+   `.fireskills/templates/Backlog.md`.
 
 ## Organizar e priorizar
 
@@ -248,7 +248,7 @@ endpoints nem troque a tecnologia usada pelo projeto.
 Quando a jornada depender de informações guardadas, consultadas, compartilhadas
 ou apagadas, anuncie a transição automática para `$fireskill-data-discovery`
 antes de declarar o brief pronto. Retome o backlog com o registro confirmado
-em `.specsfy/DATABASE.md` como contexto, sem converter a conversa em desenho
+em `.fireskills/DATABASE.md` como contexto, sem converter a conversa em desenho
 técnico.
 
 ## Manter o item

@@ -38,14 +38,14 @@ export async function updateConfig(
   payload.schema_version = 1;
   payload.watch_interval = watchInterval;
   await writeTextAtomic(
-    join(root, ".specsfy", "config.json"),
+    join(root, ".fireskills", "config.json"),
     `${JSON.stringify(payload, null, 2)}\n`,
   );
   return { project: root, watch_interval: watchInterval };
 }
 
 async function readPayload(project: string): Promise<ConfigPayload> {
-  const path = join(project, ".specsfy", "config.json");
+  const path = join(project, ".fireskills", "config.json");
   if (!(await isFile(path))) return { schema_version: 1 };
   const payload = await readJson(path);
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {

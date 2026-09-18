@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node update_database.mjs [--project <raiz>]  Atualiza o bloco gerenciado de .specsfy/DATABASE.md."); process.exit(0); }
+if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node update_database.mjs [--project <raiz>]  Atualiza o bloco gerenciado de .fireskills/DATABASE.md."); process.exit(0); }
 import { existsSync } from "node:fs";
 import { readFile, mkdir, writeFile, readdir } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
@@ -11,7 +11,7 @@ const structures = [];
 const add = (name, kind, source, fields = [], relations = []) => { const found = structures.find((item) => item.name === name && item.source === source); if (found) { found.fields.push(...fields); found.relations.push(...relations); } else structures.push({ name, kind, source, fields, relations }); };
 for (const path of await walk(join(project, "database", "migrations"))) if (path.endsWith(".php")) { const text = await readFile(path, "utf8"); for (const match of text.matchAll(/Schema::(?:create|table)\(\s*['"]([^'"]+)/g)) { const fields = [...text.matchAll(/\$table->([A-Za-z_]\w*)\(\s*['"]([^'"]+)/g)].map((item) => `${item[2]}:${item[1]}`); if (text.includes("$table->id()")) fields.unshift("id:id"); add(match[1], "Tabela", relative(project, path).replaceAll("\\", "/"), fields, fields.filter((item) => /:(foreignId|foreignUuid)$/.test(item)).map((item) => item.split(":")[0])); } }
 for (const path of await walk(project)) if (path.endsWith(".sql") || path.endsWith(".prisma")) { const text = await readFile(path, "utf8"); const source = relative(project, path).replaceAll("\\", "/"); if (path.endsWith(".sql")) for (const match of text.matchAll(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["`]?([\w.]+)["`]?\s*\(([\s\S]*?)\);/gi)) add(match[1], "Tabela SQL", source, match[2].split(",").flatMap((line) => { const part = line.match(/^\s*["`]?(\w+)["`]?\s+([\w()]+)/); return part && !["PRIMARY", "FOREIGN", "CONSTRAINT"].includes(part[1].toUpperCase()) ? [`${part[1]}:${part[2]}`] : []; })); else for (const match of text.matchAll(/model\s+(\w+)\s*\{([\s\S]*?)\}/g)) add(match[1], "Model Prisma", source, match[2].split(/\r?\n/).flatMap((line) => { const item = line.match(/^\s*(\w+)\s+([\w[\]?]+)/); return item ? [`${item[1]}:${item[2]}`] : []; })); }
-const target = join(project, ".specsfy", "DATABASE.md"); const existing = existsSync(target) ? await readFile(target, "utf8") : ""; const safe = (value) => String(value).replaceAll("|", "\\|").replaceAll("\n", " ");
+const target = join(project, ".fireskills", "DATABASE.md"); const existing = existsSync(target) ? await readFile(target, "utf8") : ""; const safe = (value) => String(value).replaceAll("|", "\\|").replaceAll("\n", " ");
 const sources = [];
 const environment = join(project, ".env.example");
 if (existsSync(environment)) {
@@ -24,4 +24,4 @@ const sourceRows = sources.join("\n") || "| A confirmar | Nenhuma estrutura reco
 const tableRows = structures.length ? structures.map((item) => `| ${safe(item.name)} | ${safe(item.kind)} | ${safe([...new Set(item.fields)].join(", ") || "A confirmar")} | ${safe([...new Set(item.relations)].join(", ") || "Não detectadas")} | \`${safe(item.source)}\` |`).join("\n") : "| A confirmar | A confirmar | A confirmar | A confirmar | A confirmar |";
 const block = `${START}\n| Fonte | Tecnologia/forma | Evidência |\n| --- | --- | --- |\n${sourceRows}\n\n## Estruturas detectadas\n\n| Estrutura | Tipo | Campos | Relações | Fonte |\n| --- | --- | --- | --- | --- |\n${tableRows}\n${END}`;
 const updated = existing.includes(START) && existing.includes(END) ? `${existing.split(START)[0]}${block}${existing.split(END).slice(1).join(END)}`.trimEnd() + "\n" : `${(existing.trim() || "# Banco de dados")}\n\n## Inventário detectado\n\n${block}\n`;
-if (updated !== existing) { await mkdir(join(project, ".specsfy"), { recursive: true }); await writeFile(target, updated); console.log(target); }
+if (updated !== existing) { await mkdir(join(project, ".fireskills"), { recursive: true }); await writeFile(target, updated); console.log(target); }

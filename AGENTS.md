@@ -8,8 +8,8 @@ código. Não trabalhe de memória: trabalhe por ele.
 
 1. Leia `fireskills/SKILL.md`. Ele diz qual skill de fluxo e qual especialista
    carregar para o pedido.
-2. Leia `.specsfy/RULES.md` (regras do projeto) e, para o assunto em questão,
-   `.specsfy/PROJECT.md`, `STACK.md`, `DATABASE.md`, `INTERFACE.md` ou
+2. Leia `.fireskills/RULES.md` (regras do projeto) e, para o assunto em questão,
+   `.fireskills/PROJECT.md`, `STACK.md`, `DATABASE.md`, `INTERFACE.md` ou
    `DESIGNSYSTEM.MD`.
 3. Carregue o especialista da área **antes** de ler ou escrever código
    (`fireskills/specialists/`; a tabela de áreas está em `fireskills/SKILL.md`).
@@ -29,12 +29,12 @@ código. Não trabalhe de memória: trabalhe por ele.
 ## Framework Fireskills
 
 Fluxo, caminhos e gates: `fireskills/skills/Spec.md` (leia ao executar uma skill de fluxo).
-Contexto do projeto: `.specsfy/` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `PACKAGES`,
+Contexto do projeto: `.fireskills/` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `PACKAGES`,
 `INTERFACE`, `DESIGNSYSTEM`, `USER-PROFILE`).
 
 - Antes de uma skill de fluxo, execute `$fireskill-setup`; rode o monitor de
   contexto no início, após cada tarefa e antes de concluir, e resolva todo `PENDING`.
-- Não repita pergunta já respondida em `.specsfy/USER-PROFILE.md`.
+- Não repita pergunta já respondida em `.fireskills/USER-PROFILE.md`.
 - Specs: `specs/inbox/`, `specs/backlog/` e `specs/<estado>/<NNNN>-<slug>/spec.md`,
   a única fonte normativa (sem `plan.md`, `tasks.md` ou `research.md`).
 - Tarefa que muda o banco inclui `[MIGRATION]`: migração versionada (drizzle-kit),

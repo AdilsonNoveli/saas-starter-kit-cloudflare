@@ -81,8 +81,8 @@ node <diretório-da-skill>/scripts/capturar_inbox.mjs \
   [--root <raiz>]
 ```
 
-O script usa `.specsfy/templates/custom/Inbox.md` quando presente e recorre a
-`.specsfy/templates/Inbox.md` caso contrário. Ele cria
+O script usa `.fireskills/templates/custom/Inbox.md` quando presente e recorre a
+`.fireskills/templates/Inbox.md` caso contrário. Ele cria
 `specs/inbox/AAAA-MM-DD-HHMMSS-<slug>.md` e nunca sobrescreve uma captura
 existente. Se o template estiver ausente, relate a instalação incompleta; não
 crie um template paralelo dentro da skill.
@@ -97,7 +97,7 @@ transições. Após escrever, apenas sugira um destes próximos passos:
 - usar `$fireskill-02-backlog` para refiná-la ou aprofundá-la.
 - usar `$fireskill-data-discovery` quando a entrada indicar informações que o
   sistema precisará guardar. Essa conversa posterior registra somente o que
-  for confirmado em `.specsfy/DATABASE.md`.
+  for confirmado em `.fireskills/DATABASE.md`.
 
 Somente carregue outra skill se o mesmo pedido também ordenar explicitamente
 esse trabalho. Nesse caso, anuncie

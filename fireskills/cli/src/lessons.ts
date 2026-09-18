@@ -6,8 +6,8 @@
  * IDs sequenciais, contagem de recorrência por fatias distintas, promoção
  * automática de candidato para confirmado, quarentena e geração do playbook.
  *
- * Estado canônico: .specsfy/lessons.json (propriedade do motor)
- * Visão compilada: .specsfy/LESSONS.md (regenerado em cada escrita)
+ * Estado canônico: .fireskills/lessons.json (propriedade do motor)
+ * Visão compilada: .fireskills/LESSONS.md (regenerado em cada escrita)
  */
 
 import { existsSync, promises as fs } from "node:fs";
@@ -63,14 +63,14 @@ function nowIso(): string {
 }
 
 function getStorePath(projectRoot: string): string {
-  return join(projectRoot, ".specsfy", "lessons.json");
+  return join(projectRoot, ".fireskills", "lessons.json");
 }
 
 function getRenderPath(projectRoot: string): string {
-  return join(projectRoot, ".specsfy", "LESSONS.md");
+  return join(projectRoot, ".fireskills", "LESSONS.md");
 }
 
-/** Carrega o banco de lições de .specsfy/lessons.json ou cria a estrutura padrão. */
+/** Carrega o banco de lições de .fireskills/lessons.json ou cria a estrutura padrão. */
 export async function loadLessons(projectRoot: string): Promise<LessonsStore> {
   const path = getStorePath(projectRoot);
   if (!existsSync(path)) {
@@ -107,7 +107,7 @@ export async function loadLessons(projectRoot: string): Promise<LessonsStore> {
   }
 }
 
-/** Salva o banco em .specsfy/lessons.json e compila o .specsfy/LESSONS.md. */
+/** Salva o banco em .fireskills/lessons.json e compila o .fireskills/LESSONS.md. */
 export async function saveLessons(
   projectRoot: string,
   store: LessonsStore,
@@ -115,7 +115,7 @@ export async function saveLessons(
   const storePath = getStorePath(projectRoot);
   const renderPath = getRenderPath(projectRoot);
 
-  await fs.mkdir(join(projectRoot, ".specsfy"), { recursive: true });
+  await fs.mkdir(join(projectRoot, ".fireskills"), { recursive: true });
 
   await fs.writeFile(
     storePath,
@@ -244,7 +244,7 @@ export async function getLessonsStatus(projectRoot: string): Promise<{
   };
 }
 
-/** Renderiza a visão formatada do playbook em .specsfy/LESSONS.md. */
+/** Renderiza a visão formatada do playbook em .fireskills/LESSONS.md. */
 export function renderLessonsMarkdown(store: LessonsStore): string {
   const confirmed = store.lessons.filter((l) => l.status === "confirmed");
   const candidates = store.lessons.filter((l) => l.status === "candidate");

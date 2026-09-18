@@ -1,13 +1,13 @@
 ---
 name: fireskill-specialist-design-system
-description: Criar e manter o .specsfy/DESIGNSYSTEM.MD com regras macro de interface SaaS, padrões CRUD, estados e exceções por alcance. Use antes de projetar telas; não use para registrar componentes locais.
+description: Criar e manter o .fireskills/DESIGNSYSTEM.MD com regras macro de interface SaaS, padrões CRUD, estados e exceções por alcance. Use antes de projetar telas; não use para registrar componentes locais.
 ---
 
 # Fireskills Specialist Design System
 
 ## Quando usar
 
-Esta skill governa o documento `.specsfy/DESIGNSYSTEM.MD` do projeto consumidor. Ela
+Esta skill governa o documento `.fireskills/DESIGNSYSTEM.MD` do projeto consumidor. Ela
 define linguagem visual, shell, composição de superfícies, estados e regras de
 negócio expostas na interface. O documento orienta UX, UI, experiência de
 interface e componentes Vue com `@nuxt/ui`.
@@ -17,33 +17,33 @@ formulário ou um componente global. Use também quando o documento não existir
 estiver desatualizado ou entrar em conflito com uma tela já projetada.
 
 Não use esta skill para catalogar componentes, props ou arquivos locais. Esse
-registro pertence a `.specsfy/INTERFACE.md`, que deve apontar para as escolhas macro sem
+registro pertence a `.fireskills/INTERFACE.md`, que deve apontar para as escolhas macro sem
 copiá-las.
 
 ## Fontes obrigatórias
 
 Leia, nesta ordem:
 
-1. `.specsfy/DESIGNSYSTEM.MD` na raiz do projeto consumidor, se existir.
-2. `.specsfy/templates/DESIGNSYSTEM.MD` para criar a fonte ausente.
-3. `.specsfy/INTERFACE.md` para conhecer componentes e telas já registradas.
-4. `.specsfy/STACK.md`, manifests, rotas, telas, permissões e regras do
+1. `.fireskills/DESIGNSYSTEM.MD` na raiz do projeto consumidor, se existir.
+2. `.fireskills/templates/DESIGNSYSTEM.MD` para criar a fonte ausente.
+3. `.fireskills/INTERFACE.md` para conhecer componentes e telas já registradas.
+4. `.fireskills/STACK.md`, manifests, rotas, telas, permissões e regras do
    domínio relacionadas à entrega.
 
-Quando a fonte não existir, copie o template gerenciado para `.specsfy/DESIGNSYSTEM.MD`
+Quando a fonte não existir, copie o template gerenciado para `.fireskills/DESIGNSYSTEM.MD`
 e preencha apenas o contexto já confirmado. Não esconda lacunas com texto
 genérico.
 
 ## Fluxo
 
 1. Identifique o produto, o módulo, a superfície e o fluxo afetado.
-2. Compare a solicitação com `.specsfy/DESIGNSYSTEM.MD` e preserve as regras já ativas.
+2. Compare a solicitação com `.fireskills/DESIGNSYSTEM.MD` e preserve as regras já ativas.
 3. Se a pessoa não informa direção visual, aplique os defaults do documento e
    registre isso como direção padrão da entrega.
 4. Se a pessoa fornece uma direção diferente, registre a exceção, seu alcance
    e a regra que ela substitui. Uma exceção de tela não altera o produto todo.
 5. Atualize o documento somente quando a regra tiver alcance macro. Registre
-   componentes e telas específicas em `.specsfy/INTERFACE.md`.
+   componentes e telas específicas em `.fireskills/INTERFACE.md`.
 6. Mapeie os cenários canônicos da superfície antes de entregar a orientação
    para UX, UI ou implementação.
 7. Retorne os arquivos lidos, a regra aplicada, as exceções registradas e os
@@ -83,7 +83,7 @@ Quando não houver direção visual contrária, aplique estas composições:
   usa `UTable` em largura total, exibe a coluna `ID` e oferece botões de editar
   e apagar na linha. O link da linha leva ao detalhe sem capturar os botões.
 - Componentes recorrentes de cabeçalho, tabela, linha, ações, formulário,
-  estados e feedback entram em `.specsfy/INTERFACE.md` e são reaproveitados antes de uma
+  estados e feedback entram em `.fireskills/INTERFACE.md` e são reaproveitados antes de uma
   nova implementação.
 
 Esses defaults não significam aparência genérica. A personalidade vem da
@@ -103,7 +103,7 @@ Use os componentes do `@nuxt/ui` v4 (`UCard`, `UTable`, `UForm`, `UModal`,
 `UDashboard*` e demais) para controles e composições de CRUD e dashboard, com o
 tema vindo de `@nuxfire/tokens` (`sharedUiConfig`, `theme.css` e
 `enterpriseTableUi`). Adapte dados, permissões, acessibilidade e linguagem do
-produto. Registre origem, estados e consumidores em `.specsfy/INTERFACE.md`.
+produto. Registre origem, estados e consumidores em `.fireskills/INTERFACE.md`.
 
 ## Formulários de criar e editar
 
@@ -125,7 +125,7 @@ componente. A equipe e a tela atual continuam visíveis no mobile.
 ## Cenários que toda entrega deve cobrir
 
 Consulte a seção `Cenários canônicos` do template e registre o recorte
-aplicável em `.specsfy/DESIGNSYSTEM.MD` ou na spec da entrega:
+aplicável em `.fireskills/DESIGNSYSTEM.MD` ou na spec da entrega:
 
 - lista com registros;
 - lista vazia;
@@ -148,9 +148,9 @@ mensagem e próximo passo.
 - UI define tokens, hierarquia, composição visual e estados a partir desta
   fonte.
 - Componentes Vue (`@nuxt/ui`) escolhem componentes e composições compatíveis
-  depois de ler esta fonte e `.specsfy/INTERFACE.md`.
+  depois de ler esta fonte e `.fireskills/INTERFACE.md`.
 - A skill de experiência de interface coordena a entrega e não deve iniciar uma
-  tela sem carregar `.specsfy/DESIGNSYSTEM.MD`.
+  tela sem carregar `.fireskills/DESIGNSYSTEM.MD`.
 
 ## Antipadrões
 
@@ -165,7 +165,7 @@ mensagem e próximo passo.
 - Componente do `@nuxt/ui` usado sem adaptar dados, estados, permissões e
   tokens do produto, ou estilizado com cor de paleta bruta em vez de cor
   semântica.
-- Novo token ou componente criado sem verificar o documento e `.specsfy/INTERFACE.md`.
+- Novo token ou componente criado sem verificar o documento e `.fireskills/INTERFACE.md`.
 - Exceção visual local registrada como regra global sem alcance explícito.
 - CRUD com cabeçalhos duplicados, UTable estreito, ID oculto ou sem ações de
   editar e apagar na linha.
@@ -174,7 +174,7 @@ mensagem e próximo passo.
 
 Antes do handoff, confira:
 
-- `.specsfy/DESIGNSYSTEM.MD` existe na raiz do projeto consumidor e tem classificação,
+- `.fireskills/DESIGNSYSTEM.MD` existe na raiz do projeto consumidor e tem classificação,
   política, defaults, estados, cenários e histórico.
 - A lista usa `UTable` e `PageHeader`.
 - Toda tela tem `Breadcrumb` com o nome da equipe ativa, módulo e tela atual.
@@ -185,12 +185,12 @@ Antes do handoff, confira:
 - Erros de campo aparecem em vermelho abaixo do campo e têm associação
   semântica.
 - A direção padrão ou a exceção está registrada com alcance.
-- `.specsfy/INTERFACE.md` contém somente o registro local da entrega.
+- `.fireskills/INTERFACE.md` contém somente o registro local da entrega.
 - A spec e as tarefas cobrem estados, permissão, foco, mensagens e retorno.
 - O dashboard, quando existir, tem filtros, contexto dos indicadores,
   alternativa acessível para visualizações e investigação detalhada.
 - Componentes `@nuxt/ui` reaproveitados ou criados têm origem, estados e
-  consumidores registrados em `.specsfy/INTERFACE.md`.
+  consumidores registrados em `.fireskills/INTERFACE.md`.
 - Cada tarefa possui o item `VISUAL` concluído antes de `EVIDENCE`, com a
   conferência de bordas, espaçamentos, margens, padding e tipografia ou a
   justificativa concreta de que não há interface.

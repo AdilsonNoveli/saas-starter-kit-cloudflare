@@ -4,7 +4,7 @@
 
 Este documento é a fonte normativa das escolhas macro de interface do projeto.
 Ele orienta a composição de todas as telas antes do registro de componentes em
-`.specsfy/INTERFACE.md`. Uma tela nova deve consultar este arquivo, as regras do domínio,
+`.fireskills/INTERFACE.md`. Uma tela nova deve consultar este arquivo, as regras do domínio,
 as permissões e as telas relacionadas.
 
 ## Classificação
@@ -27,14 +27,14 @@ as permissões e as telas relacionadas.
 - Regras de negócio, permissões, estados e linguagem do produto orientam a
   interface junto dos tokens. A aparência nunca deve esconder a ação principal,
   o estado do dado ou o caminho de recuperação.
-- `.specsfy/INTERFACE.md` registra componentes, blocos, telas e composição local. Ele não
+- `.fireskills/INTERFACE.md` registra componentes, blocos, telas e composição local. Ele não
   duplica as escolhas macro deste arquivo.
 
 ## Revisão visual obrigatória
 
 A revisão visual acontece durante o desenvolvimento de toda interface, mesmo
 sem pedido da pessoa. Em cada tarefa, compare a tela renderizada ou
-inspecionada com este sistema e com `.specsfy/INTERFACE.md`.
+inspecionada com este sistema e com `.fireskills/INTERFACE.md`.
 
 - Conferir bordas, espaçamentos, margens e padding entre shell, regiões,
   componentes, campos, ações e estados.
@@ -97,7 +97,7 @@ do projeto (`packages/tokens`). Adapte a composição aos tokens, dados,
 permissões e linguagem do produto. Não adicione uma dependência somente pela
 aparência de um exemplo.
 
-Ao reutilizar um primitive ou bloco, registre em `.specsfy/INTERFACE.md` sua origem,
+Ao reutilizar um primitive ou bloco, registre em `.fireskills/INTERFACE.md` sua origem,
 arquivo, API, estados, comportamento de teclado e telas consumidoras. Uma
 composição de catálogo serve como base; ela não substitui as regras deste
 documento nem a arquitetura da aplicação.
@@ -164,7 +164,7 @@ registrada abaixo.
   Lista, detalhe, criação e edição variam título, descrição, breadcrumbs e
   ações por props ou configuração, sem duplicar markup.
 - Componentes recorrentes de tabela, linha, ações, formulário, estados e
-  feedback são criados uma vez, registrados em `.specsfy/INTERFACE.md` e reaproveitados
+  feedback são criados uma vez, registrados em `.fireskills/INTERFACE.md` e reaproveitados
   por todas as telas compatíveis.
 - O `UTable` da listagem (`enterpriseTableUi`) ocupa toda a largura disponível. A coluna `ID` fica
   visível sempre, inclusive com outras colunas de negócio.
@@ -314,7 +314,7 @@ E encontra uma ação para tentar novamente
 
 Tokens de cor, tipografia, espaçamento, raio, foco e movimento devem ser
 reaproveitados antes de criar valores locais. Componentes acessíveis e
-composições de catálogo devem ser registrados em `.specsfy/INTERFACE.md` com origem,
+composições de catálogo devem ser registrados em `.fireskills/INTERFACE.md` com origem,
 props, eventos, estados e consumidores reais. A revisão visual precisa
 confirmar bordas, espaçamentos, margens, padding e tipografia contra esses
 tokens antes do item `EVIDENCE` da tarefa.

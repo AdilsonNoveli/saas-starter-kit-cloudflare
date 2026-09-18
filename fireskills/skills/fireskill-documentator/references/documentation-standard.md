@@ -19,7 +19,7 @@
 | `docs/packages.md` | runtime, frameworks e dependências |
 | `docs/integrations.md` | serviços externos e configuração segura |
 | `docs/decisions.md` | decisões explícitas e proveniência |
-| `.specsfy/PACKAGES.md` | inventário npm/Bun com versão, finalidade e fonte |
+| `.fireskills/PACKAGES.md` | inventário npm/Bun com versão, finalidade e fonte |
 
 ## Regras
 

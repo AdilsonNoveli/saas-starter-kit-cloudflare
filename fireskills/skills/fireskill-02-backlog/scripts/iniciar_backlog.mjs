@@ -29,7 +29,7 @@ function slug(value, title) {
   return result;
 }
 async function template(root) {
-  for (const path of [join(root, ".specsfy/templates/custom/Backlog.md"), join(root, ".specsfy/templates/Backlog.md"), sourceTemplate]) {
+  for (const path of [join(root, ".fireskills/templates/custom/Backlog.md"), join(root, ".fireskills/templates/Backlog.md"), sourceTemplate]) {
     try { return await readFile(path, "utf8"); } catch (error) { if (error?.code !== "ENOENT") throw error; }
   }
   fail("modelo não encontrado; reinstale o framework");

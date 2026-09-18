@@ -65,7 +65,7 @@ resultado confirmado.
    conteúdo para os artefatos derivados.
 5. Registre `MVP.md` como fonte em cada backlog criado pelo importador. Não
    crie, mova nem altere arquivos de contexto.
-6. Leia `.specsfy/PROJECT.md`, Inboxes, backlog e specs existentes apenas se ajudarem a
+6. Leia `.fireskills/PROJECT.md`, Inboxes, backlog e specs existentes apenas se ajudarem a
    evitar repetição ou contradição. Eles continuam separados da formulação
    recebida nesta sessão.
 7. Trate o JSON retornado pelo importador como a fila ordenada de backlogs da
@@ -169,7 +169,7 @@ pular responsabilidades:
    oito perguntas por área.
 3. Se o backlog ou a entrevista indicar informação a guardar ausente ou ambígua,
    anuncie a transição para `$fireskill-data-discovery`, conclua a entrevista de
-   dados e retome o backlog com `.specsfy/DATABASE.md` como contexto.
+   dados e retome o backlog com `.fireskills/DATABASE.md` como contexto.
 4. Após cada backlog, retome esta skill, registre a situação do item na síntese
    da sessão e prossiga para o próximo backlog da fila. Como esta skill foi
    chamada para importar o MVP, carregue `$fireskill-03-specify` ao terminar o

@@ -1,6 +1,6 @@
 ---
 name: fireskill-aux-rules
-description: Monitorar e ajudar a descobrir, formular e registrar regras duráveis em .specsfy/RULES.md sem alterar ou remover regras existentes. Use quando o monitor de contexto apontar revisão de regras; quando o usuário quiser adicionar regras do projeto; quando uma convenção recorrente precisar virar instrução explícita; ou ao revisar conflitos e duplicatas. Não inventa regras nem promove preferências sem confirmação.
+description: Monitorar e ajudar a descobrir, formular e registrar regras duráveis em .fireskills/RULES.md sem alterar ou remover regras existentes. Use quando o monitor de contexto apontar revisão de regras; quando o usuário quiser adicionar regras do projeto; quando uma convenção recorrente precisar virar instrução explícita; ou ao revisar conflitos e duplicatas. Não inventa regras nem promove preferências sem confirmação.
 ---
 
 # Manter regras do projeto
@@ -18,7 +18,7 @@ Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
 `Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
-1. Ler instruções locais, `.specsfy/PROJECT.md` e todo o `RULES.md` existente.
+1. Ler instruções locais, `.fireskills/PROJECT.md` e todo o `RULES.md` existente.
 2. Distinguir regra declarada, inferência e sugestão.
 3. Quando a formulação não estiver confirmada, selecionar uma pergunta real e
    aplicar o contrato central de perguntas numeradas.

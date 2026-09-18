@@ -17,7 +17,7 @@ models, contratos e testes antes de propor alteração.
 3. Descreva unicidade, consistência, retenção, exclusão, histórico e migração
    quando forem pertinentes.
 4. Atualize a seção de dados da spec e encaminhe respostas confirmadas para
-   `$fireskill-aux-database` e `.specsfy/DATABASE.md`.
+   `$fireskill-aux-database` e `.fireskills/DATABASE.md`.
 5. Derive cenários para criação, leitura, atualização, exclusão, autorização e
    dados inválidos. A implementação usa o especialista do banco detectado.
 

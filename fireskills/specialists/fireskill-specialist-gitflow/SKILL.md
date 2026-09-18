@@ -38,7 +38,7 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
    produção, `develop` de integração) e os prefixos das branches de vida
    curta (`feature/`, `release/`, `hotfix/`, `support/` quando aplicável).
 4. Registrar a decisão como regra confirmada do projeto (`$fireskill-aux-rules`
-   grava em `.specsfy/RULES.md`), incluindo prefixos, branch-alvo de cada
+   grava em `.fireskills/RULES.md`), incluindo prefixos, branch-alvo de cada
    tipo e política de merge — não deixar a convenção apenas verbal.
 5. Orientar a abertura, a integração e o fechamento de cada tipo de branch:
    `feature/*` parte de e volta para `develop`; `release/*` parte de
@@ -102,7 +102,7 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
   fechado (`git tag --contains <commit-do-merge>`), e a mesma correção
   presente em `develop` (`git log develop --oneline | grep <commit>` ou
   equivalente).
-- `.specsfy/RULES.md` (ou instrução equivalente do projeto) registrando a
+- `.fireskills/RULES.md` (ou instrução equivalente do projeto) registrando a
   convenção de nomes e a política de merge, revisitada por
   `$fireskill-aux-rules` quando alguém a violar.
 - Não declarar "o projeto segue Gitflow" apenas porque existe uma branch

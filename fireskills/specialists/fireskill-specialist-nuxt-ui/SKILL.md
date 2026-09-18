@@ -80,7 +80,7 @@ a dependência.
   `@nuxfire/tokens`; variação por espalhamento do objeto, sem copiar classes.
 - Formulário: `UForm` com `:schema` (zod) e `:state` reativo, `UFormField` com
   `name` igual ao campo do schema, `useNotification()` para retorno (regra do
-  projeto em `.specsfy/RULES.md`; `useToast()` direto é legado); a mutação vai por
+  projeto em `.fireskills/RULES.md`; `useToast()` direto é legado); a mutação vai por
   `useTrpcClient()`.
 - Modal: `v-model:open`; conteúdo em `#content` com `UCard` quando precisar de
   header/footer. Confirmação destrutiva: `useNotification().confirm(...)`, nunca

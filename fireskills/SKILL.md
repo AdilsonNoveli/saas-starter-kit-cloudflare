@@ -66,3 +66,33 @@ arquitetura, UX/UI, TypeScript, Postgres, Tailwind, revisão, depuração…) es
 4. Especialista orienta padrões e validação; não cria specs, não avança gates.
 5. Ação irreversível ou externa (deploy, apagar dados, publicar) exige
    autorização explícita.
+
+## Fontes de verdade (em conflito, vence a de cima)
+
+1. O código e os testes.
+2. `.specsfy/*` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `INTERFACE`, `DESIGNSYSTEM`):
+   contexto migrado de `_docs/docs` e conferido contra o código
+   (`fireskills/MIGRACAO-DOCS.md`).
+3. Os `references/nuxfire-*.md` dos especialistas.
+4. `_docs/docs/*`: histórico; pode estar desatualizado (nomes antigos de pacote).
+
+## Comandos
+
+| Para | Comando (raiz do repositório) |
+|---|---|
+| Testes | `bun run test` |
+| Typecheck | `bun run typecheck` em `apps/app` **e** `bunx vue-tsc --noEmit -p server/tsconfig.json` |
+| i18n | `bun run check:i18n` |
+| Specs: progresso, estado, esforço, milestones | `bun run fireskill progress`, `transition <id> <estado>`, `effort <id> <1-10> --reason "…"`, `milestones sync` |
+| Monitor de contexto | `node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs --project . --check` |
+| Proteção do banco | `node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs --project . --command "<comando>"` |
+| Deploy (**só com autorização**) | `bun run deploy -- --stage <stage>` |
+
+## Manter o Fireskills vivo
+
+- Terminou uma entrega: `fireskill-documentator` e o monitor sem `PENDING`.
+- Mudou regra, tela ou tabela: atualize `.specsfy/RULES.md`, `INTERFACE.md` ou
+  `DATABASE.md` (as skills `fireskill-aux-*` fazem isso sem apagar texto humano).
+- Especialista errado ou incompleto: corrija o `references/nuxfire-*.md` dele com a
+  evidência, no mesmo passo.
+- Pendências do próprio Fireskills: `fireskills/PLANO-REFATORACAO.md`.

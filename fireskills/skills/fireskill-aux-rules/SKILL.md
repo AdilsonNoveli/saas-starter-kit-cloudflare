@@ -18,7 +18,7 @@ Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
 `Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
-1. Ler instruções locais, `PROJECT.md` e todo o `RULES.md` existente.
+1. Ler instruções locais, `.specsfy/PROJECT.md` e todo o `RULES.md` existente.
 2. Distinguir regra declarada, inferência e sugestão.
 3. Quando a formulação não estiver confirmada, selecionar uma pergunta real e
    aplicar o contrato central de perguntas numeradas.

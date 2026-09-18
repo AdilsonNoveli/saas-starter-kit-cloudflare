@@ -99,7 +99,7 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
   lateral ou modal. Use somente os componentes, convenções e runners da stack
   de interface registrada; cada tarefa aponta os componentes Vue, componentes
   `@nuxt/ui` ou rotas reais. Inclua uma tarefa para atualizar
-  `INTERFACE.md` com finalidade, arquivo, API, estados, consumidores e regra
+  `.specsfy/INTERFACE.md` com finalidade, arquivo, API, estados, consumidores e regra
   de reaproveitamento de todos os blocos criados ou alterados.
   Em toda tarefa de tela (`.vue` com componentes `U*`), registre no `PREP` o uso
   de `$fireskill-specialist-nuxt-ui` antes da implementação. A skill
@@ -130,7 +130,7 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
   `[DOC]` para `.specsfy/STACK.md`. Quando alterar banco, schema, model
   persistente, tabela, campo, relação ou migration, crie uma tarefa `[DOC]`
   obrigatória para `.specsfy/DATABASE.md`.
-- Para mudança de aplicação, inclua a revisão de `PROJECT.md` no fechamento da
+- Para mudança de aplicação, inclua a revisão de `.specsfy/PROJECT.md` no fechamento da
   tarefa. Se não houver impacto material, exija justificativa na evidência em
   vez de criar conteúdo artificial.
 - Faça toda tarefa `[CODE]` exigir a reconstrução independente de `docs/` por

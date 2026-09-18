@@ -20,7 +20,7 @@ Antes de formular qualquer pergunta, leia, nesta ordem:
 
 1. `.specsfy/USER-PROFILE.md`, quando existir;
 2. a conversa atual e as respostas já dadas;
-3. `PROJECT.md`, `DESIGNSYSTEM.MD`, `.specsfy/STACK.md`,
+3. `.specsfy/PROJECT.md`, `.specsfy/DESIGNSYSTEM.MD`, `.specsfy/STACK.md`,
    `.specsfy/RULES.md`, `.specsfy/DATABASE.md` e `.specsfy/PACKAGES.md`;
 4. `AGENTS.md`, `CLAUDE.md`, `.specsfy/SPECKIT.md` e as fontes relacionadas
    listadas por ele, quando existirem;
@@ -110,7 +110,7 @@ antes de registrar a cobertura.
 
 Para cada tela de uso recorrente, identifique como a pessoa chega até ela pelos
 menus do sistema e registre o item, o destino, a permissão e o comportamento
-responsivo em `INTERFACE.md`. Uma rota técnica, callback ou etapa acessada
+responsivo em `.specsfy/INTERFACE.md`. Uma rota técnica, callback ou etapa acessada
 somente por redirecionamento pode ficar fora do menu quando a própria jornada
 comprovar esse acesso. Se não estiver claro se a tela recebe um link ou em qual
 menu ela aparece, confirme com a pessoa em uma única rodada antes de seguir.
@@ -173,13 +173,13 @@ para forçar sua execução.
    scripts `.mjs`), Bun (`bun run fireskill`), Git e acesso de escrita ao
    projeto. Corrija cada requisito ausente.
 6. Executar `node scripts/setup_context.mjs --project <raiz>`.
-   Renderizar `PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`,
-   `INTERFACE.md`, `DESIGNSYSTEM.MD` e `.specsfy/USER-PROFILE.md` a partir de
+   Renderizar `.specsfy/PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`,
+   `.specsfy/INTERFACE.md`, `.specsfy/DESIGNSYSTEM.MD` e `.specsfy/USER-PROFILE.md` a partir de
    `.specsfy/templates/custom/<Nome>.md` quando existir ou dos arquivos
    gerenciados `.specsfy/templates/Project.md`, `Stack.md`, `Rules.md`,
-   `Database.md`, `Interface.md`, `DESIGNSYSTEM.MD` e `UserProfile.md` caso
+   `Database.md`, `Interface.md`, `.specsfy/DESIGNSYSTEM.MD` e `UserProfile.md` caso
    contrário; não manter
-   modelos paralelos embutidos no script. O `DESIGNSYSTEM.MD` fica na raiz do
+   modelos paralelos embutidos no script. O `.specsfy/DESIGNSYSTEM.MD` fica na raiz do
    projeto, nasce com defaults de interface comuns e é criado somente quando
    ainda não existir. O mesmo comando deve ler a constituição e todos os arquivos
    regulares em `specs/` quando detectar GitHub Spec Kit, depois atualizar o
@@ -250,7 +250,7 @@ ou finalidade, registrar essa avaliação nas fontes da tarefa e repetir com
 `--acknowledge-rules-no-change`; nunca usar o reconhecimento para ocultar uma
 mudança documental real.
 
-Manter `PROJECT.md`, `INTERFACE.md` e `DESIGNSYSTEM.MD` na raiz. Manter
+Manter `.specsfy/PROJECT.md`, `.specsfy/INTERFACE.md` e `.specsfy/DESIGNSYSTEM.MD` na raiz. Manter
 `STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md`, `USER-PROFILE.md` e a
 projeção opcional `SPECKIT.md` em `.specsfy/`. Tratar esses
 documentos como contexto derivado do projeto, não como spec, gate ou
@@ -297,7 +297,7 @@ Confira o runtime real antes de aprovar o setup: Cloudflare Workers via SST
 combinação em `.specsfy/STACK.md` e encaminhe qualquer divergência para uma spec
 antes de aprovar o setup.
 
-Depois de instalar o especialista, o setup registra em `INTERFACE.md` que as
+Depois de instalar o especialista, o setup registra em `.specsfy/INTERFACE.md` que as
 telas são compostas por Vue SFC com componentes `@nuxt/ui`. Cada nova tela deve
 consultar o mapa, reutilizar o que já existe e registrar componentes próprios e
 componentes `@nuxt/ui` com arquivos e consumidores reais.

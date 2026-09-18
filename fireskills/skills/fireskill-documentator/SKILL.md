@@ -18,7 +18,7 @@ Modo de interação: `sem perguntas`.
 Não formule perguntas nesta skill. Registre como não identificado todo dado
 que as fontes executáveis não sustentarem.
 
-1. Ler instruções locais, `PROJECT.md`, `.specsfy/STACK.md`,
+1. Ler instruções locais, `.specsfy/PROJECT.md`, `.specsfy/STACK.md`,
    `.specsfy/RULES.md`, `.specsfy/DATABASE.md`, manifests, lockfiles,
    metadados instalados e código existente.
 2. Ler [o padrão documental](references/documentation-standard.md) antes de
@@ -75,7 +75,7 @@ Workers (`apps/functions`), recursos SST (`infra/*.ts`), scripts e Vitest.
 
 - Não copiar segredos, valores de `.env`, dados de produção ou código inteiro.
 - Não apresentar heurística como decisão confirmada.
-- Não substituir specs, `PROJECT.md` ou arquivos humanos em `.specsfy/`.
+- Não substituir specs, `.specsfy/PROJECT.md` ou arquivos humanos em `.specsfy/`.
   `PACKAGES.md` é a única projeção reconstruída pela skill nesse diretório e
   preserva conteúdo fora do bloco gerado.
 - Não exigir rede para construir. Quando o repositório GitHub de um pacote não

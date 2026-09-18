@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /** Resume a stack de interface e as superfícies atuais sem alterar o projeto. */
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 
@@ -30,22 +30,56 @@ async function files(path, listed = []) {
 
 const packageJson = await json(join(project, "package.json"));
 const composer = await json(join(project, "composer.json"));
-const packages = { ...(packageJson.dependencies ?? {}), ...(packageJson.devDependencies ?? {}) };
+const workspaceDeps = {};
+for (const group of ["apps", "packages", "layers"]) {
+  let names = [];
+  try { names = readdirSync(join(project, group)); } catch { continue; }
+  for (const name of names) {
+    const value = await json(join(project, group, name, "package.json"));
+    Object.assign(workspaceDeps, value.dependencies ?? {}, value.devDependencies ?? {});
+  }
+}
+const packages = { ...(packageJson.dependencies ?? {}), ...(packageJson.devDependencies ?? {}), ...workspaceDeps };
 const composerPackages = { ...(composer.require ?? {}), ...(composer["require-dev"] ?? {}) };
 const selected = (names) => names.filter((name) => name in packages || name in composerPackages);
 const sourceFiles = await files(project);
 const has = (path) => existsSync(join(project, path));
 const routeRoots = ["src/app", "src/pages", "app", "pages", "resources/js/Pages", "routes"];
 const componentRoots = ["src/components", "components", "resources/js/Components", "app/components"];
-const routes = sourceFiles.filter((path) => routeRoots.some((root) => path.startsWith(`${root}/`))).slice(0, 40);
-const components = sourceFiles.filter((path) => componentRoots.some((root) => path.startsWith(`${root}/`))).slice(0, 40);
+// Nuxt (monorepo): páginas e componentes vivem em apps/*/app e layers/*/app.
+function nuxtVueFiles(kind) {
+  const found = [];
+  for (const group of ["apps", "layers"]) {
+    let names = [];
+    try { names = readdirSync(join(project, group)); } catch { continue; }
+    for (const name of names) {
+      const base = join(project, group, name, "app", kind);
+      const walk = (dir) => {
+        let entries = [];
+        try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+        for (const entry of entries) {
+          if (ignored.has(entry.name)) continue;
+          const target = join(dir, entry.name);
+          if (entry.isDirectory()) walk(target);
+          else if (entry.name.endsWith(".vue")) found.push(relative(project, target).replaceAll("\\", "/"));
+        }
+      };
+      walk(base);
+    }
+  }
+  return found;
+}
+const nuxtRoutes = nuxtVueFiles("pages");
+const nuxtComponents = nuxtVueFiles("components");
+const routes = (nuxtRoutes.length ? nuxtRoutes : sourceFiles.filter((path) => routeRoots.some((root) => path.startsWith(`${root}/`)))).slice(0, 200);
+const components = (nuxtComponents.length ? nuxtComponents : sourceFiles.filter((path) => componentRoots.some((root) => path.startsWith(`${root}/`)))).slice(0, 200);
 
 const report = {
   project,
-  frameworks: selected(["laravel/framework", "next", "astro", "react", "vue", "svelte", "@inertiajs/react", "@inertiajs/vue3"]),
-  routing: selected(["next", "react-router-dom", "@inertiajs/react", "@inertiajs/vue3"]).concat(has("routes/web.php") ? ["routes/web.php"] : []),
-  styling: selected(["tailwindcss", "@tailwindcss/vite", "styled-components", "@emotion/react", "sass"]).concat(["tailwind.config.js", "tailwind.config.ts", "components.json"].filter(has)),
-  components: selected(["@radix-ui/react-dialog", "@base-ui-components/react", "class-variance-authority", "@headlessui/react"]).concat(has("components.json") ? ["shadcn/ui"] : []),
+  frameworks: selected(["nuxt", "laravel/framework", "next", "astro", "react", "vue", "svelte", "@inertiajs/react", "@inertiajs/vue3"]),
+  routing: selected(["nuxt", "vue-router", "next", "react-router-dom", "@inertiajs/react", "@inertiajs/vue3"]).concat(has("routes/web.php") ? ["routes/web.php"] : []),
+  styling: selected(["@nuxt/ui", "tailwindcss", "@tailwindcss/vite", "styled-components", "@emotion/react", "sass"]).concat(["tailwind.config.js", "tailwind.config.ts", "components.json"].filter(has)),
+  components: selected(["@nuxt/ui", "@radix-ui/react-dialog", "@base-ui-components/react", "class-variance-authority", "@headlessui/react"]).concat(has("components.json") ? ["shadcn/ui"] : []),
   forms: selected(["react-hook-form", "@tanstack/react-form", "formik", "zod", "yup"]),
   tests: selected(["vitest", "@playwright/test", "cypress", "@testing-library/react", "pestphp/pest"]),
   current_routes: routes,

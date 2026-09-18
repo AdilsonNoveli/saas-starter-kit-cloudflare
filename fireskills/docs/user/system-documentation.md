@@ -32,7 +32,7 @@ suporte ou uma escolha editorial sem que a próxima varredura a apague.
 O conteúdo gerado descreve somente o que as fontes locais sustentam. Quando a
 skill encontra uma convenção, ela pode registrá-la como observação encontrada,
 mas não a apresenta como escolha humana confirmada. Escolhas explícitas do
-projeto continuam em PROJECT.md, RULES.md, na spec aplicável ou em um ADR,
+projeto continuam em .specsfy/PROJECT.md, RULES.md, na spec aplicável ou em um ADR,
 conforme o alcance da escolha.
 
 Execute `$fireskill-documentator` livremente para documentar um sistema legado ou
@@ -156,7 +156,7 @@ Gate.
 
 O código, os testes, os manifests, os schemas e as migrations comprovam o
 estado implementado. A spec governa o comportamento da mudança, enquanto
-`PROJECT.md` e `.specsfy/` preservam informações válidas para o sistema
+`.specsfy/PROJECT.md` e `.specsfy/` preservam informações válidas para o sistema
 inteiro. Os arquivos em `<projeto>/docs/` podem ser reconstruídos dessas fontes
 e não devem copiar segredos, valores de ambiente, registros de produção ou
 código integral.

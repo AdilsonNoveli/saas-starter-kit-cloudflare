@@ -291,7 +291,7 @@ retoma a primeira etapa afetada.
 Além da spec de cada entrega, o projeto mantém informações que valem para o
 sistema inteiro:
 
-- `PROJECT.md`: finalidade, capacidades e limites do projeto.
+- `.specsfy/PROJECT.md`: finalidade, capacidades e limites do projeto.
 - `.specsfy/STACK.md`: tecnologias estruturais e suas evidências.
 - `.specsfy/RULES.md`: regras confirmadas para o trabalho.
 - `.specsfy/DATABASE.md`: visão da persistência e das relações.

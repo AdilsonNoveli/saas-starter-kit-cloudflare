@@ -30,7 +30,7 @@ iniciais. Só depois disso ele cria ou reorganiza os arquivos.
 ## Arquivos do projeto
 
 ```text
-PROJECT.md
+.specsfy/PROJECT.md
 specs.md
 specs/
 ├── milestones/

@@ -24,7 +24,7 @@ arquivo contém o fluxo, os caminhos canônicos e os gates do framework.
   em toda leitura e escrita posterior. Se ele estiver dentro de um Hub, não
   promova o trabalho para a raiz Git nem crie contexto, specs ou código fora
   desse caminho.
-- Leia `PROJECT.md`, `DESIGNSYSTEM.MD`, `.specsfy/STACK.md`,
+- Leia `.specsfy/PROJECT.md`, `.specsfy/DESIGNSYSTEM.MD`, `.specsfy/STACK.md`,
   `.specsfy/RULES.md`, `.specsfy/DATABASE.md`, `.specsfy/PACKAGES.md` e
   `.specsfy/USER-PROFILE.md` como contexto persistente antes de planejar
   mudanças.

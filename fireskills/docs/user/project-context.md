@@ -3,11 +3,11 @@
 # Informações permanentes do projeto
 
 O Specsfy separa a descrição durável do sistema das especificações de cada
-mudança. O arquivo `PROJECT.md` explica a finalidade da aplicação, enquanto
+mudança. O arquivo `.specsfy/PROJECT.md` explica a finalidade da aplicação, enquanto
 cinco documentos em `.specsfy/` registram a stack, as instruções confirmadas,
 a persistência observada no código, os pacotes instalados e o perfil de
 interação do setup.
-As regras macro de interface ficam em `DESIGNSYSTEM.MD`, na raiz do projeto, e
+As regras macro de interface ficam em `.specsfy/DESIGNSYSTEM.MD`, na raiz do projeto, e
 seguem um ciclo próprio com a skill especialista de design system.
 
 Execute `$fireskill-setup` depois de instalar o framework. Depois disso, o
@@ -21,8 +21,8 @@ mantêm esta estrutura:
 
 ```text
 <projeto>/
-├── PROJECT.md
-├── DESIGNSYSTEM.MD
+├── .specsfy/PROJECT.md
+├── .specsfy/DESIGNSYSTEM.MD
 ├── docs/
 │   └── packages/
 │       ├── README.md
@@ -43,7 +43,7 @@ preservado. A referência publicável das diretrizes vive em
 
 | Arquivo | Conteúdo | Skill mantenedora |
 | --- | --- | --- |
-| `PROJECT.md` | finalidade e capacidades | `$fireskill-setup` cria o modelo |
+| `.specsfy/PROJECT.md` | finalidade e capacidades | `$fireskill-setup` cria o modelo |
 | `.specsfy/STACK.md` | stack e evidências | `$fireskill-aux-stack` |
 | `.specsfy/RULES.md` | regras explícitas confirmadas | `$fireskill-aux-rules` |
 | `.specsfy/DATABASE.md` | persistência e relações | `$fireskill-aux-database` |
@@ -52,7 +52,7 @@ preservado. A referência publicável das diretrizes vive em
 | `docs/packages/<vendor>-<nome>.md` | instalação, configuração, uso local e testes do pacote | `$fireskill-specialist-laravel-package-manager` |
 | `.specsfy/USER-PROFILE.md` | nível de conhecimento, respostas confirmadas e fontes do setup | `$fireskill-setup` |
 | `.specsfy/SPECKIT.md` | constituição e fontes preservadas do GitHub Spec Kit | `$fireskill-setup` |
-| `DESIGNSYSTEM.MD` | defaults comuns de interface, CRUD, dashboards, estados e exceções | `$fireskill-setup` cria; `$fireskill-specialist-design-system` mantém |
+| `.specsfy/DESIGNSYSTEM.MD` | defaults comuns de interface, CRUD, dashboards, estados e exceções | `$fireskill-setup` cria; `$fireskill-specialist-design-system` mantém |
 
 Os modelos ficam em `.specsfy/templates/Project.md`, `Stack.md`, `Rules.md`,
 `Database.md` e `UserProfile.md`, junto dos demais templates do framework. Para
@@ -76,7 +76,7 @@ o setup pergunta antes de registrar a cobertura.
 
 Para cada tela de uso recorrente, o setup identifica o caminho pelos menus do
 sistema. Ele registra item, destino, permissão e comportamento responsivo em
-`INTERFACE.md`. Rotas técnicas e etapas abertas apenas por redirecionamento
+`.specsfy/INTERFACE.md`. Rotas técnicas e etapas abertas apenas por redirecionamento
 podem ficar fora do menu. Quando o destino ou a presença do link estiverem
 abertos, você escolhe em uma pergunta numerada antes da continuação.
 
@@ -130,7 +130,7 @@ node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
 | manifest, lockfile ou configuração | `$fireskill-aux-stack` revisa `STACK.md` |
 | manifest ou lockfile npm/Composer | `$fireskill-documentator` reconstrói `PACKAGES.md` e `docs/` |
 | schema, model ou migration | `$fireskill-aux-database` revisa `DATABASE.md` |
-| código da aplicação | revisar `PROJECT.md` |
+| código da aplicação | revisar `.specsfy/PROJECT.md` |
 | aplicação ou persistência | `$fireskill-documentator` reconstrói `docs/` e `PACKAGES.md` |
 | instrução ou convenção | `$fireskill-aux-rules` revisa `RULES.md` |
 
@@ -145,7 +145,7 @@ Veja a topologia e o `--check` no guia de
 ## Preservação e atualização
 
 - O setup cria um arquivo de informações somente quando ele ainda não existe.
-  Isso inclui `DESIGNSYSTEM.MD` e `.specsfy/USER-PROFILE.md`: os templates
+  Isso inclui `.specsfy/DESIGNSYSTEM.MD` e `.specsfy/USER-PROFILE.md`: os templates
   iniciais apresentam padrões comuns de interface, CRUD, dashboard e registro
   da conversa. Os arquivos continuam humanos e qualquer conteúdo existente é
   preservado.

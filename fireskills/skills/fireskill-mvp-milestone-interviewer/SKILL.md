@@ -65,7 +65,7 @@ resultado confirmado.
    conteúdo para os artefatos derivados.
 5. Registre `MVP.md` como fonte em cada backlog criado pelo importador. Não
    crie, mova nem altere arquivos de contexto.
-6. Leia `PROJECT.md`, Inboxes, backlog e specs existentes apenas se ajudarem a
+6. Leia `.specsfy/PROJECT.md`, Inboxes, backlog e specs existentes apenas se ajudarem a
    evitar repetição ou contradição. Eles continuam separados da formulação
    recebida nesta sessão.
 7. Trate o JSON retornado pelo importador como a fila ordenada de backlogs da

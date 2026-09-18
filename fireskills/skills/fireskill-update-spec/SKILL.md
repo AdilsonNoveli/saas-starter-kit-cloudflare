@@ -41,7 +41,7 @@ exigindo autorização específica.
 2. Localize a spec canônica em
    `specs/<estado>/<NNNN>-<slug>/spec.md` e leia seus metadados, requisitos,
    cenários, plano, tarefas, gates e evidências.
-3. Leia as instruções do projeto, `PROJECT.md`, `.specsfy/STACK.md`,
+3. Leia as instruções do projeto, `.specsfy/PROJECT.md`, `.specsfy/STACK.md`,
    `.specsfy/RULES.md`, `.specsfy/DATABASE.md` e o research indexado aplicável.
 4. Inspecione mudanças Git preexistentes na spec e não as atribua ao pedido
    atual.

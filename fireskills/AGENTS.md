@@ -87,7 +87,7 @@ Todo trabalho segue a metodologia fireskills. Carregue a skill adequada:
 - Instruções de entrada para agentes (lidas em toda conversa): `AGENTS.md` e
   `CLAUDE.md` **na raiz do repositório** (não este arquivo).
 - Contexto do projeto (migrado de `_docs/docs`, conferido contra o código):
-  `PROJECT.md`, `DESIGNSYSTEM.MD`, `INTERFACE.md` e `.specsfy/{STACK,RULES,DATABASE,PACKAGES}.md`.
+  `.specsfy/PROJECT.md`, `.specsfy/DESIGNSYSTEM.MD`, `.specsfy/INTERFACE.md` e `.specsfy/{STACK,RULES,DATABASE,PACKAGES}.md`.
   Relatório da migração: `fireskills/MIGRACAO-DOCS.md`.
 - Skills de fluxo: `fireskills/skills/` (contrato: `skills/Spec.md`; templates:
   `skills/templates/`; exemplo: `skills/examples/Spec.md`).

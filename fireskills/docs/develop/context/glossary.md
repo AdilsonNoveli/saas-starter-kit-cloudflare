@@ -65,7 +65,7 @@ fonte normativa antes de alterar usos.
 | Contrato de comprovação | Versão do esquema que governa os registros de teste e entrega na spec | gate isolado |
 | Projeção de progresso | Leitura somente de specs, gates, tarefas e checklists pelo CLI ou pela TUI | fonte normativa ou autorização para mudar a spec |
 | Contexto transversal | Decisão vigente aplicável a várias fatias | comportamento de uma feature |
-| Contexto persistente | PROJECT.md e arquivos .specsfy que preservam finalidade, stack, regras, dados e pacotes do projeto consumidor | spec ou documentação técnica reconstruída |
+| Contexto persistente | .specsfy/PROJECT.md e arquivos .specsfy que preservam finalidade, stack, regras, dados e pacotes do projeto consumidor | spec ou documentação técnica reconstruída |
 | Documentação reconstruída | Visão técnica derivada do código em docs/ do projeto consumidor, atualizada pelo documentador | documentação oficial do framework |
 | ADR | Registro histórico de uma decisão arquitetural e suas consequências | arquitetura vigente |
 <!-- markdownlint-enable MD013 -->

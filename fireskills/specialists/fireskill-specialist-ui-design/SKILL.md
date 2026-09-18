@@ -18,7 +18,7 @@ description: Projetar e revisar interfaces visuais de sistemas, dashboards e apl
 
 ## Fluxo
 
-1. Carregar `$fireskill-specialist-design-system` e ler `DESIGNSYSTEM.MD` antes
+1. Carregar `$fireskill-specialist-design-system` e ler `.specsfy/DESIGNSYSTEM.MD` antes
    da composição. Confirmar que a jornada e o fluxo de informação foram
    definidos com a pessoa. Para tela ou formulário novo, registrar a tarefa
    principal, as telas, os campos, as validações e o padrão de abertura
@@ -105,7 +105,7 @@ componentes.
   duas colunas responsivas conforme a superfície CRUD.
 - Conferir `Breadcrumb` em cada tela, com o nome da equipe visível e o item atual
   marcado como página. Confirmar o reaproveitamento do componente já existente.
-- Conferir que uma exceção ao `DESIGNSYSTEM.MD` tem alcance registrado.
+- Conferir que uma exceção ao `.specsfy/DESIGNSYSTEM.MD` tem alcance registrado.
 - Exercitar conteúdo curto/longo, números extremos, tradução expandida e
   preferências de data, moeda e timezone.
 - Verificar viewport mínimo suportado, zoom 200%, reflow, contraste, teclado,

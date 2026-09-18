@@ -41,7 +41,7 @@ Para criar ou alterar uma interface, comece por
 `fireskill-specialist-design-system`, examina o sistema e a stack existentes,
 conduz as perguntas sobre telas e encaminha UX, UI e
 `fireskill-specialist-nuxt-ui`. O registro local de componentes e telas fica em
-`INTERFACE.md`.
+`.specsfy/INTERFACE.md`.
 
 ## Como usar
 

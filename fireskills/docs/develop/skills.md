@@ -249,13 +249,13 @@ projeta `docs/` junto de `.specsfy/PACKAGES.md`.
 
 Os arquivos `Inbox.md`, `Backlog.md`, `Spec.md`, `Tasks.md`, `Project.md`,
 `Stack.md`, `Rules.md`, `Database.md`, `UserProfile.md`, `Interface.md` e
-`DESIGNSYSTEM.MD` são
+`.specsfy/DESIGNSYSTEM.MD` são
 gerenciados individualmente, com
 fingerprints próprios e proteção contra sobrescrita local. A resolução usada
 pelas skills segue `custom/<Nome>.md`, template gerenciado e, somente no
 monorepo, `skills/templates/<Nome>.md`.
 
-`DESIGNSYSTEM.MD` é o template das regras macro do produto consumidor. A skill
+`.specsfy/DESIGNSYSTEM.MD` é o template das regras macro do produto consumidor. A skill
 `fireskill-specialist-design-system` cria ou atualiza o arquivo na raiz do
 consumidor. `Interface.md` registra componentes e telas locais, sem repetir as
 regras macro.

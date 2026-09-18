@@ -17,26 +17,26 @@
 | --- | --- |
 | Natureza | normativo |
 | Escopo | interface dos projetos consumidores |
-| Autoridade | template, especialista e documento `DESIGNSYSTEM.MD` do consumidor |
+| Autoridade | template, especialista e documento `.specsfy/DESIGNSYSTEM.MD` do consumidor |
 
 ## Papel
 
 Registrar como o Specsfy orienta interfaces SaaS sem transformar cada tela em
-uma composição genérica. O projeto consumidor mantém `DESIGNSYSTEM.MD` na raiz
-como fonte das regras macro. `INTERFACE.md` mantém o registro local de
+uma composição genérica. O projeto consumidor mantém `.specsfy/DESIGNSYSTEM.MD` na raiz
+como fonte das regras macro. `.specsfy/INTERFACE.md` mantém o registro local de
 componentes e telas.
 
 ## Como usar
 
-Leia este contexto ao criar ou revisar o template `DESIGNSYSTEM.MD`, os
+Leia este contexto ao criar ou revisar o template `.specsfy/DESIGNSYSTEM.MD`, os
 especialistas de interface, o catálogo ou o instalador. No projeto consumidor,
-leia `DESIGNSYSTEM.MD` antes de escolher a composição de uma tela.
+leia `.specsfy/DESIGNSYSTEM.MD` antes de escolher a composição de uma tela.
 
 ## Precedência
 
 1. Regras de negócio, permissões e comportamento da spec.
-2. `DESIGNSYSTEM.MD` do projeto consumidor.
-3. `INTERFACE.md` para componentes e composição local.
+2. `.specsfy/DESIGNSYSTEM.MD` do projeto consumidor.
+3. `.specsfy/INTERFACE.md` para componentes e composição local.
 4. Catálogo e tokens da stack observada.
 
 Uma direção visual explícita pode alterar um default. Registre a exceção com
@@ -81,7 +81,7 @@ motivo concreto.
   lista ou `DataGrid` para investigação.
 - Primitives shadcn/ui atendem controles fundamentais; blocos gratuitos ReUI
   aceleram composições compatíveis de CRUD e dashboard.
-- `INTERFACE.md` registra origem, estados, acessibilidade e consumidores de cada
+- `.specsfy/INTERFACE.md` registra origem, estados, acessibilidade e consumidores de cada
   primitive ou bloco reaproveitado.
 
 ## Owners
@@ -90,8 +90,8 @@ motivo concreto.
 | --- | --- | --- |
 | `skills/templates/DESIGNSYSTEM.MD` | framework | defaults comuns de interface, CRUD, dashboards e cenários canônicos |
 | `fireskill-setup` | framework | criação do arquivo na raiz quando ausente e preservação do conteúdo local |
-| `DESIGNSYSTEM.MD` | projeto consumidor | linguagem, exceções e regras macro locais |
-| `INTERFACE.md` | projeto consumidor | componentes, blocos, telas e consumidores |
+| `.specsfy/DESIGNSYSTEM.MD` | projeto consumidor | linguagem, exceções e regras macro locais |
+| `.specsfy/INTERFACE.md` | projeto consumidor | componentes, blocos, telas e consumidores |
 | `spec.md` | projeto consumidor | comportamento e aceite da entrega |
 | `specialists/fireskill-specialist-*` | framework | orientação por etapa e tecnologia |
 
@@ -101,7 +101,7 @@ motivo concreto.
 - uma nova superfície CRUD entrar no contrato.
 - um padrão comum de dashboard, primitive ou bloco de catálogo entrar no
   contrato.
-- a relação entre `DESIGNSYSTEM.MD` e `INTERFACE.md` mudar.
+- a relação entre `.specsfy/DESIGNSYSTEM.MD` e `.specsfy/INTERFACE.md` mudar.
 - o instalador ou o catálogo alterar a disponibilidade das skills.
 - um padrão macro, cenário CRUD ou owner da interface mudar.
 
@@ -115,13 +115,13 @@ catálogo resolve as dependências da interface.
 ## Não use para
 
 - documentar uma tela específica do projeto consumidor.
-- substituir a spec, `DESIGNSYSTEM.MD` ou `INTERFACE.md`.
+- substituir a spec, `.specsfy/DESIGNSYSTEM.MD` ou `.specsfy/INTERFACE.md`.
 
 ## Fonte da verdade e precedência
 
 O `AGENTS.md` do módulo orienta a execução. O template em
 `skills/templates/DESIGNSYSTEM.MD` define os defaults publicados. O arquivo
-`DESIGNSYSTEM.MD` do consumidor registra as regras ativas e as exceções com
+`.specsfy/DESIGNSYSTEM.MD` do consumidor registra as regras ativas e as exceções com
 alcance. A spec governa o comportamento da entrega e as fontes executáveis
 comprovam o estado implementado.
 

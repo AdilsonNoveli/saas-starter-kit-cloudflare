@@ -27,7 +27,7 @@ o que será lembrado, quem usa, o que muda e quando deixa de ser necessário.
 
 1. Leia a Inbox, a descoberta de `MVP.md`, o backlog, a spec ou o pedido que
    originou a descoberta.
-2. Leia `PROJECT.md` e `.specsfy/DATABASE.md` quando existirem. Separe o que
+2. Leia `.specsfy/PROJECT.md` e `.specsfy/DATABASE.md` quando existirem. Separe o que
    já foi confirmado do que ainda precisa de conversa.
 3. Procure somente informações que o sistema precise guardar, consultar,
    comparar, mostrar, compartilhar, corrigir ou apagar. Não pergunte sobre

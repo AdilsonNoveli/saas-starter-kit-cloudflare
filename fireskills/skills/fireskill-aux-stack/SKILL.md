@@ -18,7 +18,7 @@ Modo de interação: `sem perguntas`.
 Não formule perguntas nesta skill. Quando faltar informação confirmada,
 sinalize o campo pendente para a etapa conversacional responsável.
 
-1. Ler instruções locais, `PROJECT.md` e o `STACK.md` existente.
+1. Ler instruções locais, `.specsfy/PROJECT.md` e o `STACK.md` existente.
 2. Executar `node scripts/update_stack.mjs --project <raiz>`.
 3. Conferir cada linha contra manifests, lockfiles e configurações presentes.
 4. Manter decisões, notas e linhas humanas fora do bloco

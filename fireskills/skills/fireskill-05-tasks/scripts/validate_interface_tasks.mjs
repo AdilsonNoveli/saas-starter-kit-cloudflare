@@ -19,7 +19,7 @@ if (!input || !existsSync(input)) {
     const taskEnd = taskTail.search(/^###\s+15\.\s+/im);
     const tasks = taskTail.slice(0, taskEnd < 0 ? undefined : taskEnd);
     const screens = text.match(/^####\s+Telas e responsabilidades[ \t]*$([\s\S]*?)(?=^####|^###)/im)?.[1] ?? "";
-    const blocks = text.match(/^####\s+Componentes Vue e @nuxt/ui selecionados[ \t]*$([\s\S]*?)(?=^####|^###)/im)?.[1] ?? "";
+    const blocks = text.match(/^####\s+Componentes Vue e @nuxt\/ui selecionados[ \t]*$([\s\S]*?)(?=^####|^###)/im)?.[1] ?? "";
     const screenCount = [...screens.matchAll(/^\s*-\s+.+$/gm)].length;
     const phase = tasks.match(/^####\s+Fase de interface[ \t]*$([\s\S]*?)(?=^####|^###|(?![\s\S]))/im)?.[1];
     const taskCount = phase ? [...phase.matchAll(/^\s*-\s+\[[ xX]\]\s+T\d{3,}\b/gm)].length : 0;

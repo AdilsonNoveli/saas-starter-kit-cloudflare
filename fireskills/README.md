@@ -116,9 +116,9 @@ O `fireskill-setup` cria e mantém estes arquivos na raiz do projeto:
 
 | Arquivo | Propósito |
 |---|---|
-| `PROJECT.md` | Visão do produto, objetivos, público-alvo |
-| `INTERFACE.md` | Contratos de interface (@nuxt/ui, padrões visuais) |
-| `DESIGNSYSTEM.MD` | Tokens, cores, tipografia, componentes |
+| `.specsfy/PROJECT.md` | Visão do produto, objetivos, público-alvo |
+| `.specsfy/INTERFACE.md` | Contratos de interface (@nuxt/ui, padrões visuais) |
+| `.specsfy/DESIGNSYSTEM.MD` | Tokens, cores, tipografia, componentes |
 | `.specsfy/STACK.md` | Stack técnica completa (autenticidade é tudo) |
 | `.specsfy/RULES.md` | Regras obrigatórias do projeto |
 | `.specsfy/DATABASE.md` | Schema Drizzle, tabelas, relações |

@@ -86,7 +86,7 @@ consumidor. A execução só continua quando `docs/` estiver atualizado.
 - marcar conclusão sem regressão.
 - marcar uma tarefa de banco sem criar, aplicar e conferir a migration.
 - rodar teste no banco do `.env` ou aceitar um comando que recrie o banco.
-- deixar `docs/`, `PROJECT.md` ou os arquivos `.specsfy/` incompatíveis com o
+- deixar `docs/`, `.specsfy/PROJECT.md` ou os arquivos `.specsfy/` incompatíveis com o
   código alterado.
 
 ## Próximo passo

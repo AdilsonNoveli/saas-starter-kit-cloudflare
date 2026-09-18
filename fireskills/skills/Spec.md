@@ -59,16 +59,16 @@ ou pendente.
 
 ## Contexto persistente do projeto
 
-- `PROJECT.md`, na raiz, mantém a história, a finalidade, as capacidades e os
+- `.specsfy/PROJECT.md`, na raiz, mantém a história, a finalidade, as capacidades e os
   limites gerais do projeto.
 - `.fireskills/STACK.md` mantém tecnologias estruturais e suas evidências.
 - `.fireskills/RULES.md` mantém regras explícitas confirmadas pela pessoa
   responsável.
 - `.fireskills/DATABASE.md` mantém o quadro tabular completo de persistência.
-- `INTERFACE.md`, na raiz, é o mapa canônico do design system: stack de
+- `.specsfy/INTERFACE.md`, na raiz, é o mapa canônico do design system: stack de
   interface, tokens, componentes @nuxt/ui v4 usados, composições Vue SFC,
   arquivos-fonte, componentes reutilizáveis e telas que os consomem.
-- `DESIGNSYSTEM.MD`, na raiz, mantém os defaults macro de interface, padrões
+- `.specsfy/DESIGNSYSTEM.MD`, na raiz, mantém os defaults macro de interface, padrões
   comuns de CRUD e dashboard, estados e exceções com alcance.
 - `.fireskills/PACKAGES.md` mantém o inventário de pacotes derivado dos
   manifests, lockfiles e metadados locais, com uma finalidade curta por pacote.
@@ -104,7 +104,7 @@ ou pendente.
   projeto e mantém a projeção completa em `docs/` e `.specsfy/PACKAGES.md`,
   sem depender de uma spec.
 - Não concluir uma tarefa enquanto o monitor exigir `STACK.md` ou `DATABASE.md`.
-  Toda mudança de aplicação revisa `PROJECT.md`; quando não houver impacto
+  Toda mudança de aplicação revisa `.specsfy/PROJECT.md`; quando não houver impacto
   material, registrar a justificativa na evidência da tarefa antes do
   reconhecimento explícito.
 - Preservar conteúdo humano existente. Os blocos delimitados por
@@ -196,7 +196,7 @@ configuração. Não replique o markup do cabeçalho em cada página.
 - Cada linha oferece ações independentes de editar e apagar. O botão de apagar
   respeita a permissão e confirma a consequência antes de executar.
 - Componentes recorrentes de cabeçalho, tabela, linha, ações, formulário,
-  estados e feedback são registrados em `INTERFACE.md` e reaproveitados antes
+  estados e feedback são registrados em `.specsfy/INTERFACE.md` e reaproveitados antes
   de uma nova implementação.
 
 ### Revisão visual durante o desenvolvimento
@@ -206,7 +206,7 @@ alterar uma interface, mesmo sem pedido da pessoa. O item `VISUAL` da tarefa
 fica entre `VERIFY` e `EVIDENCE` para impedir o registro da entrega sem a
 conferência.
 
-Leia `DESIGNSYSTEM.MD`, `INTERFACE.md` e os componentes afetados. Compare a
+Leia `.specsfy/DESIGNSYSTEM.MD`, `.specsfy/INTERFACE.md` e os componentes afetados. Compare a
 interface renderizada ou inspecionada nos viewports e estados relevantes com o
 sistema do projeto. A conferência precisa cobrir bordas, espaçamentos, margens,
 padding e tipografia, incluindo família, peso, tamanho, altura de linha e
@@ -249,7 +249,7 @@ fornece todos os componentes (`UButton`, `UModal`, `UTable`, `UForm`,
 `UFormField` e demais). A página ou rota limita-se a obter dados e compor
 componentes de domínio. Formulários, tabelas, filtros, ações em lote, diálogos,
 painéis laterais, estados visuais e partes repetidas ficam em componentes
-próprios. Antes de criar uma peça, leia `INTERFACE.md`, localize algo
+próprios. Antes de criar uma peça, leia `.specsfy/INTERFACE.md`, localize algo
 reutilizável e registre nela cada arquivo criado ou reaproveitado, sua origem,
 seus consumidores e o componente `@nuxt/ui` correspondente (para tabelas, o
 `enterpriseTableUi`).

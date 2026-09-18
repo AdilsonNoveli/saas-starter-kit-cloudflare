@@ -1,8 +1,8 @@
 # Perfil de interação do Specsfy
 
 Este arquivo guarda somente o nível de conhecimento e as respostas confirmadas
-durante o setup. Ele orienta a forma da conversa e não substitui `PROJECT.md`,
-`STACK.md`, `RULES.md`, `DATABASE.md`, `INTERFACE.md`, `DESIGNSYSTEM.MD` ou uma
+durante o setup. Ele orienta a forma da conversa e não substitui `.specsfy/PROJECT.md`,
+`STACK.md`, `RULES.md`, `DATABASE.md`, `.specsfy/INTERFACE.md`, `.specsfy/DESIGNSYSTEM.MD` ou uma
 spec.
 
 ## Nível de conhecimento

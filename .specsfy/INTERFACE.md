@@ -4,9 +4,9 @@
 
 Este arquivo é a fonte canônica para construir e reaproveitar a interface.
 Atualize-o antes e depois de cada tarefa que criar ou mudar uma tela Vue.
-Leia `DESIGNSYSTEM.MD` antes de escolher a composição macro. Este arquivo
+Leia `.specsfy/DESIGNSYSTEM.MD` antes de escolher a composição macro. Este arquivo
 registra componentes, blocos e telas locais; as regras globais de SaaS vivem em
-`DESIGNSYSTEM.MD`.
+`.specsfy/DESIGNSYSTEM.MD`.
 
 ## Base observada
 
@@ -24,11 +24,11 @@ No Nuxfire (Nuxt 4) o Composition Root é `apps/app` e o domínio vive em `layer
 | Tokens e tema | `packages/tokens` (`theme.css`, `index.ts`) | Cores, tipografia, espaçamento, raio e tema |
 | Configuração `@nuxt/ui` | `apps/app/app/app.config.ts` | `ui:` (spread de `sharedUiConfig`) |
 | Ícones | `@iconify-json/lucide` (apps/app/package.json) | Coleção `lucide` (`i-lucide-*`) |
-| PageHeader compartilhado | `DESIGNSYSTEM.MD` | Um componente reutilizável para lista, detalhe, criação e edição |
-| Padrão de dashboard | `DESIGNSYSTEM.MD` | `PageHeader`, filtros, `KPI`, visualização principal e investigação detalhada |
-| Padrão de linha | `DESIGNSYSTEM.MD` | `UTable` com `enterpriseTableUi` em largura total, coluna `ID`, detalhe clicável por linha e ações de editar e apagar |
-| Padrão de formulário | `DESIGNSYSTEM.MD` | Seções, coluna de contexto e painel em duas colunas responsivas |
-| Padrão de contexto | `DESIGNSYSTEM.MD` | `Breadcrumb` em todas as telas, com equipe, módulo e tela atual |
+| PageHeader compartilhado | `.specsfy/DESIGNSYSTEM.MD` | Um componente reutilizável para lista, detalhe, criação e edição |
+| Padrão de dashboard | `.specsfy/DESIGNSYSTEM.MD` | `PageHeader`, filtros, `KPI`, visualização principal e investigação detalhada |
+| Padrão de linha | `.specsfy/DESIGNSYSTEM.MD` | `UTable` com `enterpriseTableUi` em largura total, coluna `ID`, detalhe clicável por linha e ações de editar e apagar |
+| Padrão de formulário | `.specsfy/DESIGNSYSTEM.MD` | Seções, coluna de contexto e painel em duas colunas responsivas |
+| Padrão de contexto | `.specsfy/DESIGNSYSTEM.MD` | `Breadcrumb` em todas as telas, com equipe, módulo e tela atual |
 | Componentes compartilhados | A mapear | Componentes em `app/components/` do app ou da layer |
 | Composições de domínio | A mapear | Componentes em `layers/<layer>/app/components/` |
 

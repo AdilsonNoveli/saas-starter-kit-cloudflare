@@ -136,7 +136,7 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
   10 as nove partes do template com stack e convenções locais, telas, fluxo de
   informação, menus e navegação principal, formulários e ações, composição,
   componentes Vue e componentes `@nuxt/ui`, estados e acessibilidade. Use
-  `INTERFACE.md`, `.specsfy/STACK.md`, manifests, telas e código existente como fonte da stack
+  `.specsfy/INTERFACE.md`, `.specsfy/STACK.md`, manifests, telas e código existente como fonte da stack
   e do sistema atual; registre o que será preservado e alterado. Não proponha
   biblioteca incompatível nem reestruture uma tela existente sem esse exame.
   Carregue

@@ -55,7 +55,7 @@ Toda tarefa de desenvolvimento executa uma revisão visual, mesmo sem pedido da
 pessoa. O item `VISUAL` vem depois de `VERIFY` e precisa estar concluído antes
 de `EVIDENCE`.
 
-Para qualquer alteração com interface, leia `DESIGNSYSTEM.MD`, `INTERFACE.md` e
+Para qualquer alteração com interface, leia `.specsfy/DESIGNSYSTEM.MD`, `.specsfy/INTERFACE.md` e
 os componentes afetados. Inspecione a renderização ou o DOM nos viewports e
 estados relevantes. Confira bordas, espaçamentos, margens, padding e tipografia
 do sistema, além de alinhamento, largura, overflow, foco, zoom e quebra de
@@ -98,7 +98,7 @@ exigindo autorização específica.
    confirmação, retorne automaticamente para `$fireskill-05-tasks`; não implemente
    um CRUD somente como API ou persistência.
    Antes de programar, confirme os itens escolhidos na tabela da seção 10 e em
-   `INTERFACE.md`; depois de programar, atualize `INTERFACE.md` com todos os
+   `.specsfy/INTERFACE.md`; depois de programar, atualize `.specsfy/INTERFACE.md` com todos os
    blocos criados, alterados ou reaproveitados.
    Em todo componente Vue, carregue obrigatoriamente `$fireskill-specialist-nuxt-ui`
    antes de escrever `.vue` com componentes U*. Se a skill não estiver instalada,
@@ -159,7 +159,7 @@ node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
 
    Para stack pendente, faça handoff a `$fireskill-aux-stack`; para persistência,
    a `$fireskill-aux-database`; para regra confirmada, a
-   `$fireskill-aux-rules`. Revise `PROJECT.md` em toda mudança de aplicação. Se
+   `$fireskill-aux-rules`. Revise `.specsfy/PROJECT.md` em toda mudança de aplicação. Se
    não houver impacto material na história, finalidade, capacidades ou limites,
    registre a avaliação na evidência da tarefa e repita com
    `--acknowledge-project-no-change`. Não marque a tarefa enquanto o monitor

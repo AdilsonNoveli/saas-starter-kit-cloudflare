@@ -1,7 +1,3 @@
-# Nuxfire
-
-@AGENTS.md
-
 <!-- specsfy:framework:start -->
-@fireskills/skills/Spec.md
+@AGENTS.md
 <!-- specsfy:framework:end -->

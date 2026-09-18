@@ -114,13 +114,13 @@ para reconstruir a documentação técnica do sistema existente.
 | [`fireskill-data-discovery`](fireskill-data-discovery/SKILL.md) | conversar sobre informações que o produto precisa guardar | não escolhe tecnologia ou implementação |
 | [`fireskill-roadmap-milestone-interviewer`](fireskill-roadmap-milestone-interviewer/SKILL.md) | entrevistar a evolução pós-MVP | não altera o núcleo sem confirmação |
 | [`fireskill-milestone-governor`](fireskill-milestone-governor/SKILL.md) | sincronizar a projeção de milestones | não inventa condição de saída |
-| [`fireskill-setup`](fireskill-setup/SKILL.md) | detectar o stack, criar contexto ausente, preparar `DESIGNSYSTEM.MD`, manter o perfil de interação e reconciliar blocos de agentes | não sobrescreve arquivos de contexto existentes |
+| [`fireskill-setup`](fireskill-setup/SKILL.md) | detectar o stack, criar contexto ausente, preparar `.specsfy/DESIGNSYSTEM.MD`, manter o perfil de interação e reconciliar blocos de agentes | não sobrescreve arquivos de contexto existentes |
 | [`fireskill-documentator`](fireskill-documentator/SKILL.md) | reconstruir `docs/` e o inventário `.specsfy/PACKAGES.md` | não inventa decisões, relações, finalidades ou referências |
 | [`fireskill-aux-stack`](fireskill-aux-stack/SKILL.md) | manter `.specsfy/STACK.md` a partir de evidência executável | não inventa nem copia toda dependência |
 | [`fireskill-aux-rules`](fireskill-aux-rules/SKILL.md) | ajudar a registrar regras confirmadas em `.specsfy/RULES.md` | não decide regras pela pessoa |
 | [`fireskill-aux-database`](fireskill-aux-database/SKILL.md) | manter `.specsfy/DATABASE.md` após toda mudança persistente | não copia dados ou segredos |
 
-`PROJECT.md`, `INTERFACE.md` e `DESIGNSYSTEM.MD` ficam na raiz do projeto
+`.specsfy/PROJECT.md`, `.specsfy/INTERFACE.md` e `.specsfy/DESIGNSYSTEM.MD` ficam na raiz do projeto
 consumidor. `STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md` e
 `USER-PROFILE.md` ficam em
 `.specsfy/`. O setup pode ser executado
@@ -139,7 +139,7 @@ Durante planejamento, implementação e projeção de progresso,
 `fireskill-setup/scripts/monitor_context.mjs` classifica mudanças staged, unstaged
 e untracked. Alterações estruturais exigem `STACK.md`. Alterações de
 persistência exigem `DATABASE.md`. Código de aplicação exige revisão de
-`PROJECT.md`. A ausência de impacto material é registrada na evidência da
+`.specsfy/PROJECT.md`. A ausência de impacto material é registrada na evidência da
 tarefa, nunca presumida silenciosamente.
 
 `fireskill-documentator` funciona de forma independente e também é um handoff
@@ -187,7 +187,7 @@ handoff.
 ```text
 templates/
 ├── Inbox.md, Backlog.md, Spec.md e Tasks.md
-└── Project.md, Stack.md, Rules.md, Database.md, UserProfile.md, Interface.md e DESIGNSYSTEM.MD
+└── Project.md, Stack.md, Rules.md, Database.md, UserProfile.md, Interface.md e .specsfy/DESIGNSYSTEM.MD
 examples/
 └── Spec.md        # fixture preenchida para agentes, CLI e testes
 specsfy-{base-<responsabilidade>|setup|documentator|aux-<responsabilidade>}/
@@ -208,8 +208,8 @@ specsfy-{base-<responsabilidade>|setup|documentator|aux-<responsabilidade>}/
 - Uma regra normativa possui uma única fonte. Outros arquivos apontam para ela.
 - O CLI publica os templates e o exemplo sob `.specsfy/`. Somente uma spec
   criada a partir do template se torna normativa para uma feature.
-- `DESIGNSYSTEM.MD` orienta regras macro de interface no projeto consumidor;
-  `INTERFACE.md` mantém o registro local de componentes e telas.
+- `.specsfy/DESIGNSYSTEM.MD` orienta regras macro de interface no projeto consumidor;
+  `.specsfy/INTERFACE.md` mantém o registro local de componentes e telas.
 
 ## Disponibilizar as skills
 

@@ -18,7 +18,7 @@ Modo de interação: `sem perguntas`.
 Não formule perguntas nesta skill. Quando faltar informação confirmada,
 sinalize o campo pendente para a etapa conversacional responsável.
 
-1. Ler instruções locais, `PROJECT.md`, `STACK.md` e todo o `DATABASE.md`.
+1. Ler instruções locais, `.specsfy/PROJECT.md`, `STACK.md` e todo o `DATABASE.md`.
 2. Inspecionar schemas, migrations, models persistentes e configurações sem
    revelar valores de ambiente ou credenciais.
 3. Executar `node scripts/update_database.mjs --project <raiz>`.

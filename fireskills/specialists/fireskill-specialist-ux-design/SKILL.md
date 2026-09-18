@@ -18,13 +18,13 @@ description: Investigar, estruturar e validar experiências com pesquisa, arquit
 
 ## Fluxo
 
-1. Carregar `$fireskill-specialist-design-system` e ler `DESIGNSYSTEM.MD` antes
+1. Carregar `$fireskill-specialist-design-system` e ler `.specsfy/DESIGNSYSTEM.MD` antes
    de propor a solução. Quando a entrega criar ou mudar uma interface para
    pessoas, conduzir a descoberta. Perguntar, pelo contrato central, que
    telas existem, como a informação percorre o fluxo, quais campos e
    validações entram no formulário e como cada ação abre: página, painel
    lateral, modal, área expandida ou outro formato. Se a pessoa não informar
-   direção visual, aplicar os defaults do `DESIGNSYSTEM.MD`; perguntar sobre
+   direção visual, aplicar os defaults do `.specsfy/DESIGNSYSTEM.MD`; perguntar sobre
    composição somente quando houver conflito ou lacuna de tarefa. Reaproveitar
    contexto já confirmado e perguntar somente o que falta.
 2. Ler a stack e as telas existentes antes de sugerir um fluxo

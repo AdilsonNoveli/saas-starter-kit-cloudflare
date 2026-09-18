@@ -67,7 +67,7 @@ apropriada.
 | Stack, pacotes, convenções ou testes | [engineering/README.md](engineering/README.md) | a organização do contexto de engenharia mudar |
 | Persistência, migrations ou privacidade | [data/README.md](data/README.md) | a organização do contexto de dados mudar |
 | Fluxo que atravessa módulos | [flows/README.md](flows/README.md) | um mapa transversal for criado ou sua rota mudar, inclusive publicação do CLI |
-| Design system e padrões de interface | [design/README.md](design/README.md) | a fonte macro, os cenários CRUD ou a relação com `INTERFACE.md` mudar |
+| Design system e padrões de interface | [design/README.md](design/README.md) | a fonte macro, os cenários CRUD ou a relação com `.specsfy/INTERFACE.md` mudar |
 
 ## Precedência das fontes
 

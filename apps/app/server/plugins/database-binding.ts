@@ -21,9 +21,16 @@ export default defineNitroPlugin((nitroApp) => {
   // freeze/terminate the isolate right after the response is flushed.
   const scheduleClose = (event: H3Event) => {
     const closing = closeDB(event);
-    const waitUntil = event.context?.cloudflare?.context?.waitUntil;
-    if (waitUntil) {
-      waitUntil(closing);
+    // Cloudflare's ExecutionContext.waitUntil is a host method, not a plain
+    // JS function — calling it detached from `context` (e.g. hoisting it
+    // into a local `const` first, the way this used to read) throws
+    // "TypeError: Illegal invocation: function called with incorrect `this`
+    // reference" (workerd's own binding check), which took the whole App
+    // Worker down with a 500 on every request. Must be invoked as
+    // `context.waitUntil(...)`, never `const fn = context.waitUntil; fn(...)`.
+    const context = event.context?.cloudflare?.context;
+    if (context?.waitUntil) {
+      context.waitUntil(closing);
     } else {
       closing.catch(() => {});
     }

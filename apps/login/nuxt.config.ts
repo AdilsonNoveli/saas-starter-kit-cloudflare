@@ -51,7 +51,19 @@ export default defineNuxtConfig({
       },
       { name: "Español", code: "es", language: "es-ES", file: "es.json" },
     ],
-    experimental: { typedOptionsAndMessages: "default" },
+    // `apps/login` is `nitro.preset: "static"` — no server survives past
+    // `nuxt generate`, so @nuxtjs/i18n's default lazy-loading (a Nitro route,
+    // `/_i18n/<hash>/<locale>/messages.json`, served at request time) 404s
+    // forever once deployed: nothing is left to answer it, and the
+    // crawler-based prerenderer never discovers it on its own (it's fetched
+    // from inside client JS after hydration, not linked from prerendered
+    // HTML — same class of gap `apps/web`'s `docsRoutes()` works around for
+    // its own crawler-invisible routes). `prerenderMessages` bakes the hashed
+    // messages.json files into `.output/public/` at build time instead, so
+    // they're plain static assets like everything else here. apps/app and
+    // apps/web don't need this — both keep a real Nitro server at runtime,
+    // so the dynamic route genuinely exists for them.
+    experimental: { typedOptionsAndMessages: "default", prerenderMessages: true },
   },
   // Set from infra/auth.ts at build time (NUXT_PUBLIC_GITHUB_AUTH_ENABLED /
   // NUXT_PUBLIC_GOOGLE_AUTH_ENABLED), based on whether real OAuth

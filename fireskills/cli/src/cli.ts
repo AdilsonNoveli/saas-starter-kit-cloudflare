@@ -25,6 +25,18 @@ import {
 } from "./progress.js";
 import { runProjectTests } from "./project-testing.js";
 import { VERSION } from "./version.js";
+import {
+  addLesson,
+  getLessonsStatus,
+  Lesson,
+  loadLessons,
+  pruneLessons,
+} from "./lessons.js";
+import {
+  resolveSpecPath,
+  validateSpec,
+  ValidationResult,
+} from "./validator.js";
 
 interface ProjectOptions {
   project: string;
@@ -178,6 +190,97 @@ export function buildProgram(): Command {
         );
       },
     );
+
+  program
+    .command("validate")
+    .description("executa linter determinístico na spec.md")
+    .argument("<identificador>", "ID, slug ou caminho da spec")
+    .addOption(projectOption())
+    .option("--strict", "trata avisos como erros")
+    .option("--json", "emite resultado JSON")
+    .action(async (target: string, options: ProjectOptions & { strict?: boolean; json?: boolean }) => {
+      const specPath = await resolveSpecPath(options.project, target);
+      if (!specPath) {
+        throw new Error(`Spec não encontrada para o identificador: ${target}`);
+      }
+      const result = await validateSpec(
+        specPath,
+        options.strict ? { strict: true } : {},
+      );
+      if (options.json) {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        printValidation(result);
+      }
+      if (!result.valid) {
+        process.exitCode = 1;
+      }
+    });
+
+  const lesson = program.command("lesson").description("gerencia o playbook de lições aprendidas (.specsfy/LESSONS.md)");
+
+  lesson
+    .command("add")
+    .description("registra uma lição aprendida")
+    .requiredOption("--signal <tipo>", "sinal de origem (ac_gap, surviving_mutant, spec_precision_gap, spec_deviation, gate_fail)")
+    .requiredOption("--summary <texto>", "resumo do problema ocorrido")
+    .requiredOption("--rule <texto>", "regra preventiva acionável")
+    .requiredOption("--source <identificador>", "spec, PR ou contexto de origem")
+    .addOption(projectOption())
+    .option("--json", "emite resultado JSON")
+    .action(async (options: ProjectOptions & { signal: string; summary: string; rule: string; source: string; json?: boolean }) => {
+      const res = await addLesson(options.project, {
+        signal: options.signal as any,
+        summary: options.summary,
+        rule: options.rule,
+        source: options.source,
+      });
+      if (options.json) {
+        console.log(JSON.stringify(res, null, 2));
+      } else {
+        console.log(`Lição registrada com sucesso (ID: ${res.lesson.id}, status: ${res.lesson.status})${res.promoted ? " [PROMOVIDA A CONFIRMADA!]" : ""}`);
+      }
+    });
+
+  lesson
+    .command("list")
+    .description("lista lições registradas")
+    .addOption(projectOption())
+    .option("--all", "inclui candidatas e em quarentena")
+    .option("--json", "emite resultado JSON")
+    .action(async (options: ProjectOptions & { all?: boolean; json?: boolean }) => {
+      const store = await loadLessons(options.project);
+      const list = options.all ? store.lessons : store.lessons.filter(l => l.status === "confirmed");
+      if (options.json) {
+        console.log(JSON.stringify(list, null, 2));
+      } else {
+        printLessonsList(list);
+      }
+    });
+
+  lesson
+    .command("status")
+    .description("resumo quantitativo das lições")
+    .addOption(projectOption())
+    .option("--json", "emite resultado JSON")
+    .action(async (options: ProjectOptions & { json?: boolean }) => {
+      const status = await getLessonsStatus(options.project);
+      if (options.json) {
+        console.log(JSON.stringify(status, null, 2));
+      } else {
+        console.log(`Lições Aprendidas: ${status.confirmed} confirmadas, ${status.candidate} candidatas, ${status.quarantined} em quarentena (Total: ${status.total})`);
+      }
+    });
+
+  lesson
+    .command("prune")
+    .description("remove lições candidatas expiradas")
+    .addOption(projectOption())
+    .action(async (options: ProjectOptions) => {
+      const count = await pruneLessons(options.project);
+      console.log(`Candidatas expiradas removidas: ${count}`);
+    });
+
   return program;
 }
 
@@ -293,5 +396,43 @@ function printTransition(
 function printClickUpfyHandoff(handoff: Awaited<ReturnType<typeof clickUpfyHandoff>>): void {
   if (handoff.available && handoff.task_id) {
     console.log(`ClickUpfy\tencaminhar ${handoff.action} para a tarefa ${handoff.task_id}`);
+  }
+}
+
+function printValidation(result: ValidationResult): void {
+  console.log(`Validação: ${result.path}`);
+  if (result.valid) {
+    console.log("Status: VÁLIDO (Aprovado no linter de specs)");
+  } else {
+    console.log("Status: INVÁLIDO (Corrija os erros antes de avançar o gate)");
+  }
+  console.log(`Erros: ${result.summary.errors} | Avisos: ${result.summary.warnings}`);
+  if (result.issues.length > 0) {
+    console.log("--- Detalhes ---");
+    for (const issue of result.issues) {
+      const prefix = issue.level === "error" ? "❌ [ERRO]" : "⚠️ [AVISO]";
+      const line = issue.line ? ` (Linha ${issue.line})` : "";
+      console.log(`${prefix}${line}: ${issue.message}`);
+    }
+  }
+}
+
+function printLessonsList(lessons: Lesson[]): void {
+  if (lessons.length === 0) {
+    console.log("Nenhuma lição encontrada.");
+    return;
+  }
+  for (const l of lessons) {
+    const tag =
+      l.status === "confirmed"
+        ? "🛡️ [CONFIRMADA]"
+        : l.status === "candidate"
+          ? "🧪 [CANDIDATA]"
+          : "⚠️ [QUARENTENA]";
+    console.log(`${tag} L-${String(l.id).padStart(3, "0")}: ${l.summary}`);
+    console.log(`   Regra: ${l.rule}`);
+    console.log(
+      `   Sinal: ${l.signal} | Ocorrências: ${l.occurrences} | Fontes: ${l.sources.join(", ")}`,
+    );
   }
 }

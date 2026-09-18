@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - The Fool"
+  short_description: "Ataque adversarial a specs, planos e decisões"
+  default_prompt: "Use $fireskill-the-fool para atacar a spec specs/<estado>/<NNNN>-<slug>/spec.md com pre-mortem, steelman da posição oposta e auditoria de premissas não verificadas."

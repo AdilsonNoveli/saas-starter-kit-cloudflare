@@ -61,21 +61,21 @@ ou pendente.
 
 - `.specsfy/PROJECT.md`, na raiz, mantém a história, a finalidade, as capacidades e os
   limites gerais do projeto.
-- `.fireskills/STACK.md` mantém tecnologias estruturais e suas evidências.
-- `.fireskills/RULES.md` mantém regras explícitas confirmadas pela pessoa
+- `.specsfy/STACK.md` mantém tecnologias estruturais e suas evidências.
+- `.specsfy/RULES.md` mantém regras explícitas confirmadas pela pessoa
   responsável.
-- `.fireskills/DATABASE.md` mantém o quadro tabular completo de persistência.
+- `.specsfy/DATABASE.md` mantém o quadro tabular completo de persistência.
 - `.specsfy/INTERFACE.md`, na raiz, é o mapa canônico do design system: stack de
   interface, tokens, componentes @nuxt/ui v4 usados, composições Vue SFC,
   arquivos-fonte, componentes reutilizáveis e telas que os consomem.
 - `.specsfy/DESIGNSYSTEM.MD`, na raiz, mantém os defaults macro de interface, padrões
   comuns de CRUD e dashboard, estados e exceções com alcance.
-- `.fireskills/PACKAGES.md` mantém o inventário de pacotes derivado dos
+- `.specsfy/PACKAGES.md` mantém o inventário de pacotes derivado dos
   manifests, lockfiles e metadados locais, com uma finalidade curta por pacote.
-- `.fireskills/USER-PROFILE.md` mantém o nível de conhecimento confirmado, as
+- `.specsfy/USER-PROFILE.md` mantém o nível de conhecimento confirmado, as
   respostas já dadas durante o setup e as fontes dessas respostas. O setup lê
   esse arquivo antes de perguntar e não repete assuntos já confirmados.
-- `.fireskills/SPECKIT.md` aparece quando o projeto possui
+- `.specsfy/SPECKIT.md` aparece quando o projeto possui
   `.specify/memory/constitution.md`. Essa projeção lista a constituição e todos
   os arquivos regulares encontrados em `specs/`, sem alterar as fontes do
   GitHub Spec Kit.

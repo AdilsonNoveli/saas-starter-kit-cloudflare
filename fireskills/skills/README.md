@@ -4,23 +4,26 @@ Este módulo mantém a metodologia executável do Fireskills (derivada do
 Specsfy): skills, scripts determinísticos, referências, assets e metadata para
 agentes.
 
-A visão geral está em [`README.md`](../README.md) e a documentação de uso em
-[`docs/`](../docs/).
+A visão geral está em [`README.md`](../README.md). A documentação pública de uso
+(o que digitar na IDE em cada etapa) está em
+`apps/web/content/docs/2.fireskills/` (site: `/docs/fireskills`).
 
 ## Responsabilidade
 
 Este módulo possui:
 
-- as instruções operacionais das quatorze skills base, do setup, do
-  documentador e das três auxiliares.
-- **(ausente neste repositório)** os templates de inbox, backlog, spec, tarefas,
-  projeto, stack, regras, banco e interface em `templates/`, e o exemplo em
-  `examples/Spec.md`: os scripts que os leem falham até que sejam restaurados
-  (ver `PLANO-REFATORACAO.md`, "Pendências").
+- as instruções operacionais das skills do fluxo (01 a 07, `update-spec`,
+  `progress`, `interviewer`, milestones e `data-discovery`), do setup, do
+  documentador, das três auxiliares e das skills de governança (`lessons`,
+  `the-fool`, `the-jury`, `the-judge`).
+- os templates de inbox, backlog, spec, tarefas, projeto, stack, regras, banco,
+  interface, perfil e design system em `templates/`, e o exemplo em
+  `examples/Spec.md`.
 - o MCR-10 e referências dos gates.
 - scripts de validação, rastreabilidade, evidência e progresso.
 - metadata de descoberta em `agents/openai.yaml`.
-- BDD, testes e fixtures que validam as próprias skills.
+- o exemplo `examples/Spec.md` (fixture preenchida). As skills não têm suíte de
+  testes própria; a checagem delas é `fireskill-04-validate/scripts/verify_repo.mjs`.
 
 Specs pertencem ao projeto consumidor (aqui, o Nuxfire). Conhecimento técnico
 pertence a [`specialists/`](../specialists/).
@@ -119,11 +122,14 @@ para reconstruir a documentação técnica do sistema existente.
 | [`fireskill-aux-stack`](fireskill-aux-stack/SKILL.md) | manter `.specsfy/STACK.md` a partir de evidência executável | não inventa nem copia toda dependência |
 | [`fireskill-aux-rules`](fireskill-aux-rules/SKILL.md) | ajudar a registrar regras confirmadas em `.specsfy/RULES.md` | não decide regras pela pessoa |
 | [`fireskill-aux-database`](fireskill-aux-database/SKILL.md) | manter `.specsfy/DATABASE.md` após toda mudança persistente | não copia dados ou segredos |
+| [`fireskill-lessons`](fireskill-lessons/SKILL.md) | registrar lições aprendidas com sinal, regra preventiva e origem em `.specsfy/LESSONS.md` | só registra lição fundamentada em falha real |
+| [`fireskill-the-fool`](fireskill-the-fool/SKILL.md) | atacar spec, plano ou decisão (pre-mortem, premissas não verificadas) | não corrige nem aprova gates |
+| [`fireskill-the-jury`](fireskill-the-jury/SKILL.md) | deliberação colegiada de 3 a 5 subagentes para decisão de alto impacto | não serve para tarefa trivial |
+| [`fireskill-the-judge`](fireskill-the-judge/SKILL.md) | revisar diff ou PR com evidência `arquivo:linha` e veredito | não comenta o que linters e testes já pegam |
 
-`.specsfy/PROJECT.md`, `.specsfy/INTERFACE.md` e `.specsfy/DESIGNSYSTEM.MD` ficam na raiz do projeto
-consumidor. `STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md` e
-`USER-PROFILE.md` ficam em
-`.specsfy/`. O setup pode ser executado
+Todos os arquivos de contexto (`PROJECT.md`, `INTERFACE.md`, `DESIGNSYSTEM.MD`,
+`STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md`, `USER-PROFILE.md`,
+`LESSONS.md`) ficam em `.specsfy/`. O setup pode ser executado
 novamente para garantir os contextos iniciais; o documentador garante o
 inventário de pacotes. Ambos preservam arquivos existentes e todo conteúdo fora
 dos blocos gerenciados.
@@ -190,7 +196,7 @@ templates/
 └── Project.md, Stack.md, Rules.md, Database.md, UserProfile.md, Interface.md e .specsfy/DESIGNSYSTEM.MD
 examples/
 └── Spec.md        # fixture preenchida para agentes, CLI e testes
-specsfy-{base-<responsabilidade>|setup|documentator|aux-<responsabilidade>}/
+fireskill-{<etapa>|setup|documentator|aux-<responsabilidade>|<governança>}/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml

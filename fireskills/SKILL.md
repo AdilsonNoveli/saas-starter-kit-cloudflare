@@ -32,8 +32,12 @@ Plan, Delivery).
 | Conversar com a spec | `fireskill-interviewer` |
 | Definir o MVP / evolução | `fireskill-mvp-milestone-interviewer`, `fireskill-roadmap-milestone-interviewer`, `fireskill-milestone-governor` |
 | Descobrir dados do produto | `fireskill-data-discovery` |
+| Registrar / consultar lições aprendidas | `fireskill-lessons` |
+| Deliberação colegiada / decisão de alto impacto | `fireskill-the-jury` |
+| Ataque adversarial e detecção de premissas frágeis | `fireskill-the-fool` |
+| Revisão técnica de PR / diff com evidências | `fireskill-the-judge` |
 | Manter STACK/RULES/DATABASE | `fireskill-aux-stack`, `fireskill-aux-rules`, `fireskill-aux-database` |
-| Mudar estado, esforço, ver progresso ou milestones | `bun run fireskill <comando>` (ver `README.md`) |
+| Mudar estado, esforço, validar spec, lições ou milestones | `bun run fireskill <comando>` (ver `README.md`) |
 
 ## Especialistas do Nuxfire
 
@@ -84,6 +88,8 @@ arquitetura, UX/UI, TypeScript, Postgres, Tailwind, revisão, depuração…) es
 | Typecheck | `bun run typecheck` em `apps/app` **e** `bunx vue-tsc --noEmit -p server/tsconfig.json` |
 | i18n | `bun run check:i18n` |
 | Specs: progresso, estado, esforço, milestones | `bun run fireskill progress`, `transition <id> <estado>`, `effort <id> <1-10> --reason "…"`, `milestones sync` |
+| Validação determinística de spec | `bun run fireskill validate <id> [--strict]` |
+| Lições aprendidas | `bun run fireskill lesson add/list/status/prune` |
 | Monitor de contexto | `node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs --project . --check` |
 | Proteção do banco | `node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs --project . --command "<comando>"` |
 | Deploy (**só com autorização**) | `bun run deploy -- --stage <stage>` |

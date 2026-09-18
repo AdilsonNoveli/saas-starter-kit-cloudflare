@@ -59,6 +59,10 @@ Tres gates:
 | `fireskill-roadmap-milestone-interviewer` | Planeja a evolução após o MVP aceito |
 | `fireskill-milestone-governor` | Mantém relações e a projeção `specs.md` |
 | `fireskill-data-discovery` | Descobre dados que o produto precisa guardar |
+| `fireskill-lessons` | Sistema auto-evolutivo de lições aprendidas (`.specsfy/LESSONS.md`) |
+| `fireskill-the-jury` | Deliberação colegiada com rodada cega para decisões de alto impacto |
+| `fireskill-the-fool` | Ataque adversarial, pre-mortem e estresse de premissas fracas |
+| `fireskill-the-judge` | Code review determinístico e rigoroso em PRs/diffs com evidências |
 | `fireskill-aux-stack` | Mantém `.specsfy/STACK.md` |
 | `fireskill-aux-rules` | Mantém `.specsfy/RULES.md` |
 | `fireskill-aux-database` | Mantém `.specsfy/DATABASE.md` |
@@ -142,6 +146,8 @@ motor do fluxo, sem instalador nem TUI). Da raiz do repositório:
 | `bun run fireskill milestones sync` | Reconstrói `specs.md` e o progresso dos milestones |
 | `bun run fireskill migrate` | Migra specs do layout antigo para as pastas de estado |
 | `bun run fireskill test` | Executa `bun run test` (Vitest) |
+| `bun run fireskill validate <id> [--strict]` | Linter rápido da spec (metadados, seções, BDD, tarefas). **Não** é o Definition Gate: o gate é `validate_spec.mjs` da skill `fireskill-04-validate` |
+| `bun run fireskill lesson add/list/status/prune` | Gerencia o playbook auto-evolutivo de lições aprendidas (`.specsfy/LESSONS.md`) |
 | `bun run fireskill config show\|set` | Configuração do CLI |
 
 Testes do CLI: `bun run test` dentro de `fireskills/cli/`.

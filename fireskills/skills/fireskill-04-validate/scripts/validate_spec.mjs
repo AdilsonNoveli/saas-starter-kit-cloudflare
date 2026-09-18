@@ -71,8 +71,8 @@ function interfaceErrors(body, status) {
     if (title === "Revisão visual durante o desenvolvimento" && visualChecks.some(([pattern]) => !pattern.test(content))) {
       errors.push("Interface para pessoas: Revisão visual durante o desenvolvimento precisa conferir bordas, espaçamentos, margens, padding e tipografia.");
     }
-    if (title === "Contrato CRUD" && (!/PageHeader/i.test(content) || !/DataGrid/i.test(content) || !/\bID\b/.test(content) || !/editar/i.test(content) || !/apagar/i.test(content))) {
-      errors.push("Interface para pessoas: Contrato CRUD precisa declarar PageHeader, DataGrid, ID, editar e apagar.");
+    if (title === "Contrato CRUD" && (!/PageHeader/i.test(content) || !/UTable|DataGrid/i.test(content) || !/\bID\b/.test(content) || !/editar/i.test(content) || !/apagar/i.test(content))) {
+      errors.push("Interface para pessoas: Contrato CRUD precisa declarar PageHeader, UTable, ID, editar e apagar.");
     }
   }
   return errors;

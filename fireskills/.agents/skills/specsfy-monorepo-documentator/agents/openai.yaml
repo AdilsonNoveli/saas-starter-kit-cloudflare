@@ -1,0 +1,6 @@
+interface:
+  display_name: "Specsfy · Documentação do Monorepo"
+  short_description: "Documenta o monorepo e seus guias oficiais"
+  default_prompt: "Use $specsfy-monorepo-documentator para reconciliar o monorepo e atualizar a documentação técnica e os guias oficiais em docs/."
+policy:
+  allow_implicit_invocation: false

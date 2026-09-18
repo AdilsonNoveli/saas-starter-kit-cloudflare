@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Gitflow"
+  short_description: "Branches Gitflow por decisão explícita do projeto"
+  default_prompt: "Use $specsfy-specialist-gitflow para orientar esta tarefa com padrões e validação especializados."

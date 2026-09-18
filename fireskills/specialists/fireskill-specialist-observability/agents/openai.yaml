@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Observabilidade"
+  short_description: "Logs, métricas, traces, SLOs e alertas"
+  default_prompt: "Use $specsfy-specialist-observability para orientar esta tarefa com padrões e validação especializados."

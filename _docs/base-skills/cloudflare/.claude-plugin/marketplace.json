@@ -1,0 +1,15 @@
+{
+  "$schema": "https://code.claude.com/schemas/marketplace.json",
+  "name": "cloudflare",
+  "owner": {
+    "name": "Cloudflare",
+    "url": "https://workers.cloudflare.com"
+  },
+  "plugins": [
+    {
+      "name": "cloudflare",
+      "source": "./",
+      "description": "Build, test, and deploy applications on Cloudflare with platform guidance Skills and the Cloudflare MCP server."
+    }
+  ]
+}

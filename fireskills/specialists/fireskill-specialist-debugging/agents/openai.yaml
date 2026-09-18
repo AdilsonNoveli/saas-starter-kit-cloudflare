@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Depuração"
+  short_description: "Diagnóstico por reprodução e hipótese"
+  default_prompt: "Use $specsfy-specialist-debugging para orientar esta tarefa com padrões e validação especializados."

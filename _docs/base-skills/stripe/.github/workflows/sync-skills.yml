@@ -1,0 +1,74 @@
+name: Sync skills from docs.stripe.com
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run daily at 00:00 UTC
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+        
+      - name: Generate GitHub App token
+        id: app-token
+        if: |
+          github.ref == 'refs/heads/main'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
+        with:
+          client-id: ${{ secrets.GH_APP_STRIPE_AI_SYNC_CLIENT_ID }}
+          private-key: ${{ secrets.GH_APP_STRIPE_AI_SYNC_PEM }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '20'
+
+      - name: Run sync script
+        run: node scripts/sync.js
+    
+      - name: Push to Github
+        if: |
+          github.ref == 'refs/heads/main'&&
+          !github.event.repository.fork
+        shell: bash
+        run: |
+          git add \
+            ':(glob)**/skills/**' \
+            .claude-plugin/marketplace.json \
+            .cursor-plugin/marketplace.json \
+            .grok-plugin/marketplace.json \
+            providers/claude/plugin/.claude-plugin/plugin.json \
+            providers/codex/plugin/.codex-plugin/plugin.json \
+            providers/cursor/plugin/.cursor-plugin/plugin.json \
+            providers/grok/plugin/.grok-plugin/plugin.json \
+            providers/agent-plugins/plugin/plugin.json
+
+          # Skip if nothing changed
+          if git diff --staged --quiet; then
+            echo "No changes to commit, skipping."
+            exit 0
+          fi
+
+          # Allow commit to work
+          git config user.name "stripe-ai-sync[bot]"
+          git config user.email "282683001+stripe-ai-sync[bot]@users.noreply.github.com"
+
+          # Append a commit with a fix applied
+          git commit -m "sync skills"
+
+          # Authenticate with the GitHub App token and push
+          git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
+          git push origin main

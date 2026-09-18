@@ -88,5 +88,12 @@ secretList.PlatformAdminEncryptionKey = new sst.Secret(
 secretList.UserMfaSessionSecret = new sst.Secret("USER_MFA_SESSION_SECRET", "");
 secretList.UserMfaEncryptionKey = new sst.Secret("USER_MFA_ENCRYPTION_KEY", "");
 
+// TypeSafe (https://docs.typesafe.ai/) — API key for the System One models
+// (e.g. Jev) that return typed judgments and probabilities. Server-only: never
+// expose it as NUXT_PUBLIC_* or ship it to the client. Defaults to "" so a stage
+// that has not loaded it still deploys; the calling code must fail closed until
+// it does.
+secretList.TypesafeApiKey = new sst.Secret("TYPESAFE_API_KEY", "");
+
 export const secret = secretList;
 export const allSecrets = Object.values(secret);

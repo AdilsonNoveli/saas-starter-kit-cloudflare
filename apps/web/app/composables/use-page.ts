@@ -1,7 +1,9 @@
 export const usePage = async () => {
   const route = useRoute();
-  const { data: page } = await useAsyncData(route.path, () =>
-    queryCollection("docs").path(route.path).first(),
+  const { locale } = useI18n();
+  const { data: page } = await useAsyncData(
+    () => `${route.path}:${locale.value}`,
+    () => queryDocsPage(locale.value, route.path),
   );
   return page;
 };

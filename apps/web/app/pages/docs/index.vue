@@ -106,7 +106,7 @@ useSeoMeta({
 });
 defineOgImageComponent("NuxtSeo");
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 // Marketing copy, not a content field — "Enterprise Grade" isn't part of any
 // page's frontmatter, so it's attached here by path instead of invented data
@@ -147,11 +147,11 @@ const productPaths = computed(() => {
 // Fetched directly from each product's own index page instead, the same way
 // usePage() above already does for the root /docs page itself.
 const { data: productDescriptions } = await useAsyncData(
-  "docs-product-descriptions",
+  () => `docs-product-descriptions:${locale.value}`,
   async () => {
     const entries = await Promise.all(
       productPaths.value.map(async (path) => {
-        const productPage = await queryCollection("docs").path(path).first();
+        const productPage = await queryDocsPage(locale.value, path);
         return [path, productPage?.description ?? ""] as const;
       }),
     );

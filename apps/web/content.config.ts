@@ -6,6 +6,18 @@ export default defineContentConfig({
       type: "page",
       source: "docs/**",
     }),
+    // Translations of the docs, served at the same /docs/... URLs. The page and
+    // the navigation pick the collection of the active locale and fall back to
+    // `docs` (English) for anything that is not translated. See
+    // app/composables/use-docs-locale.ts.
+    docs_pt_br: defineCollection({
+      type: "page",
+      source: { include: "pt-br/docs/**", prefix: "/docs" },
+    }),
+    docs_es: defineCollection({
+      type: "page",
+      source: { include: "es/docs/**", prefix: "/docs" },
+    }),
     blog: defineCollection({
       type: "page",
       source: "blog/**",

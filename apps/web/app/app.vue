@@ -8,8 +8,12 @@
 </template>
 
 <script setup>
-const { data: navigation } = await useAsyncData("navigation", () =>
-  queryCollectionNavigation("docs"),
+const { locale } = useI18n();
+// One cache entry per locale: switching the language reads (or fetches) the
+// entry of the new locale instead of relying on a watcher.
+const { data: navigation } = await useAsyncData(
+  () => `navigation:${locale.value}`,
+  () => queryDocsNavigation(locale.value),
 );
 provide("navigation", navigation);
 

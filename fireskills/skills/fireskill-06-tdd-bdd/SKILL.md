@@ -82,8 +82,8 @@ Se o usuário não indicar o modo, use `prepare` quando a seção 14 ainda não 
      decisão reproduzível.
 5. Confira o ambiente e o comando com `check_database_safety.mjs`. Se o estado
    não for `SAFE`, não execute teste algum e mantenha a etapa pendente.
-6. Considere a decisão materializada quando `package.json` expuser o script
-   `test:tdd` (hoje ausente no Nuxfire: criar como `vitest run`); não instale
+6. No Nuxfire a decisão já está materializada: Vitest, com `bun run test` na
+   raiz (7 arquivos, 131 testes) e `vitest.config.ts` por layer; não instale
    dependência silenciosamente.
 7. Leia `references/test-levels.md` para escolher o nível mais baixo que ainda prova o comportamento.
 

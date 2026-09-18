@@ -252,8 +252,7 @@ pela stack. No Nuxfire o runner é o Vitest (`bun run test`). Em outras stacks,
 o agente preserva o runner existente ou pergunta qual adotar antes de criar ou
 executar testes. O Gherkin permanece
 somente na `spec.md` como referência: agentes derivam testes executáveis dele,
-sem criar ou executar `.feature`. A decisão Node é materializada no script
-`test:tdd`. Cada feature, história e requisito recebe no mínimo três cenários
+sem criar ou executar `.feature`. No Nuxfire a decisão do runner já está tomada: Vitest (`bun run test`). Cada feature, história e requisito recebe no mínimo três cenários
 BDD distintos e três casos TDD executáveis. Cada caso TDD possui seu próprio
 marcador `SPECSFY:`.
 

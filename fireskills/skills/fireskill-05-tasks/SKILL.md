@@ -115,9 +115,9 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
   e `NFR`.
 - Nunca crie tarefa para arquivo `.feature` ou step definition e nunca execute
   o Gherkin da spec.
-- A tarefa TDD aponta para teste Vitest e exige marcador `SPECSFY`, usando o
-  script `test:tdd` do projeto (não existe hoje no `package.json` da raiz: criar
-  como `vitest run` quando a primeira spec chegar a esta etapa).
+- A tarefa TDD aponta para teste Vitest e exige marcador `SPECSFY`, executado
+  com o Vitest do projeto (`bun run test`; para um arquivo,
+  `bunx vitest run <arquivo>`).
 - Faça cada tarefa `[CODE]` depender do predecessor TDD da mesma fatia com RED.
 - Sempre que uma tarefa criar ou alterar schema, tabela, coluna, índice,
   relação ou model persistente, crie uma tarefa `[CODE] [MIGRATION]` separada.

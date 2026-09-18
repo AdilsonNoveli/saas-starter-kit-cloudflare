@@ -176,19 +176,11 @@ development sem instalar outro runtime ou criar fontes paralelas:
 ## Especialistas sob demanda
 
 Cada skill base possui `references/specialists.md` com condições para recomendar
-contexto técnico opcional:
-
-```bash
-npx skills add https://github.com/promovaweb/specsfy \
-  --skill fireskill-specialist-<nome> --agent universal --copy --full-depth
-```
-
-As bases informam o nome, a finalidade e as dependências do especialista. Se
-ele já estiver instalado, carregam-no na mesma conversa. Se estiver ausente,
-avisam que executarão o comando acima, pedem autorização específica e só então
-executam `npx skills add`. Instalação nunca ocorre como efeito implícito do
-handoff. O workspace `promovaweb/specsfy` não é projeto consumidor e não
-recebe nenhuma categoria.
+contexto técnico. Os especialistas ficam em `fireskills/specialists/` e são
+carregados pelo nome (`$fireskill-specialist-<nome>`) na mesma conversa. Um
+especialista ausente exige nome, finalidade, dependências e autorização
+específica antes de ser copiado; a cópia nunca ocorre como efeito implícito do
+handoff.
 
 ## Estrutura
 
@@ -221,16 +213,10 @@ specsfy-{base-<responsabilidade>|setup|documentator|aux-<responsabilidade>}/
 
 ## Disponibilizar as skills
 
-O executável versionado pode ser baixado em `get.specsfy.dev`. Para instalar o
-CLI com o npm e então materializar o catálogo base:
-
-```bash
-npm install --global @promovaweb/specsfy
-specsfy install
-```
-
-O monorepo oficial mantém este módulo como fonte do catálogo, sem instalar as
-skills na própria raiz.
+O motor do fluxo é o CLI `fireskill` (código em `fireskills/cli/`), executado
+da raiz do projeto com `bun run fireskill <comando>`: `transition`, `migrate`,
+`effort`, `progress`, `milestones sync`, `test` e `config`. Não há instalação
+das skills: elas já estão neste repositório.
 
 ## Desenvolver
 

@@ -40,35 +40,35 @@ exigindo autorização específica.
 Na raiz do repositório:
 
 ```bash
-node .agents/skills/fireskill-progress/scripts/progress.mjs .
+node fireskills/skills/fireskill-progress/scripts/progress.mjs .
 ```
 
 Para integração com outras ferramentas:
 
 ```bash
-node .agents/skills/fireskill-progress/scripts/progress.mjs . --json
+node fireskills/skills/fireskill-progress/scripts/progress.mjs . --json
 ```
 
 Para uma única especificação:
 
 ```bash
-node .agents/skills/fireskill-progress/scripts/progress.mjs . --slug <slug>
+node fireskills/skills/fireskill-progress/scripts/progress.mjs . --slug <slug>
 ```
 
 Para observar o custo de contexto de uma spec:
 
 ```bash
-node .agents/skills/fireskill-progress/scripts/analyze_context.mjs \
+node fireskills/skills/fireskill-progress/scripts/analyze_context.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md --json
 ```
 
 Para projetar pendências documentais junto com o progresso:
 
 ```bash
-node .agents/skills/fireskill-setup/scripts/monitor_context.mjs \
+node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
   --project . --check
 
-node .agents/skills/fireskill-documentator/scripts/build_documentation.mjs \
+node fireskills/skills/fireskill-documentator/scripts/build_documentation.mjs \
   --project . --check
 ```
 

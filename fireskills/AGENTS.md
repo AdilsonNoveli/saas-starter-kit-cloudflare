@@ -50,7 +50,7 @@ Este arquivo governa o comportamento de agentes LLM ao trabalhar com o fireskill
 
 ## Regras Críticas Técnicas
 
-As regras completas estão em `c:\\nuxfire\\_docs\\AGENTS.md`. Este arquivo as sumariza:
+As regras completas estão em `_docs/docs/AGENTS.md` (histórico) e em `.specsfy/RULES.md` (vigentes, na raiz do repositório). Este arquivo as sumariza:
 
 1. `useDB()` cria um cliente postgres.js **por request** — nunca cacheie globalmente
 2. `closeDB()` deve ser chamado em `afterResponse` e `error` via `ExecutionContext.waitUntil()`
@@ -81,3 +81,17 @@ Todo trabalho segue a metodologia fireskills. Carregue a skill adequada:
 - Spec nova → `fireskill-03-specify`
 - Implementar → `fireskill-07-implement`
 - Verificar estado → `fireskill-progress`
+
+## Onde está cada coisa
+
+- Instruções de entrada para agentes (lidas em toda conversa): `AGENTS.md` e
+  `CLAUDE.md` **na raiz do repositório** (não este arquivo).
+- Contexto do projeto (migrado de `_docs/docs`, conferido contra o código):
+  `PROJECT.md`, `DESIGNSYSTEM.MD`, `INTERFACE.md` e `.specsfy/{STACK,RULES,DATABASE,PACKAGES}.md`.
+  Relatório da migração: `fireskills/MIGRACAO-DOCS.md`.
+- Skills de fluxo: `fireskills/skills/` (contrato: `skills/Spec.md`; templates:
+  `skills/templates/`; exemplo: `skills/examples/Spec.md`).
+- Especialistas: `fireskills/specialists/`.
+- Motor do fluxo (estados de spec, esforço, progresso, milestones): CLI
+  `fireskill`, `fireskills/cli/`, chamado por `bun run fireskill <comando>`.
+- Specs: `specs/<estado>/<NNNN>-<slug>/spec.md`; capturas em `specs/inbox/`.

@@ -84,7 +84,7 @@ async function template(root) {
       if (error?.code !== "ENOENT") throw error;
     }
   }
-  fail("template não encontrado; execute specsfy install para publicar .specsfy/templates/Spec.md");
+  fail("template não encontrado; restaure fireskills/skills/templates/Spec.md");
 }
 
 function render(content, number, title, slug) {

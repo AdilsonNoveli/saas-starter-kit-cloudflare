@@ -121,7 +121,7 @@ arquivos staged, unstaged e untracked do Git para descobrir qual documento
 precisa ser revisto, mas não permanece como daemon em segundo plano:
 
 ```bash
-node .agents/skills/fireskill-setup/scripts/monitor_context.mjs \
+node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
   --project . --check
 ```
 

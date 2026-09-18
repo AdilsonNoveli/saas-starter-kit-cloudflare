@@ -23,7 +23,7 @@ da spec. Backlog relacionado não integra o cálculo de entrega.
 
 `syncMilestones()` em `cli/src/milestones.ts` lê specs aceitas pelos layouts do
 ciclo de vida e arquivos Markdown em `specs/backlog/`. O comando público
-`specsfy milestones sync --project .` escreve somente blocos delimitados:
+`bun run fireskill milestones sync --project .` escreve somente blocos delimitados:
 
 ```text
 <!-- specsfy:specs-index:start -->

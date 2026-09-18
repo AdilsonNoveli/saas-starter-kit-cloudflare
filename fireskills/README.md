@@ -128,3 +128,26 @@ O `fireskill-setup` cria e mantém estes arquivos na raiz do projeto:
 > skills leem e escrevem hoje. Renomeá-lo para `.fireskills/` exige alterar as
 > skills, os scripts e o `Spec.md` de uma vez (pendência de decisão em
 > `PLANO-REFATORACAO.md`).
+
+## Motor do fluxo (CLI `fireskill`)
+
+O código está em `fireskills/cli/` (derivado do CLI do Specsfy, licença MIT; só o
+motor do fluxo, sem instalador nem TUI). Da raiz do repositório:
+
+| Comando | Faz |
+|---|---|
+| `bun run fireskill transition <id> <estado>` | Move a spec entre `draft`, `defined`, `planned`, `in-progress`, `review`, `completed`, atualiza `Status` e sincroniza milestones |
+| `bun run fireskill effort <id> <1-10> --reason "…"` | Registra o esforço estimado |
+| `bun run fireskill progress [--json] [--watch]` | Resumo de specs, tarefas e itens |
+| `bun run fireskill milestones sync` | Reconstrói `specs.md` e o progresso dos milestones |
+| `bun run fireskill migrate` | Migra specs do layout antigo para as pastas de estado |
+| `bun run fireskill test` | Executa `bun run test` (Vitest) |
+| `bun run fireskill config show\|set` | Configuração do CLI |
+
+Testes do CLI: `bun run test` dentro de `fireskills/cli/`.
+
+## Como os agentes entram
+
+Toda conversa começa pelo `AGENTS.md` da **raiz do repositório**, que manda ler
+`fireskills/SKILL.md`, o contexto do projeto e carregar o especialista da área
+antes de tocar em código.

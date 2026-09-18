@@ -76,7 +76,7 @@ não estiver comprovadamente separado. O setup exige `.env.testing`,
 Antes de cada comando, execute:
 
 ```bash
-node .agents/skills/fireskill-setup/scripts/check_database_safety.mjs \
+node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs \
   --project . --command "<comando>"
 ```
 
@@ -148,7 +148,7 @@ npm run build:executable
 npm run check
 ```
 
-`specsfy test --project <consumidor>` é uma porta de entrada para executar e
+`bun run fireskill test --project <consumidor>` é uma porta de entrada para executar e
 observar o runner detectado no projeto selecionado. Ele não substitui os
 comandos canônicos de regressão de cada módulo.
 

@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Incorpore um pedido surgido depois da definição inicial sem esconder a mudança,
 duplicar a fonte normativa ou obrigar a pessoa a conhecer atos e gates.
@@ -98,7 +98,7 @@ não altera código de produção e não implementa o pedido.
 5. Execute a projeção de impacto:
 
 ```bash
-node .agents/skills/fireskill-update-spec/scripts/analyze_change.mjs \
+node fireskills/skills/fireskill-update-spec/scripts/analyze_change.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md --base HEAD --mode impact
 ```
 
@@ -124,7 +124,7 @@ semântica com o pedido.
 Valide a estrutura intermediária:
 
 ```bash
-node .agents/skills/fireskill-04-validate/scripts/validate_spec.mjs \
+node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 

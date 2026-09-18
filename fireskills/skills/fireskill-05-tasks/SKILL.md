@@ -16,12 +16,12 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 ## Proteção do banco no plano
 
 Execute
-`.agents/skills/fireskill-setup/scripts/check_database_safety.mjs --project
+`fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs --project
 <raiz>` antes de planejar ou liberar qualquer tarefa `[TEST]` que acesse
 Postgres. O plano precisa manter um banco de teste explicitamente diferente do
 configurado nos secrets do stage (`DATABASE_*`); os testes Vitest atuais não
@@ -64,7 +64,7 @@ exigindo autorização específica.
 4. Execute o monitor antes de planejar:
 
 ```bash
-node .agents/skills/fireskill-setup/scripts/monitor_context.mjs \
+node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
   --project .
 ```
 
@@ -178,13 +178,13 @@ Tags permitidas após o ID: `[P]`, `[TEST]`, `[TDD]`, `[CODE]`,
 Execute:
 
 ```bash
-node .agents/skills/fireskill-05-tasks/scripts/validate_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+node fireskills/skills/fireskill-05-tasks/scripts/validate_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
 Quando houver interface para pessoas, execute também:
 
 ```bash
-node .agents/skills/fireskill-05-tasks/scripts/validate_interface_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md
+node fireskills/skills/fireskill-05-tasks/scripts/validate_interface_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md
 ```
 
 Corrija IDs duplicados, dependências inválidas/cíclicas, referências inexistentes,
@@ -207,7 +207,7 @@ teste. Em seguida, retome automaticamente esta skill para:
 3. registre o resultado em `Gate do Ato II — Plano`;
 4. execute sem `--allow-draft`.
 
-Depois do Plan Gate, execute `specsfy transition <id> planned`. Quando a
+Depois do Plan Gate, execute `bun run fireskill transition <id> planned`. Quando a
 conversa alterar abrangência, dependência ou capacidade necessária, chame
 `$fireskill-interviewer` antes de replanejar e atualize Effort com justificativa.
 

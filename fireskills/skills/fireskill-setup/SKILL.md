@@ -9,7 +9,7 @@ description: Preparar e monitorar os contextos do projeto, incluindo a constitui
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 ## Perfil de conhecimento e memória de respostas
 
@@ -94,7 +94,7 @@ framework, estratégia de autenticação, persistência, testes, observabilidade
 deploy e contratos de integração ainda ausentes.
 
 Cada rodada apresenta uma pergunta, opções numeradas, `Escrever outra resposta`,
-`Gere outras opções` e `Avançar`, conforme o contrato de `.specsfy/Spec.md`.
+`Gere outras opções` e `Avançar`, conforme o contrato de `fireskills/skills/Spec.md`.
 Após a resposta, normalize o conteúdo, registre área, assunto, resposta, fonte,
 data e alcance em `.specsfy/USER-PROFILE.md`, e só então avance.
 
@@ -132,7 +132,7 @@ texto humano fora dos blocos gerenciados e resolva qualquer resultado
 Antes de qualquer teste que acesse Postgres, execute durante o setup:
 
 ```bash
-node .agents/skills/fireskill-setup/scripts/check_database_safety.mjs \
+node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs \
   --project <raiz>
 ```
 
@@ -169,9 +169,9 @@ para forçar sua execução.
    precisar auditar o bloco reservado em arquivos de agentes.
    Quando `.specify/memory/constitution.md` existir, ler também
    [a compatibilidade com GitHub Spec Kit](references/github-spec-kit.md).
-5. Executar `specsfy doctor --project <raiz>` e corrigir cada requisito
-   ausente antes de preparar o contexto. O diagnóstico confere Node.js, Git,
-   npm, acesso ao projeto e o `npx`.
+5. Conferir os pré-requisitos antes de preparar o contexto: Node.js (para os
+   scripts `.mjs`), Bun (`bun run fireskill`), Git e acesso de escrita ao
+   projeto. Corrija cada requisito ausente.
 6. Executar `node scripts/setup_context.mjs --project <raiz>`.
    Renderizar `PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`,
    `INTERFACE.md`, `DESIGNSYSTEM.MD` e `.specsfy/USER-PROFILE.md` a partir de
@@ -223,23 +223,11 @@ para forçar sua execução.
    `fireskill-specialist-domain-modeling`,
    `fireskill-specialist-software-architecture` e
    `fireskill-specialist-nuxt-ui`.
-   Em seguida, executar
-   `specsfy skills detect --project <raiz>`. Apresente a tabela de
-   correspondência abaixo com o núcleo e os especialistas detectados, avisando
-   quais serão instalados. A pessoa já autorizou este comportamento ao iniciar
-   o setup; instale o núcleo e cada especialista detectado no projeto
-   consumidor, sem incluir outros especialistas genéricos, sempre por:
-
-   ```bash
-   npx skills add https://github.com/promovaweb/specsfy \
-     --skill <especialista-detectado> --agent universal --copy -y --full-depth
-   ```
-
-   Depois da instalação, carregue os especialistas instalados que forem
-   necessários à etapa atual. Se o comando falhar, informe o nome, a saída e a
-   continuação possível; não substitua a instalação por cópia manual.
-   Especialistas instalados manualmente continuam válidos: não os remova nem
-   tente reinstalá-los sem necessidade.
+   Em seguida, apresente a tabela de correspondência abaixo com o núcleo e os
+   especialistas detectados pelos manifests e arquivos do projeto. Os
+   especialistas já estão em `fireskills/specialists/`: não há instalação;
+   carregue o núcleo e cada especialista detectado que a etapa atual exigir, sem
+   incluir outros especialistas genéricos.
 11. Para completar ou corrigir stack, regras ou dados, anunciar o handoff e
    carregar respectivamente `$fireskill-aux-stack`, `$fireskill-aux-rules` ou
    `$fireskill-aux-database`.

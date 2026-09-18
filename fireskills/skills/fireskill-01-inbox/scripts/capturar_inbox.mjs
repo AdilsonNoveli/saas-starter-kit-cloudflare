@@ -62,7 +62,7 @@ async function resolveTemplate(root) {
   for (const path of [join(root, ".specsfy/templates/custom/Inbox.md"), join(root, ".specsfy/templates/Inbox.md"), sourceTemplate]) {
     try { return await readFile(path, "utf8"); } catch (error) { if (error?.code !== "ENOENT") throw error; }
   }
-  fail("template não encontrado; execute specsfy install para publicar .specsfy/templates/Inbox.md");
+  fail("template não encontrado; restaure fireskills/skills/templates/Inbox.md");
 }
 
 function timestamp(now) {

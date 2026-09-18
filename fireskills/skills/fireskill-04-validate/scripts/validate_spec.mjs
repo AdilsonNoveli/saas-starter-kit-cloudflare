@@ -47,7 +47,7 @@ function interfaceErrors(body, status) {
     "Menus e navegação principal",
     "Formulários e ações",
     "Composição e disposição",
-    "Blocos React e componentes selecionados",
+    "Componentes Vue e @nuxt/ui selecionados",
     "Estados e acessibilidade",
     "Revisão visual durante o desenvolvimento",
   ];

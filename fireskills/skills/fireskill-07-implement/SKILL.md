@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Execute a seção `14. Tarefas` de `spec.md` em ordem de dependência, mantendo a fonte única, testes, código, evidências e checkboxes coerentes.
 
@@ -31,7 +31,7 @@ cada pacote do workspace tudo o que o código dele importa diretamente.
 Antes de executar qualquer teste, suíte, regressão ou migration, rode:
 
 ```bash
-node .agents/skills/fireskill-setup/scripts/check_database_safety.mjs \
+node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs \
   --project <raiz> --command "<comando-pretendido>"
 ```
 
@@ -117,11 +117,11 @@ exigindo autorização específica.
    somente após `SAFE`; sem ambiente de teste separado, não rode nenhum teste.
    Registre falhas preexistentes e não as atribua à nova mudança.
 6. Antes da primeira alteração de produção, defina `Status: Implementing`,
-   `Delivery Gate: In Progress` e execute `specsfy transition <id> in-progress`.
+   `Delivery Gate: In Progress` e execute `bun run fireskill transition <id> in-progress`.
 7. Selecione trabalho pronto com:
 
 ```bash
-node .agents/skills/fireskill-07-implement/scripts/next_task.mjs \
+node fireskills/skills/fireskill-07-implement/scripts/next_task.mjs \
   <raiz>/specs/<estado>/<NNNN>-<slug>/spec.md
 ```
 
@@ -153,7 +153,7 @@ Se não houver tarefa pronta, diferencie `concluído` de `bloqueado por dependê
 5. Depois de alterar produção e antes de marcar `EXECUTE`, monitore o contexto:
 
 ```bash
-node .agents/skills/fireskill-setup/scripts/monitor_context.mjs \
+node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
   --project <raiz> --check
 ```
 
@@ -183,7 +183,7 @@ node .agents/skills/fireskill-setup/scripts/monitor_context.mjs \
    `specsfy:evidence` no bloco da tarefa e execute:
 
 ```bash
-node .agents/skills/fireskill-07-implement/scripts/verify_evidence.mjs \
+node fireskills/skills/fireskill-07-implement/scripts/verify_evidence.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md . --task TNNN
 ```
 
@@ -234,13 +234,13 @@ Quando todas as tarefas da seção 14 estiverem marcadas:
 8. para toda tarefa `[MIGRATION]`, execute `verify_evidence.mjs` e confirme o
    arquivo, a aplicação e a consulta de estado;
 9. altere `Delivery Gate` para `Passed` somente com rastreabilidade completa,
-   defina `Status: Reviewing` e execute `specsfy transition <id> review`.
+   defina `Status: Reviewing` e execute `bun run fireskill transition <id> review`.
    `$fireskill-04-validate` conclui o aceite e move a spec para `completed`.
 
 Depois do gate final, projete o resumo de entrega sem criar arquivo:
 
 ```bash
-node .agents/skills/fireskill-07-implement/scripts/render_delivery.mjs \
+node fireskills/skills/fireskill-07-implement/scripts/render_delivery.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md --format markdown
 ```
 

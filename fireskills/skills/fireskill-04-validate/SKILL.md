@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Trate `spec.md` como a única fonte da verdade e como código em linguagem natural: verifique primeiro o formato rígido, depois clareza, completude, consistência e testabilidade semanticamente.
 
@@ -42,7 +42,7 @@ exigindo autorização específica.
 4. Enquanto `Status` ou `Definition Gate` ainda estiverem pendentes, execute:
 
 ```bash
-node .agents/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
 1. Leia `references/quality-gates.md` e faça a revisão semântica.
@@ -110,9 +110,9 @@ Sem alterar requisitos automaticamente:
 4. execute novamente `validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md` sem `--allow-draft` quando o gate passar;
 5. relate o resultado no chat.
 
-Quando o Definition Gate passar, execute `specsfy transition <id> defined`.
+Quando o Definition Gate passar, execute `bun run fireskill transition <id> defined`.
 Em `review`, use a mesma análise para o aceite final. Com Delivery Gate passado,
-Status `Complete` e a DoD comprovada, execute `specsfy transition <id> completed`.
+Status `Complete` e a DoD comprovada, execute `bun run fireskill transition <id> completed`.
 Antes disso, chame `$fireskill-interviewer` quando uma resposta puder mudar a
 entrega ou o Effort.
 
@@ -123,7 +123,7 @@ Se o usuário pedir correções, edite as seções de origem, preserve IDs e rev
 Use o mesmo runner localmente e no CI:
 
 ```bash
-node .agents/skills/fireskill-04-validate/scripts/verify_repo.mjs . \
+node fireskills/skills/fireskill-04-validate/scripts/verify_repo.mjs . \
   --boundary local --timeout-seconds 300 --max-output-bytes 65536
 ```
 

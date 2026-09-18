@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Leia a `spec.md` pelo ID informado e confirme a pasta de estado. A pasta é o
 estado operacional; `Status` é seu espelho verificável. Preserve a spec como
@@ -64,7 +64,7 @@ nunca como prazo. Escolha um inteiro de 1 a 10 e uma justificativa curta:
 Execute após a confirmação:
 
 ```bash
-specsfy effort <id-da-spec> <1-10> --reason "<o que mudou a estimativa>"
+bun run fireskill effort <id-da-spec> <1-10> --reason "<o que mudou a estimativa>"
 ```
 
 O comando atualiza `Effort`, data, justificativa e histórico em `spec.md`.
@@ -86,6 +86,6 @@ registre a pendência na spec sem declarar sincronização concluída.
 
 - Não inventar respostas, Effort, vínculo de tarefa ou status remoto.
 - Não alterar uma spec em `completed` como forma de iniciar mudança nova.
-- Não mover pastas por comando do sistema; use `specsfy transition` somente na
+- Não mover pastas por comando do sistema; use `bun run fireskill transition` somente na
   skill responsável depois de seus gates.
 - Não exigir ClickUp para uma spec sem integração configurada.

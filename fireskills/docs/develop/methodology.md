@@ -32,8 +32,8 @@ Draft → Defined → Planned → Implementing → Reviewing → Complete
 - `Complete`: Delivery Gate aprovado.
 
 As pastas seguem a mesma ordem: `draft`, `defined`, `planned`,
-`in-progress`, `review` e `completed`. `specsfy transition` move o pacote e
-sincroniza o campo `Status`; `specsfy migrate` converte o layout anterior.
+`in-progress`, `review` e `completed`. `bun run fireskill transition` move o pacote e
+sincroniza o campo `Status`; `bun run fireskill migrate` converte o layout anterior.
 
 `Effort` é inteiro de 1 a 10, acompanhado de data e justificativa. O
 entrevistador recalibra a estimativa quando novas informações alteram a
@@ -232,7 +232,7 @@ não mantêm uma fonte paralela de progresso e não podem aprovar gates.
 Milestones são estados demonstráveis de produto e ficam em
 `specs/milestones/MNN.md`. Specs e backlog declaram relações no campo
 `Milestones`; `specs.md` é uma projeção derivada mantida por
-`specsfy milestones sync --project .`. O percentual considera apenas specs
+`bun run fireskill milestones sync --project .`. O percentual considera apenas specs
 `Complete`, enquanto a condição de saída do marco exige validação humana.
 
 ## Ao modificar a metodologia

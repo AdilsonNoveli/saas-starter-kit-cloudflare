@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Transforme uma entrada vaga em um item de backlog compreensível e, quando a
 intenção exigir especificação, aprofunde as decisões até produzir um brief
@@ -168,7 +168,7 @@ Quando a pessoa pedir aprofundamento, promoção ou criação de uma spec:
 4. Leia `references/discovery-map.md` para selecionar perguntas relevantes;
    não percorra o mapa mecanicamente.
 5. Quando a entrega tiver interface para pessoas, leia o `Contrato de
-   experiência de interface` de `.specsfy/Spec.md` e trate `Interface` como
+   experiência de interface` de `fireskills/skills/Spec.md` e trate `Interface` como
    área própria da descoberta. Pergunte sobre telas, fluxo de informação,
    menus e navegação principal,
    formulário, padrão de ação como painel lateral ou modal e composição. Não

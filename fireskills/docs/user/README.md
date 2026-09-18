@@ -66,7 +66,7 @@ IDs, pesquisa, tarefas e progresso.
 
 Com o método entendido, siga a [Instalação](installation.md) para instalar o
 CLI e preparar seu repositório. Ao final, `specsfy skills list` mostra as
-skills disponíveis e `specsfy progress --project .` confirma que o CLI
+skills disponíveis e `bun run fireskill progress --project .` confirma que o CLI
 consegue ler o projeto, mesmo que ainda não exista uma spec.
 
 ### 3. Faça a primeira entrega

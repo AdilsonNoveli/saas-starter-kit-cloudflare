@@ -20,7 +20,7 @@ description: Analisar o sistema atual e orientar a descoberta, o plano e a entre
    Carregar `$fireskill-specialist-design-system` e ler `DESIGNSYSTEM.MD` antes
    de propor qualquer tela. Se o arquivo não existir, criar a fonte a partir de
    `.specsfy/templates/DESIGNSYSTEM.MD`.
-   Executar `node .agents/skills/fireskill-setup/scripts/inspect_interface.mjs
+   Executar `node fireskills/skills/fireskill-setup/scripts/inspect_interface.mjs
    --project <raiz>` para localizar rotas, componentes e tecnologias antes da
    leitura detalhada.
 2. Examinar as telas, fluxos, rotas, componentes, conteúdo, permissões, estados

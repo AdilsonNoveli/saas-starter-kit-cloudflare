@@ -48,6 +48,6 @@ Registre na seção 13:
 Valide com:
 
 ```bash
-node .agents/skills/fireskill-04-validate/scripts/review_findings.mjs \
+node fireskills/skills/fireskill-04-validate/scripts/review_findings.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md
 ```

@@ -16,7 +16,7 @@ specs/<estado>/<NNNN>-<slug>/spec.md
 
 `NNNN` mantém a sequência de criação e o `slug` identifica o assunto. A pasta
 mostra o estado operacional. O campo `Status` no topo da spec é o espelho desse
-estado. Use `specsfy transition` para alterar os dois juntos, pois mover a
+estado. Use `bun run fireskill transition` para alterar os dois juntos, pois mover a
 pasta manualmente deixa o registro inconsistente.
 
 A spec não é um relatório preenchido no final. Ela recebe a definição no Ato
@@ -85,7 +85,7 @@ para 7 porque inclui migração de dados existentes e compatibilidade com uma AP
 publicada” permite revisar o valor mais tarde. Depois da confirmação, use:
 
 ```bash
-specsfy effort <id-da-spec> <1-10> --reason "<justificativa confirmada>"
+bun run fireskill effort <id-da-spec> <1-10> --reason "<justificativa confirmada>"
 ```
 
 O entrevistador pode conduzir essa atualização, mas não inventa justificativa
@@ -351,7 +351,7 @@ Registre pergunta, conclusão, fonte, localizador e impacto. Fonte externa
 consultada requer registro local em `research/`, enquanto a conclusão
 normativa fica na spec, ligada ao escopo, requisito ou plano.
 
-`specsfy progress` lê as specs sem alterá-las. Ele mostra estado, Effort,
+`bun run fireskill progress` lê as specs sem alterá-las. Ele mostra estado, Effort,
 perfil, gates e contagens. Sua porcentagem é uma projeção, não uma aprovação:
 com checklists, ela usa itens concluídos sobre itens totais, e sem checklists,
 gates aprovados sobre gates totais. Use a porcentagem para localizar trabalho

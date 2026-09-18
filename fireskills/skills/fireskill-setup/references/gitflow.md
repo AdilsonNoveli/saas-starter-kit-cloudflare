@@ -16,12 +16,5 @@ que conduz o projeto.
   setup normalmente sem branch model nenhum declarado. A ausência de menção
   não é uma lacuna a resolver por inferência.
 
-Instale no projeto consumidor:
-
-```bash
-npx skills add https://github.com/promovaweb/specsfy --skill fireskill-specialist-gitflow --agent universal --copy --full-depth
-```
-
-Se a skill já estiver instalada, anuncie a transição automática e carregue-a
-na mesma conversa. Se estiver ausente, peça autorização específica antes de
-instalar e continue automaticamente depois.
+O especialista fica em `fireskills/specialists/fireskill-specialist-gitflow/`.
+Anuncie a transição automática e carregue-o na mesma conversa.

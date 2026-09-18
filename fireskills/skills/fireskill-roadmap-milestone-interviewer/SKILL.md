@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Leia `PROJECT.md`, `specs.md`, os arquivos em `specs/milestones/` e as specs
 relacionadas. Comece pelo MVP aprovado e explique qual parte da conversa será
@@ -50,7 +50,7 @@ uma seção própria, sem apresentá-las como requisito já confirmado.
 Após aprovação, atribua IDs contínuos, vincule specs e backlog, execute:
 
 ```bash
-specsfy milestones sync --project .
+bun run fireskill milestones sync --project .
 ```
 
 Entregue uma ordem recomendada, o motivo de cada dependência e as próximas

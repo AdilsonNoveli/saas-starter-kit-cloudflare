@@ -75,7 +75,7 @@ escrito à mão já divergiu dos tokens de `navigationMenu` uma vez.
 `UModal v-model:open` com `#content` contendo `UForm` > `UCard`
 (`#header`/`#footer`), `UFormField name=…` + `UInput`, schema `zod` em
 `:schema`, `reactive` em `:state`, `:validate-on="['input']"`, `useToast()`
-para retorno e `useTrpcClient()` para a mutação.
+(legado; a regra do projeto é `useNotification()`) e `useTrpcClient()` para a mutação.
 
 **Confirmação** — não monte `UModal` de confirmação por página. Use
 `useNotification().confirm({ title, description, color })` e aguarde o

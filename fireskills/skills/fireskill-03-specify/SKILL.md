@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Crie ou atualize o pacote `specs/draft/<NNNN>-<slug>/`, no qual `spec.md` é a única fonte normativa de todo o fluxo SDD. Somente o diretório recebe o número; mantenha o arquivo sempre como `spec.md`. Consolide descoberta, research, esclarecimentos, produto, plano técnico, modelo de dados, contratos, TDD, BDD, validações, tarefas, decisões e conclusão em três atos explícitos. Evidências externas consultadas vivem em `research/`; não gere `plan.md`, `research.md`, `data-model.md`, `tasks.md`, checklists ou uma segunda especificação.
 
@@ -57,8 +57,8 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
    prefere `.specsfy/templates/custom/Spec.md`, recorre ao template gerenciado
    `.specsfy/templates/Spec.md` e cria somente
    `specs/draft/<NNNN>-<slug>/spec.md`; nunca renomeie o arquivo para incluir o ID.
-   Ao desenvolver este repositório, o script usa `skills/templates/Spec.md` como
-   fallback; no projeto consumidor, template ausente exige `specsfy install`.
+   Sem customização em `.specsfy/templates/`, o script usa
+   `fireskills/skills/templates/Spec.md`.
 4. Ao atualizar, use o caminho da spec existente fornecido ou descoberto sob a
    raiz atual; não execute o inicializador novamente.
 5. Leia a captura de origem em `specs/inbox/`, o item de backlog, o brief da
@@ -176,7 +176,7 @@ casos TDD e na seção 14.
   claims com:
 
 ```bash
-node .agents/skills/fireskill-03-specify/scripts/load_research.mjs \
+node fireskills/skills/fireskill-03-specify/scripts/load_research.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md
 ```
 
@@ -190,7 +190,7 @@ node .agents/skills/fireskill-03-specify/scripts/load_research.mjs \
 Enquanto o arquivo estiver em Draft, execute a validação estrutural intermediária:
 
 ```bash
-node .agents/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
 Corrija falhas estruturais em no máximo três ciclos. A skill `fireskill-04-validate` faz a revisão semântica, registra o resultado na seção 13 e promove `Definition Gate: Passed` e `Status: Defined`. Até lá, mantenha `Status: Draft`, `Definition Gate: Pending` e relate decisões bloqueantes.

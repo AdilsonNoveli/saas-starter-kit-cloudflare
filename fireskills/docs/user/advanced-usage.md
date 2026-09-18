@@ -49,8 +49,8 @@ gates.
 ## Automatize a leitura de progresso
 
 ```bash
-specsfy progress --project . --json
-specsfy progress --project . --watch --interval 0.5 --json
+bun run fireskill progress --project . --json
+bun run fireskill progress --project . --watch --interval 0.5 --json
 ```
 
 O JSON contém `summary` e `specs`. Com `--watch`, um snapshot novo aparece
@@ -61,8 +61,8 @@ skill responsável.
 ## Ajuste a atualização visual
 
 ```bash
-specsfy config show --project .
-specsfy config set --project . --watch-interval 0.5
+bun run fireskill config show --project .
+bun run fireskill config set --project . --watch-interval 0.5
 ```
 
 A configuração vive em `<projeto>/.specsfy/config.json` e preserva chaves

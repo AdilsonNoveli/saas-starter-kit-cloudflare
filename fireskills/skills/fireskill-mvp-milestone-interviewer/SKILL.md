@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Esta skill é a orquestradora da entrada do MVP. Ela importa `MVP.md` como a
 milestone 1.0, seleciona somente requisitos de desenvolvimento e cria um
@@ -39,7 +39,7 @@ resultado confirmado.
 
    ```bash
    node \
-     .agents/skills/fireskill-mvp-milestone-interviewer/scripts/importar_mvp.mjs \
+     fireskills/skills/fireskill-mvp-milestone-interviewer/scripts/importar_mvp.mjs \
      --root <raiz>
    ```
 
@@ -102,7 +102,7 @@ não gere a milestone nem reproduza o valor em mensagens.
 Use o script da Inbox com os campos da captura e acrescente a sessão:
 
 ```bash
-node .agents/skills/fireskill-01-inbox/scripts/capturar_inbox.mjs \
+node fireskills/skills/fireskill-01-inbox/scripts/capturar_inbox.mjs \
   --input "<texto integral da pessoa>" \
   --title "<tema da descoberta>" \
   --session "DESC-AAAAMMDD-<slug>" \
@@ -179,7 +179,7 @@ pular responsabilidades:
    implemente código, não execute tarefas e não promova o Definition Gate.
 5. Quando a fila terminar, confirme que cada tema desenvolvível possui backlog
    e spec Draft e que nenhum tema contextual gerou artefato no Specsfy.
-   Execute `specsfy milestones sync --project <raiz>` e carregue
+   Execute `bun run fireskill milestones sync --project <raiz>` e carregue
    `$fireskill-milestone-governor` para conferir vínculos e progresso de `M01`.
    A geração automática de Drafts não autoriza implementação nem validação
    final.

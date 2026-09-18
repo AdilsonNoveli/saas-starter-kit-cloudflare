@@ -20,7 +20,7 @@ Use $fireskill-progress para mostrar o progresso do projeto.
 No terminal, use o CLI para obter a mesma leitura das fontes canônicas:
 
 ```text
-specsfy progress --project .
+bun run fireskill progress --project .
 ```
 
 ## Exemplo passo a passo
@@ -64,5 +64,5 @@ Abra a página da skill indicada pelo próximo trabalho. Para acompanhar
 continuamente no terminal, use:
 
 ```text
-specsfy progress --project . --watch
+bun run fireskill progress --project . --watch
 ```

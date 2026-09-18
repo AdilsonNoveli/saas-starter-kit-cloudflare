@@ -89,7 +89,7 @@ Depois de uma tarefa de código, a implementação chama o documentador. Você
 também pode executá-lo para iniciar a documentação de um sistema legado ou
 reconciliar uma alteração feita fora do fluxo:
 
-    node .agents/skills/fireskill-documentator/scripts/build_documentation.mjs \
+    node fireskills/skills/fireskill-documentator/scripts/build_documentation.mjs \
       --project .
 
 Leia primeiro o portal, o arquivo diretamente relacionado à alteração e o
@@ -101,7 +101,7 @@ que a próxima execução voltará a produzir.
 Em seguida, execute o modo de conferência. Ele não escreve arquivos: compara a
 projeção atual com os blocos publicados.
 
-    node .agents/skills/fireskill-documentator/scripts/build_documentation.mjs \
+    node fireskills/skills/fireskill-documentator/scripts/build_documentation.mjs \
       --project . --check
 
 O resultado aprovado mostra que a documentação corresponde às fontes atuais. Um
@@ -145,7 +145,7 @@ Depois da reconstrução, a própria skill executa o modo `--check`. O comando
 compara os blocos gerados com o estado atual e falha quando `docs/` está
 desatualizado:
 
-    node .agents/skills/fireskill-documentator/scripts/build_documentation.mjs \
+    node fireskills/skills/fireskill-documentator/scripts/build_documentation.mjs \
       --project . --check
 
 O monitor do setup também retorna `PENDING` quando o código da aplicação, a

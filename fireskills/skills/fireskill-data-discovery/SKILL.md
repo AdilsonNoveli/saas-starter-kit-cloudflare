@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Converse em Português do Brasil sobre informações do sistema sem pedir que a
 pessoa descreva banco de dados, tabela, campo, chave ou relacionamento. Use
@@ -80,7 +80,7 @@ Use um nome do domínio e frases curtas compreensíveis para quem opera o
 produto.
 
 ```bash
-node .agents/skills/fireskill-data-discovery/scripts/\
+node fireskills/skills/fireskill-data-discovery/scripts/\
 registrar_dados_conversados.mjs \
   --project <raiz> \
   --nome "<informação do produto>" \

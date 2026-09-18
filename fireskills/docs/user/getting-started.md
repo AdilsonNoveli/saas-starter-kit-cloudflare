@@ -246,8 +246,8 @@ O relatório mostra specs, gates, tarefas, checklists, pendências e o próximo
 trabalho disponível. Você também pode consultar o mesmo estado pelo CLI:
 
 ```bash
-specsfy progress --project .
-specsfy progress --project . --json
+bun run fireskill progress --project .
+bun run fireskill progress --project . --json
 specsfy tui --project .
 ```
 

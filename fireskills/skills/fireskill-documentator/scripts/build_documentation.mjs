@@ -6,7 +6,7 @@ import { dirname, extname, join, relative, resolve } from "node:path";
 
 const START = "<!-- specsfy:documentator:start -->";
 const END = "<!-- specsfy:documentator:end -->";
-const ignored = new Set([".git", ".venv", "build", "coverage", "dist", "docs", "node_modules", "storage", "vendor"]);
+const ignored = new Set([".git", ".venv", "_docs", "fireskills", ".nuxt", ".output", ".sst", ".data", "build", "coverage", "dist", "docs", "node_modules", "storage", "vendor"]);
 const args = process.argv.slice(2);
 const project = resolve(args.includes("--project") ? args[args.indexOf("--project") + 1] : process.cwd());
 const check = args.includes("--check");
@@ -38,9 +38,9 @@ function repo(value) {
 function category(path) {
   const value = path.replaceAll("\\", "/");
   if (/\/(Services?|service)\//i.test(value)) return "Serviços";
-  if (/\/(routes|api)\//i.test(value) || /route\.(?:ts|js)$/.test(value)) return "Rotas e APIs";
-  if (/\/(pages?|views?|app)\//i.test(value) || /page\.(?:tsx?|jsx?)$/.test(value)) return "Páginas";
+  if (/\/(routes|api|trpc)\//i.test(value) || /route\.(?:ts|js)$/.test(value)) return "Rotas e APIs";
   if (/\/(components?)\//i.test(value)) return "Componentes";
+  if (/\/(pages?|views?|app)\//i.test(value) || /page\.(?:tsx?|jsx?)$/.test(value)) return "Páginas";
   if (/(^|\/)(tests?|spec)\//i.test(value) || /\.(test|spec)\./.test(value)) return "Testes";
   return "Outras fontes";
 }

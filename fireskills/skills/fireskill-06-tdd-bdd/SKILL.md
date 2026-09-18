@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Leia o BDD como referência e converta o comportamento especificado em testes TDD
 executáveis e evidência rastreável. O Gherkin ajuda o usuário e o agente a
@@ -28,7 +28,7 @@ Antes de executar qualquer teste focal, suíte ou regressão, confira o comando 
 o ambiente:
 
 ```bash
-node .agents/skills/fireskill-setup/scripts/check_database_safety.mjs \
+node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs \
   --project <raiz> --command "<comando-de-teste>"
 ```
 
@@ -142,7 +142,7 @@ Registre o comando de regressão na seção 11 e a evidência na matriz da seç�
 Execute:
 
 ```bash
-node .agents/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/<estado>/<NNNN>-<slug>/spec.md .
+node fireskills/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/<estado>/<NNNN>-<slug>/spec.md .
 ```
 
 Trate como gap cada feature, `US`, `FR` ou `NFR` com menos de três casos TDD e
@@ -180,7 +180,7 @@ Depois de executar os runners pertencentes ao repositório, registre `Passed` ou
 a falha na coluna Evidência da seção 12 e audite:
 
 ```bash
-node .agents/skills/fireskill-06-tdd-bdd/scripts/verify_acceptance.mjs \
+node fireskills/skills/fireskill-06-tdd-bdd/scripts/verify_acceptance.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md .
 ```
 

@@ -42,14 +42,14 @@ draft → defined → planned → in-progress → review → completed
 Draft → Defined → Planned → Implementing → Reviewing → Complete
 ```
 
-Use `specsfy transition <id> <pasta>` para transições adjacentes. O comando
-move todo o pacote e atualiza `Status`. Use `specsfy migrate` uma única vez
+Use `bun run fireskill transition <id> <pasta>` para transições adjacentes. O comando
+move todo o pacote e atualiza `Status`. Use `bun run fireskill migrate` uma única vez
 para mover o layout anterior `specs/specs/` para as pastas atuais.
 
 Toda spec tem `Effort` de 1 a 10, `Effort updated at` e `Effort rationale` no
 metadado. A pontuação estima a capacidade de raciocínio e execução necessária,
 não prazo: 1–2 usa perfil `light`, 3–6 `standard`, 7–8 `high` e 9–10
-`maximum`. Atualize-a com `specsfy effort <id> <1-10> --reason "<motivo>"`
+`maximum`. Atualize-a com `bun run fireskill effort <id> <1-10> --reason "<motivo>"`
 sempre que a descoberta, o plano ou a execução trouxer informação material.
 
 `ClickUp Task` pode vincular a spec a uma tarefa externa. Quando houver skills
@@ -97,7 +97,7 @@ ou pendente.
   versionado. A implementação aplica a migration no banco de teste e registra
   uma consulta de estado antes de concluir a tarefa ou o Delivery Gate.
 - Executar
-  `.agents/skills/fireskill-setup/scripts/monitor_context.mjs --project . --check`
+  `fireskills/skills/fireskill-setup/scripts/monitor_context.mjs --project . --check`
   no início, após cada tarefa de implementação e antes do Delivery Gate.
 - Executar `$fireskill-documentator` depois de cada tarefa de implementação e
   sempre que o usuário pedir uma reconstrução técnica. A skill lê todo o
@@ -221,7 +221,7 @@ pedido do usuário não é condição para acioná-la.
 
 Antes da primeira pergunta dessa área, leia `.specsfy/STACK.md`,
 `.specsfy/PACKAGES.md` quando existir, manifests, configurações e telas já
-publicadas. Execute `node .agents/skills/fireskill-setup/scripts/inspect_interface.mjs --project <raiz>` e use a saída para localizar as fontes relevantes. Quando houver sistema atual, percorra os fluxos e telas afetados,
+publicadas. Execute `node fireskills/skills/fireskill-setup/scripts/inspect_interface.mjs --project <raiz>` e use a saída para localizar as fontes relevantes. Quando houver sistema atual, percorra os fluxos e telas afetados,
 incluindo navegação, conteúdo, componentes, permissões, estados e limites já
 visíveis. Analise antes de sugerir ou escrever: descreva o que cada tela atual
 permite fazer, o que precisa ser preservado e o que a entrega vai mudar.
@@ -374,11 +374,9 @@ chamadora não reabre o mesmo ciclo durante essa retomada. Isso não
 transforma a escolha da próxima skill em decisão do usuário.
 O handoff não autoriza ações destrutivas, publicação, deploy, instalação de
 especialista ou outras mudanças externas: cada ação sensível continua exigindo
-autorização específica. Carregue automaticamente um especialista já instalado;
-se estiver ausente, informe nome, finalidade e dependências, avise que usará
-`npx skills add`, peça autorização específica e só então execute
-`npx skills add https://github.com/promovaweb/specsfy --skill
-fireskill-specialist-<nome> --agent universal --copy --full-depth`. Nunca altere
+autorização específica. Carregue automaticamente o especialista de
+`fireskills/specialists/`; se estiver ausente, informe nome, finalidade e
+dependências, peça autorização específica e só então copie-o. Nunca altere
 gates para contornar a etapa responsável. Após cada
 handoff, reavalie o estado canônico; se origem, destino e pendência se repetirem
 sem mudança observável, pare o ciclo e relate o impasse.
@@ -450,22 +448,25 @@ os Atos II–III. Gate posterior não permanece aprovado sobre entrada invalidad
 
 ## Arquivos gerenciados
 
-O CLI instala skills em `.agents/skills/`, publica este contrato em
-`.specsfy/Spec.md`, os templates gerenciados em `.specsfy/templates/` e o
-exemplo não normativo em `.specsfy/examples/Spec.md`. A criação de um artefato
-resolve seu template nesta ordem:
+No Nuxfire o Fireskills vive dentro do repositório, em `fireskills/`. As skills
+ficam em `fireskills/skills/`, os templates em `fireskills/skills/templates/` e
+o exemplo não normativo em `fireskills/skills/examples/Spec.md`. Este contrato é
+lido diretamente de `fireskills/skills/Spec.md`; não há cópia em `.specsfy/`. A
+criação de um artefato resolve seu template nesta ordem:
 
-1. `.specsfy/templates/custom/<Nome>.md`, customização do usuário.
-2. `.specsfy/templates/<Nome>.md`, cópia gerenciada pelo CLI.
-3. `skills/templates/<Nome>.md`, fallback exclusivo do desenvolvimento deste
-   repositório.
+1. `.specsfy/templates/custom/<Nome>.md`, customização do projeto.
+2. `.specsfy/templates/<Nome>.md`, cópia local opcional.
+3. `fireskills/skills/templates/<Nome>.md`, fonte padrão.
 
-O CLI cria `.specsfy/templates/custom/`, mas não gerencia, atualiza nem remove
-seu conteúdo, inclusive com `--force`. A criação de uma spec copia e renderiza
-o template resolvido em `specs/<estado>/<NNNN>-<slug>/spec.md`; o exemplo existe
-para inspeção, testes e compreensão da arquitetura, nunca como fonte de uma
-feature.
+O diretório `.specsfy/templates/custom/` pertence ao projeto e nunca é
+sobrescrito. A criação de uma spec copia e renderiza o template resolvido em
+`specs/<estado>/<NNNN>-<slug>/spec.md`; o exemplo existe para inspeção, testes e
+compreensão da arquitetura, nunca como fonte de uma feature.
 
-O CLI também mantém blocos delimitados em `AGENTS.md` e `CLAUDE.md`. Conteúdo
-fora desses blocos pertence ao usuário. Alterações locais em arquivos ou blocos
-gerenciados não podem ser descartadas sem `--force`.
+O comando `fireskill` (`bun run fireskill`, código em `fireskills/cli/`) executa
+o motor do fluxo: `transition`, `migrate`, `effort`, `progress`,
+`milestones sync`, `test` e `config`. Não instala skills nem especialistas: eles
+já estão no repositório.
+
+O setup mantém blocos delimitados em `AGENTS.md` e `CLAUDE.md`. Conteúdo fora
+desses blocos pertence ao usuário e nunca é substituído.

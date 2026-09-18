@@ -16,7 +16,7 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
 
 Leia `specs.md`, `specs/milestones/`, `specs/backlog/` e as specs existentes.
 Milestone, spec e backlog possuem responsabilidades distintas: o marco descreve
@@ -28,7 +28,7 @@ trabalho ainda refinável.
 Execute:
 
 ```bash
-specsfy milestones sync --project .
+bun run fireskill milestones sync --project .
 ```
 
 O comando atualiza somente blocos marcados em `specs.md` e nos arquivos de

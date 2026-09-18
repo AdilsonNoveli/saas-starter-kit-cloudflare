@@ -33,6 +33,7 @@ Plan, Delivery).
 | Definir o MVP / evolução | `fireskill-mvp-milestone-interviewer`, `fireskill-roadmap-milestone-interviewer`, `fireskill-milestone-governor` |
 | Descobrir dados do produto | `fireskill-data-discovery` |
 | Manter STACK/RULES/DATABASE | `fireskill-aux-stack`, `fireskill-aux-rules`, `fireskill-aux-database` |
+| Mudar estado, esforço, ver progresso ou milestones | `bun run fireskill <comando>` (ver `README.md`) |
 
 ## Especialistas do Nuxfire
 

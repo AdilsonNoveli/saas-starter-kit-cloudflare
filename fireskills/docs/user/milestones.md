@@ -62,7 +62,7 @@ o percentual de conclusão.
 Depois de alterar relações ou status, execute:
 
 ```bash
-specsfy milestones sync --project .
+bun run fireskill milestones sync --project .
 ```
 
 O comando atualiza blocos identificados em `specs.md` e em
@@ -70,26 +70,26 @@ O comando atualiza blocos identificados em `specs.md` e em
 referenciado por spec ou backlog e ainda sem arquivo recebe um esqueleto, para
 você completar na entrevista.
 
-`specsfy transition` também sincroniza o mapa depois de mover uma spec. Use o
+`bun run fireskill transition` também sincroniza o mapa depois de mover uma spec. Use o
 comando direto quando tiver alterado vínculos no Markdown ou refinado backlog.
 
 ## Cinco usos do comando
 
 ```bash
 # Criar ou atualizar o índice no projeto atual.
-specsfy milestones sync
+bun run fireskill milestones sync
 
 # Declarar explicitamente a raiz do projeto atual.
-specsfy milestones sync --project .
+bun run fireskill milestones sync --project .
 
 # Consumir o resultado em outra automação local.
-specsfy milestones sync --project . --json
+bun run fireskill milestones sync --project . --json
 
 # Atualizar um projeto em outro diretório.
-specsfy milestones sync --project ../crm
+bun run fireskill milestones sync --project ../crm
 
 # Atualizar relações depois de editar uma spec ou backlog.
-specsfy milestones sync --project .
+bun run fireskill milestones sync --project .
 ```
 
 O progresso considera specs com `Status: Complete`. A milestone só é concluída

@@ -79,7 +79,8 @@ a dependência.
 - Tabela: `<UTable :data :columns :ui="enterpriseTableUi" />`, importando de
   `@nuxfire/tokens`; variação por espalhamento do objeto, sem copiar classes.
 - Formulário: `UForm` com `:schema` (zod) e `:state` reativo, `UFormField` com
-  `name` igual ao campo do schema, `useToast()` para retorno; a mutação vai por
+  `name` igual ao campo do schema, `useNotification()` para retorno (regra do
+  projeto em `.specsfy/RULES.md`; `useToast()` direto é legado); a mutação vai por
   `useTrpcClient()`.
 - Modal: `v-model:open`; conteúdo em `#content` com `UCard` quando precisar de
   header/footer. Confirmação destrutiva: `useNotification().confirm(...)`, nunca

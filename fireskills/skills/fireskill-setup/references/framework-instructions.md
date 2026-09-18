@@ -1,7 +1,7 @@
 # Diretrizes publicáveis do framework
 
-- Fonte canônica: `skills/AGENTS.md` do monorepo `promovaweb/specsfy`, bloco
-  `specsfy:framework`.
+- Fonte canônica: `fireskills/skills/AGENTS.md`, bloco `specsfy:framework`
+  (derivado do monorepo `promovaweb/specsfy`).
 - Observado em: 2026-08-13.
 - Adaptação: nenhuma; o conteúdo delimitado abaixo deve permanecer idêntico à
   fonte.

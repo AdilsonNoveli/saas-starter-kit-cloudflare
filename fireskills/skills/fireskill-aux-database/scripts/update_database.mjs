@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node update_database.mjs [--project <raiz>]  Atualiza o bloco gerenciado de .specsfy/DATABASE.md."); process.exit(0); }
 import { existsSync } from "node:fs";
 import { readFile, mkdir, writeFile, readdir } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";

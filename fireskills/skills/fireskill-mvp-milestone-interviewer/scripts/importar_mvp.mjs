@@ -48,7 +48,7 @@ const developmentSignals = [
   "persist", "notificacao", "upload", "download", "workflow", "funcionalidade",
   "feature", "servico", "relatorio", "filtro", "busca", "criar", "editar", "excluir",
   "listar", "consultar", "enviar", "gerar", "salvar", "automatizar", "receber",
-  "mostrar", "acompanhar", "visualizar", "pedido", "cliente", "andamento",
+  "mostrar", "acompanhar", "visualizar", "pedido", "cliente", "andamento", "painel", "lista",
 ];
 
 const nonDevelopmentHeadings = [
@@ -317,7 +317,7 @@ async function createDraftSpec(root, title, backlogPath, fields, defaults) {
   return specPath;
 }
 
-async function createMilestone(root, source, content, developmentThemes) {
+async function createMilestone(root, source, content, developmentThemes, skippedThemes) {
   const destination = join(root, "specs", "milestones", "M01.md");
   await mkdir(dirname(destination), { recursive: true });
   const hash = createHash("sha256").update(content).digest("hex");
@@ -334,6 +334,7 @@ async function createMilestone(root, source, content, developmentThemes) {
     "",
     `- Requisitos de desenvolvimento importados: ${developmentThemes.length}.`,
     "- Contexto de negócio, posicionamento, público, métricas e demais temas não técnicos permanecem somente em `MVP.md`.",
+    ...(skippedThemes.length ? ["", "### Temas não importados", "", ...skippedThemes.map(({ title, classification }) => `- ${title}: ${classification.reason}.`), "", "Se algum deles for entrega de software, crie o backlog com `$fireskill-02-backlog`."] : []),
     "",
     "## Proveniência e próximos passos",
     "",
@@ -357,10 +358,11 @@ async function main() {
   if (!content.trim()) fail("MVP.md não pode estar vazio");
   if (containsSensitiveData(content)) fail("MVP.md contém dado sensível aparente; remova-o antes de importar");
 
-  const developmentThemes = themes(content)
-    .map((theme, index) => ({ theme, title: titleFromTheme(theme, index + 1), classification: classifyTheme(theme, index + 1) }))
-    .filter(({ classification }) => classification.developable);
-  const milestone = await createMilestone(root, source, content, developmentThemes);
+  const classified = themes(content)
+    .map((theme, index) => ({ theme, title: titleFromTheme(theme, index + 1), classification: classifyTheme(theme, index + 1) }));
+  const developmentThemes = classified.filter(({ classification }) => classification.developable);
+  const skippedThemes = classified.filter(({ classification }) => !classification.developable);
+  const milestone = await createMilestone(root, source, content, developmentThemes, skippedThemes);
   const created = [];
 
   for (const { theme, title, classification } of developmentThemes) {

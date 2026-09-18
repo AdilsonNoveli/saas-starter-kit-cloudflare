@@ -1,7 +1,7 @@
 # Nuxfire — instruções para agentes
 
 O desenvolvimento deste repositório é feito com o **Fireskills** (`fireskills/`):
-um fluxo orientado a especificações e 33 especialistas técnicos que já conhecem o
+um fluxo orientado a especificações e 34 especialistas técnicos que já conhecem o
 código. Não trabalhe de memória: trabalhe por ele.
 
 ## Comece sempre aqui

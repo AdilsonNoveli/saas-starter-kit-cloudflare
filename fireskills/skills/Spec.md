@@ -42,7 +42,8 @@ draft → defined → planned → in-progress → review → completed
 Draft → Defined → Planned → Implementing → Reviewing → Complete
 ```
 
-Use `bun run fireskill transition <id> <pasta>` para transições adjacentes. O comando
+Use `bun run fireskill transition <id> <pasta>` para transições adjacentes
+(`<id>` é o número ou o nome completo da pasta; `completed` só volta para `review`). O comando
 move todo o pacote e atualiza `Status`. Use `bun run fireskill migrate` uma única vez
 para mover o layout anterior `specs/specs/` para as pastas atuais.
 
@@ -443,7 +444,7 @@ os Atos II–III. Gate posterior não permanece aprovado sobre entrada invalidad
   PHP no Nuxfire.
 - Mantenha tarefas, checklists, gates e evidência na própria `spec.md`.
 - Preserve alterações preexistentes e instruções locais do projeto.
-- Instale especialistas somente sob demanda; eles orientam padrões técnicos e
+- Carregue especialistas somente sob demanda; eles orientam padrões técnicos e
   não substituem a fonte normativa.
 
 ## Arquivos gerenciados
@@ -465,7 +466,7 @@ compreensão da arquitetura, nunca como fonte de uma feature.
 
 O comando `fireskill` (`bun run fireskill`, código em `fireskills/cli/`) executa
 o motor do fluxo: `transition`, `migrate`, `effort`, `progress`,
-`milestones sync`, `test` e `config`. Não instala skills nem especialistas: eles
+`milestones sync`, `test`, `validate`, `lesson` e `config`. Não instala skills nem especialistas: eles
 já estão no repositório.
 
 O setup mantém blocos delimitados em `AGENTS.md` e `CLAUDE.md`. Conteúdo fora

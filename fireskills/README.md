@@ -85,6 +85,7 @@ Especialistas são skills opcionais que adicionam conhecimento técnico profundo
 | `fireskill-specialist-nuxfire-layers` | Arquitetura de layers Nuxfire (padrão único do projeto) |
 | `fireskill-specialist-nuxt-authorization` | RBAC: defineAbility, abilityProcedure, Can |
 | `fireskill-specialist-pinia` | Pinia: stores, SSR hydration, composables |
+| `fireskill-specialist-billing` | Stripe e Paddle: checkout, webhooks, assinaturas, planos |
 
 ### Engenharia (agnósticos de stack)
 
@@ -128,10 +129,8 @@ O `fireskill-setup` cria e mantém estes arquivos na raiz do projeto:
 | `.specsfy/DATABASE.md` | Schema Drizzle, tabelas, relações |
 | `.specsfy/PACKAGES.md` | Pacotes instalados por workspace |
 
-> O diretório de contexto chama-se `.specsfy/` porque é o que os scripts das
-> skills leem e escrevem hoje. Renomeá-lo para `.fireskills/` exige alterar as
-> skills, os scripts e o `Spec.md` de uma vez (pendência de decisão em
-> `PLANO-REFATORACAO.md`).
+> O diretório de contexto chama-se `.specsfy/`: é o caminho que os scripts das
+> skills leem e escrevem, e o nome é mantido.
 
 ## Motor do fluxo (CLI `fireskill`)
 

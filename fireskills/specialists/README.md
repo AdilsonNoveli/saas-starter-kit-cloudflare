@@ -25,6 +25,7 @@ Cada um foi escrito a partir do código real do repositório; as afirmações em
 | `fireskill-specialist-nuxfire-layers` | Criar, registrar e compor layers (`config.ts`, `compose-layers`) |
 | `fireskill-specialist-nuxt-authorization` | RBAC de equipe: `defineAbility`, `authorize`, `<Can>` |
 | `fireskill-specialist-pinia` | Pinia: stores, SSR e hidratação |
+| `fireskill-specialist-billing` | Stripe e Paddle: checkout, webhooks, assinaturas e planos |
 
 ## Engenharia (agnósticos de stack)
 

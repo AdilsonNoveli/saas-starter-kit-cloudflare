@@ -261,9 +261,9 @@ não escolher silenciosamente um único stack. Se nenhum framework for
 identificado, criar o modelo genérico e declarar que a confirmação está
 pendente.
 
-## Stack e especialistas instalados pelo setup
+## Stack e especialistas carregados pelo setup
 
-| Stack observada | Especialista instalado |
+| Stack observada | Especialista carregado |
 | --- | --- |
 | Nuxt (`nuxt.config.ts`) | `fireskill-specialist-nuxt` |
 | `@nuxt/ui` | `fireskill-specialist-nuxt-ui` |
@@ -276,20 +276,21 @@ pendente.
 | OpenAuth.js | `fireskill-specialist-openauth` |
 | `nuxt-authorization` | `fireskill-specialist-nuxt-authorization` |
 | Pinia | `fireskill-specialist-pinia` |
+| Stripe ou Paddle (`layers/billing`) | `fireskill-specialist-billing` |
 | TypeScript | `fireskill-specialist-typescript` |
 | Tailwind CSS | `fireskill-specialist-tailwind-css` |
 | OpenAPI | `fireskill-specialist-web-api-design` |
 | OpenTelemetry ou Prometheus | `fireskill-specialist-observability` |
 | CI/CD | `fireskill-specialist-delivery-engineering` |
 
-| Núcleo instalado em todo setup | Finalidade |
+| Núcleo carregado em todo setup | Finalidade |
 | --- | --- |
 | `fireskill-specialist-data-modeling` | dados, entidades, relações e ciclo de vida |
 | `fireskill-specialist-domain-modeling` | linguagem, regras e limites de domínio |
 | `fireskill-specialist-software-architecture` | módulos, dependências e estrutura técnica |
 | `fireskill-specialist-nuxt-ui` | componentes `@nuxt/ui`, tema e padrões de interface e CRUD |
 
-Para todo projeto Nuxfire, o setup instala `fireskill-specialist-nuxt-ui`: o
+Para todo projeto Nuxfire, o setup carrega `fireskill-specialist-nuxt-ui`: o
 `@nuxt/ui` v4 é a base de todas as interfaces e CRUDs. Não trate como opcional.
 
 Confira o runtime real antes de aprovar o setup: Cloudflare Workers via SST
@@ -297,7 +298,7 @@ Confira o runtime real antes de aprovar o setup: Cloudflare Workers via SST
 combinação em `.specsfy/STACK.md` e encaminhe qualquer divergência para uma spec
 antes de aprovar o setup.
 
-Depois de instalar o especialista, o setup registra em `.specsfy/INTERFACE.md` que as
+Depois de carregar o especialista, o setup registra em `.specsfy/INTERFACE.md` que as
 telas são compostas por Vue SFC com componentes `@nuxt/ui`. Cada nova tela deve
 consultar o mapa, reutilizar o que já existe e registrar componentes próprios e
 componentes `@nuxt/ui` com arquivos e consumidores reais.

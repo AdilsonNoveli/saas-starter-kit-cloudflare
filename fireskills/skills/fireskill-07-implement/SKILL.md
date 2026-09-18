@@ -102,7 +102,7 @@ exigindo autorização específica.
    blocos criados, alterados ou reaproveitados.
    Em todo componente Vue, carregue obrigatoriamente `$fireskill-specialist-nuxt-ui`
    antes de escrever `.vue` com componentes U*. Se a skill não estiver instalada,
-   retorne ao `$fireskill-setup` para instalar o especialista e não implemente a
+   retorne ao `$fireskill-setup` para carregar o especialista e não implemente a
    tela até concluir esse preparo.
    Para um CRUD, confirme também um único `PageHeader` reutilizável em todas as
    telas, `UTable` com `enterpriseTableUi` em largura total, coluna `ID` sempre visível,

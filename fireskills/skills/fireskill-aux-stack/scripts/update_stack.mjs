@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node update_stack.mjs [--project <raiz>]  Atualiza o bloco gerenciado de .specsfy/STACK.md."); process.exit(0); }
 import { existsSync, readdirSync } from "node:fs";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";

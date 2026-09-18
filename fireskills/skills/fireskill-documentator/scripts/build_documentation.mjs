@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node build_documentation.mjs [--project <raiz>] [--check]  Reconstrói docs/ e .specsfy/PACKAGES.md; --check só verifica."); process.exit(0); }
 /** Reconstrói documentação técnica a partir do código existente, sem sobrescrever notas humanas. */
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";

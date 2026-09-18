@@ -42,7 +42,7 @@ const NEXT_FOLDERS: Record<SpecFolder, readonly SpecFolder[]> = {
   planned: ["defined", "planned", "in-progress"],
   "in-progress": ["planned", "in-progress", "review"],
   review: ["in-progress", "review", "completed"],
-  completed: ["completed"],
+  completed: ["review", "completed"],
 };
 
 const TABLE_STATUS = /^(\|\s*Status\s*\|\s*)([^|]*)(\|\s*)$/imu;
@@ -77,12 +77,17 @@ export async function scanSpecPaths(project: string): Promise<string[]> {
   return findSpecPaths(resolvePath(project));
 }
 
-/** Localiza uma única spec nova ou ainda no layout anterior. */
+/**
+ * Localiza uma única spec nova ou ainda no layout anterior. Aceita o nome
+ * completo do diretório (`0001-login`) ou só o número (`0001`).
+ */
 export async function resolveSpec(project: string, identifier: string): Promise<ResolvedSpec> {
   const root = resolvePath(project);
-  const matches = (await findSpecPaths(root)).filter(
-    (path) => basename(dirname(path)) === identifier,
-  );
+  const all = await findSpecPaths(root);
+  const exact = all.filter((path) => basename(dirname(path)) === identifier);
+  const matches = exact.length
+    ? exact
+    : all.filter((path) => basename(dirname(path)).startsWith(`${identifier}-`));
   if (!matches.length) throw new Error(`spec não encontrada: ${identifier}`);
   if (matches.length > 1) {
     throw new Error(`há mais de uma spec com o identificador ${identifier}`);
@@ -91,7 +96,7 @@ export async function resolveSpec(project: string, identifier: string): Promise<
   const content = await readFile(path, "utf8");
   const folder = folderFromPath(root, path, content);
   return {
-    identifier,
+    identifier: basename(dirname(path)),
     folder,
     path,
     directory: dirname(path),
@@ -115,7 +120,7 @@ export async function transitionSpec(
   const updated = updateStatus(content, status);
   await writeTextAtomic(spec.path, updated);
 
-  const targetDirectory = join(resolvePath(project), "specs", to, identifier);
+  const targetDirectory = join(resolvePath(project), "specs", to, spec.identifier);
   if (spec.directory !== targetDirectory) {
     if (await pathExists(targetDirectory)) {
       throw new Error(`o destino já contém uma spec: ${targetDirectory}`);
@@ -124,7 +129,7 @@ export async function transitionSpec(
     await rename(spec.directory, targetDirectory);
   }
   return {
-    identifier,
+    identifier: spec.identifier,
     from: spec.folder,
     to,
     folder: to,

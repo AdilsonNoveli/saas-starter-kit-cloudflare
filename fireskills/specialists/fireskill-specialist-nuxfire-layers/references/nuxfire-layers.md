@@ -1,7 +1,6 @@
 # Layers do Nuxfire — o que existe de fato no código
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento (e o
-`_docs/docs/AGENTS.md`, seção "Nuxt Layers architecture", é o registro dos incidentes).
+Cada afirmação tem o arquivo de evidência. O código vence este documento.
 
 ## 1. Modelo
 

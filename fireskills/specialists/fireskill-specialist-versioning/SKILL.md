@@ -1,92 +1,36 @@
 ---
 name: fireskill-specialist-versioning
-description: Gerenciar a versão do sistema pelo SEMVER da raiz e validar tags de release. Use como apoio focal de release e deploy, junto de `$fireskill-specialist-delivery-engineering` e `$fireskill-specialist-sst`.
+description: Preparar e conferir a versão do Nuxfire pelo arquivo VERSION da raiz e, com autorização, a tag Git v<versão>. Use ao preparar uma release, junto de `$fireskill-specialist-delivery-engineering` e `$fireskill-specialist-sst`.
 ---
 
 # Versionamento
 
-## Quando usar
+## O que existe
 
-- Acionar ao preparar release, tag Git ou promoção entre stages; no Nuxfire o
-  deploy é `bun run deploy -- --stage <stage>` (`$fireskill-specialist-sst`) e
-  **não há imagem OCI/Docker**: os comandos `docker-tag`/`verify-docker-tag`
-  abaixo só se aplicam se o time passar a publicar imagens.
-- Em pedido completo de release ou deploy, devolver a coordenação para
-  `$fireskill-specialist-delivery-engineering` depois de preparar e conferir a
-  versão.
-- Não publicar imagem, tag, GitHub Release nem executar deploy sem autorização
-  explícita. A preparação local pode criar ou atualizar `SEMVER`.
+- `VERSION` na raiz: uma linha `MAJOR.MINOR.PATCH` (hoje `0.1.0`). `fireskills/VERSION` é a versão do próprio Fireskills.
+- Deploy: `bun run deploy -- --stage <stage>` (`$fireskill-specialist-sst`).
 
-## Fluxo
+## O que NÃO existe
 
-1. Localizar a raiz do projeto e ler `SEMVER`, tags Git, changelog e artefatos
-   relacionados à entrega.
-2. Criar `SEMVER` somente quando ele estiver ausente e a versão inicial tiver
-   sido confirmada.
-3. Classificar a alteração como `patch`, `minor` ou `major`, explicar o efeito
-   e propor a próxima versão antes de escrever.
-4. Atualizar `SEMVER` durante a preparação autorizada e propagar o mesmo valor
-   para metadados, imagem e manifestos que pertencem à entrega.
-5. Executar testes e conferir que a versão é superior à publicação anterior.
-6. Quando houver autorização para publicar, enviar primeiro o artefato
-   imutável. Criar a tag Git e a GitHub Release somente depois que o artefato
-   estiver disponível.
-7. Entregar a versão, o digest, o commit, os ambientes alcançados e os comandos
-   de reversão.
+Arquivo `SEMVER`, imagem Docker/OCI, registry, changelog e tags Git no repositório. Não crie nada disso sem pedido.
 
-## Padrões
+## Regras
 
-- Manter `SEMVER` na raiz com uma única versão estável `MAJOR.MINOR.PATCH` e
-  quebra de linha final.
-- Usar `patch` para correção compatível, `minor` para capacidade compatível e
-  `major` para mudança incompatível.
-- Tratar `SEMVER` como fonte da versão preparada. Tags Git, anotações OCI,
-  changelog e referência da stack devem reproduzir o mesmo valor.
-- Publicar imagens com tag SemVer e commit, registrar o digest e fazer o deploy
-  por digest quando a plataforma permitir.
-- Conferir se uma tag imutável já existe antes do push. Nunca substituir uma
-  imagem ou tag publicada.
-- Usar o utilitário local para operações determinísticas:
+- `patch`: correção compatível; `minor`: capacidade compatível; `major`: mudança incompatível.
+- Classifique a mudança, proponha a próxima versão e só então grave.
+- Preparar a versão localmente é livre. Tag Git, GitHub Release e deploy exigem autorização explícita.
+- Nunca reutilize uma versão já publicada; incremente.
+
+## Comandos
 
 ```bash
-node scripts/semver.mjs current --project .
-node scripts/semver.mjs bump patch --project .
-node scripts/semver.mjs verify 1.4.1 --project .
-node scripts/semver.mjs docker-tag registry.example/app --project .
-node scripts/semver.mjs verify-docker-tag registry.example/app:1.4.1 --project .
+node fireskills/specialists/fireskill-specialist-versioning/scripts/semver.mjs current
+node fireskills/specialists/fireskill-specialist-versioning/scripts/semver.mjs bump patch
+node fireskills/specialists/fireskill-specialist-versioning/scripts/semver.mjs verify 0.1.1
 ```
-
-Ao instalar a skill, ajuste o primeiro caminho para apontar para
-`fireskill-specialist-versioning/scripts/semver.mjs` dentro da biblioteca de
-skills do agente.
-
-## Antipadrões
-
-- Usar `latest` como identidade de uma entrega.
-- Alterar `SEMVER` depois que a imagem já foi compilada com outro valor.
-- Criar a tag Git antes de confirmar a presença da imagem no registry.
-- Recompilar o mesmo número para corrigir uma publicação. Prepare um novo
-  incremento.
-- Misturar a preparação local com autorização implícita para publicar ou
-  alterar um ambiente remoto.
 
 ## Validação
 
-- Executar `current` e `verify` para confirmar o conteúdo de `SEMVER`.
-- Gerar a tag Docker com `docker-tag` e executar `verify-docker-tag` antes do
-  build, push ou deploy; uma tag diferente do `SEMVER` interrompe o fluxo.
-- Comparar a versão com a tag Git anterior e recusar valor igual ou inferior.
-- Comparar `SEMVER`, tag da imagem, anotações OCI, changelog e manifesto de
-  deploy.
-- Confirmar o digest publicado antes de criar a tag Git.
-- Conferir que o rollback aponta para uma versão e um digest já disponíveis.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-delivery-engineering` coordena testes, promoção, tag e
-  GitHub Release.
-- `$fireskill-specialist-sst` executa o deploy do stage com a versão preparada
-  aqui.
-
-Leia [references/standards.md](references/standards.md) para a correspondência
-entre SemVer, Git, imagens OCI e a sequência de publicação.
+- `current` e `verify` confirmam o conteúdo de `VERSION`.
+- Rode `bun run test` antes de propor a tag.
+- A tag, se autorizada, é `v<VERSION>` e aponta para o commit testado.

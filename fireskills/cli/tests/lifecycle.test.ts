@@ -43,6 +43,32 @@ describe("ciclo de vida das specs", () => {
     });
   });
 
+  test("aceita só o número da spec e move o diretório completo", async () => {
+    const project = await temporaryDirectory();
+    await createSpec(project, "specs/planned/0042-login-social", "Planned");
+
+    await expect(transitionSpec(project, "0042", "in-progress")).resolves.toMatchObject({
+      identifier: "0042-login-social",
+      to: "in-progress",
+    });
+    await expect(
+      readFile(join(project, "specs/in-progress/0042-login-social/spec.md"), "utf8"),
+    ).resolves.toContain("| Status | Implementing |");
+    await expect(resolveSpec(project, "0099")).rejects.toThrow("spec não encontrada: 0099");
+  });
+
+  test("reabre uma spec concluída para review", async () => {
+    const project = await temporaryDirectory();
+    await createSpec(project, "specs/completed/0042-login-social", "Complete");
+
+    await expect(
+      transitionSpec(project, "0042-login-social", "review"),
+    ).resolves.toMatchObject({ from: "completed", to: "review", status: "Reviewing" });
+    await expect(
+      transitionSpec(project, "0042-login-social", "in-progress"),
+    ).resolves.toMatchObject({ to: "in-progress" });
+  });
+
   test("recusa transições que pulam estados", async () => {
     const project = await temporaryDirectory();
     await createSpec(project, "specs/draft/0042-login-social", "Draft");

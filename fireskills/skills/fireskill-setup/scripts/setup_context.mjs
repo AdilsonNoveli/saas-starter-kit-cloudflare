@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node setup_context.mjs [--project <raiz>]  Cria o contexto mínimo (.specsfy/, AGENTS.md, CLAUDE.md) sem sobrescrever conteúdo existente."); process.exit(0); }
 /** Cria o contexto mínimo do projeto sem sobrescrever material do usuário. */
 import { existsSync, readdirSync } from "node:fs";
 import { readFile, mkdir, writeFile } from "node:fs/promises";

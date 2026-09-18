@@ -1,8 +1,6 @@
 # Diretrizes publicáveis do framework
 
-- Fonte canônica: `fireskills/skills/AGENTS.md`, bloco `specsfy:framework`
-  (derivado do monorepo `promovaweb/specsfy`).
-- Observado em: 2026-08-13.
+- Derivado do bloco `specsfy:framework` do monorepo `promovaweb/specsfy`.
 - Adaptação: bloco **encurtado** para o Nuxfire (o original tinha ~40 linhas); o
   contrato completo continua em `{{SPECSFY_SPEC_PATH}}`, lido só quando uma skill de
   fluxo é executada.

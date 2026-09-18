@@ -8,7 +8,7 @@ description: Metodologia orientada a especificações do Nuxfire (Nuxt 4 + @nuxt
 Ponto de entrada do sistema. Ele não executa etapas: encaminha para a skill
 certa e para os especialistas que dão conhecimento técnico do Nuxfire.
 Contrato normativo: [`skills/Spec.md`](skills/Spec.md). Governança de agentes:
-[`AGENTS.md`](AGENTS.md). Visão geral: [`README.md`](README.md).
+`AGENTS.md` (raiz do repositório). Visão geral: [`README.md`](README.md).
 
 ## Fluxo
 
@@ -53,6 +53,7 @@ Carregue **antes** de escrever código na área:
 | permissões, `defineAbility`, `<Can>` | `fireskill-specialist-nuxt-authorization` |
 | login, sessão, cookies, `apps/functions/src/auth.ts` | `fireskill-specialist-openauth` |
 | stores | `fireskill-specialist-pinia` |
+| `layers/billing`, Stripe, Paddle, webhooks, planos, assinaturas | `fireskill-specialist-billing` |
 | Workers, bindings, filas, cron, Durable Objects | `fireskill-specialist-cloudflare-workers` |
 | `infra/`, secrets, stages, deploy | `fireskill-specialist-sst` |
 
@@ -74,11 +75,9 @@ arquitetura, UX/UI, TypeScript, Postgres, Tailwind, revisão, depuração…) es
 ## Fontes de verdade (em conflito, vence a de cima)
 
 1. O código e os testes.
-2. `.specsfy/*` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `INTERFACE`, `DESIGNSYSTEM`):
-   contexto migrado de `_docs/docs` e conferido contra o código
-   (`fireskills/MIGRACAO-DOCS.md`).
+2. `.specsfy/*` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `INTERFACE`, `DESIGNSYSTEM`),
+   conferido contra o código.
 3. Os `references/nuxfire-*.md` dos especialistas.
-4. `_docs/docs/*`: histórico; pode estar desatualizado (nomes antigos de pacote).
 
 ## Comandos
 
@@ -101,4 +100,3 @@ arquitetura, UX/UI, TypeScript, Postgres, Tailwind, revisão, depuração…) es
   `DATABASE.md` (as skills `fireskill-aux-*` fazem isso sem apagar texto humano).
 - Especialista errado ou incompleto: corrija o `references/nuxfire-*.md` dele com a
   evidência, no mesmo passo.
-- Pendências do próprio Fireskills: `fireskills/PLANO-REFATORACAO.md`.

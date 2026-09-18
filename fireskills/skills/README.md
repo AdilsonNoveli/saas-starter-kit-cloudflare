@@ -226,8 +226,6 @@ das skills: elas já estão neste repositório.
 
 ## Desenvolver
 
-Leia [`AGENTS.md`](AGENTS.md) antes de alterar uma skill.
-
 Uma mudança de comportamento segue:
 
 ```text

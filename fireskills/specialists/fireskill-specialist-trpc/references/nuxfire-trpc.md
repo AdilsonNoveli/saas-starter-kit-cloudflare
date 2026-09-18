@@ -88,9 +88,8 @@ import { useDB } from "~~/server/utils/db";
 import { teams } from "@nuxfire/functions/schema";
 ```
 
-Decisão registrada em `_docs/docs/AGENTS.md` ("Layers cuidam do frontend; o
-backend usa import explícito"; o plano original, `REFATORE_ARCHITETURE.md`, foi
-removido da árvore e continua no histórico do git). Auto-imports do NuxtHub
+Decisão: "Layers cuidam do frontend; o backend usa import explícito" (o plano
+original continua no histórico do git). Auto-imports do NuxtHub
 (`hubBlob()`) e do `nuxt-authorization` (`defineAbility`) são a exceção: não têm
 caminho importável.
 

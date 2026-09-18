@@ -1,7 +1,6 @@
 # Nuxt 4 no Nuxfire — o que existe de fato no código
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento; o
-`_docs/docs/AGENTS.md` registra os incidentes que originaram várias regras abaixo.
+Cada afirmação tem o arquivo de evidência. O código vence este documento.
 
 ## 1. Versões e apps
 

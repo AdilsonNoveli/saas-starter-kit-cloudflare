@@ -5,7 +5,7 @@
     "deploy": "sst deploy",
     "format": "prettier -w .",
     "test": "vitest run",
-    "check:i18n": "bun scripts/check-i18n-completeness.ts",
+    "check:i18n": "bun scripts/check-i18n-completeness.ts && bun scripts/check-docs-translations.ts",
     "fireskill": "bun fireskills/cli/src/main.ts",
     "web": "sst shell -- bun scripts/dev.ts web",
     "web-remote": "sst shell -- bun scripts/dev.ts web remote",

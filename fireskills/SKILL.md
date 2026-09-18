@@ -98,5 +98,8 @@ arquitetura, UX/UI, TypeScript, Postgres, Tailwind, revisão, depuração…) es
 - Terminou uma entrega: `fireskill-documentator` e o monitor sem `PENDING`.
 - Mudou regra, tela ou tabela: atualize `.specsfy/RULES.md`, `INTERFACE.md` ou
   `DATABASE.md` (as skills `fireskill-aux-*` fazem isso sem apagar texto humano).
+- Mudou a doc pública do Fireskills (`apps/web/content/docs/2.fireskills`): atualize a
+  tradução em `content/pt-br/docs/2.fireskills` e `content/es/docs/2.fireskills`, com os
+  mesmos blocos de código; `bun run check:i18n` confere.
 - Especialista errado ou incompleto: corrija o `references/nuxfire-*.md` dele com a
   evidência, no mesmo passo.

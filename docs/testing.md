@@ -5,7 +5,7 @@
 
 - Arquivos de teste: 7.
 - Runner: Vitest.
-- Scripts: deploy: sst deploy; format: prettier -w .; test: vitest run; check:i18n: bun scripts/check-i18n-completeness.ts; fireskill: bun fireskills/cli/src/main.ts; web: sst shell -- bun scripts/dev.ts web; web-remote: sst shell -- bun scripts/dev.ts web remote; app: sst shell -- bun scripts/dev.ts app; app-remote: sst shell -- bun scripts/dev.ts app remote.
+- Scripts: deploy: sst deploy; format: prettier -w .; test: vitest run; check:i18n: bun scripts/check-i18n-completeness.ts && bun scripts/check-docs-translations.ts; fireskill: bun fireskills/cli/src/main.ts; web: sst shell -- bun scripts/dev.ts web; web-remote: sst shell -- bun scripts/dev.ts web remote; app: sst shell -- bun scripts/dev.ts app; app-remote: sst shell -- bun scripts/dev.ts app remote.
 
 | Arquivo |
 | --- |

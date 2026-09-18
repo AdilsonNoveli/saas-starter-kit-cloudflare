@@ -5,7 +5,7 @@
 
 | Tipo | Quantidade |
 | --- | --- |
-| Código | 381 |
+| Código | 383 |
 | Testes | 7 |
 
 ## Diagramas

@@ -182,6 +182,7 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Páginas | apps/web/app/composables/use-breadcrumb.ts | BreadcrumbItem, useBreadcrumb |
 | Páginas | apps/web/app/composables/use-collapsed-map.ts | useCollapsedMap |
 | Páginas | apps/web/app/composables/use-content-navigation.ts | DocsNavBadge, DocsNavigationItem, findNavItemByPath |
+| Páginas | apps/web/app/composables/use-docs-locale.ts | docsCollectionFor, queryDocsPage, queryDocsNavigation |
 | Páginas | apps/web/app/composables/use-page.ts | — |
 | Páginas | apps/web/app/composables/use-scrollspy.ts | useScrollspy |
 | Páginas | apps/web/app/error.vue | — |
@@ -258,5 +259,4 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Outras fontes | layers/billing/nuxt.config.ts | — |
 | Rotas e APIs | layers/billing/server/api/webhooks/paddle.post.ts | dispatch, mapPaddleStatus |
 | Rotas e APIs | layers/billing/server/api/webhooks/stripe.post.ts | dispatch |
-| Outras fontes | layers/billing/server/database/schema.ts | — |
 <!-- specsfy:documentator:end -->

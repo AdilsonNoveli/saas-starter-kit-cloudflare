@@ -29,6 +29,6 @@ export default defineNuxtConfig({
   // `srcDir: "app"` used to be here, explicit, only because this layer had no
   // `app/` directory while it was backend-only and Nuxt 4 silently falls back
   // to the layer ROOT in that case (dragging `server/**` into the CLIENT
-  // TypeScript program — see _docs/AGENTS.md). `layers/billing/app/` exists as
+  // TypeScript program — see nuxfire-layers.md). `layers/billing/app/` exists as
   // of Fase 3 passo 2b, so the default now resolves to it and the line is gone.
 });

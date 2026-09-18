@@ -4,7 +4,7 @@ The platform-owner console at `/admin`: cross-tenant company management, queue
 monitoring and replay, the append-only audit trail, the elevated-MFA gate that
 guards all of it, and the `PlatformAdmin`/`AuditLog` tables behind it. **Fourth
 and last** of the core-layer extractions in Fase 3 of
-`_docs/REFATORE_ARCHITETURE.md`, after `teams`, `billing` and `notifications`.
+`nuxfire-layers.md`, after `teams`, `billing` and `notifications`.
 
 > **Status: complete (Fase 3 passo 4).** Backend and frontend in one step, like
 > `notifications` and unlike `teams`/`billing`. No temporary bridge was needed
@@ -88,7 +88,7 @@ Root with no domain logic left in it.
 - **`admin.ts` is NAMED middleware, which is why it may live here at all.** Only
   `*.global.*` middleware has the cross-layer ordering problem (layers are
   concatenated with the Composition Root last, so a layer's global middleware
-  can never run after `0.auth.global.ts` — see `_docs/AGENTS.md` and why
+  can never run after `0.auth.global.ts` — see `nuxfire-layers.md` and why
   `1.teams.global.ts` stays in `packages/app`). Named middleware always runs
   after every global one. Confirmed unchanged in the build: the global array is
   still `[<teams store init>, 0.auth.global, 1.teams.global, <noop>]` and gained
@@ -120,7 +120,7 @@ Root with no domain logic left in it.
   A relative path resolves fine under tsc, vitest, drizzle-kit, `nuxt build` and
   plain `esbuild --bundle` — none of which is SST's own Worker bundler, the one
   that actually ships `packages/functions`. Real deploy failure, d0dac0a; see
-  `_docs/AGENTS.md`. Gate used here in place of a live deploy:
+  `nuxfire-layers.md`. Gate used here in place of a live deploy:
   `bunx esbuild packages/functions/src/{cron,jobs-consumer,dlq-consumer}.ts --bundle --platform=node`,
   each individually, grepped for `Could not resolve` — zero, and
   `layers/admin/server/database/schema.ts` is present in the resulting bundle.

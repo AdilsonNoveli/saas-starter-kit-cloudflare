@@ -2,7 +2,7 @@
 
 Subscriptions, plans and the price catalog: Stripe/Paddle checkout and portal,
 both payment webhooks, and the platform-admin plan console. Second of the four
-core-layer extractions in Fase 3 of `_docs/REFATORE_ARCHITETURE.md`, after
+core-layer extractions in Fase 3 of `nuxfire-layers.md`, after
 `teams` and before `notifications`/`admin`.
 
 > **Status: complete (Fase 3 passo 2a backend + 2b frontend).** Schema, tRPC

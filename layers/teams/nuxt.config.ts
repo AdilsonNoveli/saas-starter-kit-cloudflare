@@ -27,6 +27,5 @@ export default defineNuxtConfig({
 // `prefix` to a nonsense value and watching `.nuxt/components.d.ts` actually
 // change (it previously didn't), which is also what surfaced the `path`
 // double-`/app/` bug fixed above and the prefix/filename stutter documented
-// in the components block's comment. Full writeup: _docs/AGENTS.md, "Nuxt
-// Layers architecture".
+// in the components block's comment. Full writeup: nuxfire-layers.md.
 // ---------------------------------------------------------------------------

@@ -1,9 +1,8 @@
 # Regras do sistema
 
 Estas regras complementam as instruções dos agentes sem substituir specs ou
-critérios de aceite. Origem: `_docs/docs/RULES.md` (regras do time, mantidas
-como estão) e as regras técnicas de `_docs/docs/AGENTS.md` que foram **verificadas
-no código** (o detalhe e a evidência de cada uma estão no especialista indicado).
+critérios de aceite. Regras do time, mantidas como estão, e regras técnicas **verificadas no código**
+(o detalhe e a evidência de cada uma estão no especialista indicado).
 
 ## Arquitetura
 

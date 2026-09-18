@@ -2,7 +2,7 @@
 
 `mailer/` in this package is a fork of [`@adonisjs/mail@10.4.0`](https://github.com/adonisjs/mail),
 vendored and adapted to run without the AdonisJS application framework
-(see `_docs/MAILER_FORK_PLAN.md` in the repo root for the full history).
+(see the git history of `packages/emails` for the full history).
 Its original license is preserved below, as required by its terms.
 
 ## The MIT License

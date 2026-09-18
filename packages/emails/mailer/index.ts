@@ -3,7 +3,7 @@
  * LICENSE.md), vendored so the multi-provider mailer engine used by
  * `apps/functions/src/emails.ts` is owned source instead of a dependency
  * on a single-maintainer's unofficial standalone fork
- * (`@tanayvk/mailer`). See `_docs/MAILER_FORK_PLAN.md` for the full
+ * (`@tanayvk/mailer`). See the git history of packages/emails for the full
  * history and rationale.
  *
  * Dropped from upstream on purpose (framework/build-tool glue with zero

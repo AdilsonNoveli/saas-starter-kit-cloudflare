@@ -4,7 +4,7 @@ In-app notifications: the `Notification` table, the tenant list/create/mark-read
 API, the bell slideover in the dashboard shell, the per-user "receive
 notifications" preference, the real-time push that feeds them, and the
 platform-admin console that demonstrates the whole pipeline end to end. Third of
-the four core-layer extractions in Fase 3 of `_docs/REFATORE_ARCHITETURE.md`,
+the four core-layer extractions in Fase 3 of `nuxfire-layers.md`,
 after `teams` and `billing` and before `admin`.
 
 > **Status: complete (Fase 3 passo 3).** Unlike `teams` and `billing`, this
@@ -96,7 +96,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   `@nuxfire/layer-notifications/server/database/schema` there) — never a
   relative path. That is not style: a relative path in `core-schema.ts` or the
   schema barrel breaks a real `sst deploy` and nothing short of one catches it
-  (d0dac0a; see `_docs/AGENTS.md`).
+  (d0dac0a; see `nuxfire-layers.md`).
 - **Two notification-adjacent files deliberately stayed in `packages/app`.**
   `app/composables/use-notification.ts` is a naming trap — despite the name it
   is a generic `useToast()` wrapper (success/error/info) with nothing to do with
@@ -110,7 +110,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 - **Plugin declaration order flipped across the layer boundary, and `dependsOn`
   is what absorbs it.** Nuxt concatenates plugins with the Composition Root
   **last**, the same collection order that makes global middleware unorderable
-  across layers (see `_docs/AGENTS.md`). So `ws-notifications` now appears
+  across layers (see `nuxfire-layers.md`). So `ws-notifications` now appears
   _before_ `websockets` in the registration list, where it used to come after.
   It still runs after, because `defineNuxtPlugin({ dependsOn: ["websockets"] })`
   makes Nuxt defer it — verified in the shipped client bundle, not assumed: the

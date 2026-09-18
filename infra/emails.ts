@@ -5,7 +5,7 @@ import { secret } from "./secret";
 // naming on Windows ("artifacts\Emails-src\C:\..." — it joins the handler
 // path as if it were always relative).
 // @nuxfire/emails/mailer (a vendored fork of @adonisjs/mail, see
-// packages/emails/mailer and _docs/MAILER_FORK_PLAN.md) sends every
+// packages/emails/mailer and the git history of packages/emails) sends every
 // transport — including HTTP-API ones like Resend — through nodemailer's
 // own createTransport()/sendMail() for MIME composition. nodemailer's entry
 // point unconditionally `require()`s ALL of its built-in transports

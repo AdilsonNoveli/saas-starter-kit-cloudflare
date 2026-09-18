@@ -2,7 +2,7 @@
 
 Multi-tenancy: teams, memberships, invitations and the per-tenant RBAC
 (`Role`/`Permission`) every other layer depends on. First of the four core-layer
-extractions in Fase 3 of `_docs/REFATORE_ARCHITETURE.md`, and first on purpose —
+extractions in Fase 3 of `nuxfire-layers.md`, and first on purpose —
 `billing`, `notifications` and `admin` all reference it.
 
 > **Status: complete.** Fase 3 passo 1a moved the schema, the tRPC routers, the

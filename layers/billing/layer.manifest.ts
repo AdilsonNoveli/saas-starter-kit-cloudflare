@@ -8,7 +8,7 @@ export default defineLayerManifest({
   version: "1.0.0",
 
   // Documentational only — nothing validates `extends` order automatically
-  // (see _docs/REFATORE_ARCHITETURE.md, Fase 1.4). `teams` is listed because
+  // (see nuxfire-layers.md, Fase 1.4). `teams` is listed because
   // `Subscription.teamId` is a real FK to `Team` and this layer imports
   // `@nuxfire/layer-teams/server/database/schema` directly. The reverse edge
   // exists too at the schema level (`Team.planId` -> `Plan`), but it is not

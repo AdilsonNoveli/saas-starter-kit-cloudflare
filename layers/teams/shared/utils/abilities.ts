@@ -7,8 +7,7 @@ import { PERMISSIONS } from "./permissions";
 // `nuxt-authorization` piggybacks on Nuxt's cross-layer auto-import of
 // `shared/utils/`, which is one flat namespace keyed by export name, so two
 // layers exporting the same bare name collide silently with no build error.
-// See _docs/AGENTS.md, "Nuxt Layers architecture", and §5 of
-// _docs/REFATORE_ARCHITETURE.md.
+// See nuxfire-layers.md.
 //
 // These names were the one documented exception until Fase 3 passo 1b: they
 // predate the convention, and the retrofit had to land in the same commit as

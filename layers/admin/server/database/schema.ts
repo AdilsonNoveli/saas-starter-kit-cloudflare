@@ -12,7 +12,7 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // `notifications`; `AuditLog.actorUserId` is deliberately not a foreign key, so
 // it never needed a `users` binding on either side). That makes `admin` the
 // first layer here whose schema participates in none of the three deliberate
-// cycles documented in _docs/AGENTS.md, and the TDZ rule those cycles exist to
+// cycles documented in nuxfire-layers.md, and the TDZ rule those cycles exist to
 // guard against is therefore moot in this file. Do not "restore symmetry" by
 // adding a `platformAdmin` relation to `usersRelations` over there: it would
 // manufacture a fourth cycle for no behavioural gain.
@@ -21,8 +21,7 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // A relative path resolves fine under tsc, vitest, drizzle-kit, nuxt build and
 // even plain `esbuild --bundle` — none of which is the bundler that actually
 // ships `packages/functions`. See the caution in
-// packages/functions/src/database/schema.ts and _docs/AGENTS.md, "Nuxt Layers
-// architecture", for the real deploy failure this rule comes from (d0dac0a).
+// packages/functions/src/database/schema.ts and nuxfire-layers.md for the real deploy failure this rule comes from (d0dac0a).
 // Requires `@nuxfire/functions: workspace:*` in this layer's own package.json,
 // which every other layer already declares for the same reason.
 import { users } from "@nuxfire/functions/database/core-schema";

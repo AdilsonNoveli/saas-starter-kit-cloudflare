@@ -35,5 +35,3 @@ logs
 # Wrangler local state
 .wrangler/
 
-# cópia local do repositório original, usada só para consulta
-_docs/pro-production/

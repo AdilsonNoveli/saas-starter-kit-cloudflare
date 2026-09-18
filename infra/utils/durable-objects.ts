@@ -2,7 +2,7 @@
 // `new_classes` migration for a Durable Object class that already has any
 // live instance (error 10074: "already depended on by existing Durable
 // Objects") — this isn't about migration tags, it's a one-time,
-// irreversible provisioning step. See _docs/dev-ai/lessons-learned.md for
+// irreversible provisioning step. See git history for
 // the full story of how this was discovered.
 //
 // Since our own infra code re-runs on every `sst deploy` (there's no

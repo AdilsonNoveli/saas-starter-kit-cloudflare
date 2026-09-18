@@ -20,8 +20,7 @@ uma. Preserve decisões humanas nas seções livres deste arquivo.
 
 ## Decisões e observações do projeto
 
-Fonte: `_docs/docs/AGENTS.md` e `CURRENT_STATE.md`, **conferidas contra o código em
-2026-09-18** (divergências em `fireskills/MIGRACAO-DOCS.md`). O detalhe técnico de
+Conferido contra o código em 2026-09-18. O detalhe técnico de
 cada item está no especialista correspondente (`fireskills/specialists/`).
 
 ### Versões observadas

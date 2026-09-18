@@ -1,6 +1,6 @@
 # `@nuxfire/layer-kanban`
 
-Pilot Nuxt 4 feature layer (Fase 2 of `_docs/REFATORE_ARCHITETURE.md`): visual
+Pilot Nuxt 4 feature layer (Fase 2 of `nuxfire-layers.md`): visual
 task management — boards, columns, cards, drag-and-drop — scoped to a team.
 
 ## Activation

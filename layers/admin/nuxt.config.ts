@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   // No `srcDir: "app"` line: that workaround only exists for a layer that ships
   // with no `app/` directory at all (Nuxt 4 then falls back to the layer ROOT
   // and drags `server/**` into the CLIENT TypeScript program — see
-  // _docs/AGENTS.md). This layer shipped backend and frontend in one step, so
+  // nuxfire-layers.md). This layer shipped backend and frontend in one step, so
   // `layers/admin/app/` exists from the first commit and the default resolves
   // to it.
 });

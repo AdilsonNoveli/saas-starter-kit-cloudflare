@@ -319,8 +319,7 @@ props, eventos, estados e consumidores reais. A revisão visual precisa
 confirmar bordas, espaçamentos, margens, padding e tipografia contra esses
 tokens antes do item `EVIDENCE` da tarefa.
 
-Origem deste bloco: `_docs/docs/DESIGN_SYSTEM.md`, **conferido contra
-`packages/tokens` em 2026-09-18** (a versão de origem citava `packages/design-tokens`,
+Este bloco foi **conferido contra `packages/tokens` em 2026-09-18** (a documentação anterior citava `packages/design-tokens`,
 `packages/app` e `packages/auth-frontend`, que hoje são `packages/tokens`,
 `apps/app` e `apps/login`).
 
@@ -437,6 +436,6 @@ Mono** (fallback `JetBrains Mono`), declaradas em `theme.css`.
 
 | Versão | Data | Alteração | Alcance |
 | --- | --- | --- | --- |
-| 1.0.0 | 2026-09-18 | Criação dos defaults de SaaS e dos cenários CRUD; bloco `Tokens e componentes` migrado de `_docs/docs/DESIGN_SYSTEM.md` e conferido contra `packages/tokens` | Produto |
+| 1.0.0 | 2026-09-18 | Criação dos defaults de SaaS e dos cenários CRUD; bloco `Tokens e componentes` conferido contra `packages/tokens` | Produto |
 
 <!-- markdownlint-enable MD013 -->

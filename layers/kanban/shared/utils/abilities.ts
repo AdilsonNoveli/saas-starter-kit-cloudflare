@@ -7,7 +7,7 @@ import { KANBAN_PERMISSIONS } from "./permissions";
  * layer boundaries into one global namespace. Two layers exporting a
  * `createBoard` would shadow each other silently, with no build error. This is
  * a mandatory convention, not a style preference (see
- * _docs/REFATORE_ARCHITETURE.md §5).
+ * nuxfire-layers.md).
  */
 
 interface User {

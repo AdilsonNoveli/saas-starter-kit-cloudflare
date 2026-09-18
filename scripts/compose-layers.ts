@@ -150,7 +150,7 @@ function composeLayerNavigation(root: string, layers: DiscoveredLayer[]) {
 
   // `/manifest` subpath, not the package root (`.`): `.` resolves to
   // `nuxt.config.ts` now — see the package.json comment in each layer and the
-  // "Nuxt Layers architecture" note in _docs/AGENTS.md for why `extends`
+  // "Nuxt Layers architecture" note in nuxfire-layers.md for why `extends`
   // needs the package root to BE the Nuxt config, which cost a full afternoon
   // to find (every layer's `components: [{ prefix }]` was silently inert).
   const imports = layers

@@ -40,8 +40,7 @@ No Nuxfire (Nuxt 4) o Composition Root é `apps/app` e o domínio vive em `layer
 
 ## Decisões, ownership e retenção
 
-Fonte: `_docs/docs/AGENTS.md`, conferida contra os schemas e a migração
-`0000_init.sql` em 2026-09-18. Detalhe técnico: `fireskill-specialist-drizzle`.
+Fonte: os schemas e a migração `0000_init.sql`, conferidos em 2026-09-18. Detalhe técnico: `fireskill-specialist-drizzle`.
 
 ### Fonte e convenções
 

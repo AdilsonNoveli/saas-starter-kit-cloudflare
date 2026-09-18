@@ -9,7 +9,7 @@ export default defineLayerManifest({
 
   // Empty, and that is what the code actually says — not an oversight.
   //
-  // `_docs/REFATORE_ARCHITETURE.md` (Fase 3, item 3) predicted this layer would
+  // `nuxfire-layers.md` (Fase 3, item 3) predicted this layer would
   // depend on `teams`. It does not: `Notification` has exactly one cross-table
   // reference, `userId` -> `User`, which lives in `packages/functions`
   // core-schema, and no file in this layer imports `@nuxfire/layer-teams` at
@@ -36,6 +36,6 @@ export default defineLayerManifest({
   // the cross-domain admin router is `platformAdminProcedure`, which is platform
   // authority and never routes through the tenant ability layer. Do not invent a
   // `notifications:*` permission to "complete" this list — see
-  // _docs/AGENTS.md, "Platform Admin".
+  // nuxfire-authorization.md.
   permissions: [],
 });

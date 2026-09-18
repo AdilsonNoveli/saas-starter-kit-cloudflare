@@ -6,7 +6,7 @@ import { z } from "zod";
 // primitives and server utils by explicit import, never by Nitro's merge.
 // `platformAdminProcedure` in particular is built on `protectedProcedure`, NOT
 // on `abilityProcedure` — platform authority never routes through the tenant
-// ability layer (see _docs/AGENTS.md, "Platform Admin").
+// ability layer (see nuxfire-authorization.md).
 import { platformAdminProcedure, router } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";
 import { recordAuditLog } from "~~/server/utils/audit-log";

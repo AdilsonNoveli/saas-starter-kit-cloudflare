@@ -22,7 +22,7 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // gaining a dependency on a layer that already depends on it) is NOT the
 // problem it looks like — `layers/teams` <-> `layers/billing` already do this
 // today and `bun install` resolves it as plain symlinks with no complaint. See
-// _docs/AGENTS.md, "Nuxt Layers architecture", for the full incident.
+// nuxfire-layers.md for the full incident.
 import { teams } from "@nuxfire/layer-teams/server/database/schema";
 // `Notification` moved to layers/notifications (Fase 3, passo 3). This file
 // still needs it for `usersRelations` below (`notifications: many(...)`), while

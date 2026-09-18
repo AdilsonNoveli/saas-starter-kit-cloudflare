@@ -35,7 +35,7 @@ export const seedAccountPath = "/internal/identity/seed";
 // Nuxt Layers the Composition Root (apps/app/nuxt.config.ts) extends.
 // Deliberately separate from `flags` below: `flags` provisions Cloudflare
 // resources in infra/*.ts, this decides which domain layers are compiled into
-// the app at all. See _docs/REFATORE_ARCHITETURE.md, "Composição".
+// the app at all. See nuxfire-layers.md.
 export const layers = {
   // Core layers — always extended, never toggleable: every tenant of this
   // SaaS needs them. Listed here (rather than hardcoded in nuxt.config.ts) so

@@ -5,7 +5,7 @@
  * provisioned only by the `flags` object in the root `config.ts`, read directly
  * by `infra/*.ts`. A manifest field describing infrastructure would have no
  * code reading it. See "Registro de Decisões da Auditoria" in
- * `_docs/REFATORE_ARCHITETURE.md`.
+ * `nuxfire-layers.md`.
  */
 
 /** A single item a layer injects into the application sidebar. */

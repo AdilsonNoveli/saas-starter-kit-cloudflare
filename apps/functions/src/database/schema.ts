@@ -6,7 +6,7 @@ export * from "./core-schema";
 // Layer schemas. Unconditional on purpose — NOT gated by `layers.features` in
 // config.ts. Turning a feature layer off removes its pages/components from the
 // Nuxt bundle; it never removes its tables from the database or from the typed
-// Drizzle client. See _docs/REFATORE_ARCHITETURE.md §4 ("dado órfão"): disabling
+// Drizzle client. See nuxfire-drizzle.md ("dado órfão"): disabling
 // means "out of the UI", not "erased".
 //
 // Unlike the tRPC composition (server/trpc/routers/.composition/), this file is
@@ -19,8 +19,7 @@ export * from "./core-schema";
 // jobs-consumer.ts, dlq-consumer.ts — all of which import this barrel) fails
 // it with "Could not resolve ../../../../layers/teams/server/database/schema"
 // at deploy time. Real deploy failure, not caught by any check that runs
-// short of an actual `sst deploy` — see _docs/AGENTS.md, "Nuxt Layers
-// architecture", for the full incident. `layers/kanban`'s OWN schema file
+// short of an actual `sst deploy` — see nuxfire-layers.md for the full incident. `layers/kanban`'s OWN schema file
 // already used the package-specifier form to import `Team` from
 // `@nuxfire/layer-teams` and never hit this — only this aggregator (and
 // core-schema.ts's own cross-layer import) used the relative form. Requires

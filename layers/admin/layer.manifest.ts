@@ -8,7 +8,7 @@ export default defineLayerManifest({
   version: "1.0.0",
 
   // Documentational only — nothing validates `extends` order automatically
-  // (see _docs/REFATORE_ARCHITETURE.md, Fase 1.4).
+  // (see nuxfire-layers.md, Fase 1.4).
   //
   // These two are real import edges, not guesses: `server/trpc/router.ts` here
   // imports `adminPlansRouter` from `@nuxfire/layer-billing/server/trpc/router`
@@ -41,6 +41,6 @@ export default defineLayerManifest({
   // `abilityProcedure`, and there is no `defineAbility()` anywhere in this
   // layer. Inventing an `admin:*` permission string here would put platform
   // access behind a tenant-scoped `Permission` row — precisely the escalation
-  // path the split exists to prevent. See _docs/AGENTS.md, "Platform Admin".
+  // path the split exists to prevent. See nuxfire-authorization.md.
   permissions: [],
 });

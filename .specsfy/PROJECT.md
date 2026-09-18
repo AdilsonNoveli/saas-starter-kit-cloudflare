@@ -1,8 +1,7 @@
 # Projeto
 
-> Conteúdo migrado de `_docs/docs/` e **conferido contra o código em 2026-09-18**.
-> Onde o documento de origem divergia do código, prevaleceu o código (ver
-> `fireskills/MIGRACAO-DOCS.md`). Referências de arquivo são caminhos reais.
+> Conferido contra o código em 2026-09-18; onde a documentação divergia, prevaleceu
+> o código. Referências de arquivo são caminhos reais.
 
 ## História e motivação
 
@@ -10,7 +9,7 @@ O **Nuxfire** é um SaaS starter kit multi-tenant: um monorepo pronto para
 produção que roda 100% na borda da Cloudflare (Workers), com deploy por SST 4 e
 o nome de pacotes `@nuxfire/*`. Domínio de produção `nuxfire.com`.
 
-A evolução arquitetural registrada em `_docs/docs/AGENTS.md`: todo o domínio de
+Na evolução arquitetural, todo o domínio de
 negócio saiu do app único e foi extraído para **Nuxt Layers** (`layers/`), em
 fases; `apps/app` ficou como *Composition Root* (casca do app, composição do
 tRPC, `nuxt.config.ts` e infraestrutura central) e não contém mais lógica de

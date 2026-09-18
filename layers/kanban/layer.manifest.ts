@@ -7,7 +7,7 @@ export default defineLayerManifest({
   version: "1.0.0",
 
   // Documentational only — nothing validates `extends` order automatically
-  // (see _docs/REFATORE_ARCHITETURE.md, Fase 1.4).
+  // (see nuxfire-layers.md, Fase 1.4).
   requires: ["teams"],
 
   navigation: {

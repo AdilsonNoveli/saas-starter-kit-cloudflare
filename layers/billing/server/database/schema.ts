@@ -27,7 +27,7 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // layers by relative path instead" — described a real state of the code that
 // was also a real `sst deploy` failure, fixed in d0dac0a. EVERY cross-file
 // schema import in this repo is a package specifier now, core-schema.ts and the
-// barrel included; see _docs/AGENTS.md, "Nuxt Layers architecture".)
+// barrel included; see nuxfire-layers.md.)
 import { teams } from "@nuxfire/layer-teams/server/database/schema";
 
 export const benefits = pgTable("Benefit", {

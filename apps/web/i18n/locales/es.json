@@ -511,7 +511,7 @@
       "multiLanguage": "Multiidioma"
     },
     "testimonials": {
-      "title": "Probado en Producción & Early Access",
+      "title": "Probado en Producción & Acceso Anticipado",
       "subtitle": "Feedback real de desarrolladores y founders probando Nuxfire en cargas de trabajo reales.",
       "items": {
         "item1": {
@@ -526,7 +526,7 @@
         },
         "item3": {
           "name": "Elena Rostova",
-          "role": "Fundadora SaaS · Early Access",
+          "role": "Fundadora SaaS · Acceso Anticipado",
           "quote": "La mayoría de plantillas entregan código frágil que falla con usuarios reales. Nuxfire ya tiene RBAC, invitaciones y auditoría listos. Ahorró 2 meses de trabajo..."
         },
         "item4": {
@@ -551,13 +551,13 @@
         },
         "item8": {
           "name": "Jordan Blake",
-          "role": "Ingeniero de Producto · Early Access",
+          "role": "Ingeniero de Producto · Acceso Anticipado",
           "quote": "Deja de perder tiempo creando autenticación y permisos desde cero. Migramos nuestro MVP a Nuxfire y activamos suscripciones de pago 48h después. Vale cada centavo..."
         }
       }
     },
     "avatars": {
-      "validated": "Early access con más de 40 devs probando en Discord & GitHub"
+      "validated": "Acceso anticipado con más de 40 devs probando en Discord & GitHub"
     },
     "databaseArchitecture": {
       "badge": "Motor Relacional Enterprise",
@@ -862,7 +862,7 @@
       "cardSubtitle": "Código SaaS full-stack de nivel empresarial e infraestructura en la nube",
       "lifetimeAccess": "Acceso de por vida",
       "earlyBirdBadge": "Lote de Lanzamiento",
-      "earlyBirdNote": "Precio especial de early access ($79 precio regular posterior)",
+      "earlyBirdNote": "Precio especial de acceso anticipado ($79 precio regular posterior)",
       "oneTimePayment": "Pago único",
       "neverMonthly": "Nunca más pagues una mensualidad por código",
       "includedTitle": "Todo lo que incluye tu licencia:",

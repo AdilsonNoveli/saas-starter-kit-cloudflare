@@ -511,7 +511,7 @@
       "multiLanguage": "Multi-idioma"
     },
     "testimonials": {
-      "title": "Testado em Produção & Early Access",
+      "title": "Testado em Produção & Acesso Antecipado",
       "subtitle": "Feedback real de desenvolvedores e founders testando o Nuxfire em cargas de trabalho reais.",
       "items": {
         "item1": {
@@ -526,7 +526,7 @@
         },
         "item3": {
           "name": "Elena Rostova",
-          "role": "Fundadora de SaaS · Early Access",
+          "role": "Fundadora de SaaS · Acesso Antecipado",
           "quote": "A maioria dos templates entrega código frágil que quebra com usuários reais. O Nuxfire já vem com RBAC, convites e logs prontos. Economizou 2 meses de trabalho..."
         },
         "item4": {
@@ -551,13 +551,13 @@
         },
         "item8": {
           "name": "Jordan Blake",
-          "role": "Engenheiro de Produto · Early Access",
+          "role": "Engenheiro de Produto · Acesso Antecipado",
           "quote": "Pare de perder tempo criando autenticação e permissões do zero. Migramos nosso MVP para o Nuxfire e ativamos as primeiras assinaturas pagas 48h depois. Vale ouro..."
         }
       }
     },
     "avatars": {
-      "validated": "Early access com mais de 40 devs testando no Discord & GitHub"
+      "validated": "Acesso antecipado com mais de 40 devs testando no Discord & GitHub"
     },
     "databaseArchitecture": {
       "badge": "Motor Relacional Enterprise",
@@ -862,7 +862,7 @@
       "cardSubtitle": "Base de código SaaS full-stack de nível empresarial & infraestrutura em nuvem",
       "lifetimeAccess": "Acesso vitalício",
       "earlyBirdBadge": "Lote de Lançamento",
-      "earlyBirdNote": "Preço especial de early access ($79 preço regular posterior)",
+      "earlyBirdNote": "Preço especial de acesso antecipado ($79 preço regular posterior)",
       "oneTimePayment": "Pagamento único",
       "neverMonthly": "Nunca mais pague mensalidade por código",
       "includedTitle": "Tudo o que está incluído na sua licença:",

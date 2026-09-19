@@ -559,6 +559,101 @@
     "avatars": {
       "validated": "Early access con más de 40 devs probando en Discord & GitHub"
     },
+    "databaseArchitecture": {
+      "badge": "Motor Relacional Enterprise",
+      "title": "20 Tablas Auditadas en PostgreSQL. Gobernanza Total de Inquilinos.",
+      "subtitle": "Sin esquemas frágiles ni migraciones caóticas. Nuxfire entrega una base de datos PostgreSQL relacional estricta sobre pooling Cloudflare Hyperdrive, con consola de Platform Admin completa para gestionar todas las empresas.",
+      "metrics": {
+        "tables": {
+          "value": "20",
+          "label": "Tablas Auditadas",
+          "description": "Cero datos desestructurados. Seguridad de tipos de extremo a extremo con Drizzle ORM."
+        },
+        "hyperdrive": {
+          "value": "<10ms",
+          "label": "Cloudflare Hyperdrive",
+          "description": "Pooling global de conexiones en el edge sin agotamiento de conexiones."
+        },
+        "encryption": {
+          "value": "AES-GCM",
+          "label": "Cifrado en Reposo",
+          "description": "Semillas TOTP y secretos protegidos por algoritmos autenticados."
+        },
+        "kvAuth": {
+          "value": "Zero-DB",
+          "label": "Auth en Cloudflare KV",
+          "description": "Contraseñas y sesiones en KV, liberando PostgreSQL exclusivamente para tu aplicación."
+        }
+      },
+      "adminConsole": {
+        "badge": "Consola de Platform Admin (/admin)",
+        "title": "Control Absoluto sobre Todas las Empresas e Inquilinos",
+        "description": "Escala con la seguridad que exigen las grandes empresas. El área de Platform Admin opera por encima del RBAC de los inquilinos, otorgando a los dueños del SaaS visibilidad y control total sobre cada empresa registrada.",
+        "features": {
+          "1": {
+            "title": "Métricas en Tiempo Real entre Inquilinos",
+            "description": "Consultas analíticas agrupadas que calculan miembros, plan activo y colas de cada empresa en una sola query optimizada."
+          },
+          "2": {
+            "title": "Suspensión de Empresas en 1 Clic",
+            "description": "Suspende o reactiva cualquier empresa instantáneamente sin tocar la base de datos. Los inquilinos suspendidos se bloquean en el middleware."
+          },
+          "3": {
+            "title": "Registro de Auditoría Inmutable",
+            "description": "Cada acción administrativa se registra en AuditLog (append-only) con ID del operador, dirección IP y metadatos JSON."
+          },
+          "4": {
+            "title": "MFA por Hardware y Sesiones Elevadas",
+            "description": "El acceso a /admin exige MFA obligatorio por TOTP y sesión elevada con caducidad automática de 30 minutos."
+          }
+        },
+        "mockup": {
+          "heading": "Platform Admin • Gobernanza de Empresas",
+          "subheading": "Control en tiempo real de inquilinos y telemetría agregada",
+          "colCompany": "Empresa",
+          "colPlan": "Plan Activo",
+          "colMembers": "Miembros",
+          "colStatus": "Estado del Inquilino",
+          "colAction": "Acción del Operador",
+          "statusActive": "ACTIVO",
+          "statusSuspended": "SUSPENDIDO",
+          "btnSuspend": "Suspender",
+          "btnReactivate": "Reactivar"
+        }
+      },
+      "domainsTitle": "Arquitectura de Dominios Auditada",
+      "domainsSubtitle": "Cada tabla tiene un propósito comprobado en el código, claves foráneas estrictas y relaciones Drizzle tipadas.",
+      "domains": {
+        "tenancy": {
+          "title": "Multi-Tenancy y RBAC Granular",
+          "description": "Aislamiento estricto entre espacios de trabajo con límites por asiento, invitaciones por token y roles de permiso personalizables.",
+          "tables": "Team, TeamMembership, TeamInvite, Role, Permission",
+          "tag": "layers/teams"
+        },
+        "billing": {
+          "title": "Monetización y Catálogo de Planes",
+          "description": "Suscripciones multinivel para Stripe y Paddle, catálogo de planes, cuotas en JSONB y libro de idempotencia ante webhooks repetidos.",
+          "tables": "Plan, Subscription, Benefit, BenefitsOnPlan",
+          "tag": "layers/billing"
+        },
+        "governance": {
+          "title": "Autoridad de la Plataforma y Auditoría",
+          "description": "Roles independientes de operador (SUPER_ADMIN, SUPPORT) con registro de auditoría append-only inmune al borrado de usuarios.",
+          "tables": "PlatformAdmin, AuditLog",
+          "tag": "layers/admin"
+        },
+        "jobs": {
+          "title": "Colas Asíncronas y Resiliencia Edge",
+          "description": "Procesamiento en segundo plano con backoff exponencial, registros detallados y reprocesamiento de mensajes desde la consola.",
+          "tables": "Job, Log, DeadLetterRecord, Notification, User",
+          "tag": "core & workers"
+        }
+      },
+      "summaryCallout": {
+        "lead": "Diseñado para entornos corporativos de alto tráfico: ",
+        "tail": "comienza con una arquitectura de datos relacional que nunca necesitará ser reescrita cuando tu SaaS escale."
+      }
+    },
     "faqs": {
       "title": "Tus dudas, resueltas",
       "subtitle": "Todo lo que necesitas saber sobre nuestro SaaS",

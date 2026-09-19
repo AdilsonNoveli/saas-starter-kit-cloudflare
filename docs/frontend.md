@@ -3,7 +3,7 @@
 <!-- specsfy:documentator:start -->
 ## Superfícies observadas
 
-- Componentes, páginas ou views: 150.
+- Componentes, páginas ou views: 151.
 - Tailwind: detectado.
 - Tokens CSS: --reka-dropdown-menu-trigger-width, --ui-primary, --vis-crosshair-line-stroke-color, --vis-crosshair-circle-stroke-color, --ui-bg, --vis-axis-grid-color, --ui-border, --vis-axis-tick-color, --vis-axis-tick-label-color, --ui-text-dimmed, --vis-tooltip-background-color, --vis-tooltip-border-color, --vis-tooltip-text-color, --ui-text-highlighted, ---, --ui-text, --background, --shiny-text, --shiny-dot, --color-brand, --color-flame-700, --color-brand-hover, --color-flame-600, --color-brand-secondary, --color-fire-500, --color-brand-light, --color-fire-50, --color-night-800, --color-flame-500, --color-flame-800, --gradient-angle, --gradient-angle-offset, --gradient-shine, --gradient-brand, --muted, --x, --y, --duration, --gap, --ui-, --color-, --font-sans, --font-mono, --color-flame-50, --color-flame-100, --color-flame-200, --color-flame-300, --color-flame-400, --color-flame-900, --color-flame-950, --color-fire-100, --color-fire-200, --color-fire-300, --color-fire-400, --color-fire-600, --color-fire-700, --color-fire-800, --color-fire-900, --color-fire-950, --color-night-50, --color-night-100, --color-night-200, --color-night-300, --color-night-400, --color-night-500, --color-night-600, --color-night-700, --color-night-900, --color-night-950, --radius-lg, --ui-radius, --ui-bg-muted, --ui-bg-elevated, --ui-bg-accented, --ui-border-muted, --ui-border-accented, --ui-text-muted.
 
@@ -82,6 +82,7 @@
 | apps\web\app\components\landing\LandingAvatars.vue |
 | apps\web\app\components\landing\LandingComparisonTable.vue |
 | apps\web\app\components\landing\LandingCTA.vue |
+| apps\web\app\components\landing\LandingDatabaseArchitecture.vue |
 | apps\web\app\components\landing\LandingFAQs.vue |
 | apps\web\app\components\landing\LandingFeatureBadges.vue |
 | apps\web\app\components\landing\LandingFeatureCard.vue |

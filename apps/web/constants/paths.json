@@ -292,6 +292,7 @@
   "apps/web/app/components/landing/LandingAvatars.vue",
   "apps/web/app/components/landing/LandingCTA.vue",
   "apps/web/app/components/landing/LandingComparisonTable.vue",
+  "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
   "apps/web/app/components/landing/LandingFAQs.vue",
   "apps/web/app/components/landing/LandingFeatureBadges.vue",
   "apps/web/app/components/landing/LandingFeatureCard.vue",

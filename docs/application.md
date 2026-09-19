@@ -158,6 +158,7 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Componentes | apps/web/app/components/landing/LandingAvatars.vue | — |
 | Componentes | apps/web/app/components/landing/LandingComparisonTable.vue | FeatureItem, getCategoryItems, getCategoryCount |
 | Componentes | apps/web/app/components/landing/LandingCTA.vue | — |
+| Componentes | apps/web/app/components/landing/LandingDatabaseArchitecture.vue | getTablesList |
 | Componentes | apps/web/app/components/landing/LandingFAQs.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFeatureBadges.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFeatureCard.vue | Subfeature |
@@ -258,5 +259,4 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Outras fontes | layers/billing/layer.manifest.ts | — |
 | Outras fontes | layers/billing/nuxt.config.ts | — |
 | Rotas e APIs | layers/billing/server/api/webhooks/paddle.post.ts | dispatch, mapPaddleStatus |
-| Rotas e APIs | layers/billing/server/api/webhooks/stripe.post.ts | dispatch |
 <!-- specsfy:documentator:end -->

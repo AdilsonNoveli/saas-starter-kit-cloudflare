@@ -6,6 +6,7 @@
     <LandingComparisonTable />
     <LandingFolderStructure />
     <LandingFeatureBadges />
+    <LandingDatabaseArchitecture />
     <LandingFAQs
       :title="t('landing.faqs.homeTitle')"
       :subtitle="t('landing.faqs.homeSubtitle')"

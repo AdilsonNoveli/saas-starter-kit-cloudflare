@@ -559,6 +559,101 @@
     "avatars": {
       "validated": "Early access com mais de 40 devs testando no Discord & GitHub"
     },
+    "databaseArchitecture": {
+      "badge": "Motor Relacional Enterprise",
+      "title": "20 Tabelas Auditadas no PostgreSQL. Governança Total de Tenants.",
+      "subtitle": "Nada de esquemas frágeis sem tipagem ou migrações caóticas. O Nuxfire entrega um banco PostgreSQL relacional estrito rodando sobre pooling Cloudflare Hyperdrive, com console de Platform Admin completa para gerenciar todas as empresas.",
+      "metrics": {
+        "tables": {
+          "value": "20",
+          "label": "Tabelas Auditadas",
+          "description": "Zero dados desestruturados. Tipagem estrita de ponta a ponta com Drizzle ORM."
+        },
+        "hyperdrive": {
+          "value": "<10ms",
+          "label": "Cloudflare Hyperdrive",
+          "description": "Pooling global de conexões na borda com zero esgotamento de conexões."
+        },
+        "encryption": {
+          "value": "AES-GCM",
+          "label": "Criptografia em Repouso",
+          "description": "Sementes TOTP e segredos protegidos por algoritmos autenticados."
+        },
+        "kvAuth": {
+          "value": "Zero-DB",
+          "label": "Auth no Cloudflare KV",
+          "description": "Senhas e sessões no KV, liberando o PostgreSQL exclusivamente para sua aplicação."
+        }
+      },
+      "adminConsole": {
+        "badge": "Console de Platform Admin (/admin)",
+        "title": "Controle Absoluto sobre Todas as Empresas & Tenants",
+        "description": "Escale com a segurança que grandes empresas exigem. A área de Platform Admin opera acima do RBAC dos tenants, concedendo aos donos do SaaS visibilidade e controle total sobre cada empresa cadastrada.",
+        "features": {
+          "1": {
+            "title": "Métricas em Tempo Real entre Tenants",
+            "description": "Consultas analíticas agrupadas que calculam membros, plano ativo e filas de cada empresa em uma única query otimizada."
+          },
+          "2": {
+            "title": "Suspensão de Empresas em 1 Clique",
+            "description": "Suspenda ou reative qualquer empresa instantaneamente sem tocar no banco. Tenants suspensos são bloqueados na camada de middleware."
+          },
+          "3": {
+            "title": "Trilha de Auditoria Imutável",
+            "description": "Toda ação administrativa é gravada no AuditLog (append-only) com identificador do operador, endereço IP e metadados JSON."
+          },
+          "4": {
+            "title": "MFA por Hardware & Sessões Elevadas",
+            "description": "O acesso a /admin exige MFA obrigatório por TOTP e sessão elevada com expiração automática de 30 minutos."
+          }
+        },
+        "mockup": {
+          "heading": "Platform Admin • Governança de Empresas",
+          "subheading": "Controle em tempo real de tenants & telemetria agregada",
+          "colCompany": "Empresa",
+          "colPlan": "Plano Ativo",
+          "colMembers": "Membros",
+          "colStatus": "Status do Tenant",
+          "colAction": "Ação do Operador",
+          "statusActive": "ATIVO",
+          "statusSuspended": "SUSPENSO",
+          "btnSuspend": "Suspender",
+          "btnReactivate": "Reativar"
+        }
+      },
+      "domainsTitle": "Arquitetura de Domínios Auditada",
+      "domainsSubtitle": "Cada tabela possui finalidade comprovada no código, chaves estrangeiras rigorosas e relações Drizzle tipadas.",
+      "domains": {
+        "tenancy": {
+          "title": "Multi-Tenancy & RBAC Granular",
+          "description": "Isolamento estrito entre workspaces com limites por assento, convites tokenizados por e-mail e papéis de permissão customizáveis.",
+          "tables": "Team, TeamMembership, TeamInvite, Role, Permission",
+          "tag": "layers/teams"
+        },
+        "billing": {
+          "title": "Monetização & Catálogo de Planos",
+          "description": "Assinaturas multi-tier para Stripe e Paddle, catálogo de planos, cotas em JSONB e ledger de idempotência contra webhooks repetidos.",
+          "tables": "Plan, Subscription, Benefit, BenefitsOnPlan",
+          "tag": "layers/billing"
+        },
+        "governance": {
+          "title": "Autoridade da Plataforma & Auditoria",
+          "description": "Papéis independentes de operador (SUPER_ADMIN, SUPPORT) com trilha de auditoria append-only imune à deleção de usuários.",
+          "tables": "PlatformAdmin, AuditLog",
+          "tag": "layers/admin"
+        },
+        "jobs": {
+          "title": "Filas Assíncronas & Resiliência Edge",
+          "description": "Processamento em background com backoff exponencial, logs detalhados e reprocessamento de mensagens da DLQ pela console.",
+          "tables": "Job, Log, DeadLetterRecord, Notification, User",
+          "tag": "core & workers"
+        }
+      },
+      "summaryCallout": {
+        "lead": "Projetado para ambientes corporativos de alto tráfego — ",
+        "tail": "comece com uma arquitetura de dados relacional que nunca precisará ser reescrita quando o seu SaaS escalar."
+      }
+    },
     "faqs": {
       "title": "Suas dúvidas, respondidas",
       "subtitle": "Tudo o que você precisa saber sobre o nosso SaaS",

@@ -559,6 +559,101 @@
     "avatars": {
       "validated": "Early access with 40+ devs testing on Discord & GitHub"
     },
+    "databaseArchitecture": {
+      "badge": "Enterprise Relational Engine",
+      "title": "20 Audited PostgreSQL Tables. Total Multi-Tenant Governance.",
+      "subtitle": "No brittle Schemaless setups or chaotic migrations. Nuxfire delivers a strict, audited PostgreSQL database running on Cloudflare Hyperdrive connection pooling, with complete Platform Admin control over all customer companies.",
+      "metrics": {
+        "tables": {
+          "value": "20",
+          "label": "Audited Tables",
+          "description": "Zero unstructured bloat. Full Drizzle ORM typing from SQL to Vue."
+        },
+        "hyperdrive": {
+          "value": "<10ms",
+          "label": "Cloudflare Hyperdrive",
+          "description": "Global edge connection pooling with zero connection exhaustion."
+        },
+        "encryption": {
+          "value": "AES-GCM",
+          "label": "Encrypted at Rest",
+          "description": "MFA TOTP seeds and secrets encrypted with authenticated ciphers."
+        },
+        "kvAuth": {
+          "value": "Zero-DB",
+          "label": "Cloudflare KV Auth",
+          "description": "Passwords and sessions live in KV, leaving Postgres dedicated to your app."
+        }
+      },
+      "adminConsole": {
+        "badge": "Platform Admin Console (/admin)",
+        "title": "Complete Command Over Every Company & Tenant",
+        "description": "Scale with enterprise confidence. The built-in Platform Admin area operates with elevated authority above individual tenant RBAC, giving platform owners total visibility and control over all customer companies.",
+        "features": {
+          "1": {
+            "title": "Live Cross-Tenant Metrics",
+            "description": "Aggregated real-time queries count members, active plans, and background queues for each company in a single efficient query."
+          },
+          "2": {
+            "title": "1-Click Tenant Suspension",
+            "description": "Instantly suspend or reactivate any company without touching the database. Suspended tenants are barred immediately at the middleware layer."
+          },
+          "3": {
+            "title": "Immutable Audit Trail",
+            "description": "Every operator action is permanently written to append-only AuditLog records with actor ID, IP address, and JSON metadata."
+          },
+          "4": {
+            "title": "Hardware MFA & Elevated Sessions",
+            "description": "Accessing /admin requires mandatory TOTP multi-factor authentication with 30-minute auto-expiring elevated sessions."
+          }
+        },
+        "mockup": {
+          "heading": "Platform Admin • Company Governance",
+          "subheading": "Real-time tenant control & aggregated telemetry",
+          "colCompany": "Company",
+          "colPlan": "Active Plan",
+          "colMembers": "Members",
+          "colStatus": "Tenant Status",
+          "colAction": "Operator Action",
+          "statusActive": "ACTIVE",
+          "statusSuspended": "SUSPENDED",
+          "btnSuspend": "Suspend",
+          "btnReactivate": "Reactivate"
+        }
+      },
+      "domainsTitle": "Audited Domain Architecture",
+      "domainsSubtitle": "Every table has a verified purpose in our codebase, strict foreign key constraints, and dedicated Drizzle relations.",
+      "domains": {
+        "tenancy": {
+          "title": "Multi-Tenancy & Granular RBAC",
+          "description": "Strict workspace isolation with per-seat billing enforcement, team tokenized invites, and custom role permissions.",
+          "tables": "Team, TeamMembership, TeamInvite, Role, Permission",
+          "tag": "layers/teams"
+        },
+        "billing": {
+          "title": "Monetization & Plans Catalog",
+          "description": "Multi-tier subscriptions supporting Stripe and Paddle, product catalogs, entitlement limits, and ledger idempotency.",
+          "tables": "Plan, Subscription, Benefit, BenefitsOnPlan",
+          "tag": "layers/billing"
+        },
+        "governance": {
+          "title": "Platform Authority & Audit",
+          "description": "Independent operator roles (SUPER_ADMIN, SUPPORT) with append-only audit trail surviving user deletions.",
+          "tables": "PlatformAdmin, AuditLog",
+          "tag": "layers/admin"
+        },
+        "jobs": {
+          "title": "Async Jobs & Edge Resilience",
+          "description": "Background queues with exponential backoff, execution logs, and dead-letter replay directly from the admin UI.",
+          "tables": "Job, Log, DeadLetterRecord, Notification, User",
+          "tag": "core & workers"
+        }
+      },
+      "summaryCallout": {
+        "lead": "Engineered for high-volume enterprise production — ",
+        "tail": "start with a bulletproof database schema that will never need a painful rewrite when you reach millions of requests."
+      }
+    },
     "faqs": {
       "title": "Your Questions, Answered",
       "subtitle": "Everything you need to know about our SaaS",

@@ -125,6 +125,12 @@
       "promptLabel": "How you prompt in your IDE:",
       "examplesLabel": "Artifacts & Highlights:",
       "superpowerLabel": "Step guarantee:",
+      "seniorPersona": {
+        "badge": "Fireskills Engine • Your Senior Engineer",
+        "title": "A Multi-Skilled Senior Engineer Ready to Work Inside Your IDE",
+        "description": "Fireskills is Nuxfire's robust, fail-safe builder. Powered by 34 verified domain specialists, it acts as a tireless Senior Software Engineer: transforming raw ideas into normative BDD contracts, requiring automated tests that fail before coding (TDD), and implementing features across Nuxt 4, SST, Drizzle, and Cloudflare with zero hallucinations and architectural rigor.",
+        "cta": "Explore the 6 steps below and be surprised by how simple and fast it is:"
+      },
       "items": {
         "b2b": {
           "category": "Step 01 • Ideation",

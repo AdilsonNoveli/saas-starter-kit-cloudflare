@@ -106,6 +106,10 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "TYPESAFE_API_KEY": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "USER_MFA_ENCRYPTION_KEY": {
       "type": "sst.sst.Secret"
       "value": string

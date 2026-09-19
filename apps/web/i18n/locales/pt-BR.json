@@ -125,6 +125,12 @@
       "promptLabel": "Como você comanda na IDE:",
       "examplesLabel": "Evidências & Destaques:",
       "superpowerLabel": "Garantia do passo:",
+      "seniorPersona": {
+        "badge": "Fireskills Engine • Seu Engenheiro Sênior",
+        "title": "Um Engenheiro Sênior multi-habilidoso pronto para codificar dentro da sua IDE",
+        "description": "O Fireskills é o construtor anti-falhas do Nuxfire. Composto por 34 especialistas técnicos verificados, ele opera como um Engenheiro Sênior incansável: transforma ideias brutas em contratos BDD normativos, exige testes automatizados que falham antes do código (TDD) e implementa features em Nuxt 4, SST, Drizzle e Cloudflare com zero alucinações e total robustez arquitetural.",
+        "cta": "Veja os 6 passos abaixo e surpreenda-se com a facilidade e velocidade:"
+      },
       "items": {
         "b2b": {
           "category": "Passo 01 • Ideação",

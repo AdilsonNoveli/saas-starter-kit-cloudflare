@@ -16,9 +16,35 @@
           {{ $t("landing.useCases.title") }}
         </h2>
 
-        <p class="text-muted text-base sm:text-lg lg:text-xl font-normal leading-relaxed">
+        <p class="text-muted text-base sm:text-lg lg:text-xl font-normal leading-relaxed mb-8">
           {{ $t("landing.useCases.subtitle") }}
         </p>
+
+        <!-- Fireskills Senior Engineer Persona Card / Highlight -->
+        <div class="p-6 rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 via-elevated to-elevated dark:from-emerald-950/30 dark:via-night-900/60 dark:to-night-950 text-left shadow-lg shadow-emerald-500/5">
+          <div class="flex flex-col sm:flex-row items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
+              <UIcon name="i-lucide-shield-check" class="w-6 h-6 text-emerald-500" />
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2 flex-wrap">
+                <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
+                  {{ $t("landing.useCases.seniorPersona.badge") }}
+                </span>
+                <h3 class="text-base sm:text-lg font-bold text-highlighted">
+                  {{ $t("landing.useCases.seniorPersona.title") }}
+                </h3>
+              </div>
+              <p class="text-xs sm:text-sm text-muted leading-relaxed mb-4">
+                {{ $t("landing.useCases.seniorPersona.description") }}
+              </p>
+              <div class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                <UIcon name="i-lucide-sparkles" class="w-4 h-4 shrink-0" />
+                <span>{{ $t("landing.useCases.seniorPersona.cta") }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Grid of 6 SaaS Engineering Process Steps -->
@@ -29,7 +55,7 @@
           class="flex flex-col justify-between rounded-xl border border-default bg-elevated p-6 sm:p-7 hover:border-accented transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/5 group"
         >
           <div>
-            <!-- Top: Icon & Step Badge -->
+            <!-- Top: Icon & Step Badge (same height h-12) -->
             <div class="flex items-center justify-between gap-4 mb-4">
               <div
                 class="w-12 h-12 rounded-lg flex items-center justify-center border transition-colors shrink-0"
@@ -37,7 +63,7 @@
               >
                 <UIcon :name="useCase.icon" class="w-6 h-6" :class="useCase.iconClass" />
               </div>
-              <span class="text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold px-2.5 py-1 rounded bg-muted border border-default text-toned">
+              <span class="h-12 px-3.5 sm:px-4 rounded-lg flex items-center justify-center text-xs sm:text-sm font-mono uppercase tracking-wider font-bold bg-muted/80 dark:bg-night-950/80 border border-default text-highlighted shrink-0 shadow-xs">
                 {{ t(`landing.useCases.items.${useCase.id}.category`) }}
               </span>
             </div>

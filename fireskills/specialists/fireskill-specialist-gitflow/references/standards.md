@@ -1,64 +1,51 @@
-# Padrões e referências para Gitflow
+# Gitflow Standards and References
 
-## Mapa de branches
+## Branch Topology Map
 
-| Branch       | Origem              | Destino no merge      | Vida útil                          |
-| ------------ | ------------------- | ---------------------- | ----------------------------------- |
-| `main`       | —                    | —                       | Permanente; sempre reflete produção |
-| `develop`    | `main` (uma vez)     | —                       | Permanente; integração contínua     |
-| `feature/*`  | `develop`            | `develop`               | Curta; uma feature por branch       |
-| `release/*`  | `develop`            | `main` e `develop`      | Curta; só correção e preparação     |
-| `hotfix/*`   | `main`               | `main` e `develop`      | Curta; correção urgente em produção |
-| `support/*`  | `main` (tag antiga)  | conforme decisão local  | Longa; manutenção de versão anterior|
+| Branch | Origin | Merge Target | Lifecycle |
+| --- | --- | --- | --- |
+| `main` | — | — | Permanent; mirrors production releases |
+| `develop` | `main` (initial) | — | Permanent; integration branch |
+| `feature/*` | `develop` | `develop` | Short-lived; one feature per branch |
+| `release/*` | `develop` | `main` and `develop` | Short-lived; release hardening and version bumps |
+| `hotfix/*` | `main` | `main` and `develop` | Short-lived; urgent production patches |
+| `support/*` | `main` (legacy tag) | per local policy | Long-lived; legacy major version maintenance |
 
-## Equivalência `git flow` (AVH) → Git puro
+## `git flow` (AVH) CLI to Pure Git Commands
 
-O binário `git flow` automatiza os mesmos comandos Git; usar Git puro é
-equivalente e não exige a extensão instalada:
+Pure Git commands achieve identical results without requiring custom binary extensions:
 
-- `git flow feature start <nome>` ≡
-  `git checkout -b feature/<nome> develop`
-- `git flow feature finish <nome>` ≡
-  `git checkout develop && git merge --no-ff feature/<nome> && git branch -d feature/<nome>`
-- `git flow release start <versao>` ≡
-  `git checkout -b release/<versao> develop`
-- `git flow release finish <versao>` ≡
-  `git checkout main && git merge --no-ff release/<versao> && git tag -a <versao> && git checkout develop && git merge --no-ff release/<versao> && git branch -d release/<versao>`
-- `git flow hotfix start <versao>` ≡
-  `git checkout -b hotfix/<versao> main`
-- `git flow hotfix finish <versao>` ≡
-  `git checkout main && git merge --no-ff hotfix/<versao> && git tag -a <versao> && git checkout develop && git merge --no-ff hotfix/<versao> && git branch -d hotfix/<versao>`
+- `git flow feature start <name>` ≡
+  `git checkout -b feature/<name> develop`
+- `git flow feature finish <name>` ≡
+  `git checkout develop && git merge --no-ff feature/<name> && git branch -d feature/<name>`
+- `git flow release start <version>` ≡
+  `git checkout -b release/<version> develop`
+- `git flow release finish <version>` ≡
+  `git checkout main && git merge --no-ff release/<version> && git tag -a <version> && git checkout develop && git merge --no-ff release/<version> && git branch -d release/<version>`
+- `git flow hotfix start <version>` ≡
+  `git checkout -b hotfix/<version> main`
+- `git flow hotfix finish <version>` ≡
+  `git checkout main && git merge --no-ff hotfix/<version> && git tag -a <version> && git checkout develop && git merge --no-ff hotfix/<version> && git branch -d hotfix/<version>`
 
-## Sinais de que o projeto já declarou Gitflow
+## Detecting Project Gitflow Adoption
 
-- `git config --get-regexp '^gitflow\.'` retorna as chaves de prefixo
-  (`gitflow.prefix.feature`, `.release`, `.hotfix`, `.branch.master`,
-  `.branch.develop`) gravadas pela extensão `git flow init`.
-- `.fireskills/RULES.md`, `AGENTS.md`, `CLAUDE.md` ou `CONTRIBUTING.md`
-  descrevem explicitamente o fluxo `main`/`develop`/`feature`/`release`/
-  `hotfix`.
-- Nenhum desses sinais substitui o pedido direto da pessoa; na ausência de
-  configuração ou instrução explícita, não presuma Gitflow.
+- `git config --get-regexp '^gitflow\.'` returns keys recorded by `git flow init`.
+- `.fireskills/RULES.md`, `AGENTS.md`, or `CONTRIBUTING.md` explicitly mandate Gitflow.
+- Never assume Gitflow in the absence of explicit configuration or direct user instructions.
 
-## Por que Gitflow nem sempre é a escolha certa
+## When Not to Use Gitflow
 
-Vincent Driessen, autor do modelo original, publicou em 2020 uma nota no
-próprio repositório reconhecendo que Gitflow foi desenhado para um cenário de
-releases versionadas e espaçadas, e que projetos com entrega contínua
-tendem a se beneficiar mais de um modelo mais simples (trunk-based ou GitHub
-Flow). Proponha a alternativa quando o projeto fizer múltiplos deploys por
-dia; não insista em Gitflow como padrão universal.
+In 2020, Vincent Driessen (author of the original model) acknowledged that Gitflow
+was designed for traditional multi-version software products. Web applications
+with continuous delivery benefit far more from streamlined Trunk-Based Development
+or GitHub Flow. Propose simpler alternatives when deployments occur multiple times a day.
 
-## Fontes oficiais
+## Authoritative Documentation
 
-- Modelo original (Vincent Driessen, "A successful Git branching model"):
-  https://nvie.com/posts/a-successful-git-branching-model/
-- Repositório e extensão `git-flow` (AVH Edition), incluindo a nota de 2020
-  sobre quando não usar Gitflow:
-  https://github.com/petervanderdoes/gitflow-avh
-- git-merge (`--no-ff`): https://git-scm.com/docs/git-merge
-- git-tag: https://git-scm.com/docs/git-tag
-- Pro Git — Branching Workflows (Gitflow):
-  https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows
-- Semantic Versioning (para a tag de `release`/`hotfix`):
-  https://semver.org/
+- Original Model (Vincent Driessen): https://nvie.com/posts/a-successful-git-branching-model/
+- Gitflow AVH Edition: https://github.com/petervanderdoes/gitflow-avh
+- git-merge documentation (`--no-ff`): https://git-scm.com/docs/git-merge
+- git-tag documentation: https://git-scm.com/docs/git-tag
+- Pro Git Book (Branching Workflows): https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows
+- Semantic Versioning: https://semver.org/

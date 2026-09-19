@@ -1,103 +1,94 @@
 ---
 name: fireskill-specialist-technical-research
-description: Investigar questões técnicas em fontes primárias, código-fonte, padrões e experimentos reproduzíveis, produzindo síntese rastreável com fato, inferência e lacuna separados. Use quando uma decisão depende de comportamento real de API, comparação de tecnologias ou fato tecnicamente incerto; salve a pesquisa somente no local autorizado pela spec do projeto consumidor, nunca em `research.md` paralelo.
+description: "Investigate technical questions in primary sources, source code, standards, and reproducible experiments, producing traceable syntheses separating facts, inferences, and knowledge gaps. Use when a decision depends on real API behavior, technology comparisons, or technically uncertain facts; save research solely in locations authorized by the consuming project's spec, never in a parallel `research.md`."
 ---
 
-# Pesquisa técnica
+# Technical Research
 
-## Quando usar
+## When to Use
 
-- Acionar quando uma decisão de arquitetura, biblioteca ou abordagem
-  depende de um fato técnico que ninguém confirmou com fonte primária.
-- Acionar também para comparar alternativas antes de uma decisão cara de
-  reverter, ou para verificar se um comportamento assumido ainda é válido
-  na versão atual de uma dependência.
-- Não acionar para reconfirmar uma escolha já decidida só para produzir
-  justificativa — isso é viés de confirmação, não pesquisa.
-- Combinar com `$fireskill-specialist-software-architecture` quando a pesquisa
-  embasar diretamente uma decisão estrutural registrável em ADR.
+- Trigger when an architectural, library, or engineering approach decision
+  depends on a technical fact nobody has verified with primary sources.
+- Also trigger to compare concrete alternatives before an expensive-to-reverse
+  decision, or to confirm whether an assumed behavior remains valid in the current
+  dependency version.
+- Do not trigger to re-confirm an already decided choice merely to construct a
+  post-hoc justification — that is confirmation bias, not technical research.
+- Combine with `$fireskill-specialist-software-architecture` when research directly
+  grounds a structural decision documented in an ADR.
 
-## Fluxo
+## Workflow
 
-1. Formular a pergunta específica, a decisão que ela vai suportar, o escopo
-   e a recência necessária (comportamento de hoje, ou histórico é
-   suficiente?).
-2. Definir de antemão que evidência confirmaria ou refutaria cada
-   alternativa — sem isso, qualquer resultado parece confirmar a hipótese
-   inicial.
-3. Priorizar, nesta ordem: especificação/standard, documentação oficial
-   versionada, código-fonte e changelog oficiais, experimento reproduzível
-   no ambiente alvo, e só então fonte secundária.
-4. Verificar versão, data de publicação e aplicabilidade ao ambiente real
-   observado no projeto — um comportamento documentado para outra versão
-   não é evidência para a versão em uso.
-5. Triangular toda afirmação crítica para a decisão com uma segunda fonte
-   independente, e executar experimento controlado quando a documentação
-   não resolver a dúvida.
-6. Separar explicitamente fatos confirmados, inferências (prováveis mas não
-   confirmadas), riscos e lacunas que permanecem sem evidência.
-7. Sintetizar com links diretos à fonte, próximos à afirmação específica que
-   sustentam, e a implicação concreta para a decisão em jogo.
+1. Formulate the specific question, the decision it informs, the scope, and required
+   recency (current behavior vs. historical versions).
+2. Define beforehand what evidence would confirm or refute each alternative — without
+   this, any finding appears to confirm the initial bias.
+3. Prioritize in order: specifications/standards, versioned official documentation,
+   official source code and changelogs, reproducible experiments in the target
+   runtime environment, and only then secondary sources.
+4. Verify version, release date, and direct applicability to the observed project
+   runtime — behavior documented for another version is not valid evidence for the
+   version in use.
+5. Triangulate all mission-critical claims with an independent secondary source,
+   and run controlled experiments when documentation remains ambiguous.
+6. Explicitly separate confirmed facts, inferences (probable but unproven), risks,
+   and residual knowledge gaps lacking evidence.
+7. Synthesize findings with direct links to sources adjacent to the specific claims
+   they support, noting concrete implications for the decision.
 
-## Padrões
+## Patterns
 
-- Não usar snippet de fórum, blog pessoal ou resposta de IA genérica como
-  autoridade sobre comportamento de API quando existe fonte primária
-  acessível — usar como pista para onde procurar a fonte primária, não como
-  citação final.
-- Citar a página e a seção específica da fonte próxima da afirmação, não um
-  link genérico para a home da documentação.
-- Sintetizar preservando o contexto necessário para a decisão; evitar
-  transcrição extensa que apenas desloca o trabalho de leitura para depois.
-- Registrar versão e data de qualquer fonte cujo comportamento pode mudar
-  entre releases — sem isso, a conclusão expira silenciosamente.
-- Quando duas fontes conflitam, declarar o conflito explicitamente em vez de
-  escolher uma silenciosamente sem justificar por que ela prevalece.
-- Não criar um `research.md` paralelo à fonte normativa do projeto; a
-  pesquisa é indexada e vive no local que a spec do projeto consumidor
-  define.
-- Tratar benchmark publicado por fornecedor da própria tecnologia como
-  evidência interessada — útil como ponto de partida, nunca como conclusão
-  final sem reprodução independente.
+- Never cite forum posts, personal blogs, or generic AI summaries as authoritative
+  proof of API behavior when primary sources exist — use them as clues for where
+  to locate the primary source, not as concluding citations.
+- Cite specific page anchors or sections of the source adjacent to the claim,
+  avoiding generic links to documentation homepages.
+- Synthesize while preserving necessary decision context; avoid extensive copy-pasting
+  that merely shifts reading overhead to the reader.
+- Record the exact version and publication date of any source whose behavior may
+  evolve across releases — without this, conclusions silently expire.
+- When two authoritative sources conflict, declare the discrepancy explicitly
+  rather than silently selecting one without justifying why it prevails.
+- Do not create a rogue `research.md` outside project spec boundaries; research is
+  indexed and resides strictly where the consumer project spec designates.
+- Treat vendor-published benchmarks as interested evidence — useful as hypotheses,
+  never as conclusions without independent reproduction.
 
-## Antipadrões
+## Anti-Patterns
 
-- Pesquisar depois de já ter decidido, buscando apenas confirmação — a
-  pergunta formulada no passo 1 já nasce enviesada ("por que X é melhor",
-  em vez de "X ou Y, e sob que critério").
-- Citar "a documentação diz" sem link nem versão — torna a afirmação
-  impossível de reverificar quando o comportamento mudar.
-- Copiar benchmark de marketing de um fornecedor como se fosse medição
-  neutra do ambiente do projeto.
-- Resolver uma pergunta com múltiplas fontes conflitantes escolhendo a que
-  confirma a preferência inicial, sem registrar que havia conflito.
+- Researching after already deciding, seeking only confirmation — the question
+  in step 1 is biased from inception ("why is X better" instead of "X vs Y, and under what criteria").
+- Citing "the docs state" without a link or version — leaves the claim impossible
+  to reverify when behavior shifts.
+- Copying vendor marketing benchmarks as if they were neutral measurements in the
+  project's environment.
+- Resolving conflicting sources by picking the one conforming to initial preferences
+  without documenting that a conflict existed.
 
-## Validação
+## Validation
 
-- Cada conclusão que sustenta a decisão tem evidência direta e rastreável
-  (link + versão + data), não apenas afirmação de memória.
-- As fontes usadas correspondem à versão e ao runtime real do projeto
-  consumidor, não a uma versão genérica ou desatualizada.
-- Experimentos executados são reproduzíveis por outra pessoa e não alteram
-  produção nem dado real.
-- Lacunas e incerteza residual estão explícitas na síntese final, não
-  escondidas atrás de uma conclusão mais confiante do que a evidência
-  permite.
-- Não apresentar uma hipótese não triangulada como fato — linguagem que
-  implica certeza sem a evidência correspondente é proibida.
+- Every conclusion informing a decision has direct, traceable evidence (link + version
+  + date), not memory recall.
+- Consulted sources match the exact version and runtime environment of the consuming
+  project, not outdated or generic runtimes.
+- Executed experiments are reproducible by peers and never mutate production systems
+  or real user data.
+- Gaps and residual uncertainty are explicit in the final synthesis, not hidden behind
+  unearned confidence.
+- Never present an untriangulated inference as fact — language implying certainty
+  without corresponding evidence is forbidden.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-domain-modeling` usa fontes externas para alinhar
-  conceitos sem substituir o vocabulário validado do domínio.
-- `$fireskill-specialist-prototyping` transforma incerteza técnica em experimento
-  descartável com hipótese e critério de parada.
-- `$fireskill-specialist-software-architecture` quando a pesquisa embasar uma
-  decisão estrutural registrável em ADR.
-- `$fireskill-specialist-debugging` quando a "pesquisa" for, na verdade,
-  investigar por que um comportamento observado diverge do documentado —
-  nesse caso o diagnóstico de causa raiz é o objetivo, não a comparação de
-  alternativas.
+- `$fireskill-specialist-domain-modeling` uses external sources to align concepts
+  without replacing the project's validated domain vocabulary.
+- `$fireskill-specialist-prototyping` transforms technical uncertainty into disposable
+  spikes with explicit hypotheses and stopping conditions.
+- `$fireskill-specialist-software-architecture` when research grounds structural
+  decisions recorded in ADRs.
+- `$fireskill-specialist-debugging` when "research" is actually investigating why
+  observed runtime behavior diverges from documented behavior — in that case, root
+  cause diagnosis is the objective, not technology comparison.
 
-Leia [references/standards.md](references/standards.md) para a hierarquia de
-fontes, a matriz de avaliação de evidência e o formato de síntese.
+Read [references/standards.md](references/standards.md) for the source hierarchy,
+evidence evaluation matrix, and synthesis format.

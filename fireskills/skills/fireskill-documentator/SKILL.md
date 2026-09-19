@@ -1,83 +1,69 @@
 ---
 name: fireskill-documentator
-description: Construir a documentação técnica em docs/ e o inventário de pacotes npm/Bun em .fireskills/PACKAGES.md. Use ao documentar sistemas ou após implementações.
+description: Build technical documentation in docs/ and the npm/Bun package inventory in .fireskills/PACKAGES.md. Use when documenting systems or following implementations.
 ---
 
-# Documentar o sistema
+# Document the System
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project root.
+On automatic handoff, reload it before this step.
+Reuse the root confirmed in conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `sem perguntas`.
-Não formule perguntas nesta skill. Registre como não identificado todo dado
-que as fontes executáveis não sustentarem.
+Interaction mode: `no questions`.
+Do not formulate questions in this skill. Document as unidentified any data not supported by executable sources.
 
-1. Ler instruções locais, `.fireskills/PROJECT.md`, `.fireskills/STACK.md`,
+1. Read local instructions, `.fireskills/PROJECT.md`, `.fireskills/STACK.md`,
    `.fireskills/RULES.md`, `.fireskills/DATABASE.md`, manifests, lockfiles,
-   metadados instalados e código existente.
-2. Ler [o padrão documental](references/documentation-standard.md) antes de
-   alterar a topologia publicada.
-3. Construir toda a documentação e `.fireskills/PACKAGES.md`, mesmo quando a
-   skill for acionada sem uma spec ou implementação recente:
+   installed package metadata, and existing codebase.
+2. Read [documentation standard](references/documentation-standard.md) before modifying published topology.
+3. Build all documentation and `.fireskills/PACKAGES.md`, even when invoked without a recent spec or implementation:
 
    ```bash
-   node scripts/build_documentation.mjs --project <raiz>
+   node scripts/build_documentation.mjs --project <root>
    ```
 
-4. Inspecionar os arquivos gerados e corrigir manualmente somente inferências
-   que o código não sustente. Não inventar decisões, relações ou integrações.
-5. Executar `--check` para provar que a documentação representa o estado atual:
+4. Inspect generated files and manually adjust only inferences that code does not support. Never fabricate decisions, relationships, or integrations.
+5. Execute `--check` to verify documentation reflects current system state:
 
    ```bash
-   node scripts/build_documentation.mjs --project <raiz> --check
+   node scripts/build_documentation.mjs --project <root> --check
    ```
 
-6. Preservar conteúdo humano fora dos blocos `specsfy:documentator`, inclusive
-   em `.fireskills/PACKAGES.md`. Tratar o bloco como projeção reconstruível das
-   fontes locais.
-7. Registrar na evidência da tarefa o comando, resultado e arquivos atualizados.
+6. Preserve human prose outside `specsfy:documentator` blocks, including in `.fireskills/PACKAGES.md`. Treat the block as a reproducible projection of local sources.
+7. Record command, outcome, and modified files in task evidence.
 
-## Cobertura obrigatória
+## Mandatory Coverage
 
-Manter em `docs/`:
+Maintain in `docs/`:
 
-- portal e roteiro de leitura;
-- arquitetura, componentes e UML em Mermaid;
-- inventário da aplicação e implementações existentes;
-- banco e entidades com `erDiagram`;
-- fluxos com `flowchart` e `sequenceDiagram`;
-- guia e resumo dos testes;
-- frontend, páginas, componentes Vue, `@nuxt/ui` e Tailwind;
-- bibliotecas e pacotes nativos, de framework, integrados e terceiros, com
-  versão, fonte e referência GitHub;
-- integrações e variáveis de configuração sem valores sensíveis;
-- decisões explícitas e suas fontes.
+- Readme portal and reading roadmap;
+- Architecture, components, and Mermaid UML diagrams;
+- Application inventory and existing implementations;
+- Database schemas and entities with `erDiagram`;
+- Control flows with `flowchart` and `sequenceDiagram`;
+- Testing guide and test suite summary;
+- Frontend surfaces, pages, Vue components, `@nuxt/ui`, and Tailwind;
+- Libraries and packages (native, framework, internal, third-party) with versions, sources, and GitHub links;
+- Integrations and environment configuration variables without sensitive values;
+- Explicit architectural decisions and their provenance.
 
-Manter em `.fireskills/PACKAGES.md`:
+Maintain in `.fireskills/PACKAGES.md`:
 
-- todos os pacotes npm (Bun workspaces) encontrados nos manifests e lockfiles do
-  projeto, inclusive dependências transitivas registradas localmente;
-- gerenciador, escopo, nome, versão, finalidade curta e fonte de cada pacote;
-- descrição declarada no lockfile ou pacote instalado quando existir;
-- aviso explícito quando os metadados locais não comprovarem a finalidade.
+- All npm packages (Bun workspaces) found across project manifests and lockfiles, including locally recorded transitive dependencies;
+- Package manager, scope, name, version, short purpose, and origin repository;
+- Package description from lockfile or installed `package.json`;
+- Explicit warning when local metadata lacks purpose description.
 
-Para o Nuxfire (Nuxt/Vue), mapear páginas, layouts, middleware, rotas de servidor
-(`server/api`), routers tRPC, layers (`layers/*`), schema e migrações Drizzle,
-Workers (`apps/functions`), recursos SST (`infra/*.ts`), scripts e Vitest.
+For Nuxfire (Nuxt/Vue), map pages, layouts, middleware, server routes (`server/api`), tRPC routers, layers (`layers/*`), Drizzle schemas and migrations, Workers (`apps/functions`), SST resources (`infra/*.ts`), scripts, and Vitest.
 
-## Limites
+## Boundaries
 
-- Não copiar segredos, valores de `.env`, dados de produção ou código inteiro.
-- Não apresentar heurística como decisão confirmada.
-- Não substituir specs, `.fireskills/PROJECT.md` ou arquivos humanos em `.fireskills/`.
-  `PACKAGES.md` é a única projeção reconstruída pela skill nesse diretório e
-  preserva conteúdo fora do bloco gerado.
-- Não exigir rede para construir. Quando o repositório GitHub de um pacote não
-  estiver declarado localmente nem for conhecido, publicar uma busca GitHub
-  claramente rotulada, em vez de inventar uma URL.
+- Do not copy secrets, `.env` values, production datasets, or whole code dumps.
+- Do not present heuristics as confirmed decisions.
+- Do not overwrite specs, `.fireskills/PROJECT.md`, or human notes in `.fireskills/`.
+  `PACKAGES.md` is the sole projection rebuilt by this skill in that directory and preserves content outside generated blocks.
+- Do not require network access to build. When a package repository is unknown or undeclared locally, output a clearly labeled GitHub search link rather than inventing URLs.

@@ -1,1311 +1,1292 @@
-# MCR-10 — Método Categorial de Requisitos
+# MCR-10 — Categorial Requirements Method
 
-> Metodologia para conversar com usuários, analisar especificações e refinar histórias de usuário por meio das categorias de Aristóteles.
+> Methodology for engaging with users, analyzing specifications, and refining user stories through Aristotle's categories.
 
-**Versão:** 1.0
-**Data:** 24 de julho de 2026
-**Status:** referência estável
-**Público:** pessoas de produto, análise, design, engenharia e assistentes de IA
-**Idioma:** português brasileiro
+**Version:** 1.0  
+**Date:** July 24, 2026  
+**Status:** stable reference  
+**Audience:** product managers, analysts, designers, software engineers, and AI assistants  
+**Language:** English  
 
-“Referência estável” significa que estrutura, vocabulário e protocolo estão
-prontos para uso e versionamento. Não significa que a eficácia do método já foi
-demonstrada cientificamente; as hipóteses de validação estão na seção 20.
-
----
-
-## 1. Visão geral
-
-O **MCR-10 — Método Categorial de Requisitos** é uma metodologia de descoberta, análise e refinamento de requisitos inspirada nas *Categorias* de Aristóteles.
-
-Seu objetivo é transformar relatos incompletos, histórias de usuário, solicitações, transcrições e especificações preliminares em afirmações claras, rastreáveis e verificáveis.
-
-O método parte de uma distinção fundamental: palavras e expressões isoladas podem nomear atores, objetos, atributos ou ações, mas ainda não constituem uma especificação verificável. Para que uma afirmação possa ser confirmada, negada ou testada, é necessário combinar esses elementos de maneira precisa.
-
-O MCR-10 realiza essa passagem em três movimentos:
-
-1. **Decompor:** separar a narrativa em termos, conceitos e afirmações menores.
-2. **Categorizar:** analisar o conteúdo pelas dez categorias aristotélicas.
-3. **Recompor:** transformar os elementos em regras, fluxos, critérios de aceitação e cenários verificáveis.
-
-A metodologia pode ser usada por analistas, product managers, desenvolvedores, designers, equipes de produto ou assistentes de inteligência artificial.
-
-O método é uma adaptação contemporânea. As categorias oferecem lentes para
-examinar uma declaração; elas não substituem pesquisa com usuários, análise de
-valor, engenharia, segurança ou decisão humana.
+"Stable reference" denotes that structure, vocabulary, and protocol are
+ready for active use and versioning. It does not imply that empirical efficacy has
+been demonstrated scientifically; validation hypotheses reside in section 20.
 
 ---
 
-## 2. Objetivos
+## 1. Overview
 
-O MCR-10 foi criado para:
+The **MCR-10 — Categorial Requirements Method** is a methodology for discovery, analysis, and refinement of software requirements inspired by Aristotle's *Categories*.
 
-- reduzir ambiguidades antes que elas se transformem em comportamentos contraditórios;
-- revelar atores, entidades, atributos, relações, limites, contextos, estados, permissões, ações e efeitos;
-- ajudar o analista a formular perguntas relevantes sem transformar a conversa em um questionário mecânico;
-- separar o que o usuário declarou daquilo que foi inferido pelo analista ou pela inteligência artificial;
-- identificar decisões, hipóteses, conflitos e questões em aberto;
-- transformar intenções em afirmações que possam ser confirmadas ou refutadas;
-- produzir critérios de aceitação ligados às regras que lhes deram origem;
-- manter rastreabilidade entre a fala do usuário, as decisões tomadas e a especificação final.
+Its objective is to transform incomplete narratives, user stories, requests, transcripts, and preliminary specifications into clear, traceable, and verifiable assertions.
 
-O método não substitui a decisão do usuário. Sua função é tornar visível o que foi dito, o que está implícito, o que permanece ambíguo e o que ainda precisa ser decidido.
+The method departs from a fundamental distinction: isolated words and expressions may name actors, objects, attributes, or actions, but do not yet constitute a verifiable specification. For an assertion to be confirmed, negated, or tested, these components must be combined with precision.
+
+MCR-10 executes this progression through three movements:
+
+1. **Deconstruct:** break the narrative into smaller terms, concepts, and assertions.
+2. **Categorize:** analyze content across the ten Aristotelian categories.
+3. **Recompose:** transform elements into rules, flows, acceptance criteria, and verifiable test scenarios.
+
+The methodology can be used by analysts, product managers, developers, designers, product squads, or artificial intelligence assistants.
+
+The method is a contemporary adaptation. The categories provide analytical lenses to examine declarations; they never replace user research, value engineering, technical rigor, security controls, or human judgment.
 
 ---
 
-## 3. Limites da metodologia
+## 2. Objectives
 
-O MCR-10 não determina sozinho:
+MCR-10 was created to:
 
-- a prioridade de negócio;
-- a viabilidade técnica;
-- o valor comercial de uma funcionalidade;
-- a experiência ideal para o usuário;
-- a política de segurança de uma organização;
-- a solução arquitetural que deverá ser implementada.
+- reduce ambiguity before it transforms into conflicting system behaviors;
+- expose actors, entities, attributes, relations, bounds, contexts, states, permissions, actions, and side effects;
+- guide the analyst in formulating high-impact questions without turning the dialogue into a mechanical interrogation;
+- distinguish declared user statements from inferences made by the analyst or AI assistant;
+- identify decisions, working hypotheses, conflicts, and open questions;
+- transform intent into assertions that can be objectively confirmed or refuted;
+- produce acceptance criteria directly linked to originating business rules;
+- maintain traceability between user dialogue, recorded decisions, and final specifications.
 
-Também não exige que as dez categorias estejam presentes em toda história. Quando uma categoria não for relevante, ela deve ser marcada como **não aplicável**, acompanhada de uma justificativa curta.
+The method never replaces user decision-making. Its purpose is to render visible what was declared, what remains implicit, what is ambiguous, and what must still be decided.
 
-As categorias funcionam como lentes de investigação, e não como um formulário obrigatório.
+---
 
-### 3.1 Uso proporcional por fatia vertical
+## 3. Methodology Boundaries
 
-O rigor é constante, mas a profundidade varia com o risco:
+MCR-10 does not unilaterally determine:
 
-| Perfil | Uso recomendado | Profundidade mínima |
+- business priority;
+- technical feasibility;
+- commercial value of a feature;
+- optimal user experience design;
+- organizational security policy;
+- architectural solutions to implement.
+
+Nor does it require that all ten categories be present in every user story. When a category is irrelevant, it must be marked as **not applicable**, accompanied by a concise rationale.
+
+The categories function as investigative lenses, never as a rigid checklist.
+
+### 3.1 Proportional Use by Vertical Slice
+
+Rigor remains constant, but investigative depth varies with risk:
+
+| Profile | Recommended Use | Minimum Depth |
 |---|---|---|
-| Lite | correção pequena e reversível | finalidade, categorias críticas, uma afirmação e um cenário |
-| Standard | feature comum | matriz aplicável, vocabulário, regras, falhas e Gherkin |
-| Crítico | dinheiro, autorização, privacidade, irreversibilidade ou migração | matriz completa justificada, fontes, riscos, rollback e revisão humana |
+| Lite | small, reversible bug fix | core purpose, critical categories, one assertion, one test scenario |
+| Standard | typical feature | applicable matrix, vocabulary, rules, failure modes, Gherkin scenarios |
+| Critical | financial transactions, authorization, privacy, irreversible data, migrations | full justified matrix, sources, risks, rollback strategy, human sign-off |
 
-Nenhum perfil permite inventar respostas ou omitir uma questão P1. O perfil
-reduz documentação irrelevante, não a qualidade das decisões.
+No profile permits fabricating answers or omitting a P1 blocking question. The profile
+reduces irrelevant documentation overhead, never the quality of decisions.
 
 ---
 
-## 4. Fundamento conceitual
+## 4. Conceptual Foundations
 
-A metodologia parte de três conjuntos de distinções presentes nas *Categorias*
-e acrescenta lentes modernas explicitamente identificadas. Há debate acadêmico
-sobre se a lista classifica palavras, predicações ou entidades, sobre como foi
-derivada e sobre sua exaustividade. O MCR-10 não depende de resolver esse debate:
-usa as distinções como heurísticas de análise e verifica sua utilidade no
-contexto de software.
+The methodology draws on three distinctions found in the *Categories* and adds explicitly
+identified modern lenses. Academic debate exists regarding whether the original list classifies
+words, predications, or entities, how it was derived, and its completeness. MCR-10 does not
+depend on resolving this debate: it employs the distinctions as analytical heuristics and
+verifies their practical utility in software engineering.
 
-### 4.1 Finalidade e intenção
+### 4.1 Purpose and Intent
 
-Antes da análise categorial, identifique a finalidade prática da solicitação:
+Prior to categorial analysis, identify the practical purpose of the request:
 
-- qual problema observável motivou o pedido;
-- quem percebe o problema;
-- qual mudança faria a entrega ser considerada útil;
-- como o usuário reconhecerá que o resultado foi alcançado;
-- se a solução pedida é a intenção ou apenas uma hipótese de solução.
+- what observable problem motivated the request;
+- who experiences the problem;
+- what change would make the delivery considered useful;
+- how the user will recognize that the outcome has been achieved;
+- whether the requested solution is the core intent or merely a hypothesized implementation.
 
-Finalidade não é apresentada como uma décima primeira categoria aristotélica.
-Ela é uma lente adicional do MCR-10 para desenvolvimento de software. O método
-não presume acesso à “intenção real” como estado mental: ele formula uma
-interpretação operacional e pede confirmação ao usuário.
+Purpose is not presented as an eleventh Aristotelian category; it is an additional
+lens of MCR-10 for software systems. The method does not presume access to "real intent"
+as a mental state: it formulates an operational interpretation and seeks user confirmation.
 
-### 4.2 Termos homônimos, sinônimos e parônimos
+### 4.2 Homonymous, Synonymous, and Paronymous Terms
 
-Antes de analisar o comportamento solicitado, é necessário verificar se as pessoas envolvidas estão usando as mesmas palavras com o mesmo sentido.
+Before analyzing requested behavior, confirm that all stakeholders use the same terms
+with the identical meaning.
 
-#### Homonímia
+#### Homonymy
 
-Existe homonímia quando o mesmo termo é utilizado com definições diferentes.
+Homonymy occurs when the same term is used with differing definitions.
 
-Em uma especificação, palavras como `usuário`, `cliente`, `conta`, `projeto`, `aprovação` e `administrar` podem assumir sentidos diferentes dependendo da pessoa ou do módulo.
+In a specification, words like `user`, `customer`, `account`, `project`, `approval`, and `manage`
+can take on divergent meanings depending on persona or module.
 
-Exemplo:
+Example:
 
-- para a equipe comercial, `cliente` pode ser a empresa contratante;
-- para a equipe de suporte, `cliente` pode ser cada usuário atendido;
-- para o sistema, `cliente` pode ser um registro de conta.
+- for sales, `customer` might mean the contracted enterprise organization;
+- for support, `customer` might mean the individual end user submitting a ticket;
+- for the database, `customer` might represent an account record.
 
-Quando houver homonímia, os conceitos devem ser separados, definidos ou renomeados.
+When homonymy is detected, concepts must be separated, formally defined, or renamed.
 
-#### Sinonímia ou predicação unívoca
+#### Synonymy or Univocal Predication
 
-No texto aristotélico, coisas são denominadas sinonimamente ou univocamente
-quando compartilham nome e definição correspondente. Na análise de requisitos,
-essa distinção ajuda a verificar se um termo canônico mantém o mesmo sentido
-quando aplicado a diferentes casos.
+In Aristotelian terminology, things are termed synonymously or univocally when they share
+both name and corresponding definition. In requirements analysis, this distinction helps
+verify that a canonical term maintains the same meaning when applied across different contexts.
 
-O objetivo não é eliminar variações naturais da linguagem, mas confirmar que a
-mesma palavra não muda silenciosamente de definição entre equipes, fluxos ou
-documentos.
+The goal is not to eliminate natural language variation, but to confirm that the same word
+does not silently shift definitions across teams, flows, or documents.
 
-#### Equivalência terminológica
+#### Terminological Equivalence
 
-Quando palavras diferentes, como `workspace` e `espaço de trabalho`, representam
-o mesmo conceito, o MCR-10 registra uma equivalência terminológica moderna. Essa
-normalização é útil em software, mas não deve ser apresentada como a definição
-aristotélica de sinonímia.
+When different terms, such as `workspace` and `team space`, represent the identical concept,
+MCR-10 records modern terminological equivalence. This normalization is essential in software,
+though distinct from the Aristotelian definition of synonymy.
 
-#### Paronímia
+#### Paronymy
 
-Os parônimos são termos derivados e relacionados, mas que não devem ser tratados como conceitos idênticos.
+Paronyms are derived, related terms that should not be treated as interchangeable concepts.
 
-Exemplos:
+Examples:
 
-- `aprovação`, `aprovar`, `aprovado` e `aprovador`;
-- `permissão`, `permitido` e `autorizar`;
-- `revogação`, `revogado` e `revogar`.
+- `approval`, `to approve`, `approved`, and `approver`;
+- `permission`, `permitted`, and `to authorize`;
+- `revocation`, `revoked`, and `to revoke`.
 
-Na análise de requisitos, essa distinção ajuda a separar:
+In requirements analysis, this distinction isolates:
 
-- uma entidade;
-- uma ação;
-- um estado;
-- um atributo;
-- o papel que executa a ação.
+- an entity;
+- an action;
+- a state;
+- an attribute;
+- the role executing the action.
 
-### 4.3 Expressões simples e afirmações
+### 4.3 Simple Expressions and Assertions
 
-Termos como `manager`, `token`, `ativo`, `revogar` e `ontem` possuem significado, mas não são, isoladamente, requisitos que possam ser testados.
+Terms such as `manager`, `token`, `active`, `revoke`, and `yesterday` hold meaning,
+but alone do not constitute testable requirements.
 
-Quando os termos são combinados, surge uma afirmação:
+Combining terms yields an assertion:
 
-> Um manager pode revogar o próprio token.
+> An authenticated manager can revoke their own token.
 
-Essa afirmação já pode ser investigada:
+This assertion can now be investigated:
 
-- qualquer manager pode fazer isso?
-- o token precisa estar ativo?
-- a revogação é imediata?
-- o manager pode revogar tokens de outros usuários?
-- o que acontece com uma chamada em andamento?
+- can any manager perform this?
+- must the token be currently active?
+- is revocation immediate?
+- can managers revoke tokens belonging to other users?
+- what happens to in-flight API requests?
 
-O princípio operacional do MCR-10 é:
+The operational principle of MCR-10 is:
 
-> Um requisito somente está suficientemente definido quando seus termos foram combinados em uma afirmação que possa ser confirmada, negada ou observada.
+> A requirement is only sufficiently defined when its terms have been combined into an assertion that can be confirmed, refuted, or observed.
 
-### 4.4 Tipo, instância e atributo
+### 4.4 Type, Instance, and Attribute
 
-As relações aristotélicas de **ser dito de um sujeito** e **estar em um sujeito** ajudam a evitar dois erros comuns de modelagem:
+The Aristotelian relations of **being said of a subject** and **being in a subject** prevent two common modeling errors:
 
-1. confundir um tipo com uma instância;
-2. transformar um atributo ou estado em uma entidade independente sem necessidade.
+1. confusing a type with an instance;
+2. treating an attribute or state as an independent entity without necessity.
 
-Na adaptação do MCR-10:
+In the MCR-10 adaptation:
 
-- **ser dito de** orienta relações de classificação: um `manager` é um tipo de `usuário`;
-- **estar em** orienta propriedades dependentes: o estado `bloqueado` está em uma conta;
-- a modelagem sugerida pelo analista permanece como hipótese até ser confirmada.
+- **being said of** guides classification relationships: a `manager` is a type of `user`;
+- **being in** guides dependent properties: the state `suspended` resides in an account;
+- modeling proposed by the analyst remains a hypothesis until explicitly confirmed.
 
-### 4.5 Adaptação moderna para software
+### 4.5 Modern Adaptation for Software
 
-O MCR-10 usa as categorias por analogia operacional. A tabela distingue o núcleo
-da pergunta e sua aplicação moderna:
+MCR-10 uses categories by operational analogy. The table distinguishes the core question and modern software application:
 
-| Categoria | Pergunta nuclear | Adaptação moderna para software |
+| Category | Core Question | Modern Software Adaptation |
 |---|---|---|
-| Substância | Quem ou o quê? | ator, entidade, agregado, value object, serviço externo e identidade |
-| Quantidade | Quanto ou quantos? | cardinalidade, limites, volume, precisão, quota e capacidade |
-| Qualidade | De que tipo ou qualidade? | atributos, invariantes, validação e requisitos não funcionais mensuráveis |
-| Relação | Em relação a quê? | propriedade, associação, dependência, tenancy, hierarquia e autorização por recurso |
-| Lugar | Onde? | canal, módulo, ambiente, região, dispositivo e fronteira de confiança |
-| Tempo | Quando? | ordem, duração, expiração, timeout, retenção, concorrência e consistência temporal |
-| Posição | Em qual disposição? | estado de ciclo de vida, etapa, ordenação e configuração; extensão moderna da postura |
-| Posse ou ter | O que possui? | papel, permissão, credencial, plano, capability e recurso disponível; extensão moderna de “ter” |
-| Ação | O que faz? | comando, evento, gatilho, entrada, idempotência, cancelamento e reversão |
-| Afecção | O que recebe a ação? | resultado observável, mudança de estado, erro, efeito colateral, auditoria e compensação |
+| Substance | Who or what? | actor, entity, aggregate, value object, external service, identity |
+| Quantity | How much or how many? | cardinality, bounds, volume, precision, quota, capacity |
+| Quality | Of what nature or quality? | attributes, invariants, validation rules, measurable non-functional requirements |
+| Relation | In relation to what? | ownership, association, dependency, multi-tenancy, hierarchy, resource authorization |
+| Place | Where? | channel, module, environment, region, device, trust boundary |
+| Time | When? | sequence, duration, expiration, timeout, retention, concurrency, temporal consistency |
+| Position | In what state or arrangement? | lifecycle state, workflow stage, sort order, configuration; modern extension of posture |
+| Possession / Having | What does it have? | role, permission, credential, tier, capability, available balance; modern extension of "having" |
+| Action | What does it do? | command, event, trigger, input, idempotency, cancellation, rollback |
+| Affection | What receives the action? | observable outcome, state mutation, error, side effect, audit log, compensation |
 
-Finalidade, risco, privacidade, ética, observabilidade, evidência e
-reversibilidade são preocupações transversais modernas. Elas devem ser
-investigadas quando aplicáveis, sem serem atribuídas à lista original.
+Purpose, risk, privacy, ethics, observability, evidence, and reversibility are modern
+cross-cutting concerns. They must be investigated when applicable, without attributing them
+to the original philosophical text.
 
 ---
 
-## 5. As dez categorias do MCR-10
+## 5. The Ten Categories of MCR-10
 
-### 5.1 Substância — Quem ou o quê?
+### 5.1 Substance — Who or What?
 
-A substância identifica aquilo sobre o qual se está falando.
+Substance identifies the subject matter under discussion.
 
-Na análise de requisitos, ela corresponde a:
+In requirements analysis, it corresponds to:
 
-- atores;
-- entidades;
-- objetos do domínio;
-- tipos;
-- instâncias;
-- conceitos centrais.
+- actors;
+- entities;
+- domain objects;
+- types;
+- instances;
+- core domain concepts.
 
-Perguntas orientadoras:
+Guiding questions:
 
-- Quem participa do comportamento?
-- O que exatamente está sendo criado, alterado ou consultado?
-- Quando o usuário diz `solicitação`, isso representa um tipo de processo ou um registro individual?
-- Existem atores humanos e atores sistêmicos?
-- Há uma entidade real ou apenas um atributo de outra entidade?
+- Who participates in the behavior?
+- What exactly is being created, modified, or queried?
+- When the user says `request`, does that represent a process type or an individual record?
+- Are there human actors and automated system actors?
+- Is this an independent entity or merely an attribute of another entity?
 
-Sinais de risco:
+Risk indicators:
 
-- ator não identificado;
-- conceito central sem definição;
-- tipo confundido com instância;
-- atributo tratado como entidade sem justificativa;
-- duas entidades diferentes representadas pelo mesmo nome.
+- unidentified actor;
+- core concept lacking definition;
+- type confused with instance;
+- attribute treated as an independent entity without justification;
+- two different entities represented by the identical name.
 
-### 5.2 Quantidade — Quanto ou quantos?
+### 5.2 Quantity — How Much or How Many?
 
-A quantidade investiga limites, cardinalidade, volume, frequência, tamanho e precisão.
+Quantity investigates limits, cardinality, volume, frequency, size, and precision.
 
-Ela inclui:
+It encompasses:
 
-- mínimo e máximo;
-- quantidade por usuário ou conta;
-- tamanho de arquivos ou campos;
-- frequência de execução;
-- paginação;
-- lotes;
+- minimum and maximum bounds;
+- limits per user or account;
+- file or field character limits;
+- execution frequency;
+- pagination;
+- batch sizes;
 - quotas;
-- limites financeiros;
-- casas decimais;
-- precisão.
-
-Perguntas orientadoras:
-
-- Quantos registros podem existir?
-- Cada usuário pode ter um ou vários?
-- Existe limite por conta, plano ou período?
-- Há tamanho máximo?
-- O processamento ocorre individualmente ou em lote?
-- Qual volume a solução precisa suportar?
-
-Sinais de risco:
-
-- quantidade aparentemente ilimitada;
-- limite não documentado;
-- escala desconhecida;
-- cobrança dependente de volume sem regra explícita;
-- cardinalidade ambígua;
-- comportamento diferente no primeiro, último ou único item.
-
-### 5.3 Qualidade — Como é?
-
-A qualidade descreve características, atributos e condições que tornam algo válido ou aceitável.
-
-Ela pode representar:
-
-- propriedades;
-- formato;
-- segurança;
-- desempenho;
-- disponibilidade;
-- legibilidade;
-- precisão;
-- acessibilidade;
-- integridade;
-- critérios de validação.
-
-Perguntas orientadoras:
-
-- O que torna o resultado correto?
-- O que significa `rápido`, `seguro`, `válido` ou `concluído`?
-- Quais atributos são obrigatórios?
-- Como reconhecer um resultado inválido?
-- Existe um nível mínimo de qualidade?
-
-Sinais de risco:
-
-- expressões como `funcionar bem`;
-- qualidade sem métrica;
-- validação ausente;
-- atributo obrigatório não identificado;
-- expectativa subjetiva apresentada como critério de aceitação.
-
-### 5.4 Relação — De quem, com quem ou com o quê?
-
-A relação investiga vínculos entre os elementos.
-
-Ela inclui:
-
-- propriedade;
-- pertencimento;
-- dependência;
-- hierarquia;
-- associação;
-- correlação;
-- visibilidade;
-- isolamento entre contas;
-- relação entre origem e destino.
-
-Perguntas orientadoras:
-
-- A quem este registro pertence?
-- Qual entidade depende de qual?
-- Quem pode visualizar os dados de quem?
-- Existe uma relação pai-filho?
-- O vínculo é obrigatório ou opcional?
-- A relação pode mudar depois da criação?
-
-Sinais de risco:
-
-- propriedade indefinida;
-- dados sem conta ou usuário responsável;
-- isolamento entre organizações não especificado;
-- relação muitos-para-muitos tratada como relação simples;
-- dependência escondida;
-- exclusão de uma entidade sem regra para os elementos relacionados.
-
-### 5.5 Lugar — Onde?
-
-O lugar determina o contexto espacial ou operacional em que o comportamento acontece.
-
-Ele pode representar:
-
-- tela;
-- módulo;
-- menu;
-- canal;
-- ambiente;
-- dispositivo;
-- servidor;
-- região;
-- país;
-- jurisdição;
-- origem e destino de uma integração.
-
-Perguntas orientadoras:
-
-- Onde a ação acontece?
-- Onde o resultado aparece?
-- O comportamento existe no painel, na API, no MCP ou em todos?
-- Ele funciona em ambiente de produção e teste?
-- Existem diferenças entre web, aplicativo e dispositivos móveis?
-- A região ou jurisdição altera o comportamento?
-
-Sinais de risco:
-
-- funcionalidade descrita sem indicar onde será acessada;
-- produção e homologação tratados da mesma forma;
-- comportamento multicanal não definido;
-- dados disponíveis em um contexto e indevidamente expostos em outro.
-
-### 5.6 Tempo — Quando?
-
-O tempo investiga sequência, duração, validade, recorrência, retenção e prazo.
-
-Ele inclui:
-
-- ordem dos eventos;
-- data e hora;
-- fuso horário;
-- expiração;
-- timeout;
-- recorrência;
-- retenção;
-- agendamento;
-- validade;
-- atrasos;
-- concorrência.
-
-Perguntas orientadoras:
-
-- Quando o comportamento começa?
-- Quando termina?
-- O que precisa acontecer antes?
-- A ação é imediata, agendada ou assíncrona?
-- Existe expiração?
-- Qual fuso horário deve ser usado?
-- Por quanto tempo os dados permanecem disponíveis?
-- O que acontece quando dois eventos ocorrem ao mesmo tempo?
-
-Sinais de risco:
-
-- uso de `imediatamente` sem definição;
-- ausência de fuso;
-- validade indefinida;
-- retenção não especificada;
-- eventos concorrentes sem regra;
-- comportamento recorrente sem data de encerramento.
-
-### 5.7 Posição — Em qual estado ou arranjo?
-
-A posição descreve o estado, a etapa, a ordenação ou a configuração atual de algo.
-
-Ela inclui:
-
-- estado inicial;
-- estado atual;
-- estado de destino;
-- posição em um fluxo;
-- ordenação;
-- disposição;
-- configuração;
-- pré-condições para uma transição.
-
-Perguntas orientadoras:
-
-- Em qual estado o objeto precisa estar?
-- Para qual estado ele será movido?
-- Quais transições são permitidas?
-- A ordem dos itens altera o comportamento?
-- O usuário pode retornar ao estado anterior?
-- Existe um estado terminal?
-
-Sinais de risco:
-
-- transição impossível;
-- estado inicial desconhecido;
-- estado usado sem definição;
-- reordenação ambígua;
-- ação disponível em estados nos quais deveria ser bloqueada;
-- ausência de regra para desfazer ou cancelar.
-
-### 5.8 Posse — O que o ator possui?
-
-A posse investiga recursos, capacidades e permissões disponíveis para o ator.
-
-Ela inclui:
-
-- papéis;
-- permissões;
-- credenciais;
-- tokens;
-- chaves;
-- planos;
-- saldo;
-- licenças;
-- recursos;
-- dados disponíveis;
-- capacidades habilitadas.
-
-Perguntas orientadoras:
-
-- Qual permissão o ator precisa possuir?
-- A autorização vem do papel, da conta ou do recurso?
-- O usuário precisa ter um token, plano ou saldo?
-- A posse pode ser revogada?
-- O recurso é exclusivo ou compartilhado?
-- O que acontece quando o ator perde essa capacidade?
-
-Sinais de risco:
-
-- autorização presumida;
-- papel usado como única regra sem verificar o recurso;
-- credencial sem expiração ou revogação;
-- recurso necessário indisponível;
-- acesso mantido após perda de permissão.
-
-### 5.9 Ação — O que é feito?
-
-A ação identifica o gatilho, o comando e a operação executada.
-
-Ela inclui:
-
-- quem inicia;
-- qual verbo representa o comportamento;
-- quais dados são fornecidos;
-- qual evento dispara o processo;
-- repetição;
-- cancelamento;
-- reversão;
-- idempotência.
-
-Perguntas orientadoras:
-
-- Quem inicia a ação?
-- O que exatamente significa `administrar`, `processar`, `aprovar` ou `sincronizar`?
-- Quais dados são necessários?
-- A ação pode ser repetida?
-- Pode ser cancelada?
-- Pode ser desfeita?
-- O sistema também pode iniciar a ação automaticamente?
-
-Sinais de risco:
-
-- verbo genérico;
-- ação sem gatilho;
-- operação sem entrada;
-- ausência de regra para repetição;
-- cancelamento indefinido;
-- duplicidade causada por reprocessamento.
-
-### 5.10 Afecção ou efeito recebido — O que é afetado?
-
-A categoria tradicionalmente chamada de `paixão` é apresentada no MCR-10 como **afecção** ou **efeito recebido**, evitando o sentido emocional corrente da palavra.
-
-Ela observa aquilo que recebe ou sofre a ação.
-
-Inclui:
-
-- alvo afetado;
-- resultado;
-- mudança de estado;
-- efeito colateral;
-- notificação;
-- falha;
-- compensação;
-- auditoria;
-- efeitos em outros sistemas.
-
-Perguntas orientadoras:
-
-- O que muda depois da ação?
-- Quem é afetado?
-- Qual resultado deve ser observado?
-- O que acontece quando a operação falha?
-- Existe compensação ou rollback?
-- Quem precisa ser notificado?
-- O que deve ser registrado?
-- Outros módulos ou integrações são afetados?
-
-Sinais de risco:
-
-- ação sem alvo;
-- resultado descrito apenas como intenção;
-- efeitos colaterais invisíveis;
-- falha sem comportamento esperado;
-- ausência de auditoria em ação sensível;
-- atualização parcial sem compensação.
+- financial thresholds;
+- decimal precision.
+
+Guiding questions:
+
+- How many records can exist?
+- Can each user have one or multiple items?
+- Is there a quota per account, plan, or time window?
+- What is the maximum payload or upload size?
+- Does processing occur individually or in batches?
+- What data volume must the solution handle?
+
+Risk indicators:
+
+- apparently unbounded quantities;
+- undocumented rate or size limits;
+- unknown scaling requirements;
+- volume-based billing without explicit rules;
+- ambiguous cardinality;
+- divergent behavior on first, last, or solitary items.
+
+### 5.3 Quality — How is it Characterized?
+
+Quality describes characteristics, attributes, and conditions rendering something valid or acceptable.
+
+It encompasses:
+
+- properties;
+- formats;
+- security requirements;
+- performance thresholds;
+- availability;
+- readability;
+- precision;
+- accessibility standards;
+- data integrity;
+- validation rules.
+
+Guiding questions:
+
+- What defines a correct outcome?
+- What specifically constitutes `fast`, `secure`, `valid`, or `complete`?
+- Which attributes are mandatory?
+- How is an invalid result detected?
+- What is the minimum acceptable quality standard?
+
+Risk indicators:
+
+- subjective expressions like "works nicely";
+- quality goals lacking measurable metrics;
+- absent input validation;
+- unidentified required attributes;
+- personal aesthetic preferences masquerading as acceptance criteria.
+
+### 5.4 Relation — With Whom, to Whom, or to What?
+
+Relation investigates links, bindings, and dependencies between elements.
+
+It encompasses:
+
+- ownership;
+- membership;
+- dependency chains;
+- hierarchy;
+- association;
+- correlation;
+- visibility boundaries;
+- cross-tenant isolation;
+- origin-to-destination mappings.
+
+Guiding questions:
+
+- Who owns this record?
+- Which entity depends upon which?
+- Who is authorized to view whose data?
+- Does a parent-child relationship exist?
+- Is the association mandatory or optional?
+- Can the relationship mutate post-creation?
+
+Risk indicators:
+
+- undefined ownership;
+- records lacking owning account or user;
+- unspecified multi-tenant isolation rules;
+- many-to-many relationships modeled as one-to-one;
+- hidden circular dependencies;
+- cascade deletion without rules for related entities.
+
+### 5.5 Place — Where?
+
+Place determines the spatial, architectural, or operational context of behavior.
+
+It encompasses:
+
+- screen / view;
+- module / layer;
+- menu location;
+- delivery channel;
+- environment (staging, production);
+- client device;
+- server / cloud provider;
+- deployment region;
+- jurisdiction;
+- integration endpoints.
+
+Guiding questions:
+
+- Where does the action take place?
+- Where does the outcome appear?
+- Does the behavior exist in the dashboard, API, CLI, MCP, or all channels?
+- Does it function identically in staging and production?
+- Are there mobile versus desktop distinctions?
+- Does legal jurisdiction or cloud region alter functionality?
+
+Risk indicators:
+
+- feature described without specifying access surface;
+- production and staging treated as identical without configuration flags;
+- undefined multi-channel behavior;
+- data visible in one context inadvertently exposed in another.
+
+### 5.6 Time — When?
+
+Time investigates sequence, duration, validity windows, recurrence, retention, and deadlines.
+
+It encompasses:
+
+- event ordering;
+- timestamp and date;
+- timezones;
+- expiration;
+- timeouts;
+- recurrence schedules;
+- data retention;
+- cron scheduling;
+- validity periods;
+- propagation delays;
+- concurrency.
+
+Guiding questions:
+
+- When does the behavior initiate?
+- When does it conclude?
+- What prerequisite events must occur first?
+- Is execution immediate, scheduled, or asynchronous?
+- Does the state expire?
+- Which timezone governs calculations?
+- How long must records remain available?
+- What happens when two competing events arrive simultaneously?
+
+Risk indicators:
+
+- vague terms like "immediately" lacking technical bounds;
+- omitted timezones;
+- indefinite token validity;
+- unspecified data retention;
+- unhandled concurrent race conditions;
+- recurring jobs lacking termination dates.
+
+### 5.7 Position — In What State or Arrangement?
+
+Position describes the lifecycle state, stage, order, or arrangement of an entity.
+
+It encompasses:
+
+- initial state;
+- active state;
+- terminal state;
+- position within a workflow;
+- sorting order;
+- layout disposition;
+- feature configuration;
+- transition preconditions.
+
+Guiding questions:
+
+- In what state must the entity exist prior to execution?
+- To which state does it transition?
+- Which state transitions are permitted?
+- Does item ordering alter behavior?
+- Can the user revert to the previous state?
+- Does a terminal state exist?
+
+Risk indicators:
+
+- invalid or unreachable state transitions;
+- unknown initial state;
+- undocumented state enums;
+- ambiguous drag-and-drop reordering;
+- actions accessible in states where they should be disabled;
+- absent undo or cancellation paths.
+
+### 5.8 Possession — What Does the Actor Have?
+
+Possession investigates resources, entitlements, capabilities, and permissions available to an actor.
+
+It encompasses:
+
+- security roles;
+- granular permissions;
+- credentials;
+- authentication tokens;
+- cryptographic keys;
+- subscription plans;
+- account balances;
+- software licenses;
+- resource allocations;
+- enabled capabilities.
+
+Guiding questions:
+
+- Which permissions must the actor possess?
+- Does authorization stem from role, account, or target resource?
+- Does the user require a valid token, plan tier, or credit balance?
+- Can entitlements be revoked mid-session?
+- Is the resource dedicated or shared?
+- What happens when an actor loses this capability?
+
+Risk indicators:
+
+- assumed authorization without explicit checks;
+- role-based checks ignoring resource ownership;
+- credentials lacking expiration or revocation mechanics;
+- missing prerequisite resources;
+- retained access after permissions are revoked.
+
+### 5.9 Action — What is Done?
+
+Action identifies the trigger, command, and executed operation.
+
+It encompasses:
+
+- initiating actor;
+- domain verbs representing behavior;
+- supplied payload data;
+- triggering event;
+- automated retries;
+- cancellation;
+- rollback / undo;
+- idempotency semantics.
+
+Guiding questions:
+
+- Who triggers the action?
+- What specifically do terms like `manage`, `process`, `approve`, or `sync` entail?
+- What input data is required?
+- Can the action be repeated safely?
+- Can it be cancelled in-flight?
+- Can completed operations be undone?
+- Does the system trigger the action automatically?
+
+Risk indicators:
+
+- generic verbs lacking operational definitions;
+- actions lacking explicit triggers;
+- operations lacking input specifications;
+- undefined retry policies;
+- ambiguous cancellation mechanics;
+- duplicate side effects caused by re-execution.
+
+### 5.10 Affection or Received Effect — What is Affected?
+
+The category traditionally known as `passion` is designated in MCR-10 as **affection** or **received effect**, avoiding the emotional connotation of modern language.
+
+It examines that which receives, undergoes, or suffers the action.
+
+It encompasses:
+
+- affected target entity;
+- observable outcome;
+- state mutation;
+- side effects;
+- user notifications;
+- failure modes;
+- compensation transactions;
+- audit logs;
+- downstream system mutations.
+
+Guiding questions:
+
+- What changes after the action completes?
+- Who is impacted?
+- What observable output must be verified?
+- What occurs when the operation fails?
+- Is there a compensation transaction or rollback?
+- Who must be notified?
+- What must be logged for auditing?
+- Are downstream external systems affected?
+
+Risk indicators:
+
+- actions lacking an explicit target;
+- outcomes described only as general intentions;
+- hidden side effects;
+- failure states lacking defined error behavior;
+- sensitive mutations lacking audit trails;
+- partial updates lacking compensation rollback.
 
 ---
 
-## 6. Fronteiras entre categorias próximas
+## 6. Boundaries Between Adjacent Categories
 
-Alguns elementos podem parecer pertencer a mais de uma categoria. O objetivo não é forçar uma classificação única, mas compreender o papel de cada informação.
+Certain elements appear to belong to multiple categories. The goal is not to force an artificial single label, but to understand each distinct aspect.
 
-| Fronteira | Regra de distinção | Exemplo |
+| Boundary | Distinguishing Rule | Example |
 |---|---|---|
-| Qualidade × Posição | Qualidade descreve uma característica; posição descreve estado ou arranjo no fluxo. | `prioridade alta` pode ser qualidade; `aguardando aprovação` é posição. |
-| Relação × Posse | Relação descreve vínculo; posse descreve capacidade ou recurso disponível. | `tarefa pertence ao projeto` versus `usuário possui permissão para editar`. |
-| Ação × Afecção | Ação observa quem produz a mudança; afecção observa quem recebe a mudança. | `manager revoga o token` versus `token torna-se inválido`. |
-| Lugar × Posição | Lugar indica o contexto onde algo ocorre; posição indica o estado ou ordem. | `na tela de usuários` versus `na etapa de validação`. |
-| Substância × Qualidade | Substância identifica a entidade; qualidade representa uma característica que depende dela. | `conta` versus `conta bloqueada`. |
-| Relação × Quantidade | Relação identifica o vínculo; quantidade define quantos vínculos são permitidos. | `token pertence ao usuário` e `usuário pode possuir até três tokens`. |
+| Quality × Position | Quality describes intrinsic characteristics; position describes lifecycle state or sequence. | `high priority` can be quality; `pending review` is position. |
+| Relation × Possession | Relation describes links between entities; possession describes capabilities or entitlements. | `task belongs to project` versus `user has edit permission`. |
+| Action × Affection | Action examines who produces the change; affection examines what receives the change. | `manager revokes token` versus `token becomes invalid`. |
+| Place × Position | Place indicates the context/location; position indicates state or order. | `on the users view` versus `in the validation step`. |
+| Substance × Quality | Substance identifies the entity; quality represents a dependent property. | `account` versus `suspended account`. |
+| Relation × Quantity | Relation identifies the link; quantity specifies how many links are allowed. | `token belongs to user` and `user may hold up to three tokens`. |
 
-Uma mesma passagem pode ser associada a várias categorias quando isso ajudar a compreender dependências diferentes.
+A single requirement phrase can be associated with multiple categories when doing so reveals distinct architectural constraints.
 
 ---
 
-## 7. Ciclo de aplicação
+## 7. Application Lifecycle
 
-O MCR-10 é executado em seis movimentos.
+MCR-10 is executed through six movements.
 
-### Movimento 1 — Capturar a formulação original
+### Movement 1 — Capture Original Formulation
 
-Preserve o texto ou a fala do usuário antes de normalizá-lo.
+Preserve verbatim user phrasing prior to normalization.
 
-Registre:
+Document:
 
-- a solicitação original;
-- quem forneceu a informação;
-- em qual contexto;
-- qual problema motivou a conversa;
-- quais documentos ou regras foram mencionados.
+- original user request;
+- stakeholder who provided the information;
+- business context;
+- driving problem;
+- cited documentation or compliance rules.
 
-Não comece reescrevendo a história. Uma redação mais elegante pode esconder ambiguidades importantes.
+Never begin by rewriting the story. Premature polishing obscures critical ambiguities.
 
-### Movimento 2 — Isolar os termos simples
+### Movement 2 — Isolate Simple Terms
 
-Extraia da narrativa:
+Extract from the narrative:
 
-- substantivos;
-- verbos;
-- atributos;
-- estados;
-- qualificadores;
-- quantificadores;
-- relações;
-- referências de lugar;
-- referências de tempo.
+- nouns;
+- verbs;
+- attributes;
+- states;
+- qualifiers;
+- quantifiers;
+- relationships;
+- place references;
+- time references.
 
-Exemplo:
+Example:
 
-> Como manager, quero gerar um token MCP para administrar os módulos permitidos.
+> As a manager, I want to generate an MCP token to manage permitted modules.
 
-Termos isolados:
+Isolated terms:
 
 - `manager`;
-- `gerar`;
-- `token MCP`;
-- `administrar`;
-- `módulos`;
-- `permitidos`.
+- `generate`;
+- `MCP token`;
+- `manage`;
+- `modules`;
+- `permitted`.
 
-### Movimento 3 — Desambiguar o vocabulário
+### Movement 3 — Disambiguate Vocabulary
 
-Investigue:
+Investigate:
 
-- palavras iguais com definições diferentes;
-- termos diferentes que parecem representar o mesmo conceito;
-- termos derivados que indicam entidade, ação, atributo ou estado;
-- confusão entre tipo e instância;
-- confusão entre entidade e propriedade.
+- identical words with differing definitions;
+- distinct terms representing the identical concept;
+- derived terms denoting entity, action, attribute, or state;
+- confusion between type and instance;
+- confusion between entity and dependent property.
 
-O resultado desta etapa é um glossário provisório.
+The deliverable of this step is a provisional domain glossary.
 
-### Movimento 4 — Distribuir pelas categorias
+### Movement 4 — Distribute Across Categories
 
-Associe os trechos da narrativa às dez categorias.
+Map narrative fragments across the ten categories.
 
-Para cada item, registre:
+For each item, document:
 
-- o conteúdo encontrado;
-- o trecho de origem;
-- o status da informação;
-- as lacunas;
-- as categorias relacionadas;
-- o risco da indefinição.
+- identified content;
+- originating quote;
+- information status;
+- identified gaps;
+- related categories;
+- risk of leaving undefined.
 
-### Movimento 5 — Recompor em afirmações
+### Movement 5 — Recompose into Assertions
 
-Combine os elementos em afirmações atômicas.
+Synthesize components into atomic assertions.
 
-Uma estrutura útil é:
+A standard formulation is:
 
 ```text
-[Sujeito]
-+ [ação ou predicado]
-+ [objeto ou atributo]
-+ [condição de lugar, tempo ou estado]
-+ [limite ou qualidade]
-+ [efeito observável]
+[Subject]
++ [action or predicate]
++ [object or attribute]
++ [condition of place, time, or state]
++ [bound or quality]
++ [observable effect]
 ```
 
-Exemplo:
+Example:
 
-> Um manager autenticado pode revogar o próprio token MCP na área de configurações. Após a confirmação, novas chamadas realizadas com esse token devem ser rejeitadas e a revogação deve ser registrada.
+> An authenticated manager can revoke their own MCP token in settings. Upon confirmation, subsequent calls made with this token must be rejected, and the revocation must be recorded in the audit log.
 
-### Movimento 6 — Testar e consolidar
+### Movement 6 — Test and Consolidate
 
-Para cada afirmação:
+For each assertion:
 
-- formule sua negação;
-- procure exceções;
-- investigue limites;
-- verifique autorização;
-- analise estados anteriores e posteriores;
-- identifique falhas;
-- procure efeitos colaterais;
-- determine como observar o resultado.
+- formulate its logical negation;
+- investigate exceptions;
+- test boundary limits;
+- verify authorization rules;
+- examine prior and subsequent states;
+- isolate failure modes;
+- identify side effects;
+- establish how to observe the outcome.
 
-Depois disso, converta as decisões confirmadas em:
+Convert confirmed decisions into:
 
-- regras;
-- fluxos;
-- histórias refinadas;
-- critérios de aceitação;
-- cenários;
-- questões em aberto.
+- business rules;
+- interaction flows;
+- refined user stories;
+- acceptance criteria;
+- Gherkin test scenarios;
+- documented open questions.
 
 ---
 
-## 8. Status das informações
+## 8. Information Status
 
-Toda informação deve receber um status.
+Every piece of information must hold an explicit status label.
 
-| Status | Significado |
+| Status | Meaning |
 |---|---|
-| Declarado | Foi afirmado diretamente pelo usuário ou pela fonte. |
-| Inferido | Foi deduzido a partir de outras informações, mas ainda não confirmado. |
-| Hipótese | É uma possibilidade proposta para orientar a conversa. |
-| Decisão | Foi explicitamente confirmada por uma pessoa autorizada. |
-| Conflito | Contradiz outra afirmação, regra ou fonte. |
-| Aberto | Ainda depende de resposta ou decisão. |
-| Não aplicável | A categoria não interfere no caso, com justificativa registrada. |
+| Declared | Explicitly stated by the user or primary source. |
+| Inferred | Deduced from surrounding context, pending confirmation. |
+| Hypothesis | Working proposition introduced to facilitate discussion. |
+| Decision | Formally confirmed by an authorized stakeholder. |
+| Conflict | Contradicts another assertion, rule, or source. |
+| Open | Remains pending an answer or formal decision. |
+| Not Applicable | Category does not influence the slice, with documented rationale. |
 
-Uma inferência nunca deve ser apresentada como fato declarado.
+An inference must never be presented as an established declared fact.
 
-Exemplo:
+Example:
 
 ```markdown
-- **Trecho original:** “Cada manager terá seu token.”
-- **Afirmação normalizada:** cada manager possui um token MCP individual.
-- **Status:** declarado.
-- **Questão aberta:** o usuário pode possuir mais de um token ativo?
+- **Original quote:** "Each manager will have their own token."
+- **Normalized assertion:** Each manager possesses an individual MCP token.
+- **Status:** Declared.
+- **Open Question:** Can a user hold more than one active token concurrently?
 ```
 
 ---
 
-## 9. Protocolo de conversa
+## 9. Dialogue Protocol
 
-### 9.1 Primeiro compreender, depois perguntar
+### 9.1 Understand First, Inquire Second
 
-O método não deve começar com dez perguntas correspondentes às dez categorias.
+The method does not begin by firing ten sequential questions for the ten categories.
 
-Antes da primeira pergunta:
+Before posing the first question:
 
-1. leia ou escute a solicitação;
-2. extraia o que já está explícito;
-3. identifique as lacunas;
-4. apresente uma síntese curta;
-5. escolha as perguntas de maior impacto.
+1. read or listen to the request;
+2. extract what is already explicitly defined;
+3. isolate critical knowledge gaps;
+4. present a concise synthesis of current understanding;
+5. select the highest-impact blocking questions.
 
-Exemplo:
+Example:
 
-> Entendi que o manager precisa de uma credencial MCP vinculada aos módulos que pode administrar. Antes de escrever os critérios, precisamos decidir a quem o token pertence, quantos tokens podem existir e de onde vêm as permissões dos módulos.
+> I understand that the manager requires an MCP credential linked to modules they are permitted to manage. Before drafting acceptance criteria, we need to decide whether the token belongs to the user or team, how many tokens may exist, and how module permissions are governed.
 
-### 9.2 Usar a linguagem do usuário
+### 9.2 Speak the User's Language
 
-As perguntas devem aproveitar os termos utilizados na conversa.
+Formulate inquiries using terms established by the user.
 
-Prefira:
+Prefer:
 
-> Quando você diz `cliente`, está falando da empresa contratante ou de cada conta atendida?
+> When you say `customer`, are you referring to the contracted organization or individual user accounts?
 
-Evite:
+Avoid:
 
-> Defina a substância correspondente ao conceito de cliente.
+> Define the substance corresponding to the customer concept.
 
-Os conceitos filosóficos orientam o analista. Eles não precisam aparecer na conversa quando não ajudarem o usuário.
+Philosophical concepts guide the analyst's thinking; they do not need to be exposed to the user when doing so adds cognitive friction.
 
-### 9.3 Fazer uma pergunta numerada por rodada
+### 9.3 Ask One Numbered Question per Round
 
-Em cada rodada, apresente uma pergunta real, numerada como `Pergunta 1`, e
-espere a resposta antes de formular a próxima. Se houver outras lacunas,
-reordene-as depois da resposta, sem antecipá-las na mesma rodada.
+In each round, present a single real question, numbered as `Question 1`, and
+await the user's response before formulating the next. If other gaps remain,
+re-rank them after receiving the answer, without asking them in the same round.
 
-Abaixo de cada pergunta, ofereça pelo menos três opções numeradas, seguidas das
-opções numeradas `Escrever outra resposta` e `Avançar`. Não apresente opção sem
-número.
+Below each question, provide at least three numbered options, followed by the
+numbered options `Write another answer` and `Proceed`. Never present unnumbered options.
 
-Isso permite:
+This ensures:
 
-- manter a conversa fluida;
-- incorporar respostas progressivamente;
-- evitar perguntas que se tornariam desnecessárias;
-- confirmar o entendimento antes de aprofundar;
-- reduzir respostas superficiais causadas por questionários longos.
+- fluid, natural conversation;
+- progressive incorporation of new facts;
+- avoiding questions rendered obsolete by earlier answers;
+- validating alignment before diving deeper;
+- eliminating fatigue caused by long questionnaires.
 
-### 9.4 Priorizar as perguntas
+### 9.4 Prioritize Questions
 
-As perguntas são classificadas em três níveis. Essa prioridade mede risco de
-descoberta; ela não substitui a prioridade de produto de histórias ou backlog.
+Questions are classified across three priority tiers. This priority reflects
+discovery risk; it does not replace backlog or product delivery priorities.
 
-#### P1 — Bloqueadora
+#### P1 — Blocker
 
-Uma resposta P1 muda a estrutura do produto, a regra central ou o risco da solução.
+A P1 answer alters system architecture, core business rules, or security risks.
 
-Exemplos:
+Examples:
 
-- quem é o ator;
-- a quem os dados pertencem;
-- quem possui autorização;
-- qual é o efeito principal;
-- quem pode acessar o quê;
-- o que acontece com dados, dinheiro ou ações irreversíveis.
+- identifying the acting persona;
+- data ownership boundaries;
+- access authorization;
+- primary business effect;
+- data isolation rules;
+- handling money, privacy, or irreversible operations.
 
-#### P2 — Necessária
+#### P2 — Necessary
 
-Uma resposta P2 permite implementar e testar o comportamento com segurança.
+A P2 answer enables implementing and testing behavior safely.
 
-Exemplos:
+Examples:
 
-- limites;
-- estados;
-- ordem temporal;
-- expiração;
-- exceções;
-- falhas;
-- cancelamento;
-- auditoria.
+- operational bounds;
+- lifecycle states;
+- time sequences;
+- expiration rules;
+- error handling;
+- cancellation;
+- audit logging.
 
-#### P3 — Aperfeiçoamento
+#### P3 — Enhancement
 
-Uma resposta P3 melhora a experiência ou a operação sem redefinir o comportamento central.
+A P3 answer improves user experience or operational ease without altering core behavior.
 
-Exemplos:
+Examples:
 
 - microcopy;
-- preferências visuais;
-- ordenação secundária;
-- otimizações não críticas;
-- detalhes de apresentação.
+- visual presentation preferences;
+- secondary sorting orders;
+- non-critical performance optimizations;
+- display formatting.
 
-Dentro da mesma prioridade, pergunte primeiro sobre a lacuna que afeta mais decisões posteriores.
+Within the same priority tier, inquire first about the gap impacting the greatest number of subsequent decisions.
 
-### 9.5 Estrutura de uma rodada
+### 9.5 Structure of a Round
 
-Cada rodada deve conter:
+Each conversational round must contain:
 
-1. **Síntese:** o que foi entendido.
-2. **Decisões:** o que já foi confirmado.
-3. **Lacunas:** os próximos pontos aplicáveis ainda não definidos.
-4. **Pergunta:** uma formulação concreta e numerada.
-5. **Opções:** no mínimo três sugestões numeradas por pergunta, mais escrita
-   livre e avanço.
-6. **Registro:** respostas originais e escolhas normalizadas.
-7. **Atualização:** categorias e regras afetadas.
+1. **Synthesis:** summary of what has been understood.
+2. **Decisions:** confirmed rules established so far.
+3. **Gaps:** applicable points still undefined.
+4. **Question:** a concrete, numbered question.
+5. **Options:** at least three numbered suggestions, plus write-in and proceed.
+6. **Log:** original user reply and normalized decision.
+7. **Updates:** affected categories and rules.
 
-### 9.6 Perguntas com hipóteses
+### 9.6 Hypothesis-Driven Questions
 
-Uma hipótese pode reduzir o esforço do usuário, desde que seja apresentada de forma explícita.
+Offering a concrete hypothesis reduces user fatigue when presented explicitly.
 
-Exemplo:
+Example:
 
-> Estou entendendo que cada token pertence exclusivamente ao usuário que o criou. É isso ou o token representa a conta inteira?
+> My understanding is that each token belongs exclusively to the user who created it. Is that accurate, or does the token represent the entire team account?
 
-A hipótese não deve ser incorporada à especificação até ser confirmada.
+A hypothesis must never be incorporated into the specification until confirmed.
 
-### 9.7 Ciclo adaptativo e saída explícita
+### 9.7 Adaptive Cycle and Explicit Exit
 
-O refinamento do backlog faz no máximo oito perguntas por área. Depois de cada
-rodada, reanalise o contexto acumulado e as novas respostas: entrada original,
-evidências do repositório, escolhas confirmadas, respostas anteriores e
-dependências afetadas. Reclassifique as lacunas e formule a próxima rodada
-enquanto existir lacuna aplicável e restarem perguntas no limite.
-Uma fila anterior é apenas uma hipótese de análise e deve ser
-descartada quando a resposta mudar o contexto.
+Backlog refinement poses a maximum of eight questions per area. After each
+round, re-evaluate cumulative context and new answers: original input,
+repository evidence, confirmed decisions, previous responses, and affected
+dependencies. Reclassify gaps and formulate the next round while applicable
+gaps remain within the question limit.
+Prior queues are merely analytical hypotheses to be discarded when new
+answers shift context.
 
-Ofereça `Avançar` em cada pergunta desde a primeira rodada. Na rodada seguinte,
-pergunte se a pessoa quer encerrar definitivamente as perguntas daquela área,
-responder depois ou voltar a responder agora. Inclua essa confirmação entre as
-pergunta numerada da rodada seguinte.
+Offer `Proceed` on every question from round one. In the subsequent round,
+ask whether the user wishes to definitively close questions for that area,
+answer later, or resume immediately. Include this confirmation among the
+numbered questions of the next round.
 
-Se a pessoa encerrar a área, registre
-`Área encerrada pelo usuário: <área>` no artefato aplicável e não volte ao
-assunto sem reabertura explícita. Se ela responder depois, registre
-`Área adiada pelo usuário: <área>` e preserve os pontos abertos para retomada.
-Não normalize ausência de resposta como escolha confirmada, não declare
-conclusão plena e não aprove o Definition Gate enquanto houver lacuna
-aplicável.
+If the user closes the area, record
+`Area closed by user: <area>` in the applicable artifact and do not revisit
+without an explicit request. If they defer, record
+`Area deferred by user: <area>` and preserve open items for later resumption.
+Never normalize the absence of an answer as a confirmed choice, do not declare
+full completion, and do not approve the Definition Gate while applicable gaps remain.
 
 ---
 
-## 10. Protocolo para analisar especificações e histórias
+## 10. Protocol for Analyzing Existing Specifications and Stories
 
-Quando a entrada já estiver escrita, o método deve produzir primeiro um diagnóstico.
+When written requirements already exist, the method first executes diagnostic analysis.
 
-### Etapa 1 — Segmentação
+### Step 1 — Segmentation
 
-Divida o texto em afirmações atômicas, preservando a passagem original.
+Decompose text into atomic assertions, preserving original excerpts.
 
-### Etapa 2 — Extração
+### Step 2 — Extraction
 
-Identifique:
+Extract:
 
-- atores;
-- entidades;
-- ações;
-- atributos;
-- quantidades;
-- relações;
-- lugares;
-- tempos;
-- estados;
-- recursos;
-- efeitos.
+- actors;
+- entities;
+- actions;
+- attributes;
+- quantities;
+- relations;
+- places;
+- times;
+- states;
+- capabilities;
+- effects.
 
-### Etapa 3 — Vocabulário
+### Step 3 — Vocabulary Audit
 
-Localize:
+Locate:
 
-- termos sem definição;
-- termos com mais de um sentido;
-- nomes diferentes para o mesmo conceito;
-- termos derivados usados como equivalentes;
-- classificações e atributos possivelmente confundidos.
+- undefined terms;
+- homonyms with conflicting meanings;
+- multiple names for identical concepts;
+- derived terms used interchangeably;
+- conflated entity classifications and attributes.
 
-### Etapa 4 — Classificação
+### Step 4 — Classification
 
-Associe cada trecho às categorias relevantes.
+Map each excerpt to relevant categories.
 
-### Etapa 5 — Status
+### Step 5 — Status Labeling
 
-Marque cada afirmação como:
+Label each assertion as:
 
-- declarada;
-- inferida;
-- hipótese;
-- decisão;
-- conflito;
-- aberta.
+- declared;
+- inferred;
+- hypothesis;
+- decision;
+- conflict;
+- open.
 
-### Etapa 6 — Teste lógico
+### Step 6 — Logical Stress Testing
 
-Procure:
+Investigate:
 
-- negação;
-- exceção;
-- condição de falha;
-- contradição;
-- limite;
-- ausência de efeito observável;
-- consequência não mencionada.
+- logical negations;
+- unhandled exceptions;
+- failure modes;
+- internal contradictions;
+- boundary limits;
+- lack of observable effect;
+- unstated side effects.
 
-### Etapa 7 — Cobertura
+### Step 7 — Coverage Evaluation
 
-Avalie quais categorias aplicáveis estão:
+Evaluate which applicable categories are:
 
-- ausentes;
-- apenas mencionadas;
-- definidas;
-- verificáveis.
+- absent;
+- merely mentioned;
+- defined;
+- verifiable.
 
-### Etapa 8 — Consolidação
+### Step 8 — Consolidation
 
-Somente depois do diagnóstico, gere:
+Only after completing diagnosis, produce:
 
-- resumo;
-- glossário;
-- regras;
-- decisões;
-- escopo;
-- questões;
-- histórias refinadas;
-- critérios de aceitação.
+- summary;
+- glossary;
+- rules;
+- decisions;
+- scope boundaries;
+- open questions;
+- refined user stories;
+- acceptance criteria.
 
 ---
 
-## 11. Registro de afirmações
+## 11. Assertion Record Format
 
-Cada afirmação relevante deve possuir um registro rastreável.
+Every material assertion requires a traceable structured record.
 
 ```yaml
 id: RQ-012
-trecho_de_origem: "Cada manager terá seu token."
-formulacao_normalizada: "Cada manager possui um token MCP individual."
-categorias:
-  - substancia
-  - quantidade
-  - relacao
-  - posse
-status: declarado
-fonte: "Refinamento do backlog com o responsável pelo produto"
-dependencias:
-  - "Definir se pode existir mais de um token ativo"
-teste: "Consultar os tokens vinculados a dois managers diferentes"
-risco: P1
+source_excerpt: "Each manager will have their own token."
+normalized_assertion: "Each manager possesses an individual MCP token."
+categories:
+  - substance
+  - quantity
+  - relation
+  - possession
+status: declared
+source: "Backlog refinement with product owner"
+dependencies:
+  - "Decide if multiple concurrent active tokens are permitted"
+test: "Query tokens linked to two distinct managers"
+risk: P1
 ```
 
-Campos mínimos:
+Minimum fields:
 
-| Campo | Descrição |
+| Field | Description |
 |---|---|
-| ID | Identificador estável. |
-| Trecho de origem | Fala, documento ou passagem que originou a afirmação. |
-| Formulação normalizada | Afirmação atômica sem alteração do sentido. |
-| Categorias | Categorias relacionadas. |
-| Status | Declarado, inferido, hipótese, decisão, conflito ou aberto. |
-| Fonte | Pessoa, documento, regra ou evidência. |
-| Dependências | Decisões necessárias ou afirmações relacionadas. |
-| Teste | Como confirmar, refutar ou observar o comportamento. |
-| Risco | P1, P2 ou P3. |
+| ID | Stable unique identifier. |
+| Source Excerpt | Verbatim quote, document passage, or interview transcript. |
+| Normalized Assertion | Atomic statement preserving exact meaning. |
+| Categories | Applicable Aristotelian categories. |
+| Status | Declared, Inferred, Hypothesis, Decision, Conflict, or Open. |
+| Source | Person, specification, rule, or repository evidence. |
+| Dependencies | Prerequisite decisions or related assertions. |
+| Test | Method to confirm, refute, or observe behavior. |
+| Risk | P1 (Blocker), P2 (Necessary), or P3 (Enhancement). |
 
 ---
 
-## 12. Cobertura
+## 12. Coverage Metric
 
-A cobertura é um instrumento de visibilidade, não uma nota absoluta de qualidade.
+Coverage provides visibility into analysis completeness, not an absolute quality score.
 
-| Pontuação | Estado | Critério |
+| Points | State | Criterion |
 |---:|---|---|
-| N/A | Não aplicável | A irrelevância foi justificada. |
-| 0 | Ausente | A categoria é relevante, mas não aparece. |
-| 1 | Mencionada | Existe referência, porém vaga, contraditória ou não operacional. |
-| 2 | Definida | A regra está explícita e coerente. |
-| 3 | Verificável | Possui condição, efeito observável e tratamento da exceção relevante. |
+| N/A | Not Applicable | Irrelevance documented with explicit justification. |
+| 0 | Absent | Category is relevant but entirely omitted. |
+| 1 | Mentioned | Vaguely referenced, contradictory, or non-operational. |
+| 2 | Defined | Rule is explicit, coherent, and actionable. |
+| 3 | Verifiable | Includes preconditions, observable effects, and failure handling. |
 
-A cobertura percentual pode ser calculada por:
+Percentage coverage can be calculated as:
 
 ```text
-soma dos pontos obtidos
+Sum of earned points
 ────────────────────────────────────────── × 100
-3 × quantidade de categorias aplicáveis
+3 × count of applicable categories
 ```
 
-Uma cobertura alta não elimina bloqueios. Uma única questão P1 pode impedir o refinamento mesmo quando todas as outras categorias estiverem bem definidas.
+High numerical coverage does not eliminate blockers. A single unaddressed P1 question
+blocks refinement even when all other categories are fully defined.
 
 ---
 
-## 13. Gatilhos de risco
+## 13. Risk Triggers
 
-O método deve sinalizar:
+The method must flag:
 
-- termo central com mais de uma definição;
-- ator sem papel ou limite de autorização;
-- entidade sem proprietário;
-- ação sem gatilho;
-- ação sem alvo;
-- efeito principal não observável;
-- quantidade ilimitada em fluxo com custo ou cobrança;
-- prazo relativo sem duração ou fuso;
-- transição sem estado inicial;
-- falha sem comportamento esperado;
-- operação sensível sem auditoria;
-- comportamento irreversível sem confirmação;
-- conflito entre duas afirmações;
-- critério de aceitação que apenas repete a história;
-- inferência apresentada como decisão.
-
----
-
-## 14. Estrutura da saída
-
-Ao concluir a análise, o MCR-10 pode produzir as seguintes seções.
-
-### Entendimento
-
-Resumo do problema, da intenção e do resultado esperado.
-
-### Vocabulário
-
-Definições canônicas, termos ambíguos e conceitos relacionados.
-
-### Atores e entidades
-
-Tipos, instâncias, atributos e relações principais.
-
-### Matriz categorial
-
-Conteúdo encontrado, lacunas e status em cada categoria.
-
-### Regras e decisões
-
-Afirmações confirmadas, acompanhadas de sua origem.
-
-### Escopo
-
-O que está incluído, o que está excluído e quais são as dependências.
-
-### Fluxos e estados
-
-Gatilhos, ações, transições, efeitos e falhas.
-
-### Questões em aberto
-
-Perguntas P1, P2 e P3 ainda não respondidas.
-
-### Histórias refinadas
-
-Histórias menores quando a solicitação original contiver mais de uma intenção.
-
-### Critérios de aceitação
-
-Cenários observáveis, utilizando Given/When/Then quando essa estrutura aumentar a precisão.
-
-### Cobertura e riscos
-
-Pontuação por categoria aplicável e bloqueios remanescentes.
-
-### Rastreabilidade
-
-Ligação entre trechos originais, decisões, regras e critérios.
+- central domain terms with multiple competing definitions;
+- actors lacking assigned roles or authorization boundaries;
+- entities lacking designated ownership;
+- actions lacking explicit triggers;
+- actions lacking target entities;
+- primary effects lacking observable outputs;
+- unbounded quantities in cost-bearing or metered workflows;
+- relative deadlines lacking specific durations or timezones;
+- transitions lacking defined initial states;
+- failure modes lacking defined fallback behaviors;
+- sensitive mutations lacking audit logs;
+- irreversible operations lacking confirmation;
+- contradictions between assertions;
+- acceptance criteria that merely restate user story titles;
+- unverified inferences presented as established decisions.
 
 ---
 
-## 15. Exemplo de aplicação
+## 14. Output Structure
 
-### Entrada
+Upon concluding analysis, MCR-10 delivers the following sections:
 
-> Como manager, quero gerar um token MCP para administrar os módulos permitidos.
+### Understanding
 
-### Análise inicial
+Summary of problem, intent, and target outcome.
 
-| Categoria | Conteúdo encontrado | Lacuna |
+### Vocabulary
+
+Canonical domain definitions, disambiguated terms, and related concepts.
+
+### Actors and Entities
+
+Types, instances, attributes, and primary relationships.
+
+### Categorial Matrix
+
+Identified content, knowledge gaps, and status across categories.
+
+### Rules and Decisions
+
+Confirmed assertions accompanied by provenance sources.
+
+### Scope
+
+In-scope capabilities, out-of-scope boundaries, and dependencies.
+
+### Flows and States
+
+Triggers, actions, transitions, effects, and failure modes.
+
+### Open Questions
+
+Unresolved P1, P2, and P3 questions.
+
+### Refined Stories
+
+Smaller decoupled stories when initial requests encompass multiple goals.
+
+### Acceptance Criteria
+
+Observable scenarios using Given/When/Then formatting.
+
+### Coverage and Risks
+
+Score per applicable category and remaining blockers.
+
+### Traceability
+
+Direct links between source excerpts, decisions, rules, and acceptance criteria.
+
+---
+
+## 15. Worked Example
+
+### Input Request
+
+> As a manager, I want to generate an MCP token to manage permitted modules.
+
+### Initial Analysis
+
+| Category | Identified Content | Knowledge Gap |
 |---|---|---|
-| Substância | manager, token MCP, módulo | O token pertence ao usuário ou à conta? |
-| Quantidade | um token é mencionado | Pode existir mais de um token ativo? |
-| Qualidade | não definida | Quais requisitos de segurança e exibição do segredo? |
-| Relação | manager relacionado aos módulos | Quem define os módulos permitidos? |
-| Lugar | não definido | A configuração ocorre em qual tela ou servidor? |
-| Tempo | não definido | O token expira? Quando a revogação produz efeito? |
-| Posição | estados implícitos | Quais estados existem: ativo, expirado e revogado? |
-| Posse | manager precisa de autorização | Qual permissão habilita geração e revogação? |
-| Ação | gerar e administrar | O que `administrar` inclui? |
-| Afecção | token criado e módulos acessíveis | O segredo aparece uma vez? Há auditoria? |
+| Substance | manager, MCP token, module | Does token belong to the user or team account? |
+| Quantity | one token mentioned | Can multiple active tokens exist simultaneously? |
+| Quality | undefined | What are security constraints and secret display rules? |
+| Relation | manager related to modules | Who administers permitted modules? |
+| Place | undefined | Where does configuration occur (UI view, API)? |
+| Time | undefined | Does the token expire? When does revocation take effect? |
+| Position | implicit states | What states exist: active, expired, revoked? |
+| Possession | manager requires authorization | Which permission authorizes creation and revocation? |
+| Action | generate and manage | What specifically does `manage` encompass? |
+| Affection | token created, modules accessed | Is the secret displayed only once? Is there an audit log? |
 
-### Síntese para o usuário
+### Synthesis for User
 
-> Entendi que o manager precisa de uma credencial MCP vinculada aos módulos que pode administrar. Antes de escrevermos os critérios, precisamos fechar três decisões que alteram a identidade, a autorização e a estrutura dos tokens.
+> I understand that managers need an MCP credential linked to modules they are authorized to manage. Before drafting criteria, we need to resolve three architectural decisions affecting identity, authorization, and token structures.
 
-### Fila inicial de perguntas candidatas
+### Initial Candidate Question Queue
 
-1. Cada token pertence exclusivamente a um usuário ou pode representar uma conta ou equipe?
-2. O manager poderá ter um único token ativo ou vários tokens nomeados?
-3. As permissões serão herdadas do papel do usuário ou configuradas individualmente no token?
+1. Does each token belong exclusively to an individual user, or can it represent a team account?
+2. May a manager hold a single active token, or multiple named tokens?
+3. Are module permissions inherited from user roles or configured individually per token?
 
-Pergunte primeiro sobre propriedade. Depois da resposta, recalcule as lacunas:
-a decisão pode alterar ou eliminar as perguntas seguintes. A lista é uma fila de
-análise, não um questionário a ser enviado em lote.
+Ask question 1 regarding ownership first. Upon receiving the response, recalculate gaps:
+the answer may invalidate or reshape subsequent questions. The list represents an
+analytical queue, never a batch questionnaire.
 
-### Afirmação demonstrativa após as decisões
+### Demonstrative Assertion Following Decisions
 
-> Cada token MCP pertence a um único usuário admin ou manager, possui um conjunto explícito de módulos autorizados e pode estar ativo, expirado ou revogado. Um token revogado deve ser rejeitado em novas chamadas e a revogação deve ser registrada.
+> Each MCP token belongs to a single admin or manager user, carries an explicit allowlist of authorized modules, and exists in an active, expired, or revoked state. A revoked token must be immediately rejected on subsequent API calls, and revocation must be logged in the audit trail.
 
-Essa afirmação ainda deverá ser testada:
+This assertion will subsequently be tested:
 
-- a rejeição é imediata?
-- chamadas em andamento são interrompidas?
-- o admin pode revogar o token de outro usuário?
-- qual informação deve ser armazenada na auditoria?
-- o token expirado pode ser reativado?
-
----
-
-## 16. Critérios de conclusão
-
-Uma especificação está suficientemente refinada quando:
-
-- os termos centrais possuem definição operacional;
-- atores, entidades, ação, alvo e efeito principal estão explícitos;
-- tipo, instância, atributo e estado não estão confundidos;
-- propriedade e autorização estão definidas ou justificadamente marcadas como não aplicáveis;
-- limites relevantes estão definidos;
-- o contexto de execução está definido;
-- regras temporais relevantes estão definidas;
-- estados e transições estão definidos;
-- falhas e exceções de maior risco foram tratadas;
-- efeitos colaterais foram identificados;
-- inferências aplicáveis foram confirmadas, refutadas ou marcadas como não
-  aplicáveis;
-- não existe questão aplicável sem resposta;
-- os critérios permitem observar sucesso e falha;
-- cada decisão importante pode ser ligada à sua fonte.
-
-Escolher `avançar` abre a confirmação de encerramento da área, adiamento ou
-retomada imediata. Encerrar uma área impede novas perguntas sobre ela até uma
-reabertura explícita. Adiar preserva os pontos abertos. A definição permanece
-em Draft e o Definition Gate permanece Pending enquanto houver lacuna
-aplicável.
+- is rejection instantaneous?
+- are in-flight calls aborted?
+- can admins revoke tokens belonging to other users?
+- what metadata must be recorded in the audit log?
+- can expired tokens be reactivated?
 
 ---
 
-## 17. Regras para uso por inteligência artificial
+## 16. Completion Criteria
 
-Um assistente que utilize o MCR-10 deve:
+A specification is sufficiently refined when:
 
-1. preservar a formulação original do usuário;
-2. extrair o que já está definido antes de perguntar;
-3. não repetir perguntas respondidas;
-4. marcar toda inferência;
-5. não inventar decisões para completar a especificação;
-6. usar as categorias de forma adaptativa;
-7. fazer uma pergunta numerada por rodada e esperar a resposta;
-8. priorizar autorização, propriedade, dados, dinheiro, irreversibilidade e efeito principal;
-9. atualizar a análise incrementalmente;
-10. permitir que o usuário corrija uma definição;
-11. recalcular regras dependentes quando uma decisão mudar;
-12. manter rastreabilidade entre origem, decisão e critério;
-13. gerar uma versão resumida ou completa conforme a necessidade;
-14. tratar categorias não aplicáveis de maneira explícita;
-15. analisar antes de reescrever.
-16. executar o refinamento do backlog com no máximo oito perguntas por área;
-17. reanalisar o contexto acumulado e as novas respostas depois de cada rodada;
-18. continuar enquanto existir lacuna aplicável;
-19. oferecer pelo menos três opções numeradas, `Escrever outra resposta`,
-    `Gere outras opções` e `Avançar` em cada pergunta desde a primeira rodada;
-20. confirmar se a pessoa encerra a área, responde depois ou retoma agora;
-21. registrar e respeitar áreas encerradas ou adiadas.
+- core domain terms possess operational definitions;
+- actors, entities, actions, targets, and primary effects are explicit;
+- types, instances, attributes, and states are not conflated;
+- ownership and authorization are established or justified as not applicable;
+- relevant quantitative boundaries are defined;
+- execution contexts are specified;
+- temporal rules and schedules are defined;
+- states and valid transitions are mapped;
+- high-risk failure modes and exceptions are handled;
+- side effects are identified;
+- applicable inferences are confirmed, refuted, or justified as not applicable;
+- no applicable questions remain unanswered;
+- acceptance criteria allow observing success and failure;
+- every material decision links to its origin.
+
+Selecting `Proceed` triggers confirmation of area closure, deferral, or immediate
+resumption. Closing an area prevents further questions on it without explicit reopening.
+Deferral preserves open items. The definition remains in Draft and the Definition Gate
+remains Pending while applicable gaps persist.
 
 ---
 
-## 18. Prompt operacional
+## 17. Rules for Artificial Intelligence Assistants
+
+An AI assistant applying MCR-10 must:
+
+1. preserve original user phrasing;
+2. extract what is already defined before posing questions;
+3. never repeat answered questions;
+4. explicitly label all inferences;
+5. never fabricate decisions to artificially complete a specification;
+6. apply categories adaptively rather than dogmatically;
+7. ask exactly one numbered question per round and await responses;
+8. prioritize authorization, ownership, data integrity, money, irreversibility, and core effects;
+9. update analysis incrementally after each user response;
+10. allow users to correct terminology definitions;
+11. recalculate dependent rules whenever decisions change;
+12. maintain traceability between origin, decision, and criteria;
+13. generate concise or comprehensive summaries as requested;
+14. treat non-applicable categories explicitly with documented justifications;
+15. analyze existing materials before rewriting them;
+16. limit backlog refinement to at most eight questions per area;
+17. re-analyze accumulated context and new answers after each round;
+18. continue while applicable gaps remain;
+19. offer at least three numbered options, `Write another answer`, `Generate other options`, and `Proceed` on every question from round one;
+20. confirm whether the user closes the area, defers answers, or resumes immediately;
+21. record and respect closed or deferred areas.
+
+---
+
+## 18. Operational Prompt
 
 ```text
-Analise a solicitação preservando as palavras do usuário.
+Analyze the request while preserving the user's original words.
 
-Distinga o pedido literal da finalidade e formule o resultado desejado como uma
-interpretação a ser confirmada, nunca como leitura da mente do usuário.
+Distinguish literal requests from core purpose, formulating the desired outcome
+as an interpretation to be verified, never as presumed mind-reading.
 
-Primeiro, extraia os termos simples e identifique ambiguidades, incluindo nomes
-iguais com sentidos diferentes, conceitos equivalentes e termos derivados que
-não devem ser confundidos.
+First, extract simple terms and identify ambiguities, including homonyms with
+different meanings, equivalent concepts, and derived terms that must not be conflated.
 
-Depois, distribua o conteúdo aplicável entre substância, quantidade, qualidade,
-relação, lugar, tempo, posição, posse, ação e afecção ou efeito recebido.
+Next, distribute applicable content across substance, quantity, quality, relation,
+place, time, position, possession, action, and affection / received effect.
 
-Para cada item, registre o trecho de origem e marque-o como declarado, inferido,
-hipótese, decisão, conflito ou questão aberta.
+For each item, record the source excerpt and label it as declared, inferred,
+hypothesis, decision, conflict, or open question.
 
-Recombine os elementos em afirmações com sujeito, condição, ação ou predicado e
-efeito observável. Teste cada afirmação por negação, exceção, falha e limite.
+Recompose elements into assertions containing subject, condition, action/predicate,
+and observable effect. Stress-test each assertion through negation, exceptions,
+failure modes, and boundary limits.
 
-Antes de reescrever a especificação, apresente uma síntese e faça exatamente
-uma pergunta numerada por rodada. Ofereça pelo menos três opções numeradas,
-`Escrever outra resposta`, `Gere outras opções` e `Avançar`. Priorize
-identidade,
-autorização, propriedade, dados, custo, irreversibilidade e efeito principal.
-Depois de `Avançar`, confirme encerramento da área, adiamento ou retomada
-imediata. Registre a escolha e não reabra uma área encerrada sem pedido
-explícito.
+Before rewriting the specification, present a synthesis and ask exactly one numbered
+question per round. Offer at least three numbered options, 'Write another answer',
+'Generate other options', and 'Proceed'. Prioritize identity, authorization,
+ownership, data, costs, irreversibility, and core effects. After 'Proceed',
+confirm area closure, deferral, or immediate resumption. Record choices and do
+not reopen closed areas without an explicit request.
 
-Não invente respostas.
+Never fabricate answers.
 
-Ao final, gere entendimento, vocabulário, atores e entidades, matriz categorial,
-regras confirmadas, escopo, fluxos, questões abertas, histórias refinadas,
-critérios de aceitação, cobertura, riscos e rastreabilidade.
+Finally, deliver understanding, vocabulary, actors and entities, categorial matrix,
+confirmed rules, scope boundaries, flows, open questions, refined stories,
+acceptance criteria, coverage metrics, risks, and traceability.
 ```
 
 ---
 
-## 19. Referências e fidelidade conceitual
+## 19. Conceptual References and Fidelity
 
-Fontes:
+Sources:
 
-**Aristóteles. _Categorias; Da Interpretação_. Tradução e notas de Ricardo Santos. Imprensa Nacional-Casa da Moeda, 2016.**
+**Aristotle. _Categories; On Interpretation_. Translated with notes by Ricardo Santos. Imprensa Nacional-Casa da Moeda, 2016.**
 
-- Aristóteles, *Categories*, tradução de E. M. Edghill, em *The Works of
-  Aristotle* (1928), texto e numeração Bekker:
+- Aristotle, *Categories*, translated by E. M. Edghill, in *The Works of
+  Aristotle* (1928), Bekker pagination:
   https://en.wikisource.org/wiki/The_Works_of_Aristotle/Categories
-- Paul Studtmann, “Aristotle’s Categories”, *Stanford Encyclopedia of
-  Philosophy*, arquivo Spring 2021:
+- Paul Studtmann, "Aristotle's Categories", *Stanford Encyclopedia of
+  Philosophy*, Spring 2021 archive:
   https://plato.stanford.edu/archives/spr2021/entries/aristotle-categories/
-- “Aristotle’s Logic”, seção 7.3, *Stanford Encyclopedia of Philosophy*:
+- "Aristotle's Logic", section 7.3, *Stanford Encyclopedia of Philosophy*:
   https://plato.stanford.edu/entries/aristotle-logic/
 
-Passagens utilizadas:
+Referenced passages:
 
-- *Categorias*, capítulo 1, 1a1–15: homônimos, sinônimos e parônimos;
-- *Categorias*, capítulo 2, 1a16–1b9: expressões com e sem combinação, `ser dito de` e `estar em` um sujeito;
-- *Categorias*, capítulo 4, 1b25–2a10: enumeração das dez categorias e passagem da expressão isolada à afirmação.
+- *Categories*, chapter 1, 1a1–15: homonyms, synonyms, and paronyms;
+- *Categories*, chapter 2, 1a16–1b9: expressions with and without combination, `said of` and `in` a subject;
+- *Categories*, chapter 4, 1b25–2a10: enumeration of the ten categories and progression from isolated terms to assertions.
 
-As fontes foram consultadas em 24 de julho de 2026. A tradução portuguesa acima
-é a referência bibliográfica indicada no material original; os links públicos
-permitem conferir a enumeração, os exemplos e o debate interpretativo.
+Sources consulted on July 24, 2026. Public links allow verifying enumeration,
+examples, and interpretive scholarship.
 
-O MCR-10 é uma adaptação metodológica contemporânea. Ele não atribui a
-Aristóteles uma teoria de requisitos, produto, conversação ou desenvolvimento de
-software. Termos como autorização, tenancy, observabilidade, feature flag,
-rollback e TDD pertencem exclusivamente à adaptação moderna.
+MCR-10 is a contemporary methodological adaptation. It does not attribute to
+Aristotle a modern theory of requirements engineering, product management, or
+software development. Terms like authorization, multi-tenancy, observability,
+feature flags, rollback, and TDD belong exclusively to the modern software discipline.
 
 ---
 
-## 20. Aprendizados, validação e evolução
+## 20. Learnings, Validation, and Evolution
 
-### Aprendizados incorporados
+### Incorporated Learnings
 
-- As categorias melhoram cobertura sem provar completude; uma questão P1 ainda
-  pode bloquear uma matriz com pontuação alta.
-- A finalidade precisa preceder as categorias porque um pedido pode descrever
-  uma solução sem revelar o problema.
-- Posição, posse e afecção exigem tradução cuidadosa para software; estado,
-  autorização e efeitos são extensões operacionais, não equivalências históricas.
-- Separar declaração, inferência e decisão reduz a chance de uma redação fluente
-  transformar suposição do agente em requisito.
-- A conversa é mais útil quando as categorias orientam o raciocínio silencioso e
-  apenas a lacuna de maior valor aparece para o usuário.
+- Categories improve investigative coverage without proving absolute completeness; a single
+  P1 question can block a matrix with high numerical scores.
+- Purpose must precede categories because user requests frequently describe proposed solutions
+  without revealing root problems.
+- Position, possession, and affection require careful translation for software systems;
+  lifecycle state, authorization, and side effects are operational extensions, not historical equivalences.
+- Separating declared statements, inferences, and decisions eliminates the risk of fluent
+  agent writing masquerading assumptions as confirmed requirements.
+- Dialogue is most productive when categories guide silent reasoning while only the highest-value
+  gap is presented to the user.
 
-### Hipóteses a validar
+### Validation Hypotheses
 
-O método ainda deve ser avaliado em histórias reais. Compare, antes e depois:
+The method must be evaluated against production user stories. Compare before and after:
 
-- ambiguidades materiais descobertas antes da implementação;
-- quantidade de perguntas feitas e respostas que alteraram o comportamento;
-- defeitos de requisito encontrados em desenvolvimento ou produção;
-- concordância entre dois analistas sobre categorias, status e prioridades;
-- tempo até uma história possuir Gherkin testável;
-- satisfação do usuário com a fidelidade da síntese.
+- material ambiguities discovered prior to implementation;
+- number of questions posed versus answers altering behavior;
+- requirements defects discovered during development or in production;
+- inter-rater reliability between analysts regarding categories, status, and priorities;
+- time elapsed before a story achieves testable Gherkin specifications;
+- user satisfaction with synthesis fidelity.
 
-### Possibilidades de aprimoramento
+### Potential Enhancements
 
-1. Criar exemplos calibrados por domínio: SaaS multi-tenant, pagamentos,
-   integrações, IA, dados sensíveis e sistemas assíncronos.
-2. Testar consistência entre avaliadores e refinar fronteiras que produzirem
-   classificações divergentes sem benefício prático.
-3. Automatizar extração e matriz sem automatizar decisões ou pontuação final.
-4. Vincular registros MCR diretamente a `US`, `FR`, `AC`, testes e tarefas.
-5. Criar padrões de risco que elevem automaticamente perguntas de autorização,
-   privacidade, dinheiro e irreversibilidade para P1.
-6. Medir perguntas evitadas pela análise adaptativa, não premiar quantidade de
-   perguntas ou cobertura percentual isolada.
-7. Revisar linguagem, acessibilidade e vieses para que o método funcione com
-   usuários técnicos e não técnicos.
+1. Create domain-calibrated examples: multi-tenant SaaS, fintech, integrations,
+   AI systems, sensitive health data, and asynchronous event streams.
+2. Test inter-rater reliability and refine category boundaries producing divergent
+   classifications without practical benefit.
+3. Automate extraction and matrix building without automating human decisions or scoring.
+4. Bind MCR records directly to `US`, `FR`, `AC`, test cases, and engineering tasks.
+5. Define risk heuristics automatically elevating questions concerning authorization,
+   privacy, billing, and data irreversibility to P1.
+6. Measure questions avoided through adaptive reasoning rather than rewarding raw question volume.
+7. Review plain language and accessibility so the method serves technical and non-technical stakeholders alike.
 
-Qualquer evolução deve preservar a formulação original, a proveniência das
-afirmações e a decisão humana sobre intenção e comportamento.
+Any methodological evolution must preserve original user phrasing, assertion provenance,
+and human sovereignty over intent and behavior.

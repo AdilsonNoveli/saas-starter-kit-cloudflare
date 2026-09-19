@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - 06 - TDD orientado por BDD"
-  short_description: "Usa o BDD da spec para criar TDD rastreável"
-  default_prompt: "Use $fireskill-06-tdd-bdd para ler o Gherkin de referência em specs/<estado>/<NNNN>-<slug>/spec.md, criar testes TDD rastreáveis e executar RED-GREEN-REFACTOR sem executar .feature. Orquestre transições automáticas com anúncio, execução e retomada na mesma conversa."
+  display_name: "Fireskill - 06 - TDD and BDD"
+  short_description: "Executes TDD cycle driven by spec BDD"
+  default_prompt: "Use $fireskill-06-tdd-bdd to translate the Gherkin scenarios of specs/<state>/<NNNN>-<slug>/spec.md into RED executable tests and maintain full traceability. Orchestrate automatic transitions with announcement, execution, and resumption in the same conversation."

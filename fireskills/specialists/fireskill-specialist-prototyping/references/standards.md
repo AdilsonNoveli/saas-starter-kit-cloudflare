@@ -1,53 +1,46 @@
-# Padrões e referências de prototipação
+# Prototyping Standards and References
 
-## Fidelidade por tipo de pergunta
+## Fidelity by Question Type
 
-- **Pergunta de estado/lógica** ("essa máquina de estados cobre todas as
-  transições?"): terminal ou teste executável que torne as transições e
-  invariantes visíveis passo a passo — não precisa de UI nenhuma.
-- **Pergunta de integração** ("essa API de terceiro se comporta como
-  documentado sob nossa carga?"): spike isolado contra sandbox, ambiente de
-  teste do provedor ou fake controlado, nunca contra produção do terceiro
-  sem autorização.
-- **Pergunta de estrutura de UI** ("esse fluxo de telas resolve a tarefa do
-  usuário?"): wireframe navegável com conteúdo realista — fidelidade visual
-  baixa, fidelidade de fluxo alta.
-- **Pergunta de direção visual** ("qual estilo comunica melhor a marca?"):
-  duas ou mais alternativas deliberadamente distintas entre si, nunca
-  variações sutis da mesma ideia — variações sutis não discriminam
-  preferência real.
-- **Pergunta de viabilidade de performance** ("esse mecanismo aguenta a
-  carga esperada?"): benchmark mínimo com workload representativo da
-  produção real (volume, concorrência, tamanho de payload), não um teste
-  sintético arbitrário.
+- **State/Logic Question** ("does this state machine cover all valid transitions?"):
+  terminal or executable tests that make state transitions and invariants visible step
+  by step — requires zero UI.
+- **Integration Question** ("does this third-party API behave as documented under our load?"):
+  isolated spike against a sandbox, provider staging environment, or controlled fake,
+  never against third-party production without explicit authorization.
+- **UI Structure Question** ("does this screen flow resolve the user task?"):
+  navigable wireframe with realistic content — low visual fidelity, high flow fidelity.
+- **Visual Direction Question** ("which aesthetic direction best communicates the brand?"):
+  two or more deliberately distinct alternatives, never subtle variations of the same
+  concept — subtle variations do not discriminate real preference.
+- **Performance Feasibility Question** ("does this mechanism sustain expected load?"):
+  minimal benchmark with a workload representative of real production (volume, concurrency,
+  payload size), not an arbitrary synthetic test.
 
-Escolher a fidelidade mais alta que a pergunta não exige é desperdício;
-escolher mais baixa que a pergunta exige produz uma resposta que não se
-sustenta.
+Choosing higher fidelity than the question requires is waste; choosing lower fidelity
+produces an ungrounded answer.
 
-## O que muda entre protótipo e produção
+## What Differs Between Prototype and Production
 
-O protótipo deliberadamente pula, até prova em contrário: tratamento de
-erro completo, autenticação/autorização real, observabilidade, cobertura de
-teste, acessibilidade, compatibilidade entre navegadores/dispositivos e
-hardening de segurança. Nenhum desses pode ser assumido como "já resolvido"
-só porque o protótipo funcionou — cada um exige o trabalho normal de
-produção antes do artefato virar produção.
+A prototype deliberately omits, until proven otherwise: comprehensive error handling,
+real authentication/authorization, observability instrumentation, full test coverage,
+complete web accessibility, cross-browser/device compatibility, and security hardening.
+None of these can be assumed resolved just because the prototype functioned — each
+requires the standard production engineering effort before production deployment.
 
-## Formato de saída do protótipo
+## Prototype Output Format
 
-Pergunta → Hipótese → Setup (o que foi real, o que foi simulado) →
-Observação (evidência coletada, não impressão) → Decisão (aceita, rejeitada,
-inconclusiva) → Limitações (o que não foi testado) → Próximo passo (quem
-decide o quê a partir daqui).
+Question → Hypothesis → Setup (what was real vs simulated) → Observation (collected
+evidence, not impressions) → Decision (accepted, rejected, inconclusive) → Limitations
+(what was unexercised) → Next Step (who decides what from here).
 
-O relatório do protótipo nunca vira uma fonte normativa concorrente com a
-spec do projeto — o aprendizado é incorporado à spec, ADR ou backlog, e o
-relatório em si pode ser descartado junto com o código.
+The prototype report never becomes a competing normative source alongside the project
+spec — key learnings are integrated into the spec, ADR, or backlog, and the report itself
+can be archived or discarded along with the prototype code.
 
-## Fontes oficiais e primárias
+## Primary and Official Sources
 
 - GOV.UK Service Manual — Making prototypes: https://www.gov.uk/service-manual/design/making-prototypes
 - W3C WAI — Planning and Managing: https://www.w3.org/WAI/planning/
-- Martin Fowler — Technical Debt (custo de herdar código de protótipo): https://martinfowler.com/bliki/TechnicalDebt.html
+- Martin Fowler — Technical Debt (the cost of inheriting prototype code): https://martinfowler.com/bliki/TechnicalDebt.html
 - Scaled Agile Framework — Spikes: https://framework.scaledagile.com/spikes

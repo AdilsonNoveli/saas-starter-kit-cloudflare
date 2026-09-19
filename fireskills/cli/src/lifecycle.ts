@@ -1,8 +1,8 @@
 /**
- * Ciclo de vida físico das especificações em projetos consumidores.
+ * Physical lifecycle of specifications in consuming projects.
  *
- * A pasta expressa o estado operacional. O campo `Status` em `spec.md` é um
- * espelho verificável, mantido pela mesma operação de transição.
+ * Folder expresses operational state. The `Status` field in `spec.md` is a
+ * verifiable mirror, maintained by the transition operation.
  */
 
 import { mkdir, readFile, readdir, rename } from "node:fs/promises";
@@ -52,7 +52,7 @@ const TABLE_FIELD = (field: string) => new RegExp(
   "imu",
 );
 
-/** Pacote de spec localizado pelo identificador estável. */
+/** Spec package located by stable identifier. */
 export interface ResolvedSpec {
   identifier: string;
   folder: SpecFolder;
@@ -61,25 +61,25 @@ export interface ResolvedSpec {
   status: string;
 }
 
-/** Resultado de uma alteração de estado físico. */
+/** Result of a physical state transition. */
 export interface SpecTransition extends ResolvedSpec {
   from: SpecFolder;
   to: SpecFolder;
 }
 
-/** Opções que tornam a atualização de esforço reproduzível em automações. */
+/** Options for reproducible effort updates in automations. */
 export interface EffortUpdateOptions {
   updatedAt?: string;
 }
 
-/** Lista caminhos de specs de todos os layouts aceitos pelo framework. */
+/** Lists spec paths across all accepted directory layouts. */
 export async function scanSpecPaths(project: string): Promise<string[]> {
   return findSpecPaths(resolvePath(project));
 }
 
 /**
- * Localiza uma única spec nova ou ainda no layout anterior. Aceita o nome
- * completo do diretório (`0001-login`) ou só o número (`0001`).
+ * Resolves a single spec package. Accepts full directory name (`0001-login`)
+ * or number prefix only (`0001`).
  */
 export async function resolveSpec(project: string, identifier: string): Promise<ResolvedSpec> {
   const root = resolvePath(project);
@@ -88,9 +88,9 @@ export async function resolveSpec(project: string, identifier: string): Promise<
   const matches = exact.length
     ? exact
     : all.filter((path) => basename(dirname(path)).startsWith(`${identifier}-`));
-  if (!matches.length) throw new Error(`spec não encontrada: ${identifier}`);
+  if (!matches.length) throw new Error(`spec not found: ${identifier}`);
   if (matches.length > 1) {
-    throw new Error(`há mais de uma spec com o identificador ${identifier}`);
+    throw new Error(`more than one spec found with identifier: ${identifier}`);
   }
   const path = matches[0]!;
   const content = await readFile(path, "utf8");
@@ -104,7 +104,7 @@ export async function resolveSpec(project: string, identifier: string): Promise<
   };
 }
 
-/** Move uma spec entre estados adjacentes e atualiza seu metadado espelho. */
+/** Moves a spec across adjacent states and updates its mirror metadata. */
 export async function transitionSpec(
   project: string,
   identifier: string,
@@ -113,7 +113,7 @@ export async function transitionSpec(
   assertFolder(to);
   const spec = await resolveSpec(project, identifier);
   if (!NEXT_FOLDERS[spec.folder].includes(to)) {
-    throw new Error(`transição inválida: ${spec.folder} para ${to}`);
+    throw new Error(`invalid transition: ${spec.folder} to ${to}`);
   }
   const status = STATUS_BY_FOLDER[to];
   const content = await readFile(spec.path, "utf8");
@@ -123,7 +123,7 @@ export async function transitionSpec(
   const targetDirectory = join(resolvePath(project), "specs", to, spec.identifier);
   if (spec.directory !== targetDirectory) {
     if (await pathExists(targetDirectory)) {
-      throw new Error(`o destino já contém uma spec: ${targetDirectory}`);
+      throw new Error(`destination already contains a spec: ${targetDirectory}`);
     }
     await mkdir(dirname(targetDirectory), { recursive: true });
     await rename(spec.directory, targetDirectory);
@@ -139,7 +139,7 @@ export async function transitionSpec(
   };
 }
 
-/** Migra specs dos dois layouts antigos para as pastas de estado atuais. */
+/** Migrates specs from legacy layouts to current state folders. */
 export async function migrateSpecs(project: string): Promise<SpecTransition[]> {
   const root = resolvePath(project);
   const legacy = await findLegacySpecPaths(root);
@@ -150,12 +150,12 @@ export async function migrateSpecs(project: string): Promise<SpecTransition[]> {
     const status = readStatus(content);
     const to = status ? FOLDER_BY_STATUS.get(status.toLowerCase()) : undefined;
     if (!to) {
-      throw new Error(`Status inválido para migrar ${identifier}: ${status ?? "ausente"}`);
+      throw new Error(`invalid status to migrate ${identifier}: ${status ?? "missing"}`);
     }
     const sourceDirectory = dirname(path);
     const targetDirectory = join(root, "specs", to, identifier);
     if (await pathExists(targetDirectory)) {
-      throw new Error(`o destino já contém uma spec: ${targetDirectory}`);
+      throw new Error(`destination already contains a spec: ${targetDirectory}`);
     }
     await writeTextAtomic(path, updateStatus(content, STATUS_BY_FOLDER[to]));
     await mkdir(dirname(targetDirectory), { recursive: true });
@@ -173,7 +173,7 @@ export async function migrateSpecs(project: string): Promise<SpecTransition[]> {
   return results;
 }
 
-/** Atualiza o esforço estimado e preserva uma justificativa rastreável. */
+/** Updates estimated effort and preserves traceable history. */
 export async function updateSpecEffort(
   project: string,
   identifier: string,
@@ -182,13 +182,13 @@ export async function updateSpecEffort(
   options: EffortUpdateOptions = {},
 ): Promise<ResolvedSpec & { effort: number }> {
   if (!Number.isInteger(effort) || effort < 1 || effort > 10) {
-    throw new Error("Effort precisa ser um inteiro entre 1 e 10");
+    throw new Error("Effort must be an integer between 1 and 10");
   }
   const normalizedRationale = rationale.trim().replace(/\s+/gu, " ");
-  if (!normalizedRationale) throw new Error("informe a justificativa do Effort");
+  if (!normalizedRationale) throw new Error("Effort rationale is required");
   const spec = await resolveSpec(project, identifier);
   const content = await readFile(spec.path, "utf8");
-  const previous = readTableField(content, "Effort") ?? "não informado";
+  const previous = readTableField(content, "Effort") ?? "unspecified";
   const updatedAt = options.updatedAt ?? new Date().toISOString();
   let updated = setTableField(content, "Effort", String(effort));
   updated = setTableField(updated, "Effort updated at", updatedAt);
@@ -198,7 +198,7 @@ export async function updateSpecEffort(
   return { ...spec, effort };
 }
 
-/** Expõe o estado esperado por cada pasta para scripts e interfaces. */
+/** Exposes expected mirror status for a folder. */
 export function statusForFolder(folder: SpecFolder): string {
   assertFolder(folder);
   return STATUS_BY_FOLDER[folder];
@@ -315,6 +315,6 @@ function folderFromLegacyStatus(status: string): SpecFolder {
 
 function assertFolder(folder: string): asserts folder is SpecFolder {
   if (!SPEC_FOLDERS.includes(folder as SpecFolder)) {
-    throw new Error(`status de pasta inválido: ${folder}`);
+    throw new Error(`invalid folder status: ${folder}`);
   }
 }

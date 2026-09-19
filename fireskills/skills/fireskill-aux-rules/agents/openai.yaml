@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Regras Auxiliares"
-  short_description: "Monitora e mantém regras explícitas do projeto"
-  default_prompt: "Use $fireskill-aux-rules para revisar mudanças e registrar regras em .fireskills/RULES.md preservando o conteúdo atual."
+  display_name: "Fireskill - Aux Rules"
+  short_description: "Monitors and maintains explicit project rules"
+  default_prompt: "Use $fireskill-aux-rules to review changes and record rules in .fireskills/RULES.md while preserving current content."

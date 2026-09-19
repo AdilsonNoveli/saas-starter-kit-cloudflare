@@ -1,45 +1,44 @@
-# Padrões para design systems de aplicações SaaS
+# Standards for SaaS Application Design Systems
 
 <!-- markdownlint-disable MD013 -->
 
-## Fonte macro
+## Macro Source
 
-Leia `.fireskills/DESIGNSYSTEM.MD` antes de propor tokens, shell, componentes globais ou
-composições de CRUD. Se o arquivo não existir, use
-`.fireskills/templates/DESIGNSYSTEM.MD` e registre somente o contexto confirmado.
+Read `.fireskills/DESIGNSYSTEM.MD` before proposing tokens, shell layouts, global components,
+or CRUD compositions. If absent, copy `.fireskills/templates/DESIGNSYSTEM.MD` and populate
+only confirmed context.
 
-## Superfícies comuns
+## Common Surfaces
 
-| Superfície | Composição mínima |
+| Surface | Minimal Composition |
 | --- | --- |
-| lista de CRUD | `PageHeader` compartilhado + resumo útil + `UTable` em largura total, com `ID` e ações por linha |
-| detalhe | `PageHeader` + `DetailLists` + status e próxima ação |
-| criar e editar | `PageHeader` + seções com contexto e campos em duas colunas |
-| dashboard | período ou escopo + filtros + `KPI` + tendência ou distribuição + detalhe |
-| toda tela | `Breadcrumb` com equipe, módulo e tela atual |
+| CRUD List | Shared `PageHeader` + summary + full-width `UTable` with `ID` and row actions |
+| Detail View | `PageHeader` + `DetailLists` + status and primary next action |
+| Create / Edit | `PageHeader` + responsive two-column sections (context and fields) |
+| Dashboard | Period / scope selector + filters + `KPI` strip + trend/distribution + detail table |
+| Every Screen | `Breadcrumb` displaying team, module, and current view title |
 
-Reutilize o breadcrumb já presente no layout; se não houver, use `UBreadcrumb` do `@nuxt/ui`.
+Reuse layout breadcrumb components; if absent, use `UBreadcrumb` from `@nuxt/ui`.
 
-Todas as telas CRUD reutilizam o mesmo `PageHeader`, configurado por props ou
-configuração, sem duplicar markup. A linha da listagem é link para o detalhe e
-mantém editar e apagar como ações independentes. Durante o desenvolvimento,
-confira bordas, espaçamentos, margens, padding e tipografia, mesmo sem pedido
-específico, e registre o resultado no item `VISUAL`.
+All CRUD views reuse the componentized `PageHeader` without duplicating markup.
+Table rows link to detail views while maintaining discrete click handlers for row actions.
+During development, audit borders, spacing, margins, padding, and typography, recording
+findings in the `VISUAL` task checklist.
 
-## Contratos de estado
+## State Contracts
 
-Toda superfície deve declarar, quando aplicável, `loading`, vazio, erro,
-sucesso, sem permissão, conteúdo parcial e alteração não salva. O erro de campo
-fica associado ao controle, aparece abaixo dele e preserva a entrada. Erros
-múltiplos ganham um resumo inicial com links para os campos.
+Every surface declares, as applicable: `loading`, empty, error, success, forbidden (403),
+partial content, and unsaved changes. Field errors are semantically associated with controls,
+displayed directly below inputs, and preserve entered values. Multiple errors feature
+a top summary banner with anchor links.
 
-## Formulários responsivos
+## Responsive Forms
 
-Separe os grupos de informação em seções. A coluna de contexto explica o grupo
-e o painel à direita contém os campos. Use duas colunas nos breakpoints largos,
-uma coluna no mobile e largura total para texto longo, upload e mensagens.
+Group inputs into distinct sections. Context panels explain the group; field panels
+contain controls. Use two columns on desktop viewports, collapsing to single-column
+on mobile screens, with full width for long text, file uploads, and banners.
 
-## Fontes oficiais
+## Authoritative Documentation
 
 - [Material Design 3](https://m3.material.io/)
 - [Carbon Design System](https://carbondesignsystem.com/)

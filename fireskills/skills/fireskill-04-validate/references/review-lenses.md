@@ -1,53 +1,52 @@
-# Lentes de revisão especializadas
+# Specialized Review Lenses
 
-Use as três lentes depois da validação estrutural e antes de promover um gate.
-Elas produzem achados; não alteram requisitos nem tomam decisões pelo usuário.
+Use the three lenses after structural validation and before promoting a gate.
+They produce findings; they do not alter requirements or make decisions on behalf of the user.
 
-## Produto e engenharia (`PROD`)
+## Product and Engineering (`PROD`)
 
-- finalidade, valor e métrica continuam coerentes;
-- escopo e solução não escondem uma necessidade diferente;
-- falhas, limites e custo operacional possuem comportamento observável;
-- o plano é implementável sem hipótese material não confirmada.
+- Purpose, value proposition, and success metrics remain coherent;
+- Scope and proposed solution do not mask a divergent underlying problem;
+- Failure modes, boundaries, and operational costs define observable behaviors;
+- The plan is implementable without unverified material hypotheses.
 
-## Arquitetura (`ARCH`)
+## Architecture (`ARCH`)
 
-- princípios da seção 4 aparecem no desenho das seções 8–10;
-- caminhos e fronteiras declarados correspondem ao repositório;
-- dependências não atravessam camadas ou ownership sem decisão;
-- dados, contratos, rollback e compatibilidade estão decididos;
-- a implementação não introduz deriva em relação ao plano aprovado.
+- Principles in section 4 materialize in designs within sections 8–10;
+- Declared file paths and architectural boundaries align with the actual codebase;
+- Dependencies do not cross layers or team ownership without explicit justification;
+- Data schemas, contracts, rollback strategies, and backward compatibility are decided;
+- Implementation introduces no architectural drift from the approved plan.
 
-## Segurança (`SEC`)
+## Security (`SEC`)
 
-A profundidade é proporcional a dinheiro, autorização, privacidade,
-irreversibilidade e superfície externa. Verifique:
+Depth scales with financial transactions, authorization, privacy,
+irreversibility, and external attack surfaces. Verify:
 
-- autenticação, autorização por recurso e isolamento;
-- classificação, retenção, logs e exposição de dados;
-- fronteiras de confiança, validação de entrada e output encoding;
-- segredos, dependências, abuso, rate limit e disponibilidade;
-- auditoria, revogação, rollback e resposta a falha.
+- Authentication, resource-level authorization, and tenant isolation;
+- Data classification, retention rules, sanitization in logs, and leak prevention;
+- Trust boundaries, input validation, and output encoding;
+- Secrets management, third-party dependency risks, abuse protection, rate limiting, and availability;
+- Audit logging, revocation, rollbacks, and fault recovery.
 
-## Contrato do achado
+## Finding Contract
 
-Registre na seção 13:
+Record in section 13:
 
 ```text
-- **FIND-ARCH-001** [P1] [Open] descrição — Refs: FR-001 — Evidence: path:line — Effect: efeito — Suggestion: correção
+- **FIND-ARCH-001** [P1] [Open] description — Refs: FR-001 — Evidence: path:line — Effect: effect — Suggestion: fix
 ```
 
 - Lenses: `PROD`, `ARCH`, `SEC`.
-- Severidades: `P1`, `P2`, `P3`.
-- Estados: `Open`, `Resolved`, `Accepted`.
-- IDs são únicos; `Refs` devem existir na spec e `Evidence` deve apontar para
-  arquivo local existente dentro da raiz do projeto.
-- `P1 Open` bloqueia o gate.
-- `Accepted` exige decisão registrada; `Resolved` exige evidência da correção.
+- Severities: `P1`, `P2`, `P3`.
+- Statuses: `Open`, `Resolved`, `Accepted`.
+- IDs are unique; `Refs` must exist in the spec and `Evidence` must resolve to an existing local file within the project root.
+- Any `P1 Open` finding blocks the gate.
+- `Accepted` requires recorded user rationale; `Resolved` requires concrete proof of the fix.
 
-Valide com:
+Validate with:
 
 ```bash
 node fireskills/skills/fireskill-04-validate/scripts/review_findings.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md
+  specs/<state>/<NNNN>-<slug>/spec.md
 ```

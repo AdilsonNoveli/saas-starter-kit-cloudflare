@@ -1,7 +1,7 @@
 /**
- * Versão pública do CLI.
+ * Public CLI version.
  *
- * A release atualiza este valor junto do `package.json`.
+ * Release workflows update this value together with `package.json`.
  */
 
 export const VERSION = "0.1.0";

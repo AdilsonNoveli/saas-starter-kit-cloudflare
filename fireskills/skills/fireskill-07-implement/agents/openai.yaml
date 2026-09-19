@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - 07 - Implementar"
-  short_description: "Executa e atualiza checklists da spec"
-  default_prompt: "Use $fireskill-07-implement para executar o próximo item do checklist em specs/<estado>/<NNNN>-<slug>/spec.md com BDD, TDD e evidência. Orquestre transições automáticas com anúncio, execução e retomada na mesma conversa."
+  display_name: "Fireskill - 07 - Implement"
+  short_description: "Executes production tasks from spec section 14"
+  default_prompt: "Use $fireskill-07-implement to execute tasks in section 14 of specs/<state>/<NNNN>-<slug>/spec.md, write production code, and record verifiable evidence. Orchestrate automatic transitions with announcement, execution, and resumption in the same conversation."

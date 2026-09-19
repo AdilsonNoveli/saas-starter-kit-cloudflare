@@ -1,42 +1,40 @@
 ---
 name: fireskill-aux-rules
-description: Monitorar e ajudar a descobrir, formular e registrar regras duráveis em .fireskills/RULES.md sem alterar ou remover regras existentes. Use quando o monitor de contexto apontar revisão de regras; quando o usuário quiser adicionar regras do projeto; quando uma convenção recorrente precisar virar instrução explícita; ou ao revisar conflitos e duplicatas. Não inventa regras nem promove preferências sem confirmação.
+description: Monitor and help discover, formulate, and record durable rules in .fireskills/RULES.md without altering or removing existing rules. Use when context monitor points to rule review; when the user wants to add project rules; when a recurring convention needs to become an explicit instruction; or when reviewing conflicts and duplicates. Does not invent rules or promote preferences without confirmation.
 ---
 
-# Manter regras do projeto
+# Maintaining Project Rules
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered questions contract`
+from `fireskills/skills/Spec.md`.
 
-1. Ler instruções locais, `.fireskills/PROJECT.md` e todo o `RULES.md` existente.
-2. Distinguir regra declarada, inferência e sugestão.
-3. Quando a formulação não estiver confirmada, selecionar uma pergunta real e
-   aplicar o contrato central de perguntas numeradas.
-4. Formular regras verificáveis, com verbo e limite claros.
-5. Executar:
+1. Read local instructions, `.fireskills/PROJECT.md`, and all existing `RULES.md`.
+2. Distinguish declared rule, inference, and suggestion.
+3. When the formulation is not confirmed, select a real question and apply the
+   central contract for numbered questions.
+4. Formulate verifiable rules, with clear verb and boundary.
+5. Execute:
 
 ```bash
 node scripts/add_rule.mjs \
-  --project <raiz> \
-  --section "<tema>" \
-  --rule "<regra confirmada>"
+  --project <root> \
+  --section "<topic>" \
+  --rule "<confirmed rule>"
 ```
 
-6. Revisar o resultado e preservar ordem, comentários e regras anteriores.
-7. Sinalizar conflitos sem escolher silenciosamente qual regra prevalece.
-8. Executar `$fireskill-setup` em modo de monitoramento antes de devolver o
-   handoff. Se nenhuma regra nova for necessária, registrar a justificativa na
-   evidência da tarefa e reconhecer explicitamente a revisão.
+6. Review the result, preserving ordering, comments, and previous rules.
+7. Flag conflicts without silently choosing which rule prevails.
+8. Run `$fireskill-setup` in monitoring mode before returning handoff. If no new
+   rule is needed, record rationale in task evidence and explicitly acknowledge review.
 
-Não usar `RULES.md` como substituto de `AGENTS.md`, de uma spec ou de critérios
-de aceite. Não registrar segredo, token ou dado pessoal.
+Do not use `RULES.md` as a substitute for `AGENTS.md`, a spec, or acceptance criteria.
+Do not record secrets, tokens, or personal data.

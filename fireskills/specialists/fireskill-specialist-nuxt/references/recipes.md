@@ -1,77 +1,71 @@
-# Receitas Nuxt 4 no Nuxfire
+# Nuxt 4 Recipes in Nuxfire
 
-Cada receita parte de um padrão já existente. Confirme o arquivo de referência;
-se divergir, o código vence.
+Each recipe stems from existing codebase patterns. Verify the reference file; if
+discrepancies exist, the code supersedes this document.
 
-## Nova página de equipe
+## New Team Page
 
-1. **Onde**: se é de um domínio, na **layer** dona
-   (`layers/<x>/app/pages/[[team]]/<x>/…`); só páginas de casca ficam em
-   `apps/app/app/pages/`. Modelo: `layers/kanban/app/pages/[[team]]/kanban/`.
-2. O nome da rota começa com `team…` (pasta `[[team]]`) — é o que aciona o
-   `1.teams.global.ts` (resolve a equipe pelo slug e redireciona para
-   `/select-team` se inválida).
-3. Layout: `definePageMeta({ layout: "dashboard" })`. Layouts e middleware nomeados
-   de outra origem funcionam entre layers (registro único).
-4. Dados: `useTrpcClient().<ns>.<proc>.useQuery(() => ({ … }))` com **getter**
-   (reexecuta quando a equipe/rota muda). Equipe atual: `useCurrentTeam()`.
-5. UI: `$fireskill-specialist-nuxt-ui`; textos por i18n nos três idiomas.
-6. Item de menu: `navigation.sidebar` no `layer.manifest.ts` (`{team}` no `to`).
-7. Confira que a página some junto com a layer desligada.
+1. **Location**: if domain-specific, place in the owning **layer**
+   (`layers/<x>/app/pages/[[team]]/<x>/…`); shell-level pages reside in
+   `apps/app/app/pages/`. Reference pattern: `layers/kanban/app/pages/[[team]]/kanban/`.
+2. Route naming begins with `team…` (under `[[team]]` directory) — triggers
+   `1.teams.global.ts` (resolves active team by slug, redirects to `/select-team` if invalid).
+3. Layout: `definePageMeta({ layout: "dashboard" })`. Named layouts and middleware
+   operate across layers seamlessly (unified registry).
+4. Data fetching: `useTrpcClient().<ns>.<proc>.useQuery(() => ({ … }))` with a **getter**
+   function (re-runs automatically on team/route changes). Active team: `useCurrentTeam()`.
+5. UI: `$fireskill-specialist-nuxt-ui`; localized strings across all three locales.
+6. Navigation entry: `navigation.sidebar` in `layer.manifest.ts` (`{team}` placeholder in `to`).
+7. Confirm the page disappears cleanly when the feature layer is disabled.
 
-## Página pública (sem login)
+## Public Page (Unauthenticated)
 
-- `definePageMeta({ auth: false })` — o `0.auth.global.ts` deixa passar (padrão da
-  página de convite). Não redirecione com `definePageMeta({ redirect })`.
+- `definePageMeta({ auth: false })` — `0.auth.global.ts` permits bypass (invite page pattern).
+  Do not redirect via `definePageMeta({ redirect })`.
 
-## Novo middleware
+## New Middleware
 
-- **Global** (`*.global.ts`): só se **não** depende de ordem em relação a outra
-  layer. Se depende (ex.: precisa rodar depois da autenticação), fica em
-  `apps/app/app/middleware/` com prefixo numérico.
-- **Nomeado**: pode viver na layer; `definePageMeta({ middleware: "nome" })` roda
-  depois de todos os globais.
-- Em SSR, para chamar a própria API use `useRequestFetch()`.
+- **Global** (`*.global.ts`): use only when execution order relative to other layers is
+  immaterial. If order-dependent (e.g., must run after authentication), place in
+  `apps/app/app/middleware/` with a numeric prefix.
+- **Named**: can reside in a layer; `definePageMeta({ middleware: "name" })` executes
+  after all global middleware has completed.
+- In SSR, invoke internal APIs via `useRequestFetch()`.
 
-## Novo plugin
+## New Plugin
 
-- Cliente-somente: sufixo `.client.ts`.
-- Depende de outro plugin (de qualquer origem): `defineNuxtPlugin({ name, dependsOn: ["…"], setup })`.
-- Não confie na ordem dos arquivos entre layers.
+- Client-only: `.client.ts` suffix.
+- Plugin dependencies (across any layer origin): `defineNuxtPlugin({ name, dependsOn: ["…"], setup })`.
+- Never assume alphabetical file load order between layers.
 
-## Nova rota de servidor
+## New Server Route
 
-1. `apps/app/server/api/<grupo>/<nome>.<método>.ts`, com `defineEventHandler`.
-2. Autenticação: `await getUser(event)` (`server/utils/auth.ts`); recuse cedo se
-   `!user.id`.
-3. Segredo? `useRuntimeConfig(event)` (sem `public`); defina em `runtimeConfig`
-   com `""`, entregue por `vars` em `infra/app.ts` como `NUXT_<NOME>` e falhe
-   fechado se vazio.
-4. Rota com risco de força bruta, webhook ou MFA: `server/utils/rate-limit.ts`.
-5. Banco: `useDB()` (ver `$fireskill-specialist-cloudflare-workers`).
-6. Erros: `createError({ status, message })`; log com campos extraídos.
-7. Para algo que é chamada de app, prefira uma **procedure tRPC**
-   (`$fireskill-specialist-trpc`); rota Nitro é para upload, webhooks, cookies e
-   endpoints de sessão.
+1. `apps/app/server/api/<group>/<name>.<method>.ts`, using `defineEventHandler`.
+2. Authentication: `await getUser(event)` (`server/utils/auth.ts`); reject early if `!user.id`.
+3. Secrets? `useRuntimeConfig(event)` (non-public); define in `runtimeConfig` with `""`,
+   pass via `vars` in `infra/app.ts` as `NUXT_<NAME>`, and fail closed when empty.
+4. Brute-force, webhook, or MFA attack surfaces: `server/utils/rate-limit.ts`.
+5. Database access: `useDB()` (see `$fireskill-specialist-cloudflare-workers`).
+6. Error handling: `createError({ status, message })`; log structured fields.
+7. For internal application calls, prefer a **tRPC procedure** (`$fireskill-specialist-trpc`);
+   Nitro routes are reserved for uploads, webhooks, cookies, and session endpoints.
 
-## Nova variável de ambiente / secret
+## New Environment Variable / Secret
 
-1. `runtimeConfig` em `nuxt.config.ts` (`public` só se for para o browser).
-2. `infra/secret.ts` + `.env.example` + `vars` em `infra/app.ts`
-   (`$fireskill-specialist-sst`, receita "Adicionar um secret").
-3. Nunca ler `process.env` direto em código de servidor Nuxt.
+1. `runtimeConfig` in `nuxt.config.ts` (`public` strictly for browser-accessible values).
+2. `infra/secret.ts` + `.env.example` + `vars` in `infra/app.ts`
+   (`$fireskill-specialist-sst`, "Adding a Secret" recipe).
+3. Never read `process.env` directly in Nuxt server code.
 
-## Novo idioma/mensagem
+## New Locale / String Translation
 
-- Chave em `en.json` **e** em `pt-BR.json` e `es.json`, da app ou da layer;
-  `bun run check:i18n`.
+- Add key in `en.json`, `pt-BR.json`, and `es.json`, in either the app or layer; run `bun run check:i18n`.
 
-## Verificação mínima antes de concluir
+## Minimum Verification Before Completion
 
-- `bun run typecheck` (`apps/app`) **e**
-  `bunx vue-tsc --noEmit -p server/tsconfig.json` (servidor).
+- `bun run typecheck` (`apps/app`) **and** `bunx vue-tsc --noEmit -p server/tsconfig.json` (server).
 - `bun run test`, `bun run check:i18n`.
-- Rodar a rota no SSR **e** navegando no cliente; logado, deslogado e com
-  deep-link deslogado (deve voltar à página pedida depois do login).
-- Mudou middleware, layout ou rota de layer? Provar no `nuxt build`.
-- Mudou algo de runtime Worker? Testar em stage (`sst deploy`).
+- Verify route behavior in SSR **and** client-side navigation; authenticated, unauthenticated,
+  and unauthenticated deep-links (must redirect back to requested URL post-login).
+- Modified layer middleware, layout, or routes? Verify with `nuxt build`.
+- Modified Worker runtime code? Verify on a deployed stage (`sst deploy`).

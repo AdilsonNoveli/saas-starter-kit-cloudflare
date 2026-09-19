@@ -1,76 +1,72 @@
-# Padrões e referências de arquitetura
+# Architecture Standards and References
 
-## Views do C4 Model, do mais alto ao mais baixo nível
+## C4 Model Views, from Highest to Lowest Level
 
-- **Contexto**: o sistema como caixa única, atores e sistemas externos com
-  que troca dados. Resposta a "o que é isto e quem usa".
-- **Containers**: as unidades deployáveis/executáveis (serviço, banco, SPA,
-  fila) e como se comunicam (protocolo, síncrono/assíncrono).
-- **Componentes**: dentro de um container, os módulos principais e suas
-  responsabilidades — nível onde a direção de dependência importa mais.
-- **Código**: classes/funções — só vale a pena diagramar quando a
-  complexidade local justifica, geralmente gerado a partir do código, não
-  mantido à mão.
+- **Context**: The system as a single black box, along with actors and external systems
+  exchanging data with it. Answers "what is this and who uses it".
+- **Containers**: Deployable and executable runtime units (services, databases, SPAs,
+  message brokers) and how they communicate (protocols, sync/async).
+- **Components**: Within a single container, the key internal modules and their
+  responsibilities — the level where dependency direction matters most.
+- **Code**: Classes and functions — typically generated directly from source code
+  when local complexity justifies it, rarely maintained manually.
 
-Views adicionais conforme a decisão: **Dados** (ownership, modelo de
-consistência, ciclo de vida/retenção) e **Deployment** (processos, nodes,
-rede, dependências de infraestrutura). arc42 oferece um template completo de
-documento de arquitetura equivalente, organizado em 12 seções.
+Additional views as decisions warrant: **Data** (ownership, consistency model, lifecycle/retention)
+and **Deployment** (processes, nodes, networks, infrastructure dependencies). arc42 provides
+an equivalent comprehensive architecture documentation template organized in 12 sections.
 
-## Atributos de qualidade como cenário, não adjetivo
+## Quality Attributes as Scenarios, Not Adjectives
 
-Formato SEI Quality Attribute Scenario: **estímulo** (o que acontece) +
-**fonte** (quem/o que gera o estímulo) + **ambiente** (condição do sistema
-no momento) + **artefato** (parte afetada) + **resposta** (o que o sistema
-deve fazer) + **medida da resposta** (como verificar quantitativamente).
+SEI Quality Attribute Scenario format: **stimulus** (what occurs) + **source** (who/what
+generates the stimulus) + **environment** (system condition at that moment) + **artifact**
+(system portion affected) + **response** (what the system must do) + **response measure**
+(quantitative metric to verify).
 
-Exemplo: "Sob 200 requisições/s simultâneas (estímulo, fonte: tráfego real),
-em operação normal (ambiente), o serviço de checkout (artefato) processa a
-requisição (resposta) com p99 abaixo de 300ms e taxa de erro abaixo de 0.1%
-(medida)." Sem as seis partes, o atributo não é verificável — vira opinião.
+Example: "Under 200 concurrent requests/s (stimulus, source: real production traffic),
+in normal operation (environment), the checkout service (artifact) processes the request
+(response) with p99 latency below 300ms and error rate below 0.1% (response measure)."
+Without these six components, a quality attribute cannot be verified — it remains subjective opinion.
 
-## Regra de dependência e acoplamento
+## Dependency Rule and Coupling
 
-- Dependências devem apontar das políticas voláteis (UI, framework, driver
-  de banco) para as políticas estáveis (regras de negócio) — nunca o
-  inverso. Regra central de Clean Architecture / Hexagonal / Ports & Adapters.
-- Acoplamento por contrato explícito (interface, evento, schema versionado)
-  é sustentável; acoplamento por implementação (import direto de detalhe
-  interno de outro módulo) não escala além de um time.
-- Coesão: o que muda pelo mesmo motivo deve estar junto; o que muda por
-  motivos diferentes deve estar separado (Single Responsibility no nível de
-  módulo, não só de classe).
+- Dependencies must point from volatile policies (UI, web framework, database drivers)
+  toward stable policies (business rules) — never the inverse. Core tenet of Clean
+  Architecture, Hexagonal Architecture, and Ports & Adapters.
+- Coupling via explicit contracts (interfaces, events, versioned schemas) is sustainable;
+  coupling via implementation (direct imports of internal details across modules) fails
+  to scale past a single team.
+- Cohesion: things that change for the same reason belong together; things that change
+  for different reasons must remain decoupled (Single Responsibility Principle at the
+  module level, not just class level).
 
-## Monólito modular vs. serviços distribuídos
+## Modular Monolith vs. Distributed Services
 
-- Serviços distribuídos adicionam custo real e imediato: consistência
-  eventual entre boundaries, latência de rede, observabilidade distribuída
-  obrigatória, deployment e versionamento coordenados entre times.
-- Esse custo só compensa quando há um cenário real que o exige: deployment
-  independente por time, escala heterogênea entre partes do sistema, ou
-  isolamento de falha entre domínios críticos.
-- Um monólito modular com boundaries internos claros (módulos com
-  interface, sem import cruzado de detalhe) entrega a maior parte do
-  benefício de isolamento sem o custo de rede — é o ponto de partida
-  padrão até o cenário provar o contrário.
-- Team Topologies acrescenta o eixo humano: o boundary de serviço deve
-  alinhar com o boundary de time capaz de mantê-lo de ponta a ponta
-  (stream-aligned team); serviço sem time dono vira órfão operacional.
+- Distributed services introduce real and immediate operational costs: eventual consistency
+  across boundaries, network latencies, mandatory distributed tracing, coordinated deployments,
+  and cross-team schema versioning.
+- These costs are justified only when real scenarios demand them: autonomous deployments
+  per team, heterogeneous scaling profiles, or strict failure domain isolation between
+  mission-critical domains.
+- A modular monolith with clear internal boundaries (modules exposing public interfaces,
+  forbidding cross-boundary internal imports) delivers most isolation benefits without
+  network tax — it is the recommended default starting point until proven otherwise.
+- Team Topologies adds the organizational dimension: service boundaries should align
+  with team boundaries capable of owning them end-to-end (stream-aligned teams); a service
+  without an explicit team owner becomes an operational orphan.
 
-## Formato de ADR (Architecture Decision Record)
+## ADR (Architecture Decision Record) Format
 
-Contexto (forças em jogo) → Opções consideradas → Decisão → Consequências
-(inclusive as negativas) → Evidência que embasou a escolha → Plano de
-transição → Condição que justificaria revisar a decisão no futuro. Um ADR
-não substitui diagrama (mostra estrutura) nem teste (prova comportamento) —
-ele registra o raciocínio por trás da escolha estrutural.
+Context (competing forces) → Options Considered → Decision → Consequences (including
+trade-offs and drawbacks) → Supporting Evidence → Transition Plan → Reversal Triggers
+(conditions justifying future revisit). An ADR does not replace diagrams (showing structure)
+or tests (proving behavior) — it preserves the architectural rationale behind structural choices.
 
-## Fontes oficiais
+## Official Sources
 
 - C4 Model: https://c4model.com/
-- arc42 (template de documentação de arquitetura): https://docs.arc42.org/
+- arc42 (architecture template): https://docs.arc42.org/
 - Architecture Decision Records: https://adr.github.io/
 - SEI Quality Attribute Scenarios: https://www.sei.cmu.edu/library/applicability-of-general-scenarios-to-the-architecture-tradeoff-analysis-method/
 - Team Topologies: https://teamtopologies.com/key-concepts
-- The Clean Architecture (regra de dependência): https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
-- RFC 2119 (linguagem normativa em documentos técnicos): https://www.rfc-editor.org/rfc/rfc2119
+- The Clean Architecture (dependency rule): https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+- RFC 2119 (normative language in technical specifications): https://www.rfc-editor.org/rfc/rfc2119

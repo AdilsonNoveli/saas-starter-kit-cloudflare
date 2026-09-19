@@ -1,13 +1,13 @@
-# Padrões de descoberta de interfaces
+# Interface Discovery Standards
 
-## Fontes oficiais
+## Authoritative Documentation
 
 - [WCAG 2.2](https://www.w3.org/TR/WCAG22/)
 - [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/)
-- [MDN accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
+- [MDN Accessibility Guide](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
 
-## Conferência mínima
+## Minimum Verification Checklist
 
-- Leia rotas, componentes, estilos, formulários, estados e testes existentes.
-- Registre teclado, foco, loading, vazio, erro, sucesso e permissão por tela.
-- Valide a interface em viewport móvel e desktop com o runner do projeto.
+- Inspect routes, components, styles, forms, states, and existing tests.
+- Record keyboard navigation, focus indicators, loading, empty, error, success, and permission states per screen.
+- Validate interface on both mobile and desktop viewports using the project's test runner.

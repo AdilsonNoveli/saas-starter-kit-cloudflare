@@ -1,79 +1,51 @@
-# Regras do sistema
+# System Rules
 
-Estas regras complementam as instruções dos agentes sem substituir specs ou
-critérios de aceite. Regras do time, mantidas como estão, e regras técnicas **verificadas no código**
-(o detalhe e a evidência de cada uma estão no especialista indicado).
+These rules complement agent instructions without superseding specs or acceptance criteria. They contain engineering rules verified against actual codebase files (details and evidence for each reside in the referenced specialist).
 
-## Arquitetura
+## Architecture
 
-- Separation of Concerns: um arquivo, uma responsabilidade.
-- Componentização extrema; estrutura de pastas e arquivos pensada para
-  manutenção.
-- DRY: reutilização máxima de código. YAGNI: não implementar o que não foi pedido.
-  KISS: a solução mais simples que resolve o problema.
-- Domínio de negócio vive em `layers/`; `apps/app` (Composition Root) não recebe
-  lógica de domínio. Ver `fireskill-specialist-nuxfire-layers`.
-- "Layer ativa" tem uma única fonte: `config.ts` → `activeLayerNames`. Nunca
-  decidir por presença em disco.
-- Habilidades (`defineAbility`) levam o prefixo da layer; procedures tRPC não.
-  O router de cada layer exporta o mapa `routers` com `satisfies`.
-- Schema Drizzle: o barrel `apps/functions/src/database/schema.ts` importa cada
-  layer por **especificador de pacote**, nunca por caminho relativo.
+- Separation of Concerns: one file, single responsibility.
+- Extreme componentization; folder and file structures designed for maintainability.
+- DRY: maximum code reuse. YAGNI: do not implement unrequested functionality. KISS: simplest robust solution.
+- Business domain lives in `layers/`; `apps/app` (Composition Root) contains no domain business logic. See `fireskill-specialist-nuxfire-layers`.
+- "Active layer" has a single source of truth: `config.ts` → `activeLayerNames`. Never determine activation by disk presence.
+- Abilities (`defineAbility`) carry layer prefix; tRPC procedures do not. Each layer router exports a `routers` map matching `satisfies`.
+- Drizzle Schema: barrel `apps/functions/src/database/schema.ts` imports each layer by **package specifier**, never relative path.
 
-## Código e qualidade
+## Code and Quality
 
-- Tipagem forte, **zero `any`**.
-- Zero código morto ou paliativo; zero funções sem propósito claro; zero
-  verbosidade. Código limpo, validado e otimizado.
-- Cores só semânticas do `@nuxt/ui` (`text-default`, `bg-elevated`...), nunca
-  paleta bruta; tema centralizado em `packages/tokens`. Ver
-  `fireskill-specialist-nuxt-ui`.
-- Em Worker, nunca logar um `Error` cru: extrair `message`, `name`, `stack`.
+- Strict typing, **zero `any`**.
+- Zero dead or speculative code; clean, verified, optimized implementation.
+- Only semantic `@nuxt/ui` tokens (`text-default`, `bg-elevated`...), never raw color palettes; theming centralized in `packages/tokens`. See `fireskill-specialist-nuxt-ui`.
+- Inside Workers, never log raw `Error` objects: serialize `message`, `name`, `stack`.
 
-## Testes
+## Testing
 
-- Vitest é o runner (`bun run test`). Cada layer roda sozinha com o próprio
-  `vitest.config.ts`; `defineAbility` é injetado por `vitest.setup.ts`.
-- `nuxt typecheck` **não** cobre o servidor: rodar também
-  `bunx vue-tsc --noEmit -p server/tsconfig.json` em `apps/app`.
-- Verde em `tsc`/`vitest`/`nuxt build` **não** prova o deploy: para o que toca
-  `apps/functions` e `layers/`, o gate real é `sst deploy` num stage de teste.
-- Nenhum teste roda contra o banco de desenvolvimento
-  (`fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs`).
+- Vitest is the test runner (`bun run test`). Each layer executes independently with its own `vitest.config.ts`; `defineAbility` is mocked in `vitest.setup.ts`.
+- `nuxt typecheck` does **not** cover server routes: also run `bunx vue-tsc --noEmit -p server/tsconfig.json` in `apps/app`.
+- Green `tsc`/`vitest`/`nuxt build` does **not** prove deployment: for `apps/functions` and `layers/`, the real verification gate is `sst deploy` on a test stage.
+- Tests never run against development database (`fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs`).
 
-## Segurança e privacidade
+## Security and Privacy
 
-- Segredos em `SCREAMING_SNAKE_CASE`, iguais em `.env.example`,
-  `infra/secret.ts` e `Resource.<NOME>`; só valores públicos usam `NUXT_PUBLIC_`.
-  Nunca abrir nem versionar `.env.stage` / `.env.production`.
-- Rotas de segredo vazio **falham fechadas** (MFA de plataforma e de usuário).
-- Endpoints internos do Worker `Auth` exigem `x-admin-secret` (tempo constante).
-- `platformAdminProcedure` exige `PlatformAdmin` ativo + MFA + sessão elevada de
-  30 min e nunca é derivada de `abilityProcedure`.
-- Nunca ligar criação de admin ou senha conhecida ao seed/deploy.
-- Reset de dados de `User` exige limpar também as duas chaves do `AuthKV`
-  (`["email", email, "password"]` e `["users", email]`).
+- Secrets in `SCREAMING_SNAKE_CASE`, identical across `.env.example`, `infra/secret.ts`, and `Resource.<NAME>`; only public values carry `NUXT_PUBLIC_`. Never commit or expose `.env.stage` / `.env.production`.
+- Empty secret routes **fail closed** (platform and user MFA).
+- Internal Worker `Auth` endpoints require constant-time `x-admin-secret`.
+- `platformAdminProcedure` requires active `PlatformAdmin` + MFA + elevated 30-minute session; never derived from `abilityProcedure`.
+- Never attach admin creation or hardcoded credentials to database seeds or deployments.
+- Data reset of `User` requires purging both `AuthKV` keys (`["email", email, "password"]` and `["users", email]`).
 
-## Operação
+## Operations
 
-- Deploy: `bun run deploy -- --stage <stage>` (a flag `--stage` é obrigatória;
-  nunca `SST_STAGE=`). `production` é `retain` + `protect`.
-- Migrações: gerar com `drizzle-kit generate` (ler o SQL); aplicar **só** pelo
-  deploy. Sem migração de volta: expand/contract.
-- Não desfazer, sem entender o motivo: `linker = "hoisted"`, `unenv` dividido
-  (raiz v2 / apps v1), patches por versão exata, `ssr: false` nas rotas de login.
-- Recursos Cloudflare opcionais nascem atrás de `flags` em `config.ts`; o código
-  trata o binding ausente.
-- Ver `fireskill-specialist-sst` e `fireskill-specialist-cloudflare-workers`.
+- Deployment: `bun run deploy -- --stage <stage>` (`--stage` CLI flag is mandatory; never `SST_STAGE=`). Production has `retain` + `protect`.
+- Migrations: generate with `drizzle-kit generate` (review SQL); apply **only** via deployment. No rollbacks: use expand/contract patterns.
+- Do not modify without verified understanding: `linker = "hoisted"`, split `unenv` (root v2 / apps v1), exact version patches, `ssr: false` on auth views.
+- Optional Cloudflare resources live behind `flags` in `config.ts`; code gracefully handles missing bindings.
+- See `fireskill-specialist-sst` and `fireskill-specialist-cloudflare-workers`.
 
-## Regras específicas do projeto
+## Specific Project Rules
 
-- **Dark mode obrigatório em toda UI.**
-- **Notificações ao usuário via `useNotification`** (`success`/`error`/`info`/
-  `confirm`); nunca `window.confirm`. Há `useToast()` direto em código legado
-  (ex.: `layers/teams/app/components/TeamCreateModal.vue`): migrar para
-  `useNotification` ao tocar o arquivo.
-- **Imagens e arquivos via Cloudflare R2** (`hubBlob()` do NuxtHub, API
-  compatível com S3); não há bucket S3 da AWS no projeto.
-- Ao editar qualquer arquivo, aplicar as melhorias e correções que estiverem no
-  escopo tocado.
+- **Dark mode mandatory across all UI surfaces.**
+- **User notifications via `useNotification`** (`success`/`error`/`info`/`confirm`); never `window.confirm`. Legacy `useToast()` occurrences must be migrated to `useNotification` when touched.
+- **Media and file storage via Cloudflare R2** (`hubBlob()` in NuxtHub, S3-compatible API); there is no AWS S3 bucket in this project.
+- Always apply clean-up improvements to files within touched scope.

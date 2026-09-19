@@ -1,111 +1,108 @@
-# Padrões de UI para sistemas e dashboards
+# UI Standards for Systems and Dashboards
 
 <!-- markdownlint-disable MD013 -->
 
-## Escolha de shell
+## Shell Selection
 
-| Necessidade dominante | Estrutura inicial | Comprovação para escolher |
+| Dominant Need | Initial Structure | Decision Evidence |
 | --- | --- | --- |
-| alternar entre áreas estáveis | sidebar + header contextual | cinco ou mais destinos recorrentes |
-| comparar coleção e item | master-detail ou rotas ligadas | retorno frequente ao mesmo recorte |
-| acompanhar saúde e exceções | dashboard filtrável | perguntas e ações definidas por métrica |
-| cumprir sequência obrigatória | workflow/stepper | etapas finitas e dependentes |
-| editar configuração extensa | categorias + busca | grupos estáveis e baixa frequência |
+| Switching between stable areas | Sidebar + contextual header | Five or more recurring destinations |
+| Comparing collection and item | Master-detail or linked routes | Frequent return to the same data slice |
+| Monitoring health and exceptions | Filterable dashboard | Questions and actions defined per metric |
+| Completing mandatory sequences | Workflow / Stepper | Finite, interdependent sequential steps |
+| Editing extensive configuration | Categories + search | Stable groupings and low modification frequency |
 
-Não use dashboard como sinônimo de home autenticada. Se não houver perguntas,
-comparações ou exceções explícitas, escolha navegação orientada à tarefa.
+Do not use dashboards as synonyms for authenticated homepages. Unless there are explicit
+questions, comparisons, or exceptions, choose task-oriented navigation.
 
-## Design system e CRUD
+## Design System and CRUD
 
-Antes da composição, leia `.fireskills/DESIGNSYSTEM.MD` e aplique seus defaults. Para uma
-superfície CRUD, use `PageHeader` em todas as páginas, `UTable` na lista,
-`DetailLists` no detalhe e formulários em seções com duas colunas responsivas em
-criar e editar. Labels ficam acima dos campos e a mensagem de erro aparece em
-vermelho abaixo do campo. O shell renderiza `Breadcrumb` em toda tela, com a
-equipe ativa, o módulo e a tela atual; reutilize o componente existente.
+Before composition, read `.fireskills/DESIGNSYSTEM.MD` and apply its defaults. For CRUD
+surfaces, use `PageHeader` on all pages, `UTable` in lists, `DetailLists` in detail views,
+and two-column responsive form sections in create and edit views. Input labels reside
+above fields and error messages appear in red below fields. The shell renders `Breadcrumb`
+on every screen, showing active team, module, and current view; reuse the existing component.
 
-## Hierarquia e densidade
+## Hierarchy and Density
 
-- Ordene por tarefa e consequência de falha, não pelo tamanho disponível do
-  componente.
-- Use proximidade para formar grupos, alinhamento para comparação e contraste
-  para prioridade; não dependa apenas de escala tipográfica.
-- Mantenha a ação primária única por região. Ações secundárias podem coexistir
-  quando não competem visualmente nem têm consequência semelhante.
-- Em superfícies operacionais frequentes, privilegie escaneamento e comparação;
-  em onboarding e escolhas raras, privilegie explicação e prevenção de erro.
-- Permita que densidade altere espaço, não significado ou conjunto de ações.
-- Separe cada seção de formulário em coluna de contexto e painel de campos;
-  use duas colunas nos breakpoints largos e uma no mobile.
-- Faça a linha do `UTable` abrir o detalhe por clique e teclado; reserve ações
-  internas para uma camada acima do link da linha.
+- Order elements by user task and error consequence, not available component container size.
+- Use proximity for grouping, alignment for comparison, and contrast for prioritization;
+  never rely on typography scale alone.
+- Maintain a single primary action per viewport region. Secondary actions can coexist
+  when they do not visually compete or share similar destructive consequences.
+- In frequent operational workflows, prioritize rapid scanning and comparison; in onboarding
+  and rare decisions, prioritize clarity and error prevention.
+- Allow density adjustments to alter spacing, never meaning or available action sets.
+- Separate form sections into context columns and field panels; use two columns on wide
+  screens and single column on mobile viewports.
+- Make `UTable` rows navigate to detail views via click and keyboard; keep nested actions
+  layered on top of the row link.
 
-## Dados e componentes
+## Data and Components
 
-| Componente | Contrato mínimo |
+| Component | Minimum Contract |
 | --- | --- |
-| KPI | nome, valor, unidade, período, comparação, origem e estado |
-| chart | pergunta, escala honesta, legenda, período e alternativa textual |
-| table | headers, ordenação, seleção, ações, paginação e vazio |
-| filter | estado visível, contagem, limpar e URL quando compartilhável |
-| form | label, ajuda, required, erro contextual, submit e preservação |
-| destructive action | objeto afetado, consequência, confirmação proporcional e recuperação |
+| KPI | Name, value, unit, time window, comparison baseline, origin, and state |
+| Chart | Explicit question, honest scale, legend, time range, and textual alternative |
+| Table | Column headers, sorting, selection, row actions, pagination, and empty state |
+| Filter | Visible state, item count, reset action, and shareable URL state |
+| Form | Field label, helper text, required marker, contextual error, submit, and state preservation |
+| Destructive Action | Target object, consequence explanation, proportional confirmation, and recovery path |
 
-- Use tabela quando colunas precisam ser comparadas entre linhas.
-- Use lista quando a leitura sequencial domina e cards quando cada entidade tem
-  estrutura própria; cards idênticos não substituem uma tabela.
-- Reserve cor semântica para estado. Não codifique séries de chart com tokens
-  de erro, alerta e sucesso se as séries não têm esse significado.
-- Mostre `0`, indisponível, atrasado e não autorizado como estados diferentes.
+- Use tables when columns require comparison across rows.
+- Use lists when sequential reading dominates and cards when each entity features unique structure;
+  identical cards do not replace data tables.
+- Reserve semantic colors for system state. Do not style chart series with error, warning,
+  or success colors unless series represent those exact states.
+- Explicitly represent `0`, unavailable, delayed, and unauthorized as distinct states.
 
-## Tokens e componentes
+## Tokens and Components
 
-Defina tokens em camadas:
+Define tokens in structured layers:
 
-1. primitivos: escalas de cor, espaço, tipografia, radius e elevation;
-2. semânticos: `surface`, `text-muted`, `border-danger`, `focus-ring`;
-3. componente: somente quando a semântica não é compartilhável.
+1. Primitives: Color scales, spacing scales, typography scales, border radii, elevations.
+2. Semantics: `surface`, `text-muted`, `border-danger`, `focus-ring`.
+3. Components: Only when semantics cannot be shared.
 
-Uma variante nova precisa representar estado ou uso recorrente, não uma tela
-isolada. Antes de criá-la, compare props, slots e tokens dos componentes
-existentes e registre por que composição não resolve.
+A new component variant must represent a recurring state or use case, not an isolated
+one-off screen. Before creating one, compare props, slots, and tokens of existing
+components, documenting why composition does not resolve the need.
 
-## Responsividade
+## Responsiveness
 
-- Defina breakpoints quando o conteúdo perde integridade, não por nomes de
-  dispositivo.
-- Preserve tarefa, ordem de leitura e ações; colapsar não pode esconder a única
-  forma de concluir o fluxo.
-- Troque tabelas por outra representação somente se o contrato de comparação
-  continuar disponível.
-- Teste o menor viewport suportado com conteúdo real e zoom. `overflow: hidden`
-  não corrige layout.
-- Reserve dimensões de mídia para evitar layout shift e mantenha texto legível
-  sobre imagens em todas as variantes.
+- Define breakpoints where content integrity breaks, not by device names.
+- Preserve tasks, reading order, and actions; collapsing must not conceal the only
+  way to complete a workflow.
+- Replace data tables with alternate representations only if the comparison contract
+  remains viable.
+- Test minimum supported viewports with real data and zoom. `overflow: hidden` does
+  not fix layout problems.
+- Reserve media dimensions to eliminate Cumulative Layout Shift (CLS) and keep text
+  legible over images across all variants.
 
-## Estados e casos extremos
+## States and Edge Cases
 
-| Estado | Pergunta de revisão |
+| State | Review Question |
 | --- | --- |
-| loading | estrutura preserva contexto sem prometer dado inexistente? |
-| empty | explica por que está vazio e oferece próximo passo possível? |
-| partial | distingue dados disponíveis, atrasados e falhos? |
-| error | informa impacto, recuperação e preserva entrada? |
-| offline | separa dado local, stale e ação que exige rede? |
-| permission denied | evita vazar existência e mostra caminho autorizado? |
+| Loading | Does structure preserve context without promising non-existent data? |
+| Empty | Does it explain why it is empty and provide a clear next action? |
+| Partial | Does it distinguish available, delayed, and failed data subsets? |
+| Error | Does it inform impact, recovery steps, and preserve user input? |
+| Offline | Does it separate local cached data, stale status, and network-required actions? |
+| Permission Denied | Does it avoid leaking resource existence and show authorized alternatives? |
 
-## Comprovação de revisão
+## Review Proof
 
-- screenshots comparáveis dos estados críticos em viewport estreito e largo;
-- mapa de tokens/componentes novos e justificativa de variantes;
-- conteúdo curto, longo, traduzido e números extremos sem truncamento destrutivo;
-- percurso completo por teclado com foco visível;
-- zoom, reflow, contraste, forced colors e reduced motion quando aplicáveis;
-- ação principal e consequência compreensíveis sem depender de cor ou posição.
+- Comparable screenshots of critical states in narrow and wide viewports.
+- Inventory of newly introduced tokens/components with variant justifications.
+- Stress-tested short, long, localized strings, and extreme numbers without clipping.
+- Complete keyboard traversal with visible focus indicators.
+- Zoom, reflow, contrast, forced colors, and reduced motion compliance.
+- Primary actions and consequences understandable without relying solely on color or position.
 
 <!-- markdownlint-enable MD013 -->
 
-## Fontes oficiais
+## Official Sources
 
 <!-- markdownlint-disable MD034 -->
 

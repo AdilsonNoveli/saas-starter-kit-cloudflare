@@ -1,273 +1,138 @@
 ---
 name: fireskill-setup
-description: Preparar e monitorar os contextos do projeto, incluindo a constituição e as specs preservadas de projetos com GitHub Spec Kit.
+description: Prepare and monitor project contexts, including constitution and preserved specs from GitHub Spec Kit projects.
 ---
 
-# Preparar contexto do projeto
+# Prepare Project Context
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered Questions Protocol` from `fireskills/skills/Spec.md`.
 
-## Perfil de conhecimento e memória de respostas
+## Knowledge Profile and Answer Memory
 
-O setup conduz uma conversa adaptativa curta. Ele não aplica um questionário
-fixo nem pergunta novamente algo que já esteja confirmado.
+Setup conducts a brief adaptive interview. It never applies a rigid questionnaire nor re-asks questions already confirmed.
 
-Antes de formular qualquer pergunta, leia, nesta ordem:
+Before formulating any question, read in this exact order:
 
-1. `.fireskills/USER-PROFILE.md`, quando existir;
-2. a conversa atual e as respostas já dadas;
+1. `.fireskills/USER-PROFILE.md`, when present;
+2. Current conversation and previously supplied answers;
 3. `.fireskills/PROJECT.md`, `.fireskills/DESIGNSYSTEM.MD`, `.fireskills/STACK.md`,
-   `.fireskills/RULES.md`, `.fireskills/DATABASE.md` e `.fireskills/PACKAGES.md`;
-4. `AGENTS.md`, `CLAUDE.md`, `.fireskills/SPECKIT.md` e as fontes relacionadas
-   listadas por ele, quando existirem;
-5. Inbox, backlog e specs aplicáveis, sem alterar esses arquivos.
+   `.fireskills/RULES.md`, `.fireskills/DATABASE.md`, and `.fireskills/PACKAGES.md`;
+4. `AGENTS.md`, `CLAUDE.md`, `.fireskills/SPECKIT.md`, and related sources listed within, when present;
+5. Applicable inbox captures, backlog items, and specs, without modifying these files.
 
-Monte mentalmente um mapa de assuntos respondidos. Uma declaração explícita da
-pessoa ou uma informação inequívoca nas fontes responde ao assunto, mesmo que
-use palavras diferentes da pergunta. Não peça confirmação, escolha ou
-reformulação de algo já claro. Pergunte somente por lacuna, conflito ou
-informação que mudou desde a última confirmação.
+Mentally map resolved topics. An explicit user statement or unequivocal context in documentation answers a topic, even if expressed with different terminology. Never request confirmation, choices, or reformulations for resolved facts. Query solely for genuine gaps, contradictions, or details changed since the last confirmation.
 
-Quando o nível geral ainda não estiver registrado no perfil nem na conversa,
-faça esta primeira rodada:
+When overall user experience level is not yet recorded in the profile or conversation, present this initial round:
 
 ```text
-Pergunta 1. Como você prefere receber as orientações deste setup?
-1. Iniciante: explique os termos técnicos e o efeito de cada escolha antes de prosseguir.
-2. Intermediário: conheço os fundamentos e prefiro explicações curtas junto das escolhas.
-3. Experiente: posso responder com detalhes de stack, arquitetura, comandos e integrações.
-4. Escrever outra resposta
-5. Gere outras opções
-6. Avançar
+Question 1. How would you prefer to receive guidance during this setup?
+1. Beginner: explain technical terms and the practical effect of each choice before proceeding.
+2. Intermediate: I know the fundamentals and prefer concise explanations alongside choices.
+3. Experienced: I can respond with technical details on stack, architecture, commands, and integrations.
+4. Write another response
+5. Generate more options
+6. Proceed
 ```
 
-Normalize a resposta para `iniciante`, `intermediário` ou `experiente` e grave-a
-em `.fireskills/USER-PROFILE.md`, com a fonte e a data. Se o perfil já tiver um
-nível confirmado, use-o sem perguntar. Se a conversa ou o perfil apresentarem
-níveis diferentes, faça somente uma pergunta para resolver esse conflito e
-registre a atualização.
+Normalize the response to `beginner`, `intermediate`, or `experienced`, recording it in `.fireskills/USER-PROFILE.md` with source and timestamp. If the profile already has a confirmed level, use it without re-asking. If conversation and profile present divergent levels, ask exactly one question to resolve the conflict and update the record.
 
-Adapte a profundidade por rodada:
+Adapt interview depth by round:
 
-- `iniciante`: explique cada termo técnico na própria pergunta, diga por que a
-  informação é necessária e descreva o efeito prático das opções;
-- `intermediário`: use os nomes técnicos conhecidos e acrescente uma explicação
-  curta somente quando a escolha puder ser confundida;
-- `experiente`: pergunte diretamente por versões, fronteiras de framework,
-  autenticação, persistência, testes, interface, deploy ou integrações quando
-  esse assunto ainda estiver aberto.
+- `beginner`: Explain technical terms inline, state why information is required, and outline practical effects of each option;
+- `intermediate`: Use standard technical vocabulary and append short explanations only when choices could be ambiguous;
+- `experienced`: Inquire directly about versions, framework boundaries, authentication, persistence, testing strategy, UI layout, deployment, or integrations when open.
 
-O nível ajusta a linguagem, não autoriza presumir respostas. Se a pessoa
-demonstrar experiência diferente por área, adapte aquela área sem alterar o
-nível geral sem confirmação. Depois de cada resposta, atualize o perfil, retire
-o assunto do mapa de lacunas e só então selecione a próxima pergunta. Respeite
-o limite de oito perguntas por área e o restante do contrato numerado.
+User experience level adjusts phrasing; it never authorizes guessing answers. If the user demonstrates divergent familiarity across areas, adapt that area without changing overall level unless confirmed. After each response, update the profile, remove the topic from open gaps, and select the next question. Respect the limit of eight questions per area and the remaining rules of the numbered contract.
 
-## Roteiro adaptativo do setup
+## Adaptive Setup Workflow
 
-Depois de confirmar o diretório e ler o projeto, selecione o primeiro assunto
-necessário ainda sem resposta confirmada:
+After confirming directory and inspecting the codebase, select the first necessary topic lacking confirmed answers:
 
-1. objetivo do produto e resultado principal;
-2. pessoas usuárias, equipes e papéis;
-3. acesso, autenticação e permissões;
-4. dados principais, relações e tempo de retenção;
-5. telas, navegação e estados da interface;
-6. testes, observabilidade e deploy;
-7. integrações externas e serviços dependentes.
+1. Product objective and primary outcome;
+2. User personas, teams, and roles;
+3. Access, authentication, and authorization policies;
+4. Core data entities, relationships, and retention rules;
+5. Screens, navigation paths, and interface states;
+6. Testing, observability, and deployment pipelines;
+7. External integrations and dependent services.
 
-Consulte o mapa de assuntos antes de cada rodada. Se a fonte já informar o
-assunto com clareza, registre a origem no perfil e passe ao próximo. Se duas
-fontes divergirem, pergunte somente para resolver a diferença. Se todos os
-assuntos aplicáveis estiverem confirmados, informe que o setup seguirá para a
-reconciliação dos arquivos e não crie perguntas artificiais.
+Consult the topic map before each round. If sources state facts clearly, record provenance in the profile and proceed to the next topic. If two sources diverge, ask solely to resolve the contradiction. If all applicable topics are confirmed, announce that setup proceeds to file reconciliation without asking synthetic questions.
 
-Adapte a formulação ao nível confirmado. Para iniciantes, explique o termo na
-pergunta, diga por que a resposta será usada e mostre o efeito prático de cada
-opção. Para pessoas intermediárias, use o nome técnico e uma explicação breve.
-Para pessoas experientes, pergunte diretamente por versões, fronteiras de
-framework, estratégia de autenticação, persistência, testes, observabilidade,
-deploy e contratos de integração ainda ausentes.
+Adapt question formulation to user level. Each round presents one question, numbered options, `Write another response`, `Generate more options`, and `Proceed`. After receiving an answer, normalize content, record area, topic, answer, source, timestamp, and scope in `.fireskills/USER-PROFILE.md`, then proceed.
 
-Cada rodada apresenta uma pergunta, opções numeradas, `Escrever outra resposta`,
-`Gere outras opções` e `Avançar`, conforme o contrato de `fireskills/skills/Spec.md`.
-Após a resposta, normalize o conteúdo, registre área, assunto, resposta, fonte,
-data e alcance em `.fireskills/USER-PROFILE.md`, e só então avance.
+## Mandatory Functional Coverage in Setup
 
-## Cobertura funcional obrigatória no setup
+While inspecting the product, map each business entity to actions users must perform. When journeys demand managing records, confirm coverage for create, read, update, and delete (CRUD). Never force CRUD onto read-only catalogs, immutable logs, event streams, or data maintained via third-party integrations. If sources omit needed actions, confirm with the user via a numbered question round before recording coverage.
 
-Durante a leitura do produto, relacione cada entidade de negócio às ações que a
-pessoa precisa executar. Quando a jornada exigir administrar registros,
-confirme a cobertura de criar, consultar, editar e apagar. Não force um CRUD
-para dados somente de leitura, históricos imutáveis, eventos ou informações
-mantidas por uma integração. Se as fontes não mostrarem quais ações são
-necessárias, confirme com a pessoa por meio de uma rodada do contrato numerado
-antes de registrar a cobertura.
+For recurring operational screens, identify navigation paths through system menus and document menu item, target route, required permissions, and responsive behavior in `.fireskills/INTERFACE.md`. Technical callback routes or intermediate redirect steps may reside outside menus when the journey demonstrates access. If route placement or menu presence is ambiguous, clarify with the user in a single round.
 
-Para cada tela de uso recorrente, identifique como a pessoa chega até ela pelos
-menus do sistema e registre o item, o destino, a permissão e o comportamento
-responsivo em `.fireskills/INTERFACE.md`. Uma rota técnica, callback ou etapa acessada
-somente por redirecionamento pode ficar fora do menu quando a própria jornada
-comprovar esse acesso. Se não estiver claro se a tela recebe um link ou em qual
-menu ela aparece, confirme com a pessoa em uma única rodada antes de seguir.
+Setup records these requirements into persistent context and routes behavioral changes to backlog and spec. It never creates screens, routes, or database schemas independently. Subsequent implementation covers confirmed CRUD operations and navigation links with dedicated tasks and tests.
 
-O setup registra essas necessidades no contexto persistente e encaminha
-qualquer mudança de comportamento para o backlog e a spec. Ele não cria telas,
-rotas ou persistência por conta própria. A implementação posterior deve cobrir
-o CRUD e os links confirmados, com tarefas e testes próprios.
+During every full setup run, load `$fireskill-documentator` after reconciling context files and specialists. Rebuild system documentation across `docs/` and `.fireskills/PACKAGES.md`, even without recent changes in code, schema, or dependencies. Preserve human prose outside managed blocks and resolve any `PENDING` flags before concluding.
 
-Em toda execução completa do setup, carregue `$fireskill-documentator` depois de
-reconciliar os contextos e especialistas. Reconstrua a documentação técnica de
-todo o sistema existente em `docs/` e `.fireskills/PACKAGES.md`, mesmo quando não
-houver mudança recente em aplicação, persistência ou dependências. Preserve
-texto humano fora dos blocos gerenciados e resolva qualquer resultado
-`PENDING` antes de encerrar.
+## Database Protection During Setup
 
-## Proteção do banco durante o setup
-
-Antes de qualquer teste que acesse Postgres, execute durante o setup:
+Before running tests accessing Postgres, execute during setup:
 
 ```bash
 node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs \
-  --project <raiz>
+  --project <root>
 ```
 
-Exija um banco de teste explicitamente diferente do configurado nos secrets do
-stage (`DATABASE_HOST`, `DATABASE_NAME` e afins); os testes Vitest atuais
-(billing, assentos de equipe, habilidades) não acessam o banco. O script não
-mostra credenciais nem valores de conexão.
+Require a dedicated test database explicitly separate from staging secrets (`DATABASE_HOST`, `DATABASE_NAME`, etc.); existing Vitest test suites (billing, team seats, abilities) do not connect to the database. The script never outputs credentials or secret connection strings.
 
-Um resultado `PENDING` impede qualquer teste focal, suíte ou regressão. Corrija
-o ambiente de testes, execute a conferência novamente e só continue após
-`SAFE`. Nunca rode um teste usando o banco de desenvolvimento, nem mesmo para
-diagnóstico. Um resultado `IGNORED` indica comando ou configuração capaz de
-apagar estruturas ou registros; não execute o comando e não ofereça uma opção
-para forçar sua execução.
+A `PENDING` result halts all focal, suite, or regression tests. Correct the test environment, rerun verification, and proceed only after `SAFE`. Never run tests against development databases, even for debugging. An `IGNORED` result flags commands or configurations capable of dropping structures or data; never execute the command and never offer an option to force execution.
 
-1. Antes de ler ou escrever, confirme o diretório do projeto. Na primeira
-   execução da conversa, se a pessoa já informou um caminho, resolva-o para um
-   caminho absoluto e repita-o. Quando ela não informou, ofereça exatamente
-   estas opções numeradas e aguarde a resposta: `1. Usar o diretório atual.`,
-   `2. Usar um subdiretório do Hub.` e `3. Informar outro caminho.`. Não deduza
-   o destino pela raiz Git. Nas execuções obrigatórias seguintes da mesma
-   conversa, reutilize a raiz confirmada sem repetir a pergunta.
-2. Use a raiz confirmada em cada comando posterior. Ao trabalhar em um Hub,
-   execute no subdiretório escolhido ou passe `--project <raiz>` e
-   `--root <raiz>` para scripts de contexto e specs. Não crie contexto, specs,
-   testes ou código no diretório pai.
-3. Ler `AGENTS.md`, `CLAUDE.md` e instruções locais da raiz confirmada antes de
-   escrever. Em seguida, executar `node scripts/inspect_project.mjs --project
-   <raiz>`. Ler as fontes listadas, na ordem retornada: instruções, manifests,
-   configuração, aplicação, rotas, persistência, integrações, interface, testes
-   e documentação. Não comece descoberta, sugestão de stack ou escrita até
-   entender o sistema atual e registrar o que será preservado.
-4. Ler [as diretrizes publicáveis](references/framework-instructions.md) quando
-   precisar auditar o bloco reservado em arquivos de agentes.
-   Quando `.specify/memory/constitution.md` existir, ler também
-   [a compatibilidade com GitHub Spec Kit](references/github-spec-kit.md).
-5. Conferir os pré-requisitos antes de preparar o contexto: Node.js (para os
-   scripts `.mjs`), Bun (`bun run fireskill`), Git e acesso de escrita ao
-   projeto. Corrija cada requisito ausente.
-6. Executar `node scripts/setup_context.mjs --project <raiz>`.
-   Renderizar `.fireskills/PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`,
-   `.fireskills/INTERFACE.md`, `.fireskills/DESIGNSYSTEM.MD` e `.fireskills/USER-PROFILE.md` a partir de
-   `.fireskills/templates/custom/<Nome>.md` quando existir ou dos arquivos
-   gerenciados `.fireskills/templates/Project.md`, `Stack.md`, `Rules.md`,
-   `Database.md`, `Interface.md`, `.fireskills/DESIGNSYSTEM.MD` e `UserProfile.md` caso
-   contrário; não manter
-   modelos paralelos embutidos no script. O `.fireskills/DESIGNSYSTEM.MD` fica na raiz do
-   projeto, nasce com defaults de interface comuns e é criado somente quando
-   ainda não existir. O mesmo comando deve ler a constituição e todos os arquivos
-   regulares em `specs/` quando detectar GitHub Spec Kit, depois atualizar o
-   bloco gerenciado de `.fireskills/SPECKIT.md`.
-   O setup inicial não cria `SEMVER` nem altera `infra/`. O versionamento e o
-   deploy começam somente quando a pessoa pedir esse processo de forma
-   explícita; nesse caso, anuncie o handoff para `$fireskill-specialist-sst`
-   (com `$fireskill-specialist-versioning` para a versão).
-   Toda execução deve ser idempotente: repetir o setup com as mesmas entradas
-   não altera arquivos já reconciliados, não duplica blocos e não inicia outra
-   etapa.
-7. No início e no fim de cada mudança, executar:
+## Execution Sequence
+
+1. Before reading or writing, confirm project directory. In the first run of the conversation, if a path was already specified, resolve it to absolute path and state it. When unspecified, offer: `1. Use current directory.`, `2. Use a Hub subdirectory.`, and `3. Provide another path.`. Never deduce destinations via Git parent boundaries. In subsequent mandatory runs in the same conversation, reuse confirmed root without repeating the question.
+2. Use confirmed root in all commands. When working in a Hub, execute within selected subdirectory or supply `--project <root>` and `--root <root>` to scripts. Never create contexts, specs, tests, or code in parent directories.
+3. Read `AGENTS.md`, `CLAUDE.md`, and local instructions from confirmed root before writing. Next, run `node scripts/inspect_project.mjs --project <root>`. Read sources in returned order: instructions, manifests, configuration, application, routes, persistence, integrations, interface, tests, and documentation. Do not start discovery or propose stack changes before understanding current system state.
+4. Read [framework instructions guidelines](references/framework-instructions.md) when auditing reserved blocks in agent files.
+   When `.specify/memory/constitution.md` exists, read [GitHub Spec Kit compatibility](references/github-spec-kit.md).
+5. Verify prerequisites before preparing context: Node.js (for `.mjs` scripts), Bun (`bun run fireskill`), Git, and write access. Resolve any missing prerequisite.
+6. Run `node scripts/setup_context.mjs --project <root>`.
+   Render `.fireskills/PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`,
+   `.fireskills/INTERFACE.md`, `.fireskills/DESIGNSYSTEM.MD`, and `.fireskills/USER-PROFILE.md` from `.fireskills/templates/custom/<Name>.md` when present, or managed templates `.fireskills/templates/Project.md`, `Stack.md`, `Rules.md`, `Database.md`, `Interface.md`, `DESIGNSYSTEM.MD`, and `UserProfile.md` otherwise; do not maintain parallel inline templates in scripts. `.fireskills/DESIGNSYSTEM.MD` resides at project root, initializes with SaaS defaults, and is created only when missing. The command reads the constitution and regular files in `specs/` when GitHub Spec Kit is detected, updating the managed block of `.fireskills/SPECKIT.md`.
+   Initial setup does not create `SEMVER` or modify `infra/`. Versioning and deployment start only when explicitly requested; in that case, announce handoff to `$fireskill-specialist-sst` (with `$fireskill-specialist-versioning`).
+   Setup execution is strictly idempotent: rerunning with identical inputs preserves reconciled files, does not duplicate blocks, and triggers no downstream phase.
+7. At start and end of every slice, execute:
 
    ```bash
-   node scripts/monitor_context.mjs --project <raiz> --check
+   node scripts/monitor_context.mjs --project <root> --check
    ```
 
-   Antes de testes que acessem o banco, executar também
-   `check_database_safety.mjs --project <raiz>` e
-   manter toda execução de testes suspensa até o resultado `SAFE`.
+   Before database-backed tests, run `check_database_safety.mjs --project <root>` and keep test execution suspended until `SAFE`.
 
-8. Inspecionar os arquivos iniciais, incluindo `.fireskills/USER-PROFILE.md`, e
-   `.fireskills/PACKAGES.md` quando
-   gerado e a fonte de stack usada pelo script. Quando `.fireskills/SPECKIT.md`
-   existir, abrir a constituição e cada fonte original listada na projeção.
-   Antes de qualquer descoberta de interface, executar também
-   `node scripts/inspect_interface.mjs --project <raiz>` e abrir as rotas,
-   componentes e telas atuais relacionados ao pedido. A saída orienta a
-   análise, mas não substitui a leitura das fontes do sistema. A leitura geral
-   do projeto inclui regras de autorização, papéis, dados, integrações, rotas,
-   telas, componentes, estados, testes e documentos existentes que apareçam no
-   relatório. Quando a base for grande, prossiga por grupos e informe quais
-   fontes foram lidas antes de propor qualquer alteração; não trate a ausência
-   de leitura como permissão para substituir convenções.
-9. Nunca substituir um arquivo de contexto existente, mesmo com conteúdo
-   incompleto. Em `AGENTS.md`, `CLAUDE.md` e `.fireskills/SPECKIT.md`, atualizar
-   somente o bloco delimitado do framework e preservar tudo fora dele. Nunca
-   escrever, mover, renomear ou remover arquivos em `.specify/` e `specs/`.
-10. Depois de ler a stack, instale primeiro o núcleo essencial do Fireskills:
-   `fireskill-specialist-data-modeling`,
-   `fireskill-specialist-domain-modeling`,
-   `fireskill-specialist-software-architecture` e
-   `fireskill-specialist-nuxt-ui`.
-   Em seguida, apresente a tabela de correspondência abaixo com o núcleo e os
-   especialistas detectados pelos manifests e arquivos do projeto. Os
-   especialistas já estão em `fireskills/specialists/`: não há instalação;
-   carregue o núcleo e cada especialista detectado que a etapa atual exigir, sem
-   incluir outros especialistas genéricos.
-11. Para completar ou corrigir stack, regras ou dados, anunciar o handoff e
-   carregar respectivamente `$fireskill-aux-stack`, `$fireskill-aux-rules` ou
-   `$fireskill-aux-database`.
-12. Em toda execução completa do setup, carregar `$fireskill-documentator`
-   depois das auxiliares e reconstruir `docs/` e `.fireskills/PACKAGES.md` a
-   partir de todo o projeto. Quando aplicação, persistência ou dependências
-   mudar durante outra etapa, repetir o documentador ao fim da implementação.
-13. Somente quando a pessoa solicitar ou indicar explicitamente o uso de
-   Gitflow para o projeto (ver [references/gitflow.md](references/gitflow.md)),
-   anunciar o handoff, carregar `$fireskill-specialist-gitflow` e registrar a
-   convenção de branches confirmada em `RULES.md` via `$fireskill-aux-rules`.
-   Nunca propor, presumir ou aplicar Gitflow a partir da estrutura de
-   branches do repositório, da presença de uma branch `develop` ou de
-   qualquer outro sinal implícito.
+8. Inspect initial files, including `.fireskills/USER-PROFILE.md` and `.fireskills/PACKAGES.md`. When `.fireskills/SPECKIT.md` exists, open constitution and original sources listed in projection.
+   Before any UI discovery, run `node scripts/inspect_interface.mjs --project <root>` and inspect current routes, components, and screens related to the request. The report guides analysis without replacing direct source inspection. General project inspection covers authorization rules, roles, data models, integrations, routes, screens, components, states, tests, and documentation. On large codebases, inspect in groups and report reviewed sources before proposing changes.
+9. Never overwrite existing context files. In `AGENTS.md`, `CLAUDE.md`, and `.fireskills/SPECKIT.md`, update only the delimited framework block and preserve all content outside it. Never write, move, rename, or delete files in `.specify/` or `specs/`.
+10. After reading stack, first load the Fireskills core:
+    `fireskill-specialist-data-modeling`,
+    `fireskill-specialist-domain-modeling`,
+    `fireskill-specialist-software-architecture`, and
+    `fireskill-specialist-nuxt-ui`.
+    Next, present the correspondence table below with core and specialists detected via manifests. Specialists reside in `fireskills/specialists/`: no installation required; load the core and detected specialists demanded by the current stage.
+11. To complete or adjust stack, rules, or database, announce handoff and load `$fireskill-aux-stack`, `$fireskill-aux-rules`, or `$fireskill-aux-database` respectively.
+12. In every full setup run, load `$fireskill-documentator` following auxiliary skills and reconstruct `docs/` and `.fireskills/PACKAGES.md`.
+13. Only when user explicitly requests Gitflow (see [references/gitflow.md](references/gitflow.md)), announce handoff, load `$fireskill-specialist-gitflow`, and record branch conventions in `RULES.md` via `$fireskill-aux-rules`. Never assume Gitflow based on repository branches or presence of a `develop` branch.
 
-Não contornar um resultado `PENDING`. Atualizar o documento indicado e executar
-o monitor novamente. Para mudança de aplicação sem impacto material na história
-ou finalidade, registrar essa avaliação nas fontes da tarefa e repetir com
-`--acknowledge-project-no-change`. Aplicar a mesma disciplina a regras com
-`--acknowledge-rules-no-change`; nunca usar o reconhecimento para ocultar uma
-mudança documental real.
+Do not bypass a `PENDING` result. Update indicated documents and rerun monitor. For application changes without material shift in purpose or capabilities, document rationale and repeat with `--acknowledge-project-no-change`. Apply same rigor to rules with `--acknowledge-rules-no-change`; never use flags to mask genuine documentation debt.
 
-Manter `.fireskills/PROJECT.md`, `.fireskills/INTERFACE.md` e `.fireskills/DESIGNSYSTEM.MD` na raiz. Manter
-`STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md`, `USER-PROFILE.md` e a
-projeção opcional `SPECKIT.md` em `.fireskills/`. Tratar esses
-documentos como contexto derivado do projeto, não como spec, gate ou
-autorização de implementação.
+Keep `.fireskills/PROJECT.md`, `.fireskills/INTERFACE.md`, and `.fireskills/DESIGNSYSTEM.MD` at root. Maintain `STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md`, `USER-PROFILE.md`, and optional `SPECKIT.md` in `.fireskills/`. Treat these as project-derived context, not as specs, gates, or implementation authorization.
 
-Em projeto com mais de um framework, registrar todas as fontes observadas;
-não escolher silenciosamente um único stack. Se nenhum framework for
-identificado, criar o modelo genérico e declarar que a confirmação está
-pendente.
+In multi-framework projects, document all observed sources; do not arbitrarily select a single stack. If no framework is identified, produce generic templates with confirmation pending.
 
-## Stack e especialistas carregados pelo setup
+## Stack and Specialists Loaded by Setup
 
-| Stack observada | Especialista carregado |
+| Observed Stack | Loaded Specialist |
 | --- | --- |
 | Nuxt (`nuxt.config.ts`) | `fireskill-specialist-nuxt` |
 | `@nuxt/ui` | `fireskill-specialist-nuxt-ui` |
-| Layers do Nuxfire (`layers/`, `layer.manifest.ts`) | `fireskill-specialist-nuxfire-layers` |
+| Nuxfire Layers (`layers/`, `layer.manifest.ts`) | `fireskill-specialist-nuxfire-layers` |
 | tRPC (`trpc-nuxt`) | `fireskill-specialist-trpc` |
 | Drizzle (`drizzle.config.ts`) | `fireskill-specialist-drizzle` |
 | PostgreSQL | `fireskill-specialist-postgres` |
@@ -276,29 +141,22 @@ pendente.
 | OpenAuth.js | `fireskill-specialist-openauth` |
 | `nuxt-authorization` | `fireskill-specialist-nuxt-authorization` |
 | Pinia | `fireskill-specialist-pinia` |
-| Stripe ou Paddle (`layers/billing`) | `fireskill-specialist-billing` |
+| Stripe or Paddle (`layers/billing`) | `fireskill-specialist-billing` |
 | TypeScript | `fireskill-specialist-typescript` |
 | Tailwind CSS | `fireskill-specialist-tailwind-css` |
 | OpenAPI | `fireskill-specialist-web-api-design` |
-| OpenTelemetry ou Prometheus | `fireskill-specialist-observability` |
+| OpenTelemetry or Prometheus | `fireskill-specialist-observability` |
 | CI/CD | `fireskill-specialist-delivery-engineering` |
 
-| Núcleo carregado em todo setup | Finalidade |
+| Core Loaded in Every Setup | Purpose |
 | --- | --- |
-| `fireskill-specialist-data-modeling` | dados, entidades, relações e ciclo de vida |
-| `fireskill-specialist-domain-modeling` | linguagem, regras e limites de domínio |
-| `fireskill-specialist-software-architecture` | módulos, dependências e estrutura técnica |
-| `fireskill-specialist-nuxt-ui` | componentes `@nuxt/ui`, tema e padrões de interface e CRUD |
+| `fireskill-specialist-data-modeling` | Data models, entities, relationships, lifecycle |
+| `fireskill-specialist-domain-modeling` | Domain language, business rules, boundaries |
+| `fireskill-specialist-software-architecture` | Modules, dependencies, technical architecture |
+| `fireskill-specialist-nuxt-ui` | `@nuxt/ui` components, theming, UI and CRUD patterns |
 
-Para todo projeto Nuxfire, o setup carrega `fireskill-specialist-nuxt-ui`: o
-`@nuxt/ui` v4 é a base de todas as interfaces e CRUDs. Não trate como opcional.
+For all Nuxfire projects, setup loads `fireskill-specialist-nuxt-ui`: `@nuxt/ui` v4 is the foundational UI and CRUD design system.
 
-Confira o runtime real antes de aprovar o setup: Cloudflare Workers via SST
-(`sst.config.ts`, `infra/`), Postgres por Hyperdrive e Drizzle. Registre essa
-combinação em `.fireskills/STACK.md` e encaminhe qualquer divergência para uma spec
-antes de aprovar o setup.
+Verify actual runtime before approving setup: Cloudflare Workers via SST (`sst.config.ts`, `infra/`), Postgres via Hyperdrive and Drizzle. Record this combination in `.fireskills/STACK.md`.
 
-Depois de carregar o especialista, o setup registra em `.fireskills/INTERFACE.md` que as
-telas são compostas por Vue SFC com componentes `@nuxt/ui`. Cada nova tela deve
-consultar o mapa, reutilizar o que já existe e registrar componentes próprios e
-componentes `@nuxt/ui` com arquivos e consumidores reais.
+After loading specialists, setup records in `.fireskills/INTERFACE.md` that screens are composed of Vue SFCs with `@nuxt/ui` components. Every new screen consults existing patterns and registers custom components and `@nuxt/ui` components with actual consumers.

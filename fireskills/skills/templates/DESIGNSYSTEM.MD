@@ -1,334 +1,315 @@
-# Design system do produto
+# Product Design System
 
 <!-- markdownlint-disable MD013 -->
 
-Este documento é a fonte normativa das escolhas macro de interface do projeto.
-Ele orienta a composição de todas as telas antes do registro de componentes em
-`.fireskills/INTERFACE.md`. Uma tela nova deve consultar este arquivo, as regras do domínio,
-as permissões e as telas relacionadas.
+This document is the normative source for the project's macro interface decisions.
+It guides the composition of all screens before registering components in
+`.fireskills/INTERFACE.md`. Any new screen must consult this file, domain rules,
+permissions, and related screens.
 
-## Classificação
+## Classification
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
-| Escopo | Produto inteiro |
-| Status | Ativo |
-| Versão | 1.0.0 |
-| Atualizado em | A preencher |
-| Responsável | A preencher |
+| Scope | Entire product |
+| Status | Active |
+| Version | 1.0.0 |
+| Updated at | To be filled |
+| Responsible | To be filled |
 
-## Política de direção
+## Direction Policy
 
-- Quando a pessoa não informa direção visual, os defaults deste documento ficam
-  ativos para a entrega.
-- Uma direção explícita pode substituir um default. Registre a alteração em
-  `Exceções da entrega`, informe o alcance e não transforme uma exceção local em
-  regra do produto sem confirmação.
-- Regras de negócio, permissões, estados e linguagem do produto orientam a
-  interface junto dos tokens. A aparência nunca deve esconder a ação principal,
-  o estado do dado ou o caminho de recuperação.
-- `.fireskills/INTERFACE.md` registra componentes, blocos, telas e composição local. Ele não
-  duplica as escolhas macro deste arquivo.
+- When the user does not specify visual direction, the defaults in this document remain
+  active for delivery.
+- An explicit direction may override a default. Record the change in
+  `Delivery Exceptions`, specify its scope, and do not turn a local exception into a
+  product rule without confirmation.
+- Business rules, permissions, states, and product language guide the
+  interface alongside tokens. Appearance must never conceal the primary action,
+  data state, or recovery path.
+- `.fireskills/INTERFACE.md` records components, blocks, screens, and local composition. It does not
+  duplicate the macro decisions in this file.
 
-## Revisão visual obrigatória
+## Mandatory Visual Review
 
-A revisão visual acontece durante o desenvolvimento de toda interface, mesmo
-sem pedido da pessoa. Em cada tarefa, compare a tela renderizada ou
-inspecionada com este sistema e com `.fireskills/INTERFACE.md`.
+Visual review occurs during the development of every interface, even
+without a user request. In each task, compare the rendered or inspected
+screen with this design system and with `.fireskills/INTERFACE.md`.
 
-- Conferir bordas, espaçamentos, margens e padding entre shell, regiões,
-  componentes, campos, ações e estados.
-- Conferir tipografia: família, peso, tamanho, altura de linha, espaçamento de
-  letras, hierarquia e quebra de texto.
-- Conferir alinhamento, largura, overflow, foco, zoom, conteúdo curto e
-  conteúdo longo nos viewports suportados.
-- Registrar método, viewport, estados, ajustes e resultado no item `VISUAL` da
-  tarefa. Para uma tarefa sem superfície visual, registrar `Não aplicável` e o
-  motivo concreto.
+- Check borders, spacing, margins, and padding across shell, regions,
+  components, fields, actions, and states.
+- Check typography: family, weight, size, line-height, letter spacing,
+  hierarchy, and text wrapping.
+- Check alignment, width, overflow, focus, zoom, short content, and
+  long content across supported viewports.
+- Record method, viewport, states, adjustments, and outcome in the task's `VISUAL` item.
+  For tasks with no visual surface, record `Not applicable` with concrete rationale.
 
-Essa conferência é parte da entrega e não depende de a pessoa solicitar uma
-revisão visual.
+This verification is part of delivery and does not depend on the user requesting a
+visual review.
 
-## Linguagem visual SaaS
+## SaaS Visual Language
 
-A interface deve ser informativa, reconhecível e operacional. A personalidade
-vem da combinação de tipografia, contraste, ritmo, linguagem, hierarquia dos
-dados e tratamento dos estados. Não dependa de decoração para criar identidade.
+The interface must be informative, recognizable, and operational. Personality
+stems from typography, contrast, rhythm, language, data hierarchy,
+and state treatment. Never rely on purely decorative elements for identity.
 
-- Mostre primeiro a pergunta que a tela responde, depois os dados e as ações.
-- Use densidade suficiente para trabalho recorrente, com respiro entre grupos e
-  leitura clara em telas pequenas.
-- Prefira nomes do domínio a rótulos genéricos como “Item”, “Dados” ou “Ação”.
-- Exiba unidade, período, origem, atualização e consequência quando o dado
-  precisar desse contexto.
-- Preserve a posição, filtros e valores preenchidos depois de erro ou retorno.
-- Diferencie ação primária, ação secundária e ação destrutiva por posição,
-  hierarquia e cor semântica.
+- Display first the question the screen answers, followed by data and actions.
+- Use sufficient density for recurring operational tasks, with breathing room between groups
+  and clear legibility on small screens.
+- Prefer domain terms over generic labels like "Item", "Data", or "Action".
+- Display units, periods, sources, updates, and consequences whenever data
+  requires that context.
+- Preserve scroll position, filters, and input values after errors or returns.
+- Distinguish primary, secondary, and destructive actions through placement,
+  hierarchy, and semantic color.
 
-## Dashboard canônico
+## Canonical Dashboard
 
-Um dashboard responde a uma pergunta operacional do produto. Ele não é uma
-coleção de cartões sem contexto.
+A dashboard answers an operational product question. It is not an uncoordinated
+collection of cards.
 
-- Comece com `PageHeader`, período ou escopo visível e filtros próximos da
-  região que eles alteram.
-- Use uma faixa curta de indicadores `KPI` para mostrar valor, unidade,
-  período, comparação, fonte e ação possível.
-- Depois dos indicadores, mostre a tendência ou distribuição principal e uma
-  `UTable` ou lista para investigação detalhada.
-- Cada visualização informa loading, vazio, erro e atualização. Gráficos têm
-  alternativa textual ou tabular e não dependem apenas de cor.
-- Preserve filtros, período e posição ao atualizar ou retornar de um detalhe.
-- Em telas pequenas, empilhe as informações na ordem da tarefa e evite
-  overflow horizontal sem necessidade. A responsividade preserva leitura,
-  controles e ações nos breakpoints suportados.
+- Begin with `PageHeader`, visible period or scope, and filters placed close to the
+  region they affect.
+- Use a concise row of `KPI` indicators to show value, unit,
+  period, comparison, source, and available action.
+- Below indicators, show the primary trend or distribution and a
+  `UTable` or list for detailed investigation.
+- Every visualization reports loading, empty, error, and refresh states. Charts
+  must include a textual or tabular alternative and not rely solely on color.
+- Preserve filters, period, and scroll position when refreshing or returning from detail views.
+- On small screens, stack information in task order and avoid unnecessary horizontal
+  overflow. Responsiveness preserves readability, controls, and actions across supported breakpoints.
 
-## Componentes base e blocos comuns
+## Base Components and Common Blocks
 
-Use a base disponível no projeto antes de criar uma composição nova. Os
-componentes do `@nuxt/ui` atendem controles e superfícies fundamentais, como
+Use the base available in the project before creating new compositions.
+`@nuxt/ui` components provide fundamental controls and surfaces, such as
 `UButton`, `UInput`, `UFormField`, `USelect`, `UModal`, `USlideover`, `UTabs`,
-`UTable`, `UCard`, `UBadge`, `UAlert`, `USkeleton`, `UTooltip`, `UPagination` e
+`UTable`, `UCard`, `UBadge`, `UAlert`, `USkeleton`, `UTooltip`, `UPagination`, and
 `UBreadcrumb`.
 
-Composições como `PageHeader`, navegação, filtros, `UTable`, cartões de
-indicadores, painéis e estados de feedback partem desses componentes e do tema
-do projeto (`packages/tokens`). Adapte a composição aos tokens, dados,
-permissões e linguagem do produto. Não adicione uma dependência somente pela
-aparência de um exemplo.
+Compositions such as `PageHeader`, navigation, filters, `UTable`, indicator cards,
+panels, and feedback states build upon these components and the project theme
+(`packages/tokens`). Adapt composition to tokens, data,
+permissions, and product language. Never add a dependency solely for the visual
+appearance of an example.
 
-Ao reutilizar um primitive ou bloco, registre em `.fireskills/INTERFACE.md` sua origem,
-arquivo, API, estados, comportamento de teclado e telas consumidoras. Uma
-composição de catálogo serve como base; ela não substitui as regras deste
-documento nem a arquitetura da aplicação.
+When reusing a primitive or block, record in `.fireskills/INTERFACE.md` its origin,
+file, API, states, keyboard behavior, and consumer screens. A catalog composition
+serves as a foundation; it does not replace the rules of this document nor the application architecture.
 
-## Boas práticas de interface
+## Interface Best Practices
 
-- Dê a cada tela um título orientado à tarefa, uma ação principal e um caminho
-  claro de retorno.
-- Use hierarquia visual consistente, alinhamento previsível, contraste
-  suficiente, áreas de toque confortáveis e texto legível em zoom.
-- Garanta navegação por teclado, foco visível, ordem de foco coerente,
-  mensagens associadas aos campos e nomes acessíveis para controles.
-- Não use cor, ícone ou posição como único meio de comunicar estado; combine
-  texto, semântica e indicação visual.
-- Mantenha feedback próximo da ação, evite bloquear o fluxo sem necessidade e
-  respeite `prefers-reduced-motion`.
-- Teste conteúdo curto e longo, telas pequenas e grandes, loading, vazio, erro,
-  sucesso, disabled e ausência de permissão.
+- Provide every screen with a task-oriented title, a primary action, and a clear
+  return path.
+- Maintain consistent visual hierarchy, predictable alignment, sufficient contrast,
+  comfortable touch targets, and legible text under zoom.
+- Ensure keyboard navigation, visible focus rings, logical focus order,
+  field-associated messages, and accessible names for controls.
+- Do not use color, icons, or position as the sole medium for communicating state; combine
+  text, semantics, and visual indicators.
+- Keep feedback close to the trigger action, avoid blocking workflows unnecessarily, and
+  respect `prefers-reduced-motion`.
+- Test short and long content, small and large screens, loading, empty, error,
+  success, disabled, and unauthorized states.
 
-## Shell global
+## Global Shell
 
-Todas as páginas autenticadas seguem o shell do produto, salvo exceção
-registrada abaixo.
+All authenticated pages follow the product shell, unless an exception is recorded below.
 
-- O shell possui navegação persistente, área de trabalho, retorno de foco e
-  caminho de navegação coerente.
-- Cada tela começa com `PageHeader`, contendo contexto, título orientado à
-  tarefa, descrição útil e ação primária quando houver.
-- Ações secundárias ficam próximas do título ou da região que afetam. A ação
-  destrutiva exige distinção visual e confirmação com consequência explícita.
-- A página deve declarar loading, vazio, erro, sucesso, ausência de permissão,
-  conteúdo parcial e alterações não salvas quando esses estados fizerem parte
-  do fluxo.
+- The shell provides persistent navigation, work canvas, focus management, and
+  coherent navigation paths.
+- Every screen starts with `PageHeader`, containing context, task-oriented title,
+  helpful description, and primary action when applicable.
+- Secondary actions sit close to the title or the region they affect. Destructive
+  actions require visual distinction and confirmation stating explicit consequences.
+- The page must declare loading, empty, error, success, unauthorized,
+  partial content, and unsaved changes when part of the flow.
 
-### Breadcrumb obrigatório
+### Mandatory Breadcrumb
 
-- Toda tela da aplicação exibe um `Breadcrumb` dentro do shell global. A trilha
-  usa nomes reais do produto e termina no título da tela atual.
-- A hierarquia sempre inclui a equipe ativa antes do módulo e da tela, com o
-  nome da equipe visível e um link para o contexto inicial dela. Nenhuma tela
-  autenticada pode ocultar a equipe por reduzir a trilha.
-- Procure primeiro o breadcrumb existente, o layout que já o renderiza e o tipo
-  de seus itens (ou use `UBreadcrumb`). Reaproveite essa estrutura,
-  suas rotas e seus tokens; não crie uma segunda implementação paralela.
-- Preserve a equipe e a tela atual em viewport estreito. Se os itens do meio
-  precisarem ser recolhidos, use elipse acessível, sem remover os dois extremos
-  nem o nome da equipe.
-- O item atual usa estado sem link, `aria-current="page"` e nome acessível. Os
-  itens anteriores são links reais, respeitam permissão e não dependem apenas
-  de ícones ou cor.
+- Every application screen displays a `Breadcrumb` within the global shell. The path
+  uses actual product terms and terminates at the current screen title.
+- The hierarchy always includes the active team before module and screen, with visible
+  team name and a link to its root context. No authenticated screen may hide the team
+  by truncating the trail.
+- First look for existing breadcrumbs, layouts that already render them, and item types
+  (or use `UBreadcrumb`). Reuse this structure, its routes, and tokens; do not create parallel implementations.
+- Preserve active team and current screen on narrow viewports. If intermediate items
+  must collapse, use accessible ellipsis without removing either boundary or team name.
+- Current item uses unlinked state, `aria-current="page"`, and accessible name. Preceding
+  items are real links, respect permissions, and do not rely solely on icons or color.
 
-## CRUD canônico
+## Canonical CRUD
 
-| Superfície | Composição obrigatória | Regras de uso |
+| Surface | Mandatory Composition | Usage Rules |
 | --- | --- | --- |
-| Lista | `PageHeader` + resumo útil + `UTable` | Usar para comparação densa, busca, filtros, ordenação, paginação, seleção e ações por registro. Ações em lote devem deixar escopo e resultado claros. |
-| Detalhe | `PageHeader` + `DetailLists` | Organizar atributos por assunto, destacar status e próxima ação. Adicionar atividade, relações ou histórico quando o domínio exigir. |
-| Criar | `PageHeader` + seções de formulário em duas colunas responsivas | Cada seção tem coluna de contexto, painel de campos, labels visíveis, ajuda junto do campo e submit com estado de envio. |
-| Editar | `PageHeader` + seções de formulário em duas colunas responsivas | Reaproveitar a estrutura de criar, exibir valores atuais, preservar alterações após falha e informar o resultado da gravação. |
+| List | `PageHeader` + useful summary + `UTable` | Use for dense comparison, search, filters, sorting, pagination, selection, and row actions. Batch actions must clearly state scope and result. |
+| Detail | `PageHeader` + `DetailLists` | Organize attributes by domain subject, highlight status and next action. Add activity, relations, or history when domain requires. |
+| Create | `PageHeader` + form sections in two responsive columns | Each section has a context column, field panel, visible labels, inline field help, and submit with sending state. |
+| Edit | `PageHeader` + form sections in two responsive columns | Reuse create structure, display current values, preserve changes on failure, and report save outcome. |
 
-### Reuso e ações obrigatórias do CRUD
+### Mandatory CRUD Reuse and Actions
 
-- Todas as telas de um CRUD usam o mesmo componente `PageHeader` reutilizável.
-  Lista, detalhe, criação e edição variam título, descrição, breadcrumbs e
-  ações por props ou configuração, sem duplicar markup.
-- Componentes recorrentes de tabela, linha, ações, formulário, estados e
-  feedback são criados uma vez, registrados em `.fireskills/INTERFACE.md` e reaproveitados
-  por todas as telas compatíveis.
-- O `UTable` da listagem (`enterpriseTableUi`) ocupa toda a largura disponível. A coluna `ID` fica
-  visível sempre, inclusive com outras colunas de negócio.
-- A linha inteira é o link para o detalhe por mouse e teclado. Botões
-  independentes de editar e apagar ficam na própria linha e não propagam o
-  clique para o detalhe.
-- Apagar respeita permissão, mostra o registro alvo e confirma a consequência
-  antes da execução.
+- All CRUD screens share the same reusable `PageHeader` component.
+  List, detail, create, and edit adjust title, description, breadcrumbs, and
+  actions via props or config, without duplicating markup.
+- Recurring table, row, action, form, state, and feedback components are created once,
+  recorded in `.fireskills/INTERFACE.md`, and reused across compatible screens.
+- The list `UTable` (`enterpriseTableUi`) spans full available width. The `ID` column remains
+  always visible, alongside business columns.
+- The entire row serves as the link to details via mouse and keyboard. Independent
+  edit and delete buttons reside in the row without bubbling clicks to the detail link.
+- Delete respects permissions, displays the target record, and confirms consequences
+  prior to execution.
 
-### Navegação da lista
+### List Navigation
 
-- Quando a linha representa um registro com detalhe, a linha inteira é uma ação
-  de navegação para esse detalhe. O clique em qualquer célula e a ativação por
-  teclado têm o mesmo resultado.
-- Use um link acessível sobre a área da linha, como `data-row-link`, sem colocar
-  um link dentro de outro ou transformar o `tr` em um elemento inválido.
-- Checkboxes, menus, botões e outros controles da própria linha ficam dentro de
-  `TableRowAction` ou equivalente, acima do link da linha, e não navegam para o
-  detalhe ao serem usados.
-- A linha só é clicável quando existe um destino claro. O estado hover, foco e
-  seleção devem permanecer perceptíveis sem depender apenas de cor.
+- When a row represents a record with details, the entire row acts as a navigation
+  action to those details. Clicking any cell or activating via keyboard produces the same outcome.
+- Use an accessible link across the row surface, such as `data-row-link`, avoiding nested links
+  or invalid `tr` semantics.
+- Checkboxes, menus, buttons, and other row controls reside inside `TableRowAction` or equivalent,
+  layered above the row link, and do not navigate to details upon interaction.
+- The row is clickable only when a clear target exists. Hover, focus, and selection states
+  must remain perceptible without relying solely on color.
 
-### Estrutura dos formulários
+### Form Structure
 
-Criar e editar usam seções separadas para reduzir a carga de leitura e tornar a
-revisão do registro previsível.
+Create and edit use separate sections to reduce cognitive load and keep record
+review predictable.
 
-- Cada seção usa uma coluna de contexto à esquerda, com título e descrição, e
-  um painel de formulário à direita.
-- O painel organiza campos relacionados em duas colunas nos breakpoints largos,
-  usando `grid-cols-2` ou a composição equivalente, e em uma coluna no mobile.
-- Campos longos, ajuda extensa, upload, tabelas internas e mensagens de erro
-  ocupam a largura total quando a tarefa exigir.
-- Campos dependentes permanecem próximos e seguem a ordem natural de leitura;
-  a grade nunca deve separar label, ajuda e erro do campo.
-- O rodapé da seção ou do formulário mantém cancelar, salvar, loading, sucesso e
-  erro próximos da ação. Em edição, alterações não salvas ficam protegidas.
+- Each section uses a left context column (title and description) and a right form panel.
+- The panel organizes related fields into two columns on wide breakpoints,
+  using `grid-cols-2` or equivalent composition, and single column on mobile.
+- Long inputs, extensive help text, uploads, nested tables, and error messages
+  span full width when required by the task.
+- Dependent fields remain adjacent in natural reading order; grids must never
+  separate label, help text, and error from the input.
+- Section or form footers place cancel, save, loading, success, and error close to the action.
+  In edit mode, unsaved changes are protected against accidental dismissal.
 
-### Formulários
+### Forms
 
-- Labels são visíveis e não dependem de placeholder.
-- Campos obrigatórios, formato aceito e origem do valor ficam claros antes do
-  envio.
-- A validação aponta o campo com borda, fundo ou ícone semântico vermelho e
-  mostra a mensagem de erro abaixo do campo. O texto também deve ser anunciado
-  por tecnologia assistiva.
-- Quando houver vários erros, um resumo no início oferece links para cada campo.
-- O foco vai para o primeiro erro após o envio. O valor digitado permanece salvo
-  sempre que o servidor permitir nova tentativa.
-- O botão de envio informa carregamento, sucesso ou falha sem duplicar pedidos.
+- Labels are visible and do not depend on placeholders.
+- Required fields, accepted formats, and value sources are clear prior to submission.
+- Validation marks invalid inputs with red semantic border, background, or icon,
+  displaying error messages beneath the input. Text must also be announced by assistive tech.
+- When multiple errors occur, a top summary offers anchor links to each field.
+- Focus moves to the first invalid field upon submission. Entered values remain intact
+  whenever the server allows retry.
+- Submit buttons indicate loading, success, or failure without duplicate submissions.
 
-## Estados e mensagens
+## States and Messages
 
-| Estado | Conteúdo mínimo |
+| State | Minimum Content |
 | --- | --- |
-| Loading | Estrutura próxima do conteúdo final e indicação do que está sendo carregado. |
-| Vazio | Motivo, orientação e ação para começar, quando existir. |
-| Erro | O que falhou, ação de recuperação e suporte para contato quando necessário. |
-| Sem permissão | Explicação curta sem expor dados protegidos e caminho para solicitar acesso. |
-| Sucesso | Resultado concreto, próximo passo e retorno ao contexto anterior. |
-| Parcial | Dados disponíveis, parte ausente e forma de atualizar. |
-| Não salvo | Alterações pendentes, saída protegida e opção clara de continuar ou descartar. |
+| Loading | Structure matching final layout and indication of what is loading. |
+| Empty | Reason, guidance, and primary call-to-action to begin, when applicable. |
+| Error | What failed, recovery action, and support contacts when necessary. |
+| Unauthorized | Brief explanation without exposing protected data, plus request access path. |
+| Success | Concrete result, next steps, and return path to previous context. |
+| Partial | Available data, missing parts, and how to refresh. |
+| Unsaved | Pending modifications, guarded exit, and clear choice to stay or discard. |
 
-## Regras de negócio expostas na interface
+## Business Rules Exposed in Interface
 
-- Ações visíveis respeitam papel, permissão e estado do registro.
-- Transições de status exibem estado atual, próximo estado possível e efeito da
-  operação.
-- Exclusão, cancelamento e ações irreversíveis mostram consequência, alvo e
-  confirmação antes de executar.
-- Duplicidade, conflito de versão e falha de validação retornam à tela com os
-  dados preservados.
-- Histórico, autoria e data aparecem quando a atividade altera a leitura do
-  registro.
+- Visible actions respect role, permissions, and record state.
+- Status transitions display current state, next valid states, and operation effect.
+- Deletion, cancellation, and irreversible actions indicate consequences, target, and confirmation before execution.
+- Duplication, version conflicts, and validation failures return to screen with preserved data.
+- History, authorship, and timestamps appear when activity affects record interpretation.
 
-## Cenários canônicos
+## Canonical Scenarios
 
-### Lista com registros
+### List with Records
 
 ```gherkin
-Dado que a pessoa tem permissão para consultar registros
-Quando abre a rota de lista
-Então vê um PageHeader com contexto e ação principal
-E vê um Breadcrumb com o nome da equipe e o título da tela
-E vê os registros em uma tabela com busca, filtros e ordenação adequados
-E consegue identificar status, atualização e ação disponível por linha
+Given the user has permission to view records
+When they open the list route
+Then they see a PageHeader with context and primary action
+And they see a Breadcrumb with team name and current screen title
+And they see records in a table with suitable search, filters, and sorting
+And they can identify status, updates, and available actions per row
 ```
 
-### Lista vazia
+### Empty List
 
 ```gherkin
-Dado que não há registros para o escopo atual
-Quando a pessoa abre a lista
-Então vê uma mensagem que explica o motivo do vazio
-E vê a ação para criar o primeiro registro quando tiver permissão
+Given there are no records for the current scope
+When the user opens the list
+Then they see a message explaining why it is empty
+And they see an action to create the first record when authorized
 ```
 
-### Visualização de detalhe
+### Detail View
 
 ```gherkin
-Dado que a pessoa tem acesso a um registro
-Quando abre seu detalhe
-Então vê o PageHeader com identificação, status e ações possíveis
-E vê os atributos organizados em DetailLists
-E encontra relações ou atividade quando o domínio exigir
+Given the user has access to a record
+When they open its detail view
+Then they see the PageHeader with identification, status, and valid actions
+And they see attributes organized in DetailLists
+And they find relations or activity when required by the domain
 ```
 
-### Criação válida
+### Valid Creation
 
 ```gherkin
-Dado que a pessoa tem permissão para criar
-Quando preenche as seções do formulário em duas colunas e envia
-Então vê o resultado da gravação
-E é levada ao detalhe ou à lista conforme o fluxo definido
+Given the user has permission to create
+When they fill form sections in two columns and submit
+Then they see the save outcome
+And they are navigated to details or list according to defined flow
 ```
 
-### Criação ou edição com erro de campo
+### Creation or Edit with Field Error
 
 ```gherkin
-Dado que a pessoa enviou um campo inválido
-Quando o servidor retorna a falha
-Então o campo fica com estado visual vermelho
-E a mensagem aparece abaixo do campo
-E o foco chega ao primeiro erro
-E os demais valores permanecem preenchidos
+Given the user submitted an invalid field
+When the server returns the error
+Then the field displays red visual error state
+And the error message appears beneath the field
+And focus lands on the first error
+And other entered values remain preserved
 ```
 
-### Sem permissão
+### Unauthorized
 
 ```gherkin
-Dado que a pessoa não possui a permissão necessária
-Quando tenta abrir ou executar a ação
-Então vê uma mensagem sem dados protegidos
-E não recebe controles que não pode usar
+Given the user lacks required permissions
+When they attempt to open or trigger the action
+Then they see a message without exposed protected data
+And they do not receive controls they cannot use
 ```
 
-### Erro de carregamento
+### Loading Error
 
 ```gherkin
-Dado que a fonte de dados falhou
-Quando a pessoa abre a tela
-Então vê o estado de erro com causa compreensível
-E encontra uma ação para tentar novamente
+Given the data source failed
+When the user opens the screen
+Then they see an error state with an intelligible cause
+And they find an action to retry
 ```
 
-## Tokens e componentes
+## Tokens and Components
 
-Tokens de cor, tipografia, espaçamento, raio, foco e movimento devem ser
-reaproveitados antes de criar valores locais. Componentes acessíveis e
-composições de catálogo devem ser registrados em `.fireskills/INTERFACE.md` com origem,
-props, eventos, estados e consumidores reais. A revisão visual precisa
-confirmar bordas, espaçamentos, margens, padding e tipografia contra esses
-tokens antes do item `EVIDENCE` da tarefa.
+Color, typography, spacing, radius, focus, and animation tokens must be
+reused before creating local ad-hoc values. Accessible components and catalog
+compositions must be registered in `.fireskills/INTERFACE.md` with source,
+props, events, states, and active consumers. Visual review must
+verify borders, spacing, margins, padding, and typography against these
+tokens before completing the task's `EVIDENCE` item.
 
-## Exceções da entrega
+## Delivery Exceptions
 
-| Data | Tela ou fluxo | Default substituído | Nova regra | Alcance | Motivo | Autor |
+| Date | Screen or Flow | Overridden Default | New Rule | Scope | Rationale | Author |
 | --- | --- | --- | --- | --- | --- | --- |
-| A preencher | A preencher | A preencher | A preencher | Entrega, tela ou produto | A preencher | A preencher |
+| To be filled | To be filled | To be filled | To be filled | Delivery, screen, or product | To be filled | To be filled |
 
-## Histórico
+## History
 
-| Versão | Data | Alteração | Alcance |
+| Version | Date | Change | Scope |
 | --- | --- | --- | --- |
-| 1.0.0 | A preencher | Criação dos defaults de SaaS e dos cenários CRUD | Produto |
+| 1.0.0 | To be filled | Created SaaS defaults and canonical CRUD scenarios | Product |
 
 <!-- markdownlint-enable MD013 -->

@@ -1,34 +1,32 @@
 ---
 name: fireskill-aux-stack
-description: Monitorar manifests e arquivos estruturais para criar ou atualizar .fireskills/STACK.md de forma aditiva. Use quando o monitor de contexto apontar stack pendente; quando framework, linguagem, runtime, pacote estrutural, ferramenta de teste ou persistência mudar; quando a documentação técnica estiver incompleta; ou após adicionar um framework, uma biblioteca estrutural ou dependências relevantes. Preserva conteúdo humano existente.
+description: Monitor manifests and structural files to create or update .fireskills/STACK.md additively. Use when the context monitor reports pending stack; when framework, language, runtime, structural package, testing tool, or persistence changes; when technical documentation is incomplete; or after adding a framework, structural library, or relevant dependencies. Preserves existing human content.
 ---
 
-# Manter o stack
+# Maintaining the Stack
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `sem perguntas`.
-Não formule perguntas nesta skill. Quando faltar informação confirmada,
-sinalize o campo pendente para a etapa conversacional responsável.
+Interaction mode: `no questions`.
+Do not formulate questions in this skill. When confirmed information is missing,
+flag the pending field for the responsible conversational step.
 
-1. Ler instruções locais, `.fireskills/PROJECT.md` e o `STACK.md` existente.
-2. Executar `node scripts/update_stack.mjs --project <raiz>`.
-3. Conferir cada linha contra manifests, lockfiles e configurações presentes.
-4. Manter decisões, notas e linhas humanas fora do bloco
-   `specsfy:stack`; nunca removê-las.
-5. Acrescentar manualmente somente fatos sustentados por uma fonte executável e
-   citar essa fonte na coluna `Evidência`.
-6. Se a mudança também alterar persistência, carregar
-   `$fireskill-aux-database`.
-7. Executar `$fireskill-setup` em modo de monitoramento e não devolver o handoff
-   enquanto `.fireskills/STACK.md` continuar pendente.
+1. Read local instructions, `.fireskills/PROJECT.md`, and existing `STACK.md`.
+2. Run `node scripts/update_stack.mjs --project <root>`.
+3. Verify each row against present manifests, lockfiles, and configurations.
+4. Keep human decisions, notes, and sections outside the `specsfy:stack` block;
+   never remove them.
+5. Manually append only facts backed by an executable source and cite that source
+   in the `Evidence` column.
+6. If the change also affects persistence, load `$fireskill-aux-database`.
+7. Run `$fireskill-setup` in monitoring mode and do not release the handoff
+   while `.fireskills/STACK.md` remains pending.
 
-Não copiar árvores inteiras de dependências. Registrar tecnologias estruturais,
-suas responsabilidades e evidências úteis para agentes compreenderem o sistema.
+Do not copy entire dependency trees. Record structural technologies, their
+responsibilities, and useful evidence for agents understanding the system.

@@ -1,44 +1,44 @@
 ---
 name: fireskill-specialist-billing
-description: Criar e revisar pagamentos e assinaturas do Nuxfire (`layers/billing`) — Stripe (Checkout, portal, webhook, sincronização) e Paddle (Paddle.js, webhook), ledger de idempotência no KV, tabelas Plan/Subscription, console de planos do platform admin. Use ao mexer em checkout, webhook, status de assinatura, planos, preços ou limite de assentos.
+description: Create and review Nuxfire payments and subscriptions (`layers/billing`) — Stripe (Checkout, portal, webhook, sync) and Paddle (Paddle.js, webhook), idempotency ledger in KV, Plan/Subscription tables, platform admin plans console. Use when modifying checkout, webhooks, subscription status, plans, pricing, or seat limits.
 ---
 
-# Billing (Stripe e Paddle)
+# Billing (Stripe and Paddle)
 
-## Quando usar
+## When to Use
 
-- Acionar ao alterar `layers/billing/**`: webhooks, checkout, portal, `Plan`,
-  `Subscription`, catálogo de preços ou o console `/admin/plans`.
-- Não acionar para permissões em geral (`$fireskill-specialist-nuxt-authorization`),
-  procedures (`$fireskill-specialist-trpc`) ou tabelas (`$fireskill-specialist-drizzle`);
-  combine com eles. Segredos e stages: `$fireskill-specialist-sst`.
+- Trigger when modifying `layers/billing/**`: webhooks, checkout, portal, `Plan`,
+  `Subscription`, price catalog, or `/admin/plans` console.
+- Do not trigger for general permissions (`$fireskill-specialist-nuxt-authorization`),
+  procedures (`$fireskill-specialist-trpc`), or tables (`$fireskill-specialist-drizzle`);
+  combine with them instead. Secrets and stages: `$fireskill-specialist-sst`.
 
-## Fluxo
+## Workflow
 
-1. Ler [references/nuxfire-billing.md](references/nuxfire-billing.md).
-2. Identificar o provedor da mudança (Stripe, Paddle ou ambos) e o evento afetado.
-3. Seguir o padrão existente: webhook fino (verificar → deduplicar → despachar) e
-   estado resolvido em um único lugar (`syncStripeSubscription`, `upsertSubscription`).
-4. Validar (abaixo).
+1. Read [references/nuxfire-billing.md](references/nuxfire-billing.md).
+2. Identify the provider involved (Stripe, Paddle, or both) and the affected event.
+3. Follow the established pattern: thin webhook (verify → deduplicate → dispatch) and
+   state resolved in a single place (`syncStripeSubscription`, `upsertSubscription`).
+4. Validate (below).
 
-## Regras principais
+## Core Rules
 
-- Todo webhook verifica a assinatura antes de qualquer efeito e usa o ledger
-  (`wasEventProcessed` / `markEventProcessed`); marcar como processado **só depois**
-  do sucesso, para o retry do provedor continuar seguro.
-- No Stripe, nunca confiar no payload do webhook: re-buscar a assinatura pela API
-  (`stripe.subscriptions.retrieve`) com a versão fixada em `utils/stripe.ts`.
-- Status do provedor entra por mapa exaustivo (`status-map.ts`); status novo deve
-  quebrar a compilação, não virar `INCOMPLETE` em silêncio.
-- Toda procedure que age sobre uma equipe confere a `teamMembership` do usuário.
-- Plano nunca é apagado: `isArchived`. `providerPriceId` é o elo entre `Plan` e o
-  preço no provedor.
-- `useDB()` por requisição; segredos só via `useRuntimeConfig`. Nunca logar chave
-  ou payload completo.
+- Every webhook verifies signature before any side effect and uses the ledger
+  (`wasEventProcessed` / `markEventProcessed`); mark as processed **only after**
+  successful handling, preserving safe provider retries.
+- For Stripe, never trust webhook payload data: re-fetch the subscription via the API
+  (`stripe.subscriptions.retrieve`) with the version pinned in `utils/stripe.ts`.
+- Provider status enters through an exhaustive map (`status-map.ts`); unknown statuses must
+  break compilation, never silently default to `INCOMPLETE`.
+- Every procedure operating on a team verifies the user's `teamMembership`.
+- Plans are never hard-deleted: use `isArchived`. `providerPriceId` links `Plan` to
+  the provider price.
+- `useDB()` per request; secrets exclusively via `useRuntimeConfig`. Never log keys
+  or full payloads.
 
-## Validação
+## Validation
 
-- `bun run test` (há testes de ledger, repositório de assinatura e mapa de status).
-- Typecheck de `apps/app` e `vue-tsc -p server/tsconfig.json`.
-- Mudança de schema: tarefa `[MIGRATION]` e `$fireskill-aux-database`.
-- Webhook real só com autorização (sandbox do provedor); deploy só com autorização.
+- `bun run test` (existing tests for ledger, subscription repository, status map).
+- Typechecks for `apps/app` and `bunx vue-tsc --noEmit -p server/tsconfig.json`.
+- Schema changes: include `[MIGRATION]` task and run `$fireskill-aux-database`.
+- Live webhooks only with authorization (provider sandbox); deployment only with explicit authorization.

@@ -1,102 +1,53 @@
 ---
 name: fireskill-specialist-code-review
-description: Revisar diffs, branches e PRs por contrato, correção, segurança, arquitetura, testes e risco operacional, relatando achados por severidade com localização e evidência. Use quando o usuário pedir code review, segunda opinião sobre uma mudança ou avaliação de risco de um diff; é somente leitura salvo pedido explícito para corrigir; não use para desenhar a arquitetura do zero, use `$fireskill-specialist-software-architecture` para isso.
+description: Review diffs, branches, and PRs for contract adherence, correctness, security, architecture, test quality, and operational risk, reporting findings categorized by severity with precise location and evidence. Use when reviewing code, providing a second opinion on changes, or assessing diff risk; read-only unless explicit fix requested; do not use to design architecture from scratch (use `$fireskill-specialist-software-architecture`).
 ---
 
-# Revisão de código
+# Code Review
 
-## Quando usar
+## When to Use
 
-- Acionar quando houver um diff, branch ou PR concreto para avaliar antes de
-  mergear ou publicar.
-- Acionar também quando o pedido for "segunda opinião" sobre uma mudança já
-  escrita, mesmo sem PR aberto.
-- Não acionar para desenhar uma decisão estrutural nova do zero — use
-  `$fireskill-specialist-software-architecture`; a revisão avalia o que já foi
-  decidido e escrito, não substitui a decisão.
-- Combinar com `$fireskill-specialist-application-security` quando o diff tocar
-  autenticação, autorização, dados sensíveis ou entrada externa, e com
-  `$fireskill-specialist-domain-modeling` quando o achado for sobre nomes,
-  invariantes ou fronteiras de domínio confusas.
+- Trigger when concrete diffs, branches, or PRs need evaluation prior to merging or release.
+- Trigger when asked for a "second opinion" on already implemented changes.
+- Do not trigger to design foundational architecture from scratch — use
+  `$fireskill-specialist-software-architecture`; review evaluates implemented decisions, it does not invent them.
+- Combine with `$fireskill-specialist-application-security` when diffs touch auth, sensitive
+  data, or untrusted inputs, and with `$fireskill-specialist-domain-modeling` when findings involve ambiguous domain concepts or invariants.
 
-## Fluxo
+## Workflow
 
-1. Fixar a base de comparação e o escopo exato do diff; revisar um diff sem
-   base clara produz achados sobre código que a mudança não tocou.
-2. Ler spec, issue, critérios de aceite e instruções do repositório aplicáveis
-   antes de julgar; sem isso, "correto" vira opinião pessoal.
-3. Mapear cada arquivo alterado para o comportamento e o boundary que ele
-   afeta (dado, permissão, contrato de API, config, dependência).
-4. Avaliar corretude, casos de borda, segurança, concorrência e efeito
-   operacional antes de estilo — estilo só bloqueia quando automação não o
-   cobre.
-5. Inspecionar os testes pela evidência que fornecem: eles falhariam sem a
-   correção, ou só cobrem a linha sem provar o comportamento?
-6. Confirmar cada achado suspeito lendo o código real e os chamadores/
-   consumidores antes de reportar — reduz falso positivo.
-7. Relatar por severidade, com localização exata (`arquivo:linha`), condição
-   que dispara a falha, impacto e correção provável.
+1. Fix the comparison baseline and exact diff scope; reviewing without a clean base produces
+   findings on unrelated code.
+2. Read the spec, issue, acceptance criteria, and project guidelines before judging;
+   without them, "correctness" degrades to subjective opinion.
+3. Map every changed file to its affected behavior and boundaries (data, permissions, API contract, config, dependencies).
+4. Evaluate correctness, edge cases, security, concurrency, and operational impact before
+   style — style only blocks when automation fails to cover it.
+5. Inspect tests for the evidence they provide: would they fail without this fix, or do they
+   merely execute lines without asserting behavior?
+6. Verify suspected defects against real callers and consumers before reporting — minimizes false positives.
+7. Report findings by severity, with exact location (`file:line`), trigger condition, impact,
+   and recommended remediation.
 
-## Padrões
+## Core Rules
 
-- Priorizar bugs e risco concreto; não transformar preferência de estilo em
-  bloqueador.
-- Cada achado descreve condição de entrada, consequência observável e a
-  evidência que comprova (linha, teste, log).
-- Considerar compatibilidade com clientes existentes, concorrência, plano de
-  rollback e observabilidade da mudança, não só o caminho feliz.
-- Verificar se o teste adicionado falharia sem a correção real — teste que
-  passa antes e depois da mudança não prova nada.
-- Distinguir escopo ausente do PR (bloqueador de merge) de melhoria futura
-  opcional (comentário, não bloqueio).
-- Não repetir achado que lint, formatter ou type checker automatizado já
-  cobre; aponte só o que a automação não vê.
-- Declarar explicitamente "nenhum achado nesta lente" quando for o caso, sem
-  linguagem que implique ausência de risco além do observado.
+- Prioritize real defects and concrete risks; do not elevate personal style preferences to blockers.
+- Every finding must describe input conditions, observable consequences, and concrete evidence (line, test, log).
+- Consider backward compatibility, concurrency, rollback strategies, and operational observability, not just happy paths.
+- Verify that tests fail when the fix is removed — tests passing before and after prove nothing.
+- Distinguish missing PR scope (merge blocker) from optional future improvements (advisory comments).
+- Do not duplicate findings covered by linters, formatters, or type checkers.
+- Explicitly state "no findings under this lens" when appropriate, without claiming complete absence of risk beyond observations.
 
-## Antipadrões
+## Antipatterns
 
-- Bloquear por gosto pessoal de nome de variável ou formatação quando o
-  projeto já tem linter configurado para isso — desperdiça o orçamento de
-  atenção da revisão nos achados que importam.
-- Aprovar porque "os testes passam", sem checar se o teste novo de fato
-  cobre o comportamento da mudança (teste tautológico ou sem asserção real).
-- Revisar arquivo por arquivo sem montar o fluxo entre eles — perde efeitos
-  cruzados, como uma função que muda de assinatura sem todos os chamadores
-  ajustados.
-- Reportar "parece inseguro" sem apontar o vetor concreto — achado de
-  segurança sem trust boundary e entrada específica não é acionável.
+- Blocking for variable naming or formatting preferences when linters exist for that purpose.
+- Raising issues without executable reproduction or clear rationale.
+- Omitting location citations (`file:line`).
+- Silently glossing over large PRs with superficial reviews.
 
-## Validação
+## Validation
 
-- Revisar o diff completo, incluindo arquivos de configuração, migrations e
-  chamadores/consumidores fora do diff que o comportamento afeta.
-- Conferir cada achado relatado contra o estado real do código e da suíte de
-  testes antes de publicar — achado não confirmado não entra no relatório.
-- Ordenar a lista final por severidade (probabilidade × impacto), não pela
-  ordem em que os arquivos aparecem no diff.
-- Resumir cobertura da revisão (o que foi olhado) e risco residual (o que não
-  foi possível confirmar) ao final.
-- Não declarar um diff "seguro" ou "correto" sem a evidência acima —
-  linguagem absoluta sem prova é proibida.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-debugging` fornece reprodução e causa raiz quando o
-  review encontra um defeito ainda não explicado.
-- `$fireskill-specialist-typescript` aprofunda contratos de tipo e
-  `$fireskill-specialist-web-accessibility` aprofunda semântica, teclado e WCAG
-  quando esses riscos aparecem no diff.
-- `$fireskill-specialist-application-security` quando o diff tocar identidade,
-  autorização, dado sensível ou entrada externa — a revisão de segurança
-  aprofunda o que esta skill só sinaliza.
-- `$fireskill-specialist-software-architecture` quando o achado for sobre
-  acoplamento, boundary ou decisão estrutural que o diff expõe, não apenas
-  sobre o diff em si.
-- `$fireskill-specialist-merge-conflict-resolution` quando a revisão precisar
-  ser refeita após uma resolução de conflito, já que a resolução pode mudar
-  o comportamento resultante.
-
-Leia [references/standards.md](references/standards.md) para as lentes de
-revisão, a escala de severidade, o formato de achado e as fontes oficiais de
-referência.
+- Every critical or high severity finding includes reproduction conditions and specific file:line citations.
+- Suggested remediations preserve existing tests and adhere to repository architecture.
+- Follow Conventional Comments labels (`suggestion`, `nit`, `issue`) to keep blocking criteria transparent.

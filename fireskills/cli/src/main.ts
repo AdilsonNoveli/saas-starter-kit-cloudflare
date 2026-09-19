@@ -1,5 +1,5 @@
 /**
- * Processo executável do Specsfy CLI.
+ * Fireskills CLI executable process.
  */
 
 import { runCli } from "./cli.js";
@@ -9,6 +9,6 @@ void runCli()
     process.exitCode = exitCode;
   })
   .catch((error: unknown) => {
-    console.error(`erro: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`error: ${error instanceof Error ? error.message : String(error)}`);
     process.exitCode = 1;
   });

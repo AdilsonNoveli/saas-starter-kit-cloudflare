@@ -1,13 +1,12 @@
-# Receita: adicionar ou alterar tabela
+# Recipe: Adding or Modifying a Database Table
 
-Baseada em `layers/kanban/server/database/schema.ts` (a layer de feature mais
-simples) e nas regras de `nuxfire-drizzle.md`.
+Based on `layers/kanban/server/database/schema.ts` (the canonical feature layer)
+and rules documented in `nuxfire-drizzle.md`.
 
-## Tabela nova numa layer existente
+## New Table in an Existing Layer
 
-1. Declare em `layers/<layer>/server/database/schema.ts`, seguindo as
-   convenções do arquivo (PascalCase no SQL, `id` cuid2, datas com timezone,
-   FK em callback):
+1. Declare in `layers/<layer>/server/database/schema.ts`, matching file conventions
+   (PascalCase in SQL, `id` with cuid2, timezone-aware timestamps, FK in callback):
 
 ```ts
 import { pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
@@ -15,7 +14,7 @@ import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
 import { teams } from "@nuxfire/layer-teams/server/database/schema";
 
-export const minhaTabela = pgTable("MinhaTabela", {
+export const myTable = pgTable("MyTable", {
   id: text("id").$default(() => cuid()).primaryKey().notNull(),
   teamId: text("teamId").notNull().references(() => teams.id),
   name: text("name").notNull(),
@@ -28,50 +27,46 @@ export const minhaTabela = pgTable("MinhaTabela", {
     .$onUpdate(() => new Date()),
 });
 
-export const minhaTabelaRelations = relations(minhaTabela, ({ one }) => ({
-  team: one(teams, { fields: [minhaTabela.teamId], references: [teams.id] }),
+export const myTableRelations = relations(myTable, ({ one }) => ({
+  team: one(teams, { fields: [myTable.teamId], references: [teams.id] }),
 }));
 ```
 
-2. Toda tabela de tenant tem `teamId` e as queries filtram por ele (ver
-   `$fireskill-specialist-trpc`, "escopo de tenant").
-3. Importe tabelas de outra layer pelo **arquivo dono** e pelo **especificador
-   de pacote**; declare a dependência `@nuxfire/layer-<x>: workspace:*` no
-   `package.json` da layer (e `requires: [...]` no manifest).
-4. Gere a migração e **leia o SQL**.
-5. Rode `bun run test` (Vitest) e o typecheck do servidor
-   (`bunx vue-tsc --noEmit -p server/tsconfig.json` em `apps/app`) — o
-   `nuxt typecheck` não cobre `server/**`.
+2. Every tenant table requires `teamId`, and queries must filter by it (see
+   `$fireskill-specialist-trpc`, "tenant scoping").
+3. Import foreign layer tables using the **owner file** and **package specifier**;
+   declare `@nuxfire/layer-<x>: workspace:*` in layer `package.json` (and `requires: [...]` in manifest).
+4. Generate the migration and **inspect the generated SQL**.
+5. Run `bun run test` (Vitest) and server typechecks (`bunx vue-tsc --noEmit -p server/tsconfig.json`
+   in `apps/app`) — `nuxt typecheck` does not cover `server/**`.
 
-## Layer nova (schema)
+## New Layer (Database Schema)
 
-1. Crie `layers/<nome>/server/database/schema.ts`.
-2. Exporte-o no `package.json` da layer:
+1. Create `layers/<name>/server/database/schema.ts`.
+2. Export it in the layer's `package.json`:
    `"./server/database/schema": "./server/database/schema.ts"`.
-3. Acrescente **uma linha** ao barrel
-   `apps/functions/src/database/schema.ts`:
-   `export * from "@nuxfire/layer-<nome>/server/database/schema";`
-4. Adicione `@nuxfire/layer-<nome>: workspace:*` em
-   `apps/functions/package.json` e rode `bun install`.
-5. O glob de `drizzle.config.ts` já enxerga o arquivo.
-6. **Gate real**: um `sst deploy` num stage de teste (ou, no mínimo,
-   `bunx esbuild <handler> --bundle --platform=node` para cada `handler:` de
-   `infra/*.ts`). Nada rodável localmente substitui isso para o barrel.
+3. Add **one line** to the barrel file `apps/functions/src/database/schema.ts`:
+   `export * from "@nuxfire/layer-<name>/server/database/schema";`
+4. Add `@nuxfire/layer-<name>: workspace:*` to `apps/functions/package.json` and run `bun install`.
+5. The glob pattern in `drizzle.config.ts` automatically discovers the new file.
+6. **Real Verification Gate**: Execute `sst deploy` against a test stage (or at minimum
+   run `bunx esbuild <handler> --bundle --platform=node` for each `handler:` declared in `infra/*.ts`).
+   Nothing executed purely locally replaces this verification for barrel files.
 
-## Alterar coluna/tabela existente
+## Modifying Existing Columns or Tables
 
-- Adicionar coluna nullable ou com default: migração aditiva, segura.
-- Renomear, remover, trocar tipo ou adicionar `NOT NULL`: **expand/contract** em
-  duas migrações e dois deploys (ver `nuxfire-drizzle.md` §5).
-- Nunca editar `0000_init.sql` nem `meta/` à mão.
-- Nunca "corrigir" o ciclo de schema com FK real onde hoje há só `relations()`.
+- Adding a nullable column or column with defaults: additive migration, completely safe.
+- Renaming, deleting, altering column types, or adding `NOT NULL`: **expand/contract**
+  across two migrations and two deployments (see `nuxfire-drizzle.md` §5).
+- Never edit `0000_init.sql` or `meta/` manually.
+- Never "fix" schema cycles by converting existing `relations()` into real foreign key constraints.
 
 ## Checklist
 
-- [ ] Nome SQL em PascalCase; `id`/datas no padrão.
-- [ ] FKs e relations só dentro de callback.
-- [ ] Barrel com especificador de pacote; dependência de workspace declarada.
-- [ ] SQL gerado lido; destrutivo separado.
-- [ ] Sem `teamId` esquecido em tabela de tenant.
-- [ ] Nenhuma tabela apaga dado de layer desativada.
-- [ ] `sst deploy` (ou proxy) rodado quando o barrel/`core-schema` mudou.
+- [ ] SQL table name in PascalCase; `id`/timestamps adhere to project conventions.
+- [ ] Foreign keys and relations defined strictly inside callback functions.
+- [ ] Barrel file imports use package specifiers; workspace dependency declared.
+- [ ] Generated SQL reviewed; destructive changes separated.
+- [ ] `teamId` present on all multi-tenant tables.
+- [ ] No table drops data belonging to disabled layers.
+- [ ] `sst deploy` (or bundling verification) executed whenever barrel or `core-schema` changes.

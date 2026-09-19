@@ -1,114 +1,60 @@
 ---
 name: fireskill-specialist-interface-experience
-description: Analisar o sistema atual e orientar a descoberta, o plano e a entrega de interfaces completas, bonitas e compatíveis com a stack existente.
+description: Analyze current UI architectures and guide the discovery, planning, and delivery of complete, functional, accessible user interfaces aligned with existing stack conventions.
 ---
 
-# Experiência de interface
+# Interface Experience
 
-## Quando usar
+## When to Use
 
-- Acionar ao criar ou alterar tela, dashboard, lista, formulário, jornada ou
-  CRUD usado por pessoas.
-- Acionar antes de UX, UI e implementação para entender o sistema existente e
-  organizar a conversa sobre a interface.
-- Não usar para endpoint, job ou mudança interna sem superfície para pessoas.
+- Trigger when creating or modifying screens, dashboards, lists, forms, user journeys,
+  or CRUD interfaces used by people.
+- Trigger prior to UX, UI, and frontend implementation to map current screen structures
+  and organize interface requirements.
+- Do not use for background endpoints, cron jobs, or internal tasks lacking human UI.
 
-## Fluxo
+## Workflow
 
-1. Carregar `$fireskill-setup` e ler `.fireskills/STACK.md`,
-   `.fireskills/PACKAGES.md`, manifests, instruções locais e documentação atual.
-   Carregar `$fireskill-specialist-design-system` e ler `.fireskills/DESIGNSYSTEM.MD` antes
-   de propor qualquer tela. Se o arquivo não existir, criar a fonte a partir de
-   `.fireskills/templates/DESIGNSYSTEM.MD`.
-   Executar `node fireskills/skills/fireskill-setup/scripts/inspect_interface.mjs
-   --project <raiz>` para localizar rotas, componentes e tecnologias antes da
-   leitura detalhada.
-2. Examinar as telas, fluxos, rotas, componentes, conteúdo, permissões, estados
-   e testes ligados à área afetada. Registrar o que a pessoa já consegue fazer,
-   o que deve permanecer e o que a entrega muda.
-3. Identificar framework, roteamento, primitives, estilos, formulários e runner
-   de testes usados pelo projeto. Seguir essas fontes e não trocar tecnologia
-   ou biblioteca sem confirmação da pessoa.
-4. Aplicar o contrato central de perguntas somente para lacunas reais:
-   perguntar uma lacuna por rodada sobre telas, fluxo de informação, formulário,
-   formato de ação e composição. Quando a pessoa não informa direção visual,
-   aplicar os defaults de `.fireskills/DESIGNSYSTEM.MD` e registrar a direção padrão. Só
-   perguntar sobre composição quando o pedido contrariar uma regra existente.
-   Oferecer opções textuais compatíveis com o sistema atual, `Escrever outra
-   resposta`, `Gere outras opções` e `Avançar`.
-5. Registrar na seção 10 da spec a stack observada, cada tela, o fluxo, os
-   formulários, a composição, os estados e a acessibilidade. Um CRUD não pode
-   ficar restrito a API, banco ou serviço. Para CRUD, mapear sempre lista com
-   `PageHeader` e `UTable` com detalhe clicável por linha, detalhe com
-   `PageHeader` e `DetailLists`, e criar ou editar com `PageHeader` e seções de
-   formulário em duas colunas responsivas. Toda tela também deve mapear
-   `Breadcrumb` com equipe, módulo e tela atual; reaproveitar o
-   componente já usado pelo layout. O `PageHeader` é um único componente
-   reutilizável entre essas telas. A listagem ocupa a largura disponível,
-   mostra o `ID` em coluna própria e oferece editar e apagar na linha, além do
-   link para o detalhe.
-6. Criar na seção 14 a `Fase de interface`, com uma tarefa por tela e testes
-   para navegação, formulário, validações, feedback e teclado.
-7. Chamar `$fireskill-specialist-ux-design` para jornada e
-   `$fireskill-specialist-ui-design` para composição. Antes de escrever `.vue`,
-   carregar `$fireskill-specialist-nuxt-ui` para selecionar, reaproveitar e
-   adaptar componentes `@nuxt/ui`, além de `$fireskill-specialist-nuxt` para a
-   implementação da stack (páginas, layouts, middleware, composables).
+1. Load `$fireskill-setup` and inspect `.fireskills/STACK.md`, `.fireskills/PACKAGES.md`,
+   manifests, and local guidelines. Load `$fireskill-specialist-design-system` and read
+   `.fireskills/DESIGNSYSTEM.MD` before proposing screens. If absent, initialize from
+   `skills/templates/DESIGNSYSTEM.MD`.
+   Run `node fireskills/skills/fireskill-setup/scripts/inspect_interface.mjs --project <root>`
+   to discover routes, components, and frontend dependencies.
+2. Inspect screens, flows, routes, components, permissions, states, and tests in the affected area.
+   Document current user capabilities, what must remain, and what the deliverable changes.
+3. Identify the frontend framework, routing strategy, UI primitives, styles, forms, and test runners.
+   Adhere to these sources without changing UI libraries without explicit authorization.
+4. Apply the central numbered questions contract only for genuine requirements gaps:
+   ask one gap per round concerning screens, information flow, form fields, action buttons,
+   and composition. When the user provides no specific visual direction, apply defaults from
+   `.fireskills/DESIGNSYSTEM.MD`.
+5. In section 10 of the spec, record the observed stack, each screen, flows, forms,
+   compositions, states, and accessibility requirements. A CRUD deliverable is never
+   restricted to APIs or databases alone: always map list views (`PageHeader` + `UTable`
+   with clickable row detail), detail views (`PageHeader` + `DetailLists`), and create/edit
+   flows (`PageHeader` + responsive two-column sections). Every screen must also map
+   `Breadcrumb` showing team, module, and view, reusing the layout breadcrumb.
+6. In section 14, define an `Interface Phase` with tasks per screen and test cases for
+   navigation, forms, validation, feedback states, and keyboard accessibility.
+7. Collaborate with `$fireskill-specialist-ux-design` for journeys, `$fireskill-specialist-ui-design`
+   for visual composition, `$fireskill-specialist-nuxt-ui` for `@nuxt/ui` component adaptation,
+   and `$fireskill-specialist-nuxt` for frontend page and layout implementation.
 
-## Resultado esperado
+## Expected Outcome
 
-Uma interface informativa, funcional e reconhecível para a tarefa, coerente com
-o sistema existente e com a personalidade do produto. O plano mostra telas,
-formulários, estados, regras de negócio, componentes e testes. A implementação
-preserva tudo fora do alcance registrado.
+An informative, functional, recognizable user interface matching the application's
+existing design system and architecture.
 
-## Padrões
+## Antipatterns
 
-- Mapear cada tela, ação, formulário, estado e retorno no plano.
-- Preservar a stack, os componentes e os padrões de navegação já observados.
-- Registrar teclado, foco, responsividade e mensagens junto da tela afetada.
-- Renderizar `Breadcrumb` em todas as telas, mantendo o nome da equipe ativa
-  visível. Reutilizar o breadcrumb existente no layout e sua tipagem de itens.
-- Aplicar `.fireskills/DESIGNSYSTEM.MD` como fonte macro e `.fireskills/INTERFACE.md` como registro local.
-- Usar `UTable`, `DetailLists` e `PageHeader` nas superfícies CRUD definidas;
-  a linha abre o detalhe e controles internos permanecem independentes.
-- Reutilizar o mesmo `PageHeader` componentizado em todas as telas CRUD; manter
-  `UTable` em largura total com `ID`, editar e apagar visíveis na linha.
-- Conferir bordas, espaçamentos, margens, padding e tipografia durante o
-  desenvolvimento, mesmo sem pedido da pessoa, e registrar o resultado no
-  item `VISUAL` da tarefa.
-- Organizar criar e editar em seções com coluna de contexto, painel em duas
-  colunas nos breakpoints largos e uma coluna no mobile.
-- Mostrar erro de campo em vermelho, com mensagem abaixo do campo e foco útil.
-- Projetar a hierarquia pelos dados, linguagem e estados do produto, sem cair em
-  uma composição visual genérica.
+- Implementing backend endpoints for CRUD deliverables while ignoring UI screens.
+- Introducing a secondary component library alongside `@nuxt/ui`.
+- Building forms without explicit validation states or keyboard focus management.
+- Writing screens without responsive mobile considerations.
 
-## Antipadrões
+## Validation
 
-- Propor uma tela sem ler as rotas e os componentes atuais.
-- Tratar CRUD como endpoint sem descrever a interação da pessoa.
-- Validar somente o estado feliz e ignorar vazio, erro ou permissão.
-
-## Validação
-
-- Confirmar que a pessoa recebeu pergunta sobre as telas em toda entrega que
-  cria ou altera uma interface.
-- Conferir que a seção 10 registra a stack e o sistema atual antes da proposta.
-- Confirmar que `.fireskills/DESIGNSYSTEM.MD` foi lido ou criado e que a direção padrão ou
-  exceção está registrada com alcance.
-- Executar `validate_spec.mjs`, `validate_tasks.mjs` e
-  `validate_interface_tasks.mjs` conforme a etapa.
-- Verificar mobile e desktop, loading, vazio, erro, sucesso, permissão,
-  teclado e foco antes de concluir a interface.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-ux-design` para jornada, tarefas e conteúdo.
-- `$fireskill-specialist-ui-design` para composição visual e estados.
-- `$fireskill-specialist-nuxt-ui` para selecionar e reaproveitar componentes
-  `@nuxt/ui` nas telas Vue.
-- `$fireskill-specialist-design-system` para regras macro, defaults e cenários
-  CRUD.
-
-Leia [references/standards.md](references/standards.md) para fontes de
-acessibilidade e inspeção de interfaces.
+- Review screens against `.fireskills/DESIGNSYSTEM.MD` standards.
+- Ensure all states (loading, empty, error, success, 403) are tested and demonstrable.
+- Verify that every implementation task completes its `VISUAL` checklist item.

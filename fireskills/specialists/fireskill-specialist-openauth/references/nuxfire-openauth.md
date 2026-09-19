@@ -1,161 +1,146 @@
-# OpenAuth no Nuxfire — o que existe de fato no código
+# OpenAuth in Nuxfire — What Actually Exists in the Codebase
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento.
+Each statement includes concrete file evidence. The codebase supersedes this document.
 
-## 1. Arquitetura
+## 1. Architecture
 
-- **`@openauthjs/openauth`** (`^0.3.6` em `apps/functions/package.json`; há patch
-  em `patches/@openauthjs%2Fopenauth@0.3.9.patch` — amarrado à versão exata).
-- Emissor num **Worker independente**: `apps/functions/src/auth.ts`, em
-  `auth.<domínio>`, criado em `infra/auth.ts` com o KV `AuthKV` linkado e o
-  Worker `Emails` (service binding).
-- A UI é `apps/login` (build estático `nuxt generate`), servida como assets
-  estáticos do mesmo Worker. Login, cadastro e recuperação são páginas
-  pré-renderizadas **e** dirigidas por query string (`?state=code`); essa
-  combinação quebra na hidratação, por isso estão com `{ ssr: false }` em
-  `routeRules`. **Não remova `ssr: false`.**
-- O app (`apps/app`) é **cliente OAuth** do emissor: `createClient` de
-  `@openauthjs/openauth/client`, com `issuer`/`clientID` vindos do
+- **`@openauthjs/openauth`** (`^0.3.6` in `apps/functions/package.json`; patched via
+  `patches/@openauthjs%2Fopenauth@0.3.9.patch` — locked to exact patch version).
+- Issuer deployed on a **dedicated Worker**: `apps/functions/src/auth.ts`, serving
+  `auth.<domain>`, created in `infra/auth.ts` linked to `AuthKV` and the `Emails`
+  Worker (service binding).
+- UI is `apps/login` (static `nuxt generate` bundle), hosted as static assets from
+  the same Worker. Login, signup, and recovery are pre-rendered **and** driven by query
+  strings (`?state=code`); this combination breaks hydration, requiring `{ ssr: false }`
+  in `routeRules`. **Do not remove `ssr: false`.**
+- The application (`apps/app`) is an **OAuth client** to the issuer: `createClient`
+  from `@openauthjs/openauth/client`, with `issuer`/`clientID` populated from
   `runtimeConfig.public` (`authUrl`, `authClientID`).
-- Chamadas app → `Auth` vão por **service binding** `env.Auth`
-  (`server/utils/auth.ts` → `getClient`), não pela URL pública. O binding é
-  relido a cada chamada, porque o primeiro acesso de um isolate pode chegar por
-  um despacho interno sem binding; cachear "sem binding" prenderia o isolate no
-  caminho lento.
+- App → `Auth` requests route via **service binding** `env.Auth`
+  (`server/utils/auth.ts` → `getClient`), never across public URLs. The binding is
+  re-read on each request because initial isolate invocations may arrive via internal
+  dispatches lacking bindings; caching without bindings locks the isolate onto slow public paths.
 
-## 2. Providers
+## 2. Authentication Providers
 
-`PasswordProvider` (com `ScryptHasher`) e `CodeProvider` sempre; `GithubProvider`
-e `GoogleProvider` **só se as credenciais existirem** (`Boolean(id && secret)`,
-não apenas a flag). O `apps/login` espelha essa verdade via
-`NUXT_PUBLIC_GITHUB_AUTH_ENABLED` / `NUXT_PUBLIC_GOOGLE_AUTH_ENABLED`
-(`infra/auth.ts`), para não exibir botão que falharia no clique.
-Escopos: GitHub `read:user user:email`; Google `openid email profile`.
+`PasswordProvider` (with `ScryptHasher`) and `CodeProvider` are always enabled;
+`GithubProvider` and `GoogleProvider` activate **only if credentials exist**
+(`Boolean(id && secret)`, not just feature flags). `apps/login` mirrors this state via
+`NUXT_PUBLIC_GITHUB_AUTH_ENABLED` / `NUXT_PUBLIC_GOOGLE_AUTH_ENABLED` (`infra/auth.ts`),
+preventing buttons that fail on click.
+Scopes: GitHub `read:user user:email`; Google `openid email profile`.
 
-`getIssuer(env)` é construído **por requisição, nunca cacheado**: `issuer()`
-dispara leituras de KV das chaves de assinatura e guarda promessas pendentes;
-cacheado entre requisições, a primeira requisição que não as aguarda deixa
-promessas eternas e todas as seguintes travam (foi o travamento de ~10 s em toda
-checagem de sessão). O custo de reconstruir é baixo.
+`getIssuer(env)` is instantiated **per request, never cached**: `issuer()` initiates
+KV reads of signing keys and holds pending promises; cached across requests, the first
+request failing to await them leaves hanging promises, locking all subsequent requests
+(~10s freezes on session checks). Reinstantiation overhead is minimal.
 
-O `success` do emissor (`ctx.subject("user", {...})`):
-1. obtém `{ email, name?, image?, data? }` do provider (userinfo do Google;
-   `/user` e `/user/emails` do GitHub, escolhendo o e-mail primário);
-2. lê/atualiza o perfil em `["users", email]` (só `createId()` num miss);
-3. em conta **nova** envia o e-mail `Welcome`;
-4. devolve o subject `{ id, name, email, image }`.
+The issuer `success` callback (`ctx.subject("user", {...})`):
+1. retrieves `{ email, name?, image?, data? }` from the provider (Google userinfo;
+   GitHub `/user` and `/user/emails`, selecting primary verified email);
+2. reads/updates user profiles in `["users", email]` (only `createId()` on cache miss);
+3. sends a `Welcome` email on **new account creation**;
+4. returns the subject payload `{ id, name, email, image }`.
 
-O e-mail de código/verificação sai por `sender(env.Emails)` (`"VerificationCode"`).
+Verification code emails dispatch through `sender(env.Emails)` (`"VerificationCode"`).
 
 ## 3. Subjects (`apps/functions/src/subjects.ts`)
 
-`createSubjects({ user: baseUser })`, com `valibot` (`id`, `email`, `name`,
-`image`, todos `string`). `FullUser` (com `createdAt`, `updatedAt`, `accounts[]`)
-é o registro completo guardado no KV. O app depende de
-`@nuxfire/functions/subjects`.
+`createSubjects({ user: baseUser })`, using `valibot` (`id`, `email`, `name`, `image`, all strings).
+`FullUser` (with `createdAt`, `updatedAt`, `accounts[]`) represents the complete record stored in KV.
+The app depends on `@nuxfire/functions/subjects`.
 
-## 4. O que fica no KV `AuthKV` (e por que Postgres não tem `sessions`)
+## 4. What Resides in `AuthKV` (And Why Postgres Lacks `sessions`)
 
-- Credencial de senha: chave `["email", email, "password"]` (digest Scrypt) —
-  vive **só no KV**.
-- Perfil de identidade: `["users", email]` = `{ id, email, name, image, accounts[] }`.
-  O `id` dele vira o subject, depois `session.id` no app, depois `User.id` no
-  Postgres.
-- `["email", email, "subject"]` e os tokens `["oauth:refresh", subject, token]`.
-- Chaves de assinatura/criptografia do emissor.
+- Password Credentials: key `["email", email, "password"]` (Scrypt digest) —
+  lives **strictly in KV**.
+- Identity Profile: `["users", email]` = `{ id, email, name, image, accounts[] }`.
+  Its `id` becomes the subject, then `session.id` in the app, then `User.id` in Postgres.
+- `["email", email, "subject"]` and tokens `["oauth:refresh", subject, token]`.
+- Issuer cryptographic signing keys.
 
-**Duas chaves independentes por usuário, ambas necessárias** (senha e perfil).
-Zerar só o Postgres (`User`) ou só o KV gera **split-brain**: cadastro novo falha
-com `email_taken`, ou o `createId()` novo colide em `User_email_unique` (`23505`,
-o caso que `callback.ts` detecta e se recusa a mascarar). Reset de dev que toca
-`User` deve limpar as duas chaves de cada e-mail na mesma passada (separador
-`\x1f`, `String.fromCharCode(0x1f)` — não `:`), ou apagar o namespace inteiro de
-um stage descartável.
+**Two independent keys exist per user, both required** (password and profile).
+Wiping only Postgres (`User`) or only KV induces **split-brain**: new registrations fail
+with `email_taken`, or newly generated `createId()` collides on `User_email_unique` (`23505`,
+which `callback.ts` catches and refuses to mask). Dev resets touching `User` must purge
+both keys for affected emails simultaneously (using delimiter `\x1f`, `String.fromCharCode(0x1f)`
+— not `:`), or flush the entire namespace on disposable test stages.
 
-## 5. Endpoints internos do Worker `Auth` (protegidos por segredo)
+## 5. Internal `Auth` Worker Endpoints (Protected by Secret)
 
-Rotas definidas em `config.ts` (caminhos compartilhados pelos dois lados):
+Endpoints defined in `config.ts` (shared paths across both boundaries):
 
-| Constante | Caminho | Faz |
+| Constant | Path | Operation |
 |---|---|---|
-| `identityDeletePath` | `/internal/identity/delete` | Apaga credenciais, perfil e todos os refresh tokens do e-mail |
-| `signOutOthersPath` | `/internal/identity/sign-out-others` | Revoga todos os refresh tokens do e-mail exceto o do chamador |
-| `seedAccountPath` | `/internal/identity/seed` | Cria/redefine identidade com senha conhecida (só seed de demo) |
+| `identityDeletePath` | `/internal/identity/delete` | Purges credentials, profile, and all refresh tokens for an email |
+| `signOutOthersPath` | `/internal/identity/sign-out-others` | Revokes all refresh tokens for an email except the caller's |
+| `seedAccountPath` | `/internal/identity/seed` | Creates/resets identities with known passwords (demo seed only) |
 
-Todas: `POST`, cabeçalho `x-admin-secret` comparado em **tempo constante**
-(`secretsMatch`), **503** se `ADMIN_SECRET` não estiver configurado (recusa em vez
-de expor endpoint sem autenticação), **403** se não bater. O segredo é gerado por
-stage (`random.RandomUuid("AuthAdminSecret")`), nunca versionado, e chega ao app
-como `NUXT_AUTH_ADMIN_SECRET` (sem `PUBLIC`). A URL é pública, então **chegar por
-service binding não prova nada**: o segredo é a autorização.
-Motivo estrutural: `AuthKV` só está ligado ao Worker `Auth`; quem está fora dele
-(o app, o script de seed) precisa **pedir** a operação.
-Revogação casa por `properties.email` (não pelo hash do subject), porque o hash é
-recalculado das propriedades atuais e deixa de bater se o perfil mudou (ex.:
-`updateProfile` trocando `name`). O refresh token do cliente é
-`"{subject}:{token}"`; o último `:` separa subject de token.
-`seedAccount` é idempotente e não gera novo `id` para e-mail já existente (senão
-o perfil do Postgres e os `TeamMembership` ficariam órfãos).
+All endpoints: `POST`, `x-admin-secret` header verified using **constant-time comparison**
+(`secretsMatch`), **503** if `ADMIN_SECRET` is unconfigured (rejects instead of exposing
+unauthenticated endpoints), **403** on mismatch. Secrets are generated per stage
+(`random.RandomUuid("AuthAdminSecret")`), never committed to source, reaching the app
+as `NUXT_AUTH_ADMIN_SECRET` (without `PUBLIC`). The URL is public, so **arriving via service
+binding proves nothing**: the secret provides authorization.
+Structural rationale: `AuthKV` links exclusively to the `Auth` Worker; callers outside
+it (the app, seed scripts) must **request** mutations.
+Revocation matches by `properties.email` (not subject hash) because subject hashes recalculate
+from current properties and diverge if profiles mutate (e.g., `updateProfile` changing `name`).
+Client refresh tokens format as `"{subject}:{token}"`; the final `:` separates subject from token.
+`seedAccount` is idempotent and avoids issuing new IDs for existing emails (preventing orphaned
+Postgres profiles and `TeamMembership` records).
 
-## 6. Rate limit de credenciais
+## 6. Credential Rate Limiting
 
-`enforceCredentialRateLimit` roda **antes** do emissor (não nos callbacks dos
-providers, que só executam depois da credencial já checada), só em `POST`, nas
-rotas `/password/authorize`, `/password/register`, `/password/change`,
-`/code/authorize` (5 tentativas; janela de 5 min no login, 15 min nas demais).
-Chave: `auth:<pathname>:<ip>:<email>`; nos passos de verificação de código, que
-não trazem e-mail, o e-mail vira `-` (um balde por IP). Ao estourar: redirect 302
-para a página de origem com `err=too_many_requests` e `Retry-After`. Providers
-OAuth (`/github/*`, `/google/*`) ficam de fora de propósito. Implementação em
-`apps/functions/src/rate-limit.ts` (KV cru, TTL mínimo 60 s; `CF-Connecting-IP`).
-Não é throttle geral de API: procedures tRPC comuns **não** são limitadas.
+`enforceCredentialRateLimit` executes **prior to** the issuer (not inside provider callbacks,
+which only run post-credential verification), on `POST` requests targeting `/password/authorize`,
+`/password/register`, `/password/change`, `/code/authorize` (5 attempts; 5-min window on login,
+15-min on other endpoints).
+Key: `auth:<pathname>:<ip>:<email>`; for code verification steps lacking emails, email falls back
+to `-` (IP-based bucket). On exhaustion: 302 redirect to origin page with `err=too_many_requests`
+and `Retry-After`. Third-party OAuth providers (`/github/*`, `/google/*`) are omitted by design.
+Implemented in `apps/functions/src/rate-limit.ts` (raw KV, minimum TTL 60s; `CF-Connecting-IP`).
+This does not represent a general API throttle: standard tRPC procedures are **not** rate-limited.
 
-## 7. Lado do app (`apps/app/server/`)
+## 7. App Integration (`apps/app/server/`)
 
-- Cookies: `nuxfire-access-token` (**não** httpOnly: o WebSocket do browser
-  precisa dele) e `nuxfire-refresh-token` (httpOnly), `sameSite: "lax"`, 1 ano
-  (`setTokens`). Sessão elevada de admin de plataforma:
-  `nuxfire-platform-mfa-verified`, sessão h3 selada e **distinta** desse par.
-  MFA de usuário: `nuxfire-mfa-verified` (`user-mfa-session.ts`).
-- `api/auth/callback.ts`: troca `code` por tokens (`client.exchange`), grava
-  cookies, lê a sessão com os tokens **explícitos** (o cookie antigo do navegador
-  poderia vencer e falhar a verificação), faz **upsert de `User` por
-  `session.id`** (nunca por e-mail: o e-mail é atributo mutável da identidade;
-  usar e-mail duplicaria o perfil e o usuário perderia equipes e permissões) e
-  redireciona ao cookie `nuxfire-redirect` ou `/`. Erro `23505` é logado como
-  "identidade e perfil fora de sincronia" e relançado — não reaproveite a linha
-  de outro perfil nem reescreva o `id` (nada tem FK para protegê-lo).
-- `getUserSession`: sem access token retorna cedo (evita ida ao `Auth` só para
-  ouvir "não logado"); `client.verify(subjects, access, { refresh })` e regrava
-  os cookies se renovou.
-- `getUser(event)`: perfil por **id** (mesmo critério do upsert e das permissões),
-  **sem** `mfaSecret` (o resultado vai ao `/api/auth/session`), com permissões por
-  equipe, `isPlatformAdmin` (só booleano) e `mfaEnabled` (booleano). Sem linha em
-  `User`, cai para o subject do token (senão daria loop infinito para
-  `/authorize`).
-- `getUserPermissions` degrada para "sem permissões" se o banco falhar —
-  guarda-corpo, não correção; se logar, é bug real.
-- Rotas: `api/auth/{callback,session.get,session.delete,ws-ticket.get}`,
+- Cookies: `nuxfire-access-token` (**not** httpOnly: browser WebSockets require it) and
+  `nuxfire-refresh-token` (httpOnly), `sameSite: "lax"`, 1-year duration (`setTokens`).
+  Elevated platform admin session: `nuxfire-platform-mfa-verified`, sealed h3 session **distinct**
+  from the token pair. User MFA: `nuxfire-mfa-verified` (`user-mfa-session.ts`).
+- `api/auth/callback.ts`: exchanges `code` for tokens (`client.exchange`), sets cookies,
+  reads session with **explicit tokens** (stale browser cookies could otherwise fail verification),
+  executes **`User` upsert by `session.id`** (never by email: email is a mutable attribute;
+  upserting by email duplicates profiles, stripping team memberships and roles), and redirects
+  to `nuxfire-redirect` cookie or `/`. Error `23505` logs as "identity and profile out of sync"
+  and re-throws — do not reuse another profile's row or overwrite `id`.
+- `getUserSession`: returns early if access token is absent (avoids querying `Auth` merely to
+  hear "unauthenticated"); calls `client.verify(subjects, access, { refresh })` and updates cookies
+  upon refresh.
+- `getUser(event)`: resolves profile by **id** (matching upsert and permission criteria),
+  **excluding** `mfaSecret` (payload goes to `/api/auth/session`), with team permissions,
+  `isPlatformAdmin` (boolean only), and `mfaEnabled` (boolean). Absent `User` rows, falls back
+  to token subject (preventing redirect loops to `/authorize`).
+- `getUserPermissions` degrades to "empty permissions" upon database errors — safety rail,
+  not normal flow; logging indicates real defects.
+- Routes: `api/auth/{callback,session.get,session.delete,ws-ticket.get}`,
   `api/mfa/{challenge,setup,status,verify}`.
 
-## 8. Exclusão de conta
+## 8. Account Deletion
 
-`account.deleteAccount` (`apps/app/server/trpc/routers/account.ts`) chama o
-endpoint interno do `Auth` pelo service binding com `x-admin-secret`; existe para
-que identidade e perfil nunca fiquem fora de sincronia.
+`account.deleteAccount` (`apps/app/server/trpc/routers/account.ts`) invokes the internal
+`Auth` endpoint via service binding with `x-admin-secret`, ensuring identity and profile
+remain synchronized.
 
-## 9. Logs
+## 9. Logging
 
-Nunca passe um `Error` cru ao `console.error` em Worker: `message`, `stack` e
-`name` não são enumeráveis e o log sai como `{}`. Extraia os campos
-(`{ message, name, stack }`) antes — padrão de `auth.ts`, `callback.ts`,
-`emails.ts`.
+Never pass raw `Error` objects to `console.error` in Cloudflare Workers: `message`, `stack`,
+and `name` are non-enumerable and serialize as `{}`. Extract explicit fields
+(`{ message, name, stack }`) beforehand — standardized across `auth.ts`, `callback.ts`, `emails.ts`.
 
-## 10. O que NÃO existe
+## 10. What Does NOT Exist
 
-- Tabela de sessão no Postgres; NextAuth/Lucia/Clerk; magic link como único
-  método (existem senha **e** código).
-- Autoatendimento de recuperação de MFA: admin bloqueado exige edição direta do
-  banco para limpar `mfaEnabledAt`.
-- Papéis `SUPER_ADMIN`/`SUPPORT` diferenciados em permissão (o enum existe; a
-  procedure ainda não os distingue).
+- Sessions table in Postgres; NextAuth / Lucia / Clerk; magic-link as sole authentication
+  (passwords **and** one-time codes coexist).
+- Self-service MFA recovery: locked admins require direct database intervention to clear `mfaEnabledAt`.
+- Distinct permission sets for `SUPER_ADMIN` versus `SUPPORT` (the enum exists; procedures do not yet differentiate).

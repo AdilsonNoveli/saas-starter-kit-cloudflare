@@ -1,215 +1,137 @@
 ---
 name: fireskill-03-specify
-description: "Use quando o usuário pede para promover uma entrada ou backlog já refinado, criar, iniciar ou consolidar uma especificação nova ou ainda em Draft em `spec.md`. Use também quando uma transição automática exigir criar ou completar a fonte normativa inicial. Inicializa specs em `specs/draft/` e aplica o MCR-10; para mudar spec aprovada use fireskill-update-spec, para captura sem perguntas use fireskill-01-inbox, para refinamento use fireskill-02-backlog e para revisão sem edição use fireskill-04-validate."
+description: "Use when the user asks to promote an inbox capture or refined backlog, create, start, or consolidate a new or in-draft specification in `spec.md`. Also use when an automatic transition requires creating or completing the initial normative source. Initializes specs in `specs/draft/` and applies MCR-10; to change an approved spec use fireskill-update-spec, for questionless capture use fireskill-01-inbox, for refinement use fireskill-02-backlog, and for review without editing use fireskill-04-validate."
 ---
 
-# Montar a especificação única
+# Build the Single Specification
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project root.
+On automatic handoff, reload it before this step.
+Reuse the root confirmed in conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered Questions Protocol` from `fireskills/skills/Spec.md`.
 
-Crie ou atualize o pacote `specs/draft/<NNNN>-<slug>/`, no qual `spec.md` é a única fonte normativa de todo o fluxo SDD. Somente o diretório recebe o número; mantenha o arquivo sempre como `spec.md`. Consolide descoberta, research, esclarecimentos, produto, plano técnico, modelo de dados, contratos, TDD, BDD, validações, tarefas, decisões e conclusão em três atos explícitos. Evidências externas consultadas vivem em `research/`; não gere `plan.md`, `research.md`, `data-model.md`, `tasks.md`, checklists ou uma segunda especificação.
+Create or update the package `specs/draft/<NNNN>-<slug>/`, where `spec.md` serves as the sole normative source of truth for the entire SDD lifecycle. Only the directory receives the number; keep the file name strictly as `spec.md`. Consolidate discovery, research, clarifications, product rules, technical architecture, data models, contracts, TDD, BDD, validations, tasks, decisions, and conclusion into three explicit acts. Consulted external evidence lives in `research/`; never generate `plan.md`, `research.md`, `data-model.md`, `tasks.md`, checklists, or duplicate specifications.
 
-Antes de consolidar uma spec que dependa de biblioteca, leia
-`.fireskills/PACKAGES.md`, `docs/packages/README.md` e as fichas de
-`docs/packages/`. Se a solicitação trouxer uma URL GitHub de pacote ou depender
-de uma biblioteca npm, confira se o pacote já existe no workspace e registre a
-necessidade sem duplicar dependências.
+Before consolidating a spec that depends on external libraries, read `.fireskills/PACKAGES.md`, `docs/packages/README.md`, and entries in `docs/packages/`. If the request provides a GitHub package URL or depends on an npm library, verify whether the package already exists in the workspace and record requirements without duplicating dependencies.
 
-## Orquestrar a conversa
+## Orchestrating the Conversation
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $fireskill-03-specify → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill de
-destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa. Depois de uma correção necessária a esta etapa, anuncie `Retomada
-automática: $<destino> → $fireskill-03-specify — pendência resolvida:
-<resultado>` e retome-a imediatamente. Reavalie o estado após cada handoff para
-evitar ciclos. Não peça confirmação para o handoff; ações sensíveis continuam
-exigindo autorização específica.
+When concluding this stage or detecting work belonging to another stage, announce
+`Pending blocker detected: <description> — action: resolving in this stage` and resolve it
+if it falls within scope. When responsibility transfers, announce
+`Automatic transition: $fireskill-03-specify → $<target> — reason: <reason> — expected result: <result>`
+and immediately load the destination skill, without asking for confirmation or repeating the command. Continue in the same conversation.
 
-## Preparar
+After a necessary fix in this stage, announce
+`Automatic resumption: $<target> → $fireskill-03-specify — resolved blocker: <result>`
+and resume immediately. Re-evaluate state after each handoff to prevent cycles. Handoffs do not require confirmation; sensitive actions still require explicit authorization.
 
-1. Resolva a raiz do projeto pelo diretório informado pelo usuário ou por
-   `Path.cwd()` quando ele não informar outro. Não procure nem promova o destino
-   para uma raiz Git.
-2. Ao criar uma spec, resolva o diretório desta skill e execute antes de
-   escrever:
+## Preparation
+
+1. Resolve the project root via user-specified directory or `Path.cwd()` if not specified. Do not hunt for or elevate root to an enclosing git parent.
+2. When creating a spec, resolve this skill directory and execute before writing:
 
 ```bash
-node <diretório-da-skill>/scripts/iniciar_spec.mjs \
-  --title "<nome da especificação>" [--slug <slug>] [--root <raiz>]
+node <skill-dir>/scripts/iniciar_spec.mjs \
+  --title "<specification title>" [--slug <slug>] [--root <root>]
 ```
 
-3. Use o caminho absoluto impresso pelo script. Ele aloca o próximo ID local,
-   prefere `.fireskills/templates/custom/Spec.md`, recorre ao template gerenciado
-   `.fireskills/templates/Spec.md` e cria somente
-   `specs/draft/<NNNN>-<slug>/spec.md`; nunca renomeie o arquivo para incluir o ID.
-   Sem customização em `.fireskills/templates/`, o script usa
-   `fireskills/skills/templates/Spec.md`.
-4. Ao atualizar, use o caminho da spec existente fornecido ou descoberto sob a
-   raiz atual; não execute o inicializador novamente.
-5. Leia a captura de origem em `specs/inbox/`, o item de backlog, o brief da
-   refinamento do backlog, o pedido atual, a spec nesse caminho, seu `research/` e arquivos
-   do repositório que revelem restrições reais.
-6. Se não houver informação suficiente para identificar problema, ator e
-   resultado, anuncie a pendência e carregue `$fireskill-02-backlog` para executar o ciclo.
-   Retome esta skill ao final do ciclo e use o brief completo
-   ou parcial produzido.
-7. Leia `references/mcr-10.md` ao receber relato, história, transcrição ou
-   especificação a refinar.
-8. Leia `.fireskills/DATABASE.md` quando existir. Se a jornada depender de
-   informações guardadas e o arquivo não explicar o que o produto precisa
-   lembrar, quem usa essas informações ou quando elas deixam de ser
-   necessárias, carregue `$fireskill-data-discovery` e retome esta skill depois
-   do registro confirmado.
+3. Use the absolute path printed by the script. It allocates the next local ID, prefers `.fireskills/templates/custom/Spec.md`, falls back to the managed template `.fireskills/templates/Spec.md`, and creates strictly `specs/draft/<NNNN>-<slug>/spec.md`; never rename the file to include the ID. Without customizations in `.fireskills/templates/`, the script uses `fireskills/skills/templates/Spec.md`.
+4. When updating, use the provided or discovered existing spec path under current root; do not rerun the initializer.
+5. Read source inbox capture from `specs/inbox/`, backlog item, backlog refinement brief, current request, the spec at that path, its `research/` directory, and repository files revealing real constraints.
+6. If information is insufficient to identify problem, actor, and outcome, announce the blocker and load `$fireskill-02-backlog` to execute the question cycle. Resume this skill upon completion and use the produced brief.
+7. Read `references/mcr-10.md` when receiving narrative, user stories, transcripts, or specifications to refine.
+8. Read `.fireskills/DATABASE.md` when present. If journeys depend on persisted data and the file does not explain what data must be stored, who uses it, or retention policies, load `$fireskill-data-discovery` and resume this skill once records are confirmed.
 
-## Aplicar o MCR-10
+## Apply MCR-10
 
-1. Preserve a formulação original e identifique finalidade, ator e resultado.
-2. Analise termos ambíguos, equivalências terminológicas e derivações.
-3. Use substância, quantidade, qualidade, relação, lugar, tempo, posição, posse,
-   ação e afecção como lentes adaptativas, não como questionário.
-4. Distinga cada declaração da pessoa de inferência, hipótese, decisão, conflito
-   ou questão aberta produzida durante a análise.
-5. Se existir lacuna aplicável, carregue `$fireskill-02-backlog` para executar o
-   ciclo limitado a oito perguntas por área e retome esta skill ao final do
-   ciclo. Se a pessoa
-   escolher `avançar`, aplique a confirmação e o registro definidos no contrato
-   central. Mantenha `Status: Draft` e `Definition Gate: Pending` quando
-   restarem pontos aplicáveis; não promova a spec a `Defined` e não reabra o
-   mesmo ciclo nesta retomada.
-6. Recombine decisões em afirmações com sujeito, condição, ação e efeito
-   observável; derive regras, histórias, Gherkin, limites e falhas.
-7. Registre o resultado nas seções existentes de `spec.md`; não gere relatório
-   MCR separado nem copie a referência para o pacote da fatia.
+1. Preserve original user wording and identify practical purpose, actor, and outcome.
+2. Analyze ambiguous terms, terminological equivalences, and derivations.
+3. Use substance, quantity, quality, relation, place, time, posture, state, action, and affection as adaptive analytical lenses, not as a rigid questionnaire.
+4. Distinguish user statements from analyst/AI inferences, hypotheses, decisions, conflicts, or open questions.
+5. If applicable gaps remain, load `$fireskill-02-backlog` to run the cycle (max 8 questions per area) and resume this skill upon completion. If the user chooses `Proceed`, apply confirmation and recording rules per central contract. Maintain `Status: Draft` and `Definition Gate: Pending` while applicable gaps remain; do not promote spec to `Defined` and do not reopen the same cycle during this resumption.
+6. Recombine decisions into statements containing subject, condition, action, and observable effect; derive rules, user stories, Gherkin scenarios, boundaries, and failure modes.
+7. Record results into existing sections of `spec.md`; do not produce separate MCR reports or duplicate references into the slice folder.
 
-## Escrever
+## Writing
 
-- Grave sempre em `<raiz>/specs/draft/<NNNN>-<slug>/spec.md`; o ID pertence ao
-  diretório e o arquivo permanece exatamente `spec.md`.
-- Use `<raiz>/specs/draft/<NNNN>-<slug>/research/` somente para cópias, snapshots, contratos, schemas, exemplos e notas de proveniência realmente consultados. Não coloque código de produção, testes ou documentos normativos nesse diretório.
-- Ao pesquisar uma API ou documentação externa, armazene a evidência permitida em `research/` e indexe caminho, origem, versão/data, licença e impacto em `Artefatos de pesquisa armazenados`. Se licença ou termos impedirem a cópia, armazene metadados, URL, data de acesso, checksum/versão quando disponível e notas próprias, sem reproduzir conteúdo protegido.
-- Fora de `spec.md` e `research/`, não crie outra entrada no pacote da feature.
-- Ao promover `specs/backlog/<NNNN>-<slug>.md`, registre esse caminho na spec e
-  atualize o item para `Status: Promoted` com o caminho da spec criada. O backlog
-  preserva proveniência, mas deixa de governar o comportamento.
-- Ao derivar diretamente de `specs/inbox/<data-hora>-<slug>.md`, registre o
-  caminho na spec e preserve a captura sem alteração. A análise inicial é
-  contexto, não requisito confirmado.
-- Preserve o cabeçalho como uma tabela Markdown de duas colunas, `Campo` e
-  `Valor`; não converta seus metadados em linhas `**Campo**: valor`.
-- Na tabela, declare `ID` como `SPEC-NNNN` e `Slug` como
-  `<NNNN>-<slug>` e mantenha o slug igual ao diretório pai.
-- Preserve exatamente os três atos e as 18 seções do template resolvido:
-  `.fireskills/templates/custom/Spec.md` quando existir ou
-  `.fireskills/templates/Spec.md` caso contrário.
-- Substitua o conteúdo editorial restante do modelo durante o refinamento; não
-  deixe seus exemplos ou placeholders na spec promovida para `Defined`.
-- Ao atualizar, edite o arquivo existente e preserve IDs e decisões ainda válidas.
-- Numere novos itens sem reutilizar ou renumerar IDs removidos:
-  - histórias: `US-001`;
-  - requisitos funcionais: `FR-001`;
-  - requisitos não funcionais: `NFR-001`;
-  - cenários de aceite: `AC-001`;
-  - decisões: `DEC-001`.
-- Escreva cada requisito como comportamento verificável.
-- Escreva cada cenário com Given/When/Then e associe-o a pelo menos um requisito.
-- Defina no mínimo três `AC` distintos para a feature inteira e para cada
-  `US`, `FR` e `NFR`. Conte cobertura somente quando o `AC` declarar o ID em
-  `**Cobre**`; use caminho feliz, variação/regra crítica e falha ou limite
-  material para ampliar contexto sem duplicar cenários equivalentes.
-- Inclua fora de escopo, erros, limites, segurança e acessibilidade quando relevantes.
-- Quando o cabeçalho declarar `Interface para pessoas: Sim`, preencha na seção
-  10 as nove partes do template com stack e convenções locais, telas, fluxo de
-  informação, menus e navegação principal, formulários e ações, composição,
-  componentes Vue e componentes `@nuxt/ui`, estados e acessibilidade. Use
-  `.fireskills/INTERFACE.md`, `.fireskills/STACK.md`, manifests, telas e código existente como fonte da stack
-  e do sistema atual; registre o que será preservado e alterado. Não proponha
-  biblioteca incompatível nem reestruture uma tela existente sem esse exame.
-  Carregue
-  `$fireskill-specialist-ux-design`, `$fireskill-specialist-ui-design` e o
-  especialista da stack de interface. Não aceite uma descrição de CRUD que
-  tenha somente API, banco ou serviço.
-  No Nuxfire, registre explicitamente os componentes `@nuxt/ui` usados
-  (`UTable`, `UForm`, `UModal` e demais), todos os componentes Vue previstos, suas
-  responsabilidades, arquivos, componentes de origem e regra de reuso. A página
-  apenas compõe esses componentes.
-- Quando não houver interface, declare `Interface para pessoas: Não` e explique
-  por que a entrega não será usada por uma pessoa em uma tela.
-- Mantenha a seção técnica concreta o bastante para permitir tarefas com caminhos de arquivo, sem confundir escolha interna com resultado do usuário.
-- Registre defaults reversíveis em `Suposições`; peça esclarecimento apenas quando opções plausíveis mudarem materialmente escopo, dados, segurança, UX ou testes.
-- Não deixe placeholders, exemplos do template, `TBD`, `TODO` ou marcadores de clarificação em um arquivo marcado como `Defined`.
-- Mantenha tarefas futuras na seção `14. Tarefas`; skills posteriores atualizam a mesma seção, nunca outro arquivo.
-- Use os metadados `Definition Gate`, `Plan Gate` e `Delivery Gate` para expressar prontidão sem criar relatórios separados.
+- Always save to `<root>/specs/draft/<NNNN>-<slug>/spec.md`; the ID belongs to the directory and the file remains strictly `spec.md`.
+- Use `<root>/specs/draft/<NNNN>-<slug>/research/` exclusively for consulted copies, snapshots, contracts, schemas, examples, and provenance notes. Never place production code, tests, or normative files in this directory.
+- When researching external APIs or documentation, store permissible evidence in `research/` and index path, origin, version/date, license, and impact in `Stored research artifacts`. If licensing prohibits copies, store metadata, URL, access date, checksum/version, and original notes without reproducing protected content.
+- Outside of `spec.md` and `research/`, create no additional files or directories in the feature slice.
+- When promoting `specs/backlog/<NNNN>-<slug>.md`, record its path in the spec and update the backlog item to `Status: Promoted` with the created spec path. Backlog retains provenance but ceases governing system behavior.
+- When deriving directly from `specs/inbox/<timestamp>-<slug>.md`, record the path in the spec and keep the capture intact. Initial analysis represents context, not confirmed requirements.
+- Maintain header as a two-column Markdown table with columns `Field` and `Value`; do not convert metadata into `**Field**: value` lines.
+- In the table, declare `ID` as `SPEC-NNNN` and `Slug` as `<NNNN>-<slug>`, matching the parent folder name.
+- Preserve exactly the three acts and 18 sections of the resolved template (`.fireskills/templates/custom/Spec.md` or `.fireskills/templates/Spec.md`).
+- Replace remaining boilerplate and template guidance during refinement; do not leave examples or placeholders in a spec promoted to `Defined`.
+- When updating, modify the existing file and preserve valid IDs and decisions.
+- Number new items without reusing or renumbering deleted IDs:
+  - Stories: `US-001`;
+  - Functional requirements: `FR-001`;
+  - Non-functional requirements: `NFR-001`;
+  - Acceptance criteria: `AC-001`;
+  - Decisions: `DEC-001`.
+- Write each requirement as verifiable behavior.
+- Write each scenario in Given/When/Then format and map it to at least one requirement.
+- Define a minimum of three distinct `AC`s for the entire feature and for each `US`, `FR`, and `NFR`. Coverage counts only when the `AC` explicitly declares the target ID in `**Covers**`; include happy path, critical business variations/rules, and failure or boundary conditions.
+- Include out-of-scope boundaries, error states, constraints, security, and accessibility where relevant.
+- When header declares `Human Interface: Yes`, complete in section 10 all nine template areas: local stack and conventions, screens, information flow, menus and primary navigation, forms and actions, layout composition, Vue and `@nuxt/ui` components, states, and accessibility. Use `.fireskills/INTERFACE.md`, `.fireskills/STACK.md`, manifests, existing screens, and code as sources of truth; record what is preserved and what is altered. Do not propose incompatible libraries or restructure existing screens without this analysis.
+  Load `$fireskill-specialist-ux-design`, `$fireskill-specialist-ui-design`, and the UI stack specialist. Never accept a CRUD specification limited solely to API, database, or backend services.
+  In Nuxfire, explicitly document `@nuxt/ui` components (`UTable`, `UForm`, `UModal`, etc.), all planned Vue components, their responsibilities, file paths, base components, and reuse rules. The page component simply composes these units.
+- When no interface exists, declare `Human Interface: No` and explain why the deliverable is not consumed directly by humans on screen.
+- Keep technical sections concrete enough to produce file-path-specific tasks, without confusing internal implementation details with user-facing outcomes.
+- Record reversible defaults in `Assumptions`; request clarification only when plausible options materially alter scope, data, security, UX, or test strategy.
+- Never leave placeholders, template examples, `TBD`, `TODO`, or clarification flags in a file marked `Defined`.
+- Keep future tasks in section `14. Tasks`; downstream skills update this section directly, never creating separate task files.
+- Use metadata fields `Definition Gate`, `Plan Gate`, and `Delivery Gate` to track readiness without generating separate reports.
 
-## Respeitar specs já aprovadas
+## Respect Approved Specs
 
-Se a spec já obteve `Definition Gate: Passed` e a pessoa pedir para adicionar,
-remover, corrigir ou mudar algo, anuncie a pendência e carregue automaticamente
-`$fireskill-update-spec`. Essa skill classifica o impacto, atualiza a fonte
-normativa e invalida somente os gates afetados. Retome esta skill apenas se a
-mudança retornar a spec ao estado de definição inicial.
+If a spec already holds `Definition Gate: Passed` and the user asks to add, remove, fix, or modify requirements, announce the pending blocker and automatically load `$fireskill-update-spec`. That skill assesses impact, updates the normative source, and invalidates only affected gates. Resume this skill only if changes return the spec to initial draft status.
 
-## Preservar rastreabilidade
+## Preserve Traceability
 
-Para cada `FR` e `NFR`, aponte no mínimo três cenários `AC` e mantenha o método
-de verificação explícito dos NFRs. Para cada história, identifique os requisitos
-que entregam seu valor e ao menos três `AC`. Use os mesmos IDs mais tarde nos
-casos TDD e na seção 14.
+For each `FR` and `NFR`, map at least three `AC` scenarios and specify explicit verification methods for NFRs. For each story, identify requirements delivering its value and at least three `AC`s. Carry these IDs forward into TDD test cases and section 14.
 
-## Controlar research
+## Control Research
 
-- Antes do planejamento, carregue somente as evidências indexadas e valide
-  claims com:
+- Prior to planning, load only indexed evidence and validate claims with:
 
 ```bash
 node fireskills/skills/fireskill-03-specify/scripts/load_research.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md
+  specs/<state>/<NNNN>-<slug>/spec.md
 ```
 
-- Para pesquisa material, registre `R-ID`, criticalidade, claim, veredito,
-  confiança, evidência local e orçamento na seção 2. Claim `critical` ainda não
-  verificado bloqueia o handoff; claim refutado permanece registrado. IDs devem
-  ser únicos, gasto não pode superar o limite e a âncora Markdown citada precisa
-  existir no arquivo local.
-## Autovalidar
+- For material research, record `R-ID`, criticality, claim, verdict, confidence, local evidence, and budget in section 2. Any `critical` claim not yet verified blocks handoff; refuted claims remain documented. IDs must be unique, expenses must stay within budget limits, and cited Markdown anchors must resolve in local files.
 
-Enquanto o arquivo estiver em Draft, execute a validação estrutural intermediária:
+## Self-Validate
+
+While the spec is in Draft, run intermediate structural validation:
 
 ```bash
-node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<state>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
-Corrija falhas estruturais em no máximo três ciclos. A skill `fireskill-04-validate` faz a revisão semântica, registra o resultado na seção 13 e promove `Definition Gate: Passed` e `Status: Defined`. Até lá, mantenha `Status: Draft`, `Definition Gate: Pending` e relate decisões bloqueantes.
+Resolve structural errors within a maximum of three iterations. The `fireskill-04-validate` skill conducts semantic review, records results in section 13, and promotes `Definition Gate: Passed` and `Status: Defined`. Until then, maintain `Status: Draft`, `Definition Gate: Pending`, and report blocking decisions.
 
-## Relatar
+## Reporting
 
-Informe:
+Report:
 
-- caminho `specs/<estado>/<NNNN>-<slug>/spec.md`;
-- caminhos de research armazenados ou a declaração de que não houve fonte externa;
-- status;
-- contagem de `US`, `FR`, `NFR` e `AC`;
-- suposições relevantes;
-- transição automática para `$fireskill-04-validate`, com motivo e resultado
-  esperado.
+- Path `specs/<state>/<NNNN>-<slug>/spec.md`;
+- Stored research artifact paths or explicit statement that no external sources were used;
+- Status;
+- Count of `US`, `FR`, `NFR`, and `AC`;
+- Material assumptions;
+- Automatic transition to `$fireskill-04-validate`, stating reason and expected result.
 
-## Especialistas sob demanda
+## Specialists on Demand
 
-Leia [references/specialists.md](references/specialists.md) quando requisitos,
-NFRs, dados ou decisões técnicas exigirem conhecimento especializado. Registre
-o requisito na spec e proponha carregar o especialista. Se ele não estiver
-instalado, peça autorização específica antes de instalar.
+Read [references/specialists.md](references/specialists.md) when requirements, NFRs, data models, or technical decisions require specialized domain expertise. Record the requirement in the spec and propose loading the specialist. If not installed, request explicit user authorization before installing.

@@ -1,105 +1,90 @@
 ---
 name: fireskills
-description: Metodologia orientada a especificações do Nuxfire (Nuxt 4 + @nuxt/ui + tRPC + Drizzle + Cloudflare Workers + SST). Use ao receber qualquer pedido de trabalho neste repositório — captura, refinamento, spec, validação, tarefas, TDD/BDD, implementação, documentação — para escolher a skill de fluxo e os especialistas técnicos certos.
+description: Specification-driven methodology of Nuxfire (Nuxt 4 + @nuxt/ui + tRPC + Drizzle + Cloudflare Workers + SST). Use upon receiving any engineering or product request in this repository — capture, refinement, specification, validation, tasks, TDD/BDD, implementation, documentation — to route to the correct workflow skill and technical specialists.
 ---
 
 # Fireskills
 
-Ponto de entrada do sistema. Ele não executa etapas: encaminha para a skill
-certa e para os especialistas que dão conhecimento técnico do Nuxfire.
-Contrato normativo: [`skills/Spec.md`](skills/Spec.md). Governança de agentes:
-`AGENTS.md` (raiz do repositório). Visão geral: [`README.md`](README.md).
+System entry point. It does not execute slices directly: it routes to the appropriate workflow skill and technical specialists providing deep domain context on Nuxfire. Canonical contract: [`skills/Spec.md`](skills/Spec.md). Agent governance: `AGENTS.md` (repository root). Overview: [`README.md`](README.md).
 
-## Fluxo
+## Workflow
 
-`inbox → backlog → spec → validate → tasks → TDD/BDD → implement → documentator → progress`,
-em três atos (Definir, Projetar/Provar, Entregar) com três gates (Definition,
-Plan, Delivery).
+`inbox → backlog → spec → validate → tasks → TDD/BDD → implement → documentator → progress`, across three acts (Define, Design/Prove, Deliver) with three quality gates (Definition, Plan, Delivery).
 
-| Situação | Skill |
+| Situation | Skill |
 |---|---|
-| Pedido novo, ideia solta | `fireskill-01-inbox` |
-| Refinar item e decisões | `fireskill-02-backlog` |
-| Escrever a spec normativa | `fireskill-03-specify` |
-| Provar a definição | `fireskill-04-validate` |
-| Quebrar em tarefas | `fireskill-05-tasks` |
-| Testes TDD a partir do BDD | `fireskill-06-tdd-bdd` |
-| Implementar (RED → GREEN → REFACTOR) | `fireskill-07-implement` |
-| Preparar contexto do projeto | `fireskill-setup` |
-| Mudança tardia na spec | `fireskill-update-spec` |
-| Reconstruir `docs/` | `fireskill-documentator` |
-| Ver o estado | `fireskill-progress` |
-| Conversar com a spec | `fireskill-interviewer` |
-| Definir o MVP / evolução | `fireskill-mvp-milestone-interviewer`, `fireskill-roadmap-milestone-interviewer`, `fireskill-milestone-governor` |
-| Descobrir dados do produto | `fireskill-data-discovery` |
-| Registrar / consultar lições aprendidas | `fireskill-lessons` |
-| Deliberação colegiada / decisão de alto impacto | `fireskill-the-jury` |
-| Ataque adversarial e detecção de premissas frágeis | `fireskill-the-fool` |
-| Revisão técnica de PR / diff com evidências | `fireskill-the-judge` |
-| Manter STACK/RULES/DATABASE | `fireskill-aux-stack`, `fireskill-aux-rules`, `fireskill-aux-database` |
-| Mudar estado, esforço, validar spec, lições ou milestones | `bun run fireskill <comando>` (ver `README.md`) |
+| New request, raw thought | `fireskill-01-inbox` |
+| Refine backlog item and decisions | `fireskill-02-backlog` |
+| Author canonical specification | `fireskill-03-specify` |
+| Prove specification definition | `fireskill-04-validate` |
+| Break down into executable tasks | `fireskill-05-tasks` |
+| BDD-informed TDD tests | `fireskill-06-tdd-bdd` |
+| Implement (RED → GREEN → REFACTOR) | `fireskill-07-implement` |
+| Prepare project context | `fireskill-setup` |
+| Late specification change | `fireskill-update-spec` |
+| Rebuild `docs/` inventory | `fireskill-documentator` |
+| Inspect workflow progress | `fireskill-progress` |
+| Interactive specification interview | `fireskill-interviewer` |
+| Define MVP or roadmap evolution | `fireskill-mvp-milestone-interviewer`, `fireskill-roadmap-milestone-interviewer`, `fireskill-milestone-governor` |
+| Discover domain data model | `fireskill-data-discovery` |
+| Record or query lessons learned | `fireskill-lessons` |
+| Collegiate deliberation / high-impact decision | `fireskill-the-jury` |
+| Adversarial stress-testing of assumptions | `fireskill-the-fool` |
+| Evidence-grounded pull request review | `fireskill-the-judge` |
+| Maintain STACK/RULES/DATABASE | `fireskill-aux-stack`, `fireskill-aux-rules`, `fireskill-aux-database` |
+| Transition state, effort, validation | `bun run fireskill <command>` (see `README.md`) |
 
-## Especialistas do Nuxfire
+## Nuxfire Specialists
 
-Carregue **antes** de escrever código na área:
+Load **before** writing code in each area:
 
-| Ao tocar | Carregue |
+| When touching | Load |
 |---|---|
-| `.vue`, componentes `U*`, tema, formulários, tabelas | `fireskill-specialist-nuxt-ui` |
-| páginas, layouts, middleware, plugins, Nitro, `runtimeConfig` | `fireskill-specialist-nuxt` |
+| `.vue`, `U*` components, theme, forms, tables | `fireskill-specialist-nuxt-ui` |
+| pages, layouts, middleware, plugins, Nitro, `runtimeConfig` | `fireskill-specialist-nuxt` |
 | `layers/`, `config.ts`, `layer.manifest.ts` | `fireskill-specialist-nuxfire-layers` |
-| routers e procedures, `useTrpcClient()` | `fireskill-specialist-trpc` |
-| schema, migrações, seed, queries | `fireskill-specialist-drizzle` (+ `-postgres`) |
-| permissões, `defineAbility`, `<Can>` | `fireskill-specialist-nuxt-authorization` |
-| login, sessão, cookies, `apps/functions/src/auth.ts` | `fireskill-specialist-openauth` |
+| routers and procedures, `useTrpcClient()` | `fireskill-specialist-trpc` |
+| schema, migrations, seed, queries | `fireskill-specialist-drizzle` (+ `-postgres`) |
+| permissions, `defineAbility`, `<Can>` | `fireskill-specialist-nuxt-authorization` |
+| login, sessions, cookies, `apps/functions/src/auth.ts` | `fireskill-specialist-openauth` |
 | stores | `fireskill-specialist-pinia` |
-| `layers/billing`, Stripe, Paddle, webhooks, planos, assinaturas | `fireskill-specialist-billing` |
-| Workers, bindings, filas, cron, Durable Objects | `fireskill-specialist-cloudflare-workers` |
-| `infra/`, secrets, stages, deploy | `fireskill-specialist-sst` |
+| `layers/billing`, Stripe, Paddle, webhooks, plans, subscriptions | `fireskill-specialist-billing` |
+| Workers, bindings, queues, cron, Durable Objects | `fireskill-specialist-cloudflare-workers` |
+| `infra/`, secrets, stages, deployment | `fireskill-specialist-sst` |
 
-Os demais especialistas (segurança, acessibilidade, performance, observabilidade,
-arquitetura, UX/UI, TypeScript, Postgres, Tailwind, revisão, depuração…) estão em
-[`specialists/`](specialists/); `specialists/catalog.json` os descreve.
+Stack-agnostic engineering specialists (security, accessibility, performance, observability, architecture, UX/UI, TypeScript, Postgres, Tailwind, review, debugging…) are documented in [`specialists/`](specialists/) and cataloged in `specialists/catalog.json`.
 
-## Regras
+## Core Rules
 
-1. **O código vence a documentação.** Leia o arquivo antes de afirmar.
-2. Os especialistas dizem "o que existe de fato" e "o que NÃO existe" (ver o
-   `references/nuxfire-*.md` de cada um); não assuma o que está na segunda lista.
-3. `tsc`, `vitest` e `nuxt build` verdes **não** provam que `sst deploy` funciona;
-   para o que toca `apps/functions`/`layers`, o deploy é o gate real.
-4. Especialista orienta padrões e validação; não cria specs, não avança gates.
-5. Ação irreversível ou externa (deploy, apagar dados, publicar) exige
-   autorização explícita.
+1. **Code supersedes documentation.** Read the file before making claims.
+2. Specialists describe "what actually exists" and "what DOES NOT exist" (see each `references/nuxfire-*.md`); never assume items from the second list exist.
+3. Passing `tsc`, `vitest`, and `nuxt build` **does not** prove `sst deploy` works; for `apps/functions`/`layers`, deployment is the actual verification gate.
+4. Specialists guide technical standards and validation; they do not author specs or bypass quality gates.
+5. Irreversible or external actions (deployments, data deletion, publishing) require explicit user authorization.
 
-## Fontes de verdade (em conflito, vence a de cima)
+## Sources of Truth (In conflict, higher item wins)
 
-1. O código e os testes.
-2. `.fireskills/*` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `INTERFACE`, `DESIGNSYSTEM`),
-   conferido contra o código.
-3. Os `references/nuxfire-*.md` dos especialistas.
+1. Working code and automated test suites.
+2. `.fireskills/*` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `INTERFACE`, `DESIGNSYSTEM`), cross-checked against code.
+3. Specialist references in `references/nuxfire-*.md`.
 
-## Comandos
+## Common Commands
 
-| Para | Comando (raiz do repositório) |
+| Purpose | Command (repository root) |
 |---|---|
-| Testes | `bun run test` |
-| Typecheck | `bun run typecheck` em `apps/app` **e** `bunx vue-tsc --noEmit -p server/tsconfig.json` |
-| i18n | `bun run check:i18n` |
-| Specs: progresso, estado, esforço, milestones | `bun run fireskill progress`, `transition <id> <estado>`, `effort <id> <1-10> --reason "…"`, `milestones sync` |
-| Validação determinística de spec | `bun run fireskill validate <id> [--strict]` |
-| Lições aprendidas | `bun run fireskill lesson add/list/status/prune` |
-| Monitor de contexto | `node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs --project . --check` |
-| Proteção do banco | `node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs --project . --command "<comando>"` |
-| Deploy (**só com autorização**) | `bun run deploy -- --stage <stage>` |
+| Automated tests | `bun run test` |
+| Typecheck | `bun run typecheck` in `apps/app` **and** `bunx vue-tsc --noEmit -p server/tsconfig.json` |
+| i18n completeness | `bun run check:i18n` |
+| Specs: progress, state transitions, effort, milestones | `bun run fireskill progress`, `transition <id> <state>`, `effort <id> <1-10> --reason "…"`, `milestones sync` |
+| Deterministic spec linter | `bun run fireskill validate <id> [--strict]` |
+| Lessons learned | `bun run fireskill lesson add/list/status/prune` |
+| Context monitor | `node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs --project . --check` |
+| Database safety check | `node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs --project . --command "<command>"` |
+| Deploy (**only with authorization**) | `bun run deploy -- --stage <stage>` |
 
-## Manter o Fireskills vivo
+## Keeping Fireskills Alive
 
-- Terminou uma entrega: `fireskill-documentator` e o monitor sem `PENDING`.
-- Mudou regra, tela ou tabela: atualize `.fireskills/RULES.md`, `INTERFACE.md` ou
-  `DATABASE.md` (as skills `fireskill-aux-*` fazem isso sem apagar texto humano).
-- Mudou a doc pública do Fireskills (`apps/web/content/docs/2.fireskills`): atualize a
-  tradução em `content/pt-br/docs/2.fireskills` e `content/es/docs/2.fireskills`, com os
-  mesmos blocos de código; `bun run check:i18n` confere.
-- Especialista errado ou incompleto: corrija o `references/nuxfire-*.md` dele com a
-  evidência, no mesmo passo.
+- After completing an implementation slice: run `fireskill-documentator` and ensure context monitor has no `PENDING` flags.
+- When business rules, screens, or database tables change: update `.fireskills/RULES.md`, `INTERFACE.md`, or `DATABASE.md` (auxiliary skills `fireskill-aux-*` update without erasing human notes).
+- When public docs change (`apps/web/content/docs/2.fireskills`): keep translations in `content/pt-br/` and `content/es/` in sync; `bun run check:i18n` verifies completeness.
+- Outdated or incorrect specialist: patch its `references/nuxfire-*.md` with concrete file evidence in the same commit.

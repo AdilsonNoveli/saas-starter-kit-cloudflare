@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Atualizar especificação"
-  short_description: "Atualiza uma spec quando algo muda depois"
-  default_prompt: "Use $fireskill-update-spec para incorporar este novo pedido à especificação existente e orquestrar transições automáticas até a retomada."
+  display_name: "Fireskill - Update Specification"
+  short_description: "Updates a spec when requirements change later"
+  default_prompt: "Use $fireskill-update-spec to incorporate this new request into the existing specification and orchestrate automatic transitions until resumption."

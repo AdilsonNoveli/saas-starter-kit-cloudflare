@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Resume as fontes relevantes de um projeto sem alterar seus arquivos. */
+/** Summarizes relevant project sources without modifying files. */
 import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";

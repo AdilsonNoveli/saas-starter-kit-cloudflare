@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Entrevista de roadmap"
-  short_description: "Planeja milestones pós-MVP"
-  default_prompt: "Use $fireskill-roadmap-milestone-interviewer para entrevistar a evolução pós-MVP e propor milestones sem alterar o núcleo aceito sem confirmação."
+  display_name: "Fireskill - Roadmap Interview"
+  short_description: "Plans post-MVP milestones"
+  default_prompt: "Use $fireskill-roadmap-milestone-interviewer to interview post-MVP evolution and propose milestones without altering the accepted core without confirmation."

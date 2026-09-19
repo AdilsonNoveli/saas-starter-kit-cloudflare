@@ -1,43 +1,43 @@
-# Nuxfire — instruções para agentes
+# Nuxfire — Agent Instructions
 
-O desenvolvimento deste repositório é feito com o **Fireskills** (`fireskills/`):
-um fluxo orientado a especificações e 34 especialistas técnicos que já conhecem o
-código. Não trabalhe de memória: trabalhe por ele.
+Development in this repository is governed by **Fireskills** (`fireskills/`):
+a specification-driven workflow and 34 technical specialists with verified knowledge
+of this codebase. Never work from memory: work through the framework.
 
-## Comece sempre aqui
+## Always Start Here
 
-1. Leia `fireskills/SKILL.md`. Ele diz qual skill de fluxo e qual especialista
-   carregar para o pedido.
-2. Leia `.fireskills/RULES.md` (regras do projeto) e, para o assunto em questão,
-   `.fireskills/PROJECT.md`, `STACK.md`, `DATABASE.md`, `INTERFACE.md` ou
+1. Read `fireskills/SKILL.md`. It identifies which workflow skill and technical specialist
+   to activate for the request.
+2. Read `.fireskills/RULES.md` (project rules) and, for the subject at hand,
+   `.fireskills/PROJECT.md`, `STACK.md`, `DATABASE.md`, `INTERFACE.md`, or
    `DESIGNSYSTEM.MD`.
-3. Carregue o especialista da área **antes** de ler ou escrever código
-   (`fireskills/specialists/`; a tabela de áreas está em `fireskills/SKILL.md`).
+3. Load the domain technical specialist **before** reading or modifying code
+   (`fireskills/specialists/`; routing table is in `fireskills/SKILL.md`).
 
-## Regras de trabalho
+## Core Working Rules
 
-- Muda comportamento (feature, regra, dados, tela): siga o fluxo em
-  `fireskills/skills/`. Ajuste trivial: pode ir direto, mas com RULES lidas e o
-  especialista da área carregado.
-- O código vence qualquer documento. Toda afirmação sobre o projeto precisa de um
-  arquivo como evidência.
-- Nada de deploy, exclusão de dados ou ação irreversível sem autorização explícita.
-- Não declare "pronto" sem rodar a validação: `bun run test`, typecheck
-  (`apps/app`, e `vue-tsc -p server/tsconfig.json`) e o que o especialista indicar.
+- Behavioral changes (features, business rules, data schemas, views): strictly follow workflow in
+  `fireskills/skills/`. Trivial fixes: may proceed directly, provided `.fireskills/RULES.md` has been read
+  and the relevant specialist is loaded.
+- Working code supersedes any documentation. Every claim about the project requires
+  concrete file evidence.
+- No deployments, destructive data operations, or irreversible actions without explicit user authorization.
+- Never declare work "done" without running full validation: `bun run test`, typechecks
+  (`apps/app` and `bunx vue-tsc --noEmit -p server/tsconfig.json`), and checks specified by the specialist.
 
 <!-- specsfy:framework:start -->
-## Framework Fireskills
+## Fireskills Framework
 
-Fluxo, caminhos e gates: `fireskills/skills/Spec.md` (leia ao executar uma skill de fluxo).
-Contexto do projeto: `.fireskills/` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `PACKAGES`,
+Workflow, directories, and gates: `fireskills/skills/Spec.md` (read when running any workflow skill).
+Project context: `.fireskills/` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `PACKAGES`,
 `INTERFACE`, `DESIGNSYSTEM`, `USER-PROFILE`).
 
-- Antes de uma skill de fluxo, execute `$fireskill-setup`; rode o monitor de
-  contexto no início, após cada tarefa e antes de concluir, e resolva todo `PENDING`.
-- Não repita pergunta já respondida em `.fireskills/USER-PROFILE.md`.
-- Specs: `specs/inbox/`, `specs/backlog/` e `specs/<estado>/<NNNN>-<slug>/spec.md`,
-  a única fonte normativa (sem `plan.md`, `tasks.md` ou `research.md`).
-- Tarefa que muda o banco inclui `[MIGRATION]`: migração versionada (drizzle-kit),
-  aplicada no deploy, nunca no banco de desenvolvimento.
-- Depois de cada implementação, execute `$fireskill-documentator`.
+- Before executing a workflow skill, run `$fireskill-setup`; run the context monitor at the beginning,
+  after each task, and before finishing, resolving any `PENDING` flags.
+- Do not repeat questions already answered in `.fireskills/USER-PROFILE.md`.
+- Specs: `specs/inbox/`, `specs/backlog/`, and `specs/<state>/<NNNN>-<slug>/spec.md` as the
+  sole canonical source of truth (no `plan.md`, `tasks.md`, or `research.md`).
+- Tasks that alter persistent database schemas must include `[MIGRATION]`: versioned migrations (drizzle-kit),
+  applied during deployment, never on the development database.
+- After every implementation slice, execute `$fireskill-documentator`.
 <!-- specsfy:framework:end -->

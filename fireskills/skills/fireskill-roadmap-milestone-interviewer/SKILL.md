@@ -1,64 +1,63 @@
 ---
 name: fireskill-roadmap-milestone-interviewer
-description: Use depois que o MVP tiver sido aceito para entrevistar a pessoa responsável sobre a evolução do produto, propor milestones pós-MVP e vincular specs sem reabrir silenciosamente o núcleo acordado. Não use para definir o MVP inicial, executar tarefas ou mudar uma spec concluída.
+description: Use after the MVP has been accepted to interview the responsible person about product evolution, propose post-MVP milestones, and link specs without silently reopening the agreed core. Do not use to define initial MVP, execute tasks, or modify a completed spec.
 ---
 
-# Entrevistar a evolução depois do MVP
+# Interviewing Evolution After the MVP
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered questions contract`
+from `fireskills/skills/Spec.md`.
 
-Leia `.fireskills/PROJECT.md`, `specs.md`, os arquivos em `specs/milestones/` e as specs
-relacionadas. Comece pelo MVP aprovado e explique qual parte da conversa será
-planejada agora.
+Read `.fireskills/PROJECT.md`, `specs.md`, files in `specs/milestones/`, and related
+specs. Start with the approved MVP and explain what part of the conversation will
+be planned now.
 
-## Conduzir a conversa
+## Conduct the Interview
 
-1. Reafirme o limite atual do MVP e formule uma pergunta numerada sobre
-   aprendizado, necessidade de operação ou oportunidade da próxima etapa.
-2. Reflita cada rodada em uma síntese curta e formule a próxima rodada pelas
-   lacunas que ainda impedem identificar um estado demonstrável posterior.
-3. Investigue limitações temporárias do MVP, integrações, automações,
-   relatórios, escala, permissões e hipóteses que dependem de uso real.
-4. Continue até organizar uma sequência compreensível de marcos posteriores ou
-   até registrar claramente que não há informação suficiente para ordenar a
-   evolução.
+1. Reaffirm the current boundary of the MVP and formulate a numbered question
+   about learning, operational need, or opportunity for the next stage.
+2. Reflect each round in a short synthesis and formulate the next round from the
+   gaps that still prevent identifying a subsequent demonstrable state.
+3. Investigate temporary MVP limitations, integrations, automations, reports,
+   scale, permissions, and hypotheses that depend on real-world usage.
+4. Continue until organizing a comprehensible sequence of subsequent milestones
+   or until clearly recording that there is insufficient information to order the
+   evolution.
 
-## Proteger o que já foi aceito
+## Protect What Was Already Accepted
 
-Quando a resposta alterar problema, fluxo central, limite ou condição de saída
-de uma milestone do MVP, apresente o impacto e peça confirmação explícita.
-Encaminhe a mudança de uma spec existente para `$fireskill-update-spec`; não
-reescreva o núcleo como consequência de um roadmap novo.
+When an answer alters the problem, core flow, boundary, or exit condition of an
+MVP milestone, present the impact and request explicit confirmation.
+Route changes to an existing spec to `$fireskill-update-spec`; do not rewrite
+the core as a side effect of a new roadmap.
 
-## Propor e registrar os marcos
+## Propose and Record Milestones
 
-Cada marco pós-MVP precisa de objetivo, condição de saída, fora de escopo,
-dependências e specs candidatas. Registre hipóteses dependentes de uso real em
-uma seção própria, sem apresentá-las como requisito já confirmado.
+Each post-MVP milestone needs an objective, exit condition, out-of-scope items,
+dependencies, and candidate specs. Record hypotheses dependent on real-world usage
+in their own section, without presenting them as already confirmed requirements.
 
-Após aprovação, atribua IDs contínuos, vincule specs e backlog, execute:
+After approval, assign sequential IDs, link specs and backlog, and run:
 
 ```bash
 bun run fireskill milestones sync --project .
 ```
 
-Entregue uma ordem recomendada, o motivo de cada dependência e as próximas
-capacidades que devem entrar no backlog.
+Deliver a recommended order, rationale for each dependency, and next capabilities
+that should enter the backlog.
 
-## Limites
+## Boundaries
 
-- Não converter backlog inteiro em roadmap.
-- Não mudar o MVP sem confirmação explícita.
-- Não usar percentual de tarefas como condição de conclusão do marco.
-- Não criar tarefas técnicas ou implementar código.
+- Do not convert the entire backlog into a roadmap.
+- Do not change the MVP without explicit confirmation.
+- Do not use task percentage as a milestone completion condition.
+- Do not create technical tasks or implement code.

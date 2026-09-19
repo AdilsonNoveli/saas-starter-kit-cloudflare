@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Acrescenta uma regra confirmada sem alterar o restante do documento. */
+/** Appends a confirmed rule without altering the remainder of the document. */
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
@@ -7,15 +7,15 @@ import { join, resolve } from "node:path";
 function argument(name) {
   const index = process.argv.indexOf(`--${name}`);
   const value = index >= 0 ? process.argv[index + 1] : undefined;
-  if (!value || value.startsWith("--")) throw new Error(`--${name} é obrigatório`);
+  if (!value || value.startsWith("--")) throw new Error(`--${name} is required`);
   return value;
 }
 
 function addRule(content, section, rule) {
   const normalized = rule.trim().replace(/^-\s*/u, "");
-  if (!normalized) throw new Error("a regra não pode estar vazia");
-  if (content.toLocaleLowerCase("pt-BR").includes(normalized.toLocaleLowerCase("pt-BR"))) return content;
-  const source = content.trim() ? content : "# Regras do sistema\n";
+  if (!normalized) throw new Error("rule cannot be empty");
+  if (content.toLowerCase().includes(normalized.toLowerCase())) return content;
+  const source = content.trim() ? content : "# Project Rules\n";
   const heading = `## ${section.trim()}`;
   const expression = new RegExp(`^${heading.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}\\s*$`, "imu");
   const match = expression.exec(source);
@@ -41,6 +41,6 @@ try {
     console.log(target);
   }
 } catch (error) {
-  console.error(`erro: ${error instanceof Error ? error.message : String(error)}`);
+  console.error(`error: ${error instanceof Error ? error.message : String(error)}`);
   process.exitCode = 1;
 }

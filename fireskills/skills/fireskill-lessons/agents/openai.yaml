@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Lições"
-  short_description: "Registra e consulta lições aprendidas"
-  default_prompt: "Use $fireskill-lessons para registrar uma lição aprendida com sinal, resumo, regra preventiva e origem em .fireskills/LESSONS.md, ou para consultar as lições confirmadas antes de planejar uma fatia."
+  display_name: "Fireskill - Lessons"
+  short_description: "Records and queries lessons learned"
+  default_prompt: "Use $fireskill-lessons to record a learned lesson with signal, summary, preventive rule, and source in .fireskills/LESSONS.md, or to query confirmed lessons before planning a slice."

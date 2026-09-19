@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Especialista - Tailwind CSS"
-  short_description: "Tailwind com tokens e responsividade"
-  default_prompt: "Use $fireskill-specialist-tailwind-css para orientar esta tarefa com padrões e validação especializados."
+  display_name: "Fireskill - Specialist - Tailwind CSS"
+  short_description: "Tailwind with tokens and responsiveness"
+  default_prompt: "Use $fireskill-specialist-tailwind-css to guide this task with specialized Tailwind styling and responsive patterns."

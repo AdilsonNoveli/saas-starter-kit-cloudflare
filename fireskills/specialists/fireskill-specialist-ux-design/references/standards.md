@@ -1,104 +1,103 @@
-# Padrões de pesquisa e design de experiência
+# UX Research and Experience Design Standards
 
 <!-- markdownlint-disable MD013 -->
 
-## Escolher o método pela pergunta
+## Selecting Methods by Research Question
 
-| Pergunta | Método inicial | Comprovação produzida |
+| Question | Initial Method | Produced Evidence |
 | --- | --- | --- |
-| como a tarefa acontece hoje? | entrevista contextual + observação | comportamento, contexto e workaround |
-| pessoas encontram e nomeiam conteúdo? | card sorting/tree testing | agrupamento, rótulo e caminho |
-| o fluxo pode ser concluído? | teste moderado ou não moderado | sucesso, erro, hesitação e compreensão |
-| qual variante performa melhor em escala? | experimento controlado | diferença causal dentro das métricas |
-| quais problemas já se repetem? | análise de suporte e analytics | frequência, etapa e segmento |
-| a proposta comunica valor? | prototype test orientado a tarefa | interpretação e intenção de ação |
+| How does the task occur today? | Contextual inquiry + direct observation | Actual behaviors, environmental context, and workarounds |
+| Can users find and label content? | Card sorting / Tree testing | Taxonomy groupings, nomenclature, and search paths |
+| Can the workflow be completed? | Moderated or unmoderated usability testing | Task success, error points, hesitation, and comprehension |
+| Which variant performs better at scale? | Controlled A/B experiment | Statistically significant causal behavioral differences |
+| What issues are recurring repeatedly? | Customer support tickets + product analytics | Problem frequency, funnel drop-off steps, user segments |
+| Does the proposal communicate core value? | Task-oriented prototype testing | Mental model interpretation and action intent |
 
-Não escolha entrevista para confirmar comportamento que pode ser observado nem
-experimento para uma solução cuja falha básica ainda não foi diagnosticada.
+Never choose interviews to confirm behaviors that can be observed directly, nor controlled
+experiments for solutions whose basic operational usability has not yet been established.
 
-## Plano mínimo de pesquisa
+## Minimum Research Plan
 
-1. escolha que o estudo orientará;
-2. hipótese e comprovação que poderia refutá-la;
-3. público, regras de recrutamento e exclusões;
-4. método, tarefas, roteiro e piloto;
-5. consentimento, gravação, acesso, retenção e anonimização;
-6. sinais observados e regra de severidade;
-7. limitações e regra de parada.
+1. Decision the study directly informs.
+2. Core hypothesis and evidence capable of refuting it.
+3. Target audience, recruitment criteria, and exclusion rules.
+4. Methodology, scenario tasks, interview guide, and pilot run.
+5. Participant consent, recording storage, access control, retention, and data anonymization.
+6. Observable signals and severity classification criteria.
+7. Study limitations and stopping conditions.
 
-Perguntas devem pedir episódios reais e escolhas, não aprovação da solução.
-Durante teste de tarefa, use prompts neutros e não ensine o caminho que está
-sendo avaliado.
+Questions must elicit specific past episodes and decisions, not hypotheticals or
+validation of the designer's solution. During task testing, employ neutral non-directive
+prompts and never demonstrate the expected path.
 
-## Qualidade da comprovação
+## Quality of Evidence
 
-- **Observação:** comportamento, fala ou artefato registrado.
-- **Interpretação:** explicação plausível para a observação.
-- **Achado:** padrão sustentado por comprovações relacionadas.
-- **Recomendação:** mudança proposta para tratar o achado.
-- **Questão aberta:** incerteza que ainda requer escolha ou pesquisa.
+- **Observation:** Concrete recorded behavior, spoken quote, or artifact artifact.
+- **Interpretation:** Plausible explanation grounded in the observation.
+- **Finding:** A recurring pattern supported by related observations.
+- **Recommendation:** Actionable design change proposed to address the finding.
+- **Open Question:** Residual uncertainty requiring further experimentation or decisions.
 
-Mantenha esses níveis separados na síntese. Uma recomendação sem rastreio para
-achado é opinião; um achado sem rastreio para comprovação é memória.
+Keep these layers distinct in syntheses. A recommendation without a finding is opinion;
+a finding without raw observation is ungrounded memory.
 
-Classifique severidade combinando impacto sobre a tarefa, frequência observada,
-recuperabilidade e impacto do domínio. Não converta contagem pequena de pesquisa
-qualitativa em percentual populacional.
+Classify severity combining task impact, observed frequency, recoverability, and
+domain risk. Avoid converting small qualitative cohorts into false population percentages.
 
-## Jornada e serviço
+## User Journeys and Service Design
 
-Mapeie:
+Map thoroughly:
 
-- gatilho, objetivo e regra de conclusão da pessoa;
-- canais, dispositivos e mudança de contexto;
-- passos, escolhas, espera e dependências;
-- dados ou documentos necessários;
-- falhas, recuperação, suporte e handoffs;
-- responsável interno e comprovação operacional por etapa.
+- User triggers, core objectives, and completion criteria.
+- Channels, devices, and context shifts.
+- Steps, decision forks, wait times, and external dependencies.
+- Required inputs, paperwork, or credentials.
+- Failure states, error recovery paths, customer support, and human handoffs.
+- Internal operational owners and operational evidence per step.
 
-Otimize o serviço completo, não apenas a tela. Um formulário curto que transfere
-trabalho manual para suporte pode piorar a jornada total.
+Optimize the complete end-to-end service, not just screen layouts. A concise form
+that transfers manual workload onto customer support degrades the broader experience.
 
-## Formulários e conteúdo
+## Forms and Content Design
 
-- Pergunte somente o necessário para a escolha atual e explique informação
-  sensível ou inesperada.
-- Use uma pergunta por página quando isso melhora foco e recuperação; agrupe
-  campos quando a comparação ou o preenchimento conjunto for essencial.
-- Preserve entrada após erro, associe mensagem ao campo e forneça resumo quando
-  múltiplos erros precisam ser percorridos.
-- Escreva ação pelo resultado (`Salvar endereço`), não pelo mecanismo
-  (`Continuar`), quando o efeito precisa ser claro.
-- Diferencie dado opcional, exemplo de formato e restrição real.
+- Request only what is strictly necessary for the current decision, explaining reasons
+  for sensitive or unexpected inputs.
+- Use one question per page when doing so improves focus and error recovery; group fields
+  when comparative context or concurrent completion is essential.
+- Preserve inputs across validation errors, associate error messages directly with fields,
+  and provide an error summary when multiple issues exist.
+- Label actions by outcome (`Save address`), not abstract mechanisms (`Continue`),
+  whenever clarity of consequence is required.
+- Clearly distinguish optional fields, formatting examples, and mandatory system constraints.
 
 ## Onboarding
 
-- Defina o primeiro valor observável e conduza até ele.
-- Solicite permissão e configuração no momento de uso.
-- Permita pular conteúdo instrucional que não impede a tarefa.
-- Preserve progresso e ofereça retomada explícita.
-- Meça conclusão de tarefa e ativação, não quantidade de slides vistos.
+- Define the user's first observable "aha!" value moment and guide directly toward it.
+- Request permissions and account configuration at the moment of actual usage.
+- Allow users to bypass instructional walkthroughs that do not block task completion.
+- Preserve user progress and offer clear resume paths.
+- Measure task completion and activation rates, not the volume of carousel cards swiped.
 
-## Comprovação de validação
+## Validation Proof
 
-- participantes correspondem às regras e desvios estão registrados;
-- tarefas não contêm o nome do controle ou o caminho esperado;
-- sucesso independente, sucesso assistido, falha e abandono são distintos;
-- notas e gravações consentidas sustentam cada achado;
-- limitações de amostra, ambiente e fidelidade do protótipo estão explícitas;
-- reavaliação usa tarefas críticas comparáveis depois da mudança.
+- Participants strictly adhere to recruitment criteria, with deviations documented.
+- Scenario tasks omit control names or instructions revealing the ideal path.
+- Independent completions, assisted successes, errors, and drop-offs are tracked separately.
+- Consented recordings and verbatim field notes substantiate every reported finding.
+- Limitations of sample size, test environment, and prototype fidelity are clearly documented.
+- Follow-up evaluations utilize comparable critical tasks after design modifications.
 
 <!-- markdownlint-enable MD013 -->
 
-## Fontes primárias e consolidadas
+## Primary and Consolidated Sources
 
 <!-- markdownlint-disable MD034 -->
 
-- ISO 9241-210: https://www.iso.org/standard/77520.html
-- W3C COGA guidance: https://www.w3.org/TR/coga-usable/
+- ISO 9241-210 (Human-centred design for interactive systems): https://www.iso.org/standard/77520.html
+- W3C Cognitive Accessibility Guidance: https://www.w3.org/TR/coga-usable/
 - GOV.UK Service Manual: https://www.gov.uk/service-manual
 - GOV.UK Design System patterns: https://design-system.service.gov.uk/patterns/
 - USWDS Design Principles: https://designsystem.digital.gov/design-principles/
-- Nielsen Norman Group usability heuristics: https://www.nngroup.com/articles/ten-usability-heuristics/
+- Nielsen Norman Group 10 Usability Heuristics: https://www.nngroup.com/articles/ten-usability-heuristics/
 
 <!-- markdownlint-enable MD034 -->

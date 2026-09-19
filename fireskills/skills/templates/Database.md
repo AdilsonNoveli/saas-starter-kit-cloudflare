@@ -1,25 +1,25 @@
-# Banco de dados
+# Database
 
-Mapa de persistência do sistema. Modelo inicial sugerido para
+Persistence map of the system. Initial suggested template for
 **{{STACK_LABEL}}**.
 
 {{STACK_GUIDANCE}}
 
-## Fontes de dados
+## Data Sources
 
 <!-- specsfy:database:start -->
-| Fonte | Tecnologia | Configuração segura | Evidência |
+| Source | Technology | Secure Configuration | Evidence |
 | --- | --- | --- | --- |
-| Principal | A confirmar | Nome de variável, nunca o valor | A confirmar |
+| Primary | To confirm | Variable name, never the secret value | To confirm |
 
-## Estruturas
+## Structures
 
-| Estrutura | Tipo | Campos | Relações | Fonte |
+| Structure | Type | Fields | Relations | Source |
 | --- | --- | --- | --- | --- |
-| A confirmar | A confirmar | A confirmar | A confirmar | A confirmar |
+| To confirm | To confirm | To confirm | To confirm | To confirm |
 <!-- specsfy:database:end -->
 
-## Decisões, ownership e retenção
+## Decisions, Ownership, and Retention
 
-Registre finalidade, ownership, classificação, retenção, constraints e decisões
-que não estejam explícitas nos schemas.
+Record purpose, ownership, classification, retention, constraints, and decisions
+that are not explicit in schemas.

@@ -1,85 +1,86 @@
 ---
 name: fireskill-specialist-web-accessibility
-description: Implementar e auditar acessibilidade web com WCAG, HTML semântico, teclado, foco, nomes acessíveis, contraste, zoom e tecnologias assistivas. Use para componentes, páginas, formulários, dashboards e revisões de conformidade; automação não substitui teste manual.
+description: "Implement and audit web accessibility using WCAG, semantic HTML, keyboard navigation, focus management, accessible names, contrast, zoom, and assistive technologies. Use for components, pages, forms, dashboards, and compliance reviews; automation never replaces manual testing."
 ---
 
-# Acessibilidade web
+# Web Accessibility
 
-## Quando usar
+## When to Use
 
-- Acionar ao implementar ou auditar páginas, componentes, formulários,
-  dashboards, mídia e fluxos críticos contra WCAG e semântica da plataforma.
-- Acionar para bugs de teclado, foco, nome acessível, contraste, zoom, reflow,
-  leitor de tela ou outras tecnologias assistivas.
-- Não acionar apenas para preferência visual sem barreira observável; usar
-  `$fireskill-specialist-ui-design`.
-- Combinar com a skill do framework para corrigir o código sem transferir a
-  responsabilidade de conformidade ao framework.
+- Trigger when implementing or auditing pages, components, forms, dashboards,
+  media, and critical flows against WCAG and native platform semantics.
+- Trigger for keyboard, focus management, accessible name, contrast, zoom, reflow,
+  screen reader, or other assistive technology defects.
+- Do not trigger solely for visual styling preferences lacking observable barriers;
+  use `$fireskill-specialist-ui-design`.
+- Combine with framework-specific skills to remediate source code without deferring
+  compliance responsibilities to the framework.
 
-## Fluxo
+## Workflow
 
-1. Descobrir política, nível WCAG, navegadores, tecnologias assistivas, público
-   e fluxos críticos; separar auditoria de conformidade de teste de usabilidade.
-2. Inventariar barreiras por estrutura, percepção, teclado, foco, formulário,
-   atualização dinâmica, mídia e autenticação usando
+1. Discover policy requirements, target WCAG conformance level, supported browsers,
+   assistive technologies, user cohorts, and critical journeys; distinguish compliance
+   audits from general usability testing.
+2. Catalog accessibility barriers across structure, perception, keyboard, focus,
+   forms, dynamic live updates, media, and authentication using
    [references/standards.md](references/standards.md).
-3. Corrigir HTML e comportamento nativos antes de adicionar ARIA ou widget
-   customizado; verificar nome, papel, valor, estado e relações calculados.
-4. Implementar teclado, ordem lógica, foco visível, foco não encoberto e gestão
-   após abertura, fechamento, navegação e atualização assíncrona.
-5. Validar contraste, zoom, reflow, espaçamento de texto, target size, forced
-   colors, orientação, movimento e alternativas de mídia.
-6. Executar análise automática e inspeção manual; classificar cada achado por
-   critério, impacto, caminho de reprodução e correção verificável.
-7. Exercitar tarefas críticas com tecnologia assistiva representativa e
-   documentar cobertura, limitações, exceções e risco residual.
+3. Fix native HTML semantics and platform behavior before introducing ARIA attributes
+   or custom widgets; verify calculated accessible names, roles, values, states, and relationships.
+4. Implement keyboard navigation, logical focus order, visible focus indicators,
+   unobscured focus rings, and post-event focus management across modal opens, closes,
+   route changes, and asynchronous mutations.
+5. Validate contrast ratios, text zoom, 320px reflow, text spacing, target sizes,
+   forced colors, orientation adaptability, motion sensitivity, and media alternatives.
+6. Execute automated rule scanners paired with manual technical inspection; categorize
+   every finding by WCAG success criterion, impact, reproduction steps, and verifiable remediation.
+7. Exercise critical user flows using representative assistive technologies, documenting
+   test coverage, technical limitations, declared exceptions, and residual risks.
 
-## Padrões
+## Patterns
 
-- Nenhuma ação depende apenas de hover, cor, gesto ou pointer preciso.
-- Todo controle tem nome, papel, valor e estado corretos.
-- Modal prende foco, fecha por mecanismo previsível e devolve foco.
-- Erros são associados aos campos e resumidos quando necessário.
-- Updates assíncronos anunciam somente informação relevante.
-- Charts oferecem texto/tabela equivalente e não dependem de cor.
-- ARIA nunca corrige semântica nativa incorreta.
+- No action relies solely on hover states, color alone, complex gestures, or path-based pointer gestures.
+- Every interactive control exposes correct accessible name, role, value, and current state.
+- Modals trap keyboard focus, provide predictable escape mechanics, and return focus upon closing.
+- Errors link directly to form inputs and provide clear navigable summaries when multiple errors exist.
+- Asynchronous updates announce only relevant, timely information via appropriate live regions.
+- Charts and data visualizations offer equivalent data tables or textual descriptions and never rely on color alone.
+- ARIA attributes never compensate for incorrect underlying native HTML semantics.
 
-## Antipadrões
+## Anti-Patterns
 
-- Declarar conformidade porque axe ou um linter zerou; automação não confirma
-  ordem de foco, linguagem, alternativas equivalentes ou fluxo completo.
-- Aplicar `role`, `tabindex` e handlers a `div` quando um elemento nativo cobre
-  o contrato; recria parcialmente teclado e semântica do browser.
-- Usar `aria-label` para substituir texto visível sem necessidade; nomes
-  divergentes quebram reconhecimento por voz e manutenção.
-- Mover foco em toda atualização assíncrona; interrompe leitura e contexto.
-  Anuncie status proporcional e mova foco somente quando a tarefa exigir.
-- Ocultar overflow para “resolver” reflow; o conteúdo continua inacessível,
-  apenas deixa de ser alcançável visualmente.
+- Claiming WCAG compliance simply because axe or a linter reported zero violations;
+  automated scanners cannot verify focus order, plain language, text equivalents, or task completion.
+- Applying `role`, `tabindex`, and click handlers to `div` elements when native elements
+  satisfy the specification; reimplements keyboard handling and browser semantics incompletely.
+- Using `aria-label` to override visible text unnecessarily; divergent names break
+  speech recognition software and complicate maintenance.
+- Moving focus abruptly on every asynchronous background update; disrupts reading context.
+  Announce status via polite live regions and move focus only when task completion requires it.
+- Applying `overflow: hidden` to resolve reflow issues; content remains inaccessible,
+  merely clipped from view.
 
-## Validação
+## Validation
 
-- Executar fluxo completo por teclado, sem armadilha, perda ou foco encoberto;
-  conferir ordem e retorno de foco em overlays.
-- Verificar resize de texto a 200% e reflow equivalente a 320 CSS px para
-  conteúdo vertical, além de spacing de texto e orientação suportada.
-- Medir contraste de texto, componentes e indicadores de foco e testar forced
-  colors e reduced motion quando aplicáveis.
-- Combinar axe/linter com inspeção do accessibility tree e leitor de tela nos
-  fluxos de maior risco.
-- Não declarar conformidade WCAG sem mapear critérios, escopo, evidência,
-  limitações e exceções; “acessível” não é sinônimo de teste automatizado verde.
+- Complete critical flows via keyboard alone, without keyboard traps, lost focus, or obscured focus indicators;
+  verify focus restoration upon closing overlays.
+- Verify 200% text resizing and 320 CSS px viewport reflow for vertical content without
+  horizontal scrolling, alongside text spacing overrides and orientation switching.
+- Measure contrast for text, form controls, and focus indicators, testing under forced colors
+  and reduced motion preferences.
+- Combine automated checkers with accessibility tree inspection and screen reader testing
+  on highest-risk workflows.
+- Do not declare WCAG compliance without mapping criteria, scope, concrete evidence,
+  limitations, and exceptions; "accessible" is never synonymous with green automated tests.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-tailwind-css` implementa contraste, forced colors,
-  reflow e reduced motion nos utilitários e tokens observados.
-- `$fireskill-specialist-ui-design` governa hierarquia, tokens e estados visuais
-  que precisam satisfazer contraste, reflow e foco.
-- `$fireskill-specialist-ux-design` pesquisa compreensão e sucesso de tarefa,
-  inclusive com pessoas que usam tecnologias assistivas.
-- `$fireskill-specialist-code-review` amplia a revisão para riscos além do recorte
-  de acessibilidade.
+- `$fireskill-specialist-tailwind-css` implements contrast, forced colors, reflow,
+  and reduced motion utility classes and tokens.
+- `$fireskill-specialist-ui-design` governs visual hierarchy, tokens, and states that
+  must satisfy contrast, reflow, and focus criteria.
+- `$fireskill-specialist-ux-design` researches comprehension and task success, including
+  with assistive technology users.
+- `$fireskill-specialist-code-review` broadens reviews to include risks beyond accessibility.
 
-Leia [references/standards.md](references/standards.md) para critérios WCAG 2.2,
-contratos de componentes, formulários, conteúdo dinâmico e matriz de testes.
+Read [references/standards.md](references/standards.md) for WCAG 2.2 criteria,
+component contracts, form accessibility, dynamic live regions, and test matrices.

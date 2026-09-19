@@ -1,22 +1,22 @@
-# Layers do Nuxfire — o que existe de fato no código
+# Nuxfire Layers — What Actually Exists in the Codebase
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento.
+Each statement includes concrete file evidence. The codebase supersedes this document.
 
-## 1. Modelo
+## 1. Architecture Model
 
-- Domínios de negócio ficam em `layers/<nome>/` (workspace `layers/*`), pacote
-  `@nuxfire/layer-<nome>`. Existem hoje: **core** `teams`, `billing`,
+- Business domains reside in `layers/<name>/` (`layers/*` workspace), package
+  `@nuxfire/layer-<name>`. Existing today: **core** `teams`, `billing`,
   `notifications`, `admin`; **feature** `kanban` (`config.ts`).
-- `apps/app` é o **Composition Root**: casca do app (dashboard, conta), a
-  composição do tRPC, `nuxt.config.ts` e a infraestrutura central
+- `apps/app` is the **Composition Root**: application shell (dashboard, account),
+  tRPC composition, `nuxt.config.ts`, and core infrastructure
   (`server/utils/{db,auth,audit-log,mfa-crypto,rate-limit,ws-ticket,user-mfa*}.ts`,
   `app/plugins/websockets.client.ts`, `app/composables/use-notification.ts`,
   `app/components/account/MfaSetupModal.vue`,
-  `app/middleware/{0.auth,1.teams}.global.ts`). Não tem lógica de domínio.
-- Outros pacotes: `apps/web` (site + docs), `apps/login` (UI de login estática),
+  `app/middleware/{0.auth,1.teams}.global.ts`). Contains zero business domain logic.
+- Other workspace packages: `apps/web` (marketing site + docs), `apps/login` (static login UI),
   `apps/functions` (Workers), `packages/{emails,tokens,manifest}`.
 
-## 2. Onde se registra uma layer (`config.ts`)
+## 2. Where Layers are Registered (`config.ts`)
 
 ```ts
 export const layers = {
@@ -25,54 +25,51 @@ export const layers = {
 };
 ```
 
-- **core vs feature é só sobre poder ser desligada, nunca sobre ligação.** Os dois
-  vão para o mesmo `activeLayerNames` (`apps/app/nuxt.config.ts`), que alimenta:
-  `extends`, o tRPC gerado e a navegação gerada. Para uma layer core,
-  **acrescentar o nome em `layers.core` é o registro inteiro**; nada de import à
-  mão.
-- `layers` decide quais layers Nuxt entram no app; `flags` decide quais
-  **recursos Cloudflare** o SST cria. São separados de propósito.
-- **"Ativo" tem uma única fonte: `activeLayerNames`.** Nunca decidir "está
-  ligada" só pela presença de `layer.manifest.ts` no disco (bug real da Fase 2:
-  com `kanban: false`, as páginas saíam mas o router seguia chamável e o menu
-  mostrava link para rota inexistente). Qualquer coisa nova que precise saber
-  quais layers estão ativas recebe `activeLayerNames` por parâmetro.
-- `#nuxfire/config` **não resolve** dentro do `nuxt.config.ts` (jiti não lê
-  `paths` do tsconfig): importe `config.ts` e `scripts/compose-layers.ts` por
-  caminho relativo ali.
+- **Core vs Feature distinction exists solely for toggleability, never composition.** Both
+  feed into `activeLayerNames` (`apps/app/nuxt.config.ts`), which drives `extends`,
+  generated tRPC routes, and generated navigation. For a core layer,
+  **adding the name to `layers.core` is the entire registration**; no manual imports.
+- `layers` governs which Nuxt layers compose into the application; `flags` governs which
+  **Cloudflare infrastructure resources** SST provisions. They are separate by design.
+- **"Active" has a single source of truth: `activeLayerNames`.** Never determine
+  active state merely by presence of `layer.manifest.ts` on disk (real Phase 2 bug:
+  with `kanban: false`, pages were stripped but the router remained callable and navigation
+  rendered links to non-existent routes). Any code querying active layers receives
+  `activeLayerNames` as an explicit parameter.
+- `#nuxfire/config` **does not resolve** inside `nuxt.config.ts` (jiti ignores tsconfig
+  `paths`): import `config.ts` and `scripts/compose-layers.ts` via relative paths there.
 
-## 3. Composição gerada (`scripts/compose-layers.ts`)
+## 3. Generated Composition (`scripts/compose-layers.ts`)
 
-Chamado por `apps/app/nuxt.config.ts` em todo `nuxt dev/build/generate/typecheck/prepare`;
-`bun scripts/compose-layers.ts` só serve para inspecionar. Gera dois arquivos —
-**nunca editar**:
+Invoked by `apps/app/nuxt.config.ts` on every `nuxt dev/build/generate/typecheck/prepare`;
+`bun scripts/compose-layers.ts` serves solely for inspection. Generates two files —
+**never edit manually**:
 
-1. `apps/app/server/trpc/routers/.composition/layer-routers.ts`: layer entra se
-   tem `layer.manifest.ts` **e** `server/trpc/router.ts`. Importa
-   `routers` de `@nuxfire/layer-<dir>/server/trpc/router`.
-2. `apps/app/app/composables/.composition/layer-navigation.ts`: reexporta o
-   manifesto de cada layer ativa (`@nuxfire/layer-<dir>/manifest`) para
-   `useLayerNavigation()`.
+1. `apps/app/server/trpc/routers/.composition/layer-routers.ts`: layer included if it has
+   both `layer.manifest.ts` **and** `server/trpc/router.ts`. Imports
+   `routers` from `@nuxfire/layer-<dir>/server/trpc/router`.
+2. `apps/app/app/composables/.composition/layer-navigation.ts`: re-exports manifests from each
+   active layer (`@nuxfire/layer-<dir>/manifest`) for `useLayerNavigation()`.
 
-O `name` do manifesto é lido por **regex** no texto (`name: "…"` literal); tem de
-ser literal string e igual ao nome da pasta.
+Manifest `name` is parsed via **regex** against file content (`name: "…"` literal);
+it must be a literal string matching the directory name.
 
-## 4. Anatomia de uma layer (referência: `layers/kanban`)
+## 4. Anatomy of a Layer (Reference: `layers/kanban`)
 
-| Caminho | Papel |
+| Path | Purpose |
 |---|---|
-| `package.json` | `name`, `exports`, dependências **explícitas** |
+| `package.json` | `name`, `exports`, **explicit** dependencies |
 | `nuxt.config.ts` | `$meta.name` + `components: [{ path: "./components" }]` |
 | `layer.manifest.ts` | `defineLayerManifest({ name, displayName, description, version, requires, navigation, permissions })` (`@nuxfire/manifest`) |
 | `app/` | `components/`, `composables/`, `pages/`, `layouts/`, `middleware/`, `plugins/`, `utils/` |
-| `server/trpc/router.ts` | exporta `routers` (mapa) |
-| `server/database/schema.ts` | tabelas da layer |
-| `server/utils/` | utilitários do servidor (auto-importados app-wide, ver §6) |
-| `shared/utils/abilities.ts`, `permissions.ts` | habilidades e constantes de permissão |
-| `i18n/locales/{en,es,pt-BR}.json` | mensagens da layer |
-| `vitest.config.ts`, `vitest.setup.ts` | testes (`shared/**` e `server/**`) |
+| `server/trpc/router.ts` | exports `routers` map |
+| `server/database/schema.ts` | layer database tables |
+| `server/utils/` | server utilities (auto-imported app-wide, see §6) |
+| `shared/utils/abilities.ts`, `permissions.ts` | authorization abilities and permission constants |
+| `i18n/locales/{en,es,pt-BR}.json` | localized strings |
+| `vitest.config.ts`, `vitest.setup.ts` | test configuration (`shared/**` and `server/**`) |
 
-`exports` do `package.json` (padrão de `kanban`/`teams`):
+`package.json` `exports` (standardized across `kanban`/`teams`):
 
 ```json
 ".": "./nuxt.config.ts",
@@ -82,100 +79,94 @@ ser literal string e igual ao nome da pasta.
 "./shared/*": "./shared/*.ts"
 ```
 
-- **`exports["."]` deve apontar para `nuxt.config.ts`, não para o manifesto.**
-  Apontando para o manifesto, `extends` carregava o manifesto como config do
-  Nuxt: nada errava, mas nenhum `nuxt.config.ts` de layer valia (o
-  `components.prefix` era inerte). O manifesto vive no subcaminho `./manifest`.
-- O coringa precisa da extensão no alvo: `"./shared/*": "./shared/*.ts"`
-  (`"./shared/*"` sem extensão resolve para nada em `moduleResolution: bundler`).
-- Declare **todo pacote que o código da layer importa diretamente** no
-  `package.json` da layer (`drizzle-orm`, `zod`, `@trpc/server`, `@nuxt/ui`,
-  `@nuxfire/functions: workspace:*`, `@nuxfire/layer-teams: workspace:*`…). Nunca
-  dependa de transitividade (o layout do Bun não é estável).
-- Layer **sem** `app/` faz o Nuxt 4 cair para a raiz da layer e incluir todo o
-  `server/` no programa TypeScript do cliente: declare `srcDir: "app"` no
-  `nuxt.config.ts` enquanto a pasta não existir (e remova quando existir).
+- **`exports["."]` must point to `nuxt.config.ts`, never to the manifest.**
+  Pointing to the manifest caused `extends` to evaluate the manifest as Nuxt config:
+  no crash occurred, but no layer `nuxt.config.ts` applied (`components.prefix` was inert).
+  Manifests reside under `./manifest`.
+- Wildcard exports require explicit extensions in targets: `"./shared/*": "./shared/*.ts"`
+  (`"./shared/*"` without extension resolves to nothing under `moduleResolution: bundler`).
+- Explicitly declare **every package imported by layer code** in the layer's
+  `package.json` (`drizzle-orm`, `zod`, `@trpc/server`, `@nuxt/ui`,
+  `@nuxfire/functions: workspace:*`, `@nuxfire/layer-teams: workspace:*`…). Never rely on
+  transitive dependencies (Bun hoist layouts are not guaranteed).
+- Layers **lacking** an `app/` folder cause Nuxt 4 to fall back to layer root, pulling
+  all of `server/` into client-side TypeScript compilation: declare `srcDir: "app"` in
+  `nuxt.config.ts` while `app/` is absent (remove once created).
 
-## 5. Nomes que colidem (regras que valem para toda layer)
+## 5. Collision Avoidance (Rules Governing All Layers)
 
-- **Habilidades** (`defineAbility`) levam o **prefixo da layer**:
-  `kanbanListBoards`, `teamsDeleteTeam`. `nuxt-authorization` usa o auto-import
-  de `shared/utils/` do Nuxt, que é um espaço de nomes único e por nome de
-  export; dois exports iguais colidem em silêncio. O prefixo segue a **layer**,
-  não a string de permissão. **Chaves de procedure tRPC não são prefixadas**
-  (`teams.listMembersAndInvites` é API pública).
-- Habilidades da layer se importam por `@nuxfire/layer-<nome>/shared/utils/abilities`
-  (`#shared` aponta para `shared/` do app, nunca de layer).
-- **Componentes**: o nome registrado vem do **diretório + arquivo**, e o
-  prefixo de diretório **de-duplica** contra arquivo que já começa igual
-  (`notifications/NotificationsSlideover.vue` → `<NotificationsSlideover>`), mas a
-  opção `components.prefix` **não** de-duplica (`prefix: "Kanban"` + `KanbanBoard.vue`
-  → `<KanbanKanbanBoard>`). Por isso **nenhuma layer define `prefix`**; só
-  `path: "./components"`. Preserve o subcaminho quando o nome registrado depende
-  dele (`admin/plans/CreateEditModal.vue` → `<AdminPlansCreateEditModal>`);
-  achate só para desfazer repetição. **Confira em `.nuxt/components.d.ts`** antes
-  e depois de mover.
-- `path` em `components` resolve contra o **`srcDir`** (`layers/<x>/app`), não
-  contra `rootDir`: `./components`, nunca `./app/components`.
-- **Middleware global não ordena entre layers**: o Nuxt ordena por nome só dentro
-  de uma layer e concatena as layers com o Composition Root **por último**. Por
-  isso `1.teams.global.ts` fica em `apps/app`, depois de `0.auth.global.ts`.
-  Middleware **nomeado** (`definePageMeta({ middleware: "invite" })`) sempre roda
-  depois de todos os globais e pode viver na layer.
-- **Plugins** têm primitivo de ordem: quem depende de plugin de outra origem
-  declara `defineNuxtPlugin({ dependsOn: ["websockets"] })`. Confiar na ordem de
-  arquivos deixa de valer quando o arquivo muda de layer. Plugin de WebSocket é
-  `.client.ts`; não remova o sufixo.
-- **Páginas e layouts se fundem entre layers.** `/{team}/settings` tem um pai em
-  `layers/teams` e filhos vindos de três layers. Uma página de layer pode nomear
-  `layout`/`middleware` de outra origem (`layout: "dashboard"` do Composition Root;
-  `layout: "admin"` de `layers/admin`). Prove no **build** (`dist/server/chunks/virtual/entry.mjs`),
-  não só no `nuxt prepare`.
+- **Abilities** (`defineAbility`) must carry the **layer prefix**:
+  `kanbanListBoards`, `teamsDeleteTeam`. `nuxt-authorization` leverages Nuxt's
+  `shared/utils/` auto-import, which operates on a single flat export namespace;
+  colliding exports fail silently. The prefix reflects the **layer name**, not the
+  permission string. **tRPC procedure keys are never prefixed** (`teams.listMembersAndInvites`
+  is public API).
+- Import layer abilities via `@nuxfire/layer-<name>/shared/utils/abilities` (`#shared`
+  points to the app's `shared/`, never layer files).
+- **Components**: registered names derive from **directory + filename**, and directory
+  prefixes **de-duplicate** when filenames start identically
+  (`notifications/NotificationsSlideover.vue` → `<NotificationsSlideover>`), but
+  `components.prefix` **does not** de-duplicate (`prefix: "Kanban"` + `KanbanBoard.vue`
+  → `<KanbanKanbanBoard>`). Therefore **no layer defines `prefix`**; only
+  `path: "./components"`. Preserve subdirectories when registered names depend on them
+  (`admin/plans/CreateEditModal.vue` → `<AdminPlansCreateEditModal>`). Check
+  `.nuxt/components.d.ts` before and after moves.
+- `path` in `components` resolves against **`srcDir`** (`layers/<x>/app`), not `rootDir`:
+  `./components`, never `./app/components`.
+- **Global middleware cannot guarantee ordering across layers**: Nuxt orders by name
+  only within an individual layer, concatenating layers with the Composition Root **last**.
+  Thus `1.teams.global.ts` resides in `apps/app`, executing after `0.auth.global.ts`.
+  **Named** middleware (`definePageMeta({ middleware: "invite" })`) always executes after
+  all global middleware and safely resides in layers.
+- **Plugins** provide an explicit ordering primitive: plugins depending on foreign plugins
+  declare `defineNuxtPlugin({ dependsOn: ["websockets"] })`. Relying on filename order
+  fails when files move between layers. WebSocket plugins are `.client.ts`; do not remove.
+- **Pages and layouts merge seamlessly across layers.** `/{team}/settings` has a parent
+  in `layers/teams` and children contributed from three layers. Layer pages can specify
+  `layout`/`middleware` from other origins (`layout: "dashboard"` from Composition Root;
+  `layout: "admin"` from `layers/admin`). Verify in **build**
+  (`dist/server/chunks/virtual/entry.mjs`), not merely `nuxt prepare`.
 
-## 6. Backend em layers
+## 6. Backend Execution in Layers
 
-- O `server/` de cada layer **é escaneado pelo Nitro**: `server/utils/*.ts`
-  viram auto-import do app e podem usar auto-imports como `useDB()`
-  (`layers/teams/server/utils/`). **Routers tRPC não** dependem disso: são
-  importados como módulos pelo arquivo gerado e importam explicitamente
-  `~~/server/trpc/trpc` e `~~/server/utils/db`.
-- Schema: linha **escrita à mão** no barrel
-  `apps/functions/src/database/schema.ts`, **por especificador de pacote**, e a
-  dependência `@nuxfire/layer-<nome>: workspace:*` em `apps/functions/package.json`.
-  Ver `$fireskill-specialist-drizzle` (ciclos e o incidente de deploy).
-- Layer que só depende de outra, dependa pelo especificador de pacote e declare
-  `requires: [...]` no manifesto. **`requires` é documental**: nada valida a
-  ordem do `extends`.
-- Infra por layer (Durable Object, fila, cron) **fora do escopo**: layers usam o
-  que já existe (Postgres/Hyperdrive, KV, R2). O manifesto não tem campo
-  `infrastructure` porque nada o leria.
-- Desativar uma layer de feature **não apaga tabelas** nem tira o tipo do cliente
-  Drizzle: "desativado" = fora da UI.
+- The `server/` directory of each layer is **scanned by Nitro**: `server/utils/*.ts`
+  become application auto-imports and can invoke `useDB()` (`layers/teams/server/utils/`).
+  **tRPC routers do not** depend on auto-imports: they are imported as static modules
+  by the composition script and explicitly import `~~/server/trpc/trpc` and `~~/server/utils/db`.
+- Database schema: **manual import line** in barrel `apps/functions/src/database/schema.ts`,
+  using **package specifiers**, paired with `@nuxfire/layer-<name>: workspace:*` in
+  `apps/functions/package.json`. See `$fireskill-specialist-drizzle`.
+- Layer dependencies should be declared via package specifiers and documented in
+  `requires: [...]` in the manifest. **`requires` is informational**: no tooling validates
+  `extends` ordering automatically.
+- Per-layer infrastructure (Durable Objects, queues, crons) is **out of scope**: layers
+  consume shared infrastructure (Postgres/Hyperdrive, KV, R2). Manifests omit
+  `infrastructure` fields.
+- Disabling a feature layer **does not drop tables** or strip Drizzle client types:
+  "disabled" = omitted from UI.
 
-## 7. Navegação, permissões e i18n
+## 7. Navigation, Permissions, and Localization
 
-- **Navegação**: `navigation.sidebar` no manifesto, com `label`, `icon`
-  (`i-lucide-…`), `to` (`{team}` vira o slug do tenant) e `order`. Layer sem
-  entrada de menu **omite** `navigation` (`teams`).
-- **Permissões**: strings `layer:recurso:ação` em `permissions` do manifesto; as
-  constantes espelham em `shared/utils/permissions.ts`. Linhas reais vivem em
-  `Permission` no banco (ex.: `ensureKanbanPermissions`). Ver
-  `$fireskill-specialist-nuxt-authorization`.
-- **i18n**: três arquivos por layer (`en`, `pt-BR`, `es`); `en.json` é a fonte da
-  verdade e as outras têm de ter **exatamente o mesmo conjunto de chaves**.
-  `bun run check:i18n` falha em chave faltando ou sobrando. O app usa
-  `@nuxtjs/i18n` com `restructureDir: "i18n"`, `strategy: "no_prefix"`,
+- **Navigation**: `navigation.sidebar` in manifest, providing `label`, `icon` (`i-lucide-…`),
+  `to` (`{team}` interpolates active tenant slug), and `order`. Layers without menu items
+  **omit** `navigation` (`teams`).
+- **Permissions**: strings `layer:resource:action` in manifest `permissions`; constants
+  mirrored in `shared/utils/permissions.ts`. Live records exist in the `Permission` database
+  table (e.g., `ensureKanbanPermissions`). See `$fireskill-specialist-nuxt-authorization`.
+- **i18n**: three files per layer (`en`, `pt-BR`, `es`); `en.json` is the source of truth,
+  and others must contain **identical key sets**. `bun run check:i18n` fails on mismatched keys.
+  The app uses `@nuxtjs/i18n` with `restructureDir: "i18n"`, `strategy: "no_prefix"`,
   locales `en`, `pt-br`, `es`.
-- **Testes**: um `vitest.config.ts` + `vitest.setup.ts` na layer basta; o
-  agregador (`vitest.config.mts`, `test.projects: ["apps/app", "layers/*"]`)
-  descobre sozinho. `defineAbility` é auto-import do Nuxt: o `vitest.setup.ts`
-  o coloca em `globalThis`.
+- **Testing**: a single `vitest.config.ts` + `vitest.setup.ts` inside the layer suffices;
+  the root test runner (`vitest.config.mts`, `test.projects: ["apps/app", "layers/*"]`)
+  discovers it automatically. `defineAbility` is a Nuxt auto-import: `vitest.setup.ts`
+  assigns it to `globalThis`.
 
-## 8. O que NÃO existe
+## 8. What Does NOT Exist
 
-- Validação automática de `requires`/ordem do `extends`.
-- Campo de infraestrutura no manifesto.
-- Testes de router tRPC ou de componentes de layer (a cobertura é billing,
-  assentos de equipe e habilidades).
-- `packages/app`: o nome antigo do Composition Root (READMEs de layers antigos
-  ainda o citam; hoje é `apps/app`).
+- Automated validation of `requires` / `extends` ordering.
+- Infrastructure declaration blocks in manifests.
+- Test suites for layer tRPC routers or UI components (coverage focuses on billing,
+  team seats, and RBAC abilities).
+- `packages/app`: legacy name of the Composition Root (some older layer READMEs reference it;
+  active location is `apps/app`).

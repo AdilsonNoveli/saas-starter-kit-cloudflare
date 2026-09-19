@@ -1,97 +1,73 @@
 ---
 name: fireskill-specialist-pinia
-description: Criar e revisar stores Pinia (`@pinia/nuxt`) no Nuxfire — stores no estilo de opções em `layers/*/app/composables/use-*-store.ts`, estado normalizado, actions que chamam `useTrpcClient()`, tipos derivados de `RouterOutput`, SSR/hidratação e código client-only. Use ao criar/alterar uma store, decidir entre store, `useState` ou composable com `useQuery`, ou depurar estado que diverge entre servidor e cliente; hoje há três stores (teams, invite, notifications).
+description: Create and review Pinia stores (`@pinia/nuxt`) in Nuxfire — options-style stores in `layers/*/app/composables/use-*-store.ts`, normalized state, actions that invoke `useTrpcClient()`, types derived from `RouterOutput`, SSR/hydration, and client-only code. Use when creating or modifying stores, deciding between Pinia, `useState`, or composables with `useQuery`, or debugging hydration mismatch between server and client; three stores exist today (teams, invite, notifications).
 ---
 
-# Pinia no Nuxt
+# Pinia in Nuxt
 
-## Quando usar
+## When to Use
 
-- Acionar ao criar/alterar store, ao decidir onde um estado compartilhado de UI
-  deve viver, ou ao depurar hidratação, estado vazando entre requisições ou
-  `localStorage` acessado no servidor.
-- Acionar ao usar `useTeamsStore`, `useCurrentTeam`, `useNotificationsStore` ou
-  `useInviteStore`.
-- Não acionar para dado que só uma tela usa e que o `useQuery` do tRPC já cobre
-  (`useKanban`): ver `$fireskill-specialist-trpc`. Não acionar para sessão do
-  usuário (`useSession`, `useState`): `$fireskill-specialist-openauth`.
-- Combinar com `$fireskill-specialist-nuxt` (middleware, plugins, SSR),
-  `$fireskill-specialist-nuxfire-layers` (onde a store mora) e
-  `$fireskill-specialist-typescript`.
+- Trigger when creating/modifying stores, deciding where shared UI state should live,
+  or debugging hydration mismatches, state leaks across requests, or server-side `localStorage` access.
+- Trigger when using `useTeamsStore`, `useCurrentTeam`, `useNotificationsStore`, or `useInviteStore`.
+- Do not trigger for data used only by a single screen covered by tRPC `useQuery`
+  (`useKanban`): see `$fireskill-specialist-trpc`. Do not trigger for user session
+  (`useSession`, `useState`): see `$fireskill-specialist-openauth`.
+- Combine with `$fireskill-specialist-nuxt` (middleware, plugins, SSR),
+  `$fireskill-specialist-nuxfire-layers` (layer co-location), and `$fireskill-specialist-typescript`.
 
-## Fluxo
+## Workflow
 
-1. Ler [references/nuxfire-pinia.md](references/nuxfire-pinia.md).
-2. Decidir **se precisa de store**: estado lido por vários componentes/rotas,
-   com ciclo de vida próprio (equipe atual, notificações) → store. Dado de uma
-   tela, refetch simples → `useQuery`/composable.
-3. Copiar o padrão de `use-teams-store.ts` (estado normalizado, `set*` +
-   `fetch*`, tipo de `RouterOutput`).
-4. Colocar a store na layer dona do domínio e declarar `pinia` no
-   `package.json` da layer.
-5. Marcar o que é client-only e quem o chama.
-6. Validar (seção abaixo).
+1. Read [references/nuxfire-pinia.md](references/nuxfire-pinia.md).
+2. Decide **if a store is needed**: state consumed across multiple components/routes
+   with an independent lifecycle (current team, notifications) → Pinia store. Single-screen
+   data or simple queries → `useQuery` / composable.
+3. Mirror the pattern in `use-teams-store.ts` (normalized state, `set*` + `fetch*`,
+   derived types from `RouterOutput`).
+4. Place store in the layer owning the domain and declare `pinia` in the layer's `package.json`.
+5. Isolate client-only code and callers.
+6. Validate (below).
 
-## Regras principais
+## Core Rules
 
-- Estilo de opções `defineStore(id, { state, getters, actions })`; nome
-  `use<Nome>Store`, arquivo `use-<nome>-store.ts` em `app/composables/` (auto-import).
-- `id` da store é o substantivo em minúsculas e único no app.
-- Estado é dado serializável e normalizado (`Record<chave, entidade>`); listas
-  ordenadas e buscas são *getters*.
-- Tipos vêm do servidor: `RouterOutput["ns"]["proc"]`; não redeclarar à mão.
-- Dado vem do tRPC dentro de actions `fetch*`, que chamam `set*`; `try/catch`
-  com log e retorno `null`/`undefined` no erro. As stores atuais fazem
-  `console.error(error)` com o objeto cru; numa action que pode rodar no servidor
-  (middleware/SSR), extraia `message`/`name` antes, pois em Worker um `Error` cru
-  sai como `{}`.
-- Mutação otimista atualiza o estado antes e **reconcilia no erro**
-  (`markAsRead`).
-- Chave do registro e nome do campo dizem a verdade: `useTeamsStore` chaveia por
-  **slug** e `currentTeamId` guarda o slug — não misture com `team.id`.
-- Código de browser (`localStorage`, `window`) **só** dentro de action chamada de
-  plugin `.client.ts` ou de hook de montagem; nunca no caminho do servidor.
-- Não guardar o cliente tRPC, instâncias de classe ou funções no estado.
-- Nada de estado por usuário em variável de módulo (vaza entre requisições no
-  servidor); use a store (uma instância por requisição no SSR).
-- Store que muda com a rota e precisa de ordem (`fetchTeam` no middleware global)
-  fica onde a ordem é garantida: no Composition Root.
-- Plugin de layer que usa store de outra origem declara `dependsOn`.
+- Options-style `defineStore(id, { state, getters, actions })`; named `use<Name>Store`,
+  file `use-<name>-store.ts` in `app/composables/` (auto-imported).
+- Store `id` is a lowercase noun, unique across the app.
+- State is serializable and normalized (`Record<key, entity>`); sorted arrays and searches
+  are *getters*.
+- Types come from server: `RouterOutput["ns"]["proc"]`; never manually redeclare.
+- Data fetched from tRPC inside `fetch*` actions calling `set*`; wrap with `try/catch`
+  logging and returning `null`/`undefined` on error. For actions executing on the server
+  (middleware/SSR), extract `message`/`name` before logging, since raw `Error` in Workers serializes to `{}`.
+- Optimistic mutations update state upfront and **reconcile on error** (`markAsRead`).
+- Record keys and field names must be explicit: `useTeamsStore` indexes by **slug** and
+  `currentTeamId` stores the slug — do not mix with `team.id`.
+- Browser-only APIs (`localStorage`, `window`) **only** inside actions called from
+  `.client.ts` plugins or `onMounted`; never in the server execution path.
+- Never store the tRPC client, class instances, or functions in state.
+- Never keep user state in module-scope variables (leaks across SSR requests); Pinia
+  ensures per-request instances.
+- Route-dependent stores requiring sequencing (`fetchTeam` in global middleware)
+  reside where execution order is guaranteed: the Composition Root.
+- Layer plugins using stores from another layer must declare `dependsOn`.
 
-## Antipadrões
+## Antipatterns
 
-- Criar store para dado de uma tela só ou para espelhar um `useQuery`.
-- Tipar o estado com `any` (a `invite` atual é dívida; não repita).
-- Ler `localStorage` no `state()` ou em getter (quebra o SSR e a hidratação).
-- Mutar a store fora de actions em vários lugares, espalhando a regra.
-- Chamar `useTeamsStore()` no topo do módulo (fora de setup/action), quebrando o
-  contexto do Nuxt.
-- Duplicar em store o que já é `useSession()` ou cookie.
-- Chavear por `id` sabendo que o chamador usa `slug` (e vice-versa).
-- Engolir o erro sem log, ou logar o `Error` cru em código de Worker (ver
-  `$fireskill-specialist-openauth`, §9).
-- Assumir persistência de estado entre recargas: não existe plugin de persistência.
+- Creating stores for single-screen data or mirroring a `useQuery`.
+- Typing state with `any` (`invite` is legacy debt; do not repeat).
+- Reading `localStorage` in `state()` or getters (breaks SSR and causes hydration mismatches).
+- Mutating store state outside actions across multiple files.
+- Calling `useTeamsStore()` at top-level module scope (outside setup/actions).
+- Duplicating what belongs in `useSession()` or cookies.
+- Indexing by `id` when callers pass `slug` (and vice-versa).
+- Swallowing errors silently or logging raw `Error` objects in Workers.
+- Assuming state persists across reloads: no persistence plugin exists.
 
-## Validação
+## Validation
 
-- `bun run typecheck` em `apps/app`: getters e actions com tipos de
-  `RouterOutput`, sem `any` novo.
-- Carregar a página com SSR e sem JS: o estado renderizado no servidor coincide
-  com o do cliente (sem aviso de hidratação no console).
-- Navegar entre rotas e trocar de equipe: `currentTeamId`/`teams` acompanham;
-  equipe inexistente redireciona para `/select-team`.
-- Store com código de browser: recarregar a página no servidor não lança
-  `localStorage is not defined`.
-- Falha da API: a store volta a um estado consistente (ex.: `unread` recalculado).
-- `bun run test` (Vitest); não há suíte de store, então acrescente uma se a
-  lógica de getter/reconciliação for nova.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-nuxt` — SSR, middleware, plugins e `useState`.
-- `$fireskill-specialist-trpc` — origem dos dados e dos tipos.
-- `$fireskill-specialist-nuxfire-layers` — onde a store vive e a ordem de
-  middleware/plugins.
-- `$fireskill-specialist-nuxt-authorization` — permissões vêm da sessão, não da
-  store.
-- `$fireskill-specialist-typescript` — tipos derivados.
+- `bun run --cwd apps/app typecheck`: getters and actions typed via `RouterOutput`, no `any`.
+- Load page with SSR: server-rendered HTML matches client DOM (no console hydration warnings).
+- Route navigation and team switching: `currentTeamId`/`teams` update; invalid team redirects to `/select-team`.
+- Store with browser code: server-side reload does not throw `localStorage is not defined`.
+- API failure: store falls back to consistent state (e.g., recalculated `unread`).
+- `bun run test` (Vitest); add store unit test if new getter/reconciliation logic is added.

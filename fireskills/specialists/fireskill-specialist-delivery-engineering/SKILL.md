@@ -1,118 +1,50 @@
 ---
 name: fireskill-specialist-delivery-engineering
-description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrations, rollout, rollback e supply chain. Use para pipelines, workflows, ambientes, deploys ou estratégia de entrega; use também para escolher entre rolling, blue-green, canary ou feature flag; não publique, promova ou altere produção sem autorização explícita, e para a métrica que decide o rollout use `$fireskill-specialist-observability`."
+description: "Design and review CI/CD pipelines, build artifacts, release strategies, environment promotions, migrations, rollouts, rollbacks, and supply chain security. Use for pipelines, workflows, environments, deploys, or delivery strategies; use to choose between rolling, blue-green, canary, or feature flag rollouts; never deploy, promote, or alter production without explicit user authorization, and use `$fireskill-specialist-observability` for rollout decision metrics."
 ---
 
-# Engenharia de entrega
+# Delivery Engineering
 
-## Quando usar
+## When to Use
 
-- Acionar quando o projeto tem pipeline (`*.yml` de CI/CD), estratégia de
-  release, promoção entre ambientes ou plano de rollout/rollback.
-- Acionar também para escolher entre rolling, blue-green, canary ou feature
-  flag diante de uma mudança específica.
-- Não acionar para a definição dos recursos de infraestrutura e o deploy em si
-  (use `$fireskill-specialist-sst`) nem para decidir qual sinal prova
-  que o rollout está saudável (use `$fireskill-specialist-observability`) —
-  aqui o foco é o desenho do pipeline e da estratégia de promoção.
-- Combinar com `$fireskill-specialist-application-security` quando o pipeline
-  manipula credenciais de produção ou publica artefato assinado.
+- Trigger when the project has CI/CD pipelines (`*.yml`), release strategies, environment
+  promotions, or rollout/rollback plans.
+- Trigger to select between rolling, blue-green, canary, or feature flag releases for a given change.
+- Do not trigger to define infrastructure resources or execute deployments directly
+  (use `$fireskill-specialist-sst`), nor to decide which telemetry confirms rollout health
+  (use `$fireskill-specialist-observability`) — focus here is pipeline architecture and promotion strategy.
+- Combine with `$fireskill-specialist-application-security` when pipelines handle production
+  credentials or publish signed artifacts.
 
-## Fluxo
+## Workflow
 
-1. Em release ou deploy completo, executar o deploy pelo
-   `$fireskill-specialist-sst` (`bun run deploy -- --stage <stage>`) e usar o
-   `SEMVER` preparado pela `$fireskill-specialist-versioning` para changelog e
-   tag.
-1. Mapear commit, artefato, ambientes, aprovações necessárias e owner de cada
-   promoção antes de desenhar o pipeline.
-1. Tornar build e testes reproduzíveis a partir de lockfiles versionados —
-   nunca resolver dependência "mais recente" no momento do build.
-1. Produzir o artefato imutável uma única vez e promovê-lo, sem
-   recompilação, entre ambientes (o binário testado em staging é
-   bit-a-bit o mesmo publicado em produção).
-1. Separar credenciais, permissões e trust boundaries por job — o job que
-   builda não tem a credencial que publica em produção.
-1. Coordenar migrations de schema com compatibilidade entre a versão antiga e
-   a nova da aplicação durante toda a janela de rollout (expand/contract).
-1. Definir a estratégia de rollout, os sinais objetivos de sucesso, o
-   critério de pausa e o mecanismo de rollback antes do primeiro deploy real.
-1. Registrar proveniência (de onde veio o artefato), versão, evidência de
-   teste e resultado do rollout de forma auditável.
+1. In full releases or deployments, execute deployments via `$fireskill-specialist-sst`
+   (`bun run deploy -- --stage <stage>`) and use `SEMVER` prepared by `$fireskill-specialist-versioning` for changelog and tags.
+2. Map commits, artifacts, environments, required approvals, and promotion ownership before
+   designing pipelines.
+3. Make builds and test runs deterministic from versioned lockfiles — never resolve "latest"
+   dependencies during build executions.
+4. Produce immutable artifacts once and promote them without recompilation across environments
+   (the artifact validated in staging is bit-for-bit identical to production).
+5. Segregate credentials, permissions, and trust boundaries per pipeline job — build jobs
+   must not possess production publishing credentials.
+6. Coordinate schema migrations ensuring dual-version compatibility (old and new application
+   versions coexisting during rolling deploys via expand/contract).
+7. Define rollout strategy, objective success signals, halt criteria, and rollback mechanisms
+   prior to deployment.
+8. Record artifact provenance, version metadata, test evidence, and rollout outcomes in an
+   auditable manner.
 
-## Padrões
+## Core Rules
 
-- Usar menor privilégio, credenciais temporárias (OIDC/STS em vez de secret
-  estático de longa duração) e actions/dependências de pipeline fixadas por
-  hash ou versão exata, não por tag móvel (`@latest`, `@main`).
-- Não reconstruir o artefato para cada ambiente; construir uma vez, assinar
-  ou gerar digest, e promover a mesma referência imutável.
-- Impedir concorrência incompatível (dois deploys do mesmo serviço ao mesmo
-  tempo) e impedir deploy de um commit que não passou pelo pipeline de teste
-  completo.
-- Manter ambientes reproduzíveis por infraestrutura como código; configuração
-  de ambiente fica fora do artefato (env vars, secret manager), nunca
-  embutida no build.
-- Exigir smoke checks funcionais e observabilidade ativa antes de considerar
-  um rollout concluído — "o deploy terminou sem erro" não é o mesmo que "o
-  serviço está saudável".
-- Tratar rollback de código (reverter para o binário anterior) e rollback de
-  dados (reverter uma migration já aplicada) como problemas distintos com
-  planos distintos — nem toda migration é reversível sem perda de dado.
-- Preservar trilha auditável de quem promoveu o quê, quando e com qual
-  aprovação, sem jamais registrar segredo em log ou artefato de auditoria.
-
-## Antipadrões
-
-- Pipeline que builda o artefato de novo em cada ambiente (`build` no job de
-  staging e outro `build` no job de produção): o artefato testado em
-  staging não é garantidamente o mesmo que vai para produção — dependências
-  resolvidas "latest" ou cache diferente produzem bundles diferentes. (No
-  Nuxfire cada stage roda seu próprio `sst deploy`/build; sem lockfile e cache
-  limpo por stage, a mesma regra vale.)
-- Feature flag sem owner nem expiração: acumula flags mortas que ninguém
-  lembra o propósito, aumentando a superfície de combinações não testadas.
-- Migration de schema aplicada no mesmo deploy que remove a coluna antiga:
-  quebra a versão anterior da aplicação se o rollback de código precisar
-  rodar contra o schema já alterado — use expand (adicionar) num deploy e
-  contract (remover) só depois que nenhuma versão antiga depende da coluna.
-- Secret de produção acessível a um job que roda em pull request de fork
-  externo: o contexto de PR externo não deve ter acesso a nenhum secret de
-  ambiente protegido.
-
-## Validação
-
-- Lint/validação estática do pipeline, execução completa em branch segura e
-  um teste deliberado de falha (o pipeline realmente para e não promove
-  artefato quando um step crítico falha).
-- Verificação de digest do artefato, SBOM e assinatura/proveniência
-  (attestation) quando essas práticas forem adotadas pelo projeto.
-- Ensaio completo de rollout e de rollback em ambiente representativo antes
-  da primeira execução em produção — não confiar apenas na leitura da
-  configuração do provedor.
-- Confirmação de gates de aprovação, branch protection e permissões
-  configuradas no provedor (não apenas no arquivo de workflow, que pode ser
-  sobrescrito por quem tem permissão de push).
-- Não declarar um pipeline "seguro" ou um rollout "concluído" sem essas
-  evidências; ausência de erro no log não é prova de saúde do serviço.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-versioning` prepara `SEMVER` e mantém o número alinhado
-  entre artefato, changelog, tag e promoção.
-- `$fireskill-specialist-software-architecture` define boundaries e restrições
-  estruturais que o pipeline materializa entre ambientes.
-- `$fireskill-specialist-observability` para os sinais objetivos (erro,
-  latência, saturação) que decidem continuar, pausar ou reverter um rollout.
-- `$fireskill-specialist-application-security` para hardening de credenciais de
-  pipeline, supply chain e assinatura de artefato.
-- `$fireskill-specialist-performance-engineering` quando o rollout precisa de
-  um baseline de performance antes de liberar tráfego total.
-- `$fireskill-specialist-gitflow` quando o projeto declarar Gitflow como
-  estratégia de branch — aquela skill entrega a branch e a tag corretas
-  (merge de `release/*`/`hotfix/*` em `main`), esta decide como o pipeline
-  reage a elas.
-
-Leia [references/standards.md](references/standards.md) para etapas mínimas
-de pipeline, comparação de estratégias de release e supply chain, com fontes
-oficiais.
+- Apply least privilege, ephemeral credentials (OIDC/STS instead of static long-lived tokens),
+  and pin pipeline actions/dependencies by exact commit hash.
+- Build artifacts once, sign or generate content digests, and promote that immutable reference.
+- Prevent concurrent conflicting deployments (two simultaneous deploys to the same service)
+  and block deployment of commits failing test suites.
+- Maintain environments via infrastructure as code; environment configurations live outside
+  artifacts (env vars, secret managers), never baked into builds.
+- Require functional smoke checks and active telemetry before declaring rollouts complete —
+  "deployment exited code 0" is not equivalent to "service is healthy".
+- Treat code rollback (reverting binaries) and data rollback (reverting migrations) as
+  distinct challenges with separate execution windows.

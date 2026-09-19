@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Cria um item de backlog numerado sem promover uma spec. */
+/** Creates a numbered backlog item without promoting a spec. */
 
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
@@ -13,35 +13,35 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const key = argv[index];
     const value = argv[index + 1];
-    if (!key?.startsWith("--")) fail(`argumento inválido: ${key}`);
-    if (value === undefined || value.startsWith("--")) fail(`valor ausente para ${key}`);
+    if (!key?.startsWith("--")) fail(`invalid argument: ${key}`);
+    if (value === undefined || value.startsWith("--")) fail(`missing value for ${key}`);
     values[key.slice(2)] = value;
     index += 1;
   }
-  for (const field of ["title", "idea", "problem", "person", "result", "context"]) if (values[field] === undefined) fail(`--${field} é obrigatório`);
+  for (const field of ["title", "idea", "problem", "person", "result", "context"]) if (values[field] === undefined) fail(`--${field} is required`);
   return values;
 }
-function required(value, field) { const result = value?.trim(); if (!result) fail(`${field} não pode ficar vazio`); return result; }
-function normalizedTitle(value) { const result = required(value, "o título"); if (/\r|\n/u.test(result)) fail("o título deve ocupar uma única linha"); return result; }
+function required(value, field) { const result = value?.trim(); if (!result) fail(`${field} cannot be empty`); return result; }
+function normalizedTitle(value) { const result = required(value, "title"); if (/\r|\n/u.test(result)) fail("title must occupy a single line"); return result; }
 function slug(value, title) {
   const result = value === undefined ? title.normalize("NFKD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/[^a-z0-9]+/gu, "-").replace(/^-+|-+$/gu, "") : value.trim();
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(result)) fail("slug inválido; utilize caracteres ASCII em kebab-case");
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(result)) fail("invalid slug; use ASCII characters in kebab-case");
   return result;
 }
 async function template(root) {
   for (const path of [join(root, ".fireskills/templates/custom/Backlog.md"), join(root, ".fireskills/templates/Backlog.md"), sourceTemplate]) {
     try { return await readFile(path, "utf8"); } catch (error) { if (error?.code !== "ENOENT") throw error; }
   }
-  fail("modelo não encontrado; reinstale o framework");
+  fail("template not found; reinstall the framework");
 }
 function render(content, values) {
   let result = content;
   for (const [token, value] of Object.entries(values)) {
-    if (!result.includes(token)) fail(`token obrigatório ausente: ${token}`);
+    if (!result.includes(token)) fail(`missing required token: ${token}`);
     result = result.replaceAll(token, value);
   }
   const unresolved = [...new Set(result.match(/\{\{[A-Z0-9_]+\}\}/gu) ?? [])];
-  if (unresolved.length) fail(`tokens não preenchidos: ${unresolved.join(", ")}`);
+  if (unresolved.length) fail(`unresolved tokens: ${unresolved.join(", ")}`);
   return result;
 }
 async function nextNumber(directory) {
@@ -55,18 +55,18 @@ async function main() {
   const root = resolve(args.root ?? process.cwd());
   const title = normalizedTitle(args.title);
   const values = {
-    idea: required(args.idea, "a ideia original"),
-    problem: required(args.problem, "o problema percebido"),
-    person: required(args.person, "a pessoa afetada ou beneficiada"),
-    result: required(args.result, "o resultado ou valor esperado"),
-    context: required(args.context, "o contexto"),
+    idea: required(args.idea, "original idea"),
+    problem: required(args.problem, "perceived problem"),
+    person: required(args.person, "affected or benefited person"),
+    result: required(args.result, "expected result or value"),
+    context: required(args.context, "context"),
   };
   const backlog = join(root, "specs", "backlog");
   await mkdir(backlog, { recursive: true });
   const content = await template(root);
   for (;;) {
     const number = await nextNumber(backlog);
-    if (number > 9999) fail("a sequência de backlog atingiu 9999");
+    if (number > 9999) fail("backlog sequence reached 9999");
     const destination = join(backlog, `${String(number).padStart(4, "0")}-${slug(args.slug, title)}.md`);
     try {
       await writeFile(destination, render(content, {
@@ -84,4 +84,4 @@ async function main() {
     } catch (error) { if (error?.code !== "EEXIST") throw error; }
   }
 }
-main().catch((error) => { console.error(`erro: ${error instanceof Error ? error.message : String(error)}`); process.exitCode = 1; });
+main().catch((error) => { console.error(`error: ${error instanceof Error ? error.message : String(error)}`); process.exitCode = 1; });

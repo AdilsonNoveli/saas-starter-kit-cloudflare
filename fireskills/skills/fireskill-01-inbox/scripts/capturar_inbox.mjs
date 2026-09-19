@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-/** Registra uma captura sem interação em `specs/inbox/`. */
+/** Records a questionless capture in `specs/inbox/`. */
 
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const UNKNOWN = "Não identificado no texto original.";
+const UNKNOWN = "Not identified in the original text.";
 const sourceTemplate = resolve(dirname(fileURLToPath(import.meta.url)), "../../templates/Inbox.md");
 
 function fail(message) { throw new Error(message); }
@@ -20,33 +20,33 @@ function parseArgs(argv) {
     signals: UNKNOWN,
     risks: UNKNOWN,
     directions: UNKNOWN,
-    review: "Revisar as lacunas antes da promoção.",
-    session: "Captura avulsa.",
-    turn: "Não se aplica.",
-    sources: "Nenhuma fonte contextual consultada.",
+    review: "Review gaps before promotion.",
+    session: "Standalone capture.",
+    turn: "Not applicable.",
+    sources: "No contextual sources consulted.",
     data: UNKNOWN,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const key = argv[index];
-    if (!key.startsWith("--")) fail(`argumento inválido: ${key}`);
+    if (!key.startsWith("--")) fail(`invalid argument: ${key}`);
     const value = argv[index + 1];
-    if (value === undefined || value.startsWith("--")) fail(`valor ausente para ${key}`);
+    if (value === undefined || value.startsWith("--")) fail(`missing value for ${key}`);
     values[key.slice(2)] = value;
     index += 1;
   }
-  for (const key of ["input", "title"]) if (!values[key]) fail(`--${key} é obrigatório`);
+  for (const key of ["input", "title"]) if (!values[key]) fail(`--${key} is required`);
   return values;
 }
 
 function required(value, field) {
   const normalized = value?.trim();
-  if (!normalized) fail(`${field} não pode ficar vazio`);
+  if (!normalized) fail(`${field} cannot be empty`);
   return normalized;
 }
 
 function title(value) {
-  const normalized = required(value, "o título");
-  if (/\r|\n/u.test(normalized)) fail("o título deve ocupar uma única linha");
+  const normalized = required(value, "title");
+  if (/\r|\n/u.test(normalized)) fail("title must be a single line");
   return normalized;
 }
 
@@ -54,7 +54,7 @@ function slug(value, humanTitle) {
   const result = value === undefined
     ? humanTitle.normalize("NFKD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/[^a-z0-9]+/gu, "-").replace(/^-+|-+$/gu, "")
     : value.trim();
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(result)) fail("slug inválido; utilize caracteres ASCII em kebab-case");
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(result)) fail("invalid slug; use ASCII characters in kebab-case");
   return result;
 }
 
@@ -62,7 +62,7 @@ async function resolveTemplate(root) {
   for (const path of [join(root, ".fireskills/templates/custom/Inbox.md"), join(root, ".fireskills/templates/Inbox.md"), sourceTemplate]) {
     try { return await readFile(path, "utf8"); } catch (error) { if (error?.code !== "ENOENT") throw error; }
   }
-  fail("template não encontrado; restaure fireskills/skills/templates/Inbox.md");
+  fail("template not found; restore fireskills/skills/templates/Inbox.md");
 }
 
 function timestamp(now) {
@@ -73,18 +73,18 @@ function timestamp(now) {
 function render(template, values) {
   let result = template;
   for (const [token, value] of Object.entries(values)) {
-    if (!result.includes(token)) fail(`token obrigatório ausente: ${token}`);
+    if (!result.includes(token)) fail(`missing required token: ${token}`);
     result = result.replaceAll(token, value);
   }
   const unresolved = [...new Set(result.match(/\{\{[A-Z0-9_]+\}\}/gu) ?? [])];
-  if (unresolved.length) fail(`tokens não preenchidos: ${unresolved.join(", ")}`);
+  if (unresolved.length) fail(`unfilled tokens: ${unresolved.join(", ")}`);
   return result;
 }
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const root = resolve(args.root ?? process.cwd());
-  const originalInput = required(args.input, "o texto original");
+  const originalInput = required(args.input, "original input");
   const humanTitle = title(args.title);
   const destinationRoot = join(root, "specs", "inbox");
   await mkdir(destinationRoot, { recursive: true });
@@ -99,20 +99,20 @@ async function main() {
         "{{INBOX_NAME}}": humanTitle,
         "{{INBOX_SLUG}}": slugValue,
         "{{CAPTURED_AT}}": now.toISOString().replace(/\.\d{3}Z$/u, "Z"),
-        "{{DISCOVERY_SESSION}}": required(args.session, "a sessão de descoberta"),
-        "{{CONVERSATION_TURN}}": required(args.turn, "o turno da conversa"),
+        "{{DISCOVERY_SESSION}}": required(args.session, "discovery session"),
+        "{{CONVERSATION_TURN}}": required(args.turn, "conversation turn"),
         "{{ORIGINAL_INPUT_SHA256}}": createHash("sha256").update(originalInput).digest("hex"),
         "{{ORIGINAL_INPUT}}": originalInput,
-        "{{CONSULTED_SOURCES}}": required(args.sources, "as fontes contextuais consultadas"),
-        "{{SUMMARY}}": required(args.summary, "o resumo"),
-        "{{PROBLEM_OR_OPPORTUNITY}}": required(args.problem, "o problema ou oportunidade"),
-        "{{AFFECTED_PEOPLE}}": required(args.people, "as pessoas afetadas"),
-        "{{EXPECTED_VALUE}}": required(args.value, "o valor esperado"),
-        "{{EXTRACTED_SIGNALS}}": required(args.signals, "os sinais extraídos"),
-        "{{DATA_SIGNALS}}": required(args.data, "os sinais sobre informações a guardar"),
-        "{{RISKS_AND_DEPENDENCIES}}": required(args.risks, "os riscos e dependências"),
-        "{{FUTURE_DIRECTIONS}}": required(args.directions, "as direções futuras"),
-        "{{FUTURE_REVIEW}}": required(args.review, "os pontos a revisar"),
+        "{{CONSULTED_SOURCES}}": required(args.sources, "consulted contextual sources"),
+        "{{SUMMARY}}": required(args.summary, "summary"),
+        "{{PROBLEM_OR_OPPORTUNITY}}": required(args.problem, "problem or opportunity"),
+        "{{AFFECTED_PEOPLE}}": required(args.people, "affected people"),
+        "{{EXPECTED_VALUE}}": required(args.value, "expected value"),
+        "{{EXTRACTED_SIGNALS}}": required(args.signals, "extracted signals"),
+        "{{DATA_SIGNALS}}": required(args.data, "data persistence signals"),
+        "{{RISKS_AND_DEPENDENCIES}}": required(args.risks, "risks and dependencies"),
+        "{{FUTURE_DIRECTIONS}}": required(args.directions, "future directions"),
+        "{{FUTURE_REVIEW}}": required(args.review, "points to review"),
       }), { encoding: "utf8", flag: "wx" });
       console.log(resolve(candidate));
       return;
@@ -124,6 +124,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`erro: ${error instanceof Error ? error.message : String(error)}`);
+  console.error(`error: ${error instanceof Error ? error.message : String(error)}`);
   process.exitCode = 1;
 });

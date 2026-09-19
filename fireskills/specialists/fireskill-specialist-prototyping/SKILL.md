@@ -1,104 +1,95 @@
 ---
 name: fireskill-specialist-prototyping
-description: Construir protótipos descartáveis para responder uma pergunta técnica, de interação ou visual específica, com a fidelidade mínima suficiente e sem herdar dívida técnica para produção. Use para spikes, provas de conceito e exploração de alternativas antes de uma decisão cara; não promover código de protótipo a produção sem reimplementação e validação completa; não use quando a pergunta já tem resposta documentada, use `$fireskill-specialist-technical-research` para isso.
+description: "Build disposable prototypes to answer specific technical, interaction, or visual questions with minimum sufficient fidelity and without inheriting technical debt into production. Use for spikes, proofs of concept, and exploring alternatives before expensive decisions; never promote prototype code to production without full reimplementation and validation; do not use when the question already has documented answers, use `$fireskill-specialist-technical-research` for that."
 ---
 
-# Prototipação
+# Prototyping
 
-## Quando usar
+## When to Use
 
-- Acionar quando existe uma pergunta técnica, de interação ou visual
-  específica que só um artefato executável (não um documento) consegue
-  responder com confiança.
-- Acionar também para comparar duas ou mais alternativas concretas antes de
-  uma decisão cara de reverter.
-- Não acionar quando a pergunta já tem resposta documentada em fonte
-  primária — nesse caso `$fireskill-specialist-technical-research` resolve
-  mais rápido e sem o custo de construir algo.
-- Não promover o código do protótipo diretamente a produção — a fidelidade
-  reduzida do protótipo (sem cobertura, sem tratamento de erro, sem
-  segurança) é uma escolha deliberada válida apenas enquanto ele é
-  descartável.
+- Trigger when there is a specific technical, interaction, or visual question
+  that only an executable artifact (not a document) can answer with confidence.
+- Also trigger to compare two or more concrete alternatives before making an
+  expensive-to-reverse decision.
+- Do not trigger when the question already has documented answers in primary
+  sources — in that case, `$fireskill-specialist-technical-research` resolves it
+  faster and without the cost of building anything.
+- Never promote prototype code directly to production — the reduced fidelity of
+  the prototype (no test coverage, missing error handling, omitted security) is a
+  deliberate choice valid only while it remains disposable.
 
-## Fluxo
+## Workflow
 
-1. Formular uma única pergunta e o critério que decide a resposta antes de
-   escrever qualquer código — sem isso, o protótipo vira exploração sem
-   fim.
-2. Definir o que precisa ser real (o mecanismo sob teste) e o que pode ser
-   simulado ou mockado (tudo que não afeta a resposta à pergunta).
-3. Escolher a fidelidade mínima suficiente, um tempo limite explícito e um
-   local claramente descartável no repositório ou fora dele.
-4. Construir mais de uma alternativa quando a comparação direta entre elas
-   for mais informativa que testar uma só contra a expectativa.
-5. Executar o cenário planejado e coletar evidência observável — não
-   impressão subjetiva de "parece que funciona".
-6. Responder à pergunta original explicitamente (aceita, rejeitada ou ainda
-   inconclusiva) e registrar as limitações do que foi testado.
-7. Descartar o protótipo ou arquivá-lo explicitamente como não-produção,
-   sem deixar nenhuma dependência de runtime apontando para ele.
+1. Formulate a single question and the decision criteria before writing any
+   code — without this, prototyping turns into endless aimless exploration.
+2. Define what needs to be real (the mechanism under test) and what can be simulated
+   or mocked (everything that does not affect the answer to the question).
+3. Choose the minimum sufficient fidelity, an explicit timebox, and a clearly
+   disposable location inside or outside the repository.
+4. Build more than one alternative when direct side-by-side comparison provides
+   more insight than testing a single option against expectations.
+5. Execute the planned scenario and collect observable evidence — not subjective
+   impressions of "it feels like it works".
+6. Explicitly answer the original question (accepted, rejected, or inconclusive)
+   and document the limitations of what was tested.
+7. Discard the prototype or explicitly archive it as non-production, leaving zero
+   runtime dependencies pointing to it.
 
-## Padrões
+## Patterns
 
-- Não confundir uma demo convincente com uma arquitetura válida — um
-  protótipo que "funciona na demo" não provou nada sobre concorrência,
-  escala, erro ou segurança que não foi deliberadamente exercitado.
-- Manter dados reais, credenciais de produção e integrações reais fora do
-  protótipo, salvo quando a própria pergunta exige testar contra o sistema
-  real (e mesmo assim, com escopo e autorização explícitos).
-- Para protótipo de interface, usar conteúdo realista (não "lorem ipsum")
-  e estados extremos (texto muito longo, lista vazia, erro) — a pergunta
-  sobre UI raramente é sobre o caminho feliz.
-- Para protótipo de lógica/estado, expor as transições e invariantes numa
-  interface mínima (CLI, teste executável) que as torne observáveis, em vez
-  de escondê-las atrás de uma UI completa desnecessária à pergunta.
-- Não gastar tempo com abstração, cobertura de teste ou acabamento visual
-  fora do que a pergunta exige — isso é o oposto do propósito do
-  protótipo.
-- Marcar o código como descartável de forma que impeça import acidental por
-  código de produção (diretório isolado, nome inequívoco, sem export
-  público).
-- Converter todo aprendizado relevante em requisito, decisão registrada ou
-  teste no owner correto (spec, ADR, backlog) — o protótipo em si não é
-  fonte de verdade depois de descartado.
+- Do not mistake a convincing demo for a valid architecture — a prototype that
+  "works in a demo" has proven nothing about concurrency, scale, error scenarios,
+  or security that was not deliberately exercised.
+- Keep real customer data, production credentials, and live production integrations
+  out of the prototype, unless the question itself strictly requires testing against
+  the real system (and even then, with explicit authorization and bounded scope).
+- For interface prototypes, use realistic content (never "lorem ipsum") and extreme
+  states (very long strings, empty lists, error states) — UI questions rarely concern
+  the happy path alone.
+- For logic/state prototypes, expose transitions and invariants in a minimal interface
+  (CLI, executable test) that makes them observable, rather than hiding them behind
+  an unnecessary full UI.
+- Do not spend time on abstractions, test coverage, or visual polish beyond what the
+  question demands — this opposes the fundamental purpose of prototyping.
+- Mark code as disposable in ways that prevent accidental imports by production
+  code (isolated directory, unambiguous naming, no public exports).
+- Convert all relevant learnings into requirements, documented decisions, or tests
+  in the proper canonical location (spec, ADR, backlog) — the prototype itself is
+  not a source of truth once discarded.
 
-## Antipadrões
+## Anti-Patterns
 
-- Deixar o protótipo "temporário" rodando em produção porque "funcionou" —
-  sem a validação completa (segurança, erro, escala) que o protótipo
-  deliberadamente pulou, ele carrega risco invisível para produção.
-- Testar várias perguntas ao mesmo tempo no mesmo protótipo — quando o
-  resultado é ambíguo, não dá para saber qual variável causou o quê.
-- Investir em polimento visual ou arquitetura "só por garantia" quando a
-  pergunta era puramente sobre viabilidade técnica de um mecanismo.
-- Herdar a dívida do protótipo silenciosamente: reaproveitar o arquivo do
-  protótipo como base do código de produção sem reescrevê-lo com os
-  padrões normais de qualidade.
+- Leaving "temporary" prototype code running in production because "it worked" —
+  without the full validation (security, error handling, scale) deliberately omitted,
+  it carries invisible risk into production.
+- Testing multiple questions simultaneously in the same prototype — when the result
+  is ambiguous, it is impossible to isolate which variable caused what.
+- Investing in visual polish or architecture "just in case" when the question was
+  purely about the technical feasibility of a mechanism.
+- Silently inheriting prototype debt: reusing prototype files as the base for
+  production code without rewriting them to standard quality requirements.
 
-## Validação
+## Validation
 
-- O critério de decisão foi definido antes da execução, e o resultado é
-  reproduzível por outra pessoa que rode o mesmo cenário.
-- A pergunta original tem resposta explícita: hipótese aceita, rejeitada ou
-  ainda inconclusiva (e, nesse caso, o que falta para decidir).
-- As limitações do protótipo e as diferenças em relação ao que produção
-  exigiria estão registradas explicitamente.
-- Nenhum artefato do protótipo permanece conectado ao runtime final —
-  verificado, não apenas assumido.
-- Não declarar uma abordagem "viável para produção" só com base no
-  protótipo — isso exige a implementação e validação completas descritas
-  no padrão do projeto.
+- Decision criteria were defined prior to execution, and results are reproducible
+  by another person executing the same scenario.
+- The original question has an explicit answer: hypothesis accepted, rejected,
+  or inconclusive (and in that case, what is required to decide).
+- Prototype limitations and differences relative to production requirements are
+  explicitly documented.
+- No prototype artifact remains connected to the final runtime — verified, not
+  merely assumed.
+- Do not declare an approach "production-ready" based solely on a prototype — that
+  requires full implementation and validation according to project standards.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-technical-research` quando a pergunta puder ser
-  respondida por fonte primária sem precisar construir nada.
-- `$fireskill-specialist-domain-modeling` quando o protótipo revelar um
-  conceito de domínio ainda não modelado — o aprendizado vira modelo, não
-  fica preso ao código descartável.
-- `$fireskill-specialist-ux-design` ou `$fireskill-specialist-ui-design` quando
-  o protótipo for de interface e precisar de rigor de fluxo ou hierarquia
-  visual além da pergunta pontual.
+- `$fireskill-specialist-technical-research` when the question can be answered by
+  primary sources without building anything.
+- `$fireskill-specialist-domain-modeling` when the prototype reveals an unmodeled
+  domain concept — the learning becomes a model, not trapped in disposable code.
+- `$fireskill-specialist-ux-design` or `$fireskill-specialist-ui-design` when the
+  prototype involves interface flows or visual hierarchy beyond the immediate spike.
 
-Leia [references/standards.md](references/standards.md) para níveis de
-fidelidade por tipo de pergunta, formato de saída e fontes oficiais.
+Read [references/standards.md](references/standards.md) for fidelity levels
+by question type, output format, and official sources.

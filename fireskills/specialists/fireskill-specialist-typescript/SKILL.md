@@ -1,111 +1,48 @@
 ---
 name: fireskill-specialist-typescript
-description: Modelar e revisar TypeScript seguro com strictness, narrowing, generics, modules, declarations, validação runtime e APIs públicas. Use para tsconfig, tipos, erros de compilação, bibliotecas ou contratos TS/JS; use também para eliminar any/assertions injustificados numa área alterada; não use para lógica de framework (Nuxt, Vue) nem confunda tipo estático com validação de dado externo — tipo não substitui parse em runtime.
+description: Model and review robust TypeScript code with strictness, type narrowing, generics, modules, declarations, runtime schema validation, and public API contracts. Use for tsconfig, types, compilation errors, library declarations, or TS/JS contracts; use to eliminate unjustified any/assertions in modified files; do not use for framework-specific business logic (Nuxt, Vue) or confuse static types with runtime boundary validation — types do not replace runtime parsing.
 ---
 
 # TypeScript
 
-## Quando usar
+## When to Use
 
-- Acionar quando a tarefa envolve `tsconfig`, erro de compilação, modelagem
-  de tipo, generics, módulos ou declarations de biblioteca.
-- Acionar também para revisar uma API pública TS/JS antes de publicá-la, ou
-  para decidir como validar um dado que entra de fora (rede, arquivo, env).
-- Não acionar para a lógica de negócio ou de framework em si (Vue, composables,
-  rotas) — combine com a skill do framework e use esta para o contrato de
-  tipos que ele expõe.
-- Combinar com `$fireskill-specialist-web-api-design` quando o tipo modela um
-  contrato de API consumido por outro serviço.
+- Trigger when the task involves `tsconfig`, compilation errors, type modeling,
+  generics, module resolution, or library `.d.ts` declarations.
+- Trigger to review public TS/JS library APIs or to design validation for external data
+  (network, disk, environment variables).
+- Do not trigger for framework-specific business logic (Vue composables, page routing);
+  combine with the framework specialist and use this specialist for the exposed type contracts.
+- Combine with `$fireskill-specialist-web-api-design` when types model API schemas consumed by other services.
 
-## Fluxo
+## Workflow
 
-1. Ler `tsconfig` (strict flags ativas), `package.json#type`, bundler e
-   runtime alvo, e a versão do TypeScript instalada antes de recomendar uma
-   sintaxe ou opção específica.
-2. Identificar as fronteiras não confiáveis do código alterado (entrada de
-   rede, arquivo, variável de ambiente, resposta de terceiro) e os tipos que
-   formam a API pública do módulo.
-3. Modelar os estados válidos com unions discriminadas e narrowing,
-   eliminando por construção combinações de campos que nunca deveriam
-   coexistir.
-4. Deixar a inferência trabalhar internamente; anotar explicitamente apenas
-   onde o contrato precisa ficar estável (assinatura pública, retorno de
-   função exportada).
-5. Eliminar `any`, `as` e `!` injustificados na área alterada — cada um deve
-   ter uma razão documentada ou dar lugar a narrowing real.
-6. Validar todo dado externo em runtime com um schema antes de tratá-lo como
-   o tipo esperado; tipo estático não impede um payload malformado em
-   produção.
-7. Rodar typecheck sem emissão, testes, lint e build em todos os targets
-   reais (Node, browser, edge) antes de considerar a mudança pronta.
+1. Read `tsconfig` (active strict flags), `package.json#type`, bundler and target runtimes,
+   and the installed TypeScript version before proposing specific syntax or flags.
+2. Identify untrusted boundaries in altered code (network payloads, files, environment variables,
+   third-party responses) and types forming the module's public contract.
+3. Model valid domain states using discriminated unions and type narrowing, eliminating
+   impossible state combinations by design.
+4. Let type inference operate internally; explicitly annotate only where contracts must
+   remain stable (exported function signatures, public interfaces).
+5. Eliminate unjustified `any`, `as`, and non-null assertions (`!`) in the modified code — each
+   must carry a documented rationale or be replaced with proper narrowing.
+6. Validate all external boundary data with a runtime schema before casting or treating as
+   the expected type; static types do not prevent malformed payloads in production.
+7. Run typecheck without emission (`tsc --noEmit`), tests, linter, and builds across all
+   target environments (Node, browser, edge workers) before considering work complete.
 
-## Padrões
+## Core Rules
 
-- Ativar as opções strict compatíveis com o projeto (`strict`,
-  `strictNullChecks`, `noUncheckedIndexedAccess` quando viável) e corrigir os
-  erros revelados por elas, nunca silenciá-los com cast cosmético.
-- Preferir uma union discriminada (`{ status: "ok"; data: T } | { status: "error"; error: E }`)
-  a combinações de booleanos/campos opcionais que permitem estado inválido
-  (`{ loading: true; data: T; error: E }` simultâneos).
-- Usar `unknown` — não `any` — para dado ainda não validado numa fronteira, e
-  só tratá-lo como o tipo esperado depois de narrowing ou parse explícito.
-- Manter generics mínimos: um parâmetro de tipo só se justifica quando expressa
-  uma relação real entre dois ou mais valores (entrada e saída, chave e
-  valor); generic sem essa relação é complexidade sem benefício.
-- Preferir union de literais ou objeto `as const` a `enum` quando
-  interoperabilidade com JS puro ou serialização simples importa — `enum`
-  gera código em runtime e tem regras de comparação próprias.
-- Separar imports `import type` de imports de valor, e respeitar a
-  configuração ESM/CJS do projeto (`moduleResolution`, `type` no
-  `package.json`) em vez de assumir a interoperabilidade de outro projeto.
-- Testar o tipo público quando uma regressão de inferência seria
-  observável para quem consome a biblioteca (ex.: com `tsd` ou um teste de
-  compilação dedicado), não apenas o comportamento em runtime.
-
-## Antipadrões
-
-- `as SomeType` para silenciar um erro do compilador sem checar se o valor
-  realmente tem essa forma — é uma promessa não verificada que quebra em
-  runtime na primeira divergência.
-- `!` (non-null assertion) em uma cadeia de acesso a propriedade só para
-  "passar no build" — esconde exatamente o caso `null`/`undefined` que o
-  `strictNullChecks` foi ativado para pegar.
-- Tipar a resposta de uma API externa direto do retorno de `fetch` sem
-  validação — o tipo é uma afirmação do desenvolvedor, não uma garantia; um
-  contrato mudou no backend e o app só descobre com um crash em produção.
-- Generic decorativo (`function identity<T>(x: T): T`) usado como se desse
-  segurança adicional sem expressar nenhuma relação real entre parâmetros.
-- Duplicar um tipo já exportado por outro módulo com um nome ligeiramente
-  diferente ("tipo gêmeo") em vez de importar e reexportar — os dois
-  divergem silenciosamente na próxima mudança.
-
-## Validação
-
-- Rodar typecheck sem emissão (`tsc --noEmit` ou equivalente) e o build de
-  todos os targets configurados (Node, browser, edge) antes de considerar a
-  mudança pronta.
-- Escrever teste runtime para cada validação de dado externo e para
-  serialização/deserialização de tipos que atravessam uma fronteira (rede,
-  storage).
-- Quando o projeto publica uma biblioteca, checar as declarations geradas
-  (`.d.ts`) e testar compatibilidade com pelo menos um consumidor real ou
-  simulado.
-- Buscar na área alterada por `@ts-ignore`, `@ts-expect-error` sem comentário
-  explicativo, `as any`, cast duplo (`as unknown as T`) e tipos duplicados —
-  cada ocorrência é uma dívida a justificar ou remover.
-- Não declarar o código "type-safe" apenas porque compila; sem validação
-  runtime nas fronteiras e sem os testes acima, a garantia é só estática.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-nuxt-ui` e `$fireskill-specialist-trpc` usam tipos desta
-  skill (props e slots de componentes, `RouterOutput`, schemas `zod` de
-  formulário) fortemente tipados.
-- `$fireskill-specialist-web-api-design` quando o tipo espelha um contrato de
-  API consumido por outro serviço — a fonte de verdade do contrato vive lá.
-- `$fireskill-specialist-code-review` para revisão ampla além de tipos, quando
-  a mudança também afeta lógica de negócio ou arquitetura.
-
-Leia [references/standards.md](references/standards.md) para modelagem de
-estado com tipos, configuração strict, módulos, bibliotecas e validação
-runtime, com fontes oficiais.
+- Enable strict compiler flags supported by the project (`strict`, `strictNullChecks`,
+  `noUncheckedIndexedAccess` when viable) and fix detected type errors rather than silencing them with casts.
+- Prefer discriminated unions (`{ status: "ok"; data: T } | { status: "error"; error: E }`)
+  over combinations of optional booleans and fields that permit impossible states (`{ loading: true; data: T; error: E }` simultaneously).
+- Use `unknown` — never `any` — for unvalidated input at boundaries, and treat it as the
+  expected type only after explicit narrowing or runtime parsing.
+- Keep generics minimal: a type parameter is justified only when expressing a concrete
+  relationship between two or more values (input and output, key and value); generics without relationships add unnecessary complexity.
+- Prefer literal unions or `as const` objects over TypeScript `enum` when interoperability
+  with plain JS or clean serialization is important — enums emit runtime code and have quirky comparison semantics.
+- Separate `import type` from value imports, and adhere to project ESM/CJS module resolution
+  settings (`moduleResolution`, `type` in `package.json`).

@@ -1,73 +1,50 @@
-# Padrões e referências de entrega
+# Delivery Engineering Standards and References
 
-## Etapas mínimas de pipeline
+## Minimum Pipeline Stages
 
-1. **Validação**: lint, type-check e verificação de formatação — falha rápida
-   e barata.
-2. **Build**: a partir de lockfile, produzindo um artefato versionado.
-3. **Testes**: unitários e de integração contra o artefato ou código
-   construído, nunca contra "o que está na máquina do desenvolvedor".
-4. **Análise**: SAST, dependência vulnerável, SBOM.
-5. **Empacotamento**: gerar o artefato final imutável (imagem com digest,
-   pacote versionado) uma única vez.
-6. **Promoção**: mover a mesma referência imutável entre ambientes, sem
-   rebuild, com aprovação quando o ambiente exigir.
+1. **Validation**: Linting, type-checking, and formatting verification — fail fast and cheap.
+2. **Build**: Deterministic build from lockfiles producing a versioned artifact.
+3. **Tests**: Unit and integration tests run against built artifacts or code, never against "what is on local developer machines".
+4. **Analysis**: SAST, dependency vulnerability scanning, SBOM generation.
+5. **Packaging**: Generate final immutable artifact (digest-pinned container image, versioned tarball) once.
+6. **Promotion**: Move the exact same immutable artifact reference across environments without rebuilding, requiring manual approval where configured.
 
-- Cache acelera etapas (dependências, camadas de imagem) mas nunca substitui
-  lockfile nem verificação de integridade — cache desatualizado não pode
-  mudar o resultado do build, só sua velocidade.
-- Proteja contextos de execução vindos de PR de fork externo: não
-  disponibilize secrets de ambiente protegido a esse contexto, e trate
-  `pull_request_target` (ou equivalente) com o cuidado extra que ele exige,
-  já que roda com permissões do repositório base.
-- Use `concurrency`/lock por ambiente para impedir dois deploys simultâneos
-  do mesmo serviço, e `environments` com proteção (aprovação manual,
-  branch restrita) para produção.
+- Caches accelerate steps (dependencies, image layers) but never substitute for lockfile or integrity checks.
+- Protect fork PR execution contexts: never expose protected environment secrets to fork contexts, and treat `pull_request_target` with strict scrutiny.
+- Use concurrency locks per environment to prevent simultaneous deployments to the same target, and protect production environments with gated review requirements.
 
-## Comparação de estratégias de release
+## Release Strategy Comparison
 
-| Estratégia | Como funciona | Exige | Rollback |
+| Strategy | How It Operates | Prerequisites | Rollback Characteristics |
 |---|---|---|---|
-| Rolling | Substitui instâncias em lotes | Compatibilidade entre versão antiga e nova coexistindo | Reverter lote a lote; mais lento |
-| Blue/green | Ambiente novo completo (green) recebe tráfego só depois de validado; blue fica de standby | Dobro de capacidade temporária, roteamento que troca atomicamente | Instantâneo: volta o roteamento para blue |
-| Canary | Fração pequena do tráfego vai para a versão nova, aumenta gradualmente | Métricas por versão e critério automático de promoção/abort | Interrompe o aumento e drena o canary |
-| Feature flag | Código novo já está em produção, mas inativo até a flag ligar | Owner, expiração definida e comportamento seguro quando a flag está off | Desligar a flag, sem precisar reverter deploy |
+| Rolling | Replaces server instances in batches | Compatibility between coexisting old and new versions | Batch-by-batch reversion; slower |
+| Blue / Green | New complete environment (green) receives traffic after validation; blue stays standby | 2x temporary capacity, atomic routing switch | Instantaneous: switch routing back to blue |
+| Canary | Small traffic percentage directed to new version, increased progressively | Versioned telemetry metrics and automated abort thresholds | Halt traffic increase and drain canary |
+| Feature Flag | New code deployed to production, inactive until flag toggles on | Owner, defined expiration, safe fallback when flag is off | Immediate: disable flag without reverting build |
 
-Nenhuma estratégia substitui as outras — combine-as: deploy rolling do
-binário com a funcionalidade nova atrás de uma flag, depois canary da flag
-por segmento de usuário.
+No strategy makes others obsolete — combine them: deploy binaries via rolling updates
+with features behind toggles, then canary the flag rollout across user segments.
 
-## Migrations e compatibilidade
+## Migrations and Rollout Compatibility
 
-- **Expand**: adicionar coluna/tabela nova sem remover a antiga; a versão
-  antiga da aplicação continua funcionando.
-- **Migrate**: fazer a aplicação nova escrever/ler a partir do novo formato
-  enquanto ambas as versões coexistem no rollout.
-- **Contract**: remover a coluna/tabela antiga somente depois que nenhuma
-  versão em produção (incluindo qualquer possível rollback) depende dela.
-- Rollback de **código** (voltar ao binário anterior) e rollback de **dados**
-  (reverter uma migration) têm janelas de decisão diferentes — planeje o
-  contract sempre em um deploy separado, depois de confirmar que o rollback
-  de código não será mais necessário.
+- **Expand**: Add new column/table without dropping legacy structures; previous application version remains fully functional.
+- **Migrate**: Point new application code to write/read new formats while both versions coexist during rollouts.
+- **Contract**: Drop deprecated column/table only after 100% of production traffic runs on new versions and rollback windows have expired.
+- Binary rollbacks and database migration rollbacks have distinct decision windows — schedule contract migrations in separate, subsequent deployment phases.
 
-## Supply chain
+## Supply Chain Security
 
-- SBOM (Software Bill of Materials) documenta as dependências exatas do
-  artefato publicado; gere no momento do build, não retroativamente.
-- Proveniência/attestation (ex.: SLSA) liga o artefato final ao commit, ao
-  pipeline e às entradas que o produziram, permitindo verificar que o binário
-  em produção veio do processo esperado.
-- Fixe actions/dependências de pipeline por hash de commit (não por tag
-  móvel) e monitore com uma ferramenta de score de higiene de supply chain
-  (ex.: OpenSSF Scorecard) quando o projeto adotar.
+- Generate Software Bill of Materials (SBOM) during build execution, not retroactively.
+- Build provenance (SLSA) links the output artifact back to the commit, pipeline, and inputs.
+- Pin third-party CI actions by exact commit hash rather than mutable tags (`@main`, `@v1`).
 
-## Fontes primárias
+## Authoritative Documentation
 
 - GitHub Actions: https://docs.github.com/actions
-- OpenID Connect para credenciais temporárias: https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect
-- SLSA (proveniência de build): https://slsa.dev/spec/
+- OpenID Connect for Temporary Credentials: https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect
+- SLSA: https://slsa.dev/spec/
 - OpenSSF Scorecard: https://securityscorecards.dev/
-- OCI Distribution Spec (formato de artefato de imagem): https://github.com/opencontainers/distribution-spec
+- OCI Distribution Spec: https://github.com/opencontainers/distribution-spec
 - OWASP Top 10 CI/CD Security Risks: https://owasp.org/www-project-top-10-ci-cd-security-risks/
-- Trunk-Based Development (estratégia de branch compatível com CD contínuo): https://trunkbaseddevelopment.com/
-- Martin Fowler, Feature Toggles: https://martinfowler.com/articles/feature-toggles.html
+- Trunk-Based Development: https://trunkbaseddevelopment.com/
+- Feature Toggles (Martin Fowler): https://martinfowler.com/articles/feature-toggles.html

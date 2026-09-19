@@ -1,10 +1,9 @@
 /**
- * Projeção de milestones para projetos consumidores do Specsfy.
+ * Milestone projections for consuming projects of Fireskills.
  *
- * A fonte normativa continua distribuída: cada spec e cada item de backlog
- * declara seus vínculos, enquanto este módulo mantém os blocos derivados de
- * `specs.md` e de `specs/milestones/<ID>.md`. Conteúdo humano fora dos blocos
- * delimitados nunca é substituído.
+ * The canonical source remains distributed: each spec and backlog item declares
+ * its links, while this module maintains derived blocks in `specs.md` and
+ * `specs/milestones/<ID>.md`. Human content outside delimiters is never replaced.
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -19,7 +18,7 @@ const END = "<!-- specsfy:milestone-progress:end -->";
 const INDEX_START = "<!-- specsfy:specs-index:start -->";
 const INDEX_END = "<!-- specsfy:specs-index:end -->";
 
-/** Estado agregado exposto para CLI, agentes e automações locais. */
+/** Aggregated milestone state exposed for CLI, agents, and local automations. */
 export interface MilestoneProgress {
   id: string;
   path: string;
@@ -29,7 +28,7 @@ export interface MilestoneProgress {
   percent: number;
 }
 
-/** Resultado de uma sincronização local e determinística. */
+/** Result of local deterministic milestone synchronization. */
 export interface MilestoneSyncResult {
   index_path: string;
   milestones: MilestoneProgress[];
@@ -43,11 +42,7 @@ interface LinkedRecord {
 }
 
 /**
- * Reconstrói as projeções de milestones a partir do backlog e das specs.
- *
- * O comando pode criar o esqueleto de um marco citado por uma spec. A condição
- * de saída permanece pendente até ser confirmada pela entrevista de MVP ou de
- * roadmap, portanto a sincronização não inventa requisito de produto.
+ * Reconstructs milestone projections from backlog and specs.
  */
 export async function syncMilestones(project: string): Promise<MilestoneSyncResult> {
   const root = resolvePath(project);
@@ -130,18 +125,18 @@ async function writeMilestone(
   const current = (await pathExists(path)) ? await readFile(path, "utf8") : milestoneSkeleton(progress.id);
   const body = [
     START,
-    "## Progresso derivado",
+    "## Derived Progress",
     "",
-    `- ${progress.completed_specs} de ${progress.total_specs} specs concluídas (${progress.percent}%).`,
-    `- ${progress.backlog_items} itens de backlog relacionados.`,
+    `- ${progress.completed_specs} of ${progress.total_specs} specs completed (${progress.percent}%).`,
+    `- ${progress.backlog_items} related backlog items.`,
     "",
-    "### Specs vinculadas",
+    "### Linked Specs",
     "",
-    ...(specs.length ? specs.map((spec) => `- ${spec.slug} — ${spec.title} (${spec.status})`) : ["- Nenhuma spec vinculada."]),
+    ...(specs.length ? specs.map((spec) => `- ${spec.slug} — ${spec.title} (${spec.status})`) : ["- No linked specs."]),
     "",
-    "### Backlog relacionado",
+    "### Related Backlog",
     "",
-    ...(backlog.length ? backlog.map((item) => `- ${item.slug} — ${item.title}`) : ["- Nenhum item de backlog relacionado."]),
+    ...(backlog.length ? backlog.map((item) => `- ${item.slug} — ${item.title}`) : ["- No related backlog items."]),
     END,
     "",
   ].join("\n");
@@ -153,23 +148,23 @@ async function writeSpecsIndex(
   specs: LinkedRecord[],
   milestones: MilestoneProgress[],
 ): Promise<void> {
-  const current = (await pathExists(path)) ? await readFile(path, "utf8") : "# Índice de specs\n\n";
+  const current = (await pathExists(path)) ? await readFile(path, "utf8") : "# Specifications Index\n\n";
   const rows = specs.map((spec, index) =>
     `| ${String(index + 1).padStart(2, "0")} | ${spec.slug} | ${spec.status} | ${spec.milestones.join(", ") || "—"} |`,
   );
   const body = [
     INDEX_START,
-    "## Sequência e estado",
+    "## Sequence and Status",
     "",
-    "| Ordem | Spec | Estado | Milestones |",
+    "| Order | Spec | Status | Milestones |",
     "| --- | --- | --- | --- |",
-    ...(rows.length ? rows : ["| — | Nenhuma spec | — | — |"]),
+    ...(rows.length ? rows : ["| — | No specs | — | — |"]),
     "",
-    "## Marcos",
+    "## Milestones",
     "",
     ...(milestones.length
-      ? milestones.map((milestone) => `- ${milestone.id}: ${milestone.completed_specs}/${milestone.total_specs} specs concluídas (${milestone.percent}%).`)
-      : ["- Nenhuma milestone vinculada ainda."]),
+      ? milestones.map((milestone) => `- ${milestone.id}: ${milestone.completed_specs}/${milestone.total_specs} specs completed (${milestone.percent}%).`)
+      : ["- No milestones linked yet."]),
     INDEX_END,
     "",
   ].join("\n");
@@ -177,7 +172,7 @@ async function writeSpecsIndex(
 }
 
 function milestoneSkeleton(id: string): string {
-  return `# ${id}\n\n## Objetivo\n\nA confirmar na entrevista.\n\n## Condição de saída\n\nA confirmar na entrevista.\n\n## Fora de escopo\n\nA confirmar na entrevista.\n\n`;
+  return `# ${id}\n\n## Objective\n\nTo be confirmed during interview.\n\n## Exit Condition\n\nTo be confirmed during interview.\n\n## Out of Scope\n\nTo be confirmed during interview.\n\n`;
 }
 
 function replaceBlock(current: string, start: string, end: string, next: string): string {
@@ -189,5 +184,5 @@ function replaceBlock(current: string, start: string, end: string, next: string)
 }
 
 function compareMilestone(left: string, right: string): number {
-  return left.localeCompare(right, "pt-BR", { numeric: true });
+  return left.localeCompare(right, "en", { numeric: true });
 }

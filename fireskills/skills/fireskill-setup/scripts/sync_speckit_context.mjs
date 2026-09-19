@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Projeta o contexto do GitHub Spec Kit para o Specsfy sem alterar as fontes.
+ * Projects GitHub Spec Kit context to Specsfy without modifying source files.
  *
- * A constituição ativa a integração. Cada arquivo regular sob `specs/` é lido
- * como bytes para que contratos e anexos não textuais também sejam registrados.
+ * Constitution presence activates integration. Each regular file under `specs/` is read
+ * as raw bytes to ensure non-textual contracts and attachments are indexed properly.
  */
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
@@ -16,8 +16,8 @@ const CONSTITUTION = ".specify/memory/constitution.md";
 const TARGET = ".fireskills/SPECKIT.md";
 
 /**
- * Atualiza somente o bloco gerenciado da ponte e devolve o caminho alterado.
- * A ausência da constituição indica que o projeto não usa o GitHub Spec Kit.
+ * Updates exclusively the managed block of the bridge and returns the modified path.
+ * The absence of the constitution indicates that the project does not use GitHub Spec Kit.
  */
 export async function syncSpecKitContext(projectPath) {
   const project = resolve(projectPath);
@@ -40,7 +40,7 @@ export async function syncSpecKitContext(projectPath) {
   return target;
 }
 
-/** Percorre `specs/` em ordem estável e lê todo arquivo regular encontrado. */
+/** Recursively traverses `specs/` in stable order, reading every regular file. */
 async function inspectDirectory(project, directory) {
   const files = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -54,7 +54,7 @@ async function inspectDirectory(project, directory) {
   return files.sort((left, right) => left.path.localeCompare(right.path));
 }
 
-/** Lê bytes, fingerprint e título sem pressupor que o artefato seja Markdown. */
+/** Reads bytes, SHA-256 fingerprint, and title without assuming Markdown format. */
 async function inspectFile(project, path) {
   const content = await readFile(path);
   const binary = content.includes(0);
@@ -63,28 +63,28 @@ async function inspectFile(project, path) {
   return {
     path: relative(project, path).split(sep).join("/"),
     type: classify(path, binary),
-    title: heading || (binary ? "arquivo binário" : basename(path)),
+    title: heading || (binary ? "binary file" : basename(path)),
     sha256: createHash("sha256").update(content).digest("hex"),
   };
 }
 
-/** Nomeia os artefatos conhecidos do Spec Kit e mantém fallback genérico. */
+/** Classifies known Spec Kit artifacts with a generic fallback. */
 function classify(path, binary) {
-  if (binary) return "Binário";
+  if (binary) return "Binary";
   const name = basename(path).toLowerCase();
   const normalizedPath = path.split(sep).join("/");
-  if (normalizedPath.endsWith(CONSTITUTION)) return "Constituição";
+  if (normalizedPath.endsWith(CONSTITUTION)) return "Constitution";
   if (name === "spec.md") return "Spec";
-  if (name === "plan.md") return "Plano";
-  if (name === "tasks.md") return "Tarefas";
-  if (name === "research.md") return "Pesquisa";
-  if (name === "data-model.md") return "Dados";
-  if (name === "quickstart.md") return "Guia";
-  if (path.split(sep).includes("contracts")) return "Contrato";
-  return "Artefato";
+  if (name === "plan.md") return "Plan";
+  if (name === "tasks.md") return "Tasks";
+  if (name === "research.md") return "Research";
+  if (name === "data-model.md") return "Data";
+  if (name === "quickstart.md") return "Guide";
+  if (path.split(sep).includes("contracts")) return "Contract";
+  return "Artifact";
 }
 
-/** Monta a projeção derivada que orienta agentes de volta às fontes originais. */
+/** Builds derived projection guiding agents back to original sources. */
 function renderProjection(constitution, artifacts) {
   const rows = [constitution, ...artifacts]
     .map(
@@ -93,37 +93,33 @@ function renderProjection(constitution, artifacts) {
     )
     .join("\n");
   return `${START}
-## Fontes detectadas
+## Detected Sources
 
-| Caminho | Tipo | Título | SHA-256 |
+| Path | Type | Title | SHA-256 |
 | --- | --- | --- | --- |
 ${rows}
 
-## Regras de convivência
+## Coexistence Rules
 
-- Leia a constituição e os arquivos originais listados antes de planejar ou
-  alterar uma feature correspondente.
-- Trate a constituição como governança do projeto. Registre incompatibilidades
-  com as regras do Specsfy antes de continuar e peça orientação à pessoa.
-- Preserve caminhos, conteúdo e organização de \`.specify/\` e \`specs/\`. A
-  skill \`fireskill-setup\` atualiza somente esta projeção derivada.
-- Use os artefatos existentes do Spec Kit como fonte da feature correspondente.
-  Não os converta silenciosamente para o formato nativo do Specsfy.
+- Read constitution and listed original files before planning or modifying a corresponding feature.
+- Treat constitution as project governance. Document incompatibilities with Specsfy rules before proceeding and request user direction.
+- Preserve file paths, contents, and layout of \`.specify/\` and \`specs/\`. The \`fireskill-setup\` skill updates solely this derived projection.
+- Use existing Spec Kit artifacts as sources for the corresponding feature. Do not silently convert them to native Specsfy format.
 ${END}`;
 }
 
-/** Substitui somente o bloco conhecido e preserva qualquer nota externa. */
+/** Updates exclusively the delimited managed block, preserving all external notes. */
 function upsertManagedBlock(existing, block, path) {
   const starts = existing.split(START).length - 1;
   const ends = existing.split(END).length - 1;
   if (starts !== ends || starts > 1) {
-    throw new Error(`bloco de compatibilidade malformado em ${path}`);
+    throw new Error(`malformed compatibility block in ${path}`);
   }
   if (!starts) {
     const header = existing
       ? existing
-      : "# Compatibilidade com GitHub Spec Kit\n\n" +
-        "Projeção gerada a partir das fontes preservadas no projeto.\n";
+      : "# Compatibility with GitHub Spec Kit\n\n" +
+        "Projection generated from sources preserved in the project.\n";
     const separator = header.endsWith("\n\n")
       ? ""
       : header.endsWith("\n")

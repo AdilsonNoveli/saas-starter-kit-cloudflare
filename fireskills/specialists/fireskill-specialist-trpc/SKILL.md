@@ -1,95 +1,69 @@
 ---
 name: fireskill-specialist-trpc
-description: Criar e revisar routers, procedures e o cliente tRPC v10 (trpc-nuxt) do Nuxfire — publicProcedure, protectedProcedure, abilityProcedure e platformAdminProcedure, contexto com bindings Cloudflare, composição de routers por layer (`routers` + `satisfies`) e consumo por `useTrpcClient()`. Use ao tocar `apps/app/server/trpc/`, `layers/*/server/trpc/` ou qualquer chamada `useTrpcClient()`; não cobre schema de banco (drizzle) nem definição de permissões (nuxt-authorization).
+description: Author and review Nuxfire tRPC v10 (trpc-nuxt) routers, procedures, and client usage — publicProcedure, protectedProcedure, abilityProcedure, and platformAdminProcedure, context with Cloudflare bindings, layer router composition (`routers` + `satisfies`), and client consumption via `useTrpcClient()`. Use when touching `apps/app/server/trpc/`, `layers/*/server/trpc/`, or any `useTrpcClient()` call; does not cover database schemas (drizzle) or permission definitions (nuxt-authorization).
 ---
 
 # tRPC (v10 via trpc-nuxt)
 
-## Quando usar
+## When to Use
 
-- Acionar ao criar/alterar router ou procedure, ao escolher a base de procedure,
-  ao mexer no contexto (`createContext`) ou ao consumir a API no front.
-- Acionar ao adicionar uma layer com backend (mapa `routers`).
-- Não acionar para tabelas e queries: `$fireskill-specialist-drizzle`; para
-  definir `defineAbility`/permissões: `$fireskill-specialist-nuxt-authorization`;
-  para criar a layer em si: `$fireskill-specialist-nuxfire-layers`.
-- Combinar com `$fireskill-specialist-web-api-design` (contrato, erros),
-  `$fireskill-specialist-application-security` (auth, tenant, MFA) e
-  `$fireskill-specialist-typescript`.
+- Activate when creating/modifying routers or procedures, selecting procedure bases, altering context (`createContext`), or consuming endpoints on the frontend.
+- Activate when adding a new domain layer containing backend routers (`routers` map).
+- Do not activate for database tables and SQL queries: use `$fireskill-specialist-drizzle`; for defining `defineAbility`/permissions: use `$fireskill-specialist-nuxt-authorization`; for creating layers: use `$fireskill-specialist-nuxfire-layers`.
+- Combine with `$fireskill-specialist-web-api-design` (contract, errors), `$fireskill-specialist-application-security` (auth, multi-tenancy, MFA), and `$fireskill-specialist-typescript`.
 
-## Fluxo
+## Workflow
 
-1. Ler [references/nuxfire-trpc.md](references/nuxfire-trpc.md).
-2. Achar um router equivalente (`layers/kanban/server/trpc/router.ts` para
-   feature enxuta; `layers/teams/server/trpc/teams.ts` para equipe/RBAC;
-   `layers/admin/server/trpc/*` para plataforma) e seguir o padrão.
-3. Escolher a base de procedure pela tabela da seção 3 da referência.
-4. Para router novo, seguir [references/new-router-recipe.md](references/new-router-recipe.md).
-5. Validar com o checklist da receita e a seção abaixo.
+1. Read [references/nuxfire-trpc.md](references/nuxfire-trpc.md).
+2. Locate an equivalent router (`layers/kanban/server/trpc/router.ts` for lean features; `layers/teams/server/trpc/teams.ts` for team/RBAC; `layers/admin/server/trpc/*` for platform admin) and follow conventions.
+3. Select procedure base using reference table in section 3.
+4. For new routers, follow [references/new-router-recipe.md](references/new-router-recipe.md).
+5. Validate against recipe checklist and the validation section below.
 
-## Regras principais
+## Key Rules
 
-- Versão é **tRPC v10** + `trpc-nuxt` 0.10; não use API da v11.
-- Escolha a menor base que serve: `public` < `protected` < `ability`;
-  `platformAdmin` é um eixo paralelo, nunca derivado de `abilityProcedure`.
-- Toda procedure que age numa equipe: resolver a equipe pelo banco, provar
-  associação do usuário e **depois** `authorize(ability, ...)`. Habilidade não
-  prova existência nem pertencimento.
-- Toda id recebida do cliente é cruzada com a equipe do usuário antes de leitura
-  ou escrita; operação entre entidades verifica que pertencem ao mesmo pai
-  (ex.: mover cartão só dentro do mesmo quadro).
-- Entrada validada com `zod` em `.input()`, mensagens de erro no schema.
-- Erros são `TRPCError` com `code`; unicidade do Postgres é `23505`.
-- Cada layer exporta `export const routers = { chave: router } satisfies
-  Record<string, AnyRouter>` — mapa, nome fixo, `satisfies` e nunca anotação.
-- `routers/.composition/layer-routers.ts` é gerado: não editar.
-- Layers importam `~~/server/trpc/trpc` e `~~/server/utils/db` explicitamente.
-- Tudo de plataforma fica sob `admin.*`; o caminho revela o gate.
-- `platformAdminProcedure` falha com `FORBIDDEN` uniforme; não diferenciar o
-  motivo. Mutação de admin já gera auditoria; resolver que conhece o alvo real
-  chama `recordAuditLog()` com ele.
-- Bindings opcionais (`jobsQueue`, `Websockets`) podem não existir: trate.
-- Sem `transformer`: retorno é JSON puro (Date vira string).
-- Verificação de suspensão de equipe vive só em `teams.get`.
+- Framework version is **tRPC v10** + `trpc-nuxt` 0.10; do not use v11 APIs.
+- Select the least privileged procedure base that fits: `public` < `protected` < `ability`; `platformAdmin` is an independent security axis, never derived from `abilityProcedure`.
+- For procedures acting on a team: resolve team from database, verify user membership, and **then** call `authorize(ability, ...)`. Abilities do not prove record existence or tenant membership.
+- Verify all client-supplied entity IDs belong to user's team prior to reading or mutating; cross-entity operations verify common parentage (e.g. moving a card within the same board).
+- Validate input using Zod in `.input()` with user-friendly error messages in the schema.
+- Errors must throw `TRPCError` with appropriate `code`; Postgres unique violation code is `23505`.
+- Each layer exports `export const routers = { key: router } satisfies Record<string, AnyRouter>` — named map, fixed identifier, `satisfies` operator, never explicit type annotation.
+- `routers/.composition/layer-routers.ts` is auto-generated: never edit manually.
+- Layers explicitly import `~~/server/trpc/trpc` and `~~/server/utils/db`.
+- Platform admin procedures live strictly under `admin.*`.
+- `platformAdminProcedure` fails with uniform `FORBIDDEN` code without leaking authorization failure reasons. Admin mutations log audits; procedures knowing target entity invoke `recordAuditLog()`.
+- Optional Cloudflare bindings (`jobsQueue`, `Websockets`) may be disabled: handle absence gracefully.
+- No `superjson` transformer: serialization is standard JSON (Date instances serialize as strings).
+- Team suspension enforcement lives strictly in `teams.get`.
 
-## Antipadrões
+## Anti-patterns
 
-- `throw new Error(...)` em procedure — o cliente recebe erro genérico.
-- Montar `abilityProcedure` sobre `platformAdminProcedure` ou o contrário.
-- Confiar só em `authorize` sem checar que a equipe/quadro existe e pertence ao
-  usuário.
-- Editar `.composition/layer-routers.ts` à mão.
-- Anotar `routers` como `Record<string, AnyRouter>` (o cliente perde os tipos).
-- Exportar um router único (`kanbanRouter`) em vez do mapa `routers`.
-- Importar de `~~/server/...` dentro do front (`app/`); o front só importa
-  **tipos** (`AppRouter`, `RouterOutput`).
-- Fazer `ctx.jobsQueue.send()` sem considerar a flag `jobsQueue` desligada.
-- Copiar a checagem de equipe suspensa para outras procedures.
-- Devolver a linha inteira do banco quando o cliente precisa de poucos campos
-  (vazamento de colunas; ver `columns:` em `teams.list`).
-- Assumir superjson, v11 ou testes de router existentes.
+- Throwing raw `new Error(...)` in procedures — clients receive generic internal errors.
+- Stacking `abilityProcedure` on top of `platformAdminProcedure` or vice-versa.
+- Relying solely on `authorize` without checking entity existence and team ownership.
+- Manually editing `.composition/layer-routers.ts`.
+- Annotating `routers` as `Record<string, AnyRouter>` (strips type inference on the client).
+- Exporting a single router instance (`kanbanRouter`) instead of the required `routers` map.
+- Importing from `~~/server/...` inside frontend code (`app/`); frontend only imports **types** (`AppRouter`, `RouterOutput`).
+- Calling `ctx.jobsQueue.send()` without verifying the `jobsQueue` flag is enabled.
+- Duplicating team suspension checks across procedures.
+- Returning full database rows when clients only need selected columns (column leakage; use Drizzle `columns:` selection).
 
-## Validação
+## Validation
 
-- `bun run typecheck` em `apps/app`: a inferência de `AppRouter` precisa
-  continuar completa (`trpc.<ns>.<proc>` com input e output tipados).
-- Testes: `bun run test` (Vitest) na raiz; habilidades novas têm teste em
-  `shared/utils/abilities.test.ts` da layer.
-- Chamar a procedure autenticado, sem sessão, com usuário de outra equipe e (se
-  aplicável) com MFA pendente; os quatro casos devem responder
-  `OK`/`UNAUTHORIZED`/`FORBIDDEN`/`FORBIDDEN(MFA_REQUIRED)`.
-- Para `admin.*`: sem sessão elevada deve dar `FORBIDDEN`; a mutação deve deixar
-  linha em `AuditLog` (`apps/app/server/utils/audit-log.ts`).
-- Depois de ativar/desativar uma layer em `config.ts`, confirmar que
-  `layer-routers.ts` foi regenerado e que o front não chama namespace removido.
+- `bun run typecheck` in `apps/app`: full `AppRouter` inference must remain intact (`trpc.<ns>.<proc>` with typed input and output).
+- Tests: `bun run test` (Vitest) at repository root; new abilities require tests in `shared/utils/abilities.test.ts`.
+- Test procedure responses under 4 states: authenticated member, unauthenticated, member of another team, and pending MFA; expected responses: `OK`/`UNAUTHORIZED`/`FORBIDDEN`/`FORBIDDEN(MFA_REQUIRED)`.
+- For `admin.*`: verify non-elevated sessions receive `FORBIDDEN`, and mutations generate records in `AuditLog`.
+- When toggling layers in `config.ts`, confirm `layer-routers.ts` regenerates cleanly.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-nuxt-authorization` — abilities e `authorize`.
-- `$fireskill-specialist-drizzle` — queries e schema sob `useDB()`.
-- `$fireskill-specialist-nuxfire-layers` — estrutura e registro de layers.
-- `$fireskill-specialist-nuxt` — composables e SSR (`useQuery`).
-- `$fireskill-specialist-cloudflare-workers` — bindings e regras de I/O.
-- `$fireskill-specialist-openauth` — origem de `ctx.session`.
-- `$fireskill-specialist-web-api-design` e
-  `$fireskill-specialist-application-security`.
+- `$fireskill-specialist-nuxt-authorization` — abilities and `authorize`.
+- `$fireskill-specialist-drizzle` — database queries and schema with `useDB()`.
+- `$fireskill-specialist-nuxfire-layers` — structure and registration of domain layers.
+- `$fireskill-specialist-nuxt` — composables and SSR query hooks (`useQuery`).
+- `$fireskill-specialist-cloudflare-workers` — Cloudflare bindings and I/O rules.
+- `$fireskill-specialist-openauth` — source of `ctx.session`.
+- `$fireskill-specialist-web-api-design` and `$fireskill-specialist-application-security`.

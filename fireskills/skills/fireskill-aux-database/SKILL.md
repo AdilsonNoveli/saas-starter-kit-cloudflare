@@ -1,41 +1,39 @@
 ---
 name: fireskill-aux-database
-description: Monitorar e manter a documentação completa da persistência em .fireskills/DATABASE.md, com inventário tabular de bancos, schemas, tabelas, campos, relações e migrations. Use quando o monitor de contexto apontar persistência pendente, sempre que banco, tabela, coleção, model persistente, coluna, índice, relação, schema ou migration for criado ou alterado, e ao auditar se o mapa de dados corresponde ao código. Preserva notas e decisões humanas fora do inventário detectado.
+description: Monitor and maintain complete persistence documentation in .fireskills/DATABASE.md, with tabular inventory of databases, schemas, tables, fields, relations, and migrations. Use when context monitor points to pending persistence, whenever a database, table, collection, persistent model, column, index, relation, schema, or migration is created or modified, and when auditing whether the data map matches code. Preserves human notes and decisions outside the detected inventory.
 ---
 
-# Manter o mapa de dados
+# Maintaining the Data Map
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `sem perguntas`.
-Não formule perguntas nesta skill. Quando faltar informação confirmada,
-sinalize o campo pendente para a etapa conversacional responsável.
+Interaction mode: `no questions`.
+Do not formulate questions in this skill. When confirmed information is missing,
+flag the pending field for the responsible conversational step.
 
-1. Ler instruções locais, `.fireskills/PROJECT.md`, `STACK.md` e todo o `DATABASE.md`.
-2. Inspecionar schemas, migrations, models persistentes e configurações sem
-   revelar valores de ambiente ou credenciais.
-3. Executar `node scripts/update_database.mjs --project <raiz>`.
-4. Conferir o inventário detectado contra as fontes executáveis.
-5. Completar relações, índices, constraints, ownership, retenção e finalidade
-   que não possam ser inferidos com segurança; marcar desconhecidos em vez de
-   inventar.
-6. Preservar todo conteúdo fora do bloco `specsfy:database`.
-7. Considerar a mudança de dados incompleta até `DATABASE.md` refletir a nova
-   estrutura e os testes relevantes estarem verdes.
-8. Executar `$fireskill-setup` em modo de monitoramento antes de devolver o
-   handoff e exigir que `.fireskills/DATABASE.md` deixe de aparecer como pendência.
+1. Read local instructions, `.fireskills/PROJECT.md`, `STACK.md`, and all of `DATABASE.md`.
+2. Inspect schemas, migrations, persistent models, and configurations without
+   revealing environment secrets or credentials.
+3. Run `node scripts/update_database.mjs --project <root>`.
+4. Verify the detected inventory against executable sources.
+5. Complete relations, indices, constraints, ownership, retention, and purpose
+   that cannot be reliably inferred; mark unknown rather than inventing.
+6. Preserve all content outside the `specsfy:database` block.
+7. Consider data changes incomplete until `DATABASE.md` reflects the new structure
+   and relevant tests are green.
+8. Run `$fireskill-setup` in monitoring mode before returning handoff and ensure
+   `.fireskills/DATABASE.md` no longer appears as a pending blocker.
 
-Quando `$fireskill-data-discovery` registrar respostas confirmadas, preserve a
-seção `Informações a guardar confirmadas` e compare-a com o que o código
-revela. A conversa descreve o produto; este mapa continua mostrando também o
-que já foi implementado.
+When `$fireskill-data-discovery` records confirmed responses, preserve the
+`Confirmed information to store` section and compare it with what code reveals.
+The conversation describes the product; this map continues showing what has
+already been implemented.
 
-Usar tabelas Markdown para permitir busca e comparação. Nunca copiar dados de
-produção, strings de conexão, senhas, tokens ou valores de `.env`.
+Use Markdown tables to facilitate search and comparison. Never copy production
+data, connection strings, passwords, tokens, or values from `.env`.

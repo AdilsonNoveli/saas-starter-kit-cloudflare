@@ -1,21 +1,21 @@
-# Mapa de descoberta
+# Discovery Map
 
-Use apenas as áreas que podem alterar o produto ou sua verificação.
+Use only the areas that can materially affect the product or its verification.
 
-| Área | Pergunta de alto valor |
+| Area | High-Value Question |
 | --- | --- |
-| Problema | Que dor observável deve deixar de existir? |
-| Ator | Quem inicia a ação e quem recebe o resultado? |
-| Valor | Qual resultado torna a primeira entrega útil sozinha? |
-| Escopo | O que parece relacionado, mas não pertence a esta entrega? |
-| Jornada | Qual é o menor fluxo completo do início ao resultado? |
-| Interface | Quais telas, menus, destinos, formulário, ações e disposição permitem concluir a jornada, e a ação abre em página, painel lateral, modal ou outro formato? |
-| Falhas | O que o usuário vê quando entrada, dependência ou permissão falha? |
-| Dados | O que possui identidade, estado, ciclo de vida ou retenção? |
-| Segurança | Quem pode ver ou alterar cada dado e qual abuso importa? |
-| Qualidade | Qual limite mensurável de tempo, volume, disponibilidade ou acesso importa? |
-| Integração | Qual sistema externo participa e como sua indisponibilidade deve aparecer? |
-| Técnica | Que restrição já existe no repositório e não é uma preferência nova? |
-| Aceite | Que cenário demonstrável prova cada comportamento essencial? |
+| Problem | What observable pain point must cease to exist? |
+| Actor | Who triggers the action and who receives the outcome? |
+| Value | What result makes the first delivery useful on its own? |
+| Scope | What seems related, but does NOT belong to this delivery? |
+| Journey | What is the smallest complete flow from trigger to result? |
+| Interface | Which screens, menus, targets, form fields, actions, and layouts fulfill the journey, and do actions open on a full page, slideover, modal, or other pattern? |
+| Failures | What does the user see when inputs, dependencies, or permissions fail? |
+| Data | What has identity, lifecycle, state, or retention requirements? |
+| Security | Who can view or modify each data entity and what abuse vector matters? |
+| Quality | What measurable limit of latency, throughput, availability, or access matters? |
+| Integration | Which external service participates and how should its downtime be handled? |
+| Technical | What constraint already exists in the repository that is not a new preference? |
+| Acceptance | What demonstrable scenario proves each essential behavior? |
 
-Priorize por `impacto × incerteza`. Não pergunte sobre detalhes que uma inspeção do repositório resolve.
+Prioritize by `impact × uncertainty`. Do not ask questions that direct codebase inspection easily resolves.

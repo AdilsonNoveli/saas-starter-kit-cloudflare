@@ -1,82 +1,63 @@
-# Padrões e referências de diagnóstico
+# Debugging Standards and References
 
-## Técnicas de isolamento, da mais barata à mais cara
+## Isolation Techniques from Least to Most Expensive
 
-- **Bisseção** (`git bisect`, ou busca binária manual no espaço de
-  configuração/dados): localiza a mudança mínima que introduziu a falha em
-  `O(log n)` passos sobre `n` commits/estados candidatos, em vez de revisar
-  linearmente.
-- **Differential debugging**: comparar sistematicamente ambiente que falha
-  contra ambiente que funciona, fixando todas as variáveis exceto uma por
-  rodada (versão, config, dados, ordem, carga).
-- **Delta debugging**: reduzir o caso que reproduz a falha removendo partes
-  e testando se a falha persiste, até chegar ao menor caso que ainda falha.
-- **Tracing distribuído**: seguir um `trace id` através de boundaries de
-  serviço para localizar onde a causalidade diverge do esperado — essencial
-  quando o sintoma aparece em um serviço mas a causa está em outro.
-- **Profiling**: medir onde o tempo/memória/CPU realmente é gasto antes de
-  qualquer mudança — otimizar sem profiling ataca o gargalo imaginado, não o
-  real, na maioria dos casos.
-- **Fault injection**: introduzir falha controlada (latência, erro,
-  partição) para confirmar hipótese de dependência — só em ambiente onde o
-  blast radius é conhecido e autorizado, nunca em produção sem esse aval.
+- **Bisection** (`git bisect`, or binary search across configuration/data states):
+  locates the minimum change introducing a failure in `O(log n)` steps across `n` candidate commits.
+- **Differential Debugging**: systematically compare failing vs passing environments,
+  holding all variables constant except one per round (versions, configs, data, sequence, load).
+- **Delta Debugging**: reduce the failing reproduction case by removing components and
+  testing whether failure persists, until reaching the minimal failing input.
+- **Distributed Tracing**: follow a `trace id` across service boundaries to identify where
+  causality diverges from expectations.
+- **Profiling**: measure where runtime, memory allocations, or CPU cycles are actually consumed
+  prior to proposing optimizations.
+- **Fault Injection**: introduce controlled failures (latency, errors, network partitions)
+  to confirm dependency assumptions in authorized non-production environments.
 
-## Causas comuns de flakiness, por categoria
+## Common Categories of Flakiness
 
-- **Concorrência**: race condition entre duas operações que assumem ordem
-  não garantida; ausência de lock ou de sincronização em recurso
-  compartilhado.
-- **Tempo**: timeout justo demais para o ambiente de CI, relógio do sistema
-  ou fuso horário não controlado no teste, `sleep` fixo em vez de esperar
-  por condição.
-- **Estado compartilhado**: teste que depende de ordem de execução, dado
-  deixado por outro teste, cache ou singleton não resetado entre execuções.
-- **Dependência externa**: rede, serviço de terceiro ou banco compartilhado
-  sem isolamento, sensível a carga concorrente de outros processos no CI.
-- **Não-determinismo intencional mal controlado**: `random`, UUID ou
-  timestamp sem seed fixa no teste.
+- **Concurrency**: race conditions between operations assuming uncoordinated ordering;
+  missing locks or synchronization on shared state.
+- **Timing**: overly tight CI timeouts, unmocked system clocks or timezones, hardcoded `sleep`
+  instead of polling conditions.
+- **Shared State**: tests dependent on execution order, residual state from prior tests,
+  unreset global caches or singletons.
+- **External Dependencies**: unisolated networks, third-party APIs, or shared test databases
+  experiencing concurrent contention.
+- **Uncontrolled Non-Determinism**: unseeded pseudorandom generators, UUID generation, or
+  timestamps in tests.
 
-Trate cada teste flaky como um desses até ter evidência do mecanismo — nunca
-como "instabilidade do CI" sem investigar, porque isso mascara bugs de
-concorrência que também existem em produção.
+## Symptom vs Cause: Where to Look
 
-## Sintoma vs. causa: onde procurar
+- The point where an exception throws or an error logs is rarely the origin — it is where
+  the side effect of an earlier corrupted state manifests. Trace backward: what code produced the invalid state?
+- For state corruption bugs, ask "who wrote to this last?" before asking "who read it last?".
+- In post-deploy regressions, compare the exact release diff, not merely the time window.
 
-- O ponto onde a exceção é lançada ou o erro é logado raramente é a origem —
-  é onde o efeito de um estado inválido anterior se torna visível. Percorra
-  para trás: quem produziu o dado/estado que chegou inválido até aqui?
-- Em bugs de estado, pergunte "quem escreveu por último" antes de "quem leu
-  por último" — o valor errado geralmente já estava errado antes da leitura
-  que falhou.
-- Em regressão após deploy, comparar o diff exato do release, não apenas a
-  janela de tempo — "começou depois do deploy" não localiza a linha, só
-  reduz o universo de candidatos.
+## Tooling by Environment
 
-## Ferramentas por ambiente
+- Node.js / Browser: `--inspect` + Chrome DevTools, `node --prof` for CPU profiling, `console.trace()`.
+- Python: `pdb` / `breakpoint()`, `cProfile` for CPU, `tracemalloc` for memory, `faulthandler` for deadlocks.
+- Databases: `EXPLAIN (ANALYZE, BUFFERS)` in Postgres for slow queries; `pg_stat_activity` for locks.
+- Distributed Systems: OpenTelemetry distributed traces, log correlation via `trace_id`.
 
-- Node.js/browser: `--inspect` + Chrome DevTools, `node --prof` para CPU
-  profiling, `console.trace()` para stack em ponto de interesse.
-- Python: `pdb`/`breakpoint()`, `cProfile` para CPU, `tracemalloc` para
-  memória, `faulthandler` para travas.
-- Bancos: `EXPLAIN (ANALYZE, BUFFERS)` no Postgres para causa de query lenta;
-  `pg_stat_activity` para lock e query em execução.
-- Distribuído: trace com OpenTelemetry, correlação por `trace id` em todos
-  os logs estruturados dos serviços envolvidos.
+## Diagnostic Report Structure
 
-## Registro do diagnóstico
+Upon completing diagnosis, record:
+- Observed symptom and environment
+- Minimal reproduction steps / script
+- Evaluated and discarded hypotheses with evidence
+- Root cause described at mechanism level
+- Supporting evidence (logs, traces, diffs)
+- Regression test case
 
-Ao concluir, registre: sintoma observado, reprodução (comando/passos),
-hipóteses descartadas e por quê, causa no nível do mecanismo, evidência que a
-comprova, correção aplicada (se autorizada) e o teste de regressão. Isso vale
-tanto para transferir o achado a quem vai corrigir quanto para acelerar o
-próximo diagnóstico parecido.
-
-## Fontes oficiais
+## Authoritative Documentation
 
 - git-bisect: https://git-scm.com/docs/git-bisect
-- Chrome DevTools (debugging JS): https://developer.chrome.com/docs/devtools/
+- Chrome DevTools (Debugging JS): https://developer.chrome.com/docs/devtools/
 - Python `pdb`: https://docs.python.org/3/library/pdb.html
 - Python `cProfile`/`profile`: https://docs.python.org/3/library/profile.html
-- PostgreSQL monitoring e `pg_stat_activity`: https://www.postgresql.org/docs/current/monitoring.html
+- PostgreSQL Monitoring & `pg_stat_activity`: https://www.postgresql.org/docs/current/monitoring.html
 - PostgreSQL `EXPLAIN`: https://www.postgresql.org/docs/current/using-explain.html
-- OpenTelemetry traces: https://opentelemetry.io/docs/concepts/signals/traces/
+- OpenTelemetry Traces: https://opentelemetry.io/docs/concepts/signals/traces/

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Entrevistador"
-  short_description: "Conversa a spec por estado"
-  default_prompt: "Use $fireskill-interviewer para conversar sobre a spec no estado atual e registrar apenas respostas confirmadas."
+  display_name: "Fireskill - Interviewer"
+  short_description: "Interviews a spec based on its state"
+  default_prompt: "Use $fireskill-interviewer to interview about the spec in its current state and record only confirmed responses."

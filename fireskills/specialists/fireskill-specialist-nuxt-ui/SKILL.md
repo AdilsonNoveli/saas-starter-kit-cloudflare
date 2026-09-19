@@ -1,149 +1,92 @@
 ---
 name: fireskill-specialist-nuxt-ui
-description: Construir e revisar interface Vue com @nuxt/ui v4 (Reka UI + Tailwind + Tailwind Variants) no Nuxfire — componentes U*, formulários UForm, tabelas UTable com enterpriseTableUi, layouts de dashboard, ícones Lucide e tema via packages/tokens e app.config.ts. Use antes de escrever ou alterar qualquer `.vue` que use componente U*; não cobre escolha de paleta/marca (design-system), fluxo de UX nem Tailwind puro fora do Nuxt UI.
+description: Build and review Vue interfaces with @nuxt/ui v4 (Reka UI + Tailwind CSS + Tailwind Variants) in Nuxfire — U* components, UForm validation, UTable with enterpriseTableUi, dashboard layouts, Lucide icons, and theming via packages/tokens and app.config.ts. Use before authoring or modifying any `.vue` file consuming U* components; does not cover brand palette decisions (design-system), UX user flows, or pure Tailwind outside Nuxt UI.
 ---
 
 # Nuxt UI (@nuxt/ui v4)
 
-## Quando usar
+## When to Use
 
-- Acionar antes de criar ou alterar `.vue` que use `UButton`, `UModal`, `UForm`,
-  `UTable`, `UDashboard*`, `UNavigationMenu` ou qualquer outro `U*`.
-- Acionar para customizar tema: cores semânticas, radius, variantes, slots,
-  `app.config.ts` ou `packages/tokens`.
-- Acionar para decidir o componente certo (Modal vs Slideover, Select vs
-  SelectMenu, Toast vs Alert) e para montar formulário, tabela, overlay ou
-  navegação.
-- Não acionar para decidir identidade visual e escala de tokens — usar
-  `$fireskill-specialist-design-system`; nem para composição/fluxo de tela —
-  `$fireskill-specialist-ui-design` e `$fireskill-specialist-ux-design`; nem
-  para classes Tailwind fora de componentes — `$fireskill-specialist-tailwind-css`.
-- Combinar com `$fireskill-specialist-nuxt` (páginas, layouts, composables),
-  `$fireskill-specialist-trpc` (mutações que o formulário chama) e
-  `$fireskill-specialist-web-accessibility`.
+- Activate before creating or editing `.vue` files that use `UButton`, `UModal`, `UForm`, `UTable`, `UDashboard*`, `UNavigationMenu`, or other `U*` primitives.
+- Activate to customize themes: semantic tokens, border radius, component variants, slots, `app.config.ts`, or `packages/tokens`.
+- Activate when selecting appropriate components (Modal vs Slideover, Select vs SelectMenu, Toast vs Alert) and assembling forms, tables, overlays, or navigation bars.
+- Do not activate for macro brand identity or design system tokens — use `$fireskill-specialist-design-system`; nor for screen composition or UX flows — use `$fireskill-specialist-ui-design` and `$fireskill-specialist-ux-design`; nor for raw Tailwind utilities outside components — use `$fireskill-specialist-tailwind-css`.
+- Combine with `$fireskill-specialist-nuxt` (pages, layouts, composables), `$fireskill-specialist-trpc` (form mutation endpoints), and `$fireskill-specialist-web-accessibility`.
 
-## Fluxo
+## Workflow
 
-1. Ler [references/nuxfire-real.md](references/nuxfire-real.md): ela diz onde o
-   tema mora, quais padrões já existem e o que **não** está em uso no projeto.
-2. Procurar no código uma tela ou componente equivalente (`layers/*/app/`,
-   `apps/app/app/`) e seguir o padrão existente antes de inventar um.
-3. Carregar só as referências da tarefa (tabela abaixo) **antes** de escrever
-   código.
-4. Escolher o componente pela matriz de `component-selection`; conferir
-   props/slots/eventos no tema gerado (`apps/app/.nuxt/ui/<componente>.ts`) ou
-   na documentação oficial em `https://ui.nuxt.com`.
-5. Implementar com cores semânticas, ícones `i-lucide-*` e textos via i18n
-   quando a tela for localizada.
-6. Se precisar mudar o visual de um componente **em todo o produto**, alterar
-   `packages/tokens` (não a página) e validar no DOM renderizado.
-7. Rodar a validação abaixo antes de declarar concluído.
+1. Read [references/nuxfire-real.md](references/nuxfire-real.md): it clarifies where theming lives, which patterns exist, and what is **not** in use.
+2. Search codebase for existing screen or component patterns (`layers/*/app/`, `apps/app/app/`) and follow conventions before inventing new ones.
+3. Load task-specific references from the routing table below before writing code.
+4. Select components using the `component-selection` matrix; inspect props/slots/events in generated theme files (`apps/app/.nuxt/ui/<component>.ts`) or official docs at `https://ui.nuxt.com`.
+5. Implement using semantic color tokens, `i-lucide-*` icons, and i18n keys for localized screens.
+6. When changing component visuals product-wide, modify `packages/tokens` (not individual pages) and verify rendered DOM output.
+7. Run the validation checks below before declaring work complete.
 
-## Roteamento de referências
+## Reference Routing
 
-| Tarefa | Carregar |
+| Task | Load |
 |---|---|
-| Qualquer tela nova | `nuxfire-real`, `guidelines/conventions`, `guidelines/component-selection` |
-| Dashboard / área administrativa | `nuxfire-real`, `layouts/dashboard`, `recipes/navigation` |
-| Formulário ou página de configurações | `guidelines/forms`, `guidelines/conventions` |
-| Login, cadastro, recuperar senha | `recipes/auth`, `guidelines/forms` |
-| Listagem com filtro/paginação/seleção | `recipes/data-tables`, `component-selection`, `nuxfire-real` (§3) |
+| Any new screen | `nuxfire-real`, `guidelines/conventions`, `guidelines/component-selection` |
+| Dashboard / admin area | `nuxfire-real`, `layouts/dashboard`, `recipes/navigation` |
+| Form or settings page | `guidelines/forms`, `guidelines/conventions` |
+| Login, registration, password recovery | `recipes/auth`, `guidelines/forms` |
+| Table with filtering/pagination/selection | `recipes/data-tables`, `component-selection`, `nuxfire-real` (§3) |
 | Modal, slideover, drawer, command palette | `recipes/overlays`, `component-selection` |
-| Tema, cores, variantes, prop `ui` | `guidelines/design-system`, `nuxfire-real` (§2) |
-| Landing, preços, changelog | `layouts/landing`, `guidelines/design-system` |
-| Achar o nome de um componente | `references/components.md` |
+| Theming, color tokens, variants, `ui` prop | `guidelines/design-system`, `nuxfire-real` (§2) |
+| Marketing, pricing, changelog | `layouts/landing`, `guidelines/design-system` |
+| Component discovery by name | `references/components.md` |
 
-Arquivos em `references/`: `nuxfire-real.md`, `components.md`,
+Files in `references/`: `nuxfire-real.md`, `components.md`,
 `guidelines/{design-system,component-selection,conventions,forms}.md`,
 `layouts/{dashboard,landing,docs,chat,editor}.md`,
 `recipes/{data-tables,auth,overlays,navigation}.md`.
 
-`layouts/chat.md`, `layouts/editor.md` e `layouts/docs.md` descrevem recursos do
-Nuxt UI que dependem de pacotes que o Nuxfire **não** tem hoje (Vercel AI SDK,
-TipTap, conteúdo em Markdown). Não os aplique sem decisão explícita de adicionar
-a dependência.
+## Key Rules
 
-## Regras principais
+- `<UApp>` wraps the application exactly once (already in `app.vue`); toasts, tooltips, and overlay providers depend on it. Never nest another `UApp`.
+- Use **semantic color tokens exclusively**: `text-default`, `text-muted`, `text-dimmed`, `bg-elevated`, `bg-muted`, `border-default`, `border-muted`, `text-primary`. Never hardcode raw palette scales (`text-gray-500`, `bg-red-600`).
+- Style cascade precedence (highest wins): instance `ui`/`class` prop -> `app.config.ts` (`sharedUiConfig`) -> default component theme.
+- Global theme lives in `packages/tokens` (`sharedUiConfig` in `index.ts`, CSS custom properties in `theme.css`). Never duplicate tokens in app `main.css`.
+- When overriding a component globally, target the active **variant**, not `slots`: variant classes apply later and override slot definitions.
+- Tables: `<UTable :data :columns :ui="enterpriseTableUi" />` imported from `@nuxfire/tokens`; customize via object spread rather than copying classes.
+- Forms: `UForm` with `:schema` (Zod) and reactive `:state`, `UFormField` with `name` matching schema key, and `useNotification()` for feedback (`useToast()` direct is legacy); mutations call `useTrpcClient()`.
+- Modals: `v-model:open`; content in `#content` using `UCard` when header/footer are required. Destructive actions trigger `useNotification().confirm(...)`, never bespoke per-page modals.
+- Icons use format `i-{collection}-{name}`; default collection is `lucide` (`i-lucide-users`). Custom SVGs use `nuxt-svgo` (prefix `icon`, folder `~/assets/icons`).
+- Menu/tab/select options belong in an `items` array rather than manual slots per entry.
+- Reusable components listed in `references/components.md` must not be rewritten manually.
 
-- `<UApp>` envolve a aplicação uma única vez (já está em `app.vue`); toast,
-  tooltip e overlay dependem dele. Não aninhar outro `UApp`.
-- Usar **somente cores semânticas**: `text-default`, `text-muted`,
-  `text-dimmed`, `bg-elevated`, `bg-muted`, `border-default`, `border-muted`,
-  `text-primary`. Nunca paleta bruta (`text-gray-500`, `bg-red-600`).
-- Ordem de prioridade de estilo (maior vence): prop `ui`/`class` da instância →
-  `app.config.ts` (`sharedUiConfig`) → tema padrão do componente.
-- Tema global vive em `packages/tokens` (`sharedUiConfig` em `index.ts`,
-  variáveis em `theme.css`). Não duplicar token no `main.css` de um app.
-- Ao sobrescrever componente globalmente, mexer na **variante** ativa, não em
-  `slots`: a classe de variante é aplicada depois e descarta a de slot.
-- Tabela: `<UTable :data :columns :ui="enterpriseTableUi" />`, importando de
-  `@nuxfire/tokens`; variação por espalhamento do objeto, sem copiar classes.
-- Formulário: `UForm` com `:schema` (zod) e `:state` reativo, `UFormField` com
-  `name` igual ao campo do schema, `useNotification()` para retorno (regra do
-  projeto em `.fireskills/RULES.md`; `useToast()` direto é legado); a mutação vai por
-  `useTrpcClient()`.
-- Modal: `v-model:open`; conteúdo em `#content` com `UCard` quando precisar de
-  header/footer. Confirmação destrutiva: `useNotification().confirm(...)`, nunca
-  um `UModal` novo por página.
-- Ícones no formato `i-{coleção}-{nome}`; coleção padrão `lucide`
-  (`i-lucide-users`). SVG próprio entra por `nuxt-svgo` (prefixo `icon`,
-  pasta `~/assets/icons`).
-- Estado dos itens de menu/tabs/selects vai em array `items` — não em slot
-  manual por item.
-- Um componente que já existe em `references/components.md` não é reescrito à
-  mão (botão, card, badge, dropdown…).
+## Anti-patterns
 
-## Antipadrões
+- Hardcoded palette colors or hex codes in `.vue` files — breaks light/dark mode and centralized rebranding (`packages/tokens/theme.css`).
+- Copying `enterpriseTableUi` classes into local pages instead of importing the configured object.
+- Applying global overrides to `slots.root` when the active variant redefines the same property: classes vanish silently.
+- Redeclaring `--ui-*`, `--color-*`, or typography rules in an app `main.css` that already imports `@nuxfire/tokens/theme.css`.
+- Inverting the stylesheet import order: `tailwindcss` -> `@nuxt/ui` -> `theme.css`.
+- Omitting `@source "./index.ts"` in `theme.css` when defining token classes only in `packages/tokens/index.ts`.
+- Building bespoke navigation links beside `UNavigationMenu`: diverges from design tokens.
+- Creating repetitive confirmation modals across pages instead of using the unified `ConfirmDialog`.
+- Assuming uninstalled features exist (chat/editor packages, MCP tools).
+- Coding component APIs from memory without inspecting props/slots in generated theme types or official docs.
+- Introducing redundant third-party UI libraries for capabilities Nuxt UI already covers.
 
-- Cor de paleta bruta ou hex em `.vue` — quebra tema claro/escuro e rebranding
-  centralizado (`packages/tokens/theme.css`).
-- Copiar as classes de `enterpriseTableUi` para dentro da página em vez de
-  importar o objeto.
-- Colocar override global de aparência em `slots.root` quando a variante ativa
-  redefine a mesma propriedade: a classe some sem erro.
-- Redeclarar `--ui-*`, `--color-*` ou fonte no `main.css` de um app que já
-  importa `@nuxfire/tokens/theme.css`.
-- Inverter a ordem `tailwindcss` → `@nuxt/ui` → `theme.css` no CSS de entrada.
-- Esquecer `@source "./index.ts"` em `theme.css` ao adicionar classes só em
-  `packages/tokens/index.ts` — a classe chega ao DOM sem regra de CSS.
-- Botão ou link de navegação feito à mão ao lado de `UNavigationMenu`: diverge
-  dos tokens `navigationMenu` (já aconteceu na sidebar).
-- Montar `UModal` de confirmação em cada página em vez de usar o
-  `ConfirmDialog` único.
-- Assumir `useOverlay()`, `locale` no `UApp`, MCP do Nuxt UI, chat ou editor
-  como parte do projeto: nenhum está em uso (ver `nuxfire-real.md` §6).
-- Implementar de memória a API de um componente sem checar props/slots no tema
-  gerado ou na documentação da versão instalada (4.11.0).
-- Adicionar biblioteca de UI paralela ao Nuxt UI para algo que ele já cobre.
+## Validation
 
-## Validação
+- `bun run typecheck` in `apps/app` (`nuxt typecheck`) passes without slot/prop errors in modified `.vue` files.
+- Zero raw palette color classes in modified files:
+  `grep -nE "\b(text|bg|border|ring)-(gray|zinc|slate|stone|neutral|red|green|blue)-[0-9]{2,3}\b" <files>` returns empty.
+- Run the app (`bun run app` in root) and test screens in light/dark themes across mobile and desktop viewport widths; inspect DOM elements to verify overridden utility classes apply.
+- Test keyboard navigation: visible focus rings, tab order, `Esc` dismisses overlays, accessible labels on all `UFormField` elements.
+- Forms: verify invalid state, valid submission, and server error handling (toast/field error).
+- Tables: verify empty state, loading skeleton, error state, and clickable rows where applicable.
+- Never declare UI accessible or responsive without verified DOM evidence.
 
-- `bun run typecheck` em `apps/app` (`nuxt typecheck`) sem erro de props/slots
-  nos `.vue` alterados.
-- Sem paleta bruta nos arquivos alterados:
-  `grep -nE "\b(text|bg|border|ring)-(gray|zinc|slate|stone|neutral|red|green|blue)-[0-9]{2,3}\b" <arquivos>`
-  deve retornar vazio.
-- Subir o app (`bun run app` na raiz, que usa `sst shell`) e abrir a tela nos temas claro e
-  escuro, em largura de celular e de desktop; conferir no DOM que a classe do
-  override chegou (não confiar só no código).
-- Percorrer a tela por teclado: foco visível, ordem de tab, `Esc` em overlays,
-  rótulo em todo campo (`UFormField`).
-- Formulário: caso inválido, válido e erro do servidor (toast/erro de campo).
-- Tabela: estado vazio, carregando, erro e linha clicável quando aplicável.
-- Não declarar "acessível" ou "responsivo" apenas porque o componente é do Nuxt
-  UI; a evidência acima é obrigatória.
+## Related Skills
 
-## Skills relacionadas
-
-- `$fireskill-specialist-nuxt` para páginas, layouts, composables e SSR.
-- `$fireskill-specialist-design-system` para paleta, tokens e decisões de marca
-  que acabam em `packages/tokens`.
-- `$fireskill-specialist-ui-design` e `$fireskill-specialist-ux-design` para
-  composição de tela e fluxo antes do componente.
-- `$fireskill-specialist-tailwind-css` para utilitários e responsividade fora dos
-  componentes.
-- `$fireskill-specialist-trpc` para a chamada que o formulário dispara.
-- `$fireskill-specialist-nuxt-authorization` para esconder/mostrar ação por
-  permissão (`<Can>`).
-- `$fireskill-specialist-web-accessibility` para contraste, foco e teclado em
-  profundidade.
+- `$fireskill-specialist-nuxt` for pages, layouts, composables, and SSR.
+- `$fireskill-specialist-design-system` for tokens, palette, and brand rules residing in `packages/tokens`.
+- `$fireskill-specialist-ui-design` and `$fireskill-specialist-ux-design` for screen layout composition and user journeys.
+- `$fireskill-specialist-tailwind-css` for utility classes and responsive layouts outside components.
+- `$fireskill-specialist-trpc` for backend API mutation procedures.
+- `$fireskill-specialist-nuxt-authorization` for permission-based component rendering (`<Can>`).
+- `$fireskill-specialist-web-accessibility` for deep contrast, focus management, and keyboard support.

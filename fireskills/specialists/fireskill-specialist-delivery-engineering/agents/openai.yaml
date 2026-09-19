@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Especialista - Engenharia de entrega"
-  short_description: "CI/CD, artefatos, rollout e rollback"
-  default_prompt: "Use $fireskill-specialist-delivery-engineering para orientar esta tarefa com padrões e validação especializados."
+  display_name: "Fireskill - Specialist - Delivery Engineering"
+  short_description: "CI/CD, build artifacts, rollout, and rollback"
+  default_prompt: "Use $fireskill-specialist-delivery-engineering to guide this task with specialized delivery patterns and pipeline validation."

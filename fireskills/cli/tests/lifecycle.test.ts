@@ -1,4 +1,4 @@
-/** Contratos do ciclo de vida físico das especificações. */
+/** Spec physical lifecycle contracts. */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
@@ -19,98 +19,98 @@ async function createSpec(
   await mkdir(join(path, ".."), { recursive: true });
   await writeFile(
     path,
-    `# Login social\n\n| Status | ${status} |\n| Effort | 4 |\n`,
+    `# Social login\n\n| Status | ${status} |\n| Effort | 4 |\n`,
   );
   return path;
 }
 
-describe("ciclo de vida das specs", () => {
-  test("move a spec, espelha Status e preserva o pacote", async () => {
+describe("spec lifecycle", () => {
+  test("moves spec, mirrors Status, and preserves package", async () => {
     const project = await temporaryDirectory();
-    await createSpec(project, "specs/planned/0042-login-social", "Planned");
-    const result = await transitionSpec(project, "0042-login-social", "in-progress");
+    await createSpec(project, "specs/planned/0042-social-login", "Planned");
+    const result = await transitionSpec(project, "0042-social-login", "in-progress");
 
     expect(result).toMatchObject({
       from: "planned",
       to: "in-progress",
       status: "Implementing",
     });
-    const target = join(project, "specs/in-progress/0042-login-social/spec.md");
+    const target = join(project, "specs/in-progress/0042-social-login/spec.md");
     expect(await readFile(target, "utf8")).toContain("| Status | Implementing |");
-    await expect(resolveSpec(project, "0042-login-social")).resolves.toMatchObject({
+    await expect(resolveSpec(project, "0042-social-login")).resolves.toMatchObject({
       folder: "in-progress",
       path: target,
     });
   });
 
-  test("aceita só o número da spec e move o diretório completo", async () => {
+  test("accepts spec number only and moves full directory", async () => {
     const project = await temporaryDirectory();
-    await createSpec(project, "specs/planned/0042-login-social", "Planned");
+    await createSpec(project, "specs/planned/0042-social-login", "Planned");
 
     await expect(transitionSpec(project, "0042", "in-progress")).resolves.toMatchObject({
-      identifier: "0042-login-social",
+      identifier: "0042-social-login",
       to: "in-progress",
     });
     await expect(
-      readFile(join(project, "specs/in-progress/0042-login-social/spec.md"), "utf8"),
+      readFile(join(project, "specs/in-progress/0042-social-login/spec.md"), "utf8"),
     ).resolves.toContain("| Status | Implementing |");
-    await expect(resolveSpec(project, "0099")).rejects.toThrow("spec não encontrada: 0099");
+    await expect(resolveSpec(project, "0099")).rejects.toThrow("spec not found: 0099");
   });
 
-  test("reabre uma spec concluída para review", async () => {
+  test("reopens a completed spec for review", async () => {
     const project = await temporaryDirectory();
-    await createSpec(project, "specs/completed/0042-login-social", "Complete");
+    await createSpec(project, "specs/completed/0042-social-login", "Complete");
 
     await expect(
-      transitionSpec(project, "0042-login-social", "review"),
+      transitionSpec(project, "0042-social-login", "review"),
     ).resolves.toMatchObject({ from: "completed", to: "review", status: "Reviewing" });
     await expect(
-      transitionSpec(project, "0042-login-social", "in-progress"),
+      transitionSpec(project, "0042-social-login", "in-progress"),
     ).resolves.toMatchObject({ to: "in-progress" });
   });
 
-  test("recusa transições que pulam estados", async () => {
+  test("rejects transitions that skip states", async () => {
     const project = await temporaryDirectory();
-    await createSpec(project, "specs/draft/0042-login-social", "Draft");
+    await createSpec(project, "specs/draft/0042-social-login", "Draft");
 
     await expect(
-      transitionSpec(project, "0042-login-social", "completed"),
-    ).rejects.toThrow("draft para completed");
+      transitionSpec(project, "0042-social-login", "completed"),
+    ).rejects.toThrow("draft to completed");
   });
 
-  test("migra a estrutura anterior para a pasta correspondente ao Status", async () => {
+  test("migrates legacy layout to folder matching Status", async () => {
     const project = await temporaryDirectory();
-    await createSpec(project, "specs/specs/0042-login-social", "Complete");
+    await createSpec(project, "specs/specs/0042-social-login", "Complete");
 
     await expect(migrateSpecs(project)).resolves.toEqual([
       expect.objectContaining({
-        identifier: "0042-login-social",
+        identifier: "0042-social-login",
         to: "completed",
       }),
     ]);
     await expect(
-      readFile(join(project, "specs/completed/0042-login-social/spec.md"), "utf8"),
+      readFile(join(project, "specs/completed/0042-social-login/spec.md"), "utf8"),
     ).resolves.toContain("| Status | Complete |");
   });
 
-  test("atualiza esforço entre 1 e 10 com justificativa e histórico", async () => {
+  test("updates effort between 1 and 10 with rationale and history", async () => {
     const project = await temporaryDirectory();
-    await createSpec(project, "specs/draft/0042-login-social", "Draft");
+    await createSpec(project, "specs/draft/0042-social-login", "Draft");
 
-    await updateSpecEffort(project, "0042-login-social", 7, "Integração externa descoberta.", {
+    await updateSpecEffort(project, "0042-social-login", 7, "External integration discovered.", {
       updatedAt: "2026-08-08T14:00:00.000Z",
     });
 
     const content = await readFile(
-      join(project, "specs/draft/0042-login-social/spec.md"),
+      join(project, "specs/draft/0042-social-login/spec.md"),
       "utf8",
     );
     expect(content).toContain("| Effort | 7 |");
     expect(content).toContain("| Effort updated at | 2026-08-08T14:00:00.000Z |");
-    expect(content).toContain("| Effort rationale | Integração externa descoberta. |");
-    expect(content).toContain("- 2026-08-08T14:00:00.000Z: 4 → 7. Integração externa descoberta.");
+    expect(content).toContain("| Effort rationale | External integration discovered. |");
+    expect(content).toContain("- 2026-08-08T14:00:00.000Z: 4 → 7. External integration discovered.");
     await expect(
-      updateSpecEffort(project, "0042-login-social", 11, "Fora da faixa."),
-    ).rejects.toThrow("entre 1 e 10");
+      updateSpecEffort(project, "0042-social-login", 11, "Out of range."),
+    ).rejects.toThrow("between 1 and 10");
   });
 });

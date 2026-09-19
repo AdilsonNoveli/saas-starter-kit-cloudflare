@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Descoberta de dados"
-  short_description: "Conversa sobre o que o sistema deve guardar"
-  default_prompt: "Use $fireskill-data-discovery para conversar em linguagem simples sobre o que o sistema precisa guardar e registrar apenas respostas confirmadas em DATABASE.md."
+  display_name: "Fireskill - Data Discovery"
+  short_description: "Interviews about information the system must store"
+  default_prompt: "Use $fireskill-data-discovery to converse in simple language about what information the system needs to store and record only confirmed answers in DATABASE.md."

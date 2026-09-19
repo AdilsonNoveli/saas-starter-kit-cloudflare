@@ -1,12 +1,12 @@
-# Escolha do nível de teste
+# Choosing Test Levels
 
-| Comportamento | Nível preferido | Evite |
+| Behavior | Preferred Level | Avoid |
 | --- | --- | --- |
-| Regra pura, transformação, validação | Unidade | subir servidor ou banco sem necessidade |
-| Persistência, fila, cache, serviço interno | Integração | mockar o adaptador que precisa ser provado |
-| Contrato HTTP/evento externo | Contrato ou integração | depender de produção |
-| Jornada essencial visível ao usuário | Aceite/E2E | reproduzir toda regra interna no E2E |
-| Desempenho, concorrência, resiliência | Teste especializado mensurável | afirmar apenas que “parece rápido” |
-| Layout ou acessibilidade | DOM/acessibilidade e poucos fluxos E2E | screenshot como única evidência sem critério |
+| Pure domain rules, transformations, validations | Unit | Spinning up servers or databases unnecessarily |
+| Persistence, queues, cache, internal services | Integration | Mocking the very adapter being verified |
+| HTTP contracts / external events | Contract or Integration | Relying on live production environments |
+| Critical visible user journeys | Acceptance / E2E | Duplicating all domain logic in slow E2E flows |
+| Performance, concurrency, resilience | Measurable specialized tests | Vague assertions that it "feels fast" |
+| Layout or accessibility | DOM / accessibility and targeted E2E | Screenshots as sole uncalibrated evidence |
 
-Use a menor camada que observa o resultado especificado. Um `AC` pode exigir mais de um nível quando cruza fronteiras, mas cada teste deve ter uma razão distinta.
+Use the lowest layer that conclusively observes specified behavior. An `AC` may span multiple levels when crossing boundaries, but each test must have a distinct purpose.

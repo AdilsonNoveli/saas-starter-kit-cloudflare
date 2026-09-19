@@ -1,58 +1,43 @@
 # Fireskills Specialists
 
-Catálogo de skills técnicas do Fireskills para o Nuxfire. O prefixo
-`fireskill-specialist-` distingue contexto especializado das skills base que
-executam a metodologia (`skills/`). Cada especialista é uma pasta com
-`SKILL.md`, `agents/openai.yaml` e `references/`.
+Technical skills catalog of Fireskills for Nuxfire. The `fireskill-specialist-` prefix distinguishes specialized technical context from core methodology skills (`skills/`). Each specialist resides in a folder containing `SKILL.md`, `agents/openai.yaml`, and `references/`.
 
-`catalog.json` é a fonte de descoberta: nome, descrição, categoria, tags e
-`detect` (arquivos e dependências que indicam que o especialista se aplica).
+`catalog.json` serves as the discovery index: name, description, category, tags, and `detect` rules (files and dependencies indicating when the specialist applies).
 
-## Especialistas da stack Nuxfire
+## Nuxfire Stack Specialists
 
-Cada um foi escrito a partir do código real do repositório; as afirmações em
-`references/nuxfire-*.md` citam o arquivo de evidência.
+Each specialist is derived directly from actual repository code. Statements in `references/nuxfire-*.md` link directly to verified source files.
 
-| Especialista | Cobre |
+| Specialist | Scope |
 |---|---|
-| `fireskill-specialist-nuxt` | Nuxt 4: páginas, layouts, middleware, plugins, Nitro, `runtimeConfig`, i18n, SSR |
-| `fireskill-specialist-nuxt-ui` | `@nuxt/ui` v4: componentes, tema, `packages/tokens`, formulários, tabelas |
-| `fireskill-specialist-trpc` | tRPC v10 (`trpc-nuxt`): procedures, routers por layer, contexto, cliente |
-| `fireskill-specialist-drizzle` | Drizzle + Postgres: schema por layer, barrel, migrações, seed |
-| `fireskill-specialist-cloudflare-workers` | Workers: bindings, `waitUntil`, KV, R2, Queues, DO, Cron, Hyperdrive |
-| `fireskill-specialist-sst` | SST 4: `infra/*.ts`, secrets, stages, flags, deploy |
-| `fireskill-specialist-openauth` | OpenAuth.js: emissor, sessões no KV, cookies, reset de identidade |
-| `fireskill-specialist-nuxfire-layers` | Criar, registrar e compor layers (`config.ts`, `compose-layers`) |
-| `fireskill-specialist-nuxt-authorization` | RBAC de equipe: `defineAbility`, `authorize`, `<Can>` |
-| `fireskill-specialist-pinia` | Pinia: stores, SSR e hidratação |
-| `fireskill-specialist-billing` | Stripe e Paddle: checkout, webhooks, assinaturas e planos |
+| `fireskill-specialist-nuxt` | Nuxt 4: pages, layouts, middleware, plugins, Nitro, `runtimeConfig`, i18n, SSR |
+| `fireskill-specialist-nuxt-ui` | `@nuxt/ui` v4: components, theming, `packages/tokens`, forms, tables |
+| `fireskill-specialist-trpc` | tRPC v10 (`trpc-nuxt`): procedures, per-layer routers, context, client |
+| `fireskill-specialist-drizzle` | Drizzle + Postgres: per-layer schemas, barrel exports, migrations, seeds |
+| `fireskill-specialist-cloudflare-workers` | Workers: bindings, `waitUntil`, KV, R2, Queues, Durable Objects, Cron, Hyperdrive |
+| `fireskill-specialist-sst` | SST 4: `infra/*.ts`, secrets, stages, flags, deployment |
+| `fireskill-specialist-openauth` | OpenAuth.js: issuer, KV sessions, cookies, identity management |
+| `fireskill-specialist-nuxfire-layers` | Creating, registering, and composing domain layers (`config.ts`, `compose-layers`) |
+| `fireskill-specialist-nuxt-authorization` | Team RBAC: `defineAbility`, `authorize`, `<Can>` component |
+| `fireskill-specialist-pinia` | Pinia: stores, SSR state hydration |
+| `fireskill-specialist-billing` | Stripe and Paddle: checkout, webhooks, subscriptions, and plans |
 
-## Engenharia (agnósticos de stack)
+## Engineering Specialists (Stack-Agnostic)
 
 `typescript`, `postgres`, `tailwind-css`, `software-architecture`,
 `web-api-design`, `application-security`, `debugging`, `code-review`,
 `performance-engineering`, `observability`, `data-modeling`,
 `domain-modeling`, `prototyping`, `technical-research`, `design-system`,
 `ui-design`, `ux-design`, `interface-experience`, `web-accessibility`,
-`delivery-engineering`, `versioning`, `gitflow` e
-`merge-conflict-resolution`, todos com o prefixo `fireskill-specialist-`.
+`delivery-engineering`, `versioning`, `gitflow`, and
+`merge-conflict-resolution`, all prefixed with `fireskill-specialist-`.
 
-Para criar ou alterar uma interface, comece por
-`fireskill-specialist-interface-experience`: ela carrega o
-`fireskill-specialist-design-system`, examina o sistema e a stack existentes,
-conduz as perguntas sobre telas e encaminha UX, UI e
-`fireskill-specialist-nuxt-ui`. O registro local de componentes e telas fica em
-`.fireskills/INTERFACE.md`.
+When creating or modifying user interfaces, begin with `fireskill-specialist-interface-experience`: it activates `fireskill-specialist-design-system`, audits existing UI tokens and stack conventions, structures screen questions, and routes to UX, UI, and `fireskill-specialist-nuxt-ui`. Local component and screen registrations reside in `.fireskills/INTERFACE.md`.
 
-## Como usar
+## How to Use
 
-O agente carrega um especialista pelo nome (`$fireskill-specialist-<nome>`)
-quando a tarefa toca a área dele; a tabela de detecção de cada skill base
-(`skills/*/references/specialists.md`) indica qual carregar. Um especialista
-orienta padrões técnicos e validação; não cria specs, não avança gates e não
-substitui a fonte normativa.
+Agents load a specialist by name (`$fireskill-specialist-<name>`) whenever a task touches its technical domain; each core skill's discovery table (`skills/*/references/specialists.md`) indicates which to load. A specialist provides technical guidelines and validation criteria; it does not author specifications, advance gates, or replace canonical project files.
 
-## Licença
+## License
 
-Ver [LICENSE](LICENSE). O Fireskills é derivado do Specsfy; mantenha o aviso de
-licença e a atribuição ao distribuir.
+See [LICENSE](LICENSE). Fireskills is derived from Specsfy; preserve license notices and attribution upon redistribution.

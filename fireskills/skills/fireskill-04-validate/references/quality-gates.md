@@ -1,62 +1,55 @@
-# Gates de qualidade
+# Quality Gates
 
-## Conteúdo
+## Content
 
-- O arquivo declara `Formato: Specsfy/2.0` e preserva exatamente os três atos na ordem canônica.
-- O problema, ator e resultado são explícitos.
-- Escopo e fora de escopo não se contradizem.
-- Métricas de sucesso têm alvo e método de observação.
-- Termos canônicos são usados de modo consistente.
-- Research distingue fatos confirmados, esclarecimentos, suposições e decisões.
-- Research registra fontes, documentação consultada, dúvidas respondidas e dúvidas abertas.
-- Toda API ou documentação externa consultada possui evidência em `research/`, com origem, versão/data, licença quando aplicável e caminho indexado no `spec.md`.
+- The file declares `Format: Specsfy/2.0` and strictly preserves the three acts in canonical order.
+- Problem, persona, and expected outcome are explicit.
+- In-scope and out-of-scope sections do not contradict each other.
+- Success metrics define numeric/observable targets and measurement methods.
+- Canonical domain terms are used consistently.
+- Research distinguishes verified facts, clarifications, assumptions, and decisions.
+- Research records sources, consulted documentation, resolved questions, and open questions.
+- Every external API or documentation consulted has local evidence in `research/`, with origin, version/date, license where applicable, and indexed path in `spec.md`.
 
-## Requisitos
+## Requirements
 
-- Cada requisito descreve uma obrigação, não uma solução vaga.
-- Palavras como rápido, seguro, simples, escalável e intuitivo têm medida ou critério.
-- Permissões, validação, erros, concorrência, limites e estados vazios aparecem quando relevantes.
-- Requisitos não funcionais têm alvo e verificação.
+- Each requirement describes an obligation, not an ambiguous solution.
+- Subjective words like fast, secure, simple, scalable, and intuitive have explicit measures or objective criteria.
+- Permissions, validation, error handling, concurrency, limits, and empty states are documented where relevant.
+- Non-functional requirements have targets and verification methods.
 
-## Comportamento
+## Behavior
 
-- Cada jornada P1 tem caminho feliz e falha relevante.
-- Cada cenário BDD possui Given, When e Then observáveis.
-- Cada `AC` referencia `US/FR/NFR` existentes.
-- A feature inteira e cada `US`, `FR` e `NFR` possuem pelo menos três `AC`
-  distintos declarados em `**Cobre**`.
+- Each P1 journey includes both happy path and critical failure variations.
+- Each BDD scenario contains observable Given, When, and Then clauses.
+- Each `AC` references existing `US/FR/NFR` identifiers.
+- The entire feature and each `US`, `FR`, and `NFR` have at least three distinct `AC` scenarios declared in `**Covers**`.
 
-## Implementabilidade
+## Implementability
 
-- O design técnico respeita o repositório existente.
-- Plano, modelo de dados, estados, contratos e migrações estão decididos o suficiente para nomear arquivos em tarefas.
-- Migrations, models, controllers/casos de uso, views, queries/repositórios e jobs têm responsabilidade, caminho e “Não aplicável” justificado quando ausentes.
-- APIs expostas e externas registram versão, autenticação, entradas, saídas, erros e documentação consultada.
-- Dependências externas incluem falha, timeout ou indisponibilidade quando material.
-- Riscos e suposições não escondem decisões de alto impacto.
+- Technical architecture respects the existing repository structure.
+- Implementation plan, data model, state machines, contracts, and migrations are decided concretely enough to specify file paths in tasks.
+- Migrations, models, controllers/use cases, views, queries/repositories, and background jobs define explicit responsibilities, paths, and justified "Not applicable" when omitted.
+- Exposed and consumed APIs document version, authentication, inputs, outputs, errors, and consulted references.
+- External dependencies include failure modes, timeouts, and degradation strategies.
+- Risks and assumptions do not conceal unresolved high-impact decisions.
 
-## Verificação
+## Verification
 
-- A estratégia mantém o BDD como referência e separa os níveis executáveis de
-  TDD: unidade, integração/contrato, browser e manual.
-- A matriz liga `FR/NFR → AC/método → teste/comando → evidência`.
-- A estratégia prevê pelo menos três casos TDD executáveis para a feature
-  inteira e para cada `US`, `FR` e `NFR`.
-- Tarefas `[TEST]` precedem tarefas `[CODE]` para o mesmo comportamento.
-- `Plan Gate: Passed` exige que os predecessores TDD das tarefas `[CODE]`
-  estejam concluídos com RED registrado.
-- Verificação manual tem justificativa.
-- Definition of Done pode ser provada por comandos ou evidências objetivas.
-- Quando uma atestação for publicada, ela usa schema 2, digest da política
-  executável, limites explícitos, commit e bindings com hashes de arquivos.
-- Timeout usa código 124; saída truncada é marcada e não expõe bytes posteriores
-  ao limite configurado.
+- The testing strategy treats BDD as normative reference and separates executable TDD levels: unit, integration/contract, browser, and manual.
+- Traceability matrix connects `FR/NFR → AC/method → test/command → evidence`.
+- Strategy defines at least three executable TDD cases for the feature and each `US`, `FR`, and `NFR`.
+- `[TEST]` tasks precede `[CODE]` tasks for the same behavior.
+- `Plan Gate: Passed` requires that TDD predecessors of `[CODE]` tasks are completed with RED status documented.
+- Manual verification includes explicit rationale.
+- Definition of Done is proven via executable commands or objective evidence.
+- Published attestations adhere to schema 2, executable policy digest, explicit limits, commit SHA, and file hash bindings.
+- Timeouts return exit code 124; truncated outputs are tagged without exposing bytes beyond limits.
 
-## Fonte única
+## Single Source of Truth
 
-- O pacote `specs/<estado>/<NNNN>-<slug>/` contém somente o `spec.md` normativo e, quando necessário, `research/` com evidências não normativas.
-- Não existem `plan.md`, `research.md`, `data-model.md`, `tasks.md` ou checklists paralelos.
-- Gates e evidências vivem na seção 13 de `spec.md`.
-- Tarefas e progresso vivem na seção 14 do mesmo arquivo.
-- Os estados seguem `Draft → Defined → Planned → Implementing → Complete`;
-  nenhum gate posterior permanece aprovado quando sua entrada é reaberta.
+- The package `specs/<state>/<NNNN>-<slug>/` contains exclusively the normative `spec.md` and optional `research/` with non-normative evidence.
+- No parallel `plan.md`, `research.md`, `data-model.md`, `tasks.md`, or checklists exist.
+- Gates and evidence live in section 13 of `spec.md`.
+- Tasks and progress live in section 14 of `spec.md`.
+- Lifecycle strictly follows `Draft → Defined → Planned → Implementing → Complete`; no downstream gate remains approved when an upstream gate is reopened.

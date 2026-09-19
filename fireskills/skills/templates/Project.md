@@ -1,29 +1,28 @@
-# Projeto
+# Project
 
-## História e motivação
+## History and Motivation
 
-Descreva a origem do projeto, o problema que motivou sua criação e sua evolução.
+Describe origin of the project, problem that motivated its creation, and major evolution milestones.
 
-## Finalidade
+## Purpose
 
-Explique para que o sistema serve e qual resultado entrega.
+Explain what the system accomplishes and what core value it delivers.
 
-## Pessoas e contexto de uso
+## Users and Operational Context
 
-Registre quem usa o sistema e em quais situações.
+Record target user personas, permissions, and environments in which they interact with the product.
 
-## Capacidades principais
+## Core Capabilities
 
-Liste as capacidades estáveis sem transformar esta descrição em inventário de
-rotas, schemas ou tarefas.
+List stable product capabilities without transforming this description into an ephemeral inventory of routes, schemas, or tasks.
 
-## Limites
+## Boundaries and Non-Goals
 
-Explique o que o sistema deliberadamente não faz.
+Document explicit non-goals and what the system deliberately avoids doing.
 
-## Contexto técnico
+## Technical Context
 
-Modelo inicial sugerido a partir de: **{{STACK_LABEL}}**. Detalhes verificáveis
-ficam em `.fireskills/STACK.md` e `.fireskills/DATABASE.md`.
+Initial model suggested from: **{{STACK_LABEL}}**. Verified architectural details
+reside in `.fireskills/STACK.md` and `.fireskills/DATABASE.md`.
 
 {{STACK_GUIDANCE}}

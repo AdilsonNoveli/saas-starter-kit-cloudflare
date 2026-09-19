@@ -1,114 +1,85 @@
 ---
 name: fireskill-01-inbox
-description: "Use quando o usuário enviar uma ideia, pensamento, necessidade, oportunidade ou texto livre para guardar, capturar, anotar ou retomar depois. Preserve o input integral, faça pré-processamento silencioso e crie imediatamente um arquivo timestampado em `specs/inbox/`. Não faça perguntas, não peça confirmação e não crie backlog, spec, tarefas, testes ou código."
+description: "Use when the user submits an idea, thought, need, opportunity, or free-form text to store, capture, or revisit later. Faithfully preserves raw input, performs silent preprocessing, and immediately creates a timestamped file in `specs/inbox/`. Never asks questions, requests confirmation, or creates backlog items, specs, tasks, tests, or code."
 ---
 
-# Registrar uma entrada na Inbox
+# Register an Inbox Entry
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, load `$fireskill-setup` at the repository root. In automated handoffs, reload it prior to this step. Reuse confirmed project root and do not proceed if setup reports pending blockers.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `sem perguntas`.
-Não formule perguntas nesta skill. Registre pontos ausentes para uma etapa
-posterior sem interromper a captura.
+Interaction mode: `no questions`.
+Formulate zero questions in this skill. Record missing details as future review points without interrupting raw capture.
 
-Registre imediatamente o texto recebido em `specs/inbox/`. Trate a Inbox como
-uma entrada durável anterior ao backlog: ela preserva intenção e
-organiza sinais úteis, mas não decide requisitos nem autoriza implementação.
+Save received input immediately into `specs/inbox/`. Treat the Inbox as a durable intake layer prior to backlog refinement: it preserves intent and organizes signals, but does not decide requirements or authorize implementation.
 
-## Não interromper a captura
+## Do Not Interrupt Capture
 
-- Não faça perguntas, mesmo quando a ideia estiver vaga, contraditória ou
-  incompleta.
-- Não peça confirmação antes de escrever.
-- Não bloqueie a captura por duplicata, falta de contexto ou incerteza.
-- Registre lacunas em `Pontos a revisar no futuro`; não tente resolvê-las com o
-  usuário nesta etapa.
-- Depois de salvar, informe somente o caminho, um resumo breve do que foi
-  processado e o próximo passo opcional. Não inicie o próximo passo
-  automaticamente.
+- Never ask questions, even if the submitted idea is vague, contradictory, or incomplete.
+- Do not request confirmation before writing to disk.
+- Do not block capture due to potential duplicates, missing context, or uncertainty.
+- Record ambiguities under `Points to review in the future`; do not attempt to resolve them with the user during capture.
+- After saving, report only the file path, a concise summary of parsed signals, and optional next steps. Do not start next steps automatically.
 
-## Preservar e pré-processar
+## Preserve and Preprocess
 
-1. Faça uma verificação silenciosa de credenciais, tokens, chaves privadas e
-   dados pessoais sensíveis evidentes. Se encontrar algum, não grave o arquivo
-   nem faça perguntas; informe que a política de privacidade exige remover o
-   dado sensível e reenviar a ideia.
-2. Use como texto original todo o input que expressa a ideia. Preserve sua
-   formulação integral, sem “corrigi-la” ou substituir palavras.
-3. Derive silenciosamente um título curto, concreto e fiel. Gere o slug a
-   partir dele.
-4. Separe a análise nas categorias:
-   - **Declaração:** conteúdo explicitamente presente no texto original;
-   - **Inferência:** interpretação plausível, sempre identificada como tal;
-   - **A revisar:** lacuna, conflito ou decisão que poderá ser revista depois.
-5. Extraia somente quando houver evidência:
-   - resumo em uma frase;
-   - problema ou oportunidade;
-   - pessoas afetadas ou beneficiadas;
-   - resultado ou valor esperado;
-   - sinais de escopo, regra, restrição, canal ou solução mencionada;
-   - riscos, dependências e relações evidentes;
-   - possíveis direções de backlog ou spec, sem promovê-las.
-   - informações que o sistema talvez precise guardar, consultar, compartilhar
-     ou apagar, como sinal para conversa futura.
-6. Use `Não identificado no texto original.` quando não houver base. Não
-   invente stakeholder, prioridade, prazo, regra, solução ou critério de aceite.
+1. Silently inspect for exposed credentials, secret tokens, private keys, or sensitive personal data. If found, do not write file or prompt questions; inform that security policies require removing sensitive data and resubmitting.
+2. Use all text expressing the idea as raw original input. Preserve phrasing verbatim without "correcting" or substituting words.
+3. Derive a concise, faithful title and generate kebab-case slug.
+4. Categorize extracted signals:
+   - **Declaration:** explicit statements directly present in original input;
+   - **Inference:** plausible interpretation, always labeled as such;
+   - **To Review:** ambiguities, conflicts, or architectural choices to review later.
+5. Extract only when grounded by evidence:
+   - one-sentence summary;
+   - core problem or opportunity;
+   - affected users or beneficiaries;
+   - desired outcome or value;
+   - signals regarding scope, business rules, constraints, channels, or proposed solutions;
+   - visible dependencies and risks;
+   - possible future backlog or specification directions without promoting them;
+   - persistent data requirements to explore in subsequent discovery.
+6. Use `Not identified in original text.` when evidence is absent. Never fabricate stakeholders, priorities, deadlines, rules, or acceptance criteria.
 
-## Criar o arquivo
+## Create the File
 
-Execute uma única vez:
+Execute once:
 
 ```bash
-node <diretório-da-skill>/scripts/capturar_inbox.mjs \
-  --input "<texto original integral>" \
-  --title "<título derivado>" \
-  --summary "<resumo>" \
-  --problem "<problema ou oportunidade>" \
-  --people "<pessoas afetadas>" \
-  --value "<resultado ou valor>" \
-  --signals "<sinais extraídos>" \
-  --data "<sinais sobre informações que talvez precisem ser guardadas>" \
-  --risks "<riscos ou dependências>" \
-  --directions "<direções futuras possíveis>" \
-  --review "<pontos a revisar futuramente>" \
-  [--root <raiz>]
+node <skill-directory>/scripts/capturar_inbox.mjs \
+  --input "<full raw input>" \
+  --title "<derived title>" \
+  --summary "<summary>" \
+  --problem "<problem or opportunity>" \
+  --people "<affected users>" \
+  --value "<desired outcome or value>" \
+  --signals "<extracted signals>" \
+  --data "<data storage signals>" \
+  --risks "<risks or dependencies>" \
+  --directions "<potential future directions>" \
+  --review "<points to review later>" \
+  [--root <project-root>]
 ```
 
-O script usa `.fireskills/templates/custom/Inbox.md` quando presente e recorre a
-`.fireskills/templates/Inbox.md` caso contrário. Ele cria
-`specs/inbox/AAAA-MM-DD-HHMMSS-<slug>.md` e nunca sobrescreve uma captura
-existente. Se o template estiver ausente, relate a instalação incompleta; não
-crie um template paralelo dentro da skill.
+The script resolves `.fireskills/templates/custom/Inbox.md` when present, falling back to `.fireskills/templates/Inbox.md`. It creates `specs/inbox/YYYY-MM-DD-HHMMSS-<slug>.md` and never overwrites existing captures.
 
-## Orquestrar a conversa
+## Conversational Orchestration
 
-Esta skill é uma exceção deliberada ao handoff automático do framework:
-capturar é o resultado final do pedido e precisa ocorrer sem perguntas nem
-transições. Após escrever, apenas sugira um destes próximos passos:
+This skill is a deliberate exception to automatic handoffs: raw capture is the terminal goal of the request and must happen without questions or transitions. After saving, suggest possible next steps:
 
-- manter a entrada na Inbox;
-- usar `$fireskill-02-backlog` para refiná-la ou aprofundá-la.
-- usar `$fireskill-data-discovery` quando a entrada indicar informações que o
-  sistema precisará guardar. Essa conversa posterior registra somente o que
-  for confirmado em `.fireskills/DATABASE.md`.
+- keep entry in Inbox for future review;
+- use `$fireskill-02-backlog` to refine into a backlog item;
+- use `$fireskill-data-discovery` when input suggests new data storage requirements.
 
-Somente carregue outra skill se o mesmo pedido também ordenar explicitamente
-esse trabalho. Nesse caso, anuncie
-`Transição automática: $fireskill-01-inbox → $<destino> — motivo: <motivo> —
-resultado esperado: <resultado>` depois de a captura estar segura.
+Only switch skills if the user's prompt explicitly commanded subsequent steps in the same turn. In that case, announce `Automated transition: $fireskill-01-inbox → $<destination> — reason: <reason> — expected result: <result>` after capture is safely written.
 
-## Limites
+## Boundaries
 
-- Não pesquisar duplicatas antes de salvar.
-- Não alterar nem apagar capturas anteriores.
-- Não transformar inferência em declaração do usuário.
-- Não criar `specs/backlog/`, qualquer pasta de estado de spec, tarefas, research, testes ou
-  código.
-- Não usar a ideia como fonte normativa de comportamento.
+- Do not search for duplicates before saving.
+- Never modify or delete prior inbox entries.
+- Never mislabel inferences as user declarations.
+- Never create `specs/backlog/`, spec state folders, tasks, research, tests, or code.
+- Never treat raw inbox thoughts as normative behavioral specifications.

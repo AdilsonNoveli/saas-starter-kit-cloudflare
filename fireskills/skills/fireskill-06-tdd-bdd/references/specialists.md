@@ -1,19 +1,18 @@
-# Especialistas para TDD orientado pelo BDD
+# Specialists for BDD-Driven TDD
 
-Use o especialista da tecnologia para escolher seam, fixture e comandos
-compatíveis (`fireskill-specialist-nuxt`, `-trpc`, `-drizzle`,
-`-nuxt-authorization`, `-pinia`). Acrescente conforme o risco:
+Use technology specialists to select test seams, fixtures, and compatible commands
+(`fireskill-specialist-nuxt`, `-trpc`, `-drizzle`, `-nuxt-authorization`, `-pinia`).
+Add specialists based on specific risk areas:
 
-- acessibilidade: `fireskill-specialist-web-accessibility`;
-- segurança: `fireskill-specialist-application-security`;
-- performance/carga: `fireskill-specialist-performance-engineering`;
-- dados/concorrência: `fireskill-specialist-postgres` e `-drizzle`;
-- deploy/falhas: `-sst`, `-cloudflare-workers` ou `-delivery-engineering`.
+- Accessibility: `fireskill-specialist-web-accessibility`;
+- Security: `fireskill-specialist-application-security`;
+- Performance/Load: `fireskill-specialist-performance-engineering`;
+- Data/Concurrency: `fireskill-specialist-postgres` and `-drizzle`;
+- Deploy/Failover: `-sst`, `-cloudflare-workers`, or `-delivery-engineering`.
 
-Nenhum especialista pode substituir RED observado ou inventar comportamento.
+No specialist can substitute for observed RED or fabricate behavior.
 
-Os especialistas ficam em `specialists/` deste repositório. Se o necessário não
-estiver disponível para o agente, informe nome, finalidade e dependências e peça
-autorização específica antes de instalar ou copiar; nunca carregue especialista
-sem relação com a tarefa. Se já estiver disponível, anuncie a transição
-automática e carregue-o na mesma conversa.
+Specialists reside in `specialists/` in this repository. If the required specialist
+is not yet available to the agent, state its name, purpose, and dependencies and request
+explicit user authorization before installing or copying; never load specialists
+unrelated to the task. If already present, announce automatic transition and load it within the same conversation.

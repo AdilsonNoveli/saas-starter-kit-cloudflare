@@ -1,44 +1,35 @@
-# Gates de conclusão
+# Completion Gates
 
-## Por tarefa
+## Per Task
 
-- Dependências estão concluídas.
-- Resultado descrito existe no caminho indicado.
-- IDs referenciados continuam válidos.
-- Teste focal observou RED quando o comportamento era novo.
-- O Gherkin da spec foi usado como referência para desenhar o teste TDD; nenhum
-  `.feature` foi criado ou executado.
-- Cada caso TDD identificado por seu próprio `SPECSFY:` observou RED e depois
-  GREEN; a feature inteira e cada `US`, `FR` e `NFR` possuem ao menos três.
-- Teste focal e regressão relacionada estão verdes.
-- Checkbox mudou somente após a verificação.
-- Os seis itens `PREP/EXECUTE/VERIFY/VISUAL/EVIDENCE/IMPROVE` estão concluídos
-  nessa ordem e refletem resultados reais. `VISUAL` registra a conferência de
-  bordas, espaçamentos, margens, padding e tipografia quando a tarefa altera a
-  interface, mesmo sem pedido específico.
-- O pai foi concluído somente depois dos seis itens.
-- Toda tarefa `[MIGRATION]` possui arquivo versionado, comando de aplicação com
-  saída zero e consulta de estado com saída zero.
-- A micro-retrospectiva registrou melhoria aplicada ou ausência justificada.
+- Dependencies are completed.
+- Described outcome exists at the specified file path.
+- Referenced IDs remain valid.
+- Focal test observed RED when behavior was new.
+- Spec Gherkin was used as reference to design the TDD test; no raw `.feature` file was created or executed.
+- Each TDD case identified by its own `SPECSFY:` marker observed RED and then GREEN; feature as a whole and each `US`, `FR`, and `NFR` have at least three.
+- Focal test and related regression suites pass green.
+- Checkboxes change only after verification.
+- The six items `PREP/EXECUTE/VERIFY/VISUAL/EVIDENCE/IMPROVE` are complete in that exact order and reflect concrete results. `VISUAL` records verification of borders, spacing, margins, padding, and typography when the task modifies UI surfaces, even without explicit user request.
+- Parent task is marked complete only after all six items are checked.
+- Every `[MIGRATION]` task has a versioned file, exit-0 application command, and exit-0 status check query.
+- Micro-retrospective recorded an applied improvement or documented justification for none.
 
-## Por história
+## Per Story
 
-- O teste independente da história foi executado.
-- A história possui ao menos três `AC` e três casos TDD distintos.
-- Todos os cenários `AC` da história têm evidência.
-- Caminhos de erro e permissão relevantes foram exercitados.
-- A história entrega valor sem depender de uma história de prioridade menor, salvo decisão explícita.
+- Independent story test was executed.
+- Story has at least three `AC`s and three distinct TDD test cases.
+- All story `AC` scenarios have documented evidence.
+- Relevant error and permission paths were exercised.
+- Story delivers independent value without depending on lower-priority stories, unless explicitly decided.
 
-## Final
+## Final Acceptance
 
-- `Definition Gate` e `Plan Gate` permanecem `Passed`; `Delivery Gate` só muda
-  para `Passed` depois das evidências abaixo.
-- A seção `14. Tarefas` de `specs/<estado>/<NNNN>-<slug>/spec.md` não possui tarefas abertas.
-- A suite completa, lint, tipos e build disponíveis passam.
-- Rastreabilidade não possui gaps automatizáveis.
-- NFRs têm medição ou evidência documentada.
-- Não há placeholder, teste pulado ou mudança de escopo escondida.
-- O código observado corresponde à versão atual da fonte única `specs/<estado>/<NNNN>-<slug>/spec.md`.
-- Nenhuma alteração estrutural do banco ficou sem sua tarefa `[MIGRATION]`, e
-  todas as
-  migrations planejadas foram aplicadas e conferidas no banco de teste.
+- `Definition Gate` and `Plan Gate` remain `Passed`; `Delivery Gate` transitions to `Passed` only after the evidence below.
+- Section `14. Tasks` of `specs/<state>/<NNNN>-<slug>/spec.md` contains zero open tasks.
+- Full test suite, linter, typecheck, and build pass clean.
+- Traceability contains zero automatable gaps.
+- NFRs have documented measurements or evidence.
+- No placeholders, skipped tests, or undisclosed scope changes exist.
+- Observed codebase matches the current version of the single source of truth `specs/<state>/<NNNN>-<slug>/spec.md`.
+- No structural database mutation was left without a `[MIGRATION]` task, and all planned migrations were applied and verified on the test database.

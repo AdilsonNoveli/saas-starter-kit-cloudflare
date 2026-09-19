@@ -1,17 +1,17 @@
-# Stack do sistema
+# System Stack
 
-Documente tecnologias estruturais e a evidência executável que confirma cada
-uma. Preserve decisões humanas nas seções livres deste arquivo.
+Document structural technologies and the executable evidence that confirms each
+one. Preserve human decisions in the freeform sections of this file.
 
-## Inventário detectado
+## Detected Inventory
 
 <!-- specsfy:stack:start -->
-| Camada | Tecnologia | Evidência |
+| Layer | Technology | Evidence |
 | --- | --- | --- |
 {{STACK_ROWS}}
 <!-- specsfy:stack:end -->
 
-## Decisões e observações do projeto
+## Project Decisions and Notes
 
-Acrescente aqui escolhas, restrições e contexto que não podem ser inferidos dos
+Add here choices, constraints, and context that cannot be inferred from
 manifests.

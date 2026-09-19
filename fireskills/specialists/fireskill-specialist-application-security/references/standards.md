@@ -1,89 +1,80 @@
-# Padrões e referências de segurança
+# Application Security Standards and References
 
-## Threat modeling: perguntas por categoria (STRIDE)
+## Threat Modeling: Category Questions (STRIDE)
 
-| Categoria | Pergunta central | Controle típico |
+| Category | Core Question | Typical Control |
 |---|---|---|
-| Spoofing | O ator é quem afirma ser? | Autenticação forte, MFA |
-| Tampering | O dado foi alterado em trânsito ou repouso? | Integridade, assinatura, constraints de banco |
-| Repudiation | É possível provar quem fez o quê? | Log auditável, não repudiável |
-| Information disclosure | Um ator vê dado que não deveria? | Autorização por objeto, minimização de dado |
-| Denial of service | Um ator pode indisponibilizar o serviço? | Rate limit por ator/recurso, timeout, backpressure |
-| Elevation of privilege | Um ator ganha permissão além da concedida? | Autorização no servidor, negar por padrão |
+| Spoofing | Is the actor who they claim to be? | Strong authentication, MFA |
+| Tampering | Was data altered in transit or at rest? | Integrity checks, signatures, database constraints |
+| Repudiation | Can we prove who performed the action? | Audit logs, non-repudiation |
+| Information Disclosure | Can an unauthorized actor view data? | Object-level authorization, data minimization |
+| Denial of Service | Can an actor make the service unavailable? | Rate limits per actor/resource, timeouts, backpressure |
+| Elevation of Privilege | Can an actor gain unassigned privileges? | Server-side authorization, deny by default |
 
-Use como checklist ao desenhar uma feature nova: para cada trust boundary
-identificado, pergunte as seis categorias antes de implementar o controle.
+Use as a feature design checklist: for every identified trust boundary, evaluate
+all six categories before implementing controls.
 
-## Checklist por boundary
+## Boundary Checklist
 
-- **Identidade**: emissão, expiração, revogação e recuperação de credencial;
-  MFA para operações de alto risco; nunca reutilizar identificador de sessão
-  após elevação de privilégio (login, troca de senha) sem regenerar o token.
-- **Autorização**: verificar função, objeto específico, tenant, campo e
-  ação — autorização por rota sozinha não cobre IDOR; toda referência a
-  objeto vinda do cliente precisa de checagem de propriedade no servidor.
-- **Entrada**: validar tamanho, formato, encoding e destino esperado;
-  considerar o custo de processar a entrada (proteção contra payload que
-  força processamento caro, como decompression bomb ou regex catastrófico).
-- **Dados**: classificar por sensibilidade, minimizar coleta e retenção,
-  definir backup e exclusão compatíveis com a classificação — dado que não
-  existe não pode vazar.
-- **Operação**: gestão de secrets com rotação, logs sem dado sensível,
-  alertas de segurança com owner, patching de dependência em cadência
-  definida, plano de resposta a incidente sem cultura de culpa individual.
+- **Identity**: issuance, expiration, revocation, and credential recovery;
+  MFA for high-risk operations; never reuse session tokens after privilege elevation
+  (login, password change) without token regeneration.
+- **Authorization**: verify role, specific target object, tenant, field, and action —
+  route-level authorization alone does not prevent IDOR; all client-supplied object IDs
+  require server-side ownership verification.
+- **Input**: validate size, format, encoding, and intended destination; consider the
+  cost of input processing (defenses against decompression bombs, catastrophic regex backtracking).
+- **Data**: classify by sensitivity, minimize collection and retention, define backup and
+  deletion policies adhering to classification — data that does not exist cannot be breached.
+- **Operations**: secrets rotation, log sanitization (no PII or credentials), alerted
+  security signals with owners, timely dependency patching, and blameless incident response.
 
-## Segurança de API (OWASP API Security Top 10, categorias recorrentes)
+## API Security (OWASP API Security Top 10 Recurring Categories)
 
-- **Broken Object Level Authorization (BOLA/IDOR)**: falha mais comum em
-  APIs — todo endpoint que recebe um ID de objeto deve revalidar que o ator
-  autenticado tem direito sobre aquele objeto específico, não apenas sobre
-  a operação em geral.
-- **Broken Authentication**: tokens sem expiração adequada, refresh token
-  sem rotação, endpoints de autenticação sem rate limit contra força bruta.
-- **Excessive Data Exposure / falta de filtragem no output**: retornar o
-  objeto interno completo e deixar o cliente decidir o que exibir expõe
-  campo sensível que a UI nunca deveria ter recebido.
-- **Rate limiting ausente ou só por IP**: permite abuso de recurso caro
-  (busca, exportação, envio de e-mail) por ator autenticado que rotaciona
-  IP ou está atrás de NAT compartilhado.
+- **Broken Object Level Authorization (BOLA / IDOR)**: most common API vulnerability —
+  every endpoint receiving an object ID must verify that the authenticated actor possesses
+  rights over that specific instance, not just the general operation.
+- **Broken Authentication**: missing token expiration, lack of refresh token rotation,
+  unprotected authentication endpoints vulnerable to brute force.
+- **Excessive Data Exposure / Missing Output Filtering**: returning complete internal
+  database entities and relying on UI clients to filter fields leaks sensitive data.
+- **Missing or IP-Only Rate Limiting**: allows abuse of expensive operations (search,
+  exports, email delivery) by authenticated actors rotating IPs or behind shared NAT.
 
-## Supply chain e dependências
+## Supply Chain and Dependencies
 
-- Analisar dependências com ferramenta de SCA (Software Composition
-  Analysis) integrada ao pipeline, não apenas manualmente antes de release.
-- Verificar secrets vazados no histórico do repositório com scanner
-  dedicado, incluindo commits antigos, não só o estado atual.
-- Preferir SBOM gerado no build e, quando o projeto adotar, proveniência de
-  build (SLSA) para rastrear a origem de um artefato publicado.
+- Run Software Composition Analysis (SCA) integrated into the CI/CD pipeline, not merely
+  ad-hoc before releases.
+- Scan for leaked credentials across full repository git history, not only in HEAD.
+- Generate SBOMs during builds and verify build provenance (SLSA) when adopted.
 
-## Comandos de verificação (exemplos por ecossistema)
+## Verification Commands
 
 ```bash
-# Dependências vulneráveis (SCA) — escolha conforme o ecossistema do projeto
+# Vulnerable dependencies (SCA)
 npm audit --audit-level=high
 pip-audit
 trivy fs .
 
-# Secrets vazados no histórico completo do repositório, não só no HEAD
+# Leaked secrets across complete repository history
 gitleaks detect --source . --log-opts="--all"
 
-# SAST genérico com regras da comunidade
+# SAST scanning with community rules
 semgrep --config=auto .
 ```
 
-Trate esses comandos como ponto de partida: confirme qual scanner o
-projeto já usa (arquivo de config, CI existente) antes de sugerir uma
-ferramenta nova, e nunca declare "sem vulnerabilidade" só porque um scanner
-não encontrou nada — scanners têm falso negativo, sobretudo para lógica de
-autorização específica do domínio.
+Confirm which scanners the project already adopts (config files, CI workflows)
+before introducing new tooling. Never declare "zero vulnerabilities" solely because
+scanners returned exit code 0 — scanners suffer false negatives, especially around
+domain-specific business logic.
 
-## Fontes primárias
+## Authoritative Documentation
 
-- OWASP ASVS (checklist de verificação por nível de rigor): https://owasp.org/www-project-application-security-verification-standard/
-- OWASP Cheat Sheet Series (guia prático por tópico): https://cheatsheetseries.owasp.org/
+- OWASP ASVS: https://owasp.org/www-project-application-security-verification-standard/
+- OWASP Cheat Sheet Series: https://cheatsheetseries.owasp.org/
 - OWASP API Security Top 10: https://owasp.org/API-Security/
-- OWASP Top 10 (aplicações web): https://owasp.org/www-project-top-ten/
-- OWASP Threat Modeling (incluindo STRIDE): https://owasp.org/www-community/Threat_Modeling
-- NIST SSDF (ciclo de vida de desenvolvimento seguro): https://csrc.nist.gov/Projects/ssdf
+- OWASP Top 10: https://owasp.org/www-project-top-ten/
+- OWASP Threat Modeling: https://owasp.org/www-community/Threat_Modeling
+- NIST SSDF: https://csrc.nist.gov/Projects/ssdf
 - NIST Digital Identity Guidelines: https://pages.nist.gov/800-63-4/
-- OpenSSF (supply chain e boas práticas): https://openssf.org/
+- OpenSSF: https://openssf.org/

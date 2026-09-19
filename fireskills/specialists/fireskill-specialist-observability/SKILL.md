@@ -1,115 +1,107 @@
 ---
 name: fireskill-specialist-observability
-description: "Projetar e revisar logs, métricas, traces, correlação, SLOs, alertas e dashboards para explicar comportamento de sistemas. Use quando a tarefa envolve instrumentação, incidentes, telemetry ou operação; use também para definir o sinal que decide um rollout ou dispara um alerta; não confunda volume de logs com observabilidade, e para o diagnóstico de causa de latência específica use `$fireskill-specialist-performance-engineering`."
+description: "Design and review logs, metrics, traces, correlation, SLOs, alerts, and dashboards to explain system behavior. Use when the task involves instrumentation, incidents, telemetry, or operations; also use to define the signal that decides a rollout or triggers an alert; do not confuse log volume with observability, and for diagnosing specific latency root causes use `$fireskill-specialist-performance-engineering`."
 ---
 
-# Observabilidade
+# Observability
 
-## Quando usar
+## When to Use
 
-- Acionar quando o pedido envolve instrumentação (logs, métricas, traces),
-  investigação de incidente, definição de SLI/SLO ou construção de
-  dashboard/alerta.
-- Acionar também para definir o sinal objetivo que autoriza continuar, pausar
-  ou reverter um rollout.
-- Não acionar para diagnosticar a causa raiz de uma latência específica já
-  detectada — usar `$fireskill-specialist-performance-engineering` para
-  profiling e otimização; observability aqui é sobre desenhar o sistema de
-  sinais, não sobre investigar um caso pontual já instrumentado.
-- Combinar com `$fireskill-specialist-delivery-engineering` quando o sinal
-  definido aqui vai decidir um `failure_action` de rollout.
+- Trigger when the request involves instrumentation (logs, metrics, traces),
+  incident investigation, SLI/SLO definition, or dashboard/alert construction.
+- Also trigger to define the objective signal that authorizes proceeding, pausing,
+  or rolling back a deployment rollout.
+- Do not trigger to diagnose the root cause of a specific already detected
+  latency — use `$fireskill-specialist-performance-engineering` for
+  profiling and optimization; observability here focuses on designing the signal
+  system, not on investigating a single already instrumented case.
+- Combine with `$fireskill-specialist-delivery-engineering` when the signal
+  defined here decides a rollout `failure_action`.
 
-## Fluxo
+## Workflow
 
-1. Definir as perguntas operacionais reais ("o checkout está funcionando
-   para o usuário?") e as jornadas críticas antes de escolher qualquer
-   ferramenta.
-2. Estabelecer SLIs (indicadores medíveis) e SLOs (alvo aceitável) com
-   orçamento de erro explícito quando o serviço tiver criticidade que
-   justifique.
-3. Mapear os trust/system boundaries (HTTP, fila, job, banco) e o contexto de
-   correlação que precisa atravessá-los (trace id, request id).
-4. Instrumentar eventos, métricas e spans com cardinalidade controlada desde
-   o desenho, não como correção posterior.
-5. Proteger dados sensíveis na telemetry (redaction, mascaramento) e definir
-   política de retenção por tipo de sinal.
-6. Construir dashboards organizados por decisão (o que essa tela me ajuda a
-   decidir?) e alertas organizados por ação (o que eu faço quando esse
-   alerta dispara?).
-7. Validar a telemetry nos três estados — sucesso, falha e degradação
-   parcial — antes de confiar nela durante um incidente real.
+1. Define real operational questions ("is checkout functioning for the user?")
+   and critical user journeys before choosing any tooling.
+2. Establish SLIs (measurable indicators) and SLOs (acceptable target) with an
+   explicit error budget whenever service criticality justifies it.
+3. Map trust and system boundaries (HTTP, queue, background job, database) and the
+   correlation context that must traverse them (trace ID, request ID).
+4. Instrument events, metrics, and spans with controlled cardinality by design,
+   not as an afterthought.
+5. Protect sensitive data in telemetry (redaction, masking) and define retention
+   policies by signal category.
+6. Build dashboards organized by decision (what does this view help me decide?)
+   and alerts organized by action (what do I do when this alert fires?).
+7. Validate telemetry across all three states — success, failure, and partial
+   degradation — before relying on it during an active incident.
 
-## Padrões
+## Patterns
 
-- Logs estruturados (chave-valor ou JSON) com evento nomeado, severidade,
-  identificador de correlação e contexto mínimo necessário — nunca uma
-  string livre concatenada que exige regex para extrair dado.
-- Métricas usam apenas labels de cardinalidade limitada e conhecida
-  (endpoint normalizado, código de status, tenant se o volume de tenants for
-  baixo); nunca user id, URL crua com query string ou mensagem de erro bruta
-  como label — cada valor único de label multiplica as séries armazenadas.
-- Traces preservam o mesmo contexto de correlação atravessando HTTP, fila e
-  job assíncrono — um trace que "quebra" na borda de uma fila não serve para
-  depurar o problema mais comum (latência distribuída entre serviços).
-- Alertas refletem impacto real ao usuário ou risco iminente de violar o
-  SLO, e todo alerta tem owner e runbook alcançável — alerta sem ação
-  associada é ruído que treina a equipe a ignorar alertas.
-- Dashboards começam pela visão de saúde agregada (RED/USE) e permitem
-  drill-down até o sinal granular, não o inverso.
-- Sampling de traces preserva 100% dos erros e das transações de negócio
-  crítico, mesmo reduzindo a amostragem do caminho feliz de alto volume.
-- A própria telemetry falha de modo seguro (degrada, não derruba o produto)
-  — um exportador de métricas fora do ar nunca pode derrubar a aplicação que
-  instrumenta.
+- Structured logs (key-value or JSON) with named event, severity, correlation
+  identifier, and minimum necessary context — never an arbitrary concatenated
+  string that requires regex parsing to extract data.
+- Metrics only use labels with bounded, known cardinality (normalized endpoint,
+  status code, tenant if tenant count is small); never user IDs, raw URLs with
+  query strings, or raw error messages as labels — every unique label value
+  multiplies stored time series.
+- Traces preserve the same correlation context across HTTP, message queues, and
+  asynchronous jobs — a trace that breaks at the edge of a queue cannot debug
+  the most common problem (distributed latency across services).
+- Alerts reflect real user impact or imminent risk of SLO violation, and every
+  alert has an owner and an accessible runbook — an alert without an associated
+  action is noise that conditions the team to ignore alerts.
+- Dashboards start from an aggregated health view (RED/USE) and enable drill-down
+  to granular signals, not the reverse.
+- Trace sampling preserves 100% of errors and critical business transactions,
+  even when downsampling high-volume happy paths.
+- Telemetry itself fails safely (degrades gracefully, never brings down the product)
+  — an offline metrics exporter must never crash the application it instruments.
 
-## Antipadrões
+## Anti-Patterns
 
-- "Logar tudo" sem estrutura nem nível de severidade consistente: aumenta
-  custo de armazenamento e reduz a capacidade real de encontrar o evento
-  relevante durante um incidente — volume de log não é observabilidade.
-- Métrica com label de alta cardinalidade (ex.: `user_id` ou `order_id` como
-  label): explode o número de séries temporais armazenadas e pode derrubar
-  ou encarecer drasticamente o backend de métricas.
-- Alerta configurado em uma métrica de causa em vez de uma métrica de
-  sintoma (ex.: alertar em "CPU alta" em vez de "taxa de erro/latência
-  acima do SLO"): gera ruído em picos benignos e não necessariamente
-  detecta o impacto real ao usuário.
-- Dashboard que só existe porque "parecia útil na hora", sem revisão
-  periódica: acumula painéis obsoletos que competem por atenção com os
-  painéis que realmente importam durante um incidente.
+- "Log everything" without structure or consistent severity levels: increases
+  storage costs and diminishes the real ability to find relevant events during
+  an incident — log volume is not observability.
+- Metrics with high-cardinality labels (e.g., `user_id` or `order_id` as a
+  label): explodes time series storage and can drastically degrade or inflate
+  the cost of the metrics backend.
+- Alerts configured on cause metrics rather than symptom metrics (e.g., alerting
+  on "high CPU" instead of "error rate / latency exceeding SLO"): produces noise
+  during benign spikes and does not necessarily reflect real user impact.
+- Dashboards that exist only because "it seemed useful at the time", without
+  periodic review: accumulates obsolete panels that compete for attention with
+  panels that truly matter during an incident.
 
-## Validação
+## Validation
 
-- Gerar telemetry ponta a ponta em um cenário controlado e confirmar que a
-  correlação (trace id) atravessa todos os boundaries mapeados.
-- Verificar cardinalidade projetada, custo estimado, retenção configurada e
-  que campos sensíveis passam por redaction antes de sair do serviço.
-- Confirmar que os alertas configurados realmente disparam no cenário que
-  deveriam (teste ou simulação) e que o runbook vinculado é executável por
-  alguém que não escreveu o código.
-- Rodar, contra um cenário de falha conhecido, as queries que a equipe usaria
-  durante um incidente real, confirmando que elas retornam o sinal esperado
-  dentro de um tempo útil.
-- Não declarar um sistema "observável" apenas por existir dashboard; a prova
-  é a equipe conseguir responder à pergunta operacional original usando
-  apenas a telemetry, sem acesso a código ou banco.
+- Generate end-to-end telemetry in a controlled scenario and confirm that
+  correlation (trace ID) traverses all mapped boundaries.
+- Verify projected cardinality, estimated cost, configured retention, and ensure
+  sensitive fields undergo redaction before leaving the service.
+- Confirm that configured alerts actually fire in the intended scenario (test
+  or simulation) and that the linked runbook is actionable by someone who did
+  not write the code.
+- Run, against a known failure scenario, the queries the team would use during
+  a live incident, confirming they return the expected signal within useful time.
+- Do not declare a system "observable" merely because a dashboard exists; proof
+  requires the team being able to answer the original operational question
+  using telemetry alone, without direct code or database access.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-debugging` consome os sinais para isolar causa e pede
-  instrumentação adicional quando a evidência é insuficiente.
-- `$fireskill-specialist-postgres` e `$fireskill-specialist-cloudflare-workers`
-  produzem sinais de dados, filas e cache (Workers Logs/Traces) com
-  cardinalidade e retenção controladas aqui.
-- `$fireskill-specialist-web-api-design` define correlação e erro no contrato;
-  esta skill mede o comportamento do endpoint em operação.
-- `$fireskill-specialist-performance-engineering` para diagnóstico de causa
-  raiz de uma latência ou gargalo já detectado pelos sinais aqui definidos.
-- `$fireskill-specialist-delivery-engineering` quando o sinal de saúde definido
-  aqui alimenta a decisão de continuar ou reverter um rollout.
-- `$fireskill-specialist-application-security` quando a telemetry precisa
-  registrar (ou deliberadamente não registrar) eventos de segurança.
+- `$fireskill-specialist-debugging` consumes signals to isolate root causes and
+  requests additional instrumentation when evidence is insufficient.
+- `$fireskill-specialist-postgres` and `$fireskill-specialist-cloudflare-workers`
+  produce data, queue, and cache signals (Workers Logs/Traces) with cardinality
+  and retention governed here.
+- `$fireskill-specialist-web-api-design` defines correlation and errors in the
+  contract; this skill measures endpoint operational behavior.
+- `$fireskill-specialist-performance-engineering` for diagnosing root causes of
+  latencies or bottlenecks already detected by signals defined here.
+- `$fireskill-specialist-delivery-engineering` when the health signal defined
+  here informs decisions to continue or roll back a release.
+- `$fireskill-specialist-application-security` when telemetry must record (or
+  deliberately exclude) security events.
 
-Leia [references/standards.md](references/standards.md) para os pilares de
-observabilidade, frameworks de dashboard (RED/USE), SLIs/SLOs e fontes
-oficiais de OpenTelemetry.
+Read [references/standards.md](references/standards.md) for observability
+pillars, dashboard frameworks (RED/USE), SLIs/SLOs, and official OpenTelemetry sources.

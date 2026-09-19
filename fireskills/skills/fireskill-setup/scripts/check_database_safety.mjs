@@ -1,6 +1,6 @@
 /**
- * Confere a separação do banco de testes e recusa comandos que podem apagar
- * estruturas ou registros antes que uma skill execute testes ou migrations.
+ * Verifies test database isolation and rejects commands capable of deleting
+ * structures or records before a skill executes tests or migrations.
  */
 
 import { existsSync } from "node:fs";
@@ -45,11 +45,11 @@ const errors = [];
 const ignored = [];
 
 if (!existsSync(project)) {
-  errors.push(`projeto não encontrado: ${project}`);
+  errors.push(`project not found: ${project}`);
 } else {
   for (const pattern of destructiveCommands) {
     if (pattern.test(command)) {
-      ignored.push("o comando informado pode apagar estruturas ou registros");
+      ignored.push("the specified command may delete database structures or records");
       break;
     }
   }
@@ -75,18 +75,18 @@ const payload = {
 if (json) {
   console.log(JSON.stringify(payload, null, 2));
 } else {
-  console.log(`Proteção do banco: ${status.toUpperCase()}`);
-  for (const message of errors) console.log(`PENDENTE: ${message}`);
-  for (const message of ignored) console.log(`IGNORADO: ${message}`);
+  console.log(`Database protection: ${status.toUpperCase()}`);
+  for (const message of errors) console.log(`PENDING: ${message}`);
+  for (const message of ignored) console.log(`IGNORED: ${message}`);
 }
 process.exitCode = status === "safe" ? 0 : status === "ignored" ? 3 : 1;
 
-/** Exige um destino explícito de teste diferente do banco usado pelo .env. */
+/** Requires explicit test database distinct from development database. */
 async function inspectLaravelEnvironment() {
   const developmentPath = join(project, ".env");
   const testingPath = join(project, ".env.testing");
   if (!existsSync(testingPath)) {
-    errors.push("Laravel exige .env.testing antes de executar qualquer teste");
+    errors.push("Laravel requires .env.testing before executing tests");
     return;
   }
 
@@ -96,22 +96,22 @@ async function inspectLaravelEnvironment() {
   const testing = parseEnv(await readFile(testingPath, "utf8"));
 
   if (testing.get("APP_ENV") !== "testing") {
-    errors.push(".env.testing precisa declarar APP_ENV=testing");
+    errors.push(".env.testing must declare APP_ENV=testing");
   }
   if (!testing.get("DB_DATABASE") && !testing.get("DB_URL")) {
     errors.push(
-      ".env.testing precisa declarar DB_DATABASE ou DB_URL sem herdar o .env",
+      ".env.testing must declare DB_DATABASE or DB_URL without inheriting .env",
     );
     return;
   }
   const testingTarget = databaseTarget(testing, development);
   const developmentTarget = databaseTarget(development);
   if (developmentTarget && testingTarget === developmentTarget) {
-    errors.push(".env.testing aponta para o banco de desenvolvimento");
+    errors.push(".env.testing points to the development database");
   }
 }
 
-/** Recusa traits Laravel que recriam migrations durante a inicialização. */
+/** Rejects Laravel traits that recreate migrations during startup. */
 async function inspectLaravelTests() {
   const tests = join(project, "tests");
   if (!existsSync(tests)) return;
@@ -121,13 +121,13 @@ async function inspectLaravelTests() {
     const match = destructiveTestTraits.exec(source);
     if (match) {
       ignored.push(
-        `${basename(path)} usa ${match[1] ?? match[0]}, que pode recriar o banco`,
+        `${basename(path)} uses ${match[1] ?? match[0]}, which may recreate the database`,
       );
     }
   }
 }
 
-/** Recusa migrations com remoção de schema ou limpeza ampla de registros. */
+/** Rejects migrations with schema drop or broad data deletion. */
 async function inspectLaravelMigrations() {
   const migrations = join(project, "database", "migrations");
   if (!existsSync(migrations)) return;
@@ -135,12 +135,12 @@ async function inspectLaravelMigrations() {
     const source = await readFile(path, "utf8");
     const up = migrationMethod(source, "up", "down");
     if (destructiveMigrationSource.some((pattern) => pattern.test(up))) {
-      ignored.push(`${basename(path)} contém uma alteração que pode apagar dados`);
+      ignored.push(`${basename(path)} contains a mutation that may delete data`);
     }
   }
 }
 
-/** Isola o corpo executado pelo avanço da migration e desconsidera o rollback. */
+/** Isolates migration up body and ignores rollback. */
 function migrationMethod(source, method, nextMethod) {
   const start = source.search(new RegExp(`public\\s+function\\s+${method}\\s*\\(`, "u"));
   if (start < 0) return source;
@@ -151,7 +151,7 @@ function migrationMethod(source, method, nextMethod) {
   return next < 0 ? tail : tail.slice(0, next);
 }
 
-/** Lê arquivos pequenos de uma árvore sem seguir links simbólicos. */
+/** Reads small files without following symlinks. */
 async function regularFiles(root) {
   const found = [];
   const pending = [root];
@@ -167,7 +167,7 @@ async function regularFiles(root) {
   return found.sort();
 }
 
-/** Interpreta somente pares chave-valor; valores nunca são incluídos na saída. */
+/** Parses key-value pairs without echoing values. */
 function parseEnv(source) {
   const result = new Map();
   for (const line of source.split(/\r?\n/u)) {
@@ -178,7 +178,7 @@ function parseEnv(source) {
   return result;
 }
 
-/** Produz uma identidade comparável sem revelar credenciais ou nomes na saída. */
+/** Computes comparable database target identity without exposing secrets. */
 function databaseTarget(environment, fallback = new Map()) {
   const get = (name) => environment.get(name) ?? fallback.get(name);
   const url = get("DB_URL");
@@ -193,7 +193,7 @@ function databaseTarget(environment, fallback = new Map()) {
   ].join("|");
 }
 
-/** Confere o conteúdo do alias de pacote acionado pelo comando informado. */
+/** Verifies package alias content invoked by target command. */
 async function inspectCommandAlias() {
   const aliases = [];
   const composerMatch = /\bcomposer\s+(?:run\s+)?([\w:-]+)/iu.exec(command);
@@ -213,10 +213,10 @@ async function inspectCommandAlias() {
         typeof source === "string" &&
         destructiveCommands.some((pattern) => pattern.test(source))
       ) {
-        ignored.push(`o script ${name} pode apagar estruturas ou registros`);
+        ignored.push(`script ${name} may delete database structures or records`);
       }
     } catch {
-      errors.push(`não foi possível conferir o script ${name} em ${basename(manifest)}`);
+      errors.push(`could not verify script ${name} in ${basename(manifest)}`);
     }
   }
 }

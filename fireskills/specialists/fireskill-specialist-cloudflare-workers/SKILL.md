@@ -1,135 +1,91 @@
 ---
 name: fireskill-specialist-cloudflare-workers
-description: Escrever e revisar código que roda em Cloudflare Workers no Nuxfire — bindings (Hyperdrive, KV, R2, D1, Queues, Durable Objects, service bindings), waitUntil, cron, filas com DLQ, regras de I/O por requisição e compatibilidade (nodejs_compat). Use ao tocar `apps/functions/src/*`, `apps/app/server/plugins`, `server/utils/db.ts` ou qualquer código que use `env`/`event.context.cloudflare`; a definição de infraestrutura e deploy é do `$fireskill-specialist-sst`, não deste.
+description: Write and review Cloudflare Workers runtime code in Nuxfire — bindings (Hyperdrive, KV, R2, D1, Queues, Durable Objects, service bindings), waitUntil, cron triggers, queues with DLQ, per-request I/O boundaries, and nodejs_compat. Use when touching `apps/functions/src/*`, `apps/app/server/plugins`, `server/utils/db.ts`, or any code accessing `env`/`event.context.cloudflare`; infrastructure provisioning and deployments belong to `$fireskill-specialist-sst`.
 ---
 
 # Cloudflare Workers
 
-> A memória sobre APIs e limites da Cloudflare envelhece. Verifique na
-> documentação oficial e nos tipos gerados antes de afirmar comportamento,
-> limite ou assinatura. Este especialista diz **como o Nuxfire usa** o runtime.
+> Memory of Cloudflare APIs and runtime limits degrades over time. Verify against official documentation and generated TypeScript types before asserting behavior, quota limits, or signatures. This specialist documents **how Nuxfire operates** on this runtime.
 
-## Quando usar
+## When to Use
 
-- Acionar ao criar ou alterar handler de Worker (`fetch`, `queue`, `scheduled`),
-  plugin Nitro que lê `event.context.cloudflare`, acesso a KV/R2/D1/Hyperdrive/
-  Queue/Durable Object, ou chamada Worker→Worker.
-- Acionar ao depurar erro que só aparece em Worker: "Cannot perform I/O on
-  behalf of a different request", "Illegal invocation", resposta 500 em toda
-  requisição, conexões de banco esgotadas.
-- Não acionar para declarar recurso, domínio, secret ou stage: usar
-  `$fireskill-specialist-sst`. Não acionar para queries e schema: usar
-  `$fireskill-specialist-drizzle` e `$fireskill-specialist-postgres`.
-- Combinar com `$fireskill-specialist-nuxt` (Nitro, plugins),
-  `$fireskill-specialist-openauth` (Worker `Auth`),
-  `$fireskill-specialist-observability` e
-  `$fireskill-specialist-performance-engineering`.
+- Activate when creating or modifying Worker handlers (`fetch`, `queue`, `scheduled`), Nitro plugins reading `event.context.cloudflare`, storage access (KV/R2/D1/Hyperdrive/Queue/Durable Object), or Worker-to-Worker communication.
+- Activate when debugging runtime-specific Worker errors: "Cannot perform I/O on behalf of a different request", "Illegal invocation", 500 errors across all routes, or exhausted database connection pools.
+- Do not activate to declare infrastructure resources, domains, secrets, or stages: use `$fireskill-specialist-sst`. Do not activate for database SQL queries or schema modeling: use `$fireskill-specialist-drizzle` and `$fireskill-specialist-postgres`.
+- Combine with `$fireskill-specialist-nuxt` (Nitro, plugins), `$fireskill-specialist-openauth` (Auth Worker), `$fireskill-specialist-observability`, and `$fireskill-specialist-performance-engineering`.
 
-## Fluxo
+## Workflow
 
-1. Ler [references/nuxfire-workers.md](references/nuxfire-workers.md): quais
-   Workers existem, quais bindings, e as regras de I/O que já quebraram.
-2. Identificar em qual Worker o código roda (App/Web = Nitro; `Auth`, `Emails`,
-   `Websockets`, consumers e `Cron` = handlers puros em `apps/functions/src`).
-3. Confirmar o binding no SST (`infra/*.ts`) **antes** de usá-lo no código; um
-   binding que não foi linkado não existe em runtime.
-4. Carregar só a referência do produto envolvido (tabela abaixo).
-5. Implementar mantendo I/O por requisição e `ctx.waitUntil` para trabalho após
-   a resposta.
-6. Validar (seção abaixo) e, para mudança de runtime, testar em stage real: o
-   ambiente local não reproduz Hyperdrive nem service bindings por completo.
+1. Read [references/nuxfire-workers.md](references/nuxfire-workers.md): existing Workers, provisioned bindings, and critical I/O rules.
+2. Identify in which Worker target code runs (App/Web = Nitro; `Auth`, `Emails`, `Websockets`, Queue consumers, and `Cron` = vanilla handlers in `apps/functions/src`).
+3. Verify binding configuration in SST (`infra/*.ts`) **prior** to referencing it in code; unlinked bindings do not exist at runtime.
+4. Load task-specific references from the routing table below.
+5. Implement maintaining per-request I/O lifecycles and `ctx.waitUntil` for background work following responses.
+6. Validate against checks below and test runtime alterations against a live stage: local development cannot emulate Hyperdrive or service bindings with full fidelity.
 
-## Roteamento de referências
+## Reference Routing
 
-| Situação | Ler |
+| Situation | Read |
 |---|---|
-| Qualquer Worker do projeto | `nuxfire-workers` |
-| Compatibility date, tipos, secrets, logs/traces | `best-practices/configuration` |
-| Streaming, promessas, estado de requisição, segurança | `best-practices/runtime-patterns` |
-| Assinatura de handler, classes de plataforma, serialização | `best-practices/platform-apis` |
+| Any project Worker | `nuxfire-workers` |
+| Compatibility date, types, secrets, logs/traces | `best-practices/configuration` |
+| Streaming, promises, request context, security | `best-practices/runtime-patterns` |
+| Handler signature, platform classes, serialization | `best-practices/platform-apis` |
 | Postgres via Hyperdrive | `products/hyperdrive/*` |
-| KV (rate limit, cache) | `products/kv/*` |
+| KV (rate limiting, caches) | `products/kv/*` |
 | R2 (`BLOB`) | `products/r2/*` |
-| Fila e DLQ | `products/queues/*` |
-| Cron Trigger | `products/cron-triggers/*` |
-| Durable Object (WebSockets) | `durable-objects/index`, `durable-objects/rules`, `products/do-storage/*` |
-| Testar DO/Workers | `durable-objects/testing`, `durable-objects/workers` |
-| Comandos do CLI | `wrangler` |
-| Bindings em geral | `products/bindings/*` |
-| Logs e traces | `products/observability/*` |
+| Queues and DLQ | `products/queues/*` |
+| Cron Triggers | `products/cron-triggers/*` |
+| Durable Objects (WebSockets) | `durable-objects/index`, `durable-objects/rules`, `products/do-storage/*` |
+| Testing DO/Workers | `durable-objects/testing`, `durable-objects/workers` |
+| CLI commands | `wrangler` |
+| Bindings overview | `products/bindings/*` |
+| Logs and traces | `products/observability/*` |
 
-Cada `products/<x>/` traz `README`, `api`, `configuration`, `patterns` e
-`gotchas`. Comece por `gotchas`.
+## Key Rules
 
-## Regras principais
+- Database clients, socket connections, and I/O handles are instantiated **strictly per request** and never stored in module-level global variables. Only raw binding handles may be module-scoped. In apps, use `useDB()`; in vanilla handlers, construct clients inside the handler scope.
+- Close Postgres connections upon request termination inside `ctx.waitUntil` (`closeDB`). Never assume the runtime automatically closes sockets.
+- Invoke `ctx.waitUntil(p)` / `context.waitUntil(p)` **as a method on its parent receiver**; never destructure or assign to a detached variable.
+- Asynchronous operations executed without `await`, `return`, or `waitUntil` are dropped by the runtime and silently swallow errors.
+- Use service bindings (`env.Auth`, `env.Emails`) for Worker-to-Worker communication; never invoke public HTTP endpoints of peer Workers in the same deployment.
+- Use native bindings rather than Cloudflare REST APIs for supported storage and queue operations.
+- `nodejs_compat` is enabled across all Workers in `infra/utils/constants.ts`; verify Node.js module compatibility before introducing dependencies.
+- Sensitive tokens and random IDs: use `crypto.randomUUID()` or `crypto.getRandomValues()`, never `Math.random()`; compare secrets using constant-time algorithms.
+- Large or unbounded payloads: stream responses rather than buffering via `await response.text()`.
+- Secrets enter exclusively through `sst.Secret`/`vars`; only public values use `NUXT_PUBLIC_`.
+- Queue message processing: invoke `message.ack()` on success, `message.retry()` on transient failure; DLQ consumers log and acknowledge.
+- KV: minimum TTL is 60 seconds; rate limiting windows must not be smaller than this threshold.
+- Never type `Env` as `any`; use typed local `Environment` interfaces with `Hyperdrive` types from `@cloudflare/workers-types`.
+- Durable Object classes extend `DurableObject`; access context via `this.env` and `this.ctx`.
+- Durable Object `new_sqlite_classes` migration is executed only once per provisioned class: never re-apply to existing classes (error 10074).
 
-- Cliente de banco, de socket ou de qualquer objeto de I/O é **por
-  requisição** e nunca em variável de módulo. Só o *handle* do binding pode ser
-  global. No app, use `useDB()`; em handler puro, crie o cliente dentro do
-  handler.
-- Encerre o cliente Postgres ao fim da requisição, dentro de `ctx.waitUntil`
-  (`closeDB`). Não confie que o runtime feche sockets.
-- Chame `ctx.waitUntil(p)` / `context.waitUntil(p)` **como método**; nunca
-  extraia para variável.
-- Trabalho assíncrono sem `await`, sem `return` e sem `waitUntil` é descartado
-  e esconde erros.
-- Use service binding (`env.Auth`, `env.Emails`) para Worker→Worker; não faça
-  `fetch()` na URL pública de outro Worker do mesmo projeto.
-- Use o binding, não a API REST da Cloudflare, para operações que o binding
-  cobre.
-- `nodejs_compat` está ligado em todos os Workers via
-  `infra/utils/constants.ts`; não dependa de módulo Node sem confirmar suporte.
-- Tokens e IDs sensíveis: `crypto.randomUUID()`/`crypto.getRandomValues()`,
-  nunca `Math.random()`; compare segredos com comparação de tempo constante.
-- Corpo grande ou ilimitado: stream, não `await response.text()`.
-- Segredos só por `sst.Secret`/`vars`; só o que é público usa `NUXT_PUBLIC_`.
-- Mensagem de fila: `message.ack()` em sucesso, `message.retry()` em falha; a
-  DLQ só registra e dá ack.
-- KV: TTL mínimo 60s; janela de rate limit nunca menor que isso.
-- Não tipar `Env` com `any`; no projeto, `interface Environment` local com o
-  tipo `Hyperdrive` de `@cloudflare/workers-types`.
-- Classe de DO estende `DurableObject`; use `this.env`/`this.ctx`.
-- Migração `new_sqlite_classes` de DO é única: nunca reenviar para classe
-  existente (erro 10074).
+## Anti-patterns
 
-## Antipadrões
+- `let db = postgres(...)` at top-level module scope shared across requests.
+- Destructuring `const { waitUntil } = ctx` or `const fn = context.waitUntil` — strips method receiver and crashes Worker execution.
+- Fetching `https://auth.<domain>/...` from `App` to `Auth` instead of using `env.Auth`.
+- Renaming `BLOB`, `KV`, `CACHE` (NuxtHub) or `DB` (apps/web D1).
+- Maintaining a parallel `wrangler.toml` alongside SST — introduces split configuration truth.
+- Hand-crafting duplicate `Env` interfaces that drift from what SST actually provisioned.
+- Storing request-scoped state in module global variables (causes cross-tenant data leaks).
+- Using `ctx.passThroughOnException()` as an error handling strategy.
+- Trusting `X-Forwarded-For` in production: authoritative client IP is provided by `CF-Connecting-IP`.
 
-- `let db = postgres(...)` no topo do módulo, reaproveitado entre requisições.
-- `const { waitUntil } = ctx` / `const fn = context.waitUntil` — perde o
-  receiver e derruba o Worker.
-- `fetch("https://auth.<domínio>/...")` de dentro do `App` para o `Auth`.
-- Renomear `BLOB`, `KV`, `CACHE` (NuxtHub) ou `DB` (D1 do `apps/web`).
-- Declarar `wrangler.toml` paralelo ao SST — duas fontes de verdade.
-- Escrever `interface Env` à mão que duplica bindings em vez de tipar pelo que
-  o SST realmente linkou.
-- Guardar estado de requisição em variável de módulo (vaza entre usuários).
-- `ctx.passThroughOnException()` como tratamento de erro.
-- Confiar em `X-Forwarded-For` em produção: o IP confiável é `CF-Connecting-IP`.
-- Confiar em `dlq.retryDelay` do SST 4.14.0 (bug ms/s); o atraso real é o de
-  `transform.consumer`.
-- Assumir Workflows, Workers AI, Vectorize ou observabilidade declarada em
-  código: não existem no projeto.
+## Validation
 
-## Validação
+- `bun run typecheck` in `apps/app` for Nitro code; `tsc` in `apps/functions`; zero `any` types in `Env`.
+- Project tests: `bun run test` (Vitest) at repository root.
+- After modifying database I/O: verify sequential requests on a real stage without "Cannot perform I/O..." errors, and confirm idle connection pools remain bounded.
+- After modifying queues/cron: verify message processing, dead-letter routing to DLQ, and audit entries in logs.
+- After modifying Durable Objects/WebSockets: test valid connection tokens, expired token rejection, and automatic reconnection.
+- Test deployment with `sst deploy` on a test stage is the definitive gate.
 
-- `bun run typecheck` em `apps/app` para código Nitro; para `apps/functions`,
-  `tsc` do próprio pacote quando houver script; nenhum `any` novo em `Env`.
-- Testes do projeto: `bun run test` (Vitest) na raiz.
-- Depois de mexer em I/O de banco: requisições em sequência no stage real sem
-  "Cannot perform I/O…", e sem crescimento de conexões ociosas no Postgres.
-- Depois de mexer em fila/cron: uma mensagem que sucede, uma que falha até a
-  DLQ, e uma linha esperada em `logs`/`deadLetterRecords`.
-- Depois de mexer em DO/WebSocket: conexão com ticket válido, com ticket
-  expirado, e reconexão.
-- `sst deploy` num stage de teste é o teste final; verificação local passar não
-  basta para mudanças de binding, migração de DO ou compatibilidade.
+## Related Skills
 
-## Skills relacionadas
-
-- `$fireskill-specialist-sst` — recursos, links, secrets, stages e deploy.
-- `$fireskill-specialist-nuxt` — Nitro, plugins e `useEvent()`.
-- `$fireskill-specialist-drizzle` — schema e queries sobre o cliente Postgres.
-- `$fireskill-specialist-openauth` — Worker de autenticação e `AuthKV`.
-- `$fireskill-specialist-application-security` — segredos, HMAC, rate limit.
-- `$fireskill-specialist-observability` e
-  `$fireskill-specialist-performance-engineering`.
+- `$fireskill-specialist-sst` — resources, bindings, secrets, stages, and deploy workflows.
+- `$fireskill-specialist-nuxt` — Nitro plugins and `useEvent()`.
+- `$fireskill-specialist-drizzle` — schema and database queries.
+- `$fireskill-specialist-openauth` — authentication Worker and `AuthKV`.
+- `$fireskill-specialist-application-security` — secrets, HMAC, rate limiting.
+- `$fireskill-specialist-observability` and `$fireskill-specialist-performance-engineering`.

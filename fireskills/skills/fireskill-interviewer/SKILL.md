@@ -1,91 +1,90 @@
 ---
 name: fireskill-interviewer
-description: "Use quando uma spec em draft, defined, planned, in-progress ou review precisar de conversa para resolver lacunas, recalibrar Effort ou registrar respostas confirmadas antes da próxima transição. Não use para capturar Inbox sem perguntas, executar implementação, aprovar gates ou mover pastas diretamente."
+description: "Use when a spec in draft, defined, planned, in-progress, or review needs conversation to resolve gaps, recalibrate Effort, or record confirmed answers before the next transition. Do not use to capture Inbox without questions, execute implementation, approve gates, or move directories directly."
 ---
 
-# Conversar com uma spec pelo estado atual
+# Interviewing a Spec by Current State
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered questions contract`
+from `fireskills/skills/Spec.md`.
 
-Leia a `spec.md` pelo ID informado e confirme a pasta de estado. A pasta é o
-estado operacional; `Status` é seu espelho verificável. Preserve a spec como
-fonte normativa e registre apenas respostas, escolhas e justificativas
-confirmadas pela pessoa responsável.
+Read `spec.md` by specified ID and confirm state directory. The directory is the
+operational state; `Status` is its verifiable mirror. Preserve the spec as the
+normative source and record only answers, choices, and justifications confirmed
+by the responsible person.
 
-## Conduzir a conversa
+## Conduct the Interview
 
-1. Leia a spec, seus gates, tarefas, evidências e o contexto do projeto.
-2. Identifique a lacuna real que mais afeta a próxima etapa e monte uma rodada
-   conforme o contrato central.
-3. Reavalie a spec depois de cada rodada. Não repita informação confirmada nem
-   use perguntas como ritual.
-4. Atualize a seção adequada da spec após confirmar a resposta. Quando a nova
-   informação mudar capacidade necessária, ajuste também o Effort.
-5. Entregue a responsabilidade de validação, implementação ou transição à skill
-   correspondente. Esta skill não aprova gate, não executa tarefa e não move a
-   spec.
+1. Read the spec, its gates, tasks, evidence, and project context.
+2. Identify the real gap that most impacts the next step and assemble a round
+   according to the central contract.
+3. Re-evaluate the spec after each round. Do not repeat confirmed information
+   or use questions as mere ritual.
+4. Update the appropriate section of the spec after confirming the response.
+   When new information alters necessary capacity, also adjust Effort.
+5. Transfer responsibility for validation, implementation, or transition to the
+   corresponding skill. This skill does not approve gates, execute tasks, or
+   move the spec.
 
-## Adaptar o foco à pasta
+## Adapt Focus to Directory
 
-| Pasta | Foco da conversa |
+| Directory | Conversation Focus |
 | --- | --- |
-| `draft` | problema, atores, comportamento, regras, falhas e aceite |
-| `defined` | ambiguidade que afeta plano, dados, segurança ou testes |
-| `planned` | dependências, ordem de tarefas, estratégia de TDD e BDD |
-| `in-progress` | mudança tardia, descoberta de execução e impacto no escopo |
-| `review` | aceite observado, documentação, pendências de entrega e retorno |
-| `completed` | não entreviste para alterar a entrega; inicie ou reabra a mudança pelo fluxo correto |
+| `draft` | Problem, actors, behavior, rules, failure paths, and acceptance |
+| `defined` | Ambiguity affecting plan, data, security, or tests |
+| `planned` | Dependencies, task order, TDD and BDD strategy |
+| `in-progress` | Late changes, execution discoveries, and scope impact |
+| `review` | Observed acceptance, documentation, delivery gaps, and feedback |
+| `completed` | Do not interview to alter delivery; initiate or reopen change via the correct flow |
 
-`inbox` não recebe perguntas. `backlog` continua sob responsabilidade de
-`$fireskill-02-backlog`, que chama este protocolo de descoberta quando necessário.
+`inbox` does not receive questions. `backlog` remains under the responsibility of
+`$fireskill-02-backlog`, which calls this discovery protocol when needed.
 
-## Atualizar Effort
+## Update Effort
 
-Use Effort como estimativa de capacidade de raciocínio e execução necessária,
-nunca como prazo. Escolha um inteiro de 1 a 10 e uma justificativa curta:
+Use Effort as an estimate of reasoning capacity and required execution, never
+as a deadline. Choose an integer from 1 to 10 and a short rationale:
 
-- 1–2: alteração atômica e padrão conhecido;
-- 3–4: mudança local e testes diretos;
-- 5–6: vários arquivos ou integração conhecida;
-- 7–8: mudança transversal, migração ou integração externa;
-- 9–10: arquitetura, alta incerteza ou revisão humana frequente.
+- 1–2: Atomic change and known pattern;
+- 3–4: Local change and straightforward tests;
+- 5–6: Multiple files or known integration;
+- 7–8: Cross-cutting change, migration, or external integration;
+- 9–10: Architectural redesign, high uncertainty, or frequent human review.
 
-Execute após a confirmação:
+Execute after confirmation:
 
 ```bash
-bun run fireskill effort <id-da-spec> <1-10> --reason "<o que mudou a estimativa>"
+bun run fireskill effort <spec-id> <1-10> --reason "<what changed the estimate>"
 ```
 
-O comando atualiza `Effort`, data, justificativa e histórico em `spec.md`.
-Não vincule a estimativa ao nome de um modelo: use a faixa para escolher o
-perfil de execução `light`, `standard`, `high` ou `maximum`.
+The command updates `Effort`, date, rationale, and history in `spec.md`.
+Do not bind the estimate to a model name: use the bracket to choose execution
+profile `light`, `standard`, `high`, or `maximum`.
 
-## Integrar ClickUpfy quando presente
+## Integrate ClickUpfy When Present
 
-Se o projeto contiver uma skill `clickupfy-*` e a spec tiver `ClickUp Task`,
-depois de uma transição ou ajuste de Effort carregue a skill ClickUpfy
-apropriada. Use o mapeamento configurado pelo projeto ou, quando ausente,
-`draft`/`defined`/`planned` para `To Do`, `in-progress` para `In Progress`,
-`review` para `In Review` e `completed` para `Complete`.
+If the project contains a `clickupfy-*` skill and the spec has a `ClickUp Task`,
+load the appropriate ClickUpfy skill after a transition or Effort adjustment.
+Use the mapping configured by the project or, when absent, `draft`/`defined`/`planned`
+to `To Do`, `in-progress` to `In Progress`, `review` to `In Review`, and
+`completed` to `Complete`.
 
-O estado local permanece canônico. Se a atualização remota não ocorrer,
-registre a pendência na spec sem declarar sincronização concluída.
+Local state remains canonical. If remote update does not succeed, record the
+pending blocker in the spec without declaring synchronization complete.
 
-## Limites
+## Boundaries
 
-- Não inventar respostas, Effort, vínculo de tarefa ou status remoto.
-- Não alterar uma spec em `completed` como forma de iniciar mudança nova.
-- Não mover pastas por comando do sistema; use `bun run fireskill transition` somente na
-  skill responsável depois de seus gates.
-- Não exigir ClickUp para uma spec sem integração configurada.
+- Do not invent answers, Effort, task bindings, or remote status.
+- Do not edit a spec in `completed` to start a new change.
+- Do not move folders via shell commands; use `bun run fireskill transition`
+  only in the responsible skill after its gates pass.
+- Do not require ClickUp for a spec without configured integration.

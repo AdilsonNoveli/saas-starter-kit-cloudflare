@@ -1,35 +1,32 @@
-# CLI `fireskill`
+# `fireskill` CLI
 
-Motor do fluxo do Fireskills: estados de spec, esforço, progresso e milestones.
-Derivado do CLI do Specsfy (`promovaweb/specsfy`, licença MIT, ver `LICENSE`),
-**reduzido ao que o Fireskills usa**.
+Engine for the Fireskills lifecycle: spec states, effort tracking, progress monitoring, and milestones.
+Derived from the Specsfy CLI (`promovaweb/specsfy`, MIT license, see `LICENSE`),
+**scoped strictly to what Fireskills actively utilizes**.
 
-## O que veio e o que não veio
+## Capabilities
 
-| Veio | Não veio (e por quê) |
+| Included | Excluded (and rationale) |
 |---|---|
-| `transition`, `migrate`, `effort`, `progress`, `milestones sync`, `config`, integração opcional ClickUpfy | `install`, `update`, `upgrade`, `skills *`, `doctor`: eram o instalador; o Fireskills vive dentro do repositório |
-| `test` (reescrito: executa `bun run test`, Vitest) | `test` original: só detectava Laravel + Pest |
-| | `tui` (interface `neo-blessed`, 1600 linhas): opcional; `progress --watch` cobre o acompanhamento |
+| `transition`, `migrate`, `effort`, `progress`, `milestones sync`, `config`, optional ClickUpfy integration | `install`, `update`, `upgrade`, `skills *`, `doctor`: were upstream installer tooling; Fireskills lives directly within the repository |
+| `test` (rewritten: runs `bun run test`, Vitest) | Original upstream `test`: only detected Laravel + Pest |
+| | `tui` (`neo-blessed` terminal UI, 1,600 lines): omitted; `progress --watch` covers live monitoring |
 
-## Uso
+## Usage
 
-Da raiz do repositório (o script `fireskill` está no `package.json` da raiz):
+From the repository root (the `fireskill` script is configured in root `package.json`):
 
 ```bash
 bun run fireskill --help
 bun run fireskill progress
-bun run fireskill transition 0001-meu-slug defined
+bun run fireskill transition 0001-my-slug defined
 ```
 
-Ou direto: `bun fireskills/cli/src/main.ts <comando>`. Bun executa o TypeScript
-sem build.
+Or directly: `bun fireskills/cli/src/main.ts <command>`. Bun executes TypeScript without build steps.
 
-## Desenvolvimento
+## Development
 
-- Dependência: `commander` (declarada em `package.json`). Neste monorepo ela é
-  resolvida pelo `node_modules` da raiz (v13.1.0); numa cópia limpa, rode
-  `bun install --cwd fireskills/cli`.
-- Testes (Vitest, 20 casos derivados dos do upstream): `bunx vitest run` dentro de
-  `fireskills/cli/`. Typecheck: `bunx tsc -p tsconfig.json --noEmit`.
-- Regras de estado e transições permitidas: `src/lifecycle.ts`.
+- Dependency: `commander` (declared in `package.json`). In this monorepo it resolves
+  via root `node_modules` (v13.1.0); in isolated setups, run `bun install --cwd fireskills/cli`.
+- Tests (Vitest, 30 test cases): `bun run --cwd fireskills/cli test`. Typecheck: `bun run --cwd fireskills/cli typecheck`.
+- Lifecycle rules and allowed transitions: `src/lifecycle.ts`.

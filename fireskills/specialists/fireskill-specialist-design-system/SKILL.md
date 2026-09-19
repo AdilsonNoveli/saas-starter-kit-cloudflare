@@ -1,209 +1,141 @@
 ---
 name: fireskill-specialist-design-system
-description: Criar e manter o .fireskills/DESIGNSYSTEM.MD com regras macro de interface SaaS, padrões CRUD, estados e exceções por alcance. Use antes de projetar telas; não use para registrar componentes locais.
+description: Create and maintain .fireskills/DESIGNSYSTEM.MD with macro SaaS interface rules, CRUD patterns, states, and scoped exceptions. Use before designing screens; do not use to inventory local component files.
 ---
 
 # Fireskills Specialist Design System
 
-## Quando usar
+## When to Use
 
-Esta skill governa o documento `.fireskills/DESIGNSYSTEM.MD` do projeto consumidor. Ela
-define linguagem visual, shell, composição de superfícies, estados e regras de
-negócio expostas na interface. O documento orienta UX, UI, experiência de
-interface e componentes Vue com `@nuxt/ui`.
+This skill governs `.fireskills/DESIGNSYSTEM.MD` in consumer projects. It establishes
+visual language, shell layout, surface composition, states, and business rules exposed
+in the user interface. It guides UX, UI, interface experience, and Vue components with `@nuxt/ui`.
 
-Use antes de criar ou revisar uma tela, um fluxo CRUD, uma navegação, um
-formulário ou um componente global. Use também quando o documento não existir,
-estiver desatualizado ou entrar em conflito com uma tela já projetada.
+Use before creating or reviewing screens, CRUD workflows, navigation, forms, or
+global components. Also use when the document is missing, outdated, or conflicting
+with an implemented screen.
 
-Não use esta skill para catalogar componentes, props ou arquivos locais. Esse
-registro pertence a `.fireskills/INTERFACE.md`, que deve apontar para as escolhas macro sem
-copiá-las.
+Do not use this skill to catalog local components, props, or file locations. That
+registry belongs in `.fireskills/INTERFACE.md`, which links to macro design choices without duplicating them.
 
-## Fontes obrigatórias
+## Required Sources
 
-Leia, nesta ordem:
+Read in this order:
 
-1. `.fireskills/DESIGNSYSTEM.MD` na raiz do projeto consumidor, se existir.
-2. `.fireskills/templates/DESIGNSYSTEM.MD` para criar a fonte ausente.
-3. `.fireskills/INTERFACE.md` para conhecer componentes e telas já registradas.
-4. `.fireskills/STACK.md`, manifests, rotas, telas, permissões e regras do
-   domínio relacionadas à entrega.
+1. `.fireskills/DESIGNSYSTEM.MD` at the project root, if present.
+2. `skills/templates/DESIGNSYSTEM.MD` if creating the document.
+3. `.fireskills/INTERFACE.md` to review existing registered components and screens.
+4. `.fireskills/STACK.md`, manifests, routes, screens, permissions, and domain rules.
 
-Quando a fonte não existir, copie o template gerenciado para `.fireskills/DESIGNSYSTEM.MD`
-e preencha apenas o contexto já confirmado. Não esconda lacunas com texto
-genérico.
+When absent, copy the managed template to `.fireskills/DESIGNSYSTEM.MD` and populate
+only confirmed context. Do not fill gaps with generic placeholder copy.
 
-## Fluxo
+## Workflow
 
-1. Identifique o produto, o módulo, a superfície e o fluxo afetado.
-2. Compare a solicitação com `.fireskills/DESIGNSYSTEM.MD` e preserve as regras já ativas.
-3. Se a pessoa não informa direção visual, aplique os defaults do documento e
-   registre isso como direção padrão da entrega.
-4. Se a pessoa fornece uma direção diferente, registre a exceção, seu alcance
-   e a regra que ela substitui. Uma exceção de tela não altera o produto todo.
-5. Atualize o documento somente quando a regra tiver alcance macro. Registre
-   componentes e telas específicas em `.fireskills/INTERFACE.md`.
-6. Mapeie os cenários canônicos da superfície antes de entregar a orientação
-   para UX, UI ou implementação.
-7. Retorne os arquivos lidos, a regra aplicada, as exceções registradas e os
-   cenários cobertos.
+1. Identify product, module, surface, and affected user flow.
+2. Compare requests against `.fireskills/DESIGNSYSTEM.MD` and preserve active rules.
+3. If no visual direction is given, apply document defaults and record this as the default design direction.
+4. If a different direction is provided, record the exception, its scope, and the rule it replaces. A single screen exception does not alter global rules.
+5. Update the document only when rules have macro scope. Document specific components and screens in `.fireskills/INTERFACE.md`.
+6. Map canonical scenarios for the surface before handing off to UX, UI, or implementation.
+7. Report consulted sources, applied rules, recorded exceptions, and covered scenarios.
 
-Em toda entrega visual, faça a revisão durante o desenvolvimento mesmo sem
-pedido da pessoa. Confira bordas, espaçamentos, margens, padding e tipografia
-do sistema nos viewports e estados relevantes. Registre o método, o resultado e
-os ajustes no item `VISUAL` da tarefa.
+Conduct visual reviews during development even without explicit user requests.
+Verify borders, spacing, margins, padding, and typography across viewports and states.
+Record methodology, results, and adjustments in the `VISUAL` task checklist item.
 
-## Padrões
+## Standards
 
-### Defaults obrigatórios para SaaS
+### Mandatory SaaS Defaults
 
-Quando não houver direção visual contrária, aplique estas composições:
+When no contrary visual direction exists, apply these compositions:
 
-- Lista de CRUD: `PageHeader` + resumo útil + `UTable`. Use busca, filtros,
-  ordenação, paginação, seleção e ações por linha quando o volume ou o domínio
-  pedir.
-- Detalhe: `PageHeader` + `DetailLists`, com status, próxima ação e relações ou
-  atividade quando forem úteis para o domínio.
-- Criar e editar: `PageHeader` + seções de formulário em duas colunas
-  responsivas, com coluna de contexto e painel de campos.
-- Formulário: labels visíveis acima dos campos, ajuda contextual, valores
-  preservados e estado de envio.
-- Erro de campo: borda, fundo ou ícone semântico vermelho, mensagem visível
-  abaixo do campo, associação semântica e foco no primeiro erro.
-- Erros múltiplos: resumo no início com links para os campos afetados.
-- Tela: `loading`, vazio, erro, sucesso, sem permissão, conteúdo parcial e não
-  salvo quando o fluxo comportar esses estados.
-- Breadcrumb: obrigatório em toda tela da aplicação, com o nome da equipe ativa
-  visível antes do módulo e do título atual. Reaproveitar o
-  breadcrumb existente no layout (ou `UBreadcrumb` do `@nuxt/ui` se não houver).
-- UTable: linha inteira clicável para abrir o detalhe, com equivalente de
-  teclado e controles internos protegidos por `TableRowAction` ou equivalente.
-- CRUD: todas as telas reutilizam o mesmo `PageHeader` componentizado; a lista
-  usa `UTable` em largura total, exibe a coluna `ID` e oferece botões de editar
-  e apagar na linha. O link da linha leva ao detalhe sem capturar os botões.
-- Componentes recorrentes de cabeçalho, tabela, linha, ações, formulário,
-  estados e feedback entram em `.fireskills/INTERFACE.md` e são reaproveitados antes de uma
-  nova implementação.
+- CRUD List: `PageHeader` + summary + `UTable`. Use search, filters, sorting,
+  pagination, selection, and row actions as required by volume and domain.
+- Detail View: `PageHeader` + `DetailLists`, with status badge, primary next action,
+  and related records or activity history.
+- Create / Edit: `PageHeader` + form sections in responsive two-column layout
+  (left context column, right fields panel).
+- Form Fields: visible top labels above inputs, contextual help text, preserved inputs,
+  and explicit submission state.
+- Field Validation Errors: red border/icon, visible error message directly below input,
+  semantic ARIA association, and focus on the first invalid field.
+- Multiple Errors: summary banner at top linking to affected inputs.
+- Screen States: `loading`, empty, error, success, forbidden (403), partial content,
+  and unsaved changes when applicable.
+- Breadcrumbs: mandatory on every screen, showing active team name before module
+  and page title. Reuse layout breadcrumb (or `UBreadcrumb` from `@nuxt/ui`).
+- UTable: entire row clickable to open details, with keyboard equivalents and
+  row action buttons isolated via `TableRowAction` or stop-propagation.
+- CRUD Consistency: all views reuse the componentized `PageHeader`; tables use
+  full-width `UTable`, display `ID` column, and provide edit and delete row actions.
+- Reusable components for headers, tables, rows, actions, forms, states, and feedback
+  must be recorded in `.fireskills/INTERFACE.md` and reused before implementing new components.
 
-Esses defaults não significam aparência genérica. A personalidade vem da
-hierarquia dos dados, linguagem do domínio, tipografia, tokens, ritmo, estados,
-contraste e uso do shell. A composição deve informar e orientar a tarefa.
+These defaults do not imply generic styling. Character originates in domain hierarchy,
+typography, tokens, rhythm, contrast, and shell execution.
 
-## Dashboards e blocos comuns
+## Dashboards and Shared Blocks
 
-Quando a entrega incluir um dashboard, use `PageHeader`, período ou escopo,
-filtros, uma faixa curta de `KPI` com valor, unidade, período, comparação e
-fonte, seguida da tendência ou distribuição principal e de uma lista detalhada
-ou `UTable` para investigação. Cada indicador e visualização deve declarar
-loading, vazio, erro e atualização, além de alternativa textual ou tabular para
-gráficos.
+Dashboards feature `PageHeader`, date/scope selector, filters, a concise `KPI` strip
+(value, unit, period, comparison, source), followed by primary trends/distributions
+and detailed investigative data tables. Every metric must define loading, empty,
+error, and refresh states, with accessible text/tabular alternatives for charts.
 
-Use os componentes do `@nuxt/ui` v4 (`UCard`, `UTable`, `UForm`, `UModal`,
-`UDashboard*` e demais) para controles e composições de CRUD e dashboard, com o
-tema vindo de `@nuxfire/tokens` (`sharedUiConfig`, `theme.css` e
-`enterpriseTableUi`). Adapte dados, permissões, acessibilidade e linguagem do
-produto. Registre origem, estados e consumidores em `.fireskills/INTERFACE.md`.
+Use `@nuxt/ui` v4 components (`UCard`, `UTable`, `UForm`, `UModal`, `UDashboard*`)
+themed via `@nuxfire/tokens` (`sharedUiConfig`, `theme.css`, `enterpriseTableUi`).
 
-## Formulários de criar e editar
+## Form Layouts
 
-Organize criar e editar em seções independentes. Cada seção apresenta contexto
-à esquerda e o painel de campos à direita. No painel, campos relacionados usam
-duas colunas nos breakpoints largos e uma coluna no mobile; campos longos,
-uploads e erros podem ocupar toda a largura. O rodapé mantém cancelar e salvar
-próximos do resultado da ação.
+Organize create/edit flows into distinct sections. Context on the left, fields panel
+on the right. Fields use two columns on desktop viewports and collapse to single-column
+on mobile. Actions footer keeps cancel and submit buttons adjacent to form outcomes.
 
-## Breadcrumb e shell
+## Canonical Scenarios
 
-Toda tela renderiza o `Breadcrumb` no shell global. A trilha deve mostrar a
-equipe ativa, o módulo e a tela atual, usando labels reais e links válidos nos
-itens anteriores. Localize e reaproveite o breadcrumb já presente no layout,
-junto da tipagem dos itens (ou `UBreadcrumb` do `@nuxt/ui`, se não houver);
-adapte apenas a composição necessária para inserir a equipe sem duplicar o
-componente. A equipe e a tela atual continuam visíveis no mobile.
+Cover these scenarios in `.fireskills/DESIGNSYSTEM.MD` or delivery specs:
 
-## Cenários que toda entrega deve cobrir
+- list with populated records;
+- empty list state;
+- detail view with status and action buttons;
+- valid creation;
+- valid editing;
+- create/edit with field validation errors;
+- unauthorized access (403);
+- data loading failure;
+- unsaved changes warning;
+- destructive action outcomes (confirmation modals for deletion/cancellation).
 
-Consulte a seção `Cenários canônicos` do template e registre o recorte
-aplicável em `.fireskills/DESIGNSYSTEM.MD` ou na spec da entrega:
+## Boundaries and Handoff
 
-- lista com registros;
-- lista vazia;
-- detalhe com status e ações;
-- criação válida;
-- edição válida;
-- criação ou edição com erro de campo;
-- ausência de permissão;
-- falha de carregamento;
-- alteração não salva, quando houver edição;
-- resultado de ação destrutiva, quando houver exclusão ou cancelamento.
+- UX defines flow, information architecture, and task terminology from this source.
+- UI defines tokens, hierarchy, visual rhythm, and states from this source.
+- Vue components (`@nuxt/ui`) implement matching compositions after reading this source and `.fireskills/INTERFACE.md`.
+- The interface experience skill coordinates delivery and must load `.fireskills/DESIGNSYSTEM.MD` before designing screens.
 
-Para cada cenário, informe pré-condição, ação, resposta, estado visual, foco,
-mensagem e próximo passo.
+## Antipatterns
 
-## Limites e handoff
+- Card walls when users need to compare tabular records.
+- Monolithic forms lacking section groupings.
+- Multi-column forms on mobile screens.
+- Placeholders used as substitutes for form labels.
+- Errors conveyed solely through icons, color, or distant toasts.
+- Screens lacking empty states or recovery routes.
+- Dashboards presenting disconnected numbers without context, units, or next steps.
+- Creating bespoke styles using arbitrary hex codes instead of semantic tokens.
+- Registering local screen exceptions as global design rules.
 
-- UX define fluxo, arquitetura da informação e linguagem da tarefa a partir
-  desta fonte.
-- UI define tokens, hierarquia, composição visual e estados a partir desta
-  fonte.
-- Componentes Vue (`@nuxt/ui`) escolhem componentes e composições compatíveis
-  depois de ler esta fonte e `.fireskills/INTERFACE.md`.
-- A skill de experiência de interface coordena a entrega e não deve iniciar uma
-  tela sem carregar `.fireskills/DESIGNSYSTEM.MD`.
+## Validation
 
-## Antipadrões
+Before handoff, verify:
 
-- Parede de cards quando a pessoa precisa comparar registros.
-- Formulário sem seções quando o domínio tem grupos de informação distintos.
-- Duas colunas no mobile ou uma grade que separa campo, ajuda e erro.
-- Placeholder usado como único label.
-- Erro indicado somente por ícone, cor ou toast distante do campo.
-- Tela sem `PageHeader`, sem estado vazio ou sem caminho de recuperação.
-- Dashboard que mostra números sem pergunta, período, unidade ou próxima ação.
-- Dashboard que usa uma parede de cartões sem hierarquia ou investigação.
-- Componente do `@nuxt/ui` usado sem adaptar dados, estados, permissões e
-  tokens do produto, ou estilizado com cor de paleta bruta em vez de cor
-  semântica.
-- Novo token ou componente criado sem verificar o documento e `.fireskills/INTERFACE.md`.
-- Exceção visual local registrada como regra global sem alcance explícito.
-- CRUD com cabeçalhos duplicados, UTable estreito, ID oculto ou sem ações de
-  editar e apagar na linha.
-
-## Validação
-
-Antes do handoff, confira:
-
-- `.fireskills/DESIGNSYSTEM.MD` existe na raiz do projeto consumidor e tem classificação,
-  política, defaults, estados, cenários e histórico.
-- A lista usa `UTable` e `PageHeader`.
-- Toda tela tem `Breadcrumb` com o nome da equipe ativa, módulo e tela atual.
-- O breadcrumb já existente no layout é reaproveitado (ou `UBreadcrumb`).
-- O detalhe usa `DetailLists` e `PageHeader`.
-- Criar e editar usam seções, coluna de contexto, painel de campos em duas
-  colunas nos breakpoints largos e uma coluna no mobile.
-- Erros de campo aparecem em vermelho abaixo do campo e têm associação
-  semântica.
-- A direção padrão ou a exceção está registrada com alcance.
-- `.fireskills/INTERFACE.md` contém somente o registro local da entrega.
-- A spec e as tarefas cobrem estados, permissão, foco, mensagens e retorno.
-- O dashboard, quando existir, tem filtros, contexto dos indicadores,
-  alternativa acessível para visualizações e investigação detalhada.
-- Componentes `@nuxt/ui` reaproveitados ou criados têm origem, estados e
-  consumidores registrados em `.fireskills/INTERFACE.md`.
-- Cada tarefa possui o item `VISUAL` concluído antes de `EVIDENCE`, com a
-  conferência de bordas, espaçamentos, margens, padding e tipografia ou a
-  justificativa concreta de que não há interface.
-
-Execute os testes e validadores da stack quando houver implementação. Para a
-skill do Specsfy, execute `quick_validate.py` e a suíte do monorepo.
-
-## Skills relacionadas
-
-- [references/standards.md](references/standards.md)
-- `skills/templates/DESIGNSYSTEM.MD`
-- `skills/templates/Interface.md`
-- `fireskill-specialist-interface-experience`
-- `fireskill-specialist-ux-design`
-- `fireskill-specialist-ui-design`
-- `fireskill-specialist-nuxt-ui`
+- `.fireskills/DESIGNSYSTEM.MD` exists at project root with policy, defaults, states, and scenarios.
+- List views use `UTable` and `PageHeader`.
+- Every screen renders `Breadcrumb` displaying team, module, and page title.
+- Existing layout breadcrumb components are reused.
+- Detail views use `DetailLists` and `PageHeader`.
+- Forms use sections with responsive two-column layouts.
+- Field errors display in red beneath controls with semantic ARIA associations.
+- Scoped exceptions are recorded with explicit boundaries.
+- `.fireskills/INTERFACE.md` tracks local component registries.
+- Task checklist items include completed `VISUAL` reviews prior to `EVIDENCE`.

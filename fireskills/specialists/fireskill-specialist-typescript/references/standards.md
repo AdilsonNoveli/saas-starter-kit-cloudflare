@@ -1,96 +1,80 @@
-# Padrões e referências TypeScript
+# TypeScript Standards and References
 
-## Modelagem por situação
+## Modeling by Context
 
-| Situação | Escolha |
+| Context | Recommended Approach |
 | --- | --- |
-| Estado finito com campos que variam por caso | Union discriminada com campo `kind`/`status`/`type` literal |
-| Conjunto fechado e conhecido de chaves | `Record<K, V>` ou mapped type sobre uma union de literais |
-| Dado vindo de fora (rede, arquivo, env) | Schema runtime (`zod`, `valibot` ou equivalente) que produz o tipo validado |
-| API pública que outro pacote pode estender (`declare module`, merge) | `interface` |
-| Tipo interno, union, tupla ou tipo computado | `type` alias |
-| Invariante que sempre deve valer (ex.: string não vazia, range) | Constructor/factory function que só devolve o tipo se a invariante for provada, nunca um cast |
+| Finite states with fields varying per state | Discriminated union with literal discriminant field (`kind`/`status`/`type`) |
+| Closed, predefined set of keys | `Record<K, V>` or mapped type over a literal union |
+| Data from untrusted boundaries (network, disk, env) | Runtime schema (`zod`, `valibot`, etc.) producing validated types |
+| Public extensible interface (`declare module`, merging) | `interface` |
+| Internal type, union, tuple, or computed type | `type` alias |
+| Invariants that must always hold (non-empty string, range) | Smart constructor / factory returning types only upon proven invariants, never casts |
 
-## `strict` e narrowing
+## `strict` and Narrowing
 
-- `strictNullChecks` é o efeito mais valioso do modo strict: sem ele,
-  `null`/`undefined` passam por qualquer tipo silenciosamente.
-- `noUncheckedIndexedAccess` adiciona `| undefined` a todo acesso por índice
-  (`arr[i]`, `record[key]`) — ative quando o projeto tolera o esforço de
-  narrowing adicional; ele pega bugs reais de índice fora do range.
-- Narrowing por `typeof`, `instanceof`, campo discriminante ou type guard
-  (`function isX(v: unknown): v is X`) é preferível a `as` em qualquer
-  situação em que o valor pode ser inspecionado em runtime.
-- `unknown` é o tipo de entrada correto para dado não confiável; `any`
-  desliga a checagem de tipo para todo o resto da cadeia a partir dali —
-  usar `any` é equivalente a sair do TypeScript naquele ponto.
+- `strictNullChecks` is the cornerstone of strict mode: without it, `null` and `undefined`
+  flow silently into every type.
+- `noUncheckedIndexedAccess` adds `| undefined` to index access (`arr[i]`, `record[key]`) —
+  enable when codebases can sustain narrowing overhead; it catches out-of-bounds indexing bugs.
+- Type narrowing via `typeof`, `instanceof`, discriminant properties, or type predicates
+  (`function isX(v: unknown): v is X`) is preferred over `as` assertions whenever inspectable at runtime.
+- `unknown` is the only correct input type for untrusted boundary data; `any` turns off compiler
+  type-checking downstream.
 
-## `satisfies` vs anotação vs inferência
+## `satisfies` vs Explicit Annotations vs Inference
 
-| Objetivo | Ferramenta |
+| Goal | Tool |
 | --- | --- |
-| Deixar o compilador inferir o tipo mais preciso possível de um valor interno | Nenhuma anotação — deixe a inferência trabalhar |
-| Checar que um valor cumpre um tipo, mas preservar o tipo literal mais específico inferido (ex.: chaves de um objeto de rotas, paleta de tokens) | `satisfies T` |
-| Fixar o tipo de uma API pública para que ela não mude de forma silenciosa quando a implementação mudar | Anotação explícita de retorno na assinatura exportada |
-| Alargar deliberadamente um literal para o tipo base (ex.: permitir novas chaves depois) | Anotação explícita (`const x: T = {...}`), que descarta o tipo literal |
+| Let the compiler infer the narrowest type for internal values | No annotation — leverage inference |
+| Validate value against a type while preserving narrowest literal type (route tables, design tokens) | `satisfies T` |
+| Lock public API contracts to prevent unintended shifts when implementation changes | Explicit return annotation on exported signatures |
+| Intentionally widen a literal to its base type | Explicit type annotation (`const x: T = {...}`) |
 
-`const config = {...} satisfies Record<string, Route>` mantém `config.home`
-com o tipo literal da rota específica (autocomplete e narrowing exatos),
-enquanto `const config: Record<string, Route> = {...}` alarga todo acesso
-para o tipo genérico `Route`. Use `satisfies` sempre que o consumidor do
-valor se beneficia do tipo mais específico e o papel do tipo declarado é só
-validar, não substituir, a inferência.
+Using `const config = {...} satisfies Record<string, Route>` preserves exact literal keys
+for autocomplete and narrowing, whereas `const config: Record<string, Route> = {...}` widens
+all accesses to the generic `Route`. Use `satisfies` whenever consumers benefit from specific
+literal types.
 
 ## Generics
 
-- Um parâmetro de tipo só se justifica quando relaciona duas ou mais partes
-  da assinatura (parâmetro de entrada e tipo de retorno, chave e valor).
-  Sem essa relação, o generic é ruído.
-- Prefira `T extends unknown` implícito a `T extends any` em constraints;
-  constraints amplas demais (`T extends object`) raramente pegam erro real.
-- Funções de ordem superior devem inferir o generic do argumento passado
-  (`function map<T, U>(arr: T[], fn: (x: T) => U): U[]`), nunca exigir que o
-  chamador declare o tipo manualmente quando a inferência já resolve.
+- A type parameter is justified only when it connects two or more parts of the signature
+  (e.g., input parameter to return type, key to value). Without this relationship, generics add pure friction.
+- Prefer implicit `T extends unknown` over `T extends any`.
+- Higher-order functions must infer generics from arguments (`function map<T, U>(arr: T[], fn: (x: T) => U): U[]`),
+  never forcing callers to manually specify type arguments when inference suffices.
 
-## Módulos
+## Modules
 
-- Use `import type { X }` para importar apenas tipos — permite que o
-  bundler elimine o import na saída JS e evita ciclo de import desnecessário
-  em runtime.
-- Confirme `"type": "module"` ou `"commonjs"` no `package.json` e a extensão
-  de import (`.js` explícito em ESM Node) antes de assumir que uma
-  biblioteca resolve igual em todos os targets.
-- Bibliotecas que suportam ESM e CJS devem declarar `exports` com
-  condições (`import`/`require`/`types`) coerentes; um `types` apontando para
-  o arquivo errado quebra apenas para quem consome via um dos dois formatos.
+- Use `import type { X }` for type-only imports — enables bundlers to elide imports completely
+  and prevents circular runtime dependencies.
+- Verify `"type": "module"` or `"commonjs"` in `package.json` and explicit extensions (`.js` in Node ESM)
+  before assuming uniform library resolution across runtime targets.
+- Dual-package libraries (ESM and CJS) must configure package `exports` with coherent conditions
+  (`import`/`require`/`types`).
 
-## Bibliotecas e API pública
+## Libraries and Public APIs
 
-- Toda função exportada tem assinatura anotada explicitamente (parâmetros e
-  retorno); depender de inferência numa API pública trava a forma exposta ao
-  primeiro uso e dificulta mudança controlada depois.
-- Gere e revise as declarations (`.d.ts`) publicadas — um erro de
-  `tsconfig` (`declaration`, `declarationMap`) pode publicar tipo incorreto
-  mesmo com o build passando.
-- Mudança de tipo público que quebra um consumidor existente é mudança
-  major em SemVer, mesmo que nenhuma linha de runtime tenha mudado.
+- Every exported function must have explicitly annotated parameter and return types.
+- Generate and inspect emitted `.d.ts` declaration files — compiler config errors can emit
+  broken types even when builds succeed.
+- Public type changes that break downstream compilation constitute a SemVer major release,
+  even if runtime JS remains untouched.
 
-## Validação runtime nas fronteiras
+## Runtime Validation at Boundaries
 
-- Tipo estático desaparece em runtime; um payload de API, arquivo de config
-  ou variável de ambiente deve ser validado por um schema que produza o tipo
-  (parse, não apenas cast) antes de ser tratado como confiável.
-- Erros de validação devem ser diferenciáveis de erros de lógica de negócio
-  — trate-os como uma categoria própria de falha (dado malformado), com
-  mensagem que aponta o campo e o valor recebido.
+- Static types vanish at runtime; incoming API payloads, configuration files, and environment
+  variables must be parsed through runtime schemas before being trusted.
+- Validation failures should be distinguishable from business logic errors, reporting the
+  exact field path and offending value.
 
-## Fontes oficiais
+## Authoritative Documentation
 
 - Handbook: https://www.typescriptlang.org/docs/handbook/intro.html
 - Narrowing: https://www.typescriptlang.org/docs/handbook/2/narrowing.html
 - Generics: https://www.typescriptlang.org/docs/handbook/2/generics.html
 - Modules: https://www.typescriptlang.org/docs/handbook/modules.html
-- TSConfig reference: https://www.typescriptlang.org/tsconfig/
-- Declaration files: https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html
+- TSConfig Reference: https://www.typescriptlang.org/tsconfig/
+- Declaration Files: https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html
 - Do's and Don'ts: https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html
 - Semantic Versioning: https://semver.org/

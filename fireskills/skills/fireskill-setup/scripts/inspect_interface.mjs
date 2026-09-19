@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Resume a stack de interface e as superfícies atuais sem alterar o projeto. */
+/** Summarizes the interface stack and existing surfaces without modifying the project. */
 import { existsSync, readdirSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
@@ -46,7 +46,7 @@ const sourceFiles = await files(project);
 const has = (path) => existsSync(join(project, path));
 const routeRoots = ["src/app", "src/pages", "app", "pages", "resources/js/Pages", "routes"];
 const componentRoots = ["src/components", "components", "resources/js/Components", "app/components"];
-// Nuxt (monorepo): páginas e componentes vivem em apps/*/app e layers/*/app.
+// Nuxt (monorepo): pages and components live in apps/*/app and layers/*/app.
 function nuxtVueFiles(kind) {
   const found = [];
   for (const group of ["apps", "layers"]) {

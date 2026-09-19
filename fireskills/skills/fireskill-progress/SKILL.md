@@ -1,68 +1,67 @@
 ---
 name: fireskill-progress
-description: Use quando o usuário pede progresso geral, status de todas as especificações, percentual concluído, quanto falta, bloqueios ou próximo trabalho do repositório Specsfy, ou quando uma transição automática pedir a projeção final ou o roteamento pelo estado observado. Produz uma visão somente leitura de specs, gates, tarefas e checklists; não use para alterar a especificação ou implementar tarefas.
+description: Use when the user asks for overall progress, status of all specifications, percentage complete, remaining work, blockers, or next task across the Fireskills repository, or when an automatic transition requests final projection or routing based on observed state. Produces a read-only view of specs, gates, tasks, and checklists; do not use to modify specifications or implement tasks.
 ---
 
-# Informar progresso geral
+# Report Overall Progress
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `sem perguntas`.
-Não formule perguntas nesta skill. Apresente a projeção observada e o próximo
-handoff aplicável.
+Interaction mode: `no questions`.
+Do not formulate questions in this skill. Present the observed projection and
+the next applicable handoff.
 
-Leia o estado exclusivamente de `specs/<estado>/*/spec.md`. O relatório é uma projeção da
-fonte da verdade, nunca uma segunda fonte de estado.
+Read state exclusively from `specs/<state>/*/spec.md`. The report is a projection
+of the source of truth, never a second source of state.
 
-## Orquestrar a conversa
+## Orchestrate the Conversation
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $fireskill-progress → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill de
-destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa. Depois de uma correção necessária a esta etapa, anuncie `Retomada
-automática: $<destino> → $fireskill-progress — pendência resolvida:
-<resultado>` e retome-a imediatamente. Reavalie o estado após cada handoff para
-evitar ciclos. Não peça confirmação para o handoff; ações sensíveis continuam
-exigindo autorização específica.
+Upon completing this step or detecting work from another step, announce
+`Pending blocker detected: <description> — action: resolving in this step` and
+resolve it when it belongs to your own scope. When responsibility shifts,
+announce `Automatic transition: $fireskill-progress → $<destination> — reason:
+<reason> — expected outcome: <outcome>` and immediately load the destination
+skill, without asking for confirmation or repeating the command. Continue in the
+same conversation. After a necessary correction for this step, announce
+`Automatic resumption: $<destination> → $fireskill-progress — blocker resolved:
+<outcome>` and resume immediately. Re-evaluate state after each handoff to avoid
+cycles. Do not ask for confirmation for handoffs; sensitive actions still require
+explicit authorization.
 
-## Executar
+## Execute
 
-Na raiz do repositório:
+At the repository root:
 
 ```bash
 node fireskills/skills/fireskill-progress/scripts/progress.mjs .
 ```
 
-Para integração com outras ferramentas:
+For integration with other tools:
 
 ```bash
 node fireskills/skills/fireskill-progress/scripts/progress.mjs . --json
 ```
 
-Para uma única especificação:
+For a single specification:
 
 ```bash
 node fireskills/skills/fireskill-progress/scripts/progress.mjs . --slug <slug>
 ```
 
-Para observar o custo de contexto de uma spec:
+To observe context cost for a spec:
 
 ```bash
 node fireskills/skills/fireskill-progress/scripts/analyze_context.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md --json
+  specs/<state>/<NNNN>-<slug>/spec.md --json
 ```
 
-Para projetar pendências documentais junto com o progresso:
+To project documentation status alongside progress:
 
 ```bash
 node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
@@ -72,57 +71,55 @@ node fireskills/skills/fireskill-documentator/scripts/build_documentation.mjs \
   --project . --check
 ```
 
-Trate `PENDING` como blocker da entrega e anuncie o handoff indicado pelo
-monitor. Retome esta skill depois que a auxiliar atualizar o documento ou que a
-avaliação sem impacto estiver registrada e reconhecida.
-Se o segundo comando indicar documentação ausente ou desatualizada, anuncie o
-handoff para `$fireskill-documentator`, reconstrua `docs/` e retome a projeção.
+Treat `PENDING` as a delivery blocker and announce the handoff indicated by the
+monitor. Resume this skill after the auxiliary skill updates the document or the
+zero-impact evaluation is recorded and acknowledged.
+If the second command indicates missing or outdated documentation, announce the
+handoff to `$fireskill-documentator`, rebuild `docs/`, and resume projection.
 
-Sem `--usage-json`, o resultado é sempre rotulado `estimated` e documenta a
-heurística. Métricas fornecidas explicitamente são `measured`; nunca apresente
-estimativa como uso real.
+Without `--usage-json`, the result is always labeled `estimated` and documents
+the heuristic. Explicitly provided metrics are `measured`; never present an
+estimate as actual usage.
 
-## Interpretar
+## Interpret
 
-1. Informe os denominadores de specs, gates, tarefas e itens de checklist.
-2. Mostre o ato atual e a próxima skill responsável, ambos derivados do
-   `Status`.
-3. Diferencie especificação concluída, trabalho em progresso e blocker real.
-4. Mostre o próximo par `TNNN/ITEM` pronto quando existir.
-5. Trate um gate `Failed`, inconsistência de checklist ou dependência sem caminho
-   pronto como blocker. Um gate `In Progress` isolado não é falha.
-6. Trate documentação obrigatória apontada por `monitor_context.mjs` como
-   blocker, mesmo que todos os checkboxes estejam marcados.
-7. Trate `docs/` ausente ou desatualizado segundo `$fireskill-documentator` como
-   blocker da entrega.
-8. Se uma spec existente exigir mudança de comportamento ou plano, anuncie a
-   pendência e carregue automaticamente `$fireskill-update-spec`. Retome a
-   projeção depois que a atualização percorrer os atos invalidados.
-9. Se nenhuma spec existir, preserve o código 2. Capturas em `specs/inbox/` e
-   itens em `specs/backlog/` não contam como progresso normativo. Quando o
-   pedido também exigir avançar uma captura existente, anuncie a pendência e
-   carregue `$fireskill-02-backlog`; quando já
-   houver intenção e definição suficientes, carregue `$fireskill-03-specify`.
+1. Report denominators for specs, gates, tasks, and checklist items.
+2. Show current act and next responsible skill, both derived from `Status`.
+3. Distinguish completed specification, work in progress, and actual blocker.
+4. Show the next ready `TNNN/ITEM` pair when one exists.
+5. Treat a `Failed` gate, checklist inconsistency, or dependency without a ready
+   path as a blocker. An isolated `In Progress` gate is not a failure.
+6. Treat mandatory documentation flagged by `monitor_context.mjs` as a blocker,
+   even if all checkboxes are marked.
+7. Treat missing or outdated `docs/` according to `$fireskill-documentator` as a
+   delivery blocker.
+8. If an existing spec requires behavior or plan changes, announce the blocker
+   and automatically load `$fireskill-update-spec`. Resume projection after the
+   update traverses invalidated acts.
+9. If no specs exist, preserve exit code 2. Captures in `specs/inbox/` and items
+   in `specs/backlog/` do not count as normative progress. When the request also
+   requires advancing an existing capture, announce the blocker and load
+   `$fireskill-02-backlog`; when sufficient intent and definition exist, load
+   `$fireskill-03-specify`.
 
-## Preservar a fonte
+## Preserve the Source
 
-- Não edite specs, checkboxes, testes ou código durante a consulta.
-- Não conte `spec.md` dentro de `research/`; a descoberta é exatamente
-  `specs/<estado>/*/spec.md`.
-- Não invente progresso a partir de commits, arquivos ou memória do chat.
-- Para atualizar estado, anuncie e carregue automaticamente a skill responsável
-  na mesma conversa. Retome automaticamente o progresso depois da atualização.
+- Do not edit specs, checkboxes, tests, or code during queries.
+- Do not count `spec.md` inside `research/`; discovery is strictly
+  `specs/<state>/*/spec.md`.
+- Do not invent progress from commits, files, or chat memory.
+- To update state, announce and automatically load the responsible skill in the
+  same conversation. Automatically resume progress after the update.
 
-## Relatar
+## Report
 
-Entregue primeiro o resumo global, depois specs que exigem atenção, blockers e
-próximo trabalho. Quando houver etapa acionável, anuncie e execute a transição
-automaticamente. Use a saída JSON sem reinterpretar nomes de campos quando o
-usuário pedir automação ou dados estruturados.
+Deliver the overall summary first, then specs requiring attention, blockers,
+and next work. When an actionable step exists, announce and execute the
+transition automatically. Use JSON output without reinterpreting field names
+when the user requests automation or structured data.
 
-## Especialistas sob demanda
+## Specialists on Demand
 
-Leia [references/specialists.md](references/specialists.md) somente para propor
-contexto para a próxima tarefa. Carregue automaticamente a skill base ou o
-especialista já instalado que seja responsável; instalação exige autorização
-específica.
+Read [references/specialists.md](references/specialists.md) only to propose
+context for the next task. Automatically load the base skill or installed
+responsible specialist; installation requires explicit user authorization.

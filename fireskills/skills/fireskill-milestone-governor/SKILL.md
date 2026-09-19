@@ -1,64 +1,63 @@
 ---
 name: fireskill-milestone-governor
-description: Use para projetar o estado dos milestones a partir de specs e backlog, identificar vínculos ausentes, sugerir ajustes e atualizar somente os blocos derivados. Não use para inventar objetivos de produto, alterar condições de saída confirmadas ou concluir marcos sem validação humana.
+description: Use to project milestone status from specs and backlog, identify missing linkages, suggest adjustments, and update only derived blocks. Do not use to invent product objectives, alter confirmed exit conditions, or complete milestones without human validation.
 ---
 
-# Governar milestones a partir das fontes do projeto
+# Governing Milestones from Project Sources
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered questions contract`
+from `fireskills/skills/Spec.md`.
 
-Leia `specs.md`, `specs/milestones/`, `specs/backlog/` e as specs existentes.
-Milestone, spec e backlog possuem responsabilidades distintas: o marco descreve
-um estado demonstrável; a spec define uma capacidade; o backlog registra
-trabalho ainda refinável.
+Read `specs.md`, `specs/milestones/`, `specs/backlog/`, and existing specs.
+Milestone, spec, and backlog have distinct responsibilities: a milestone describes
+a demonstrable state; a spec defines a capability; a backlog records still-refinable
+work.
 
-## Projetar o estado atual
+## Project Current State
 
-Execute:
+Run:
 
 ```bash
 bun run fireskill milestones sync --project .
 ```
 
-O comando atualiza somente blocos marcados em `specs.md` e nos arquivos de
-milestone. Ele calcula specs completas pelo `Status: Complete` e mostra itens
-de backlog sem usá-los para fechar o marco.
+The command updates only marked blocks in `specs.md` and in milestone files.
+It calculates completed specs by `Status: Complete` and shows backlog items
+without using them to close the milestone.
 
-## Analisar e sugerir
+## Analyze and Suggest
 
-Depois da projeção, procure por:
+After projection, look for:
 
-- spec ou backlog ligado a um marco inexistente;
-- milestone sem condição de saída confirmada;
-- spec sem milestone quando sua finalidade já for conhecida;
-- dependência que torna a ordem atual incoerente;
-- conjunto de specs que parece formar um novo estado demonstrável.
+- spec or backlog linked to a non-existent milestone;
+- milestone without confirmed exit condition;
+- spec without milestone when its purpose is already known;
+- dependency that makes the current sequence incoherent;
+- set of specs that appears to form a new demonstrable state.
 
-Explique a sugestão, o material que a sustenta e o efeito no mapa. Peça
-confirmação antes de mudar relações estruturais. Para falta de descoberta do
-MVP, encaminhe a conversa para `$fireskill-mvp-milestone-interviewer`; para
-evolução posterior, use `$fireskill-roadmap-milestone-interviewer`.
+Explain the suggestion, supporting material, and effect on the map. Request
+confirmation before changing structural relationships. For lack of MVP discovery,
+direct conversation to `$fireskill-mvp-milestone-interviewer`; for subsequent
+evolution, use `$fireskill-roadmap-milestone-interviewer`.
 
-## Concluir um marco
+## Complete a Milestone
 
-Uma milestone só pode ser declarada concluída quando suas specs necessárias
-estiverem completas e a pessoa responsável confirmar a condição de saída por
-uma demonstração, teste de aceite ou outra verificação registrada. O comando
-de sincronização informa progresso; ele não substitui essa confirmação.
+A milestone may only be declared complete when its required specs are complete
+and the responsible person confirms the exit condition through a demonstration,
+acceptance test, or other recorded verification. The sync command reports
+progress; it does not replace this human confirmation.
 
-## Limites
+## Boundaries
 
-- Não alterar texto humano fora dos blocos gerados.
-- Não mover specs, editar gates, tarefas ou código.
-- Não usar uma lista de tarefas fechadas como aceite da milestone.
+- Do not alter human text outside generated blocks.
+- Do not move specs, edit gates, tasks, or code.
+- Do not use a checklist of closed tasks as milestone acceptance.

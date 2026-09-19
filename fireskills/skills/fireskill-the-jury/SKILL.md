@@ -1,53 +1,53 @@
 ---
 name: fireskill-the-jury
-description: Protocolo deliberativo multi-agente para decisões arquiteturais, técnicas ou estratégicas de alto impacto no Nuxfire. Spawna um painel de 3 a 5 subagentes que formam opiniões cegas independentes (anti-ancoragem), debatem sob papéis ortogonais e emitem um veredito vinculante com rubrica explícita e registro de divergência.
+description: Multi-agent deliberative protocol for high-impact architectural, technical, or strategic decisions in Nuxfire. Spawns a panel of 3 to 5 subagents that form independent blind opinions (anti-anchoring), debate under orthogonal roles, and issue a binding verdict with an explicit rubric and recorded dissent.
 ---
 
-# Fireskill The Jury: Deliberação Colegiada
+# Fireskill The Jury: Collegial Deliberation
 
-O **The Jury** é o protocolo colegiado do Fireskills para decisões de alto impacto onde uma única perspectiva ou suposição de agente não é suficiente. 
+**The Jury** is the collegial Fireskills protocol for high-impact decisions where a single perspective or agent assumption is insufficient.
 
-Ele elimina o viés de concordância cega (*sycophancy*) e o viés de ancoragem através de uma **rodada inicial cega e simultânea** entre múltiplos avaliadores.
-
----
-
-## Quando Utilizar
-
-- Escolha de arquitetura irreversível (ex.: adoção de novo binding Cloudflare, divisão de monorepo).
-- Dilemas técnicos complexos (ex.: persistência em KV vs. Hyperdrive/Postgres para determinada carga).
-- Redesenho de modelo de dados multi-tenant ou estratégia de autorização RBAC.
-- Decisões de produto de alto risco (ex.: modelo de precificação Stripe vs. Paddle).
-
-*Não use para tarefas factuais simples ou correções triviais de sintaxe.*
+It eliminates sycophancy and anchoring bias through a **blind, simultaneous initial round** among multiple evaluators.
 
 ---
 
-## O Fluxo em 5 Fases
+## When to Use
+
+- Irreversible architectural choice (e.g., adopting a new Cloudflare binding, monorepo restructuring).
+- Complex technical dilemmas (e.g., persistence in KV vs. Hyperdrive/Postgres for a given workload).
+- Multi-tenant data model redesign or RBAC authorization strategy.
+- High-risk product decisions (e.g., Stripe vs. Paddle pricing model).
+
+*Do not use for simple factual tasks or trivial syntax corrections.*
+
+---
+
+## The 5-Phase Workflow
 
 ```text
-FASE 0: Enquadramento → FASE 1: Montagem → FASE 2: Rodada Cega → FASE 3: Deliberação → FASE 4: Veredito
+PHASE 0: Framing → PHASE 1: Assembly → PHASE 2: Blind Round → PHASE 3: Deliberation → PHASE 4: Verdict
 ```
 
-### Fase 0: Enquadramento da Questão
-O orquestrador define 3 elementos obrigatórios antes de iniciar:
-1. **Pergunta em Forma Decidível**: "Devemos migrar a fila X para Cloudflare Queues ou manter no Drizzle com polling?"
-2. **Rubrica de Avaliação (2 a 4 critérios)**: Ex.: Performance sob concorrência, complexidade de manutenção, blast radius e custo.
-3. **Evidência Compartilhada**: Arquivos reais de código, schemas ou métricas do projeto.
+### Phase 0: Framing the Question
+The orchestrator defines 3 mandatory elements before starting:
+1. **Question in Decidable Form**: "Should we migrate queue X to Cloudflare Queues or keep it in Drizzle with polling?"
+2. **Evaluation Rubric (2 to 4 criteria)**: E.g., Performance under concurrency, maintenance complexity, blast radius, and cost.
+3. **Shared Evidence**: Real code files, schemas, or project metrics.
 
-### Fase 1: Montagem do Painel
-O painel é montado com papéis estritamente ortogonais:
-- **Proponente**: Defende o caso mais forte a favor da opção principal.
-- **Cético / Advogado do Diabo**: Ataca as premissas e defende a alternativa mais robusta ou a manutenção do status quo.
-- **Integrador**: Focado na rubrica, custo total de propriedade e impacto a longo prazo.
+### Phase 1: Panel Assembly
+The panel is assembled with strictly orthogonal roles:
+- **Proponent**: Advocates the strongest case in favor of the primary option.
+- **Skeptic / Devil's Advocate**: Challenges assumptions and defends the most robust alternative or maintaining status quo.
+- **Integrator**: Focused on the rubric, total cost of ownership, and long-term impact.
 
-### Fase 2: Rodada Cega (Blind Round) — Não Negociável
-Todos os jurados emitem seus pareceres iniciais de forma **independente e simultânea**. Nenhum jurado tem acesso à resposta dos outros antes de registrar sua convicção inicial. Isso previne que o primeiro agente ancore o restante do grupo.
+### Phase 2: Blind Round — Non-Negotiable
+All jurors issue their initial opinions **independently and simultaneously**. No juror has access to responses from others before recording their initial conviction. This prevents the first agent from anchoring the rest of the group.
 
-### Fase 3: Deliberação
-Os pareceres são revelados ao grupo. Cada jurado avalia os contra-argumentos e só pode alterar seu voto caso um argumento novo e factual tenha sido apresentado.
+### Phase 3: Deliberation
+Opinions are revealed to the group. Each juror evaluates counter-arguments and may only alter their vote if a novel, factual argument has been introduced.
 
-### Fase 4: Veredito Vinculante
-O júri emite um veredito consolidado:
-- **Opção Escolhida** com nível de confiança calibrado.
-- **Divergência Preservada (*Dissent*)**: Registro dos pontos de alerta do cético que devem ser monitorados na implementação.
-- **Ação Concreta Imediata**: Qual especificação ou tarefa deve ser criada.
+### Phase 4: Binding Verdict
+The jury issues a consolidated verdict:
+- **Selected Option** with calibrated confidence level.
+- **Preserved Dissent**: Record of skeptic warning points that must be monitored during implementation.
+- **Immediate Concrete Action**: Which specification or task must be created.

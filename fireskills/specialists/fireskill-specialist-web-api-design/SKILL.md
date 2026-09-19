@@ -1,87 +1,86 @@
 ---
 name: fireskill-specialist-web-api-design
-description: Projetar e revisar APIs HTTP com recursos, métodos, status, erros, paginação, idempotência, concorrência, autenticação e evolução compatível. Use para REST, JSON APIs, webhooks ou OpenAPI; não aplicar estilo REST a RPC sem avaliar o contrato real.
+description: "Design and review HTTP APIs with resources, methods, status codes, errors, pagination, idempotency, concurrency, authentication, and backwards-compatible evolution. Use for REST, JSON APIs, webhooks, or OpenAPI; never blindly apply REST patterns to RPC without evaluating real contract requirements."
 ---
 
-# Design de APIs web
+# Web API Design
 
-## Quando usar
+## When to Use
 
-- Acionar ao projetar ou revisar contratos HTTP, REST, JSON, webhooks ou
-  descrições OpenAPI para consumidores internos ou externos.
-- Acionar para decisões de recursos, métodos, status, erros, paginação,
-  idempotência, concorrência, autenticação e compatibilidade.
-- Não acionar para RPC ou eventos como se fossem recursos HTTP sem primeiro
-  confirmar o estilo do contrato real.
-- Combinar com `$fireskill-specialist-application-security` para threat modeling,
-  credenciais, abuso e trust boundaries.
+- Trigger when designing or reviewing HTTP, REST, JSON API contracts, webhooks, or
+  OpenAPI specifications for internal or external consumers.
+- Trigger for decisions regarding resource modeling, HTTP methods, status codes,
+  structured errors, pagination, idempotency, concurrency, authentication, and API versioning.
+- Do not trigger for RPC protocols or event schemas treating them as generic HTTP resources
+  without confirming the actual architectural contract style.
+- Combine with `$fireskill-specialist-application-security` for threat modeling,
+  credential handling, rate-limiting abuse, and trust boundaries.
 
-## Fluxo
+## Workflow
 
-1. Descobrir consumidores, casos de uso, estilo existente, volume, latência,
-   disponibilidade, trust boundaries e política de compatibilidade.
-2. Modelar recursos, identidade, relações, invariantes e ownership sem expor
-   tabelas ou objetos internos como contrato por conveniência.
-3. Definir operações, schemas, headers, status e Problem Details; registrar a
-   semântica de retry por operação usando
-   [references/standards.md](references/standards.md).
-4. Projetar autenticação, autorização por recurso/tenant, idempotência,
-   precondições e concorrência antes de implementar handlers.
-5. Especificar paginação, filtros, ordenação determinística, limites, rate
-   limiting e comportamento diante de dados mutáveis.
-6. Materializar OpenAPI/JSON Schema e contract tests positivos, negativos e de
-   compatibilidade executados contra a implementação.
-7. Definir logs, métricas, correlação, depreciação, migração e critérios para
-   remover comportamento antigo sem quebrar consumidores conhecidos.
+1. Discover consumers, use cases, existing architectural styles, request volume,
+   latency budgets, availability targets, trust boundaries, and compatibility policies.
+2. Model resources, identifiers, entity relationships, business invariants, and ownership
+   without exposing internal database schemas or ORM entities as public contracts for convenience.
+3. Define operations, schemas, headers, status codes, and Problem Details; document
+   explicit retry semantics per operation using [references/standards.md](references/standards.md).
+4. Design authentication, resource-level and tenant-level authorization, idempotency,
+   preconditions, and optimistic concurrency before implementing route handlers.
+5. Specify cursor/offset pagination, query filters, deterministic sorting, payload size limits,
+   rate limiting, and handling of mutating underlying data.
+6. Materialize OpenAPI/JSON Schema specifications and executable contract tests covering
+   positive, negative, and backwards-compatibility test suites against the implementation.
+7. Define structured logging, telemetry metrics, correlation headers, deprecation schedules,
+   migration plans, and sunset policies to decommission legacy behavior safely.
 
-## Padrões
+## Patterns
 
-- Usar semântica HTTP coerente e status específicos.
-- Manter formato de erro estável, acionável e sem vazamento.
-- Usar cursor quando dados mudam durante paginação extensa.
-- Tornar criação/retry seguros com chave de idempotência quando necessário.
-- Proteger webhooks com assinatura, timestamp, replay defense e reentrega.
-- Evitar breaking changes silenciosas e campos com semântica ambígua.
-- Não expor modelo de persistência como contrato por conveniência.
+- Adhere to coherent HTTP semantics and specific standard status codes.
+- Maintain stable, actionable error formats that never leak internal stack traces or secrets.
+- Use cursor-based pagination whenever underlying datasets mutate during extended traversals.
+- Ensure safe creation and automated retry flows using idempotency keys.
+- Secure webhooks with cryptographic payload signatures, timestamps, replay defense, and retry policies.
+- Prevent silent breaking changes and avoid ambiguous field semantics.
+- Never expose persistence schemas as external API contracts for convenience.
 
-## Antipadrões
+## Anti-Patterns
 
-- Responder `200` para todo resultado e codificar falha apenas no body; caches,
-  clientes e observabilidade perdem a semântica do protocolo.
-- Repetir POST após timeout sem idempotência ou reconciliação; uma resposta
-  perdida pode duplicar cobrança, pedido ou efeito externo.
-- Paginar por offset em coleção grande e mutável sem ordenação estável; itens
-  são duplicados ou omitidos entre páginas.
-- Autorizar somente no endpoint/lista e não no recurso carregado; IDs válidos
-  atravessam tenants ou escopos.
-- Versionar a URL para toda mudança aditiva; multiplica contratos ativos sem
-  resolver disciplina de compatibilidade.
+- Responding with `200 OK` for every request and encoding failures solely in response bodies;
+  caches, API gateways, and observability tooling lose standard protocol semantics.
+- Repeating POST requests after network timeouts without idempotency keys or reconciliation;
+  lost responses can duplicate billing charges, order submissions, or side effects.
+- Paginating via simple offsets across large, rapidly changing datasets without stable sort keys;
+  results in duplicated or skipped items between pages.
+- Enforcing authorization solely at the endpoint or list level rather than checking loaded resources;
+  allows valid IDs to cross tenant boundaries or access control scopes.
+- Versioning URLs for every minor additive change; multiplies active surface contracts
+  without solving backwards compatibility discipline.
 
-## Validação
+## Validation
 
-- Executar contract tests de request, response, headers e Problem Details
-  contra exemplos válidos e inválidos da descrição.
-- Provar autorização por recurso e tenant com identidade correta, identidade
-  cruzada, credencial expirada e escopo insuficiente.
-- Simular retry, duplicação, timeout após commit, corrida de atualização e
-  paginação enquanto itens entram e saem.
-- Fazer lint e validação estrutural de OpenAPI/JSON Schema e comparar breaking
-  changes contra a última versão publicada.
-- Não declarar compatibilidade ou idempotência sem evidência de replay e teste
-  automatizado do contrato observado pelo consumidor.
+- Execute contract tests validating requests, responses, headers, and Problem Details
+  against positive and negative examples declared in the OpenAPI specification.
+- Prove tenant-level and resource-level authorization boundaries using valid identity,
+  cross-tenant identity, expired credentials, and insufficient scopes.
+- Simulate network retries, duplicate requests, post-commit timeouts, concurrent update races,
+  and pagination traversal while records are inserted and deleted.
+- Run structural linters and validators across OpenAPI and JSON Schema definitions,
+  verifying backwards compatibility against published versions.
+- Never declare compatibility or idempotency without replay test evidence and automated
+  contract test suites verifying the consumer perspective.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-application-security` cobre threat modeling, OAuth,
-  proteção de segredo, abuso e trust boundaries.
-- `$fireskill-specialist-domain-modeling` define vocabulário e invariantes antes
-  de expô-los como recursos.
-- `$fireskill-specialist-typescript` modela tipos internos sem torná-los
-  automaticamente a fonte pública do contrato.
-- `$fireskill-specialist-observability` define telemetria e SLOs além dos campos
-  de correlação do contrato.
-- `$fireskill-specialist-performance-engineering` mede throughput e latência sem
-  alterar semântica para ganhar benchmark.
+- `$fireskill-specialist-application-security` covers threat modeling, OAuth, secret
+  management, abuse defense, and trust boundaries.
+- `$fireskill-specialist-domain-modeling` defines domain vocabulary and business invariants
+  before exposing them as API resources.
+- `$fireskill-specialist-typescript` models internal type systems without blindly exposing
+  them as public contracts.
+- `$fireskill-specialist-observability` defines telemetry and SLO monitoring beyond contract
+  correlation headers.
+- `$fireskill-specialist-performance-engineering` measures API throughput and latency without
+  compromising semantic integrity for synthetic benchmarks.
 
-Leia [references/standards.md](references/standards.md) para matrizes de método,
-erros, idempotência, concorrência, paginação, webhooks e evolução compatível.
+Read [references/standards.md](references/standards.md) for method matrices,
+error handling, idempotency, concurrency, pagination, webhooks, and compatible evolution.

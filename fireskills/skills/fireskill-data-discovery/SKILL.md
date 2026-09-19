@@ -1,117 +1,111 @@
 ---
 name: fireskill-data-discovery
-description: Converse em linguagem cotidiana quando o produto precisar guardar informações, sugira formatos adequados e registre respostas confirmadas em `.fireskills/DATABASE.md`.
+description: Converse in everyday language when the product needs to store information, suggest appropriate formats, and record confirmed answers in `.fireskills/DATABASE.md`.
 ---
 
-# Descobrir as informações que o sistema precisa guardar
+# Discovering Information the System Needs to Store
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered questions contract`
+from `fireskills/skills/Spec.md`.
 
-Converse em Português do Brasil sobre informações do sistema sem pedir que a
-pessoa descreva banco de dados, tabela, campo, chave ou relacionamento. Use
-palavras do próprio produto:
-o que será lembrado, quem usa, o que muda e quando deixa de ser necessário.
+Converse about system information without asking the user to describe databases,
+tables, columns, foreign keys, or technical schemas. Use the product's own vocabulary:
+what needs to be remembered, who uses it, what changes, and when it is no longer needed.
 
-## Preparar a conversa
+## Prepare the Conversation
 
-1. Leia a Inbox, a descoberta de `MVP.md`, o backlog, a spec ou o pedido que
-   originou a descoberta.
-2. Leia `.fireskills/PROJECT.md` e `.fireskills/DATABASE.md` quando existirem. Separe o que
-   já foi confirmado do que ainda precisa de conversa.
-3. Procure somente informações que o sistema precise guardar, consultar,
-   comparar, mostrar, compartilhar, corrigir ou apagar. Não pergunte sobre
-   dados que não alteram a jornada ou a operação.
-4. Preserve fontes e formulações da pessoa. Uma hipótese não vira conteúdo
-   confirmado no arquivo de dados.
+1. Read the Inbox, `MVP.md` discovery, backlog, spec, or request that prompted
+   the discovery.
+2. Read `.fireskills/PROJECT.md` and `.fireskills/DATABASE.md` when they exist.
+   Separate what is already confirmed from what still requires discussion.
+3. Look only for information the system needs to store, query, compare, display,
+   share, correct, or delete. Do not ask about data that does not alter user journey
+   or operations.
+4. Preserve sources and user formulations. A hypothesis does not become confirmed
+   content in the data file.
 
-## Perguntar sem linguagem técnica
+## Ask Without Technical Jargon
 
-Em cada rodada, escolha uma informação aplicável de maior impacto ainda não
-confirmada e siga o contrato central. Mantenha uma lista das informações a
-guardar ausentes ou ambíguas. Depois de cada resposta, atualize a lista e
-pergunte sobre a próxima até que todas estejam confirmadas, adiadas ou
-encerradas, respeitando o máximo de oito perguntas por área. Prefira perguntas
-como estas, ajustadas ao contexto:
+In each round, select the highest-impact unconfirmed information item and follow
+the central contract. Maintain a list of missing or ambiguous data items to store.
+After each response, update the list and ask about the next until all are confirmed,
+deferred, or closed, respecting the maximum of eight questions per area.
+Prefer questions like these, tailored to the context:
 
-- "O que você precisa lembrar sobre cada pedido, pessoa ou atendimento?"
-- "Quem pode ver ou mudar essa informação?"
-- "O que precisa continuar ligado quando uma pessoa fizer mais de um pedido?"
-- "Quando essa informação muda, deixa de valer ou precisa ser apagada?"
-- "Que informação não pode aparecer para outras pessoas?"
+- "What do you need to remember about each order, person, or interaction?"
+- "Who can see or change this information?"
+- "What needs to stay linked when a person places multiple orders?"
+- "When does this information change, expire, or need to be deleted?"
+- "What information must not be visible to other people?"
 
-Evite explicar a mecânica interna. Se a pessoa usar termos técnicos, confirme
-o efeito no trabalho dela antes de registrar a resposta.
+Avoid explaining internal mechanics. If the user uses technical terms, confirm
+the effect on their workflow before recording the answer.
 
-## Sugerir como cada informação será registrada
+## Suggest How Each Piece of Data Should Be Recorded
 
-Depois de entender a finalidade, proponha uma forma simples de registrar cada
-informação e peça confirmação. Escolha a sugestão pelo uso esperado, sem citar
-tecnologias ou partes internas do sistema:
+After understanding the purpose, propose a simple way to record each piece of
+information and ask for confirmation. Choose suggestions based on expected usage,
+without naming underlying technologies or database internals:
 
-- texto curto para nomes, títulos e códigos lidos rapidamente;
-- texto livre para observações e descrições maiores;
-- número para quantidades, medidas e contagens;
-- valor em dinheiro para preços, cobranças e descontos;
-- data ou horário para agendamentos, prazos e acontecimentos;
-- escolha entre opções para situação, categoria ou prioridade;
-- sim ou não para confirmações;
-- arquivo ou imagem para comprovantes e anexos.
+- short text for names, titles, and codes read quickly;
+- freeform text for notes and longer descriptions;
+- number for quantities, measurements, and counts;
+- currency/monetary value for prices, charges, and discounts;
+- date or timestamp for appointments, deadlines, and occurrences;
+- choice between options for status, category, or priority;
+- yes/no for confirmations;
+- file or image for receipts and attachments.
 
-Apresente a sugestão como hipótese do produto, explique seu motivo em uma
-frase e pergunte se ela representa o uso real. Registre o `formato sugerido`
-somente depois da confirmação. Quando uma mesma informação tiver usos
-distintos, registre cada uso separadamente.
+Present the suggestion as a product hypothesis, explain its rationale in one
+sentence, and ask if it reflects actual usage. Record the `suggested format` only
+after confirmation. When the same information has distinct usages, record each
+usage separately.
 
-## Registrar o que foi confirmado
+## Record What Was Confirmed
 
-Depois de uma resposta confirmada, entregue o contexto para o script abaixo.
-Use um nome do domínio e frases curtas compreensíveis para quem opera o
-produto.
+After a confirmed answer, pass the context to the script below.
+Use domain terminology and concise phrases understandable by business operators.
 
 ```bash
 node fireskills/skills/fireskill-data-discovery/scripts/\
 registrar_dados_conversados.mjs \
-  --project <raiz> \
-  --nome "<informação do produto>" \
-  --para-que-serve "<finalidade>" \
-  --o-que-guardar "<informações necessárias>" \
-  --formato-sugerido "<forma confirmada de registrar>" \
-  --ligacoes "<o que permanece ligado a quê>" \
-  --acesso "<quem consulta ou altera>" \
-  --ciclo-de-vida "<quando muda, deixa de valer ou é apagado>" \
-  --fontes "<caminhos de Inbox, backlog, MVP ou spec>"
+  --project <root> \
+  --nome "<product information>" \
+  --para-que-serve "<purpose>" \
+  --o-que-guardar "<required information>" \
+  --formato-sugerido "<confirmed format to record>" \
+  --ligacoes "<what stays linked to what>" \
+  --acesso "<who queries or modifies>" \
+  --ciclo-de-vida "<when it changes, expires, or is deleted>" \
+  --fontes "<paths of Inbox, backlog, MVP, or spec>"
 ```
 
-Registre somente respostas confirmadas na seção `Informações a guardar
-confirmadas`. Mantenha essa seção separada do que foi observado no código. Não
-altere o trecho detectado automaticamente e não copie dados reais, credenciais
-ou informações pessoais sensíveis.
+Record only confirmed answers in the `Confirmed information to store` section.
+Keep this section separate from what was detected in code. Do not alter the
+automatically detected block and never copy real credentials or sensitive personal data.
 
 ## Handoffs
 
-- No backlog, faça esta descoberta antes de declarar o brief pronto quando a
-  jornada depender de informações guardadas.
-- Durante a descoberta do MVP, preserve `MVP.md` como fonte e carregue esta
-  skill para cada informação a guardar ausente ou ambígua em um backlog
-  importado.
-- Na especificação, carregue esta skill se a fonte de dados não explicar o que
-  a jornada precisa lembrar ou quem pode consultar cada informação.
-- A Inbox não faz perguntas. Ela apenas preserva sinais para esta etapa.
+- In the backlog, conduct this discovery before declaring the brief ready when the
+  journey depends on stored information.
+- During MVP discovery, preserve `MVP.md` as source and load this skill for each
+  missing or ambiguous data item in an imported backlog.
+- In specification, load this skill if the data source does not explain what the
+  journey needs to remember or who can query each piece of information.
+- Inbox does not ask questions. It only preserves signals for this step.
 
-## Limites
+## Boundaries
 
-- Não escolher tecnologia, estrutura interna ou implementação.
-- Não criar backlog, spec, tarefas, testes ou código.
-- Não preencher lacunas por inferência.
-- Não registrar conteúdo sensível.
+- Do not choose technology, internal structure, or implementation.
+- Do not create backlog, spec, tasks, tests, or code.
+- Do not fill gaps through inference.
+- Do not record sensitive content.

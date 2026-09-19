@@ -1,62 +1,62 @@
 ---
 name: fireskill-lessons
-description: Sistema auto-evolutivo de lições aprendidas do Fireskills. Registra regras preventivas a partir de falhas de teste, regressões, mutantes sobreviventes e desvios de especificação, mantendo o playbook (.fireskills/LESSONS.md) ativo para prevenir a repetição de erros passados.
+description: Self-evolving lessons-learned system of Fireskills. Records preventive rules from test failures, regressions, surviving mutants, and specification deviations, keeping the active playbook (.fireskills/LESSONS.md) updated to prevent repeating past mistakes.
 ---
 
-# Fireskill Lessons: Sistema Auto-Evolutivo de Lições
+# Fireskill Lessons: Self-Evolving Lessons System
 
-O `fireskill-lessons` é a memória evolutiva do Fireskills. Sempre que um bug for corrigido, um teste falhar inesperadamente ou uma mutação revelar fragilidade na cobertura, esta skill extrai uma **regra preventiva acionável** e a registra no sistema.
+`fireskill-lessons` is the evolutionary memory of Fireskills. Whenever a bug is fixed, a test fails unexpectedly, or mutation testing reveals a coverage weakness, this skill extracts an **actionable preventive rule** and records it in the system.
 
 ---
 
-## Sinais de Origem
+## Origin Signals
 
-Toda lição deve ser fundamentada em um sinal real e comprovado por código:
+Every lesson must be grounded in an actual signal proven by code:
 
-| Sinal | Descrição |
+| Signal | Description |
 |---|---|
-| `ac_gap` | Critério de aceite da spec não coberto ou que falhou em produção. |
-| `surviving_mutant` | O teste passou mesmo após uma mutação lógica no código (teste falso-positivo ou fraco). |
-| `spec_precision_gap` | A especificação continha ambiguidade que levou a uma implementação incorreta. |
-| `spec_deviation` | A implementação divergiu do plano técnico ou violou convenções do projeto. |
-| `gate_fail` | Falha detectada em um dos gates (typecheck `vue-tsc`, linter ou Vitest). |
+| `ac_gap` | Spec acceptance criterion not covered or failed in production. |
+| `surviving_mutant` | Test passed even after a logical mutation in code (false-positive or weak test). |
+| `spec_precision_gap` | Specification contained ambiguity that led to an incorrect implementation. |
+| `spec_deviation` | Implementation diverged from technical plan or violated project conventions. |
+| `gate_fail` | Failure detected in one of the gates (typecheck `vue-tsc`, linter, or Vitest). |
 
 ---
 
-## Ciclo de Vida da Lição
+## Lesson Lifecycle
 
-1. **Candidata (`candidate`)**: Registrada pela primeira vez. Fica em observação no playbook.
-2. **Confirmada (`confirmed`)**: Promovida automaticamente pelo motor quando reincide em 2 ou mais fatias distintas (`sources`). Torna-se **regra mandatória** consultada antes do planejamento de novas fatias.
-3. **Quarentena (`quarantined`)**: Se uma lição causar falso-positivo ou se mostrar inviável na prática, recebe penalidade via `penalize` e é colocada em quarentena.
+1. **Candidate (`candidate`)**: Recorded for the first time. Placed under observation in the playbook.
+2. **Confirmed (`confirmed`)**: Automatically promoted by the engine when recurring across 2 or more distinct slices (`sources`). Becomes a **mandatory rule** consulted before planning new slices.
+3. **Quarantine (`quarantined`)**: If a lesson causes false positives or proves unviable in practice, it receives a penalty via `penalize` and is placed in quarantine.
 
 ---
 
-## Comandos Operacionais
+## Operational Commands
 
 ```bash
-# Registrar uma nova lição fundamentada
+# Record a new grounded lesson
 bun run fireskill lesson add \
   --signal gate_fail \
-  --summary "Import de layer via caminho relativo no schema" \
-  --rule "Sempre importar schemas de layers pelo especificador de pacote (@nuxfire/*) no apps/functions" \
+  --summary "Layer import via relative path in schema" \
+  --rule "Always import layer schemas via package specifier (@nuxfire/*) in apps/functions" \
   --source "0042-billing"
 
-# Listar lições confirmadas ativas
+# List active confirmed lessons
 bun run fireskill lesson list
 
-# Listar todas as lições (incluindo candidatas e quarentena)
+# List all lessons (including candidates and quarantined)
 bun run fireskill lesson list --all
 
-# Ver sumário quantitativo
+# View quantitative summary
 bun run fireskill lesson status
 
-# Limpar candidatas antigas não corroboradas
+# Prune stale uncorroborated candidates
 bun run fireskill lesson prune
 ```
 
 ---
 
-## Arquivos Gerados e Mantidos
+## Generated and Maintained Files
 
-- **`.fireskills/lessons.json`**: Base canônica serializada em JSON, de propriedade do motor.
-- **`.fireskills/LESSONS.md`**: Playbook formatado em Markdown, consumido diretamente por agentes antes de redigir especificações ou tarefas.
+- **`.fireskills/lessons.json`**: Canonical database serialized in JSON, owned by the engine.
+- **`.fireskills/LESSONS.md`**: Playbook formatted in Markdown, consumed directly by agents before drafting specifications or tasks.

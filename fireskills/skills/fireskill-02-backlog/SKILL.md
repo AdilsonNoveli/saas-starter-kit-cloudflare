@@ -1,294 +1,196 @@
 ---
 name: fireskill-02-backlog
-description: "Use quando o usuário quer transformar uma captura de `specs/inbox/`, uma oportunidade, um problema ou um item existente em backlog pronto para especificação, inclusive por transição automática. Pesquisa duplicatas e referências, cria ou atualiza `specs/backlog/`, faz perguntas adaptativas, aplica o MCR-10 e produz um brief testável. Para apenas guardar um texto sem perguntas use fireskill-01-inbox; não use para escrever spec.md, tarefas, testes ou implementação."
+description: "Use when the user wants to turn an inbox capture from `specs/inbox/`, an opportunity, a problem, or an existing item into a backlog ready for specification, including via automatic transition. Searches duplicates and references, creates or updates `specs/backlog/`, asks adaptive questions, applies MCR-10, and produces a testable brief. To simply store text without questions use fireskill-01-inbox; do not use to write spec.md, tasks, tests, or implementation."
 ---
 
-# Refinar e aprofundar o backlog
+# Refine and Deepen the Backlog
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project root.
+On automatic handoff, reload it before this step.
+Reuse the root confirmed in conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered Questions Protocol` from `fireskills/skills/Spec.md`.
 
-Transforme uma entrada vaga em um item de backlog compreensível e, quando a
-intenção exigir especificação, aprofunde as decisões até produzir um brief
-testável. Esta é a segunda etapa sequencial do framework. Ela reúne registro,
-refinamento e descoberta sem transformar o backlog em fonte normativa.
+Transform a vague input into an intelligible backlog item and, when intent requires specification,
+deepen decisions until producing a testable brief. This is the second sequential stage of the framework.
+It unifies capture, refinement, and discovery without turning backlog into a normative source of truth.
 
-## Orquestrar a conversa
+## Orchestrating the Conversation
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $fireskill-02-backlog → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill
-de destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa.
+When concluding this stage or detecting work belonging to another stage, announce
+`Pending blocker detected: <description> — action: resolving in this stage` and resolve it
+if it falls within scope. When responsibility transfers, announce
+`Automatic transition: $fireskill-02-backlog → $<target> — reason: <reason> — expected result: <result>`
+and immediately load the destination skill, without asking for confirmation or repeating the command. Continue in the same conversation.
 
-Depois de uma correção necessária a esta etapa, anuncie `Retomada automática:
-$<destino> → $fireskill-02-backlog — pendência resolvida: <resultado>` e retome-a
-imediatamente. Reavalie o estado após cada handoff para evitar ciclos. O handoff
-não exige confirmação; ações sensíveis continuam exigindo autorização
-específica.
+After a necessary fix in this stage, announce
+`Automatic resumption: $<target> → $fireskill-02-backlog — resolved blocker: <result>`
+and resume immediately. Re-evaluate state after each handoff to prevent cycles. Handoffs do not require confirmation; sensitive actions still require explicit authorization.
 
-## Buscar duplicatas e referências
+## Search Duplicates and References
 
-1. Extraia termos derivados do pedido do usuário, incluindo nomes do domínio e
-   equivalentes evidentes já usados na conversa.
-2. Antes de criar ou atualizar o item, pesquise esses termos em:
+1. Extract terms derived from the user request, including domain terms and obvious equivalents already used in conversation.
+2. Before creating or updating the item, search these terms in:
    - `specs/inbox/*.md`;
    - `specs/backlog/*.md`;
-   - `specs/<estado>/*/spec.md`;
+   - `specs/<state>/*/spec.md`;
    - `docs/**/*.md`.
-3. Leia somente resultados plausíveis e classifique cada relação:
-   - **possível duplicata**: problema, pessoa, resultado e contexto
-     substancialmente iguais;
-   - **backlog relacionado**: item complementar, dependência ou precedente;
-   - **spec relacionada**: comportamento definido ou entregue que limita o
-     item;
-   - **documentação relacionada**: vocabulário, regra ou contexto do projeto.
-4. Apresente correspondências materiais com seus caminhos. Diante de possível
-   duplicata, confirme com o usuário se deve atualizar o item ou registrar uma
-   diferença real.
-5. Registre fontes úteis em `Referências relacionadas`, com caminho relativo e
-   tipo de relação. Não transforme uma decisão encontrada em declaração do
-   usuário.
+3. Inspect only plausible results and classify each relation:
+   - **possible duplicate**: problem, person, result, and context substantially identical;
+   - **related backlog**: complementary item, dependency, or precedent;
+   - **related spec**: defined or delivered behavior that bounds the item;
+   - **related documentation**: project vocabulary, rule, or context.
+4. Present substantive matches with their paths. In case of a possible duplicate, confirm with the user whether to update the item or record a real distinction.
+5. Record useful sources in `Related references`, with relative path and relation type. Do not turn a discovered decision into a user assertion.
 
-Se uma resposta mudar materialmente os termos, o problema, a pessoa, o
-resultado ou o contexto, repita a busca.
+If a response materially shifts terms, problem, person, result, or context, repeat the search.
 
-## Reaproveitar respostas confirmadas no MVP
+## Reuse Confirmed MVP Answers
 
-Quando o backlog vier de uma milestone derivada de `MVP.md`, antes de
-formular qualquer pergunta:
+When the backlog originates from an MVP milestone derived from `MVP.md`, before formulating any question:
 
-1. leia `specs/milestones/M01.md` e a seção
-   `Registros confirmados no MVP` do backlog; abra também o `MVP.md` original
-   quando o caminho registrado estiver disponível;
-2. extraia cada declaração que responde problema, pessoa, resultado, escopo,
-   jornada, regra, dado, integração, limite ou critério de aceite;
-3. converta a declaração em resposta normalizada no campo aplicável do backlog
-   e mantenha o trecho e o caminho de origem como proveniência;
-4. trate como respondida uma questão cuja resposta esteja expressa no MVP,
-   mesmo que o arquivo não use o mesmo rótulo da pergunta;
-5. pergunte somente por lacuna real, ambiguidade relevante ou contradição entre
-   o MVP, as fontes relacionadas e a conversa atual.
+1. Read `specs/milestones/M01.md` and the `Confirmed MVP Records` section of the backlog; also open the original `MVP.md` when the recorded path is available;
+2. Extract every statement that answers problem, person, result, scope, journey, rule, data, integration, boundary, or acceptance criterion;
+3. Convert the statement into a normalized answer in the applicable backlog field and keep the source excerpt and path as provenance;
+4. Treat as answered any question whose answer is explicitly stated in the MVP, even if the file does not use the exact question phrasing;
+5. Ask only for genuine gaps, relevant ambiguity, or contradiction between the MVP, related sources, and current conversation.
 
-Não peça confirmação, escolha ou reformulação para uma resposta que o MVP já
-declara. Uma síntese curta pode informar o que foi reaproveitado, mas não abre
-uma nova rodada. Quando uma leitura razoável admitir mais de um significado,
-apresente apenas essa ambiguidade e cite os trechos que a provocam.
+Do not request confirmation, choice, or reformulation for an answer the MVP already declares. A brief summary can report what was reused, but does not open a new question round. When a reasonable reading admits multiple interpretations, present only that ambiguity and quote the triggering excerpts.
 
-Se a importação registrar um `Default aplicado automaticamente`, considere-o
-confirmado quando a base indicada for explícita ou inequívoca. Se uma pergunta
-tiver uma única opção compatível com o MVP, aplique essa opção, registre a
-normalização e siga para a próxima lacuna. Só mostre opções quando houver uma
-escolha real, mais de uma interpretação compatível ou uma sugestão que a fonte
-não permita confirmar. A entrevista deve perguntar apenas o que o MVP não
-conseguiu responder ou sugerir com segurança.
+If the import records a `Default applied automatically`, consider it confirmed when the indicated basis is explicit or unequivocal. If a question has only one option compatible with the MVP, apply that option, record normalization, and proceed to the next gap. Only offer choices when there is a real tradeoff, multiple compatible interpretations, or a suggestion that sources do not confirm. The interview should ask only what the MVP could not answer or suggest with certainty.
 
-## Garantir a captura mínima
+## Ensure Minimum Capture
 
-1. Preserve a formulação original recebida na conversa ou em
-   `specs/inbox/<data-hora>-<slug>.md`. Separe declaração, inferência e aberto.
-2. Confirme se o contexto esclarece:
-   - problema percebido;
-   - pessoa afetada ou beneficiada;
-   - resultado ou valor esperado;
-   - contexto suficiente para distinguir a entrada de pedidos semelhantes.
-3. Se algo estiver ausente, vago, contraditório ou ambíguo, selecione a lacuna
-   real de maior impacto e monte exatamente uma pergunta numerada por rodada.
-4. Reavalie as lacunas depois de cada resposta. Não transforme os itens em
-   questionário fixo nem repita informação já fornecida.
-5. Não crie nem atualize o arquivo enquanto algum item essencial continuar
-   ausente ou ambíguo. Se a pessoa não souber responder, explique a lacuna sem
-   inventar conteúdo.
+1. Preserve the original wording received in conversation or in `specs/inbox/<timestamp>-<slug>.md`. Separate assertions, inferences, and open points.
+2. Confirm whether context clarifies:
+   - perceived problem;
+   - affected or benefited person;
+   - expected result or value;
+   - sufficient context to distinguish the entry from similar requests.
+3. If anything is missing, vague, contradictory, or ambiguous, select the highest-impact genuine gap and construct exactly one numbered question per round.
+4. Re-evaluate gaps after each answer. Do not turn items into a rigid questionnaire or repeat already provided information.
+5. Do not create or update the file while essential items remain missing or ambiguous. If the user does not know the answer, explain the gap without inventing content.
 
-A captura mínima não exige solução técnica, critérios completos de aceitação
-ou prioridade. Esses dados podem amadurecer no aprofundamento.
+Minimum capture does not require technical solution, full acceptance criteria, or priority. These details can mature during deepening.
 
-## Criar ou atualizar o item
+## Create or Update the Item
 
-1. Se a pessoa apenas quiser explorar sem registrar, converse e confirme antes
-   de escrever.
-2. Se existir item correspondente, atualize-o sem mudar seu ID e preserve a
-   formulação anterior.
-3. Se a origem for `specs/inbox/`, registre esse caminho em
-   `Referências relacionadas`; não altere nem apague a captura.
-4. Para criar um item novo, execute:
+1. If the user only wants to explore without recording, converse and confirm before writing.
+2. If a matching item exists, update it without changing its ID and preserve the prior wording.
+3. If originating from `specs/inbox/`, record that path in `Related references`; do not alter or delete the capture.
+4. To create a new item, execute:
 
 ```bash
-node <diretório-da-skill>/scripts/iniciar_backlog.mjs \
-  --title "<título curto>" \
-  --idea "<formulação original>" \
-  --problem "<problema percebido>" \
-  --person "<pessoa afetada ou beneficiada>" \
-  --result "<resultado ou valor esperado>" \
-  --context "<contexto que distingue a ideia>" \
-  [--slug <slug>] [--root <raiz>]
+node <skill-dir>/scripts/iniciar_backlog.mjs \
+  --title "<short title>" \
+  --idea "<original formulation>" \
+  --problem "<perceived problem>" \
+  --person "<affected or benefited person>" \
+  --result "<expected result or value>" \
+  --context "<context distinguishing the idea>" \
+  [--slug <slug>] [--root <root>]
 ```
 
-5. Use o caminho absoluto impresso pelo script. Ele prefere
-   `.fireskills/templates/custom/Backlog.md` e recorre a
-   `.fireskills/templates/Backlog.md`.
+5. Use the absolute path printed by the script. It prefers `.fireskills/templates/custom/Backlog.md` and falls back to `.fireskills/templates/Backlog.md`.
 
-## Organizar e priorizar
+## Organize and Prioritize
 
-Leia `references/backlog-quality.md` ao estruturar, refinar, priorizar ou
-avaliar prontidão.
+Read `references/backlog-quality.md` when structuring, refining, prioritizing, or assessing readiness.
 
-- Classifique, quando conhecido, em Produto → Épico → Funcionalidade → item.
-- Use tipos como épico, história, regra, técnico e melhoria sem confundir tipo
-  com prioridade.
-- Ordene por valor, risco, dependências, urgência, esforço, desbloqueios e
-  incerteza; não marque tudo como prioridade alta.
-- Aprofunde campos conforme risco e complexidade. Autenticação, pagamentos,
-  permissões, privacidade e operações assíncronas exigem mais cuidado.
-- Prefira comportamento observável a solução de interface.
-- Torne atributos de qualidade mensuráveis quando forem materiais.
-- Use listas, fluxos, cenários ou matrizes quando reduzirem ambiguidade.
+- Classify, when known, into Product → Epic → Feature → Item.
+- Use types such as epic, story, rule, technical, and improvement without conflating type with priority.
+- Order by value, risk, dependencies, urgency, effort, unlocks, and uncertainty; do not label everything high priority.
+- Deepen fields based on risk and complexity. Authentication, payments, permissions, privacy, and async operations require greater care.
+- Prefer observable behavior over UI implementation choices.
+- Make quality attributes measurable when material.
+- Use lists, flows, scenarios, or matrices when they reduce ambiguity.
 
-## Aprofundar para a especificação
+## Deepen for Specification
 
-Quando a pessoa pedir aprofundamento, promoção ou criação de uma spec:
+When the user requests deepening, promotion, or creation of a spec:
 
-1. Leia a entrada de `specs/inbox/`, o item de `specs/backlog/` ou a spec
-   indicada. Se houver mais de um candidato, pergunte qual aprofundar.
-2. Resuma em uma frase o problema, a pessoa e o resultado percebido.
-3. Separe o que está decidido do que pode mudar escopo, experiência, segurança,
-   dados, testes ou arquitetura.
-4. Leia `references/discovery-map.md` para selecionar perguntas relevantes;
-   não percorra o mapa mecanicamente.
-5. Quando a entrega tiver interface para pessoas, leia o `Contrato de
-   experiência de interface` de `fireskills/skills/Spec.md` e trate `Interface` como
-   área própria da descoberta. Pergunte sobre telas, fluxo de informação,
-   menus e navegação principal,
-   formulário, padrão de ação como painel lateral ou modal e composição. Não
-   escolha o padrão no lugar da pessoa quando houver alternativas reais.
-   Antes da pergunta, leia a stack e as telas existentes indicadas pelo
-   contrato central. Quando já houver sistema, percorra a área afetada e
-   registre navegação, componentes, conteúdo, permissões e estados que a nova
-   entrega preserva ou altera. Use isso para oferecer opções compatíveis em vez
-   de sugerir uma biblioteca nova por padrão. Pedido de criar ou alterar tela,
-   dashboard, lista, formulário, fluxo visual ou CRUD ativa essa área, mesmo
-   que a pessoa não use a palavra “interface”.
-   Carregue `$fireskill-specialist-interface-experience` antes de fechar essa
-   área; ele coordena a análise do sistema atual e os especialistas seguintes.
-   Carregue `$fireskill-specialist-ux-design` antes de fechar a jornada e
-   `$fireskill-specialist-ui-design` antes de fechar a composição.
-   Quando a stack usar `@nuxt/ui`, todo CRUD declarado na descoberta deve
-   registrar `UTable` (com `enterpriseTableUi`), filtros, `UForm`, `UModal` ou
-   `USlideover` e os estados aplicáveis; carregue `$fireskill-specialist-nuxt-ui`
-   antes de fechar a área.
-6. Leia `../fireskill-03-specify/references/mcr-10.md` e faça a análise categorial
-   silenciosamente antes da primeira pergunta.
-7. Leia `references/specialists.md` somente quando tecnologia ou disciplina
-   exigir contexto adicional.
+1. Read the entry from `specs/inbox/`, the item from `specs/backlog/`, or the indicated spec. If multiple candidates exist, ask which to deepen.
+2. Summarize the problem, persona, and perceived outcome in a single sentence.
+3. Separate what is decided from what may affect scope, experience, security, data, tests, or architecture.
+4. Read `references/discovery-map.md` to select relevant questions; do not traverse the map mechanically.
+5. When the deliverable includes user-facing UI, read the `Interface Experience Contract` in `fireskills/skills/Spec.md` and treat `Interface` as a distinct discovery area. Ask about screens, information flow, menus and primary navigation, forms, interaction patterns (such as slideover vs. modal), and layout composition. Do not choose patterns on behalf of the user when real alternatives exist.
+   Before asking, inspect the stack and existing screens designated by the central contract. When a system already exists, traverse the affected area and record navigation, components, content, permissions, and states that the new delivery preserves or alters. Use this to offer compatible choices rather than suggesting a new library by default. Requests to create or modify screens, dashboards, lists, forms, visual workflows, or CRUD activate this area, even if the user never uses the word "interface".
+   Load `$fireskill-specialist-interface-experience` before concluding this area; it coordinates analysis of the current system and downstream specialists.
+   Load `$fireskill-specialist-ux-design` before concluding journeys and `$fireskill-specialist-ui-design` before concluding composition.
+   When the stack uses `@nuxt/ui`, all CRUD declared in discovery must record `UTable` (with `enterpriseTableUi`), filters, `UForm`, `UModal` or `USlideover`, and applicable states; load `$fireskill-specialist-nuxt-ui` before concluding the area.
+6. Read `../fireskill-03-specify/references/mcr-10.md` and perform the categorical analysis silently before the first question.
+7. Read `references/specialists.md` only when technology or discipline requires additional context.
 
-## Conduzir a descoberta adaptativa
+## Conduct Adaptive Discovery
 
-Execute um ciclo com no máximo oito perguntas por área:
+Run a cycle with a maximum of eight questions per area:
 
-1. Antes de cada rodada, releia a entrada, as decisões confirmadas, o contexto acumulado e as novas respostas, junto dos registros do MVP.
-2. Reclassifique lacunas e dependências. Continue enquanto existir lacuna
-   aplicável e restarem perguntas no limite; encerre quando cada uma estiver
-   decidida, não aplicável ou resolvida por evidência.
-3. Selecione a lacuna real com maior `impacto × incerteza` e apresente a rodada
-   conforme o contrato central.
-4. Registre cada resposta original, a decisão normalizada e seus efeitos. Volte ao
-   primeiro passo; não reutilize uma fila fixa.
+1. Before each round, re-read the input, confirmed decisions, accumulated context, and new responses alongside MVP records.
+2. Reclassify gaps and dependencies. Continue while applicable gaps remain and questions are within limit; terminate when each is decided, non-applicable, or resolved by evidence.
+3. Select the genuine gap with highest `impact × uncertainty` and present the round in accordance with the central contract.
+4. Record each original response, the normalized decision, and its consequences. Return to step 1; never use a fixed static queue.
 
-Ao alcançar oito perguntas, apresente síntese, registre as lacunas abertas e
-pare. Só reabra o ciclo quando a pessoa pedir explicitamente mais perguntas e
-informar quantas quer responder.
+Upon reaching eight questions, present a summary, record open gaps, and pause. Only reopen the cycle when the user explicitly requests more questions and states how many they wish to answer.
 
-Inclua `Avançar` em cada pergunta desde a primeira rodada. Se a pessoa escolher
-essa opção:
+Include `Proceed` in every question starting from the first round. If the user selects this option:
 
-- na rodada seguinte, confirme se ela encerra definitivamente as perguntas
-  daquela área, responde depois ou volta a responder agora;
-- faça a confirmação como a única pergunta numerada da rodada;
-- ao encerrar, registre `Área encerrada pelo usuário: <área>` e não pergunte
-  novamente, salvo reabertura explícita;
-- ao adiar, registre `Área adiada pelo usuário: <área>` e preserve os pontos
-  não respondidos para retomada;
-- não preencha respostas por inferência;
-- permita o handoff solicitado, mantendo `Status: Draft` e
-  `Definition Gate: Pending` quando restarem lacunas aplicáveis.
+- In the following round, confirm whether they definitively close questions for that area, defer answering, or resume answering now;
+- Issue this confirmation as the sole numbered question of the round;
+- Upon closing, record `Area closed by user: <area>` and do not ask again unless explicitly reopened;
+- Upon deferral, record `Area deferred by user: <area>` and preserve unanswered points for later resumption;
+- Do not infer answers into blanks;
+- Permit the requested handoff, keeping `Status: Draft` and `Definition Gate: Pending` when applicable gaps remain.
 
-Durante a conversa:
+During conversation:
 
-- ofereça pelo menos três opções numeradas quando reduzirem o esforço e
-  recomende uma com justificativa curta;
-- aceite respostas livres e use-as na reanálise;
-- preserve termos originais e diferencie declaração, inferência, hipótese,
-  decisão, conflito e aberto;
-- confirme intenção operacional por síntese;
-- não recite as dez categorias nem transforme cada uma em pergunta.
+- Provide at least three numbered options when reducing cognitive effort, and recommend one with concise rationale;
+- Accept freeform responses and incorporate them into re-analysis;
+- Preserve original wording and differentiate assertions, inferences, hypotheses, decisions, conflicts, and open items;
+- Confirm operational intent through synthesis;
+- Do not recite the ten categories or turn each into a question.
 
-Garanta cobertura suficiente de problema, atores, resultado, escopo, jornadas,
-falhas, limites, regras, dados, segurança, privacidade, desempenho,
-acessibilidade, restrições existentes e sinais objetivos de aceite e sucesso.
+Ensure sufficient coverage of problem, actors, outcome, scope, journeys, failure modes, boundaries, rules, data, security, privacy, performance, accessibility, existing constraints, and objective signs of acceptance and success.
 
-Para interface usada por pessoas, também cubra telas, navegação, fluxo de
-informação, menus e navegação principal, campos e validações do formulário,
-padrão de abertura de cada ação, disposição dos elementos, estados e uso por
-teclado. Registre as respostas
-textuais e a stack observada no backlog para que a spec não reduza um CRUD a
-endpoints nem troque a tecnologia usada pelo projeto.
+For user-facing interfaces, also cover screens, navigation, information flow, menus and primary navigation, form fields and validation, activation patterns for actions, element layout, states, and keyboard usage. Record textual answers and observed stack in the backlog so the spec does not reduce CRUD to raw endpoints or switch technology stacks arbitrarily.
 
-Quando a jornada depender de informações guardadas, consultadas, compartilhadas
-ou apagadas, anuncie a transição automática para `$fireskill-data-discovery`
-antes de declarar o brief pronto. Retome o backlog com o registro confirmado
-em `.fireskills/DATABASE.md` como contexto, sem converter a conversa em desenho
-técnico.
+When journeys depend on stored, queried, shared, or deleted data, announce automatic transition to `$fireskill-data-discovery` before declaring the brief ready. Resume backlog with confirmed records in `.fireskills/DATABASE.md` as context, without turning conversation into low-level technical design.
 
-## Manter o item
+## Maintain the Item
 
-Use exatamente `specs/backlog/<NNNN>-<slug>.md` e mantenha:
+Use exact path `specs/backlog/<NNNN>-<slug>.md` and maintain:
 
-- `Status: Captured` enquanto o item estiver apenas registrado;
-- `Status: Refining` durante refinamento ou descoberta;
-- `Status: Ready for specification` quando o brief estiver suficiente;
-- `Status: Promoted` depois que uma spec derivada existir.
+- `Status: Captured` while the item is only recorded;
+- `Status: Refining` during refinement or discovery;
+- `Status: Ready for specification` when the brief is sufficient;
+- `Status: Promoted` once a derived spec exists.
 
-Mantenha as metainformações na tabela abaixo do título. Não invente prioridade,
-prazo, stakeholder, solução ou evidência. Use `Pronto para desenvolvimento`
-como diagnóstico, nunca como autorização de implementação.
+Keep metadata in the table below the title. Never invent priority, deadlines, stakeholders, solutions, or evidence. Use `Ready for Development` as a diagnostic checklist, never as implementation authorization.
 
-## Encerrar
+## Conclude
 
-Apresente um `Brief pronto para especificar` com:
+Present a `Brief Ready to Specify` containing:
 
-1. Problema e objetivo.
-2. Atores.
-3. Escopo e fora de escopo.
-4. Jornadas e regras essenciais.
-5. Critérios de aceite em Given/When/Then.
-6. Restrições técnicas e de qualidade.
-7. Suposições.
-8. Decisões abertas ou `Nenhuma lacuna aplicável`.
-9. Vocabulário ambíguo e inferências confirmadas.
+1. Problem and objective.
+2. Actors.
+3. Scope and out of scope.
+4. Essential journeys and rules.
+5. Acceptance criteria in Given/When/Then format.
+6. Technical and quality constraints.
+7. Assumptions.
+8. Open decisions or `No applicable gaps`.
+9. Ambiguous vocabulary and confirmed inferences.
 
-Atualize o item de backlog quando a pessoa autorizar esse registro. Quando o
-brief estiver suficiente ou a pessoa escolher `avançar`, retorne
-automaticamente para `$fireskill-update-spec` se a etapa foi chamada por mudança
-tardia em spec aprovada. Para criar ou consolidar a definição inicial, chame
-`$fireskill-03-specify`. No caso de `avançar`, entregue brief parcial e informe
-as lacunas que impedem o Definition Gate.
+Update the backlog item when the user authorizes recording. When the brief is sufficient or the user selects `Proceed`, automatically return to `$fireskill-update-spec` if called due to late changes on an approved spec. To create or consolidate initial definition, call `$fireskill-03-specify`. In case of `Proceed` with open items, deliver partial brief and state gaps that block the Definition Gate.
 
-## Limites
+## Boundaries
 
-- Não alterar nem apagar entradas de Inbox.
-- Não criar `spec.md`, tarefas, research, testes ou código.
-- Não inventar stakeholders, integrações, restrições ou decisões.
-- Não transformar hipótese técnica em requisito.
-- Não mover nem apagar item existente sem confirmação.
+- Do not modify or delete Inbox entries.
+- Do not create `spec.md`, tasks, research, tests, or code.
+- Do not fabricate stakeholders, integrations, constraints, or decisions.
+- Do not convert technical hypotheses into requirements.
+- Do not move or delete existing items without confirmation.

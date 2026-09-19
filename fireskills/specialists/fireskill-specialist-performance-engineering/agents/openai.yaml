@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Especialista - Engenharia de desempenho"
-  short_description: "Performance medida, explicada e protegida"
-  default_prompt: "Use $fireskill-specialist-performance-engineering para orientar esta tarefa com padrões e validação especializados."
+  display_name: "Fireskill - Specialist - Performance Engineering"
+  short_description: "Performance measured, explained, and protected"
+  default_prompt: "Use $fireskill-specialist-performance-engineering to guide this task with specialized standards and validation."

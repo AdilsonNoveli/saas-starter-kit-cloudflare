@@ -1,87 +1,87 @@
 # Backlog: {{BACKLOG_NAME}}
 
-| Metainformação | Valor |
+| Metadata | Value |
 | --- | --- |
 | ID | {{BACKLOG_ID}} |
 | Status | Captured |
-| Produto | A esclarecer |
-| Épico | A esclarecer |
-| Funcionalidade | A esclarecer |
-| Tipo | A esclarecer |
-| Prioridade | Não priorizado |
+| Product | To be clarified |
+| Epic | To be clarified |
+| Feature | To be clarified |
+| Type | To be clarified |
+| Priority | Unprioritized |
 | Milestones | |
-| Criado em | {{CURRENT_DATE}} |
-| Spec promovida | Nenhuma |
+| Created at | {{CURRENT_DATE}} |
+| Promoted spec | None |
 
-## Ideia original
+## Original Idea
 
 {{ORIGINAL_IDEA}}
 
-## Problema percebido
+## Perceived Problem
 
 {{PERCEIVED_PROBLEM}}
 
-## Pessoa afetada ou beneficiada
+## Affected or Benefited Person
 
 {{AFFECTED_PERSON}}
 
-## Resultado ou valor esperado
+## Expected Result or Value
 
 {{EXPECTED_RESULT}}
 
-## Contexto
+## Context
 
 {{IDEA_CONTEXT}}
 
-## Referências relacionadas
+## Related References
 
-- Nenhuma referência relevante encontrada.
+- No relevant references found.
 
-## Comportamento esperado
+## Expected Behavior
 
-A esclarecer.
+To be clarified.
 
-## Regras de negócio
+## Business Rules
 
-- A esclarecer conforme risco e complexidade.
+- To be clarified according to risk and complexity.
 
-## Critérios de aceitação
+## Acceptance Criteria
 
-- A esclarecer antes de considerar o item refinado.
+- To be clarified before considering the item refined.
 
-## Qualidades e operação
+## Qualities and Operation
 
-- Segurança: a avaliar.
-- Privacidade: a avaliar.
-- Desempenho e volume: a avaliar.
-- Auditoria e observabilidade: a avaliar.
+- Security: to evaluate.
+- Privacy: to evaluate.
+- Performance and volume: to evaluate.
+- Audit and observability: to evaluate.
 
-## Dependências
+## Dependencies
 
-- Nenhuma registrada.
+- None registered.
 
-## Situações de erro
+## Error Situations
 
-- A esclarecer.
+- To be clarified.
 
-## Escopo
+## Scope
 
-- Dentro: a esclarecer.
-- Fora: a esclarecer.
+- In scope: to be clarified.
+- Out of scope: to be clarified.
 
-## Dúvidas, decisões e riscos
+## Questions, Decisions, and Risks
 
-- Nenhum registrado.
+- None registered.
 
-## Pronto para desenvolvimento
+## Ready for Development
 
-- [ ] O problema e a pessoa beneficiada estão claros.
-- [ ] O evento inicial e o resultado esperado estão claros.
-- [ ] Permissões, regras e exceções relevantes estão claras.
-- [ ] O resultado pode ser verificado objetivamente.
-- [ ] Segurança, privacidade e desempenho foram avaliados conforme o risco.
-- [ ] Fora de escopo, dependências e decisões pendentes estão registrados.
+- [ ] The problem and benefited person are clear.
+- [ ] The initial trigger and expected result are clear.
+- [ ] Permissions, rules, and relevant exceptions are clear.
+- [ ] The result can be objectively verified.
+- [ ] Security, privacy, and performance were evaluated according to risk.
+- [ ] Out of scope, dependencies, and pending decisions are recorded.
 
-## Próximo passo
+## Next Step
 
-Aprofundar nesta etapa até o item ficar pronto para `$fireskill-03-specify`.
+Refine in this stage until the item is ready for `$fireskill-03-specify`.

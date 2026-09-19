@@ -1,13 +1,13 @@
 /**
- * lessons.ts - Motor determinístico de Lições Aprendidas para o Fireskills.
+ * lessons.ts - Deterministic Lessons Learned engine for Fireskills.
  *
- * O modelo/humano fornece o julgamento (qual erro aconteceu, a regra preventiva
- * e a evidência que o fundamenta). Este módulo gerencia o registro mecânico:
- * IDs sequenciais, contagem de recorrência por fatias distintas, promoção
- * automática de candidato para confirmado, quarentena e geração do playbook.
+ * The model/human provides judgment (what error happened, the preventive rule,
+ * and the grounding evidence). This module manages mechanical bookkeeping:
+ * sequential IDs, recurrence counting across distinct slices, automatic promotion
+ * from candidate to confirmed, quarantine, and playbook rendering.
  *
- * Estado canônico: .fireskills/lessons.json (propriedade do motor)
- * Visão compilada: .fireskills/LESSONS.md (regenerado em cada escrita)
+ * Canonical state: .fireskills/lessons.json (engine owned)
+ * Compiled view: .fireskills/LESSONS.md (regenerated on each write)
  */
 
 import { existsSync, promises as fs } from "node:fs";
@@ -45,11 +45,11 @@ export interface LessonsStore {
 }
 
 export const SIGNALS: Record<LessonSignal, string> = {
-  ac_gap: "Critério de aceite não coberto ou quebrado",
-  surviving_mutant: "Mutante sobreviveu (teste fraco ou falso-positivo)",
-  spec_precision_gap: "Especificação imprecisa ou ambígua",
-  spec_deviation: "Implementação divergiu do plano/contrato",
-  gate_fail: "Falha de typecheck, linter ou teste unitário em gate",
+  ac_gap: "Acceptance criterion uncovered or broken",
+  surviving_mutant: "Mutant survived (weak test or false positive)",
+  spec_precision_gap: "Imprecise or ambiguous specification",
+  spec_deviation: "Implementation deviated from plan or contract",
+  gate_fail: "Typecheck, linter, or unit test failure at quality gate",
 };
 
 const DEFAULTS = {
@@ -70,10 +70,10 @@ function getRenderPath(projectRoot: string): string {
   return join(projectRoot, ".fireskills", "LESSONS.md");
 }
 
-/** Carrega o banco de lições de .fireskills/lessons.json ou cria a estrutura padrão. */
+/** Loads or initializes the lessons store. */
 export async function loadLessons(projectRoot: string): Promise<LessonsStore> {
-  const path = getStorePath(projectRoot);
-  if (!existsSync(path)) {
+  const storePath = getStorePath(projectRoot);
+  if (!existsSync(storePath)) {
     return {
       schema: 1,
       promote_threshold: DEFAULTS.promote_threshold,
@@ -83,78 +83,55 @@ export async function loadLessons(projectRoot: string): Promise<LessonsStore> {
       lessons: [],
     };
   }
-
-  try {
-    const raw = await fs.readFile(path, "utf-8");
-    const data = JSON.parse(raw) as Partial<LessonsStore>;
-    return {
-      schema: 1,
-      promote_threshold: data.promote_threshold ?? DEFAULTS.promote_threshold,
-      window_days: data.window_days ?? DEFAULTS.window_days,
-      quarantine_threshold: data.quarantine_threshold ?? DEFAULTS.quarantine_threshold,
-      next_id: data.next_id ?? 1,
-      lessons: data.lessons ?? [],
-    };
-  } catch {
-    return {
-      schema: 1,
-      promote_threshold: DEFAULTS.promote_threshold,
-      window_days: DEFAULTS.window_days,
-      quarantine_threshold: DEFAULTS.quarantine_threshold,
-      next_id: 1,
-      lessons: [],
-    };
-  }
+  const content = await fs.readFile(storePath, "utf-8");
+  return JSON.parse(content) as LessonsStore;
 }
 
-/** Salva o banco em .fireskills/lessons.json e compila o .fireskills/LESSONS.md. */
+/** Saves store state and regenerates LESSONS.md. */
 export async function saveLessons(
   projectRoot: string,
   store: LessonsStore,
 ): Promise<void> {
   const storePath = getStorePath(projectRoot);
-  const renderPath = getRenderPath(projectRoot);
-
   await fs.mkdir(join(projectRoot, ".fireskills"), { recursive: true });
-
-  await fs.writeFile(
-    storePath,
-    JSON.stringify(store, null, 2) + "\n",
-    "utf-8",
-  );
-
-  const markdown = renderLessonsMarkdown(store);
-  await fs.writeFile(renderPath, markdown, "utf-8");
+  await fs.writeFile(storePath, JSON.stringify(store, null, 2), "utf-8");
+  await renderPlaybook(projectRoot, store);
 }
 
-/** Registra uma nova lição ou incrementa ocorrência em lição existente. */
+/**
+ * Adds a new lesson or increments occurrences of an existing one.
+ */
 export async function addLesson(
   projectRoot: string,
   input: {
+    signal: LessonSignal;
     summary: string;
     rule: string;
-    signal: LessonSignal;
     source: string;
   },
 ): Promise<{ lesson: Lesson; promoted: boolean }> {
   const store = await loadLessons(projectRoot);
   const now = nowIso();
 
-  // Normaliza o resumo para comparar similaridade
-  const normalizedSummary = input.summary.trim().toLowerCase();
+  const normalizedSummary = input.summary.trim();
+  const normalizedRule = input.rule.trim();
 
-  const existing = store.lessons.find(
-    (l) => l.summary.trim().toLowerCase() === normalizedSummary,
+  let existing = store.lessons.find(
+    (l) =>
+      l.status !== "quarantined" &&
+      (l.summary.toLowerCase() === normalizedSummary.toLowerCase() ||
+        l.rule.toLowerCase() === normalizedRule.toLowerCase()),
   );
+
+  let promoted = false;
 
   if (existing) {
     if (!existing.sources.includes(input.source)) {
       existing.sources.push(input.source);
-      existing.occurrences += 1;
     }
+    existing.occurrences += 1;
     existing.updated_at = now;
 
-    let promoted = false;
     if (
       existing.status === "candidate" &&
       existing.occurrences >= store.promote_threshold
@@ -162,145 +139,152 @@ export async function addLesson(
       existing.status = "confirmed";
       promoted = true;
     }
-
-    await saveLessons(projectRoot, store);
-    return { lesson: existing, promoted };
+  } else {
+    existing = {
+      id: store.next_id++,
+      summary: normalizedSummary,
+      rule: normalizedRule,
+      signal: input.signal,
+      status: "candidate",
+      sources: [input.source],
+      occurrences: 1,
+      created_at: now,
+      updated_at: now,
+      penalties: 0,
+    };
+    store.lessons.push(existing);
   }
 
-  const newLesson: Lesson = {
-    id: store.next_id++,
-    summary: input.summary.trim(),
-    rule: input.rule.trim(),
-    signal: input.signal,
-    status: "candidate",
-    sources: [input.source],
-    occurrences: 1,
-    created_at: now,
-    updated_at: now,
-    penalties: 0,
-  };
-
-  store.lessons.push(newLesson);
   await saveLessons(projectRoot, store);
-  return { lesson: newLesson, promoted: false };
+  return { lesson: existing, promoted };
 }
 
-/** Penaliza uma lição caso ela cause falso-positivo ou falhe na prática. */
+/**
+ * Penalizes an ineffective or misleading lesson.
+ */
 export async function penalizeLesson(
   projectRoot: string,
   id: number,
   _reason?: string,
-): Promise<Lesson> {
+): Promise<{ lesson: Lesson; quarantined: boolean }> {
   const store = await loadLessons(projectRoot);
   const lesson = store.lessons.find((l) => l.id === id);
+
   if (!lesson) {
-    throw new Error(`Lição com ID ${id} não encontrada.`);
+    throw new Error(`Lesson with ID ${id} not found.`);
   }
 
   lesson.penalties += 1;
   lesson.updated_at = nowIso();
 
+  let quarantined = false;
   if (lesson.penalties >= store.quarantine_threshold) {
     lesson.status = "quarantined";
+    quarantined = true;
   }
 
   await saveLessons(projectRoot, store);
-  return lesson;
+  return { lesson, quarantined };
 }
 
-/** Remove candidatos antigos não corroborados. */
+/**
+ * Prunes expired candidates.
+ */
 export async function pruneLessons(projectRoot: string): Promise<number> {
   const store = await loadLessons(projectRoot);
-  const now = Date.now();
+  const now = new Date();
   const windowMs = store.window_days * 24 * 60 * 60 * 1000;
 
   const initialCount = store.lessons.length;
-  store.lessons = store.lessons.filter((lesson) => {
-    if (lesson.status === "confirmed") return true;
-    const updatedMs = new Date(lesson.updated_at).getTime();
-    return now - updatedMs <= windowMs;
+  store.lessons = store.lessons.filter((l) => {
+    if (l.status !== "candidate") return true;
+    const updatedAt = new Date(l.updated_at).getTime();
+    return now.getTime() - updatedAt <= windowMs;
   });
 
-  const pruned = initialCount - store.lessons.length;
-  if (pruned > 0) {
+  const removed = initialCount - store.lessons.length;
+  if (removed > 0) {
     await saveLessons(projectRoot, store);
   }
-  return pruned;
+  return removed;
 }
 
-/** Retorna resumo quantitativo do banco de lições. */
+/** Returns counts by status. */
 export async function getLessonsStatus(projectRoot: string): Promise<{
+  total: number;
   confirmed: number;
   candidate: number;
   quarantined: number;
-  total: number;
 }> {
   const store = await loadLessons(projectRoot);
   return {
+    total: store.lessons.length,
     confirmed: store.lessons.filter((l) => l.status === "confirmed").length,
     candidate: store.lessons.filter((l) => l.status === "candidate").length,
     quarantined: store.lessons.filter((l) => l.status === "quarantined").length,
-    total: store.lessons.length,
   };
 }
 
-/** Renderiza a visão formatada do playbook em .fireskills/LESSONS.md. */
-export function renderLessonsMarkdown(store: LessonsStore): string {
+/**
+ * Renders `.fireskills/LESSONS.md` from canonical state.
+ */
+async function renderPlaybook(
+  projectRoot: string,
+  store: LessonsStore,
+): Promise<void> {
   const confirmed = store.lessons.filter((l) => l.status === "confirmed");
   const candidates = store.lessons.filter((l) => l.status === "candidate");
   const quarantined = store.lessons.filter((l) => l.status === "quarantined");
 
   const lines: string[] = [
-    "# Playbook de Lições Aprendidas (Fireskills)",
+    "# Playbook: Lessons Learned",
     "",
-    "> **Arquivo gerado automaticamente pelo motor de lições do Fireskills.**",
-    "> Regras preventivas extraídas de regressões, mutações e falhas de teste passadas.",
-    "> Não edite este arquivo manualmente. Use `bun run fireskill lesson add`.",
+    "> Self-evolving playbook managed by Fireskills. Grounded in actual bugs and gate failures.",
+    "> Generated automatically from `.fireskills/lessons.json` — do not edit manually.",
     "",
-    "## Resumo",
-    "",
-    `- **Confirmadas (ativas)**: ${confirmed.length}`,
-    `- **Candidatas (em observação)**: ${candidates.length}`,
-    `- **Em Quarentena**: ${quarantined.length}`,
-    "",
-    "---",
-    "",
-    "## 🛡️ Lições Confirmadas (Obrigatórias no Planejamento e Código)",
+    "## 🛡️ Confirmed Preventive Rules (Active Playbook)",
     "",
   ];
 
   if (confirmed.length === 0) {
-    lines.push("_Nenhuma lição confirmada registrada ainda._", "");
+    lines.push("_No confirmed lessons yet._");
+    lines.push("");
   } else {
     for (const l of confirmed) {
       lines.push(`### L-${String(l.id).padStart(3, "0")}: ${l.summary}`);
-      lines.push("");
-      lines.push(`- **Regra Preventiva**: ${l.rule}`);
-      lines.push(`- **Sinal de Origem**: \`${l.signal}\` (${SIGNALS[l.signal]})`);
-      lines.push(`- **Ocorrências**: ${l.occurrences} (fontes: ${l.sources.join(", ")})`);
-      lines.push(`- **Última Atualização**: ${l.updated_at.split("T")[0]}`);
+      lines.push(`- **Rule:** ${l.rule}`);
+      lines.push(`- **Signal:** \`${l.signal}\` (${SIGNALS[l.signal] || l.signal})`);
+      lines.push(`- **Occurrences:** ${l.occurrences} (Sources: ${l.sources.join(", ")})`);
+      lines.push(`- **Confirmed on:** ${l.updated_at.split("T")[0]}`);
       lines.push("");
     }
   }
 
-  lines.push("---", "", "## 🧪 Lições Candidatas (Aguardando Reincidência)", "");
+  lines.push("## 🧪 Candidate Lessons (Under Observation)");
+  lines.push("");
 
   if (candidates.length === 0) {
-    lines.push("_Nenhuma candidata pendente._", "");
+    lines.push("_No candidate lessons in the observation window._");
+    lines.push("");
   } else {
     for (const l of candidates) {
-      lines.push(`- **[C-${String(l.id).padStart(3, "0")}]** **${l.summary}** — ${l.rule} *(sinal: \`${l.signal}\`, fonte: ${l.sources.join(", ")})*`);
+      lines.push(
+        `- **L-${String(l.id).padStart(3, "0")}** [${l.signal}]: ${l.summary} → Rule: "${l.rule}" (${l.occurrences}/${store.promote_threshold} occurrences to confirm)`,
+      );
     }
     lines.push("");
   }
 
   if (quarantined.length > 0) {
-    lines.push("---", "", "## ⚠️ Lições em Quarentena", "");
+    lines.push("## ⚠️ Quarantined Lessons (Penalized)");
+    lines.push("");
     for (const l of quarantined) {
-      lines.push(`- **[Q-${String(l.id).padStart(3, "0")}]** **${l.summary}** — Penalidades: ${l.penalties}`);
+      lines.push(
+        `- **L-${String(l.id).padStart(3, "0")}**: ${l.summary} (Penalties: ${l.penalties})`,
+      );
     }
     lines.push("");
   }
 
-  return lines.join("\n");
+  await fs.writeFile(getRenderPath(projectRoot), lines.join("\n"), "utf-8");
 }

@@ -1,201 +1,147 @@
 ---
 name: fireskill-06-tdd-bdd
-description: "Use quando o usuário pede TDD, BDD, testes derivados do Gherkin de referência da especificação, rastreabilidade entre `spec.md` e testes, ou um ciclo RED-GREEN-REFACTOR. Use também quando uma transição automática pedir materialização, RED ou verificação de testes. Use para editar as seções 11–13 e executar testes; `fireskill-07-implement` continua responsável pelas tarefas de produção na seção 14 do mesmo arquivo."
+description: "Use when the user requests TDD, BDD, tests derived from specification reference Gherkin, traceability between `spec.md` and tests, or a RED-GREEN-REFACTOR cycle. Also use when an automatic transition requests materialization, RED proof, or test verification. Use to edit sections 11–13 and execute tests; `fireskill-07-implement` remains responsible for production tasks in section 14 of the same file."
 ---
 
-# Executar TDD orientado pelo BDD da especificação
+# Execute TDD Driven by Specification BDD
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project root.
+On automatic handoff, reload it before this step.
+Reuse the root confirmed in conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered Questions Protocol` from `fireskills/skills/Spec.md`.
 
-Leia o BDD como referência e converta o comportamento especificado em testes TDD
-executáveis e evidência rastreável. O Gherkin ajuda o usuário e o agente a
-entender contexto, ação e resultado; ele próprio não é uma suíte de testes.
+Read BDD scenarios as normative reference and convert specified behavior into executable TDD tests and traceable evidence. Gherkin helps users and agents comprehend context, action, and expected outcome; it is not an executable test runner itself.
 
-## Proteção obrigatória do banco
+## Mandatory Database Protection
 
-Antes de executar qualquer teste focal, suíte ou regressão, confira o comando e
-o ambiente:
+Before executing any focal test, test suite, or regression run, verify the command and environment:
 
 ```bash
 node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs \
-  --project <raiz> --command "<comando-de-teste>"
+  --project <root> --command "<test-command>"
 ```
 
-Para testes que acessem Postgres, a conferência exige um banco de teste
-explicitamente diferente do configurado nos secrets do stage (`DATABASE_*`); os
-testes Vitest atuais não acessam o banco. Não execute nenhum teste enquanto o resultado for `PENDING`. Corrija o ambiente
-de testes, repita a conferência e prossiga somente depois de `SAFE`.
+For tests accessing Postgres, verification requires a dedicated test database explicitly separate from staging secrets (`DATABASE_*`); existing Vitest test suites do not connect to the database. Do not execute any tests while the result is `PENDING`. Fix the test environment, rerun the safety check, and proceed only after `SAFE`.
 
-Trate `IGNORED` como descarte obrigatório do comando. Não execute, não adapte
-com `--force` e não peça autorização para rodar `migrate:fresh`,
-`migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`,
-`schema:drop`, `prisma migrate reset`, `drizzle-kit push --force`,
-`drizzle-kit drop`, `DROP DATABASE`, `DROP SCHEMA`,
-`DROP TABLE`, `TRUNCATE` ou equivalentes. Não use `RefreshDatabase` nem
-`DatabaseMigrations`; em testes com banco, prefira transação revertida e
-fixtures que criem somente os registros usados pelo caso.
+Treat `IGNORED` as an absolute command rejection. Do not run, adapt with `--force`, or seek authorization to execute `migrate:fresh`, `migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`, `schema:drop`, `prisma migrate reset`, `drizzle-kit push --force`, `drizzle-kit drop`, `DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`, `TRUNCATE`, or equivalents. Do not use `RefreshDatabase` or `DatabaseMigrations`; for database-backed tests, prefer rolled-back transactions and fixtures creating strictly necessary records.
 
-## Orquestrar a conversa
+## Orchestrating the Conversation
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $fireskill-06-tdd-bdd → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill de
-destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa. Depois de uma correção necessária a esta etapa, anuncie `Retomada
-automática: $<destino> → $fireskill-06-tdd-bdd — pendência resolvida:
-<resultado>` e retome-a imediatamente. Reavalie o estado após cada handoff para
-evitar ciclos. Não peça confirmação para o handoff; ações sensíveis continuam
-exigindo autorização específica.
+When concluding this stage or detecting work belonging to another stage, announce
+`Pending blocker detected: <description> — action: resolving in this stage` and resolve it
+if it falls within scope. When responsibility transfers, announce
+`Automatic transition: $fireskill-06-tdd-bdd → $<target> — reason: <reason> — expected result: <result>`
+and immediately load the destination skill, without asking for confirmation or repeating the command. Continue in the same conversation.
 
-## Escolher o modo
+After a necessary fix in this stage, announce
+`Automatic resumption: $<target> → $fireskill-06-tdd-bdd — resolved blocker: <result>`
+and resume immediately. Re-evaluate state after each handoff to prevent cycles. Handoffs do not require confirmation; sensitive actions still require explicit authorization.
 
-- `prepare`: antes da implementação, criar o próximo teste/scenario e provar RED sem escrever código de produção.
-- `cycle`: executar RED → GREEN → REFACTOR para uma fatia explicitamente escolhida.
-- `verify`: executar suites e auditar rastreabilidade sem criar comportamento novo.
+## Choose Mode
 
-Se o usuário não indicar o modo, use `prepare` quando a seção 14 ainda não estiver em execução e `cycle` quando houver uma tarefa ativa.
+- `prepare`: Prior to implementation, create the next test case/scenario and prove RED without writing production code.
+- `cycle`: Execute RED → GREEN → REFACTOR for an explicitly selected vertical slice.
+- `verify`: Execute test suites and audit traceability without introducing new behavior.
 
-## Preparar
+If the user specifies no mode, use `prepare` when section 14 is not yet in execution, and `cycle` when an active task exists.
 
-1. Leia `specs/<estado>/<NNNN>-<slug>/spec.md`, testes e configuração do projeto.
-2. Exija `Formato: Specsfy/2.0` e `Definition Gate: Passed`. No modo `prepare`,
-   use `Status: Defined` e `Plan Gate: Pending`; nos modos `cycle` e `verify`,
-   use `Status: Planned` ou `Implementing`.
-3. Selecione uma fatia vertical pequena: um `AC` Gherkin e seus `FR/NFR`.
-4. Resolva o runner de testes pela stack antes de escrever testes:
-   - Nuxfire (Node/Bun): use Vitest (`bun run test`; agregador `vitest.config.mts`
-     e um `vitest.config.ts` por layer);
-   - outra stack: preserve o runner de testes existente ou pergunte quando não houver
-     decisão reproduzível.
-5. Confira o ambiente e o comando com `check_database_safety.mjs`. Se o estado
-   não for `SAFE`, não execute teste algum e mantenha a etapa pendente.
-6. No Nuxfire a decisão já está materializada: Vitest, com `bun run test` na
-   raiz (7 arquivos, 131 testes) e `vitest.config.ts` por layer; não instale
-   dependência silenciosamente.
-7. Leia `references/test-levels.md` para escolher o nível mais baixo que ainda prova o comportamento.
+## Preparation
 
-## Usar o BDD para escrever TDD
+1. Read `specs/<state>/<NNNN>-<slug>/spec.md`, test files, and repository configuration.
+2. Require `Format: Specsfy/2.0` and `Definition Gate: Passed`. In `prepare` mode, require `Status: Defined` and `Plan Gate: Pending`; in `cycle` and `verify` modes, require `Status: Planned` or `Implementing`.
+3. Select a small vertical slice: one Gherkin `AC` and associated `FR/NFR`s.
+4. Resolve the project test runner based on stack before authoring tests:
+   - Nuxfire (Node/Bun): Vitest (`bun run test`; root aggregator `vitest.config.mts` and one `vitest.config.ts` per layer);
+   - Other stacks: preserve existing test runners or ask when no reproducible decision exists.
+5. Verify test command and environment with `check_database_safety.mjs`. If state is not `SAFE`, do not execute tests and keep step pending.
+6. In Nuxfire, Vitest is configured at root (`bun run test`, 7 files, 131 tests) and per-layer; never install testing dependencies silently.
+7. Read `references/test-levels.md` to select the lowest testing level that conclusively proves behavior.
 
-- Use o bloco Gherkin do `AC` em `spec.md` como contrato de referência sem mudar
-  seu significado.
-- Não crie, copie nem execute arquivos `.feature` ou step definitions. Os termos
-  Given/When/Then permanecem apenas na `spec.md`.
-- Escreva o teste TDD com Vitest ao lado do código (`shared/**/*.test.ts` ou
-  `server/**/*.test.ts` da layer), no menor nível que prova o comportamento.
-  Marque cada caso executável, imediatamente junto à sua definição, com:
+## Use BDD to Write TDD
+
+- Use the Gherkin block of the `AC` in `spec.md` as reference contract without altering its meaning.
+- Do not create, copy, or run raw `.feature` files or step definitions. Given/When/Then remain strictly in `spec.md`.
+- Author TDD tests in Vitest alongside code (`shared/**/*.test.ts` or `server/**/*.test.ts` of the layer), at the lowest layer proving the requirement. Tag each executable test case immediately above its definition with:
 
 ```ts
 // SPECSFY: US-001 FR-001 AC-001
 ```
-- Materialize no mínimo três casos TDD distintos para a feature inteira e para
-  cada `US`, `FR` e `NFR`: caminho feliz, regra/variação crítica e falha ou
-  limite material. Um único marcador `SPECSFY:` compartilhado pelo arquivo
-  conta como um caso, mesmo que o arquivo contenha vários testes.
-- Cubra cada `AC` com ao menos um caso TDD, sem multiplicar casos equivalentes.
-- Escolha unidade, integração, contrato ou browser conforme a fronteira descrita
-  pelo BDD; não crie uma segunda suíte apenas para rotulá-la como BDD.
-- Não use mocks para remover justamente a fronteira que o cenário pretende provar.
 
-## Ciclo obrigatório
+- Materialize at least three distinct TDD cases for the feature and for each `US`, `FR`, and `NFR`: happy path, critical business variation/rule, and failure or boundary condition. A single `SPECSFY:` comment shared across a file counts as one test case, even if the file contains multiple assertions.
+- Cover each `AC` with at least one TDD case, avoiding redundant test cases.
+- Select unit, integration, contract, or browser tests according to the boundary described by BDD; never create separate test suites merely to label them BDD.
+- Avoid mocks that stub out the exact boundary the scenario seeks to verify.
+
+## Mandatory Cycle
 
 ### RED
 
-1. Leia o BDD de referência e escreva o menor teste TDD que prova o `AC` e seus
-   requisitos.
-2. Execute o teste TDD; nunca execute Gherkin.
-3. Confirme falha pelo comportamento ausente ou incorreto.
-4. Se falhar por sintaxe, fixture, importação ou ambiente, corrija o teste e repita.
-5. Se passar antes da mudança, o teste não demonstra o gap: refine-o ou prove que a funcionalidade já existe.
+1. Read the reference BDD scenario and write the minimal TDD test proving the `AC` and requirements.
+2. Run the TDD test; never run raw Gherkin.
+3. Confirm failure stems directly from missing or incorrect behavior.
+4. If failure is due to syntax errors, fixture issues, broken imports, or environment, fix test harness and rerun.
+5. If the test passes before implementation, it fails to demonstrate a behavioral gap: refine test or prove functionality already exists.
 
-No modo `prepare`, pare após o RED válido, registre evidência e conclua o
-checklist da tarefa `[TEST]` correspondente. Não
-altere `Plan Gate`; anuncie e retorne automaticamente para
-`$fireskill-05-tasks`, que valida todos os predecessores antes de promover a
-spec para `Planned`.
-Registre a linha correspondente na tabela `Evidência RED-GREEN-REFACTOR` com o RED observado.
+In `prepare` mode, stop after achieving valid RED, record evidence, and check off the checklist of the corresponding `[TEST]` task. Do not modify `Plan Gate`; announce and automatically return to `$fireskill-05-tasks`, which validates all predecessors before promoting spec to `Planned`.
+Record the corresponding row in the `RED-GREEN-REFACTOR Evidence` table with observed RED output.
 
 ### GREEN
 
-No modo `cycle`, escreva o mínimo de código de produção que satisfaça o cenário. Execute primeiro o teste focal e depois a suite relacionada. Não generalize antes de haver um exemplo que exija generalização.
-Atualize a mesma linha de evidência com o GREEN observado.
+In `cycle` mode, write the minimal production code necessary to satisfy the scenario. Run the focal test first, followed by the related suite. Do not generalize until required by an actual concrete example.
+Update the evidence row with observed GREEN output.
 
 ### REFACTOR
 
-Com tudo verde, elimine duplicação e melhore nomes/estrutura sem alterar comportamento. Execute novamente as suites relacionadas.
-Registre o comando de regressão na seção 11 e a evidência na matriz da seção 12.
+With tests green, eliminate duplication and improve naming/structure without altering behavior. Re-execute related suites.
+Record regression command in section 11 and evidence in the section 12 matrix.
 
-## Auditar rastreabilidade
+## Audit Traceability
 
 Execute:
 
 ```bash
-node fireskills/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/<estado>/<NNNN>-<slug>/spec.md .
+node fireskills/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/<state>/<NNNN>-<slug>/spec.md .
 ```
 
-Trate como gap cada feature, `US`, `FR` ou `NFR` com menos de três casos TDD e
-cada `AC` sem ao menos um caso. Para `NFR` verificado manualmente ou por
-observabilidade, cite a evidência sem dispensar os três casos automatizáveis;
-quando necessário, ajuste `--kinds` sem remover IDs aplicáveis.
-Em specs com `Evidence Contract: 1`, acrescente `--full-chain` para exigir
-`US/FR/NFR/AC → teste → tarefa → evidência`.
-Durante execução, mantenha `Delivery Gate: In Progress` e atualize o
-`Gate do Ato III — Entrega` da seção 13. Use `Passed` somente quando não houver
-gap obrigatório, todas as tarefas estiverem concluídas e a Definition of Done
-estiver comprovada.
+Treat as gaps any feature, `US`, `FR`, or `NFR` with fewer than three TDD cases, and any `AC` lacking at least one case. For manual or observability-verified NFRs, document evidence without dispensing with three automatable cases; adjust `--kinds` when justified without removing applicable IDs.
+In specs with `Evidence Contract: 1`, add `--full-chain` to enforce `US/FR/NFR/AC → test → task → evidence`.
+During implementation, maintain `Delivery Gate: In Progress` and update `Act III Gate — Delivery` in section 13. Set `Passed` only when no mandatory gaps remain, all tasks are complete, and the Definition of Done is verified.
 
-## Disciplina sob pressão
+## Discipline Under Pressure
 
-| Tentação | Regra |
+| Temptation | Rule |
 | --- | --- |
-| “É uma mudança pequena.” | Mudanças pequenas recebem testes pequenos; tamanho não substitui RED. |
-| “O código já está pronto.” | Escreva um teste de caracterização; não altere produção para fabricar RED. Para comportamento novo, escolha um caso ainda não atendido. |
-| “O prazo permite pular RED.” | Sem falha observada não há prova de que o teste protege o requisito. |
-| “O líder autorizou.” | Autoridade pode mudar escopo, não transformar ausência de evidência em TDD. |
-| “Testar depois é equivalente.” | Test-first guia o contrato e prova sensibilidade antes da implementação. |
+| "It's a tiny change." | Small changes get small tests; size never excuses skipping RED. |
+| "The code is already written." | Write a characterization test; never edit production code to fabricate fake RED. For new behavior, write a test case not yet satisfied. |
+| "Deadline pressure allows skipping RED." | Without an observed failure, there is zero proof the test protects the requirement. |
+| "The tech lead approved skipping." | Authority may adjust scope, but cannot turn lack of evidence into TDD. |
+| "Testing afterwards is equivalent." | Test-first shapes API ergonomics and proves failure detection before code exists. |
 
-Em uma tarefa de teste, atualize `PREP`, `EXECUTE`, `VERIFY`, `VISUAL`,
-`EVIDENCE` e `IMPROVE` conforme cada etapa acontecer. O item `VISUAL` também é
-obrigatório para confirmar se o teste toca uma interface; quando não tocar,
-registre `Não aplicável` e o motivo. Não marque o pai como concluído sem
-arquivo, marcador, RED válido, comando/evidência e revisão do processo.
-Não escreva código de produção antes que o predecessor TDD informado pelo BDD
-da mesma fatia esteja concluído e com RED registrado na spec.
+In a test task, update `PREP`, `EXECUTE`, `VERIFY`, `VISUAL`, `EVIDENCE`, and `IMPROVE` as each occurs. `VISUAL` is mandatory to confirm whether tests touch UI surfaces; if non-visual, record `Not applicable` with rationale. Do not mark the parent task complete without file, marker, valid RED, command/evidence, and process review.
+Do not write production code before the TDD predecessor informed by spec BDD in the same slice is complete with RED recorded in the spec.
 
-## Auditar QA
+## Audit QA
 
-Depois de executar os runners pertencentes ao repositório, registre `Passed` ou
-a falha na coluna Evidência da seção 12 e audite:
+After running project test suites, record `Passed` or failure details in the Evidence column of section 12, then audit:
 
 ```bash
 node fireskills/skills/fireskill-06-tdd-bdd/scripts/verify_acceptance.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md .
+  specs/<state>/<NNNN>-<slug>/spec.md .
 ```
 
-O auditor não executa comandos extraídos de Markdown. AC manual exige método,
-responsável e evidência; AC sem resultado impede `Delivery Gate: Passed`.
-Quando houver atestação do runner, repita com `--attestation PATH`: o auditor
-exige exatamente o check `acceptance:<slug>` aprovado, detail JSON válido e
-cobertura de todos os ACs. Texto `Passed` isolado não substitui essa prova.
+The auditor never runs arbitrary commands extracted from Markdown. Manual ACs require methodology, owner, and evidence; unverified ACs prevent `Delivery Gate: Passed`.
+When test runner attestation exists, repeat with `--attestation PATH`: the auditor strictly requires the `acceptance:<slug>` check passed, valid JSON detail, and full AC coverage. Plain text `Passed` does not substitute for this proof.
 
-## Relatar evidência
+## Report Evidence
 
-Informe a fatia, IDs cobertos, arquivo do teste, comando RED, causa da falha, comando GREEN quando aplicável, suite de regressão e gaps de rastreabilidade.
+Report slice, covered IDs, test file, RED command, failure reason, GREEN command when applicable, regression suite, and traceability gaps.
 
-## Especialistas sob demanda
+## Specialists on Demand
 
-Leia [references/specialists.md](references/specialists.md) quando o runner,
-boundary ou oráculo de teste for específico de uma tecnologia. O especialista
-complementa; esta skill preserva RED/GREEN e rastreabilidade.
+Read [references/specialists.md](references/specialists.md) when test runner, boundary, or testing oracle requires technology-specific domain knowledge. Specialists complement this skill; this skill enforces RED/GREEN rigor and traceability.

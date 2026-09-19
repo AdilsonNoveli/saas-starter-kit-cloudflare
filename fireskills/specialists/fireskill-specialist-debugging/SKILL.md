@@ -1,101 +1,60 @@
 ---
 name: fireskill-specialist-debugging
-description: Diagnosticar bugs, regressões, falhas intermitentes e problemas de performance por reprodução, minimização, hipótese falsificável e instrumentação até a causa no nível do mecanismo. Use quando o usuário pedir diagnóstico ou relatar algo quebrado, incluindo falhas intermitentes e degradação de performance; não implementar correção quando o pedido for somente diagnóstico; não use para otimizar algo que já funciona corretamente sem sintoma, use `$fireskill-specialist-performance-engineering` para isso.
+description: Diagnose bugs, regressions, intermittent test flakiness, and performance bottlenecks through minimal reproduction, falsifiable hypotheses, and targeted instrumentation down to root mechanism. Use when diagnosing or reporting broken system behavior, including flaky tests or performance degradation; do not modify code if only diagnosis was requested; do not use to optimize correctly working systems without symptoms (use `$fireskill-specialist-performance-engineering`).
 ---
 
-# Diagnóstico
+# Debugging and Diagnosis
 
-## Quando usar
+## When to Use
 
-- Acionar quando houver um comportamento observado divergente do esperado,
-  com ou sem reprodução confiável ainda estabelecida.
-- Acionar também para falha intermitente ("flaky"), regressão após deploy ou
-  degradação de performance com sintoma concreto (timeout, erro, lentidão
-  reportada).
-- Não acionar para otimizar um sistema que já se comporta corretamente e sem
-  sintoma — isso é `$fireskill-specialist-performance-engineering`, que parte de
-  um SLO e não de uma falha.
-- Combinar com `$fireskill-specialist-observability` quando o ambiente de
-  produção não expuser sinal suficiente para instrumentar o boundary certo.
+- Trigger when observed behavior diverges from expectations, with or without an established reproduction.
+- Trigger for intermittent ("flaky") test failures, post-deploy regressions, or performance
+  degradation with concrete symptoms (timeouts, error spikes, reported latency).
+- Do not trigger to optimize correctly functioning systems without symptoms — that is
+  governed by `$fireskill-specialist-performance-engineering`, which starts from an SLO rather than a defect.
+- Combine with `$fireskill-specialist-observability` when production environments lack sufficient telemetry.
 
-## Fluxo
+## Workflow
 
-1. Capturar comportamento esperado, comportamento observado, ambiente exato e
-   o momento/frequência da última ocorrência — sem isso a hipótese é chute.
-2. Construir uma reprodução confiável ou, quando reprodução direta não for
-   viável, um sinal observável e repetível (log, métrica, trace) que
-   correlacione com a falha.
-3. Reduzir input, componentes envolvidos e janela de tempo até o menor caso
-   que ainda reproduz a falha — cada elemento removido que não muda o
-   resultado é uma variável eliminada da hipótese.
-4. Formular hipóteses falsificáveis e ordená-las pela facilidade de teste e
-   pela probabilidade dado o sintoma observado, não pela mais interessante.
-5. Instrumentar o boundary mais discriminante entre as hipóteses restantes —
-   o ponto onde uma hipótese prevê um valor e a outra prevê outro.
-6. Identificar causa, extensão do impacto (só esse caminho, ou a classe
-   inteira de chamadas) e o mecanismo exato pelo qual ela produz o sintoma.
-7. Se autorizado a corrigir, aplicar a menor mudança que remove a causa e
-   adicionar teste de regressão que falha sem a correção.
+1. Capture expected behavior, observed behavior, exact environment, and timestamp/frequency
+   of occurrences — without this, hypotheses remain mere guesses.
+2. Build a reliable reproduction script or, when direct reproduction is unviable, identify
+   a repeatable observable signal (logs, metrics, distributed traces) correlating with the failure.
+3. Minimize input payloads, participating components, and time windows down to the smallest
+   case reproducing the issue — each removed factor eliminates a hypothesis variable.
+4. Formulate falsifiable hypotheses ordered by testability and probability given symptoms.
+5. Instrument the most discriminative boundary between competing hypotheses — the precise
+   point where hypothesis A predicts value X while hypothesis B predicts value Y.
+6. Identify root cause, blast radius (isolated path vs entire class of calls), and the
+   exact mechanism generating the symptom.
+7. If authorized to remediate, apply the minimal change eliminating root cause and add
+   an automated regression test that fails when the fix is removed.
 
-## Padrões
+## Core Rules
 
-- Não alterar mais de uma causa candidata por vez — mudar duas coisas ao
-  mesmo tempo invalida a atribuição de causa quando o sintoma desaparece.
-- Separar correlação temporal de causalidade: "começou depois do deploy X"
-  é uma pista, não uma prova, até isolar o mecanismo.
-- Preservar evidência (logs, estado, dump) antes de reiniciar processo ou
-  limpar estado — o ambiente que falhou pode ser irreproduzível depois.
-- Comparar ambiente bom e ruim sistematicamente: mesma versão, config,
-  dados, carga e ordem de operações, variando um fator por vez.
-- Tratar flakiness como sintoma de concorrência, timing, estado compartilhado
-  ou dependência externa até haver prova do contrário — nunca como "só
-  rodar de novo".
-- Remover instrumentação temporária, verbosa ou sensível (dado pessoal,
-  segredo) antes de concluir o diagnóstico.
-- Descrever a causa no nível do mecanismo ("a race entre X e Y permite
-  leitura antes da escrita completar"), nunca só no nível do sintoma
-  ("às vezes falha").
+- Vary only one candidate cause at a time — changing multiple factors simultaneously
+  invalidates causal attribution when symptoms disappear.
+- Distinguish temporal correlation from causality: "started after deploy X" is a clue,
+  not proof, until the mechanism is isolated.
+- Preserve diagnostic evidence (logs, dumps, heap snapshots) prior to restarting processes
+  or clearing state.
+- Compare working and failing environments systematically: identical version, config,
+  data, load, and operation ordering, varying one factor per run.
+- Treat flakiness as an indicator of concurrency races, timing assumptions, shared state,
+  or unisolated external dependencies — never dismiss as "just re-run the CI".
+- Remove temporary or verbose instrumentation before closing diagnostics.
+- Describe root causes at the mechanism level ("a race condition between X and Y allows
+  reads before writes commit"), never merely at symptom level ("fails intermittently").
 
-## Antipadrões
+## Antipatterns
 
-- "Adicionar print e rodar de novo" sem hipótese prévia — gera ruído,
-  raramente reduz o espaço de busca e é frequentemente indistinguível de
-  tentativa aleatória.
-- Corrigir o primeiro ponto onde o erro aparece, sem verificar se ali é a
-  origem ou apenas onde o efeito se torna visível (o `NullPointerException`
-  raramente nasce onde é lançado).
-- Declarar "corrigido" porque a reprodução manual parou de falhar uma vez —
-  sem reprodução automatizada e determinística, a ausência do sintoma pode
-  ser apenas sorte ou mudança de timing.
-- Ignorar teste flaky como "instável, não relacionado" sem investigar —
-  flakiness é evidência de bug real de concorrência ou estado compartilhado
-  na maioria dos casos, não ruído a suprimir.
+- Applying shotgun changes hoping something works without isolating the cause.
+- Fixing symptoms at call sites while leaving the corrupted state generator intact.
+- Dismissing intermittent test failures as environmental noise without investigation.
+- Modifying production state destructively during active incident diagnosis.
 
-## Validação
+## Validation
 
-- A reprodução falha de forma determinística antes da correção e passa de
-  forma determinística depois, no mesmo ambiente.
-- O teste de regressão adicionado falha pelo motivo correto quando a
-  correção é revertida (não por outro motivo incidental).
-- Cenários adjacentes ao caminho corrigido foram verificados quanto a efeito
-  colateral da mudança.
-- Existe registro conciso de causa (mecanismo), evidência que a comprova e
-  prevenção (teste, invariante, alarme) adicionada.
-- Não declarar a causa "resolvida" sem essa evidência — atribuir causa por
-  intuição sem reprodução ou teste de regressão é proibido.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-technical-research` confirma comportamento externo,
-  errata ou compatibilidade quando a causa depende de documentação primária.
-- `$fireskill-specialist-observability` para instrumentar produção quando o
-  sinal disponível não é suficiente para discriminar hipóteses.
-- `$fireskill-specialist-performance-engineering` quando o sintoma for
-  degradação sem erro funcional — o diagnóstico de causa raiz aqui pode
-  entregar a esta skill a decisão de qual otimização vale o custo.
-- `$fireskill-specialist-code-review` para revisar a correção e o teste de
-  regressão antes do merge.
-
-Leia [references/standards.md](references/standards.md) para técnicas de
-reprodução e isolamento, causas comuns de flakiness, ferramentas por
-ambiente e fontes oficiais.
+- Reproduction case reliably fails on the unfixed codebase and reliably passes after applying remediation.
+- Added regression test specifically targets the failure mechanism and asserts expected domain behavior.
+- Clean removal of all debug logs, breakpoints, and temporary profiling hooks.

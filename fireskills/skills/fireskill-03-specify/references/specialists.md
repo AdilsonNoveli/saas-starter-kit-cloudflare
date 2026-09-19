@@ -1,23 +1,22 @@
-# Especialistas para especificação
+# Specialists for Specification
 
-Use os especialistas de `specialists/` para aprofundar:
+Use specialists in `specialists/` to deepen specific areas:
 
-- dados: `fireskill-specialist-postgres`, `-drizzle` e `-data-modeling`;
-- segurança e APIs: `-application-security`, `-web-api-design`, `-trpc` e
+- Data: `fireskill-specialist-postgres`, `-drizzle`, and `-data-modeling`;
+- Security and APIs: `-application-security`, `-web-api-design`, `-trpc`, and
   `-nuxt-authorization`;
-- arquitetura e operação: `-software-architecture`, `-nuxfire-layers`,
-  `-observability`, `-performance-engineering`, `-cloudflare-workers`, `-sst` e
+- Architecture and Operations: `-software-architecture`, `-nuxfire-layers`,
+  `-observability`, `-performance-engineering`, `-cloudflare-workers`, `-sst`, and
   `-delivery-engineering`;
-- experiência: `-interface-experience`, `-ui-design`, `-ux-design`,
-  `-web-accessibility` e o especialista da stack de interface (`-nuxt-ui`,
-  com `-nuxt`);
-- stack: o especialista com o nome da tecnologia detectada.
+- User Experience: `-interface-experience`, `-ui-design`, `-ux-design`,
+  `-web-accessibility`, and the interface stack specialist (`-nuxt-ui`,
+  with `-nuxt`);
+- Stack: the specialist matching the name of detected technologies.
 
-Especialista informa padrões; a fonte normativa continua sendo
-`specs/<estado>/<NNNN>-<slug>/spec.md` do projeto consumidor.
+Specialists inform standards and best practices; the normative source of truth remains
+`specs/<state>/<NNNN>-<slug>/spec.md` in the target project.
 
-Os especialistas ficam em `specialists/` deste repositório. Se o necessário não
-estiver disponível para o agente, informe nome, finalidade e dependências e peça
-autorização específica antes de instalar ou copiar; nunca carregue especialista
-sem relação com a tarefa. Se já estiver disponível, anuncie a transição
-automática e carregue-o na mesma conversa.
+Specialists reside in `specialists/` in this repository. If the required specialist
+is not yet available to the agent, state its name, purpose, and dependencies and request
+explicit user authorization before installing or copying; never load specialists
+unrelated to the task. If already present, announce automatic transition and load it within the same conversation.

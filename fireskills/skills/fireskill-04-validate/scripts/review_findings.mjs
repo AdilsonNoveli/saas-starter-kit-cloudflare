@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Valida findings de produto, arquitetura e segurança registrados na spec. */
+/** Validates product, architecture, and security findings recorded in the spec. */
 
 import { lstat, readFile, realpath } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
@@ -12,9 +12,9 @@ function argumentsMap(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     if (argv[index] === "--json") { values.json = true; continue; }
     if (argv[index]?.startsWith("--")) { values[argv[index].slice(2)] = argv[index + 1]; index += 1; continue; }
-    if (!values.spec) values.spec = argv[index]; else throw new Error(`argumento inválido: ${argv[index]}`);
+    if (!values.spec) values.spec = argv[index]; else throw new Error(`invalid argument: ${argv[index]}`);
   }
-  if (!values.spec) throw new Error("informe o caminho da spec");
+  if (!values.spec) throw new Error("specify the spec path");
   return values;
 }
 
@@ -37,17 +37,17 @@ async function analyze(text, root) {
   }
   const declarations = new Set([...text.matchAll(/^\s*-\s+\*\*(FIND-(?:PROD|ARCH|SEC)-\d{3,})\*\*/gmu)].map((match) => match[1]));
   const parsed = new Set(findings.map((item) => item.id));
-  const errors = [...declarations].filter((item) => !parsed.has(item)).sort().map((item) => `${item}: formato inválido`);
+  const errors = [...declarations].filter((item) => !parsed.has(item)).sort().map((item) => `${item}: invalid format`);
   const counts = new Map();
   for (const item of findings) counts.set(item.id, (counts.get(item.id) ?? 0) + 1);
-  for (const [id, count] of [...counts].sort()) if (count > 1) errors.push(`${id}: ID duplicado`);
+  for (const [id, count] of [...counts].sort()) if (count > 1) errors.push(`${id}: duplicate ID`);
   const definitions = new Set([...text.matchAll(defined)].flatMap((match) => [match[1], match[2]]).filter(Boolean));
   for (const item of findings) {
     const refs = [...new Set(item.refs.match(/\b(?:US|FR|NFR|AC)-\d{3,}\b/gu) ?? [])].sort();
     const invalid = refs.filter((reference) => !definitions.has(reference));
-    if (!refs.length) errors.push(`${item.id}: refs ausentes`);
-    else if (invalid.length) errors.push(`${item.id}: refs inexistentes: ${invalid.join(", ")}`);
-    if (root && !(await safeEvidence(root, item.evidence))) errors.push(`${item.id}: evidence local inexistente ou insegura: ${item.evidence}`);
+    if (!refs.length) errors.push(`${item.id}: missing refs`);
+    else if (invalid.length) errors.push(`${item.id}: non-existent refs: ${invalid.join(", ")}`);
+    if (root && !(await safeEvidence(root, item.evidence))) errors.push(`${item.id}: non-existent or unsafe local evidence: ${item.evidence}`);
   }
   const blocking = findings.filter((item) => item.severity === "P1" && item.status === "Open").map((item) => item.id);
   return { schema_version: 1, result: !errors.length && !blocking.length ? "passed" : "failed", findings, blocking, errors };
@@ -64,10 +64,10 @@ try {
     console.log(`Reviews: ${payload.result.toUpperCase()}`);
     payload.findings.forEach((item) => console.log(`- ${item.id} [${item.severity}] [${item.status}]`));
     payload.blocking.forEach((item) => console.log(`BLOCKER: ${item}`));
-    payload.errors.forEach((item) => console.log(`ERRO: ${item}`));
+    payload.errors.forEach((item) => console.log(`ERROR: ${item}`));
   }
   process.exitCode = payload.result === "passed" ? 0 : 1;
 } catch (error) {
-  console.error(`ERRO: ${error instanceof Error ? error.message : String(error)}`);
+  console.error(`ERROR: ${error instanceof Error ? error.message : String(error)}`);
   process.exitCode = 2;
 }

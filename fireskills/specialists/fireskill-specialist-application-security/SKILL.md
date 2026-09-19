@@ -1,118 +1,85 @@
 ---
 name: fireskill-specialist-application-security
-description: "Modelar ameaças e revisar segurança de aplicações, APIs, autenticação, autorização, dados, dependências, secrets e infraestrutura. Use para mudanças com trust boundaries, identidade, entrada externa, dados sensíveis ou revisão de segurança; use também para threat modeling antes de uma feature com nova superfície de ataque; não declare segurança sem evidência, e para hardening de pipeline/credenciais de deploy use `$fireskill-specialist-delivery-engineering`."
+description: "Model threats and review application security across APIs, authentication, authorization, data storage, dependencies, secrets, and infrastructure. Use for changes involving trust boundaries, identity, external input, sensitive data, or security audits; use for threat modeling before introducing a new attack surface; never declare security without evidence, and use `$fireskill-specialist-delivery-engineering` for pipeline hardening and deployment credential security."
 ---
 
-# Segurança de aplicações
+# Application Security
 
-## Quando usar
+## When to Use
 
-- Acionar quando a mudança introduz ou toca trust boundary, identidade,
-  entrada externa (upload, URL, query, deserialize) ou dado sensível.
-- Acionar também antes de desenhar uma feature com superfície de ataque nova
-  (novo endpoint público, nova integração, novo tipo de usuário) para fazer
-  threat modeling preventivo.
-- Não acionar como substituto de revisão de credenciais de pipeline/deploy —
-  usar `$fireskill-specialist-delivery-engineering` para isso; aqui o foco é a
-  aplicação e seus dados, não a esteira de entrega.
-- Combinar com `$fireskill-specialist-postgres`, `$fireskill-specialist-trpc` e
-  `$fireskill-specialist-nuxt-authorization` quando o risco envolve acesso a dado
-  por equipe (tenant) ou autorização de procedure.
-- Combinar com `$fireskill-specialist-openauth` para sessão, cookies, MFA e
-  credenciais, e com `$fireskill-specialist-sst` para secrets por stage.
+- Trigger when changes introduce or modify trust boundaries, identity, external inputs
+  (uploads, URLs, query parameters, deserialization), or sensitive data.
+- Trigger prior to designing features with new attack surfaces (new public endpoints,
+  third-party integrations, new user roles) to perform proactive threat modeling.
+- Do not trigger as a substitute for deployment pipeline credential audits — use
+  `$fireskill-specialist-delivery-engineering` for CI/CD hardening; focus here is on application code and stored data.
+- Combine with `$fireskill-specialist-postgres`, `$fireskill-specialist-trpc`, and
+  `$fireskill-specialist-nuxt-authorization` when risks involve tenant data isolation or procedure authorization.
+- Combine with `$fireskill-specialist-openauth` for session handling, cookies, MFA, and credentials,
+  and with `$fireskill-specialist-sst` for stage-specific secrets.
 
-## Fluxo
+## Workflow
 
-1. Mapear ativos, atores, trust boundaries, entradas externas e efeitos
-   (o que muda de estado) antes de pensar em controle.
-2. Definir ameaças plausíveis e seu impacto real antes de escolher
-   controles — não implementar defesa para uma ameaça que não existe no
-   contexto do sistema.
-3. Verificar autenticação, autorização por objeto (não só por rota) e
-   separação de tenants em toda operação que lê ou muta dado.
-4. Validar toda entrada pelo tipo, tamanho e destino esperado; normalizar
-   saída conforme o contexto de renderização; proteger operações mutáveis
-   contra replay e CSRF quando aplicável.
-5. Revisar gestão de secrets, criptografia em trânsito e em repouso,
-   ciclo de vida de sessão, dependências vulneráveis e configuração de
-   produção.
-6. Materializar testes positivos (fluxo autorizado funciona) e negativos
-   (fluxo não autorizado falha) nos boundaries críticos identificados.
-7. Registrar risco residual, owner, sinal de observabilidade associado e
-   plano de resposta — nenhum sistema fica "100% seguro", apenas com risco
-   conhecido e monitorado.
+1. Map assets, actors, trust boundaries, external inputs, and side effects (state mutations)
+   before selecting controls.
+2. Define plausible threats and actual business impact before choosing controls — do not
+   implement defenses against threats irrelevant to the system context.
+3. Verify authentication, object-level authorization (not merely route-level), and tenant
+   isolation on every read and write operation.
+4. Validate all inputs by type, length, format, and destination; encode outputs according to
+   rendering contexts; protect state-changing endpoints against replay and CSRF where applicable.
+5. Review secrets management, encryption in transit and at rest, session lifecycles,
+   vulnerable dependencies, and production configuration.
+6. Implement both positive tests (authorized flows succeed) and negative tests (unauthorized
+   flows fail predictably) across critical boundaries.
+7. Document residual risks, owners, associated observability signals, and incident response
+   plans — no system is "100% secure", only operating under known, monitored risk.
 
-## Padrões
+## Core Rules
 
-- Negar por padrão e conceder o menor privilégio necessário para cada
-  identidade e operação.
-- Autorizar no servidor em toda operação e em todo objeto acessado — nunca
-  confiar em uma verificação apenas client-side ou em um ID de objeto vindo
-  do cliente sem revalidar propriedade/tenant.
-- Tratar upload de arquivo, URL fornecida pelo usuário, template
-  renderizado com dado externo, query dinâmica e deserialização de dado
-  externo como entradas hostis por padrão.
-- Não implementar criptografia própria; usar primitivas e bibliotecas
-  estabelecidas. Nunca logar segredo, token, senha ou dado sensível, mesmo
-  em ambiente de debug.
-- Rotacionar credenciais periodicamente e preferir identidade temporária
-  (tokens de curta duração, STS/OIDC) a segredo estático de longa duração.
-- Mitigar abuso com limites por ator e por recurso (rate limit por usuário/
-  API key/tenant), não apenas por IP — um IP compartilhado (NAT, proxy)
-  penaliza usuários legítimos e um atacante distribuído contorna limite
-  só por IP.
-- Ao corrigir uma vulnerabilidade, corrigir a causa raiz e adicionar teste
-  de regressão, sem divulgar detalhe de exploração além do necessário para
-  quem precisa corrigir ou validar.
+- Deny by default and grant least privilege for each identity and operation.
+- Authorize on the server for every operation and every accessed object — never rely on
+  client-side checks or client-provided resource IDs without re-validating ownership/tenant.
+- Treat file uploads, user-supplied URLs, templates rendering external data, dynamic queries,
+  and deserialization as hostile inputs by default.
+- Never write bespoke cryptography; use vetted, established cryptographic primitives.
+  Never log secrets, tokens, passwords, or sensitive PII, even in debug environments.
+- Rotate credentials regularly and prefer ephemeral credentials (short-lived tokens, STS/OIDC)
+  over long-lived static secrets.
+- Mitigate abuse with actor- and resource-level limits (rate limits per user/API key/tenant),
+  not merely per IP — shared NAT/proxies penalize legitimate users while attackers bypass IP limits easily.
+- When remediating a vulnerability, fix the root cause and add regression tests without
+  disclosing exploitation details beyond what is required for verification.
 
-## Antipadrões
+## Antipatterns
 
-- Verificar autorização apenas pela rota (`/admin/*` protegido) sem verificar
-  o objeto específico acessado dentro da rota: um usuário autenticado como
-  tenant A consegue acessar `/api/orders/123` de um tenant B só trocando o
-  ID na URL (IDOR — Insecure Direct Object Reference).
-- Validar entrada só no client (JavaScript no navegador) sem revalidar no
-  servidor: qualquer requisição direta à API contorna completamente a
-  validação client-side.
-- Confiar em `Content-Type` ou extensão de arquivo declarados pelo cliente
-  para decidir como processar um upload: permite disfarçar um arquivo
-  malicioso como um tipo inofensivo.
-- Guardar segredo de aplicação (chave de API, senha de banco) em variável de
-  ambiente sem controle de acesso ao processo/log, ou logar o payload
-  completo de uma requisição que contém token de autenticação — o segredo
-  vaza por um canal indireto mesmo com o "cofre" correto na origem.
-- Anunciar "sistema seguro" ou "vulnerabilidade corrigida" sem teste
-  negativo específico comprovando que o vetor original não funciona mais.
+- Authorizing only at the route level (`/admin/*`) without verifying object ownership:
+  allows IDOR where tenant A accesses `/api/orders/123` of tenant B by altering IDs.
+- Validating inputs only in client-side JavaScript: direct API requests completely bypass client validation.
+- Trusting client-declared `Content-Type` or file extensions for file uploads.
+- Storing secrets in environment variables without process/log access controls, or logging
+  entire request payloads containing bearer tokens.
+- Claiming a system is "secure" or a vulnerability is "resolved" without negative automated tests.
 
-## Validação
+## Validation
 
-- Casos de teste negativos: acesso sem autenticação, com identidade errada,
-  com tenant errado e replay de uma requisição já processada — todos devem
-  falhar de forma controlada.
-- Análise de dependências vulneráveis e varredura de secrets vazados com as
-  ferramentas já adotadas pelo projeto, rodada como parte do fluxo normal,
-  não apenas manualmente antes de um release grande.
-- Configuração segura de produção: headers de segurança (ex.:
-  `Content-Security-Policy`, `Strict-Transport-Security`), atributos de
-  cookie (`HttpOnly`, `Secure`, `SameSite`) e política de CORS restrita à
-  origem realmente necessária.
-- Evidência concreta de cada controle reivindicado e do risco residual que
-  permanece — nunca declarar algo "seguro" em linguagem absoluta sem o teste
-  que comprova.
+- Negative test cases: unauthenticated access, incorrect identity, cross-tenant access,
+  and replayed requests — all must fail predictably and safely.
+- Vulnerability scanning (SCA) and secret detection run as standard development gates.
+- Secure production configuration: security headers (`Content-Security-Policy`,
+  `Strict-Transport-Security`), cookie attributes (`HttpOnly`, `Secure`, `SameSite`),
+  and restricted CORS origins.
+- Concrete evidence for each claimed control and documented residual risk.
 
-## Skills relacionadas
+## Related Specialists
 
-- `$fireskill-specialist-code-review` aplica a revisão ampla e
-  `$fireskill-specialist-observability` registra sinais de abuso sem vazar dados
-  sensíveis.
-- `$fireskill-specialist-postgres` e `$fireskill-specialist-drizzle` para
-  modelagem de isolamento por tenant no nível de dado (constraints, chaves,
-  filtros por `teamId`).
-- `$fireskill-specialist-delivery-engineering` para hardening de credenciais
-  de pipeline, assinatura de artefato e supply chain.
-- `$fireskill-specialist-web-api-design` quando o risco nasce do desenho do
-  contrato de API (verbos, versionamento, exposição de campo sensível).
+- `$fireskill-specialist-code-review` for broader review and `$fireskill-specialist-observability`
+  for abuse signals without PII leaks.
+- `$fireskill-specialist-postgres` and `$fireskill-specialist-drizzle` for tenant isolation
+  at the data layer (`teamId` constraints and filters).
+- `$fireskill-specialist-delivery-engineering` for pipeline credentials, artifact signing,
+  and supply chain security.
+- `$fireskill-specialist-web-api-design` when security risks stem from API contract design.
 
-Leia [references/standards.md](references/standards.md) para checklist de
-threat modeling por boundary, ASVS, segurança de API e supply chain, com
-fontes primárias.
+Read [references/standards.md](references/standards.md) for threat modeling checklists by boundary,
+ASVS, API security, and supply chain standards.

@@ -1,5 +1,5 @@
 /**
- * Leitura dos itens de backlog de um projeto consumidor.
+ * Backlog item reader for consuming projects.
  */
 
 import { createHash } from "node:crypto";
@@ -10,7 +10,7 @@ import { isFile, resolvePath } from "./filesystem.js";
 const FIELD = /^\*\*([^*]+)\*\*:\s*(.+?)\s*$/;
 const TABLE_FIELD = /^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/;
 
-/** Projeção de um arquivo em `specs/backlog/`. */
+/** Projection of a file in `specs/backlog/`. */
 export interface BacklogItem {
   slug: string;
   title: string;
@@ -20,13 +20,13 @@ export interface BacklogItem {
   content: string;
 }
 
-/** Lê todos os backlogs do projeto em ordem estável. */
+/** Reads all project backlog items in stable order. */
 export async function scanBacklogs(project: string): Promise<BacklogItem[]> {
   const root = resolvePath(project);
   return Promise.all((await backlogPaths(root)).map(parseBacklog));
 }
 
-/** Calcula o fingerprint dos caminhos e conteúdos de backlog. */
+/** Computes sha256 fingerprint of backlog paths and contents. */
 export async function backlogsFingerprint(project: string): Promise<string> {
   const root = resolvePath(project);
   const digest = createHash("sha256");
@@ -62,25 +62,19 @@ async function parseBacklog(path: string): Promise<BacklogItem> {
   const content = await readFile(path, "utf8");
   const slug = basename(path, ".md");
   let title = slug;
-  const fields = new Map<string, string>();
+  let identifier = slug;
+  let status = "Captured";
   for (const line of content.split(/\r?\n/u)) {
     if (line.startsWith("# ") && title === slug) {
-      title = line.slice(2).trim();
-      if (title.toLowerCase().startsWith("backlog:")) {
-        title = title.split(":", 2)[1]?.trim() ?? title;
-      }
+      const heading = line.slice(2).trim();
+      title = heading.replace(/^Backlog:\s*/iu, "");
     }
     const match = FIELD.exec(line) ?? TABLE_FIELD.exec(line);
-    if (match?.[1] && match[2]) {
-      fields.set(match[1].trim().toLowerCase(), match[2].trim());
-    }
+    if (!match?.[1] || !match[2]) continue;
+    const key = match[1].trim().toLowerCase();
+    const value = match[2].trim();
+    if (key === "id") identifier = value;
+    if (key === "status") status = value;
   }
-  return {
-    slug,
-    title,
-    identifier: fields.get("id") ?? slug,
-    status: fields.get("status") ?? "Unknown",
-    path,
-    content,
-  };
+  return { slug, title, identifier, status, path, content };
 }

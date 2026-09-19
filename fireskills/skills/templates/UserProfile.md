@@ -1,35 +1,27 @@
-# Perfil de interação do Specsfy
+# User Interaction Profile
 
-Este arquivo guarda somente o nível de conhecimento e as respostas confirmadas
-durante o setup. Ele orienta a forma da conversa e não substitui `.fireskills/PROJECT.md`,
-`STACK.md`, `RULES.md`, `DATABASE.md`, `.fireskills/INTERFACE.md`, `.fireskills/DESIGNSYSTEM.MD` ou uma
-spec.
+This file records user expertise level and confirmed architectural preferences collected during setup. It guides agent conversational interaction and does not replace `.fireskills/PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`, `.fireskills/INTERFACE.md`, `.fireskills/DESIGNSYSTEM.MD`, or active specifications.
 
-## Nível de conhecimento
+## Expertise Level
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
-| Nível atual | A confirmar |
-| Fonte da confirmação | A confirmar |
-| Última confirmação | A confirmar |
+| Current level | To be confirmed |
+| Confirmation source | To be confirmed |
+| Last confirmed at | To be confirmed |
 
-Valores permitidos: `iniciante`, `intermediário` e `experiente`.
+Allowed values: `beginner`, `intermediate`, and `expert`.
 
-## Respostas confirmadas
+## Confirmed Responses
 
-Registre somente respostas dadas pela pessoa ou declarações inequívocas já
-presentes nas fontes lidas. Não registre segredos, tokens, senhas ou dados de
-produção.
+Record only statements explicitly provided by user or unambiguous declarations from audited repository sources. Never record credentials, tokens, secrets, or production data.
 
-| Área | Pergunta ou assunto | Resposta normalizada | Fonte | Confirmado em |
+| Area | Question or Topic | Normalized Response | Source | Confirmed At |
 | --- | --- | --- | --- | --- |
-| Nenhuma | A confirmar | A confirmar | A confirmar | A confirmar |
+| None | To be confirmed | To be confirmed | To be confirmed | To be confirmed |
 
-## Uso pelo setup
+## Usage by Setup
 
-- Antes de perguntar, leia este arquivo, a conversa atual e os contextos do
-  projeto disponíveis.
-- Uma resposta já registrada ou explicitamente declarada em outra fonte não
-  volta a ser perguntada.
-- Se fontes divergirem, pergunte apenas para resolver a divergência e registre
-  a nova fonte e o alcance da resposta.
+- Before prompting, review this file, active conversation, and available project context files.
+- Questions already recorded or explicitly declared in codebase files must not be asked again.
+- If conflicting answers exist, ask only to resolve the ambiguity and update the source citation.

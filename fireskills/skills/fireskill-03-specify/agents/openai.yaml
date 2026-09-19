@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - 03 - Especificar"
-  short_description: "Inicializa e refina specs numeradas"
-  default_prompt: "Use $fireskill-03-specify para iniciar uma spec numerada no diretório atual e consolidar seus requisitos. Orquestre transições automáticas com anúncio, execução e retomada na mesma conversa."
+  display_name: "Fireskill - 03 - Specify"
+  short_description: "Initializes and refines numbered specs"
+  default_prompt: "Use $fireskill-03-specify to start a numbered spec in the current directory and consolidate its requirements. Orchestrate automatic transitions with announcement, execution, and resumption in the same conversation."

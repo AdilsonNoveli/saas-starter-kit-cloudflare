@@ -1,18 +1,18 @@
-# Regras do sistema
+# System Rules
 
-Estas regras complementam as instruções dos agentes sem substituir specs ou
-critérios de aceite. Modelo inicial sugerido para **{{STACK_LABEL}}**.
+These rules complement agent instructions without replacing specs or
+acceptance criteria. Initial suggested template for **{{STACK_LABEL}}**.
 
 {{STACK_GUIDANCE}}
 
-## Arquitetura
+## Architecture
 
-## Código e qualidade
+## Code and Quality
 
-## Testes
+## Testing
 
-## Segurança e privacidade
+## Security and Privacy
 
-## Operação
+## Operations
 
-## Regras específicas do projeto
+## Project-Specific Rules

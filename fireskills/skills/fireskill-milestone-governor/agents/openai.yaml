@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Governança de milestones"
-  short_description: "Atualiza o mapa de marcos"
-  default_prompt: "Use $fireskill-milestone-governor para analisar milestones, manter o índice derivado de specs e backlog e sugerir ajustes confirmáveis."
+  display_name: "Fireskill - Milestone Governance"
+  short_description: "Updates the milestone roadmap"
+  default_prompt: "Use $fireskill-milestone-governor to analyze milestones, maintain the index derived from specs and backlog, and suggest confirmable adjustments."

@@ -1,143 +1,137 @@
 ---
 name: fireskill-specialist-ui-design
-description: Projetar e revisar interfaces visuais de sistemas, dashboards e aplicações com hierarquia, layout, tokens, componentes, densidade, estados e responsividade. Use para telas, dashboards, design systems, layouts, tabelas, formulários e navegação; combine com UX e acessibilidade quando houver fluxo ou interação.
+description: "Design and review visual interfaces for systems, dashboards, and applications with hierarchy, layout, tokens, components, density, states, and responsiveness. Use for screens, dashboards, design systems, layouts, tables, forms, and navigation; combine with UX and accessibility when user flows or interactions are involved."
 ---
 
-# Design de interface
+# UI Design
 
-## Quando usar
+## When to Use
 
-- Acionar para definir ou revisar hierarquia, grid, shell, densidade, tokens,
-  estados visuais, tabelas, formulários e navegação de uma interface.
-- Acionar quando uma tela funciona, mas a composição dificulta escaneamento,
-  comparação, priorização ou recuperação de erros.
-- Não acionar para descobrir se o fluxo resolve a necessidade da pessoa; usar
-  `$fireskill-specialist-ux-design` para pesquisa, jornada e teste de tarefa.
-- Combinar com `$fireskill-specialist-nuxt-ui` quando a implementação Vue puder
-  partir de componentes `@nuxt/ui` já usados no projeto.
+- Trigger to define or review hierarchy, grid, shell, density, tokens, visual
+  states, tables, forms, and navigation of an interface.
+- Trigger when a screen functions correctly, but its composition hinders visual
+  scanning, comparison, prioritization, or error recovery.
+- Do not trigger to discover whether the user flow resolves the user's fundamental
+  need; use `$fireskill-specialist-ux-design` for research, journey mapping, and task testing.
+- Combine with `$fireskill-specialist-nuxt-ui` when Vue implementations can leverage
+  existing `@nuxt/ui` components in the project.
 
-## Fluxo
+## Workflow
 
-1. Carregar `$fireskill-specialist-design-system` e ler `.fireskills/DESIGNSYSTEM.MD` antes
-   da composição. Confirmar que a jornada e o fluxo de informação foram
-   definidos com a pessoa. Para tela ou formulário novo, registrar a tarefa
-   principal, as telas, os campos, as validações e o padrão de abertura
-   escolhido. Se não houver direção visual, aplicar os defaults do documento e
-   só retornar à UX quando faltar uma resposta sobre comportamento ou tarefa.
-2. Ler a stack observada, tokens, componentes, breakpoints e
-   screenshots atuais antes de propor uma linguagem nova.
-   Quando o sistema já existir, inspecionar também as telas e fluxos afetados,
-   sua navegação, conteúdo, permissões e estados antes de mudar a composição.
-   Preserve framework, primitives, estilos e convenções locais. Só proponha
-   nova biblioteca quando a pessoa confirmar a mudança ou quando a stack não
-   oferecer uma base identificável.
-3. Identificar pessoa, tarefa principal, frequência, dispositivo, densidade e
-   consequência do erro; ordenar conteúdo e ações por essa prioridade.
-4. Para CRUD, aplicar a matriz macro: lista com `PageHeader` e `UTable`,
-   detalhe com `PageHeader` e `DetailLists`, criar e editar com `PageHeader` e
-   seções de formulário em duas colunas responsivas. Cada seção tem coluna de
-   contexto e painel de campos; registrar a justificativa apenas para uma
-   exceção explícita.
-5. Mapear dados, unidades, permissões e estados nominal, loading, empty,
-   partial, error, offline e permission denied antes do layout.
-6. Escolher shell, navegação e grid coerentes com a arquitetura da informação;
-   usar a matriz em [references/standards.md](references/standards.md).
-7. Definir hierarquia por agrupamento, contraste, escala e espaço e mapear cada
-   escolha para tokens semânticos.
-8. Implementar ou especificar componentes e casos extremos em todos os
-   breakpoints sem criar variantes equivalentes às já existentes.
-9. Durante o desenvolvimento, conferir bordas, espaçamentos, margens, padding
-   e tipografia do sistema, mesmo sem pedido da pessoa. Compare renderização,
-   inspeção DOM ou outra forma equivalente nos estados e viewports relevantes.
-10. Validar conteúdo real, legibilidade, responsividade, acessibilidade e
-   consistência com comprovação visual e comportamental. Registrar o resultado
-   no item `VISUAL` da tarefa.
+1. Load `$fireskill-specialist-design-system` and read `.fireskills/DESIGNSYSTEM.MD` before
+   starting composition. Confirm that user journeys and information flow have been
+   agreed upon. For a new screen or form, document the main task, screens, fields,
+   validations, and layout pattern. If no visual direction is specified, apply document
+   defaults and only refer back to UX when behavioral or task details are missing.
+2. Read observed stack, tokens, components, breakpoints, and existing screenshots
+   before proposing a new visual language. When the system already exists, inspect
+   affected screens, flows, navigation, content, permissions, and states before
+   altering composition. Preserve frameworks, primitives, styles, and local conventions.
+   Only propose a new library when explicitly confirmed or when the stack lacks an
+   identifiable base.
+3. Identify persona, primary task, frequency, device, density, and error consequences;
+   order content and actions according to this priority.
+4. For CRUD interfaces, apply the macro layout matrix: list view with `PageHeader`
+   and `UTable`, detail view with `PageHeader` and `DetailLists`, create/edit views
+   with `PageHeader` and form sections in two responsive columns. Each section has
+   a context column and a fields panel; document justifications for any explicit exception.
+5. Map data, units, permissions, and states: nominal, loading, empty, partial, error,
+   offline, and permission denied prior to finalizing layout.
+6. Choose shell, navigation, and grid layout coherent with information architecture;
+   reference the layout matrix in [references/standards.md](references/standards.md).
+7. Establish visual hierarchy through grouping, contrast, scale, and whitespace,
+   mapping every choice to semantic design tokens.
+8. Implement or specify components and edge cases across all breakpoints without
+   creating redundant variants of existing components.
+9. During development, verify borders, spacing, margins, padding, and system typography,
+   even without an explicit request. Compare rendering, DOM inspection, or equivalent
+   means across relevant viewports and states.
+10. Validate real content, legibility, responsiveness, accessibility, and visual
+    consistency with visual and behavioral proof. Record the verification in the
+    task's `VISUAL` item.
 
-Quando a implementação usar componentes Vue, carregar
-`$fireskill-specialist-nuxt-ui` depois de definir a composição para escolher os
-componentes `@nuxt/ui` sem transferir a escolha visual para o catálogo de
-componentes.
+When implementations use Vue components, load `$fireskill-specialist-nuxt-ui` after
+defining composition to select `@nuxt/ui` components without deferring visual
+design choices to the component catalog.
 
-## Padrões
+## Patterns
 
-- Dashboard responde perguntas; não é coleção de cards decorativos.
-- Colocar visão geral antes do detalhe e ação junto do objeto afetado.
-- Usar tabela para comparação densa, lista para leitura e cards para entidades distintas.
-- Preservar posição, filtros e contexto ao navegar entre lista e detalhe.
-- Exibir unidade, período, origem, atualização e vazio nos dados.
-- Manter ação destrutiva distinta, explicada e reversível quando possível.
-- Definir tokens semânticos e uma escala limitada de spacing/tipografia.
-- Construir personalidade por dados, linguagem, tokens, ritmo e estados, não por
-  uma pilha genérica de cards.
-- Exibir labels acima dos campos e erro de campo em vermelho abaixo do campo.
-- Usar duas colunas para campos relacionados nos breakpoints largos, uma coluna
-  no mobile e largura total para campos longos, ajuda, upload e erros.
-- Tornar a linha inteira do `UTable` a navegação do detalhe; manter botões,
-  checkboxes e menus internos acima do link da linha.
-- Manter `Breadcrumb` em todas as telas, com a equipe ativa, o módulo e a tela
-  atual. Adaptar o breadcrumb já renderizado pelo shell existente.
-- Usar um único `PageHeader` componentizado e reutilizável em lista, detalhe,
-  criação e edição do CRUD.
-- Usar `UTable` em largura total na lista, mostrar sempre a coluna `ID`,
-  transformar a linha em link para o detalhe e manter botões de editar e apagar
-  independentes dentro da linha.
+- Dashboards answer explicit questions; they are not mere decorative card collections.
+- Place high-level summaries before details and position actions adjacent to affected objects.
+- Use tables for dense comparison, lists for sequential reading, and cards for distinct entities.
+- Preserve scroll position, filter states, and context when navigating between list and detail views.
+- Always display units, time windows, data origins, freshness/timestamps, and empty representations.
+- Keep destructive actions distinct, clearly explained, and reversible whenever possible.
+- Define semantic tokens and a constrained spacing/typography scale.
+- Build product personality through structured data, tone, tokens, rhythm, and states,
+  rather than generic card stacks.
+- Position input labels above fields and render field errors in red directly below the input.
+- Use two columns for related fields on wide breakpoints, single column on mobile, and
+  full-width for long text inputs, helper text, file uploads, and errors.
+- Make the entire `UTable` row clickable for detail navigation; keep internal buttons,
+  checkboxes, and context menus layered above the row link.
+- Maintain a `Breadcrumb` across all screens, showing active team, module, and current
+  page. Adapt the breadcrumb rendered by the existing shell.
+- Use a single componentized, reusable `PageHeader` across list, detail, create, and
+  edit CRUD views.
+- Use full-width `UTable` for lists, always display the `ID` column, make rows navigate
+  to detail views, and keep edit/delete actions accessible within each row.
 
-## Antipadrões
+## Anti-Patterns
 
-- Distribuir métricas em cards idênticos sem pergunta, período ou comparação;
-  a tela exibe números, mas não permite interpretar variação ou prioridade.
-- Criar uma nova cor, spacing ou variante para cada tela; o design system perde
-  vocabulário comum e torna mudanças globais imprevisíveis.
-- Usar placeholder como label, ícone sem texto acessível ou cor como único
-  estado; o significado desaparece conforme interação e acessibilidade.
-- Esconder ações frequentes em menus para obter uma tela “limpa”; aumenta custo
-  operacional e reduz descoberta sem diminuir complexidade real.
-- Usar cards para uma lista que pede comparação ou substituir `PageHeader` por
-  um título solto.
-- Duplicar o markup do `PageHeader` por tela, esconder o `ID`, estreitar o
-  `UTable` ou deixar editar e apagar fora da linha do registro.
+- Scattering metrics across identical cards without questions, time windows, or comparison
+  baselines; screens show raw numbers without context for variance or priority.
+- Inventing new colors, spacing values, or component variants for individual screens;
+  design systems lose common vocabulary, making global changes unpredictable.
+- Using placeholders as labels, icon-only buttons without accessible text, or color
+  as the sole indicator of state; critical meaning degrades across accessibility modes.
+- Hiding frequent actions inside nested menus for a "cleaner" aesthetic; increases
+  operational overhead and hinders discoverability without reducing real complexity.
+- Using cards for list data requiring comparative scanning, or replacing `PageHeader`
+  with isolated loose headings.
+- Duplicating `PageHeader` markup across individual screens, hiding record IDs,
+  constraining `UTable` width, or moving edit/delete actions outside the record row.
 
-## Validação
+## Validation
 
-- Comparar cenários nominal, loading, empty, partial, error, offline e
-  permission denied na mesma composição.
-- Conferir `UTable`, `DetailLists`, `PageHeader` e formulários em seções com
-  duas colunas responsivas conforme a superfície CRUD.
-- Conferir `Breadcrumb` em cada tela, com o nome da equipe visível e o item atual
-  marcado como página. Confirmar o reaproveitamento do componente já existente.
-- Conferir que uma exceção ao `.fireskills/DESIGNSYSTEM.MD` tem alcance registrado.
-- Exercitar conteúdo curto/longo, números extremos, tradução expandida e
-  preferências de data, moeda e timezone.
-- Verificar viewport mínimo suportado, zoom 200%, reflow, contraste, teclado,
-  foco e reduced motion.
-- Auditar tokens e componentes novos contra os já publicados e justificar
-  qualquer duplicação.
-- Conferir bordas, espaçamentos, margens, padding e tipografia nos estados e
-  viewports relevantes durante a implementação, registrando o resultado no
-  item `VISUAL`.
-- Revisão final conjunta com `$fireskill-specialist-nuxt-ui` quando algum
-  componente `@nuxt/ui` tiver sido adaptado.
-- Não declarar a interface consistente ou responsiva sem screenshots ou
-  inspeção equivalente nos estados e viewports críticos.
+- Compare nominal, loading, empty, partial, error, offline, and permission denied
+  states within the same composition.
+- Verify `UTable`, `DetailLists`, `PageHeader`, and two-column responsive form sections
+  match CRUD interface guidelines.
+- Verify `Breadcrumb` on every screen, displaying active team name and marking the current
+  item as `aria-current="page"`. Confirm reuse of the existing breadcrumb component.
+- Confirm any exception to `.fireskills/DESIGNSYSTEM.MD` has documented rationale and scope.
+- Stress-test short/long strings, extreme numbers, expanded translated text, and date/currency/timezone
+  formatting preferences.
+- Verify minimum supported viewport, 200% zoom, reflow, contrast ratios, keyboard navigation,
+  focus indicators, and reduced motion settings.
+- Audit newly introduced tokens and components against published design systems, justifying
+  any duplication.
+- Verify borders, spacing, margins, padding, and typography across viewports during implementation,
+  recording proof under the `VISUAL` task entry.
+- Perform joint final review with `$fireskill-specialist-nuxt-ui` whenever `@nuxt/ui`
+  components have been adapted.
+- Do not declare an interface responsive or consistent without screenshots or DOM inspection
+  across critical states and viewports.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-interface-experience` para mapear telas, ações e estados
-  antes da composição visual.
-- `$fireskill-specialist-nuxt` governa páginas, layouts, middleware e SSR da
-  interface; esta skill governa composição e estados visuais.
-- `$fireskill-specialist-prototyping` testa alternativas de composição no menor
-  nível de fidelidade necessário antes da implementação definitiva.
-- `$fireskill-specialist-nuxt-ui` fornece os componentes `@nuxt/ui` e o tema;
-  esta skill decide hierarquia e coerência do sistema que os utiliza.
-- `$fireskill-specialist-ux-design` governa pesquisa, jornada, arquitetura da
-  informação e validação de tarefas.
-- `$fireskill-specialist-design-system` fornece regras macro, defaults e cenários
-  canônicos antes da composição visual.
-- `$fireskill-specialist-web-accessibility` conduz auditoria WCAG, teclado e
-  tecnologia assistiva.
-- `$fireskill-specialist-tailwind-css` traduz tokens e variantes para utilitários
-  quando essa é a stack observada.
+- `$fireskill-specialist-interface-experience` for mapping screens, actions, and states
+  before visual composition.
+- `$fireskill-specialist-nuxt` governs pages, layouts, middleware, and SSR; this skill
+  governs composition and visual states.
+- `$fireskill-specialist-prototyping` tests composition alternatives at the lowest
+  necessary fidelity before full implementation.
+- `$fireskill-specialist-nuxt-ui` provides `@nuxt/ui` components and theming; this
+  skill decides hierarchy and system coherence.
+- `$fireskill-specialist-ux-design` governs user research, journeys, information
+  architecture, and task usability validation.
+- `$fireskill-specialist-design-system` provides macro rules, defaults, and canonical
+  scenarios prior to visual composition.
+- `$fireskill-specialist-web-accessibility` conducts WCAG audits, keyboard accessibility,
+  and assistive technology verification.
+- `$fireskill-specialist-tailwind-css` translates tokens and variants into utility classes
+  when Tailwind is the observed stack.
 
-Leia [references/standards.md](references/standards.md) para matrizes de layout,
-densidade, dados, tokens, estados e regras de revisão visual.
+Read [references/standards.md](references/standards.md) for layout matrices,
+density guidelines, data tables, tokens, states, and visual review criteria.

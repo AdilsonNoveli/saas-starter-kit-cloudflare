@@ -1,4 +1,4 @@
-# Versionamento
+# Versioning
 
-- Formato: [Semantic Versioning](https://semver.org/), só `MAJOR.MINOR.PATCH` estável no `VERSION`, com quebra de linha final; sem prefixo `v`, metadados ou pré-release.
-- Tag Git (com autorização): `v<VERSION>`, criada depois dos testes e do deploy do stage.
+- Format: [Semantic Versioning](https://semver.org/), strict `MAJOR.MINOR.PATCH` in `VERSION` file with a trailing newline; no `v` prefix, metadata, or pre-release tags.
+- Git Tag (with explicit authorization): `v<VERSION>`, created after tests pass and stage deployment succeeds.

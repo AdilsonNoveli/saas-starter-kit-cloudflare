@@ -1,159 +1,147 @@
-# SST no Nuxfire — o que existe de fato no código
+# SST in Nuxfire — What Actually Exists in the Codebase
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento.
+Each statement includes concrete file evidence. The codebase supersedes this document.
 
-## 1. Modelo
+## 1. Architecture Model
 
-- **SST 4.14.0** (`package.json` da raiz), `home: "cloudflare"`, providers
+- **SST 4.14.0** (root `package.json`), `home: "cloudflare"`, providers
   `cloudflare 6.20.0`, `command 1.0.1`, `random 4.17.0` (`sst.config.ts`).
-- `sst.config.ts` importa **todo `.ts` de `infra/`** e mescla o export `outputs`
-  de cada um; não existe arquivo central de stack. Um recurso novo = um arquivo
-  (ou um trecho) em `infra/`.
-- `#nuxfire/config` aponta para o `config.ts` da raiz.
-- Não há `wrangler.toml`/`wrangler.jsonc`: tudo é `sst.cloudflare.*`.
-- **Não há CI/CD** (`.github/workflows/` não existe). O único caminho é
-  `bun run deploy` manual. Adicionar pipeline é trabalho novo, não conserto.
-- `.sst/` e `sst-env.d.ts` são gerados; `Resource.<Nome>` só tipa depois de
-  `sst dev`/`deploy` gerá-los.
+- `sst.config.ts` imports **every `.ts` in `infra/`** and merges the `outputs` export
+  of each; no monolithic central stack file exists. A new resource = a new file (or snippet) in `infra/`.
+- `#nuxfire/config` maps to the root `config.ts`.
+- No `wrangler.toml` or `wrangler.jsonc` exist: everything provisions via `sst.cloudflare.*`.
+- **No CI/CD exists** (`.github/workflows/` does not exist). The sole deployment path
+  is manual `bun run deploy`. Adding automated CI pipelines is new work, not a fix.
+- `.sst/` and `sst-env.d.ts` are generated; `Resource.<Name>` only provides types after
+  `sst dev`/`deploy` runs.
 
-## 2. Arquivos de `infra/`
+## 2. Infrastructure Inventory (`infra/`)
 
-| Arquivo | Cria |
+| File | Provisions |
 |---|---|
-| `dns.ts` | Domínios por stage e `sst.Linkable` de URL (`AuthUrl`, `WebUrl`, `AppUrl`, `WebsocketsUrl`) |
-| `secret.ts` | Todos os `sst.Secret` (por flag) |
+| `dns.ts` | Stage domains and `sst.Linkable` URLs (`AuthUrl`, `WebUrl`, `AppUrl`, `WebsocketsUrl`) |
+| `secret.ts` | All `sst.Secret` definitions (governed by feature flags) |
 | `database.ts` | `sst.cloudflare.Hyperdrive("AppDB")` |
-| `auth.ts` | `Kv("AuthKV")`, Worker `Auth`, `adminSecret`, build estático de `apps/login` |
-| `emails.ts` | Worker `Emails` |
-| `websockets.ts` | Worker `Websockets` + Durable Object (`flags.websockets`) |
-| `jobs.ts` | `Queue("JobQueue")` + `Queue("JobDLQ")` e consumers (`flags.jobsQueue`) |
-| `cron.ts` | `Cron("Cron")`, `0 * * * *` |
-| `app.ts` | `deployWorker("App", …)` (vars, secrets, link) |
+| `auth.ts` | `Kv("AuthKV")`, `Auth` Worker, `adminSecret`, static bundle of `apps/login` |
+| `emails.ts` | `Emails` Worker |
+| `websockets.ts` | `Websockets` Worker + Durable Object (`flags.websockets`) |
+| `jobs.ts` | `Queue("JobQueue")` + `Queue("JobDLQ")` and consumers (`flags.jobsQueue`) |
+| `cron.ts` | `Cron("Cron")`, scheduled hourly at `0 * * * *` |
+| `app.ts` | `deployWorker("App", …)` (vars, secrets, links) |
 | `web.ts` | `D1("DB")` + `deployWorker("Web", …)` |
-| `utils/nuxt.ts` | `deployWorker`: build + Worker nativo + migração + seed |
-| `utils/builder.ts` | `command.local.Command` que roda `bun run build`, limitado por `SST_BUILD_CONCURRENCY_SITE` (padrão 1) |
+| `utils/nuxt.ts` | `deployWorker`: build execution + native Worker + migrations + seeds |
+| `utils/builder.ts` | `command.local.Command` running `bun run build`, throttled by `SST_BUILD_CONCURRENCY_SITE` (default 1) |
 | `utils/constants.ts` | `COMPATIBILITY` (`date "2025-09-01"`, `nodejs_compat`) |
-| `utils/durable-objects.ts` | Consulta a API da Cloudflare: a classe do DO já existe neste stage? |
-| `utils/semaphore.ts` | Semáforo do builder |
+| `utils/durable-objects.ts` | Queries Cloudflare API: does the DO class exist in this stage? |
+| `utils/semaphore.ts` | Builder concurrency semaphore |
 
-## 3. Stages e domínios
+## 3. Stages and DNS
 
-- Stage é **flag de CLI**, não variável de ambiente:
-  `bun run deploy -- --stage production` (o `--` é obrigatório).
-  **Não** `SST_STAGE=production`.
-- Stage de dev usa o nome de usuário do sistema por padrão; domínio
-  `<stage>.<devDomain>` (`infra/dns.ts`: `production` → `prodDomain`).
-  Domínios em `config.ts`: `prodDomain = "nuxfire.com"`,
-  `devDomain = "dev.nuxfire.com"`; subdomínios `app.`, `auth.`, `websockets.`.
-- `production`: `removal: "retain"` e `protect: true`; os demais: `remove`,
-  sem proteção (`sst.config.ts`).
-- Conta Cloudflare nova precisa do subdomínio `workers.dev` provisionado uma
-  vez (abrir **Workers & Pages** no painel) — senão o deploy falha no meio com
-  `403 … workers.dev subdomain` (código 10063). Não é problema de token.
+- Stage is specified via **CLI flag**, never an environment variable:
+  `bun run deploy -- --stage production` (the `--` argument separator is mandatory).
+  **Not** `SST_STAGE=production`.
+- Dev stages default to the system username; domain is `<stage>.<devDomain>`
+  (`infra/dns.ts`: `production` → `prodDomain`). Domains configured in `config.ts`:
+  `prodDomain = "nuxfire.com"`, `devDomain = "dev.nuxfire.com"`; subdomains `app.`, `auth.`, `websockets.`.
+- `production`: `removal: "retain"` and `protect: true`; other stages: `remove`,
+  unprotected (`sst.config.ts`).
+- New Cloudflare accounts require the `workers.dev` subdomain initialized once
+  (navigate to **Workers & Pages** in dashboard) — otherwise deployments fail mid-run
+  with `403 … workers.dev subdomain` (error code 10063). This is not an API token error.
 
-## 4. Secrets e variáveis
+## 4. Secrets and Variables
 
-- Nome do secret em **`SCREAMING_SNAKE_CASE`**, igual em três lugares:
-  `.env.example`, `infra/secret.ts` (`new sst.Secret("DATABASE_HOST", "")`) e
-  `Resource.DATABASE_HOST` no código. A chave JS
-  (`secretList.DatabaseHost`) é só ergonomia interna; o literal é o que vale.
-  Não introduza secret em camelCase.
-- `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` são **variáveis de ambiente
-  reais do shell**, nunca `sst.Secret`: o SST precisa delas antes de ler o cofre.
-  Necessárias em todo comando `sst` (`secret load`, `secret set`, `deploy`,
-  `dev`).
-- Secrets são carregados **por stage**, de arquivo com o nome do stage:
-  `bunx sst secret load .env.stage --fallback` (dev) ou
-  `bunx sst secret load .env.production --stage production` (produção, **sem**
-  `--fallback`, que faria os valores de produção virarem padrão de todo stage).
-  Nunca um `.env` único reaproveitado, nunca `.env.local`.
-- `.env.example` é o modelo canônico. **Não abra, cole nem versione**
-  `.env.stage`/`.env.production`: contêm valores reais.
-- Secrets sensíveis chegam ao Worker por `vars` (`infra/app.ts`); só o que é
-  público tem prefixo `NUXT_PUBLIC_`.
-- Secrets operados por humano (`PLATFORM_MFA_SESSION_SECRET`,
-  `PLATFORM_ADMIN_ENCRYPTION_KEY`, `USER_MFA_*`) têm default `""`: o stage sobe
-  e as rotas correspondentes **falham fechadas** até serem carregados. A chave
-  de criptografia guarda TOTP já gravado; perdê-la obriga reinscrição.
+- Secret names use **`SCREAMING_SNAKE_CASE`**, matching identically in three locations:
+  `.env.example`, `infra/secret.ts` (`new sst.Secret("DATABASE_HOST", "")`), and
+  `Resource.DATABASE_HOST` in application code. JS keys (`secretList.DatabaseHost`)
+  are internal syntax ergonomics; string literals govern runtime. Do not introduce camelCase secrets.
+- `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are **shell environment variables**,
+  never `sst.Secret`: SST requires them before decrypting vaults. Required for all `sst`
+  commands (`secret load`, `secret set`, `deploy`, `dev`).
+- Secrets load **per stage**, from stage-named files:
+  `bunx sst secret load .env.stage --fallback` (dev) or
+  `bunx sst secret load .env.production --stage production` (production, **without**
+  `--fallback`, which would leak production secrets as defaults across other stages).
+  Never share a generic `.env` or `.env.local`.
+- `.env.example` is the canonical schema template. **Never commit, paste, or track**
+  `.env.stage` / `.env.production`: they contain production credentials.
+- Sensitive secrets enter Workers via `vars` (`infra/app.ts`); only public variables
+  use the `NUXT_PUBLIC_` prefix.
+- Operator-managed secrets (`PLATFORM_MFA_SESSION_SECRET`, `PLATFORM_ADMIN_ENCRYPTION_KEY`,
+  `USER_MFA_*`) default to `""`: stages provision successfully, and corresponding endpoints
+  **fail closed** until secrets are loaded. Encryption keys protect stored TOTP data;
+  losing them forces user MFA re-enrollment.
 
 ## 5. Flags (`config.ts`)
 
-`flags` provisiona **recursos Cloudflare** (`infra/*.ts`); `layers` decide quais
-**layers Nuxt** entram no app. São mecanismos separados de propósito. Flags de
-integração: `stripe`, `paddle`, `githubAuth`, `googleAuth`, `resend`, `smtp`,
-`ses`, `sparkPost`, `mailgun`, `websockets`, `cron`, `jobsQueue`. Hoje
-`stripe`, `paddle`, `githubAuth`, `googleAuth`, `resend`, `websockets` e
-`jobsQueue` estão `true`. `websockets` e `jobsQueue` exigem Workers Paid.
-(Observação: `flags.cron` existe só no tipo — não tem valor em `config.ts` nem
-é consultada por `infra/cron.ts`; o Cron é sempre criado.)
-Um provedor de auth só vale de fato se as credenciais existirem: o Worker
-`Auth` e o build do `apps/login` avaliam a mesma verdade (`!!id && !!secret`).
+`flags` provisions **Cloudflare infrastructure resources** (`infra/*.ts`); `layers` governs
+which **Nuxt layers** compose into the app. They are separate mechanisms by design.
+Integration flags: `stripe`, `paddle`, `githubAuth`, `googleAuth`, `resend`, `smtp`,
+`ses`, `sparkPost`, `mailgun`, `websockets`, `cron`, `jobsQueue`. Currently
+`stripe`, `paddle`, `githubAuth`, `googleAuth`, `resend`, `websockets`, and `jobsQueue`
+are `true`. `websockets` and `jobsQueue` require Workers Paid plans.
+(Note: `flags.cron` exists only in TypeScript definitions — `infra/cron.ts` does not inspect
+it; the Cron worker is always provisioned.)
+Authentication providers only activate if credentials exist: the `Auth` Worker and
+`apps/login` build evaluate the identical condition (`!!id && !!secret`).
 
-## 6. Pegadinhas de infra que já quebraram deploy (não reabrir)
+## 6. Infrastructure Gotchas Learned from Previous Incidents
 
-1. **`handler` de Worker é caminho relativo, nunca `path.resolve()`** —
-   absoluto quebra o staging de artefatos no Windows. (`assets.directory`
-   absoluto é aceito.)
-2. **`link` usa o nome próprio do recurso**: não dá para linkar `AppDB` e
-   chamá-lo `DB`. O NuxtHub exige `BLOB`/`KV`/`CACHE` literais — por isso esses
-   recursos são criados com esses nomes em `infra/utils/nuxt.ts`. O D1 do
-   `apps/web` também deve se chamar `DB`.
-3. **Durações são string** (`"120 seconds"`), nunca número (erro
+1. **Worker `handler` is a relative path, never `path.resolve()`** — absolute paths
+   corrupt artifact staging on Windows. (`assets.directory` accepts absolute paths.)
+2. **`link` uses the exact resource name**: you cannot link `AppDB` and reference it
+   as `DB`. NuxtHub demands literal `BLOB`/`KV`/`CACHE` — hence resources are created
+   with those exact names in `infra/utils/nuxt.ts`. The D1 database for `apps/web`
+   must also be named `DB`.
+3. **Durations are strings** (`"120 seconds"`), never raw numbers (error
    `duration.split is not a function`).
-4. **Bug do SST 4.14.0**: `dlq.retryDelay` é convertido em ms em vez de s;
-   acima de ~86 s a Cloudflare rejeita. Contorno em `infra/jobs.ts`:
-   sobrescrever `args.settings.retryDelay` (número de segundos) em
-   `transform.consumer`. Não reverta achando que o upstream corrigiu sem checar.
-5. **`new_sqlite_classes` de Durable Object é migração única e irreversível**
-   (erro 10074 ao reenviar). `infra/websockets.ts` pergunta à API da
-   Cloudflare se a classe já existe no stage antes de incluir a migração — não
-   fixe o valor. Sem `CLOUDFLARE_API_TOKEN` no ambiente, assume "já
-   provisionada".
-6. **Não existe componente Nuxt no SST.** O build roda como
-   `command.local.Command` (`infra/utils/builder.ts`) e o
-   `sst.cloudflare.Worker` espera por `dependsOn`. É o único jeito de passar a
-   saída do Nitro ao Worker nativo, não um remendo a limpar.
-7. **`@nuxthub/core` força o diretório de saída do Nitro para `dist`** (não
-   `.output`) quando `hub: {…}` está ligado. `deployWorker` decide o nome pelo
-   mesmo `app: boolean` que liga `BLOB`/`KV`/`CACHE`.
-8. **Consumer de fila e DO não têm prop de alto nível**: consumer via
-   `queue.subscribe(...)`; DO só por `transform.worker`, onde `args.bindings` é
-   um `Output` do Pulumi (`$output(args.bindings ?? []).apply(...)`).
-9. **`emails.ts`**: o pacote `nodemailer` só funciona no Worker com um patch
-   (`patches/nodemailer@<versão>.patch`, `patchedDependencies`). Se o `bun
-   install` resolver outra versão, a chave do patch precisa acompanhar
-   (o Bun casa versão exata e ignora o patch em silêncio).
-10. **Deploy chama migração e seed** para o `App`
-    (`infra/utils/nuxt.ts`): `bunx drizzle-kit migrate` e
-    `bun run src/database/seed/index.ts`, ambos direto no Postgres com os
-    secrets `Database*`. O que roda no seu terminal também precisa alcançar o
-    host do banco (IPv6/IPv4).
-11. **Nada rodável localmente substitui `sst deploy`** para o que em
-    `apps/functions` alcança `layers/` (ver `$fireskill-specialist-drizzle`):
-    trate um deploy real, ou `bunx esbuild <handler> --bundle --platform=node`
-    para cada `handler:` de `infra/*.ts`, como gate.
+4. **SST 4.14.0 bug**: `dlq.retryDelay` converts to milliseconds instead of seconds;
+   above ~86s Cloudflare rejects the value. Workaround in `infra/jobs.ts`:
+   override `args.settings.retryDelay` (seconds count) in `transform.consumer`.
+   Do not revert without verifying upstream fixes.
+5. **Durable Object `new_sqlite_classes` is a one-time irreversible migration**
+   (error 10074 upon resending). `infra/websockets.ts` queries Cloudflare's API
+   to determine if the class already exists before including migrations. Absent
+   `CLOUDFLARE_API_TOKEN`, it assumes "already provisioned".
+6. **No Nuxt native component exists in SST.** Builds execute via
+   `command.local.Command` (`infra/utils/builder.ts`), and `sst.cloudflare.Worker`
+   awaits build completion using `dependsOn`. This is the designated architecture
+   passing Nitro outputs to native Workers, not a temporary workaround.
+7. **`@nuxthub/core` forces Nitro output directory to `dist`** (not `.output`)
+   when `hub: {…}` is active. `deployWorker` determines output path using the same
+   `app: boolean` flag that binds `BLOB`/`KV`/`CACHE`.
+8. **Queue consumers and DOs lack top-level Pulumi props**: consumers bind via
+   `queue.subscribe(...)`; DOs attach exclusively via `transform.worker`, where
+   `args.bindings` is a Pulumi `Output` (`$output(args.bindings ?? []).apply(...)`).
+9. **`emails.ts`**: `nodemailer` functions on Workers only with an explicit patch
+   (`patches/nodemailer@<version>.patch`, `patchedDependencies`). If `bun install`
+   resolves a new version, update patch keys accordingly (Bun matches exact versions
+   and silently skips unkeyed patches).
+10. **Deployments run migrations and seeds** for the `App` (`infra/utils/nuxt.ts`):
+    `bunx drizzle-kit migrate` and `bun run src/database/seed/index.ts` run directly
+    against Postgres using `Database*` secrets. The workstation executing deployments
+    must have network reachability to the database host (IPv6/IPv4).
+11. **Nothing locally executed substitutes for `sst deploy`** when `apps/functions`
+    imports from `layers/` (see `$fireskill-specialist-drizzle`): require a live deployment
+    or `bunx esbuild <handler> --bundle --platform=node` for each `handler:` in `infra/*.ts`.
 
-## 7. Bun e workspaces (por que importa no deploy)
+## 7. Bun and Workspaces (Impact on Deployments)
 
-- `bunfig.toml` fixa `linker = "hoisted"`: o linker `isolated` quebra o esbuild
-  embutido do SST no Windows (`ERROR_INVALID_FUNCTION`). Não desfaça.
-- `unenv` é dividido de propósito: a raiz quer v2 (bundler do SST); cada pacote
-  Nuxt (`app`/`web`/`login`) quer v1 (Nitro). **Nunca** adicione `overrides`
-  global de `unenv`.
-- Todo pacote importado diretamente pelo **seu** código precisa ser dependência
-  explícita do `package.json` daquele pacote, nunca herdado por transitividade
-  (ex.: `@nuxt/ui`).
-- Patches em `patches/` são amarrados à **versão exata** (hoje:
-  `nodemailer@9.1.1` e `@openauthjs/openauth@0.3.9`); após regenerar o
-  `bun.lock`, reconfira cada `patchedDependencies`.
+- `bunfig.toml` pins `linker = "hoisted"`: the `isolated` linker breaks SST's
+  embedded esbuild on Windows (`ERROR_INVALID_FUNCTION`). Do not revert.
+- `unenv` versions are split intentionally: repository root requires v2 (SST bundler);
+  Nuxt application packages (`app`/`web`/`login`) require v1 (Nitro). **Never**
+  introduce a global `overrides` for `unenv`.
+- Every package imported directly by application code must be declared as an explicit
+  dependency in that package's `package.json`, never inherited transitively (e.g., `@nuxt/ui`).
+- Patches in `patches/` are pinned to **exact versions** (currently: `nodemailer@9.1.1`
+  and `@openauthjs/openauth@0.3.9`); re-verify `patchedDependencies` after regenerating `bun.lock`.
 - Workspaces: `apps/*`, `packages/*`, `layers/*`.
-- Comandos da raiz: `bun run deploy`, `bun run app` (`sst shell -- bun
-  scripts/dev.ts app`), `bun run web`, variantes `-remote`, `bun run test`,
-  `bun run check:i18n`, `bun run format`.
+- Root CLI scripts: `bun run deploy`, `bun run app` (`sst shell -- bun scripts/dev.ts app`),
+  `bun run web`, `-remote` variants, `bun run test`, `bun run check:i18n`, `bun run format`.
 
-## 8. O que NÃO existe
+## 8. What Does NOT Exist
 
-- CI/CD, GitHub Actions, deploy por `wrangler` fora do SST.
-- Stack central, módulo Nuxt do SST, `wrangler.toml`.
-- Observabilidade declarada nos Workers (ver
-  `$fireskill-specialist-cloudflare-workers`, §6).
+- CI/CD, GitHub Actions, non-SST `wrangler` deployments.
+- Monolithic stack file, SST Nuxt component, application `wrangler.toml`.
+- Code-declared observability blocks in Workers (see `$fireskill-specialist-cloudflare-workers`, §6).

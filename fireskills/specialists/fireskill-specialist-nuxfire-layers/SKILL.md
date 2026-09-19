@@ -1,98 +1,68 @@
 ---
 name: fireskill-specialist-nuxfire-layers
-description: Criar, registrar, ativar e compor Nuxt Layers no monorepo Nuxfire — `layers/<nome>`, `config.ts` (`layers.core`/`layers.features`), `layer.manifest.ts`, `scripts/compose-layers.ts`, arquivos gerados `.composition/`, exports do `package.json`, prefixos de habilidade/componente, i18n e testes por layer. Use ao criar uma layer, mover código para/de uma layer, ligar/desligar uma layer ou tocar `apps/app/nuxt.config.ts`; específico do Nuxfire (não é o guia genérico de Nuxt Layers).
+description: Create, register, activate, and compose Nuxt Layers in the Nuxfire monorepo — `layers/<name>`, `config.ts` (`layers.core`/`layers.features`), `layer.manifest.ts`, `scripts/compose-layers.ts`, generated `.composition/` files, `package.json` exports, ability/component naming conventions, i18n, and per-layer testing. Use when creating a layer, moving code to/from a layer, toggling layers, or modifying `apps/app/nuxt.config.ts`; specific to Nuxfire architecture.
 ---
 
 # Nuxfire Layers
 
-## Quando usar
+## When to Use
 
-- Acionar ao criar uma layer, decidir se algo vira layer ou fica no
-  Composition Root, ligar/desligar layer em `config.ts`, mover páginas,
-  componentes, router ou schema entre layers.
-- Acionar ao depurar: layer que não carrega, componente com nome estranho,
-  ability que colide, rota/menu de layer desligada ainda vivos, middleware global
-  em ordem errada.
-- Não acionar para o uso de `defineNuxtConfig`/páginas/composables em geral:
-  `$fireskill-specialist-nuxt`. Para o conteúdo de uma parte da layer, use o
-  especialista dela: `-trpc`, `-drizzle`, `-nuxt-authorization`, `-nuxt-ui`.
-- Combinar com `$fireskill-specialist-software-architecture` e
-  `$fireskill-specialist-domain-modeling` para decidir **onde** um domínio vive,
-  e com `$fireskill-specialist-sst` (`flags` ≠ `layers`).
+- Activate when creating a layer, deciding whether logic belongs in a layer or Composition Root, toggling layers in `config.ts`, or moving pages, components, routers, or schemas between layers.
+- Activate when debugging: inactive layers still resolving, conflicting abilities, broken navigation links for disabled features, or inverted middleware order.
+- Do not activate for generic Nuxt pages or composables: use `$fireskill-specialist-nuxt`. For layer subcomponents, use domain specialists: `-trpc`, `-drizzle`, `-nuxt-authorization`, `-nuxt-ui`.
+- Combine with `$fireskill-specialist-software-architecture` and `$fireskill-specialist-domain-modeling` to establish bounded contexts, and `$fireskill-specialist-sst` (`flags` vs `layers`).
 
-## Fluxo
+## Workflow
 
-1. Ler [references/nuxfire-layers.md](references/nuxfire-layers.md) (o mapa) e,
-   para criar, [references/new-layer-recipe.md](references/new-layer-recipe.md).
-2. Decidir **core** (sempre ligada) ou **feature** (desligável). Nada mais
-   muda por essa escolha: o registro é o mesmo mecanismo.
-3. Partir de `layers/kanban` como modelo e adaptar.
-4. Registrar em `config.ts`; deixar o `compose-layers` regenerar os arquivos.
-5. Validar ligada **e** desligada (seção abaixo).
+1. Read [references/nuxfire-layers.md](references/nuxfire-layers.md) and [references/new-layer-recipe.md](references/new-layer-recipe.md).
+2. Classify as **core** (permanently enabled) or **feature** (toggleable). Mechanics are identical: registration uses the same pattern.
+3. Use `layers/kanban` as the canonical reference implementation.
+4. Register in `config.ts`; let `compose-layers` regenerate composition targets.
+5. Validate enabled **and** disabled states.
 
-## Regras principais
+## Key Rules
 
-- O Composition Root (`apps/app`) não tem lógica de domínio; domínio vai para
-  `layers/`.
-- Registro de layer core = acrescentar o nome em `layers.core`. Sem import à mão
-  em lugar nenhum.
-- "Ativa" tem **uma** fonte: `activeLayerNames` (de `config.ts`). Nada decide
-  ativação só pelo que existe no disco.
-- `exports["."]` do `package.json` = `./nuxt.config.ts`; manifesto em
-  `./manifest`; coringa com extensão (`"./shared/*": "./shared/*.ts"`).
-- `nuxt.config.ts` da layer: `$meta.name` e `components: [{ path: "./components" }]`.
-  **Sem `prefix`**; o nome do componente vem do arquivo (`Kanban*.vue`).
-- `name` do manifesto é literal e igual ao nome da pasta (lido por regex).
-- `server/trpc/router.ts` exporta `routers` (mapa) com `satisfies`; o gerador
-  importa por esse nome fixo.
-- Habilidades com prefixo da layer; procedures **sem** prefixo.
-- Todo pacote importado pela layer é dependência explícita do seu `package.json`.
-- Layer sem `app/` precisa de `srcDir: "app"`.
-- Middleware global não se ordena entre layers; o que depende de ordem fica no
-  Composition Root. Plugin de layer que depende de outro declara `dependsOn`.
-- Schema: linha manual no barrel, por especificador de pacote; nunca relativo.
-- Desligar uma layer não apaga tabelas.
-- Sem infraestrutura por layer nesta versão (Durable Object, fila, cron): use o
-  que já existe.
-- i18n com os três idiomas e chaves idênticas (`bun run check:i18n`).
-- Nunca editar `.composition/*`.
+- Composition Root (`apps/app`) contains no domain business logic; all domain code belongs in `layers/`.
+- Core layer registration = adding name to `layers.core` in `config.ts`. No manual imports elsewhere.
+- Active status has **one** source of truth: `activeLayerNames` in `config.ts`. Never determine activation from disk contents.
+- `package.json` exports: `exports["."]` = `./nuxt.config.ts`; manifest at `./manifest`; wildcards declare extensions (`"./shared/*": "./shared/*.ts"`).
+- Layer `nuxt.config.ts`: define `$meta.name` and `components: [{ path: "./components" }]`. **No `prefix` setting**; component names are derived from files (`Kanban*.vue`).
+- Manifest `name` matches directory name literally (parsed via regex).
+- `server/trpc/router.ts` exports `routers` map using `satisfies`; composition engine imports by this fixed symbol.
+- Abilities carry the layer prefix; procedures do **not** carry prefixes.
+- Every package imported by a layer must be explicitly listed in its `package.json`.
+- Layer without `app/` directory specifies `srcDir: "app"`.
+- Global middleware does not support cross-layer ordering; order-critical middleware resides in Composition Root. Layer plugins declare `dependsOn`.
+- Database schemas: add manual line in barrel via package specifier; never relative paths.
+- Deactivating a layer does not drop database tables.
+- No independent infrastructure per layer (Durable Objects, queues, crons); share provisioned resources.
+- Multilingual i18n support across all 3 languages with matching keys (`bun run check:i18n`).
+- Never edit `.composition/*` files manually.
 
-## Antipadrões
+## Anti-patterns
 
-- Decidir "layer ligada" pelo disco (router chamável e link 404 quando desligada).
-- `exports["."]` para `layer.manifest.ts`.
-- `components.prefix` com arquivo já prefixado; `path: "./app/components"`.
-- Habilidade sem prefixo; prefixar procedure tRPC.
-- Mover middleware global para uma layer e quebrar o redirect pós-login.
-- Depender de transitividade em vez de declarar a dependência.
-- Import relativo de `layers/` em `apps/functions`.
-- `requires` tratado como validação (é só documentação).
-- Levar lógica de domínio de volta ao `apps/app`.
-- Criar layer "por organização" sem domínio próprio: layer é unidade de domínio
-  ativável, não pasta de conveniência.
-- Assumir que `typecheck`/`nuxt prepare` provam que a layer carregou.
+- Determining active status by disk presence (causes 404 links and callable routers when deactivated).
+- Pointing `exports["."]` to `layer.manifest.ts`.
+- Configuring `components.prefix` when files already carry prefixes.
+- Creating abilities without layer prefixes; adding prefixes to tRPC procedure names.
+- Moving global auth middleware into a layer and breaking post-login redirect flows.
+- Relying on transitive dependencies instead of declaring direct dependencies.
+- Using relative imports from `layers/` inside `apps/functions`.
+- Moving domain logic back into `apps/app`.
+- Creating empty convenience layers lacking coherent domain models.
 
-## Validação
+## Validation
 
-- Subir o Nuxt: a linha `compose-layers: N active layer(s) […]` lista a layer;
-  `.composition/layer-routers.ts` e `layer-navigation.ts` a incluem.
-- Ligar/desligar em `config.ts`: páginas, procedure e item de menu somem e voltam
-  **juntos**.
-- `.nuxt/components.d.ts` com os nomes esperados; prova de que o `nuxt.config.ts`
-  carrega: `prefix` absurdo temporário e diff.
-- Rotas/layout/middleware cruzando layers: conferir no **build**
-  (`dist/server/chunks/virtual/entry.mjs`).
-- `bun run typecheck` (`apps/app`), `bunx vue-tsc --noEmit -p server/tsconfig.json`
-  (servidor), `bun run test`, `bun run check:i18n`.
-- Se `apps/functions` passa a importar da layer: `sst deploy` de teste ou esbuild
-  por `handler:`.
+- Start app: verify `compose-layers: N active layer(s) […]` lists layer; confirm entries in `.composition/layer-routers.ts` and `layer-navigation.ts`.
+- Toggle in `config.ts`: verify pages, procedures, and menu links disappear and reappear in sync.
+- Verify `.nuxt/components.d.ts` contains expected component type declarations.
+- Inspect compiled build (`dist/server/chunks/virtual/entry.mjs`) when modifying layouts or middleware.
+- `bun run typecheck` (`apps/app`), `bunx vue-tsc --noEmit -p server/tsconfig.json` (server), `bun run test`, and `bun run check:i18n`.
+- When `apps/functions` imports from layer: verify bundling via `sst deploy` on test stage or `esbuild` per handler.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-nuxt` — Nuxt 4 em geral.
-- `$fireskill-specialist-trpc`, `$fireskill-specialist-drizzle`,
-  `$fireskill-specialist-nuxt-authorization`, `$fireskill-specialist-nuxt-ui` —
-  cada parte interna da layer.
-- `$fireskill-specialist-sst` — `flags` (recursos) vs `layers` (código).
-- `$fireskill-specialist-software-architecture` e
-  `$fireskill-specialist-domain-modeling` — fronteiras de domínio.
+- `$fireskill-specialist-nuxt` — Nuxt 4 application patterns.
+- `$fireskill-specialist-trpc`, `$fireskill-specialist-drizzle`, `$fireskill-specialist-nuxt-authorization`, `$fireskill-specialist-nuxt-ui`.
+- `$fireskill-specialist-sst` — `flags` (Cloudflare resources) vs `layers` (application code).
+- `$fireskill-specialist-software-architecture` and `$fireskill-specialist-domain-modeling`.

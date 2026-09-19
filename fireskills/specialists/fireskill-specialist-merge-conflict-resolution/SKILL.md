@@ -1,106 +1,58 @@
 ---
 name: fireskill-specialist-merge-conflict-resolution
-description: Resolver conflitos Git de merge ou rebase pela intenção de cada lado, distinguindo conflito textual de conflito semântico, preservando comportamento e revalidando a integração. Use quando já existe uma operação em andamento com arquivos unmerged; não abortar a operação, reescrever histórico remoto ou escolher um lado inteiro (`ours`/`theirs` global) sem autorização explícita.
+description: "Resolve Git merge or rebase conflicts based on intent from both branches, distinguishing textual from semantic conflicts, preserving functionality, and validating the integrated state. Use when a Git operation is already in progress with unmerged files; do not abort operations, rewrite remote history, or discard an entire side (`ours`/`theirs` globally) without explicit authorization."
 ---
 
-# Resolução de conflitos
+# Merge Conflict Resolution
 
-## Quando usar
+## When to Use
 
-- Acionar quando um `git merge`, `git rebase` ou `git cherry-pick` já está
-  em andamento e há arquivos marcados como unmerged.
-- Não acionar para decidir qual branch deveria ter ganho a mudança em
-  termos de produto — isso é decisão de quem pediu a integração; esta skill
-  resolve o texto e o comportamento resultante, não reabre a decisão de
-  negócio.
-- Combinar com `$fireskill-specialist-code-review` depois da resolução — o
-  resultado combinado precisa da mesma revisão que qualquer diff novo teria.
+- Trigger when an active `git merge`, `git rebase`, or `git cherry-pick` has unmerged files.
+- Do not trigger to make product decisions about which feature should take precedence —
+  that is a product decision; this specialist resolves the resulting code and behavior.
+- Combine with `$fireskill-specialist-code-review` after resolution — integrated code
+  requires the same scrutiny as any new diff.
 
-## Fluxo
+## Workflow
 
-1. Inspecionar o estado exato da operação (merge, rebase, cherry-pick),
-   quais branches/commits estão envolvidos e quais arquivos estão unmerged.
-2. Para cada hunk em conflito, recuperar a intenção de cada lado — o que a
-   mudança tentava alcançar, não apenas o texto literal.
-3. Classificar o conflito: textual (mesma linha, texto diferente),
-   estrutural (mesma função/bloco reorganizado), semântico (sem marcador de
-   texto, mas comportamento incompatível — ex.: assinatura mudou de um lado,
-   caller não ajustado do outro) ou gerado (lockfile, arquivo build).
-4. Construir o resultado que preserva as duas intenções quando elas são
-   compatíveis — a resolução correta raramente é escolher um lado inteiro.
-5. Quando as intenções são genuinamente incompatíveis, escolher pelo
-   objetivo da integração (o que a spec/issue que motivou a integração
-   pede) e registrar o trade-off descartado.
-6. Remover todos os marcadores de conflito, validar sintaxe/parse do
-   arquivo e rodar os checks focais (lint, typecheck) nos arquivos tocados.
-7. Continuar a operação (`git merge --continue`/`git rebase --continue`) e
-   executar a suíte de regressão relevante antes de publicar.
+1. Inspect the exact state of the operation (merge, rebase, cherry-pick), participating
+   branches/commits, and unmerged paths.
+2. For each conflicting hunk, deduce the intent of each side — what each change was trying
+   to achieve, rather than just the literal characters.
+3. Classify the conflict: textual (same line, different text), structural (same block
+   reorganized), semantic (no text markers, but incompatible behavior — e.g., signature
+   changed on one side, caller not updated on the other), or generated (lockfiles, build outputs).
+4. Construct a combined resolution preserving both intents when compatible — the correct
+   fix is rarely choosing one entire side blindly.
+5. When intents are genuinely mutually exclusive, select according to integration objectives
+   and document the discarded trade-off.
+6. Remove all conflict markers, verify file syntax, and run targeted checks (lint, typecheck).
+7. Continue the operation (`git merge --continue` or `git rebase --continue`) and run
+   relevant regression test suites before pushing.
 
-## Padrões
+## Core Rules
 
-- Nunca usar `git checkout --ours`/`--theirs` (ou resolução estratégica
-  `-X ours`/`-X theirs`) em lote por conveniência — cada hunk pode ter uma
-  resolução correta diferente; aplicar uma estratégia global descarta
-  mudanças reais de um dos lados sem revisão.
-- Não editar um arquivo gerado (lockfile, build output, código gerado) sem
-  atualizar a fonte que o gera e regenerar — editar o gerado diretamente
-  diverge na próxima geração.
-- Preservar mudanças de schema, migrations, testes e contratos de API de
-  ambos os lados quando elas não colidem de fato — um conflito num arquivo
-  vizinho não autoriza descartar uma mudança de schema em outro.
-- Reavaliar imports, renomes e chamadas mesmo em arquivos sem marcador
-  textual — um rename de um lado e um novo uso do nome antigo do outro lado
-  não gera conflito Git, mas quebra em runtime ou build.
-- Não introduzir comportamento novo além do estritamente necessário para
-  resolver o conflito — a resolução não é uma oportunidade de refactor.
-- Não usar `--abort`, force push ou reset destrutivo sem pedido explícito de
-  quem está conduzindo a integração — a operação em andamento pode
-  representar trabalho de resolução já feito por outra pessoa.
-- Conferir ao final que nenhum arquivo permanece unmerged e que o índice
-  está limpo antes de continuar a operação.
+- Never use blanket `git checkout --ours`/`--theirs` or `-X ours`/`-X theirs` across the board —
+  each hunk may have a different correct resolution.
+- Never manually edit generated files (lockfiles, build outputs, code generators) — update
+  the defining manifests and regenerate.
+- Preserve schema changes, migrations, tests, and API contracts from both sides when they
+  do not genuinely clash.
+- Audit imports, renames, and call sites even in files without conflict markers — a rename
+  on one branch and a new call site on the other causes runtime breaks without Git conflict markers.
+- Do not introduce unrelated refactorings during conflict resolution.
+- Never execute `--abort`, force pushes, or hard resets without explicit user authorization.
+- Ensure no unmerged paths remain and index is clean before concluding.
 
-## Antipadrões
+## Antipatterns
 
-- Resolver "compilando" apenas: o arquivo perde os marcadores e builda, mas
-  o comportamento resultante nunca foi comparado contra a intenção de
-  nenhum dos dois lados — conflito semântico sobrevive disfarçado de
-  resolvido.
-- Rebase que reescreve commits já publicados e compartilhados sem alinhar
-  com quem mais trabalha sobre eles — quebra o histórico de outra pessoa
-  silenciosamente.
-- Resolver todos os hunks de um arquivo grande de uma vez sem revisar cada
-  um isoladamente — aumenta a chance de aceitar um hunk errado por fadiga.
-- Confiar em `git rerere` para repetir uma resolução anterior sem
-  reconfirmar que o contexto ao redor não mudou o suficiente para invalidar
-  a resolução gravada.
+- Wholesale acceptance of `ours` or `theirs` to make conflicts disappear quickly.
+- Leaving lingering conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`).
+- Manually editing lockfiles rather than regenerating via package managers (`bun install`).
+- Forgetting to run typechecks and tests across both sides of the integrated change.
 
-## Validação
+## Validation
 
-- `git status` sem nenhum arquivo unmerged e sem marcador de conflito
-  residual em nenhum arquivo (`grep` por `<<<<<<<` no diretório de trabalho).
-- Diff combinado revisado hunk a hunk contra a intenção reconstruída de
-  ambos os lados.
-- Typecheck, build e testes focais dos arquivos tocados executados, mais a
-  suíte de regressão relevante ao comportamento integrado.
-- Histórico resultante e o destino do push (branch, force ou não)
-  confirmados antes de publicar — nunca publicar uma resolução sem essa
-  checagem quando o histórico foi reescrito.
-- Não declarar a integração "resolvida" sem essa evidência — resolução sem
-  build/teste revalidado é apenas ausência de marcador, não correção
-  comprovada.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-code-review` para revisar o resultado combinado como
-  qualquer diff novo, já que a resolução pode introduzir comportamento não
-  coberto pelos PRs originais isoladamente.
-- `$fireskill-specialist-domain-modeling` quando o conflito semântico revelar
-  que dois lados modelaram o mesmo conceito de domínio de forma
-  incompatível — o conflito é sintoma de um boundary não alinhado.
-- `$fireskill-specialist-gitflow` quando o merge/rebase em conflito envolver
-  `feature/`, `release/` ou `hotfix/` de um projeto que declarou Gitflow —
-  aquela skill decide a topologia e o destino do merge, esta resolve o
-  conflito textual ou semântico já aberto.
-
-Leia [references/standards.md](references/standards.md) para comandos de
-diagnóstico, tipos de conflito sem marcador textual e fontes oficiais do Git.
+- `git status` reports clean working directory with zero unmerged paths.
+- All modified files parse without syntax errors.
+- Project typecheck and test suites run and pass.

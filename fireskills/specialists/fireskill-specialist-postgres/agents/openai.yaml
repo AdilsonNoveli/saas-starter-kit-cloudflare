@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Especialista - PostgreSQL"
-  short_description: "PostgreSQL correto, rápido e recuperável"
-  default_prompt: "Use $fireskill-specialist-postgres para orientar esta tarefa com padrões e validação especializados."
+  display_name: "Fireskill - Specialist - PostgreSQL"
+  short_description: "Correct, performant, and recoverable PostgreSQL"
+  default_prompt: "Use $fireskill-specialist-postgres to guide this task with specialized patterns and validation."

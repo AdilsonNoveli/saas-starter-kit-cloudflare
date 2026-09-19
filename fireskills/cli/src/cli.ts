@@ -1,10 +1,7 @@
 /**
- * Entrada pública do CLI do Fireskills.
+ * Public entrypoint for the Fireskills CLI.
  *
- * Motor do fluxo (transições de estado, esforço, progresso, milestones e
- * testes). Derivado do CLI do Specsfy (MIT, ver LICENSE); o instalador, o
- * catálogo remoto, o atualizador e a TUI não foram trazidos: o Fireskills vive
- * dentro do repositório e não é distribuído por esse CLI.
+ * Workflow engine (state transitions, effort, progress, milestones, and testing).
  */
 
 import { Command, CommanderError, Option } from "commander";
@@ -42,29 +39,29 @@ interface ProjectOptions {
   project: string;
 }
 
-/** Constrói o parser público sem executar efeitos. */
+/** Builds public parser without executing side effects. */
 export function buildProgram(): Command {
   const program = new Command();
   program
     .name("fireskill")
-    .description("Fluxo do Fireskills: estados de spec, esforço, progresso e milestones.")
+    .description("Fireskills workflow engine: spec states, effort, progress, and milestones.")
     .version(VERSION, "--version")
     .showHelpAfterError();
 
   program
     .command("transition")
-    .description("move uma spec para o próximo estado")
-    .argument("<identificador>", "ID e slug da spec")
-    .argument("<status>", "pasta de destino")
+    .description("moves a spec to the next state")
+    .argument("<identifier>", "spec ID or directory slug")
+    .argument("<status>", "destination state folder")
     .addOption(projectOption())
-    .option("--json", "emite resultado JSON")
+    .option("--json", "emit JSON result")
     .action(async (
       identifier: string,
       status: string,
       options: ProjectOptions & { json?: boolean },
     ) => {
       if (!SPEC_FOLDERS.includes(status as (typeof SPEC_FOLDERS)[number])) {
-        throw new Error(`status de pasta inválido: ${status}`);
+        throw new Error(`invalid folder status: ${status}`);
       }
       const result = await transitionSpec(
         options.project,
@@ -77,9 +74,9 @@ export function buildProgram(): Command {
 
   program
     .command("migrate")
-    .description("migra specs do layout anterior para pastas de estado")
+    .description("migrates specs from previous layouts to current state folders")
     .addOption(projectOption())
-    .option("--json", "emite resultado JSON")
+    .option("--json", "emit JSON result")
     .action(async (options: ProjectOptions & { json?: boolean }) => {
       const migrated = await migrateSpecs(options.project);
       if (migrated.length) await syncMilestones(options.project);
@@ -89,17 +86,17 @@ export function buildProgram(): Command {
           printTransition(item, await clickUpfyHandoff(options.project, item.path, "transition"), false);
         }
       }
-      else console.log("nenhuma spec legada para migrar");
+      else console.log("no legacy specs to migrate");
     });
 
   program
     .command("effort")
-    .description("atualiza o esforço estimado de uma spec")
-    .argument("<identificador>", "ID e slug da spec")
-    .argument("<pontuacao>", "inteiro de 1 a 10", Number)
-    .requiredOption("--reason <texto>", "justificativa da estimativa")
+    .description("updates the estimated effort of a spec")
+    .argument("<identifier>", "spec ID or directory slug")
+    .argument("<score>", "integer from 1 to 10", Number)
+    .requiredOption("--reason <text>", "rationale for the effort estimate")
     .addOption(projectOption())
-    .option("--json", "emite resultado JSON")
+    .option("--json", "emit JSON result")
     .action(async (
       identifier: string,
       score: number,
@@ -121,11 +118,11 @@ export function buildProgram(): Command {
 
   program
     .command("progress")
-    .description("exibe progresso das specs")
+    .description("displays spec progress summary")
     .addOption(projectOption())
-    .option("--json", "emite resultado JSON")
-    .option("--watch", "emite novo resumo quando uma spec muda")
-    .option("--interval <segundos>", "intervalo do watch em segundos", Number)
+    .option("--json", "emit JSON result")
+    .option("--watch", "emits new summary whenever a spec changes")
+    .option("--interval <seconds>", "watch interval in seconds", Number)
     .action(
       async (options: ProjectOptions & {
         json?: boolean;
@@ -136,17 +133,17 @@ export function buildProgram(): Command {
 
   const milestones = program
     .command("milestones")
-    .description("mantém os marcos derivados de specs e backlog");
+    .description("maintains milestones derived from specs and backlog");
   milestones
     .command("sync")
-    .description("atualiza specs.md e o progresso dos milestones")
+    .description("updates specs.md and milestone progress projections")
     .addOption(projectOption())
-    .option("--json", "emite resultado JSON")
+    .option("--json", "emit JSON result")
     .action(async (options: ProjectOptions & { json?: boolean }) => {
       const result = await syncMilestones(options.project);
       if (options.json) console.log(JSON.stringify(result));
       else {
-        console.log(`Índice\t${result.index_path}`);
+        console.log(`Index\t${result.index_path}`);
         for (const milestone of result.milestones) {
           console.log(
             `${milestone.id}\t${milestone.completed_specs}/${milestone.total_specs} specs\t` +
@@ -158,28 +155,28 @@ export function buildProgram(): Command {
 
   program
     .command("test")
-    .description("executa os testes do projeto (Vitest, via bun run test)")
+    .description("runs project tests (Vitest, via bun run test)")
     .addOption(projectOption())
     .action(async (options: ProjectOptions) => {
       const result = await runProjectTests(options.project);
       process.exitCode = result.exit_code;
     });
 
-  const config = program.command("config").description("configura o projeto consumidor");
+  const config = program.command("config").description("manages project configuration");
   config
     .command("show")
-    .description("exibe a configuração efetiva")
+    .description("displays effective configuration")
     .addOption(projectOption())
-    .option("--json", "emite resultado JSON")
+    .option("--json", "emit JSON result")
     .action(async (options: ProjectOptions & { json?: boolean }) => {
       printConfig(await loadConfig(options.project), Boolean(options.json));
     });
   config
     .command("set")
-    .description("altera a configuração")
+    .description("updates configuration values")
     .addOption(projectOption())
-    .requiredOption("--watch-interval <segundos>", "intervalo de atualização", Number)
-    .option("--json", "emite resultado JSON")
+    .requiredOption("--watch-interval <seconds>", "watch update interval", Number)
+    .option("--json", "emit JSON result")
     .action(
       async (
         options: ProjectOptions & { watchInterval: number; json?: boolean },
@@ -193,15 +190,15 @@ export function buildProgram(): Command {
 
   program
     .command("validate")
-    .description("executa linter determinístico na spec.md")
-    .argument("<identificador>", "ID, slug ou caminho da spec")
+    .description("runs deterministic linter on spec.md")
+    .argument("<identifier>", "spec ID, slug, or file path")
     .addOption(projectOption())
-    .option("--strict", "trata avisos como erros")
-    .option("--json", "emite resultado JSON")
+    .option("--strict", "treat warnings as errors")
+    .option("--json", "emit JSON result")
     .action(async (target: string, options: ProjectOptions & { strict?: boolean; json?: boolean }) => {
       const specPath = await resolveSpecPath(options.project, target);
       if (!specPath) {
-        throw new Error(`Spec não encontrada para o identificador: ${target}`);
+        throw new Error(`Spec not found for identifier: ${target}`);
       }
       const result = await validateSpec(
         specPath,
@@ -217,17 +214,17 @@ export function buildProgram(): Command {
       }
     });
 
-  const lesson = program.command("lesson").description("gerencia o playbook de lições aprendidas (.fireskills/LESSONS.md)");
+  const lesson = program.command("lesson").description("manages the lessons learned playbook (.fireskills/LESSONS.md)");
 
   lesson
     .command("add")
-    .description("registra uma lição aprendida")
-    .requiredOption("--signal <tipo>", "sinal de origem (ac_gap, surviving_mutant, spec_precision_gap, spec_deviation, gate_fail)")
-    .requiredOption("--summary <texto>", "resumo do problema ocorrido")
-    .requiredOption("--rule <texto>", "regra preventiva acionável")
-    .requiredOption("--source <identificador>", "spec, PR ou contexto de origem")
+    .description("records a lesson learned")
+    .requiredOption("--signal <type>", "source signal (ac_gap, surviving_mutant, spec_precision_gap, spec_deviation, gate_fail)")
+    .requiredOption("--summary <text>", "summary of the issue encountered")
+    .requiredOption("--rule <text>", "actionable preventive rule")
+    .requiredOption("--source <identifier>", "source spec, PR, or context identifier")
     .addOption(projectOption())
-    .option("--json", "emite resultado JSON")
+    .option("--json", "emit JSON result")
     .action(async (options: ProjectOptions & { signal: string; summary: string; rule: string; source: string; json?: boolean }) => {
       const res = await addLesson(options.project, {
         signal: options.signal as any,
@@ -238,16 +235,16 @@ export function buildProgram(): Command {
       if (options.json) {
         console.log(JSON.stringify(res, null, 2));
       } else {
-        console.log(`Lição registrada com sucesso (ID: ${res.lesson.id}, status: ${res.lesson.status})${res.promoted ? " [PROMOVIDA A CONFIRMADA!]" : ""}`);
+        console.log(`Lesson recorded successfully (ID: ${res.lesson.id}, status: ${res.lesson.status})${res.promoted ? " [PROMOTED TO CONFIRMED!]" : ""}`);
       }
     });
 
   lesson
     .command("list")
-    .description("lista lições registradas")
+    .description("lists recorded lessons")
     .addOption(projectOption())
-    .option("--all", "inclui candidatas e em quarentena")
-    .option("--json", "emite resultado JSON")
+    .option("--all", "include candidate and quarantined lessons")
+    .option("--json", "emit JSON result")
     .action(async (options: ProjectOptions & { all?: boolean; json?: boolean }) => {
       const store = await loadLessons(options.project);
       const list = options.all ? store.lessons : store.lessons.filter(l => l.status === "confirmed");
@@ -260,31 +257,31 @@ export function buildProgram(): Command {
 
   lesson
     .command("status")
-    .description("resumo quantitativo das lições")
+    .description("displays quantitative summary of lessons")
     .addOption(projectOption())
-    .option("--json", "emite resultado JSON")
+    .option("--json", "emit JSON result")
     .action(async (options: ProjectOptions & { json?: boolean }) => {
       const status = await getLessonsStatus(options.project);
       if (options.json) {
         console.log(JSON.stringify(status, null, 2));
       } else {
-        console.log(`Lições Aprendidas: ${status.confirmed} confirmadas, ${status.candidate} candidatas, ${status.quarantined} em quarentena (Total: ${status.total})`);
+        console.log(`Lessons Learned: ${status.confirmed} confirmed, ${status.candidate} candidate, ${status.quarantined} quarantined (Total: ${status.total})`);
       }
     });
 
   lesson
     .command("prune")
-    .description("remove lições candidatas expiradas")
+    .description("removes expired candidate lessons")
     .addOption(projectOption())
     .action(async (options: ProjectOptions) => {
       const count = await pruneLessons(options.project);
-      console.log(`Candidatas expiradas removidas: ${count}`);
+      console.log(`Expired candidates removed: ${count}`);
     });
 
   return program;
 }
 
-/** Executa o CLI e converte falhas conhecidas em exit code previsível. */
+/** Runs CLI and converts known errors into predictable exit codes. */
 export async function runCli(argv = process.argv): Promise<number> {
   const program = buildProgram();
   program.exitOverride();
@@ -302,13 +299,13 @@ export async function runCli(argv = process.argv): Promise<number> {
       return error.exitCode;
     }
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`erro: ${message}`);
+    console.error(`error: ${message}`);
     return 1;
   }
 }
 
 function projectOption(): Option {
-  return new Option("--project <caminho>", "raiz do projeto consumidor").default(
+  return new Option("--project <path>", "consumer project root directory").default(
     process.cwd(),
   );
 }
@@ -321,7 +318,7 @@ async function runProgress(options: ProjectOptions & {
   const configured = await loadConfig(options.project);
   const interval = options.interval ?? configured.watch_interval;
   if (!Number.isFinite(interval) || interval <= 0) {
-    throw new Error("interval deve ser maior que zero");
+    throw new Error("interval must be greater than zero");
   }
   let previous = "";
   while (true) {
@@ -354,16 +351,16 @@ function printProgress(
     return;
   }
   console.log(
-    `Resumo\t${summary.total_specs} specs\t` +
-      `${summary.completed_tasks}/${summary.total_tasks} tarefas\t` +
-      `${summary.completed_items}/${summary.total_items} itens\t` +
+    `Summary\t${summary.total_specs} specs\t` +
+      `${summary.completed_tasks}/${summary.total_tasks} tasks\t` +
+      `${summary.completed_items}/${summary.total_items} items\t` +
       `${summary.percent}%`,
   );
   for (const spec of specs) {
     console.log(
       `${spec.slug}\t${spec.status}\t` +
-        `${spec.completed_tasks}/${spec.total_tasks} tarefas\t` +
-        `${spec.completed_items}/${spec.total_items} itens\t${spec.percent}%`,
+        `${spec.completed_tasks}/${spec.total_tasks} tasks\t` +
+        `${spec.completed_items}/${spec.total_items} items\t${spec.percent}%`,
     );
   }
 }
@@ -395,23 +392,23 @@ function printTransition(
 
 function printClickUpfyHandoff(handoff: Awaited<ReturnType<typeof clickUpfyHandoff>>): void {
   if (handoff.available && handoff.task_id) {
-    console.log(`ClickUpfy\tencaminhar ${handoff.action} para a tarefa ${handoff.task_id}`);
+    console.log(`ClickUpfy\tforward ${handoff.action} to task ${handoff.task_id}`);
   }
 }
 
 function printValidation(result: ValidationResult): void {
-  console.log(`Validação: ${result.path}`);
+  console.log(`Validation: ${result.path}`);
   if (result.valid) {
-    console.log("Status: VÁLIDO (Aprovado no linter de specs)");
+    console.log("Status: VALID (Passed spec linter)");
   } else {
-    console.log("Status: INVÁLIDO (Corrija os erros antes de avançar o gate)");
+    console.log("Status: INVALID (Fix errors before advancing the gate)");
   }
-  console.log(`Erros: ${result.summary.errors} | Avisos: ${result.summary.warnings}`);
+  console.log(`Errors: ${result.summary.errors} | Warnings: ${result.summary.warnings}`);
   if (result.issues.length > 0) {
-    console.log("--- Detalhes ---");
+    console.log("--- Details ---");
     for (const issue of result.issues) {
-      const prefix = issue.level === "error" ? "❌ [ERRO]" : "⚠️ [AVISO]";
-      const line = issue.line ? ` (Linha ${issue.line})` : "";
+      const prefix = issue.level === "error" ? "❌ [ERROR]" : "⚠️ [WARN]";
+      const line = issue.line ? ` (Line ${issue.line})` : "";
       console.log(`${prefix}${line}: ${issue.message}`);
     }
   }
@@ -419,20 +416,20 @@ function printValidation(result: ValidationResult): void {
 
 function printLessonsList(lessons: Lesson[]): void {
   if (lessons.length === 0) {
-    console.log("Nenhuma lição encontrada.");
+    console.log("No lessons found.");
     return;
   }
   for (const l of lessons) {
     const tag =
       l.status === "confirmed"
-        ? "🛡️ [CONFIRMADA]"
+        ? "🛡️ [CONFIRMED]"
         : l.status === "candidate"
-          ? "🧪 [CANDIDATA]"
-          : "⚠️ [QUARENTENA]";
+          ? "🧪 [CANDIDATE]"
+          : "⚠️ [QUARANTINE]";
     console.log(`${tag} L-${String(l.id).padStart(3, "0")}: ${l.summary}`);
-    console.log(`   Regra: ${l.rule}`);
+    console.log(`   Rule: ${l.rule}`);
     console.log(
-      `   Sinal: ${l.signal} | Ocorrências: ${l.occurrences} | Fontes: ${l.sources.join(", ")}`,
+      `   Signal: ${l.signal} | Occurrences: ${l.occurrences} | Sources: ${l.sources.join(", ")}`,
     );
   }
 }

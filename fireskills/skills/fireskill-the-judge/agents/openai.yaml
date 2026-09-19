@@ -1,4 +1,4 @@
 interface:
   display_name: "Fireskill - The Judge"
-  short_description: "Code review de PR ou diff baseado em evidências"
-  default_prompt: "Use $fireskill-the-judge para revisar este diff ou PR com citações arquivo:linha, checagens locais primeiro, no máximo 5 nits e veredito APPROVE, COMMENT ou REQUEST_CHANGES."
+  short_description: "Evidence-based code review of PRs or diffs"
+  default_prompt: "Use $fireskill-the-judge to review this diff or PR with file:line citations, local checks first, maximum 5 nits, and verdict APPROVE, COMMENT, or REQUEST_CHANGES."

@@ -1,20 +1,10 @@
-# Especialista de branch sob demanda
+# On-Demand Branch Specialist
 
-O setup não escolhe modelo de branch por iniciativa própria. `git branch -a` já
-existente, uma branch chamada `develop` ou qualquer outro sinal do repositório
-não autorizam propor Gitflow. A escolha do modelo de branch pertence à pessoa
-que conduz o projeto.
+Setup does not pick a branch model proactively. Existing `git branch -a`, a branch named `develop`, or any other repository signal never authorizes assuming Gitflow. The choice of branch model belongs strictly to the person guiding the project.
 
-- Carregar `$fireskill-specialist-gitflow` somente quando a pessoa pedir
-  Gitflow explicitamente nesta conversa, ou quando `RULES.md` já registrar
-  essa escolha de uma tarefa anterior.
-- Ao carregar, registrar a convenção confirmada (branches permanentes,
-  prefixos de `feature/`, `release/`, `hotfix/` e política de merge) em
-  `.fireskills/RULES.md` via `$fireskill-aux-rules`, para que o setup não precise
-  perguntar de novo na próxima execução.
-- Se a pessoa não mencionar Gitflow nem indicar essa preferência, seguir o
-  setup normalmente sem branch model nenhum declarado. A ausência de menção
-  não é uma lacuna a resolver por inferência.
+- Load `$fireskill-specialist-gitflow` only when the user explicitly requests Gitflow in conversation, or when `RULES.md` records this decision from a prior task.
+- Upon loading, record confirmed conventions (permanent branches, prefixes for `feature/`, `release/`, `hotfix/`, and merge policy) into `.fireskills/RULES.md` via `$fireskill-aux-rules`, so setup does not need to inquire again.
+- If the user makes no mention of Gitflow, proceed normally without declared branch models. The absence of mention is not a gap to resolve through inference.
 
-O especialista fica em `fireskills/specialists/fireskill-specialist-gitflow/`.
-Anuncie a transição automática e carregue-o na mesma conversa.
+The specialist resides in `fireskills/specialists/fireskill-specialist-gitflow/`.
+Announce automatic transition and load it within the same conversation.

@@ -1,462 +1,437 @@
-# Especificação integrada: {{SPEC_NAME}}
+# Integrated Specification: {{SPEC_NAME}}
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
-| Formato | Specsfy/2.0 |
+| Format | Specsfy/2.0 |
 | ID | {{SPEC_ID}} |
 | Slug | {{SPEC_NUMBER}}-{{SPEC_SLUG}} |
 | Status | Draft |
 | Effort | 1 |
 | Effort updated at | {{CURRENT_DATE}} |
-| Effort rationale | Estimativa inicial; revisar durante a descoberta. |
+| Effort rationale | Initial estimate; review during discovery. |
 | ClickUp Task | |
 | Milestones | |
 | Definition Gate | Pending |
 | Plan Gate | Pending |
 | Delivery Gate | Pending |
 | Evidence Contract | 1 |
-| Interface para pessoas | A definir |
-| Atualizada em | {{CURRENT_DATE}} |
+| Human Interface | To be defined |
+| Updated at | {{CURRENT_DATE}} |
 
-## Ato I — Definir
+## Act I — Define
 
-### 1. Problema e resultado
+### 1. Problem and Desired Outcome
 
-#### Problema
+#### Problem
 
-[Dor observável e contexto.]
+[Observable pain point and context.]
 
-#### Resultado desejado
+#### Desired Outcome
 
-[Mudança percebida pelo usuário ou negócio.]
+[Observable improvement perceived by user or business.]
 
-#### Métricas de sucesso
+#### Success Metrics
 
-- [Métrica mensurável com alvo.]
+- [Measurable metric with quantitative target.]
 
-### 2. Research e esclarecimentos
+### 2. Research and Clarifications
 
-#### Researchs executados
+#### Executed Research
 
-- **R-001**: [pergunta investigada] → [conclusão e impacto].
-- Para claim material, use: `**R-001** [critical] claim — Verdict: verified|refuted|unverifiable — Confidence: high|medium|low — Evidence: research/caminho#locator — Budget: usado/limite`. IDs são únicos, `usado ≤ limite` e a âncora deve existir.
+- **R-001**: [investigated question] → [conclusion and architectural impact].
+- For material claims: `**R-001** [critical] claim — Verdict: verified|refuted|unverifiable — Confidence: high|medium|low — Evidence: research/path#locator — Budget: used/limit`. IDs are unique, `used <= limit`, and anchors must exist.
 
-#### Fontes e contexto consultados
+#### Consulted Sources and Context
 
-- [Código, documento, stakeholder ou “Nenhuma fonte externa”.]
+- [Codebase file, documentation, stakeholder, or "No external sources".]
 
-#### Documentação consultada
+#### Consulted Documentation
 
-- [Título/serviço, versão/data, URL ou caminho local, tópicos relevantes.]
+- [Service title, version/date, URL or local path, relevant sections.]
 
-#### Artefatos de pesquisa armazenados
+#### Stored Research Artifacts
 
-- `specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/research/[fonte]/`: [origem, versão/data, licença quando aplicável e propósito], ou “Nenhum artefato externo”.
-- Toda fonte externa efetivamente consultada deve ter uma evidência local em `research/`; registre aqui o caminho e mantenha conclusões normativas no `spec.md`.
+- `specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/research/[source]/`: [origin, version/date, license when applicable, purpose], or "No external artifacts".
+- Every consulted external source must preserve local evidence in `research/`; record relative path here and keep normative conclusions in `spec.md`.
 
-#### Dúvidas respondidas
+#### Resolved Questions
 
-- **Q**: [pergunta material] → **A**: [resposta incorporada].
+- **Q**: [material question] → **A**: [incorporated answer].
 
-#### Dúvidas abertas
+#### Open Questions
 
-- [Pergunta bloqueante ou “Nenhuma”.]
+- [Blocking question or "None".]
 
-### 3. Escopo e atores
+### 3. Scope and Actors
 
-#### Incluído
+#### In Scope
 
-- [Capacidade incluída.]
+- [Included capability.]
 
-#### Fora de escopo
+#### Out of Scope
 
-- [Limite explícito.]
+- [Explicit system boundary.]
 
-#### Atores
+#### Actors
 
-- **[Ator]**: [objetivo, permissões ou responsabilidade].
+- **[Actor]**: [goal, permissions, or system role].
 
-### 4. Princípios e restrições do projeto
+### 4. Principles and Constraints
 
-- **PR-001**: [regra de governança, qualidade ou arquitetura].
+- **PR-001**: [governance, quality, or architectural constraint].
 
-### 5. Histórias de usuário
+### 5. User Stories
 
-#### US-001 — [título] (P1)
+#### US-001 — [title] (P1)
 
-Como [ator], quero [capacidade], para [valor].
+As a [actor], I want [capability], so that [value delivered].
 
-**Por que P1**: [valor e urgência].
-**Teste independente**: [como demonstrar valor isoladamente].
-**Requisitos**: FR-001
+**Why P1**: [value and urgency rationale].
+**Independent Test**: [command and observable demonstration].
+**Requirements**: FR-001
 
-### 6. Cenários BDD de aceite
+### 6. BDD Acceptance Scenarios
 
-#### AC-001 — [comportamento]
+#### AC-001 — [happy path behavior]
 
-**Cobre**: US-001, FR-001, NFR-001
+**Covers**: US-001, FR-001, NFR-001
 
 ```gherkin
 @US-001 @FR-001 @NFR-001 @AC-001
-Feature: [capacidade observável]
+Feature: [observable capability]
 
-  Scenario: [caminho feliz aceito]
-    Given [estado inicial]
-    When [ação]
-    Then [resultado observável]
+  Scenario: [accepted happy path]
+    Given [initial state]
+    When [action]
+    Then [observable outcome]
 ```
 
-#### AC-002 — [regra ou variação crítica]
+#### AC-002 — [critical variation or business rule]
 
-**Cobre**: US-001, FR-001, NFR-001
+**Covers**: US-001, FR-001, NFR-001
 
 ```gherkin
 @US-001 @FR-001 @NFR-001 @AC-002
-Feature: [capacidade observável]
+Feature: [observable capability]
 
-  Scenario: [regra ou variação crítica]
-    Given [contexto alternativo]
-    When [ação]
-    Then [regra observável]
+  Scenario: [critical rule variation]
+    Given [alternative context]
+    When [action]
+    Then [observable rule enforcement]
 ```
 
-#### AC-003 — [falha ou limite material]
+#### AC-003 — [edge case or boundary condition]
 
-**Cobre**: US-001, FR-001, NFR-001
+**Covers**: US-001, FR-001, NFR-001
 
 ```gherkin
 @US-001 @FR-001 @NFR-001 @AC-003
-Feature: [capacidade observável]
+Feature: [observable capability]
 
-  Scenario: [falha ou limite material]
-    Given [condição de falha ou limite]
-    When [ação]
-    Then [tratamento observável]
+  Scenario: [material edge case or boundary]
+    Given [failure condition or boundary state]
+    When [action]
+    Then [observable error recovery]
 ```
 
-### 7. Requisitos
+### 7. Requirements
 
-#### Funcionais
+#### Functional
 
-- **FR-001**: O sistema deve [comportamento verificável].
+- **FR-001**: The system shall [verifiable behavior].
 
-#### Não funcionais
+#### Non-Functional
 
-- **NFR-001**: [atributo mensurável]. **Verificação**: [teste, inspeção ou medição].
+- **NFR-001**: [measurable quality attribute]. **Verification**: [automated test, inspection, or metric].
 
-#### Erros e casos-limite
+#### Errors and Edge Cases
 
-- [Condição] → [comportamento observável].
+- [Condition] → [observable system behavior].
 
-## Ato II — Projetar e provar
+## Act II — Design and Prove
 
-### 8. Plano técnico
+### 8. Technical Plan
 
-#### Contexto existente
+#### Existing Context
 
-- [Stack, arquitetura e convenções encontradas no repositório.]
+- [Stack, architecture, and conventions identified in repository.]
 
-#### Arquitetura e módulos
+#### Architecture and Modules
 
-- [Componentes, responsabilidades, persistência e pontos de extensão.]
+- [Components, responsibilities, persistence layer, extension points.]
 
 #### Migrations
 
-- [Mudança de schema, ordem, rollback e compatibilidade ou “Não aplicável”.]
+- [Schema changes, migration order, rollback strategy, or "Not applicable".]
 
 #### Models
 
-- [Model, responsabilidade, invariantes e arquivo.]
+- [Model name, responsibility, domain invariants, source file.]
 
-#### Controllers e casos de uso
+#### Procedures and Handlers
 
-- [Controller/handler/use case, entrada, saída, autorização e arquivo.]
+- [tRPC procedure, controller, use case, input validation, output, auth, source file.]
 
-#### Views e experiência
+#### Views and UI Experience
 
-- [Tela/componente, estados loading/empty/error/success, acessibilidade e arquivo.]
+- [Screen/component, states loading/empty/error/success, accessibility, source file.]
 
-#### Queries e repositórios
+#### Queries and Repositories
 
-- [Query/repository, filtros, paginação, índices, consistência e arquivo.]
+- [Query builder, filters, pagination, indexes, consistency, source file.]
 
-#### Jobs e processamento assíncrono
+#### Jobs and Async Processing
 
-- [Job/event consumer, retry, idempotência e dead-letter ou “Não aplicável”.]
+- [Queue consumer, retry schedule, idempotency key, DLQ strategy, or "Not applicable".]
 
-#### Estrutura de arquivos
+#### File Structure
 
 ```text
 specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/
   spec.md
   research/
-src/
-tests/
+apps/
+layers/
 ```
 
-### 9. Modelo de dados
+### 9. Data Model
 
-#### Entidades
+#### Entities
 
-| Entidade | Identidade | Atributos e regras | Relações |
+| Entity | Identity | Attributes and Validation | Relationships |
 | --- | --- | --- | --- |
-| [Entidade] | [chave] | [campos, validações] | [cardinalidade] |
+| [Entity] | [Primary key] | [Fields and schema rules] | [Cardinality] |
 
-#### Estados e transições
+#### States and Transitions
 
-| Entidade | Estado atual | Evento | Próximo estado | Invariantes |
+| Entity | Current State | Event | Next State | Invariants |
 | --- | --- | --- | --- | --- |
-| [Entidade] | [estado] | [evento] | [estado] | [regra] |
+| [Entity] | [State] | [Trigger] | [Next state] | [Rule] |
 
-#### Migração e retenção
+#### Migration and Retention
 
-- [Estratégia ou “Não aplicável”.]
+- [Database migration and retention policy or "Not applicable".]
 
-### 10. Interfaces e contratos
+### 10. Interfaces and Contracts
 
-#### Interface para pessoas
+#### Human Interface
 
-- **Há interface para pessoas**: [Sim ou Não, com justificativa quando Não.]
+- **Human interface present**: [Yes or No with rationale.]
 
-#### Stack e convenções de interface
+#### Interface Stack and Conventions
 
-- [Framework, roteamento, componentes, estilos, formulários, testes, telas atuais afetadas e fontes locais observadas. Explique “A confirmar” quando a stack não definir a camada.]
+- [Framework, routing, components, styling, forms, testing, affected screens. Explain "To be confirmed" when stack does not declare layer.]
 
-#### Telas e responsabilidades
+#### Screens and Responsibilities
 
-- [Tela, pessoa que a usa, tarefa principal, entrada e saída, ou “Não aplicável”.]
+- [Screen name, actor, primary goal, inputs and outputs, or "Not applicable".]
 
-#### Fluxo de informação e navegação
+#### Navigation and Information Flow
 
-- [Como a pessoa chega, consulta, altera, confirma, retorna ou recupera o contexto. Registre o `Breadcrumb` de cada tela com equipe, módulo e tela atual.]
+- [How users discover, query, mutate, confirm, and recover context. Record breadcrumb trail for each screen (Team > Module > Screen).]
 
-#### Menus e navegação principal
+#### Menus and Primary Navigation
 
-- [Menu principal e menus secundários, seus itens, destinos ou rotas, permissões e comportamento responsivo. Se não houver menu, declare como a pessoa chega às telas e por que a navegação direta é suficiente.]
+- [Primary navigation, sidebar items, destinations, permissions, and responsive behaviors. If no menu, declare how views are reached.]
 
-#### Formulários e ações
+#### Forms and Actions
 
-- [Campos, agrupamentos, obrigatoriedade, ajuda, validações, erros, ação principal e padrão: página, painel lateral, modal, área expandida ou outro.]
+- [Form fields, input groupings, required attributes, validation messages, and visual container: page, slide-over panel, modal, or inline row.]
 
-#### Composição e disposição
+#### Layout Composition and Density
 
-- [Hierarquia, navegação, `Breadcrumb` no shell, regiões da tela, densidade,
-  responsividade e componentes existentes.]
-- [No Nuxfire, o runtime é Cloudflare Workers: registre os bindings usados e o
-  efeito no I/O por requisição quando a entrega tocar o servidor.]
+- [Visual hierarchy, responsive layout, shell layout, and component reuse.]
 
-#### Componentes Vue e @nuxt/ui selecionados
+#### Vue and @nuxt/ui Component Selection
 
-| Tela | Componente Vue | Responsabilidade | Arquivo previsto | Componente ou composição | Origem | Reuso ou extensão |
+| Screen | Vue Component | Responsibility | Target File | Component Composition | Origin | Reuse or Extend |
+| --- | --- | --- | --- | --- | --- | --- |
+| [Screen] | [UI Block] | [Encapsulated purpose] | [File path] | [Component name] | [@nuxt/ui or custom] | [Existing or new with rationale] |
+
+- [Select @nuxt/ui primitives (`UTable`, `UForm`, `UModal`, etc.) for this feature. Register custom components.]
+- [Keep inventory aligned with `.fireskills/INTERFACE.md`.]
+
+#### States and Accessibility
+
+- [Explicit handling for loading, empty, error, success, forbidden, keyboard navigation, and focus rings.]
+
+#### CRUD Contract
+
+- [Use uniform `PageHeader` component for list, detail, create, and edit views.]
+- [Listings use full-width `UTable` (`enterpriseTableUi`), keep `ID` column visible, make rows interactive links, and offer independent edit/delete actions.]
+- [Register reusable components in `.fireskills/INTERFACE.md`.]
+
+#### Visual Review During Development
+
+- [Perform visual review during implementation checking borders, margins, padding, spacing, and typography across viewports.]
+- [Record review method and adjustments under task `VISUAL` checklist item.]
+
+#### Exposed APIs
+
+- [tRPC procedure, HTTP method/path, auth level, request payload, response schema, error codes.]
+
+#### External APIs
+
+- [Service, endpoint, version, auth credentials, timeout, retry strategy, fallback, or "None".]
+
+### 11. TDD Strategy
+
+- **Unit**: [pure functions, composables, validations, utilities].
+- **Integration/Contract**: [procedure boundary, service bindings, database access].
+- **BDD/Acceptance**: [Reference Gherkin guiding test implementation].
+- **Test Runner**: [Vitest via `bun run test`].
+- **E2E**: [Critical user journeys or "Not applicable".]
+
+#### RED-GREEN-REFACTOR Evidence
+
+| IDs | Reference BDD | TDD Test Case | Observed RED | Observed GREEN | Refactor/Regression |
 | --- | --- | --- | --- | --- | --- |
-| [Tela] | [Bloco] | [O que concentra] | [Caminho] | [Nome] | [`@nuxt/ui` ou próprio] | [Bloco existente ou novo, com motivo] |
+| US-001, FR-001, NFR-001, AC-001 | [AC-001 in section 6] | [case 1 with `SPECSFY:` comment marker] | Pending | Pending | Pending |
+| US-001, FR-001, NFR-001, AC-002 | [AC-002 in section 6] | [case 2 with `SPECSFY:` comment marker] | Pending | Pending | Pending |
+| US-001, FR-001, NFR-001, AC-003 | [AC-003 in section 6] | [case 3 with `SPECSFY:` comment marker] | Pending | Pending | Pending |
 
-- [Escolha os componentes `@nuxt/ui` (`UTable`, `UForm`, `UModal` e demais) desta
-  entrega. Registre também cada componente próprio que compõe a tela.]
-- [A lista deve corresponder a `.fireskills/INTERFACE.md`; não usar somente nomes de
-  bibliotecas sem informar os componentes selecionados.]
+### 12. Test Plan and Traceability
 
-#### Estados e acessibilidade
-
-- [Loading, vazio, erro, sucesso, permissão insuficiente, teclado, foco e tecnologia assistiva.]
-- [O `Breadcrumb` mantém a equipe visível, usa links válidos nos itens
-  anteriores e marca a tela atual com semântica de página.]
-
-#### Contrato CRUD
-
-- [Quando houver CRUD, todas as telas usam o mesmo `PageHeader` componentizado
-  e reutilizável para lista, detalhe, criação e edição.]
-- [A listagem usa `UTable` (`enterpriseTableUi`) em largura total, mantém a coluna `ID` visível,
-  transforma a linha inteira em link para o detalhe e oferece botões
-  independentes de editar e apagar.]
-- [Registre em `.fireskills/INTERFACE.md` os componentes reaproveitados e os novos, com
-  seus consumidores, estados e regra de extensão.]
-
-#### Revisão visual durante o desenvolvimento
-
-- [A revisão visual ocorre durante a implementação, mesmo sem pedido da
-  pessoa, e confere bordas, espaçamentos, margens, padding e tipografia do
-  sistema nos estados e viewports relevantes.]
-- [Registre método, viewport, estados, achados e ajustes na tarefa. Para uma
-  tarefa sem interface, registre `Não aplicável` e o motivo concreto.]
-
-#### APIs expostas
-
-- [Método/rota ou evento, autenticação, request, response, erros e versionamento.]
-
-#### APIs externas utilizadas
-
-- [Serviço, operação, versão, autenticação, timeout, retry e fallback ou “Nenhuma”.]
-
-#### Documentação das APIs consultadas
-
-- [Título, versão/data, URL ou caminho local e decisões extraídas.]
-
-#### Eventos e outros contratos
-
-- [Schema, produtor, consumidor, compatibilidade ou “Não aplicável”.]
-
-### 11. Estratégia TDD
-
-- **Unidade**: [regras e componentes].
-- **Integração/contrato**: [fronteiras].
-- **BDD/aceite**: [Gherkin de referência que orienta o entendimento e o desenho dos testes TDD].
-- **Runner TDD**: [Vitest, via `bun run test`; outra stack = runner existente ou decisão explícita].
-- **E2E**: [jornadas essenciais ou “Não aplicável”.]
-- **Verificação manual**: [somente o inevitável, com motivo].
-
-#### Evidência RED-GREEN-REFACTOR
-
-| IDs | BDD de referência | Teste TDD informado pelo BDD | RED observado | GREEN observado | Refactor/regressão |
-| --- | --- | --- | --- | --- | --- |
-| US-001, FR-001, NFR-001, AC-001 | [AC-001 na seção 6] | [caso 1 em layers/recurso/shared/utils/recurso.test.ts com marcador próprio `SPECSFY:`] | Pending | Pending | Pending |
-| US-001, FR-001, NFR-001, AC-002 | [AC-002 na seção 6] | [caso 2 em layers/recurso/shared/utils/recurso.test.ts com marcador próprio `SPECSFY:`] | Pending | Pending | Pending |
-| US-001, FR-001, NFR-001, AC-003 | [AC-003 na seção 6] | [caso 3 em layers/recurso/shared/utils/recurso.test.ts com marcador próprio `SPECSFY:`] | Pending | Pending | Pending |
-
-### 12. Plano de testes e rastreabilidade
-
-| Requisito | Cenário BDD | Nível | Arquivo/comando esperado | Evidência |
+| Requirement | BDD Scenario | Level | Test File/Command | Evidence |
 | --- | --- | --- | --- | --- |
-| FR-001 | AC-001 | Unidade | [tests/arquivo] | Pending |
-| FR-001 | AC-002 | [nível] | [tests/arquivo] | Pending |
-| FR-001 | AC-003 | [nível] | [tests/arquivo] | Pending |
-| NFR-001 | AC-001 | [nível] | [comando] | Pending |
-| NFR-001 | AC-002 | [nível] | [comando] | Pending |
-| NFR-001 | AC-003 | [nível] | [comando] | Pending |
+| FR-001 | AC-001 | Unit | [test file path] | Pending |
+| FR-001 | AC-002 | [level] | [test file path] | Pending |
+| FR-001 | AC-003 | [level] | [test file path] | Pending |
+| NFR-001 | AC-001 | [level] | [verification command] | Pending |
+| NFR-001 | AC-002 | [level] | [verification command] | Pending |
+| NFR-001 | AC-003 | [level] | [verification command] | Pending |
 
-### 13. Validações
+### 13. Validations
 
-#### Gate do Ato I — Definição
+#### Act I Gate — Definition
 
-- **Resultado**: Pending
-- **Comando**: `node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md`
-- **Achados**: [Pending.]
-- Findings especializados, quando aplicáveis, seguem `FIND-PROD|ARCH|SEC-NNN`,
-  severidade `P1|P2|P3`, estado `Open|Resolved|Accepted`, refs e evidência.
+- **Result**: Pending
+- **Command**: `node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md`
+- **Findings**: [Pending.]
 
-#### Gate do Ato II — Plano
+#### Act II Gate — Plan
 
-- **Resultado**: Pending
-- **Comando**: `node fireskills/skills/fireskill-05-tasks/scripts/validate_tasks.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md`
-- **Achados**: [Pending.]
+- **Result**: Pending
+- **Command**: `node fireskills/skills/fireskill-05-tasks/scripts/validate_tasks.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md`
+- **Findings**: [Pending.]
 
-#### Gate do Ato III — Entrega
+#### Act III Gate — Delivery
 
-- **Resultado**: Pending
-- **Comando**: `node fireskills/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md .`
-- **Achados**: [Pending.]
+- **Result**: Pending
+- **Command**: `node fireskills/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md .`
+- **Findings**: [Pending.]
 
-### 14. Tarefas
+### 14. Tasks
 
-Formato:
-`- [ ] TNNN [P?] [TIPO] [US-NNN?] Ação com caminho — Refs: IDs — Depends: IDs|none`
+Format:
+`- [ ] TNNN [P?] [TYPE] [US-NNN?] Action with file path — Refs: IDs — Depends: IDs|none`
 
-Cada tarefa possui exatamente este checklist, atualizado durante a execução:
+Every task maintains this exact checklist during execution:
 
 ```markdown
-  - [ ] **PREP**: Confirmar escopo, IDs, dependências e baseline.
-  - [ ] **EXECUTE**: Produzir a entrega no caminho declarado.
-  - [ ] **VERIFY**: Executar a verificação focal adequada.
-  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia do sistema; se não houver interface, registrar `Não aplicável` e o motivo.
-  - [ ] **EVIDENCE**: Registrar comando, resultado e IDs nas seções 11–13.
-  - [ ] **IMPROVE**: Registrar melhoria aplicada ou ausência justificada.
+  - [ ] **PREP**: Confirm scope, IDs, dependencies, and baseline.
+  - [ ] **EXECUTE**: Produce implementation at declared file path.
+  - [ ] **VERIFY**: Execute targeted test verification.
+  - [ ] **VISUAL**: Check borders, margins, padding, spacing, and typography; if non-visual, mark `Not applicable` with rationale.
+  - [ ] **EVIDENCE**: Record command output and resolved IDs in sections 11–13.
+  - [ ] **IMPROVE**: Record process improvement or justify absence.
 ```
 
-#### Fase 1 — RED TDD informado pelo BDD
+#### Phase 1 — RED TDD Informed by BDD
 
-- [ ] T001 [TEST] [TDD] [US-001] Derivar do AC-001 um caso Vitest falhando em layers/recurso/shared/utils/recurso.test.ts — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none
-  - [ ] **PREP**: Ler o Gherkin da spec e confirmar regra, IDs e nível de teste.
-  - [ ] **EXECUTE**: Escrever o caso TDD com marcador próprio `SPECSFY:`, sem criar ou executar `.feature`.
-  - [ ] **VERIFY**: Observar RED válido.
-  - [ ] **VISUAL**: Conferir a interface afetada ou registrar `Não aplicável` porque a tarefa só materializa teste.
-  - [ ] **EVIDENCE**: Registrar comando e causa do RED.
-  - [ ] **IMPROVE**: Revisar a cobertura e registrar aprendizado.
+- [ ] T001 [TEST] [TDD] [US-001] Derive from AC-001 a failing Vitest test case in layers/feature/shared/utils/feature.test.ts — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none
+  - [ ] **PREP**: Read spec Gherkin and confirm rule, IDs, and test level.
+  - [ ] **EXECUTE**: Author TDD case with unique `SPECSFY:` comment marker without creating `.feature` files.
+  - [ ] **VERIFY**: Observe valid RED failure.
+  - [ ] **VISUAL**: Inspect affected UI or mark `Not applicable` for test implementation.
+  - [ ] **EVIDENCE**: Record test execution command and failure trace.
+  - [ ] **IMPROVE**: Review coverage and record lesson learned.
 
-- [ ] T002 [TEST] [TDD] [US-001] Derivar do AC-002 um caso Vitest falhando em layers/recurso/shared/utils/recurso.test.ts — Refs: US-001, FR-001, NFR-001, AC-002 — Depends: none
-  - [ ] **PREP**: Ler o Gherkin da spec e confirmar regra, IDs e nível de teste.
-  - [ ] **EXECUTE**: Escrever o caso TDD com marcador próprio `SPECSFY:`, sem criar ou executar `.feature`.
-  - [ ] **VERIFY**: Observar RED válido.
-  - [ ] **VISUAL**: Conferir a interface afetada ou registrar `Não aplicável` porque a tarefa só materializa teste.
-  - [ ] **EVIDENCE**: Registrar comando e causa do RED.
-  - [ ] **IMPROVE**: Revisar a cobertura e registrar aprendizado.
+- [ ] T002 [TEST] [TDD] [US-001] Derive from AC-002 a failing Vitest test case in layers/feature/shared/utils/feature.test.ts — Refs: US-001, FR-001, NFR-001, AC-002 — Depends: none
+  - [ ] **PREP**: Read spec Gherkin and confirm rule, IDs, and test level.
+  - [ ] **EXECUTE**: Author TDD case with unique `SPECSFY:` comment marker without creating `.feature` files.
+  - [ ] **VERIFY**: Observe valid RED failure.
+  - [ ] **VISUAL**: Inspect affected UI or mark `Not applicable` for test implementation.
+  - [ ] **EVIDENCE**: Record test execution command and failure trace.
+  - [ ] **IMPROVE**: Review coverage and record lesson learned.
 
-- [ ] T003 [TEST] [TDD] [US-001] Derivar do AC-003 um caso Vitest falhando em layers/recurso/shared/utils/recurso.test.ts — Refs: US-001, FR-001, NFR-001, AC-003 — Depends: none
-  - [ ] **PREP**: Ler o Gherkin da spec e confirmar regra, IDs e nível de teste.
-  - [ ] **EXECUTE**: Escrever o caso TDD com marcador próprio `SPECSFY:`, sem criar ou executar `.feature`.
-  - [ ] **VERIFY**: Observar RED válido.
-  - [ ] **VISUAL**: Conferir a interface afetada ou registrar `Não aplicável` porque a tarefa só materializa teste.
-  - [ ] **EVIDENCE**: Registrar comando e causa do RED.
-  - [ ] **IMPROVE**: Revisar a cobertura e registrar aprendizado.
+- [ ] T003 [TEST] [TDD] [US-001] Derive from AC-003 a failing Vitest test case in layers/feature/shared/utils/feature.test.ts — Refs: US-001, FR-001, NFR-001, AC-003 — Depends: none
+  - [ ] **PREP**: Read spec Gherkin and confirm rule, IDs, and test level.
+  - [ ] **EXECUTE**: Author TDD case with unique `SPECSFY:` comment marker without creating `.feature` files.
+  - [ ] **VERIFY**: Observe valid RED failure.
+  - [ ] **VISUAL**: Inspect affected UI or mark `Not applicable` for test implementation.
+  - [ ] **EVIDENCE**: Record test execution command and failure trace.
+  - [ ] **IMPROVE**: Review coverage and record lesson learned.
 
-#### Fase 2 — US-001 [título] (P1)
+#### Phase 2 — US-001 [title] (P1)
 
-**Objetivo**: [valor entregue].
-**Teste independente**: [comando e resultado].
+**Goal**: [delivered user capability].
+**Independent Test**: [test command and verified result].
 
-- [ ] T004 [CODE] [US-001] Implementar comportamento em layers/recurso/server/trpc/router.ts — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
-  - [ ] **PREP**: Confirmar RED TDD e dependências.
-  - [ ] **EXECUTE**: Implementar a menor mudança.
-  - [ ] **VERIFY**: Executar testes focais e regressão.
-  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia do sistema na interface afetada; registrar `Não aplicável` com motivo quando não houver superfície visual.
-  - [ ] **EVIDENCE**: Registrar GREEN e arquivos alterados.
-  - [ ] **IMPROVE**: Aplicar melhoria de processo ou justificar nenhuma.
-  <!-- specsfy:evidence {"task":"T004","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["layers/recurso/server/trpc/router.ts"],"commands":[{"run":"comando focal","exit":0}]} -->
+- [ ] T004 [CODE] [US-001] Implement behavior in layers/feature/server/trpc/router.ts — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
+  - [ ] **PREP**: Confirm failing RED TDD tests and declared dependencies.
+  - [ ] **EXECUTE**: Implement minimal passing code.
+  - [ ] **VERIFY**: Execute targeted test suite and regression tests.
+  - [ ] **VISUAL**: Inspect borders, margins, padding, spacing, and typography; mark `Not applicable` with rationale if non-visual.
+  - [ ] **EVIDENCE**: Record passing GREEN test output and modified files.
+  - [ ] **IMPROVE**: Document refactoring or justify absence.
+  <!-- specsfy:evidence {"task":"T004","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["layers/feature/server/trpc/router.ts"],"commands":[{"run":"targeted test command","exit":0}]} -->
 
-**Checkpoint**: [como demonstrar a história isoladamente].
+**Checkpoint**: [how to demonstrate capability in isolation].
 
-#### Fase de interface
+#### Interface Phase
 
-- [ ] T005 [CODE] [US-001] Implementar a tela de [responsabilidade] em layers/recurso/app/components/RecursoLista.vue — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
-  - [ ] **PREP**: Confirmar stack, tela atual, fluxo, formulário e estados definidos na seção 10; carregar `$fireskill-specialist-nuxt-ui` antes de escrever `.vue` com componentes `U*`.
-  - [ ] **EXECUTE**: Implementar os componentes Vue, tela, ações e formulário conforme a composição acordada; registrar cada bloco e componente em `.fireskills/INTERFACE.md`.
-  - [ ] **VERIFY**: Exercitar Breadcrumb, navegação, validações, feedback e teclado.
-  - [ ] **VISUAL**: Conferir PageHeader reutilizado, `UTable` (`enterpriseTableUi`) em largura total, coluna `ID`, link da linha, ações de editar e apagar, bordas, espaçamentos, margens, padding e tipografia nos estados e viewports relevantes.
-  - [ ] **EVIDENCE**: Registrar arquivos, comando e resultado da interação.
-  - [ ] **IMPROVE**: Aplicar melhoria de interface ou justificar nenhuma.
-  <!-- specsfy:evidence {"task":"T005","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["layers/recurso/app/components/RecursoLista.vue"],"commands":[{"run":"comando focal","exit":0}]} -->
+- [ ] T005 [CODE] [US-001] Implement UI view in layers/feature/app/components/FeatureList.vue — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
+  - [ ] **PREP**: Confirm stack conventions, routing, forms, and states from section 10; load `$fireskill-specialist-nuxt-ui` before editing `.vue` files.
+  - [ ] **EXECUTE**: Implement Vue SFC with `@nuxt/ui` components; register components in `.fireskills/INTERFACE.md`.
+  - [ ] **VERIFY**: Test Breadcrumb, keyboard navigation, input validation, and notifications.
+  - [ ] **VISUAL**: Inspect reusable PageHeader, full-width `UTable` (`enterpriseTableUi`), ID column, row action buttons, borders, padding, and typography across screen viewports.
+  - [ ] **EVIDENCE**: Record modified files and component interaction tests.
+  - [ ] **IMPROVE**: Apply UI improvements or justify absence.
+  <!-- specsfy:evidence {"task":"T005","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["layers/feature/app/components/FeatureList.vue"],"commands":[{"run":"targeted test command","exit":0}]} -->
 
-#### Fase final — Qualidade
+#### Final Quality Phase
 
-- [ ] T006 [TEST] Executar regressão e rastreabilidade em layers/recurso/shared/utils/recurso.test.ts — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T004, T005
-  - [ ] **PREP**: Identificar suites, checks e gates.
-  - [ ] **EXECUTE**: Executar regressão e rastreabilidade.
-  - [ ] **VERIFY**: Confirmar ausência de gaps.
-  - [ ] **VISUAL**: Repassar a conferência visual final ou registrar `Não aplicável` com motivo concreto.
-  - [ ] **EVIDENCE**: Registrar contagens e comandos finais.
-  - [ ] **IMPROVE**: Registrar retrospectiva do processo.
+- [ ] T006 [TEST] Execute full test regression and traceability in layers/feature/shared/utils/feature.test.ts — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T004, T005
+  - [ ] **PREP**: Identify relevant test suites and validation gates.
+  - [ ] **EXECUTE**: Run complete automated test regression.
+  - [ ] **VERIFY**: Confirm zero test failures or traceability gaps.
+  - [ ] **VISUAL**: Review final UI state or mark `Not applicable` with rationale.
+  - [ ] **EVIDENCE**: Record final test counts and commands.
+  - [ ] **IMPROVE**: Document workflow retrospective notes.
 
-### 15. Ordem de execução
+### 15. Execution Order
 
-- Caminho crítico: T001/T002/T003 → T004 → T005 → T006.
-- Tarefas paralelas: [IDs e motivo, ou “Nenhuma”.]
-- Estratégia de MVP: [menor conjunto de histórias entregável].
+- Critical Path: T001/T002/T003 → T004 → T005 → T006.
+- Parallel Tasks: [IDs and rationale or "None".]
+- MVP Strategy: [minimal slice delivering end-to-end customer value].
 
-## Ato III — Entregar e validar
+## Act III — Deliver and Validate
 
-### 16. Dependências, riscos e suposições
+### 16. Dependencies, Risks, and Assumptions
 
-#### Dependências
+#### Dependencies
 
-- [Dependência ou “Nenhuma”.]
+- [Upstream dependency or "None".]
 
-#### Riscos
+#### Risks
 
-- [Risco] → [mitigação].
+- [Risk description] → [Mitigation strategy].
 
-#### Suposições
+#### Assumptions
 
-- [Default assumido.]
+- [Assumed default or operational baseline.]
 
-### 17. Decisões
+### 17. Decisions
 
-- **DEC-001**: [decisão] — [razão, alternativas e trade-off].
+- **DEC-001**: [decision title] — [rationale, considered alternatives, and trade-offs].
 
 ### 18. Definition of Done
 
-- [ ] `Definition Gate` está `Passed`.
-- [ ] `Plan Gate` está `Passed`.
-- [ ] `Delivery Gate` está `Passed`.
-- [ ] Todos os cenários `AC` aplicáveis passam.
-- [ ] Todos os requisitos possuem evidência de verificação.
-- [ ] Todas as tarefas na seção 14 estão concluídas.
-- [ ] Testes e checks estáticos disponíveis passam.
+- [ ] `Definition Gate` is `Passed`.
+- [ ] `Plan Gate` is `Passed`.
+- [ ] `Delivery Gate` is `Passed`.
+- [ ] All applicable `AC` acceptance scenarios pass.
+- [ ] All requirements have verified test evidence.
+- [ ] All tasks in section 14 are completed.
+- [ ] All static checks and automated test suites pass.

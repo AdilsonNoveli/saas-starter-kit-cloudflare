@@ -1,106 +1,74 @@
 ---
 name: fireskill-specialist-nuxt
-description: Construir e revisar o app Nuxt 4 do Nuxfire — páginas, layouts, middleware (global e nomeado), plugins, composables, rotas de servidor Nitro, `runtimeConfig`, i18n, SSR e as particularidades de rodar Nitro em Cloudflare Workers (`cloudflare-module`, NuxtHub, `asyncContext`). Use ao tocar `apps/app`, `apps/login`, `apps/web` ou `apps/app/nuxt.config.ts`, ou ao depurar SSR, hidratação, redirecionamento e ordem de middleware; componentes de UI são do `$fireskill-specialist-nuxt-ui` e o mecanismo de layers é do `$fireskill-specialist-nuxfire-layers`.
+description: Build and review Nuxfire Nuxt 4 applications — pages, layouts, middleware (global and named), plugins, composables, Nitro server routes, `runtimeConfig`, i18n, SSR, and running Nitro on Cloudflare Workers (`cloudflare-module`, NuxtHub, `asyncContext`). Use when touching `apps/app`, `apps/login`, `apps/web`, or `apps/app/nuxt.config.ts`, or when debugging SSR, hydration mismatches, redirect loops, and middleware execution order; UI components belong to `$fireskill-specialist-nuxt-ui` and domain layers belong to `$fireskill-specialist-nuxfire-layers`.
 ---
 
 # Nuxt 4 (Nuxfire)
 
-## Quando usar
+## When to Use
 
-- Acionar ao criar/alterar página, layout, middleware, plugin, composable, rota
-  `server/api`, plugin Nitro, `runtimeConfig` ou configuração de módulo.
-- Acionar ao depurar SSR que trava, hidratação divergente, redirect em loop, ordem
-  de middleware, variável de ambiente que não chega ao Worker ou build que sobe
-  com cache velho.
-- Não acionar para componentes `U*`/tema (`$fireskill-specialist-nuxt-ui`), para
-  criar/ligar layer (`$fireskill-specialist-nuxfire-layers`), para procedures
-  (`$fireskill-specialist-trpc`) nem para stores (`$fireskill-specialist-pinia`).
-- Combinar com `$fireskill-specialist-cloudflare-workers` (Nitro em Workers),
-  `$fireskill-specialist-openauth` (sessão/login),
-  `$fireskill-specialist-web-accessibility` e
-  `$fireskill-specialist-performance-engineering`.
+- Activate when creating/modifying pages, layouts, middleware, plugins, composables, `server/api` routes, Nitro plugins, `runtimeConfig`, or module configs.
+- Activate when debugging stalled SSR, hydration mismatches, redirect loops, middleware ordering, environment variables missing in Workers, or stale build caches.
+- Do not activate for `@nuxt/ui` primitives or theming (`$fireskill-specialist-nuxt-ui`), layer creation/linking (`$fireskill-specialist-nuxfire-layers`), tRPC procedures (`$fireskill-specialist-trpc`), or Pinia stores (`$fireskill-specialist-pinia`).
+- Combine with `$fireskill-specialist-cloudflare-workers` (Nitro on Workers), `$fireskill-specialist-openauth` (session/auth flows), `$fireskill-specialist-web-accessibility`, and `$fireskill-specialist-performance-engineering`.
 
-## Fluxo
+## Workflow
 
-1. Ler [references/nuxfire-nuxt.md](references/nuxfire-nuxt.md); para uma tarefa
-   comum, [references/recipes.md](references/recipes.md).
-2. Decidir **onde** o código mora: domínio → layer; casca/infraestrutura central →
-   `apps/app`.
-3. Achar uma página/middleware/plugin parecido e seguir o padrão.
-4. Implementar pensando nos **dois** ambientes: SSR (Worker) e cliente.
-5. Validar logado, deslogado e em deep-link (seção abaixo).
+1. Read [references/nuxfire-nuxt.md](references/nuxfire-nuxt.md); for common recipes, consult [references/recipes.md](references/recipes.md).
+2. Determine **where** code belongs: domain logic -> domain layer; shell and central infrastructure -> `apps/app`.
+3. Locate existing page/middleware/plugin and follow repository patterns.
+4. Implement taking both SSR (Worker) and client runtimes into account.
+5. Validate authenticated, unauthenticated, and deep-link flows.
 
-## Regras principais
+## Key Rules
 
-- `~~` é a raiz do app; `#nuxfire/config` **não** resolve no `nuxt.config.ts`
-  (use caminho relativo).
-- Lógica de domínio vai para `layers/`; o Composition Root fica com casca,
-  composição do tRPC, `nuxt.config.ts` e infraestrutura central.
-- Segredo entra por `runtimeConfig` **sem** `public` e por `NUXT_<NOME>`;
-  só o público leva `NUXT_PUBLIC_`; segredo vazio → a rota **falha fechada**.
-  Nunca ler `process.env` em código de servidor Nuxt.
-- Em SSR, chamada à própria API usa `useRequestFetch()`; `$fetch`/`useFetch` puros
-  não levam cookies e já travaram todas as páginas.
-- Middleware global não se ordena entre layers; o que depende de ordem
-  (`0.auth`, `1.teams`) fica em `apps/app/app/middleware/`. Middleware nomeado pode
-  ficar em layer.
-- Redirecionar de uma rota-catch-all/`/` com **middleware imperativo**, não com
-  `definePageMeta({ redirect })`.
-- Página pública: `definePageMeta({ auth: false })`.
-- Plugin só de cliente leva `.client.ts`; plugin que depende de outro declara
-  `dependsOn`.
-- `apps/login`: rotas de login/cadastro/recuperação mantêm `ssr: false`.
-- Nitro em Workers: preset `cloudflare-module`, `asyncContext` ligado, saída em
-  `dist` por causa do `hub:`; não cachear objeto de I/O em módulo.
-- Rota de servidor autentica com `getUser(event)`; rate limit em rotas sensíveis;
-  erro via `createError`; nunca logar `Error` cru.
-- Dados de tela: `useTrpcClient().….useQuery(() => ({…}))` com getter; toast e
-  confirmação: `useNotification()`.
-- i18n com os três idiomas e chaves idênticas (`bun run check:i18n`).
-- CSP hoje é **Report-Only** (`server/middleware/csp.ts`): nova integração de
-  terceiro (script, iframe, conexão) atualiza a política.
-- `vue` e `vue-router` estão em `latest`: ao depurar comportamento estranho após
-  `bun install`, confira a versão resolvida.
+- `~~` resolves to app root; `#nuxfire/config` does **not** resolve in `nuxt.config.ts` (use relative path).
+- Domain logic belongs to `layers/`; Composition Root contains shell, tRPC composition, `nuxt.config.ts`, and core infrastructure.
+- Secrets enter via `runtimeConfig` **without** `public` and via `NUXT_<NAME>`; only public frontend config takes `NUXT_PUBLIC_`; empty secrets cause routes to **fail closed**. Never read `process.env` directly in Nuxt server code.
+- In SSR, calling the app's own API requires `useRequestFetch()`; raw `$fetch`/`useFetch` omit cookie headers and stall page loads.
+- Global middleware does not support cross-layer ordering; order-dependent middleware (`0.auth`, `1.teams`) lives in `apps/app/app/middleware/`. Named middleware can reside inside layers.
+- Redirect from catch-all/`/` using **imperative middleware**, not `definePageMeta({ redirect })`.
+- Public routes: `definePageMeta({ auth: false })`.
+- Client-only plugins must use `.client.ts`; plugins with dependencies declare `dependsOn`.
+- `apps/login`: auth routes retain `ssr: false` to avoid query-string hydration breaks.
+- Nitro on Cloudflare Workers: preset `cloudflare-module`, `asyncContext` enabled, output in `dist` due to `hub:`; never cache I/O clients in module variables.
+- Server routes authenticate with `getUser(event)`; rate limit sensitive endpoints; errors via `createError`; never log raw `Error` instances.
+- UI data queries: `useTrpcClient().….useQuery(() => ({…}))` with getter; notifications and confirmations: `useNotification()`.
+- i18n across all three languages with identical keys (`bun run check:i18n`).
+- CSP is currently **Report-Only** (`server/middleware/csp.ts`): new external scripts/connections must update policy headers.
 
-## Antipadrões
+## Anti-patterns
 
-- `useFetch`/`$fetch` para `/api/...` em middleware SSR.
-- `definePageMeta({ redirect })` em `/` ou em catch-all.
-- Mover `1.teams.global.ts`/`0.auth.global.ts` para uma layer.
-- `localStorage`/`window` em setup/`state()` executado no servidor.
-- Plugin de WebSocket sem `.client`.
-- Segredo sob `NUXT_PUBLIC_` ou lido de `process.env`.
-- Remover `ssr: false` das rotas de login "para corrigir" hidratação.
-- Remover `clean:build-cache` do build (o `.data` velho já publicou locale
-  antigo).
-- Confiar em `nuxt typecheck` para o servidor, ou em `nuxt prepare` para provar
-  ordem de middleware.
-- Cliente de banco/objeto de I/O em variável de módulo.
-- Chamar `hubDatabase()`: o banco é Postgres via Hyperdrive.
-- Endpoint Nitro para o que deveria ser procedure tRPC tipada.
-- Trocar `Content-Security-Policy-Report-Only` por enforcing sem observar tráfego.
+- Using raw `useFetch`/`$fetch` for internal `/api/...` calls in SSR middleware.
+- Using `definePageMeta({ redirect })` on `/` or catch-all routes.
+- Moving `1.teams.global.ts` or `0.auth.global.ts` into a domain layer.
+- Accessing `localStorage` or `window` in server-executed setup routines or stores.
+- Creating WebSocket plugins without `.client.ts`.
+- Exposing secrets under `NUXT_PUBLIC_` or reading `process.env`.
+- Removing `ssr: false` from login routes.
+- Removing `clean:build-cache` from build scripts.
+- Relying solely on `nuxt typecheck` for server routes, or `nuxt prepare` for middleware ordering.
+- Placing database clients or I/O handles in module-level global variables.
+- Invoking `hubDatabase()`: database is PostgreSQL via Hyperdrive.
+- Writing raw Nitro endpoints for functionality that should be a type-safe tRPC procedure.
 
-## Validação
+## Validation
 
-- `bun run typecheck` em `apps/app` **e**
-  `bunx vue-tsc --noEmit -p server/tsconfig.json` (servidor).
-- `bun run test` (Vitest) e `bun run check:i18n` na raiz.
-- Página nova: SSR e navegação no cliente, temas claro/escuro, deslogado (deve ir
-  ao login e **voltar** à página pedida), logado sem acesso à equipe (`/select-team`).
-- Mudou middleware/layout/rotas de layer: verificar no `nuxt build`
-  (`dist/server/chunks/virtual/entry.mjs`).
-- Sem aviso de hidratação no console; sem `localStorage is not defined` no log do
-  servidor.
-- Variável nova: chega ao Worker (stage real) e a rota falha fechada quando vazia.
-- Mudança de runtime Worker: `sst deploy` num stage de teste.
+- `bun run typecheck` in `apps/app` **and** `bunx vue-tsc --noEmit -p server/tsconfig.json` (server).
+- `bun run test` (Vitest) and `bun run check:i18n` at repository root.
+- New pages: verify SSR and client hydration, light/dark themes, unauthenticated redirect (must redirect to login and **return** to requested URL), and authenticated users without team access (`/select-team`).
+- Inspect `nuxt build` output (`dist/server/chunks/virtual/entry.mjs`) when modifying middleware, layouts, or layer routes.
+- Zero hydration warnings in browser console; zero `localStorage is not defined` errors in server logs.
+- New environment variables: verify propagation to Workers and fail-closed behavior when empty.
+- Runtime Worker changes: verify with `sst deploy` targeting a test stage.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-nuxt-ui` — componentes, tema, formulários, tabelas.
-- `$fireskill-specialist-nuxfire-layers` — layers e composição.
-- `$fireskill-specialist-trpc` — API tipada.
-- `$fireskill-specialist-pinia` — estado compartilhado.
-- `$fireskill-specialist-openauth` — sessão, login, cookies.
-- `$fireskill-specialist-cloudflare-workers` — runtime e bindings.
-- `$fireskill-specialist-sst` — variáveis, secrets e deploy.
-- `$fireskill-specialist-typescript` — tipos.
+- `$fireskill-specialist-nuxt-ui` — components, theming, forms, tables.
+- `$fireskill-specialist-nuxfire-layers` — layers and composition.
+- `$fireskill-specialist-trpc` — type-safe API.
+- `$fireskill-specialist-pinia` — shared state.
+- `$fireskill-specialist-openauth` — sessions, auth, cookies.
+- `$fireskill-specialist-cloudflare-workers` — runtime and bindings.
+- `$fireskill-specialist-sst` — environment variables, secrets, deployments.
+- `$fireskill-specialist-typescript` — typing.

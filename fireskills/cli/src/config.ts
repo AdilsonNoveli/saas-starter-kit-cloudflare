@@ -1,5 +1,5 @@
 /**
- * Configuração persistente por projeto.
+ * Persistent project configuration.
  */
 
 import { join } from "node:path";
@@ -7,7 +7,7 @@ import { isFile, readJson, resolvePath, writeTextAtomic } from "./filesystem.js"
 
 export const DEFAULT_WATCH_INTERVAL = 0.75;
 
-/** Configuração efetiva do projeto. */
+/** Effective project configuration. */
 export interface ProjectConfig {
   project: string;
   watch_interval: number;
@@ -18,7 +18,7 @@ type ConfigPayload = Record<string, unknown> & {
   watch_interval?: number;
 };
 
-/** Carrega a configuração e aplica os valores padrão. */
+/** Loads project configuration and applies defaults. */
 export async function loadConfig(project: string): Promise<ProjectConfig> {
   const root = resolvePath(project);
   const payload = await readPayload(root);
@@ -27,7 +27,7 @@ export async function loadConfig(project: string): Promise<ProjectConfig> {
   return { project: root, watch_interval: interval };
 }
 
-/** Atualiza o intervalo preservando campos desconhecidos. */
+/** Updates watch interval preserving unknown fields. */
 export async function updateConfig(
   project: string,
   watchInterval: number,
@@ -49,17 +49,17 @@ async function readPayload(project: string): Promise<ConfigPayload> {
   if (!(await isFile(path))) return { schema_version: 1 };
   const payload = await readJson(path);
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-    throw new Error(`configuração inválida: ${path}`);
+    throw new Error(`invalid configuration: ${path}`);
   }
   const value = payload as ConfigPayload;
   if ((value.schema_version ?? 1) !== 1) {
-    throw new Error("versão de configuração não suportada");
+    throw new Error("unsupported configuration version");
   }
   return value;
 }
 
 function validateInterval(interval: number): void {
   if (!Number.isFinite(interval) || interval <= 0) {
-    throw new Error("watch interval deve ser um número finito maior que zero");
+    throw new Error("watch interval must be a finite number greater than zero");
   }
 }

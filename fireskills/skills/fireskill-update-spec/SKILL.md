@@ -1,151 +1,145 @@
 ---
 name: fireskill-update-spec
-description: "Use quando o usuário esqueceu algo, quer adicionar, remover, corrigir ou mudar um pedido em uma spec existente que já foi definida, planejada, está sendo implementada ou foi concluída. Use também quando uma transição automática detectar mudança tardia de comportamento, escopo, aceite, dados, segurança ou plano. Atualiza a fonte normativa, invalida somente os gates afetados e coordena a retomada; para criar a spec inicial use fireskill-03-specify, para decidir uma ambiguidade use fireskill-02-backlog e para implementar use fireskill-07-implement."
+description: "Use when the user forgot something, wants to add, remove, correct, or change a request in an existing spec that has already been defined, planned, is being implemented, or was completed. Also use when an automatic transition detects a late change in behavior, scope, acceptance, data, security, or plan. Updates the normative source, invalidates only affected gates, and coordinates resumption; to create the initial spec use fireskill-03-specify, to resolve an ambiguity use fireskill-02-backlog, and to implement use fireskill-07-implement."
 ---
 
-# Atualizar uma especificação existente
+# Update an Existing Specification
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project
+root. In an automatic handoff, load it again before this step. Reuse the confirmed
+root in the conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered questions contract`
+from `fireskills/skills/Spec.md`.
 
-Incorpore um pedido surgido depois da definição inicial sem esconder a mudança,
-duplicar a fonte normativa ou obrigar a pessoa a conhecer atos e gates.
+Incorporate a request that emerged after the initial definition without hiding
+the change, duplicating the normative source, or forcing the person to know
+acts and gates.
 
-## Orquestrar a conversa
+## Orchestrate the Conversation
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $fireskill-update-spec → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill de
-destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa. Depois de uma correção necessária a esta etapa, anuncie `Retomada
-automática: $<destino> → $fireskill-update-spec — pendência resolvida:
-<resultado>` e retome-a imediatamente. Reavalie o estado após cada handoff para
-evitar ciclos. Não peça confirmação para o handoff; ações sensíveis continuam
-exigindo autorização específica.
+Upon completing this step or detecting work from another step, announce
+`Pending blocker detected: <description> — action: resolving in this step` and
+resolve it when it belongs to your own scope. When responsibility shifts,
+announce `Automatic transition: $fireskill-update-spec → $<destination> — reason:
+<reason> — expected outcome: <outcome>` and immediately load the destination
+skill, without asking for confirmation or repeating the command. Continue in the
+same conversation. After a necessary correction for this step, announce
+`Automatic resumption: $<destination> → $fireskill-update-spec — blocker resolved:
+<outcome>` and resume immediately. Re-evaluate state after each handoff to avoid
+cycles. Do not ask for confirmation for handoffs; sensitive actions still require
+explicit authorization.
 
-## Confirmar a entrada
+## Confirm Input
 
-1. Preserve literalmente o novo pedido antes de interpretá-lo.
-2. Localize a spec canônica em
-   `specs/<estado>/<NNNN>-<slug>/spec.md` e leia seus metadados, requisitos,
-   cenários, plano, tarefas, gates e evidências.
-3. Leia as instruções do projeto, `.fireskills/PROJECT.md`, `.fireskills/STACK.md`,
-   `.fireskills/RULES.md`, `.fireskills/DATABASE.md` e o research indexado aplicável.
-4. Inspecione mudanças Git preexistentes na spec e não as atribua ao pedido
-   atual.
-5. Se não existir uma spec, anuncie a pendência e carregue
-   `$fireskill-02-backlog` para uma ideia superficial ou
-   `$fireskill-03-specify` quando já houver intenção explícita de criar a fatia.
-6. Se a spec ainda estiver em `Draft` e nunca tiver obtido
-   `Definition Gate: Passed`, carregue `$fireskill-03-specify`; esta skill
-   governa somente a revisão de uma definição que já avançou.
+1. Preserve the new request verbatim before interpreting it.
+2. Locate the canonical spec in `specs/<state>/<NNNN>-<slug>/spec.md` and read
+   its metadata, requirements, scenarios, plan, tasks, gates, and evidence.
+3. Read project instructions, `.fireskills/PROJECT.md`, `.fireskills/STACK.md`,
+   `.fireskills/RULES.md`, `.fireskills/DATABASE.md`, and applicable indexed research.
+4. Inspect preexisting Git changes in the spec and do not attribute them to the
+   current request.
+5. If no spec exists, announce the blocker and load `$fireskill-02-backlog` for
+   a rough idea or `$fireskill-03-specify` when there is explicit intent to
+   create the slice.
+6. If the spec is still in `Draft` and has never obtained `Definition Gate: Passed`,
+   load `$fireskill-03-specify`; this skill only governs revising a definition
+   that has already progressed.
 
-## Classificar antes de escrever
+## Classify Before Writing
 
-Leia [a matriz de classificação](references/change-classification.md) quando o
-pedido puder alterar comportamento, plano ou fronteira entre specs.
+Read [the classification matrix](references/change-classification.md) when the
+request might alter behavior, plan, or boundaries between specs.
 
-- Para correção interna reversível sem efeito observável, não altere a spec:
-  registre a avaliação na evidência da tarefa e retome
-  `$fireskill-07-implement`.
-- Para esclarecimento editorial que não muda significado, preserve os gates e
-  altere somente a redação necessária.
-- Para mudança de comportamento, aceite, escopo, dados, segurança ou interface,
-  reabra desde o Ato I.
-- Para mudança somente de solução, tarefas ou estratégia de testes, reabra
-  desde o Ato II.
-- Para capacidade independente da finalidade e dos atores da fatia atual, não a
-  acrescente silenciosamente: carregue `$fireskill-02-backlog` ou
-  `$fireskill-03-specify` conforme a maturidade do pedido.
-- Quando opções plausíveis mudarem materialmente o resultado, faça handoff para
-  `$fireskill-02-backlog`, execute o ciclo adaptativo e
-  retome esta skill ao final do ciclo. Se a pessoa escolher `avançar`, aplique a
-  confirmação e o registro definidos no contrato central, reabra o Ato I quando
-  restarem pontos aplicáveis, não encaminhe a definição como aprovada e
-  não reabra o mesmo ciclo nesta retomada.
+- For reversible internal fix without observable effect, do not edit the spec:
+  record the evaluation in the task evidence and resume `$fireskill-07-implement`.
+- For editorial clarification that does not alter meaning, preserve gates and
+  edit only the necessary wording.
+- For change in behavior, acceptance, scope, data, security, or interface,
+  reopen from Act I.
+- For change only in solution, tasks, or test strategy, reopen from Act II.
+- For capability independent of the purpose and actors of the current slice, do
+  not add it silently: load `$fireskill-02-backlog` or `$fireskill-03-specify`
+  according to request maturity.
+- When plausible options materially change the outcome, hand off to
+  `$fireskill-02-backlog`, run the adaptive cycle, and resume this skill at the
+  end of the cycle. If the user chooses `advance`, apply the confirmation and
+  record defined in the central contract, reopen Act I when applicable points
+  remain, do not forward the definition as approved, and do not reopen the same
+  cycle in this resumption.
 
-Esta skill não cria uma spec nova, não decide requisito material pela pessoa,
-não altera código de produção e não implementa o pedido.
+This skill does not create a new spec, does not decide material requirements for
+the user, does not modify production code, and does not implement the request.
 
-## Incorporar a mudança
+## Incorporate the Change
 
-1. Confirme que a pessoa autorizou incorporar o pedido à spec atual. O pedido
-   explícito para mudar, adicionar, remover ou corrigir já constitui essa
-   autorização; não repita a confirmação.
-2. Edite somente `spec.md` e o research indexado necessário. Não crie
-   `change-request.md`, `plan.md`, `tasks.md`, `research.md` ou outra fonte
-   paralela.
-3. Atualize todas as seções normativas afetadas, preserve IDs e decisões ainda
-   válidos e nunca renumere IDs existentes. Para mudança de comportamento,
-   registre razão, decisão e IDs impactados na seção 17. Para mudança somente
-   de plano, registre a razão na seção de plano ou risco afetada sem criar uma
-   decisão de produto artificial.
-4. Não reescreva evidência histórica como se tivesse sido produzida para a nova
-   entrada. Marque como pendente toda prova posterior que dependa da versão
-   invalidada.
-5. Execute a projeção de impacto:
+1. Confirm that the user authorized incorporating the request into the current spec.
+   An explicit request to change, add, remove, or fix already constitutes this
+   authorization; do not repeat confirmation.
+2. Edit only `spec.md` and necessary indexed research. Do not create
+   `change-request.md`, `plan.md`, `tasks.md`, `research.md`, or another parallel
+   source.
+3. Update all affected normative sections, preserve valid IDs and decisions, and
+   never renumber existing IDs. For behavior changes, record reason, decision,
+   and impacted IDs in section 17. For plan-only changes, record the reason in
+   the affected plan or risk section without creating an artificial product
+   decision.
+4. Do not rewrite historical evidence as if it had been produced for the new
+   input. Mark as pending all subsequent proof that depends on the invalidated
+   version.
+5. Run the impact projection:
 
 ```bash
 node fireskills/skills/fireskill-update-spec/scripts/analyze_change.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md --base HEAD --mode impact
+  specs/<state>/<NNNN>-<slug>/spec.md --base HEAD --mode impact
 ```
 
-Use `--mode changelog` para listar IDs adicionados, removidos e alterados. A
-classificação usa títulos canônicos, não números de seção; `unknown` reabre do
-Ato I por segurança. O script é somente leitura e não substitui a comparação
-semântica com o pedido.
+Use `--mode changelog` to list added, removed, and altered IDs. Classification
+uses canonical headings, not section numbers; `unknown` reopens from Act I for
+safety. The script is read-only and does not replace semantic comparison with
+the request.
 
-## Invalidar somente o necessário
+## Invalidate Only What Is Necessary
 
-- Para mudança do Ato I, defina `Status: Draft`,
-  `Definition Gate: Pending`, `Plan Gate: Pending` e
-  `Delivery Gate: Pending`.
-- Para mudança somente do Ato II, defina `Status: Defined`, preserve
-  `Definition Gate: Passed` e retorne `Plan Gate` e `Delivery Gate` para
-  `Pending`.
-- Para esclarecimento editorial comprovadamente sem mudança semântica, preserve
-  status e gates.
-- Nunca mantenha um gate posterior aprovado sobre uma entrada invalidada.
-- Preserve tarefas e evidências ainda válidas; `$fireskill-05-tasks` reconcilia
-  itens afetados e suas dependências antes de novo RED.
+- For Act I changes, set `Status: Draft`, `Definition Gate: Pending`,
+  `Plan Gate: Pending`, and `Delivery Gate: Pending`.
+- For Act II changes only, set `Status: Defined`, preserve `Definition Gate: Passed`,
+  and return `Plan Gate` and `Delivery Gate` to `Pending`.
+- For provable editorial clarifications with no semantic change, preserve status
+  and gates.
+- Never keep a subsequent gate approved over an invalidated input.
+- Preserve tasks and evidence that remain valid; `$fireskill-05-tasks` reconciles
+  affected items and their dependencies before new RED tests.
 
-Valide a estrutura intermediária:
+Validate the intermediate structure:
 
 ```bash
 node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+  specs/<state>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
-## Retomar o fluxo
+## Resume Flow
 
-- Mudança desde o Ato I: carregue `$fireskill-04-validate`; depois percorra
-  tasks, TDD/BDD e a etapa que originou a mudança. Se o refinamento do backlog terminou por
-  `avançar`, não faça esse handoff na mesma retomada: relate as lacunas e encerre
-  com os gates pendentes.
-- Mudança somente do Ato II: carregue `$fireskill-05-tasks`, que reconcilia o
-  plano, chama `$fireskill-06-tdd-bdd` e retoma a origem.
-- Mudança detectada durante implementação: retome
-  `$fireskill-07-implement` somente depois de Definition e Plan Gate voltarem a
-  `Passed` e existir RED válido para o comportamento novo ou alterado.
-- Mudança detectada depois de `Complete`: percorra novamente os atos invalidados
-  e só restaure `Complete` com Delivery Gate e DoD comprovados.
+- Change from Act I: load `$fireskill-04-validate`; then proceed through tasks,
+  TDD/BDD, and the step that originated the change. If backlog refinement ended
+  with `advance`, do not make this handoff in the same resumption: report gaps
+  and exit with pending gates.
+- Change only from Act II: load `$fireskill-05-tasks`, which reconciles the
+  plan, calls `$fireskill-06-tdd-bdd`, and resumes origin.
+- Change detected during implementation: resume `$fireskill-07-implement` only
+  after Definition and Plan Gate return to `Passed` and a valid RED test exists
+  for the new or altered behavior.
+- Change detected after `Complete`: traverse invalidated acts again and only
+  restore `Complete` with proven Delivery Gate and DoD.
 
-## Relatar
+## Report
 
-Informe o pedido preservado, a spec alterada, a classificação, os IDs e seções
-afetados, os gates invalidados, as evidências preservadas ou tornadas pendentes
-e a próxima skill carregada. Não exponha complexidade do framework antes do
-resultado: diga primeiro que o pedido foi incorporado e que o fluxo necessário
-será retomado automaticamente.
+Report the preserved request, altered spec, classification, affected IDs and
+sections, invalidated gates, preserved or pending evidence, and the next loaded
+skill. Do not expose framework complexity before the outcome: first state that
+the request was incorporated and the necessary flow will resume automatically.

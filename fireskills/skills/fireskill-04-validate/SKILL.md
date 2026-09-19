@@ -1,150 +1,105 @@
 ---
 name: fireskill-04-validate
-description: "Use quando o usuário pede para validar, revisar, auditar ou checar se `specs/{id}-{slug}/spec.md` segue o formato rígido Specsfy/2.0 e está pronto para planejar. Use também quando uma transição automática pedir prova do Definition Gate ou nova validação após correção. Use antes do Ato II. Registre gates na seção 13 do mesmo arquivo; não crie checklist, relatório, plan.md ou outro artefato."
+description: "Use when the user asks to validate, review, audit, or check whether `specs/{id}-{slug}/spec.md` strictly follows the Specsfy/2.0 standard and is ready for planning. Also use when an automatic transition requests proof of Definition Gate or re-validation after correction. Use before Act II. Record gates in section 13 of the same file; do not create checklists, reports, plan.md, or other artifacts."
 ---
 
-# Validar a especificação
+# Validate the Specification
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project root.
+On automatic handoff, reload it before this step.
+Reuse the root confirmed in conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered Questions Protocol` from `fireskills/skills/Spec.md`.
 
-Trate `spec.md` como a única fonte da verdade e como código em linguagem natural: verifique primeiro o formato rígido, depois clareza, completude, consistência e testabilidade semanticamente.
+Treat `spec.md` as the single source of truth and as code in natural language: first verify structural compliance, followed by semantic clarity, completeness, consistency, and testability.
 
-## Orquestrar a conversa
+## Orchestrating the Conversation
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $fireskill-04-validate → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill de
-destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa. Depois de uma correção necessária a esta etapa, anuncie `Retomada
-automática: $<destino> → $fireskill-04-validate — pendência resolvida:
-<resultado>` e retome-a imediatamente. Reavalie o estado após cada handoff para
-evitar ciclos. Não peça confirmação para o handoff; ações sensíveis continuam
-exigindo autorização específica.
+When concluding this stage or detecting work belonging to another stage, announce
+`Pending blocker detected: <description> — action: resolving in this stage` and resolve it
+if it falls within scope. When responsibility transfers, announce
+`Automatic transition: $fireskill-04-validate → $<target> — reason: <reason> — expected result: <result>`
+and immediately load the destination skill, without asking for confirmation or repeating the command. Continue in the same conversation.
 
-## Executar a validação
+After a necessary fix in this stage, announce
+`Automatic resumption: $<target> → $fireskill-04-validate — resolved blocker: <result>`
+and resume immediately. Re-evaluate state after each handoff to prevent cycles. Handoffs do not require confirmation; sensitive actions still require explicit authorization.
 
-1. Resolva `specs/<estado>/<NNNN>-<slug>/spec.md` pelo caminho informado; se houver várias specs e nenhum slug, pergunte qual validar.
-2. Confirme `Formato: Specsfy/2.0`, os três atos na ordem, slug igual ao diretório e pacote restrito a `spec.md` e ao diretório opcional `research/`.
-3. Para toda API ou documentação externa consultada, confirme uma evidência local em `research/` e seu índice em `Artefatos de pesquisa armazenados`; esse material é informativo, nunca uma segunda fonte normativa.
-4. Enquanto `Status` ou `Definition Gate` ainda estiverem pendentes, execute:
+## Execute Validation
+
+1. Resolve `specs/<state>/<NNNN>-<slug>/spec.md` from the provided path; if multiple specs exist and no slug is provided, ask which to validate.
+2. Confirm `Format: Specsfy/2.0`, the three acts in sequence, slug matching parent directory, and package strictly containing `spec.md` and optional `research/`.
+3. For every external API or documentation consulted, confirm local evidence in `research/` and its index in `Stored research artifacts`; this material is informative, never a second normative source.
+4. While `Status` or `Definition Gate` remains pending, execute:
 
 ```bash
-node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/<state>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
-1. Leia `references/quality-gates.md` e faça a revisão semântica.
-2. Confira o campo `Interface para pessoas`. Se for `Sim`, exija na seção 10
-   stack e convenções observadas, telas e responsabilidades, fluxo de
-   informação e navegação, menus e navegação principal, formulários e ações,
-   composição e disposição, estados e acessibilidade. Confira se a tecnologia
-   proposta segue as fontes
-   da stack ou se a lacuna foi registrada para a pessoa. Um CRUD sem telas e
-   formulário é `BLOCKER`; retorne automaticamente ao
-   `$fireskill-02-backlog` para esclarecer a lacuna.
-3. Compare research, requisitos, BDD, plano técnico, modelo de dados, contratos,
-   TDD, matriz e tarefas. Confirme no mínimo três `AC` distintos para a feature
-   inteira e para cada `US`, `FR` e `NFR`; não confunda “arquivo bem formatado”
-   com “especificação correta”.
-4. Quando produto, arquitetura ou segurança forem materiais, leia
-   `references/review-lenses.md`, registre findings na seção 13 e execute
-   `scripts/review_findings.mjs`. `P1 Open` mantém o gate pendente.
-5. Se a definição alterar stack ou persistência, exija que a Definition of Done
-   cite respectivamente `.fireskills/STACK.md` ou `.fireskills/DATABASE.md`. Para
-   mudança material de finalidade ou capacidade, exija revisão de `.fireskills/PROJECT.md`;
-   para regra nova confirmada, exija `.fireskills/RULES.md`.
-6. No aceite final, procure tarefas `[MIGRATION]` e execute
-   `verify_evidence.mjs --delivery` para cada uma. Mantenha o Delivery Gate
-   pendente quando a tarefa estiver aberta ou quando o arquivo, o comando de
-   aplicação ou a consulta de estado estiver ausente.
+5. Read `references/quality-gates.md` and perform semantic review.
+6. Verify `Human Interface` field. If `Yes`, require in section 10: observed stack and conventions, screens and responsibilities, information flow and navigation, menus and primary navigation, forms and actions, composition and layout, states, and accessibility. Verify whether proposed technology adheres to stack sources or if gaps were explicitly recorded. A CRUD without screens and forms is a `BLOCKER`; automatically return to `$fireskill-02-backlog` to clarify the gap.
+7. Compare research, requirements, BDD, technical plan, data model, contracts, TDD, matrix, and tasks. Confirm at least three distinct `AC`s for the entire feature and for each `US`, `FR`, and `NFR`; do not confuse "well-formatted file" with "correct specification".
+8. When product, architecture, or security is material, read `references/review-lenses.md`, record findings in section 13, and execute `scripts/review_findings.mjs`. Any `P1 Open` finding keeps the gate pending.
+9. If definition alters stack or persistence, require the Definition of Done to reference `.fireskills/STACK.md` or `.fireskills/DATABASE.md` respectively. For material shifts in purpose or capabilities, require review of `.fireskills/PROJECT.md`; for new confirmed rules, require `.fireskills/RULES.md`.
+10. In final acceptance, inspect `[MIGRATION]` tasks and execute `verify_evidence.mjs --delivery` for each. Keep Delivery Gate pending while the task is open or when migration file, run command, or verification query is missing.
 
-## Classificar achados
+## Classify Findings
 
-- `BLOCKER`: impede tarefa ou teste correto; requisito contraditório, sem comportamento observável, decisão de alto impacto ausente ou cenário principal não coberto.
-- `WARNING`: aumenta retrabalho ou risco, mas admite implementação segura.
-- `NOTE`: melhoria editorial sem efeito material.
+- `BLOCKER`: Prevents correct task execution or testing; contradictory requirement, missing observable behavior, omitted high-impact decision, or uncovered primary scenario.
+- `WARNING`: Increases rework or risk, but permits safe implementation.
+- `NOTE`: Editorial improvement without material impact.
 
-Para cada achado, cite seção ou ID, explique o impacto e proponha uma correção concreta.
+For each finding, cite section or ID, explain impact, and propose concrete resolution.
 
 ## Gate
 
-Retorne exatamente um resultado:
+Return exactly one outcome:
 
-- `READY`: nenhuma falha de formato e nenhum `BLOCKER` sem resolução.
-- `NOT READY`: qualquer falha estrutural ou `BLOCKER`.
+- `READY`: No formatting failures and no unresolved `BLOCKER`s.
+- `NOT READY`: Any structural failure or `BLOCKER`.
 
-Inclua contagens, cobertura mínima `US/FR/NFR ↔ 3 ACs` e os três achados mais
-importantes e a transição automática:
+Include counts, minimum coverage `US/FR/NFR ↔ 3 ACs`, top three findings, and automatic transition:
 
-- `READY` → `$fireskill-05-tasks` para planejar a seção 14;
-- `NOT READY` → retorno a `$fireskill-02-backlog` quando faltar decisão; a
-  o refinamento do backlog executa seu ciclo completo e esta validação só é retomada depois
-  de fechar as lacunas ou registrar a saída explícita `avançar`; após essa
-  saída, registre `NOT READY` e não reabra o mesmo ciclo nesta retomada;
-  quando a correção já estiver decidida, use `$fireskill-update-spec` para
-  uma spec anteriormente aprovada e `$fireskill-03-specify` para a definição
-  inicial.
+- `READY` → `$fireskill-05-tasks` to plan section 14;
+- `NOT READY` → return to `$fireskill-02-backlog` when decisions are missing; backlog refinement executes its full cycle and validation resumes only after closing gaps or receiving explicit user `Proceed`; after `Proceed`, record `NOT READY` and do not reopen the same cycle; when the fix is already decided, use `$fireskill-update-spec` for previously approved specs and `$fireskill-03-specify` for initial drafts.
 
-Anuncie o motivo e carregue imediatamente a skill escolhida.
+Announce reason and immediately load the selected skill.
 
-## Registrar no arquivo único
+## Record in the Single Spec
 
-Sem alterar requisitos automaticamente:
+Without altering requirements automatically:
 
-1. atualize `Gate do Ato I — Definição` na seção 13 com resultado, data e achados;
-2. em `READY`, defina `Definition Gate: Passed` e `Status: Defined`;
-3. em `NOT READY`, defina `Definition Gate: Failed`, `Plan Gate: Pending`,
-   `Delivery Gate: Pending` e mantenha `Status: Draft`;
-4. execute novamente `validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md` sem `--allow-draft` quando o gate passar;
-5. relate o resultado no chat.
+1. Update `Act I Gate — Definition` in section 13 with outcome, date, and findings;
+2. On `READY`, set `Definition Gate: Passed` and `Status: Defined`;
+3. On `NOT READY`, set `Definition Gate: Failed`, `Plan Gate: Pending`, `Delivery Gate: Pending`, and keep `Status: Draft`;
+4. Rerun `validate_spec.mjs specs/<state>/<NNNN>-<slug>/spec.md` without `--allow-draft` when the gate passes;
+5. Report result in chat.
 
-Quando o Definition Gate passar, execute `bun run fireskill transition <id> defined`.
-Em `review`, use a mesma análise para o aceite final. Com Delivery Gate passado,
-Status `Complete` e a DoD comprovada, execute `bun run fireskill transition <id> completed`.
-Antes disso, chame `$fireskill-interviewer` quando uma resposta puder mudar a
-entrega ou o Effort.
+When Definition Gate passes, execute `bun run fireskill transition <id> defined`.
+In `review`, use the same analysis for final acceptance. With Delivery Gate passed, Status `Complete`, and proven DoD, execute `bun run fireskill transition <id> completed`.
+Prior to that, invoke `$fireskill-interviewer` when a response may alter delivery or effort.
 
-Se o usuário pedir correções, edite as seções de origem, preserve IDs e revalide. Nunca crie outro arquivo de especificação ou validação.
+If the user requests fixes, edit source sections, preserve IDs, and revalidate. Never create duplicate specification or validation files.
 
-## Enforcement do repositório
+## Repository Enforcement
 
-Use o mesmo runner localmente e no CI:
+Use the same runner locally and in CI:
 
 ```bash
 node fireskills/skills/fireskill-04-validate/scripts/verify_repo.mjs . \
   --boundary local --timeout-seconds 300 --max-output-bytes 65536
 ```
 
-As fronteiras `local`, `git` e `ci` não mudam a política. `--attestation PATH`
-é a única forma de persistir uma atestação; `--self-test` executa canários em
-diretório temporário e nunca produz binding probatório. A atestação schema 2
-liga commit, digest executável, checks aprovados, tarefas e hashes de arquivos.
-O digest cobre comandos, limites e os arquivos da política. Não aceite um gate
-que passa em apenas uma fronteira, excede limites ou trunca diagnóstico sem
-marcar `truncated`.
+Boundaries `local`, `git`, and `ci` do not alter policy. `--attestation PATH` is the sole mechanism to persist attestations; `--self-test` executes canaries in temporary directories and never creates probative bindings. Schema 2 attestation links commit, executable digest, approved checks, tasks, and file hashes. The digest covers commands, limits, and policy files. Never accept a gate that passes in only one boundary, exceeds limits, or truncates diagnostics without marking `truncated`.
 
-O contrato do catálogo exige as quatorze skills base, `fireskill-setup`,
-`fireskill-documentator` e
-as três `fireskill-aux-*`; também valida cada `fireskill-specialist-*` instalada,
-sem impor um total máximo de especialistas.
-O Gherkin BDD é referência exclusiva da `spec.md`: o enforcement nunca executa
-`.feature`. Ele executa os testes derivados com o Vitest já configurado no
-projeto (`bun run test`; para um arquivo, `bunx vitest run <arquivo>`).
+The catalog contract requires all 14 base skills, `fireskill-setup`, `fireskill-documentator`, and the three `fireskill-aux-*` skills; it also validates every installed `fireskill-specialist-*`, without capping total specialists.
+Gherkin BDD serves exclusively as specification reference in `spec.md`: enforcement never runs raw `.feature` files. It executes tests derived through Vitest configured in the project (`bun run test`; for single file, `bunx vitest run <file>`).
 
-## Especialistas sob demanda
+## Specialists on Demand
 
-Leia [references/specialists.md](references/specialists.md) quando um gate
-depender de revisão técnica específica. Instalação é recomendação explícita,
-nunca efeito colateral da validação.
+Read [references/specialists.md](references/specialists.md) when a gate depends on domain-specific technical review. Specialist installation is an explicit recommendation, never a silent side effect of validation.

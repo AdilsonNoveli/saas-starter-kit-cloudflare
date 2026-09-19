@@ -1,344 +1,343 @@
-# Especificação integrada: Painel de progresso das especificações
+# Integrated Specification: Specification Progress Dashboard
 
-| Campo | Valor |
+| Field | Value |
 | --- | --- |
-| Formato | Specsfy/2.0 |
+| Format | Specsfy/2.0 |
 | ID | SPEC-0001 |
-| Slug | 0001-painel-progresso |
+| Slug | 0001-progress-dashboard |
 | Status | Draft |
 | Definition Gate | Pending |
 | Plan Gate | Pending |
 | Delivery Gate | Pending |
 | Evidence Contract | 1 |
-| Atualizada em | 2026-07-25 |
+| Updated at | 2026-07-25 |
 
-> Exemplo não normativo. Ele demonstra a arquitetura do documento e serve como
-> fixture legível para o CLI; um projeto real deve criar sua própria `spec.md`.
+> Non-normative example. It demonstrates document architecture and acts as a
+> readable fixture for the CLI; real projects must create their own `spec.md`.
 
-## Ato I — Definir
+## Act I — Define
 
-### 1. Problema e resultado
+### 1. Problem and outcome
 
-#### Problema
+#### Problem
 
-É difícil enxergar o progresso de várias especificações sem abrir cada arquivo.
+It is difficult to assess the progress of multiple specifications without manually opening each file.
 
-#### Resultado desejado
+#### Desired outcome
 
-Exibir no terminal uma visão consolidada e atualizada das checklists.
+Display a consolidated, live overview of checklists directly in the terminal.
 
-#### Métricas de sucesso
+#### Success metrics
 
-- Recalcular o progresso em até 1 segundo após salvar uma spec.
+- Recalculate progress within 1 second of saving a spec file.
 
-### 2. Research e esclarecimentos
+### 2. Research and clarifications
 
-#### Researchs executados
+#### Executed research
 
-- Nenhuma pesquisa externa foi necessária para este exemplo.
+- No external research was required for this example.
 
-#### Fontes e contexto consultados
+#### Consulted sources and context
 
-- Contrato central do framework e estrutura do template canônico.
+- Central framework contract and canonical template structure.
 
-#### Documentação consultada
+#### Consulted documentation
 
-- Nenhuma documentação externa.
+- No external documentation.
 
-#### Artefatos de pesquisa armazenados
+#### Stored research artifacts
 
-- Nenhum artefato externo.
+- No external artifacts.
 
-#### Dúvidas respondidas
+#### Answered questions
 
-- **Q**: Qual é a fonte do progresso? → **A**: As checklists da `spec.md`.
+- **Q**: What is the source of truth for progress? → **A**: Checklists in `spec.md`.
 
-#### Dúvidas abertas
+#### Open questions
 
-- Nenhuma.
+- None.
 
-### 3. Escopo e atores
+### 3. Scope and actors
 
-#### Incluído
+#### In-scope
 
-- Listagem de specs e totais de itens concluídos e pendentes.
+- Listing specs with total completed and pending items.
 
-#### Fora de escopo
+#### Out-of-scope
 
-- Alteração automática das checklists pelo painel.
+- Automated modification of checklists by the dashboard.
 
-#### Atores
+#### Actors
 
-- **Pessoa desenvolvedora**: acompanha a execução de uma especificação.
+- **Developer**: monitors execution of a specification.
 
-### 4. Princípios e restrições do projeto
+### 4. Project principles and constraints
 
-- **PR-001**: O painel somente projeta o estado dos arquivos existentes.
+- **PR-001**: The dashboard only projects the state of existing files.
 
-### 5. Histórias de usuário
+### 5. User stories
 
-#### US-001 — Visualizar progresso (P1)
+#### US-001 — View progress (P1)
 
-Como pessoa desenvolvedora, quero ver o progresso das specs, para identificar o
-próximo trabalho sem abrir cada documento.
+As a developer, I want to view spec progress to identify the next work slice without opening each document.
 
-**Por que P1**: A visão consolidada é o valor central.
-**Teste independente**: Executar o CLI sobre uma fixture com checklists.
-**Requisitos**: FR-001
+**Why P1**: Consolidated visibility is the core value proposition.
+**Independent test**: Run the CLI against a fixture with checklists.
+**Requirements**: FR-001
 
-### 6. Cenários BDD de aceite
+### 6. BDD acceptance scenarios
 
-#### AC-001 — Consolidar checklists
+#### AC-001 — Consolidate checklists
 
-**Cobre**: US-001, FR-001, NFR-001
+**Covers**: US-001, FR-001, NFR-001
 
 ```gherkin
 @US-001 @FR-001 @NFR-001 @AC-001
-Feature: Progresso consolidado
+Feature: Consolidated progress
 
-  Scenario: Spec com itens concluídos e pendentes
-    Given uma spec com duas checklists concluídas e duas pendentes
-    When o painel calcula seu progresso
-    Then ele informa cinquenta por cento
+  Scenario: Spec with completed and pending items
+    Given a spec with two completed and two pending checklists
+    When the dashboard calculates its progress
+    Then it reports fifty percent
 ```
 
-#### AC-002 — Consolidar spec sem checklists
+#### AC-002 — Consolidate spec without checklists
 
-**Cobre**: US-001, FR-001, NFR-001
+**Covers**: US-001, FR-001, NFR-001
 
 ```gherkin
 @US-001 @FR-001 @NFR-001 @AC-002
-Feature: Progresso consolidado
+Feature: Consolidated progress
 
-  Scenario: Spec ainda sem itens rastreáveis
-    Given uma spec sem checklists
-    When o painel calcula seu progresso
-    Then ele informa zero itens sem modificar a spec
+  Scenario: Spec without traceable items
+    Given a spec without checklists
+    When the dashboard calculates its progress
+    Then it reports zero items without modifying the spec
 ```
 
-#### AC-003 — Rejeitar spec ilegível
+#### AC-003 — Reject unreadable spec
 
-**Cobre**: US-001, FR-001, NFR-001
+**Covers**: US-001, FR-001, NFR-001
 
 ```gherkin
 @US-001 @FR-001 @NFR-001 @AC-003
-Feature: Progresso consolidado
+Feature: Consolidated progress
 
-  Scenario: Arquivo da spec não pode ser lido
-    Given uma spec cujo conteúdo não pode ser lido
-    When o painel tenta calcular seu progresso
-    Then ele informa o erro sem modificar o arquivo
+  Scenario: Spec file cannot be read
+    Given a spec whose content cannot be read
+    When the dashboard attempts to calculate progress
+    Then it reports the error without modifying the file
 ```
 
-### 7. Requisitos
+### 7. Requirements
 
-#### Funcionais
+#### Functional
 
-- **FR-001**: O CLI deve calcular checklists concluídas e pendentes por spec.
+- **FR-001**: The CLI must calculate completed and pending checklists per spec.
 
-#### Não funcionais
+#### Non-functional
 
-- **NFR-001**: A projeção não deve modificar a spec. **Verificação**: comparar o
-  conteúdo antes e depois da leitura.
+- **NFR-001**: Projection must not modify the spec. **Verification**: compare
+  file checksum before and after reading.
 
-#### Erros e casos-limite
+#### Errors and edge cases
 
-- Arquivo ilegível → informar erro sem alterar o arquivo.
+- Unreadable file → report error without mutating the file.
 
-## Ato II — Projetar e provar
+## Act II — Design and prove
 
-### 8. Plano técnico
+### 8. Technical plan
 
-#### Contexto existente
+#### Existing context
 
-- CLI TypeScript com parser de Markdown e interface terminal.
+- TypeScript CLI with Markdown parser and terminal interface.
 
-#### Arquitetura e módulos
+#### Architecture and modules
 
-- O scanner descobre specs; o parser calcula métricas; a TUI projeta resultados.
+- The scanner discovers specs; the parser calculates metrics; the TUI projects results.
 
 #### Migrations
 
-- Não aplicável.
+- Not applicable.
 
 #### Models
 
-- `SpecProgress` preserva identidade e totais derivados.
+- `SpecProgress` preserves identity and derived totals.
 
-#### Controllers e casos de uso
+#### Controllers and use cases
 
-- `scan_project` recebe a raiz e retorna as projeções.
+- `scan_project` receives root directory and returns projections.
 
-#### Views e experiência
+#### Views and experience
 
-- Dashboard com totais, percentual, barra de progresso e estados vazios.
+- Dashboard with totals, percentages, progress bars, and empty states.
 
-#### Queries e repositórios
+#### Queries and repositories
 
-- Não aplicável.
+- Not applicable.
 
-#### Jobs e processamento assíncrono
+#### Jobs and asynchronous processing
 
-- Um observador invalida a projeção quando arquivos Markdown mudam.
+- A file watcher invalidates projections when Markdown files change.
 
-#### Estrutura de arquivos
+#### File structure
 
 ```text
-specs/draft/0001-painel-progresso/
+specs/draft/0001-progress-dashboard/
   spec.md
 cli/src/progress.ts
 cli/tests/progress.test.ts
 ```
 
-### 9. Modelo de dados
+### 9. Data model
 
-#### Entidades
+#### Entities
 
-| Entidade | Identidade | Atributos e regras | Relações |
+| Entity | Identity | Attributes and rules | Relations |
 | --- | --- | --- | --- |
-| SpecProgress | caminho da spec | total, concluídas, pendentes | deriva de uma spec |
+| SpecProgress | spec path | total, completed, pending | derived from a spec |
 
-#### Estados e transições
+#### States and transitions
 
-| Entidade | Estado atual | Evento | Próximo estado | Invariantes |
+| Entity | Current state | Event | Next state | Invariants |
 | --- | --- | --- | --- | --- |
-| Projeção | atual | arquivo salvo | recalculada | não modifica a origem |
+| Projection | current | file saved | recalculated | does not mutate source |
 
-#### Migração e retenção
+#### Migration and retention
 
-- Não aplicável.
+- Not applicable.
 
-### 10. Interfaces e contratos
+### 10. Interfaces and contracts
 
-#### APIs expostas
+#### Exposed APIs
 
-- `scan_project(root)` retorna uma coleção de progresso.
+- `scan_project(root)` returns a collection of progress objects.
 
-#### APIs externas utilizadas
+#### External APIs consumed
 
-- Nenhuma.
+- None.
 
-#### Documentação das APIs consultadas
+#### Documentation of consulted APIs
 
-- Nenhuma.
+- None.
 
-#### Eventos e outros contratos
+#### Events and other contracts
 
-- Mudança do `mtime` invalida a projeção em memória.
+- Changes in `mtime` invalidate in-memory projections.
 
-### 11. Estratégia TDD
+### 11. TDD strategy
 
-- **Unidade**: cálculo e percentual.
-- **Integração/contrato**: descoberta da estrutura canônica.
-- **BDD/aceite**: Gherkin AC-001, AC-002 e AC-003 como referência para os testes derivados.
-- **E2E**: inicialização do dashboard com a fixture.
-- **Verificação manual**: legibilidade do terminal.
+- **Unit**: calculation and percentage logic.
+- **Integration/contract**: discovery of canonical structure.
+- **BDD/acceptance**: Gherkin AC-001, AC-002, and AC-003 as reference for derived tests.
+- **E2E**: dashboard initialization with fixture.
+- **Manual verification**: terminal rendering legibility.
 
-#### Evidência RED-GREEN-REFACTOR
+#### RED-GREEN-REFACTOR evidence
 
-| IDs | BDD de referência | Teste TDD informado pelo BDD | RED observado | GREEN observado | Refactor/regressão |
+| IDs | Reference BDD | TDD test informed by BDD | Observed RED | Observed GREEN | Refactor / regression |
 | --- | --- | --- | --- | --- | --- |
-| US-001, FR-001, NFR-001, AC-001 | AC-001 na seção 6 | caso de percentual em tests/progress.test.ts com `SPECSFY:` próprio | Pending | Pending | Pending |
-| US-001, FR-001, NFR-001, AC-002 | AC-002 na seção 6 | caso vazio em tests/progress.test.ts com `SPECSFY:` próprio | Pending | Pending | Pending |
-| US-001, FR-001, NFR-001, AC-003 | AC-003 na seção 6 | caso ilegível em tests/progress.test.ts com `SPECSFY:` próprio | Pending | Pending | Pending |
+| US-001, FR-001, NFR-001, AC-001 | AC-001 in section 6 | percentage test case in tests/progress.test.ts with `SPECSFY:` tag | Pending | Pending | Pending |
+| US-001, FR-001, NFR-001, AC-002 | AC-002 in section 6 | empty test case in tests/progress.test.ts with `SPECSFY:` tag | Pending | Pending | Pending |
+| US-001, FR-001, NFR-001, AC-003 | AC-003 in section 6 | unreadable test case in tests/progress.test.ts with `SPECSFY:` tag | Pending | Pending | Pending |
 
-### 12. Plano de testes e rastreabilidade
+### 12. Test plan and traceability
 
-| Requisito | Cenário BDD | Nível | Arquivo/comando esperado | Evidência |
+| Requirement | BDD scenario | Level | Expected file/command | Evidence |
 | --- | --- | --- | --- | --- |
-| FR-001 | AC-001 | Unidade | `npm test -- --run tests/progress.test.ts` | Pending |
-| FR-001 | AC-002 | Unidade | `npm test -- --run tests/progress.test.ts` | Pending |
-| FR-001 | AC-003 | Integração | `npm test -- --run tests/progress.test.ts` | Pending |
-| NFR-001 | AC-001 | Integração | comparar checksum antes e depois | Pending |
-| NFR-001 | AC-002 | Integração | comparar checksum antes e depois | Pending |
-| NFR-001 | AC-003 | Integração | comparar checksum antes e depois | Pending |
+| FR-001 | AC-001 | Unit | `npm test -- --run tests/progress.test.ts` | Pending |
+| FR-001 | AC-002 | Unit | `npm test -- --run tests/progress.test.ts` | Pending |
+| FR-001 | AC-003 | Integration | `npm test -- --run tests/progress.test.ts` | Pending |
+| NFR-001 | AC-001 | Integration | compare checksum before and after | Pending |
+| NFR-001 | AC-002 | Integration | compare checksum before and after | Pending |
+| NFR-001 | AC-003 | Integration | compare checksum before and after | Pending |
 
-### 13. Validações
+### 13. Validations
 
-#### Gate do Ato I — Definição
+#### Act I Gate — Definition
 
-- **Resultado**: Pending
-- **Comando**: `validate_spec.mjs specs/draft/0001-painel-progresso/spec.md`
-- **Achados**: Exemplo mantido em Draft.
+- **Outcome**: Pending
+- **Command**: `validate_spec.mjs specs/draft/0001-progress-dashboard/spec.md`
+- **Findings**: Example maintained in Draft.
 
-#### Gate do Ato II — Plano
+#### Act II Gate — Plan
 
-- **Resultado**: Pending
-- **Comando**: `validate_tasks.mjs specs/draft/0001-painel-progresso/spec.md`
-- **Achados**: Execução ainda não iniciada.
+- **Outcome**: Pending
+- **Command**: `validate_tasks.mjs specs/draft/0001-progress-dashboard/spec.md`
+- **Findings**: Execution not yet started.
 
-#### Gate do Ato III — Entrega
+#### Act III Gate — Delivery
 
-- **Resultado**: Pending
-- **Comando**: `check_traceability.mjs specs/draft/0001-painel-progresso/spec.md .`
-- **Achados**: Execução ainda não iniciada.
+- **Outcome**: Pending
+- **Command**: `check_traceability.mjs specs/draft/0001-progress-dashboard/spec.md .`
+- **Findings**: Execution not yet started.
 
-### 14. Tarefas
+### 14. Tasks
 
-- [ ] T001 [TEST] [TDD] [US-001] Materializar o caso de percentual em tests/progress.test.ts — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none
-  - [ ] **PREP**: Confirmar fixture, IDs e baseline.
-  - [ ] **EXECUTE**: Escrever o caso com marcador `SPECSFY:` próprio.
-  - [ ] **VERIFY**: Observar RED válido.
-  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia; registrar `Não aplicável` porque a tarefa só materializa teste.
-  - [ ] **EVIDENCE**: Registrar comando e causa do RED.
-  - [ ] **IMPROVE**: Revisar a clareza da fixture.
+- [ ] T001 [TEST] [TDD] [US-001] Materialize percentage test case in tests/progress.test.ts — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none
+  - [ ] **PREP**: Confirm fixture, IDs, and baseline.
+  - [ ] **EXECUTE**: Write test case with designated `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe valid RED state.
+  - [ ] **VISUAL**: Verify borders, spacing, margins, padding, and typography; record `Not applicable` because task only materializes tests.
+  - [ ] **EVIDENCE**: Record command and cause of RED.
+  - [ ] **IMPROVE**: Review fixture clarity.
 
-- [ ] T002 [TEST] [TDD] [US-001] Materializar o caso vazio em tests/progress.test.ts — Refs: US-001, FR-001, NFR-001, AC-002 — Depends: none
-  - [ ] **PREP**: Confirmar fixture, IDs e baseline.
-  - [ ] **EXECUTE**: Escrever o caso com marcador `SPECSFY:` próprio.
-  - [ ] **VERIFY**: Observar RED válido.
-  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia; registrar `Não aplicável` porque a tarefa só materializa teste.
-  - [ ] **EVIDENCE**: Registrar comando e causa do RED.
-  - [ ] **IMPROVE**: Revisar a clareza da fixture.
+- [ ] T002 [TEST] [TDD] [US-001] Materialize empty test case in tests/progress.test.ts — Refs: US-001, FR-001, NFR-001, AC-002 — Depends: none
+  - [ ] **PREP**: Confirm fixture, IDs, and baseline.
+  - [ ] **EXECUTE**: Write test case with designated `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe valid RED state.
+  - [ ] **VISUAL**: Verify borders, spacing, margins, padding, and typography; record `Not applicable` because task only materializes tests.
+  - [ ] **EVIDENCE**: Record command and cause of RED.
+  - [ ] **IMPROVE**: Review fixture clarity.
 
-- [ ] T003 [TEST] [TDD] [US-001] Materializar o caso ilegível em tests/progress.test.ts — Refs: US-001, FR-001, NFR-001, AC-003 — Depends: none
-  - [ ] **PREP**: Confirmar fixture, IDs e baseline.
-  - [ ] **EXECUTE**: Escrever o caso com marcador `SPECSFY:` próprio.
-  - [ ] **VERIFY**: Observar RED válido.
-  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia; registrar `Não aplicável` porque a tarefa só materializa teste.
-  - [ ] **EVIDENCE**: Registrar comando e causa do RED.
-  - [ ] **IMPROVE**: Revisar a clareza da fixture.
+- [ ] T003 [TEST] [TDD] [US-001] Materialize unreadable test case in tests/progress.test.ts — Refs: US-001, FR-001, NFR-001, AC-003 — Depends: none
+  - [ ] **PREP**: Confirm fixture, IDs, and baseline.
+  - [ ] **EXECUTE**: Write test case with designated `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe valid RED state.
+  - [ ] **VISUAL**: Verify borders, spacing, margins, padding, and typography; record `Not applicable` because task only materializes tests.
+  - [ ] **EVIDENCE**: Record command and cause of RED.
+  - [ ] **IMPROVE**: Review fixture clarity.
 
-- [ ] T004 [CODE] [US-001] Implementar o cálculo em cli/src/progress.ts — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
-  - [ ] **PREP**: Confirmar RED e contrato somente leitura.
-  - [ ] **EXECUTE**: Implementar a menor mudança.
-  - [ ] **VERIFY**: Executar teste focal e regressão.
-  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia; registrar `Não aplicável` com o motivo se não houver interface.
-  - [ ] **EVIDENCE**: Registrar GREEN e arquivos alterados.
-  - [ ] **IMPROVE**: Registrar melhoria ou ausência justificada.
+- [ ] T004 [CODE] [US-001] Implement calculation in cli/src/progress.ts — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
+  - [ ] **PREP**: Confirm RED and read-only contract.
+  - [ ] **EXECUTE**: Implement minimal change.
+  - [ ] **VERIFY**: Execute targeted test and regression suite.
+  - [ ] **VISUAL**: Verify borders, spacing, margins, padding, and typography; record `Not applicable` with rationale if no interface exists.
+  - [ ] **EVIDENCE**: Record GREEN and modified files.
+  - [ ] **IMPROVE**: Record improvement or justified absence.
 
-### 15. Ordem de execução
+### 15. Execution order
 
-- Caminho crítico: T001/T002/T003 → T004.
-- Tarefas paralelas: Nenhuma.
-- Estratégia de MVP: calcular e exibir o percentual de uma spec.
+- Critical path: T001/T002/T003 → T004.
+- Parallel tasks: None.
+- MVP strategy: calculate and display percentage for a single spec.
 
-## Ato III — Entregar e validar
+## Act III — Deliver and validate
 
-### 16. Dependências, falhas possíveis e suposições
+### 16. Dependencies, potential failures, and assumptions
 
-#### Dependências
+#### Dependencies
 
-- Parser Markdown do próprio CLI.
+- CLI internal Markdown parser.
 
-#### Falhas possíveis
+#### Potential failures
 
-- Somar checklists em blocos de código → ignorar blocos cercados.
+- Summing checklists inside code blocks → ignore fenced code blocks.
 
-#### Suposições
+#### Assumptions
 
-- A estrutura canônica permanece em `specs/<estado>/<NNNN>-<slug>/spec.md`.
+- Canonical structure remains in `specs/<state>/<NNNN>-<slug>/spec.md`.
 
-### 17. Decisões
+### 17. Decisions
 
-- **DEC-001**: Manter o painel somente leitura — preserva a spec como fonte.
+- **DEC-001**: Keep dashboard strictly read-only — preserves spec as single source of truth.
 
 ### 18. Definition of Done
 
-- [ ] `Definition Gate` está `Passed`.
-- [ ] `Plan Gate` está `Passed`.
-- [ ] `Delivery Gate` está `Passed`.
-- [ ] Todos os cenários `AC` aplicáveis passam.
-- [ ] Todos os requisitos possuem evidência de verificação.
-- [ ] Todas as tarefas na seção 14 estão concluídas.
-- [ ] Testes e checks estáticos disponíveis passam.
+- [ ] `Definition Gate` is `Passed`.
+- [ ] `Plan Gate` is `Passed`.
+- [ ] `Delivery Gate` is `Passed`.
+- [ ] All applicable `AC` scenarios pass.
+- [ ] All requirements have verification evidence.
+- [ ] All tasks in section 14 are completed.
+- [ ] Available tests and static checks pass.

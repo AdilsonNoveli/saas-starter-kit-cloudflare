@@ -1,117 +1,116 @@
-# Padrões para APIs HTTP
+# HTTP API Standards
 
-## Recursos, métodos e precondições
+## Resources, Methods, and Preconditions
 
-| Intenção | Método/contrato | Propriedade relevante |
+| Intent | Method / Contract | Key Semantic Property |
 | --- | --- | --- |
-| ler representação | `GET` | safe, idempotente e cacheável conforme headers |
-| substituir estado conhecido | `PUT` | idempotente; representação completa definida |
-| alterar parcialmente | `PATCH` | formato e idempotência precisam ser declarados |
-| criar/processar comando | `POST` | proteger retry quando efeito não é naturalmente idempotente |
-| remover | `DELETE` | efeito pretendido idempotente, resposta pode variar |
+| Read representation | `GET` | Safe, idempotent, and cacheable according to headers |
+| Replace known state | `PUT` | Idempotent; complete representation defined |
+| Partially update | `PATCH` | Patch format and idempotency semantics must be declared |
+| Create / Process command | `POST` | Protect with idempotency when side effect is non-idempotent |
+| Delete resource | `DELETE` | Intended effect is idempotent; responses may vary |
 
-Use `If-Match` com ETag ou precondição equivalente quando duas edições não podem
-sobrescrever uma à outra silenciosamente. Responda `412 Precondition Failed`
-quando a precondição recebida falhar e `428 Precondition Required` somente se a
-política do servidor exigir requisição condicional.
+Use `If-Match` with ETags or equivalent preconditions when concurrent edits must not
+silently overwrite each other. Respond with `412 Precondition Failed` when preconditions
+fail, and `428 Precondition Required` only when server policy strictly mandates conditional updates.
 
-## Status e erros
+## Status Codes and Error Handling
 
-- `201 Created`: recurso criado e `Location` quando houver URI própria.
-- `202 Accepted`: processamento ainda não terminou; exponha forma de acompanhar.
-- `204 No Content`: sucesso sem representação; não envie body.
-- `400 Bad Request`: sintaxe ou request genericamente inválido.
-- `401 Unauthorized`: autenticação ausente/inválida, com desafio quando cabível.
-- `403 Forbidden`: identidade conhecida sem autorização suficiente.
-- `404 Not Found`: recurso ausente ou ocultado por política consistente.
-- `409 Conflict`: conflito com estado atual que o cliente pode tratar.
-- `422 Unprocessable Content`: conteúdo entendido, mas semanticamente inválido.
-- `429 Too Many Requests`: limite excedido; informe retry quando possível.
+- `201 Created`: Resource successfully created, providing `Location` header when it has its own URI.
+- `202 Accepted`: Asynchronous request accepted; provide polling status or tracking link.
+- `204 No Content`: Successful execution yielding no representation body; never send payload.
+- `400 Bad Request`: Malformed syntax or generically invalid request.
+- `401 Unauthorized`: Missing or invalid authentication; supply `WWW-Authenticate` challenge when applicable.
+- `403 Forbidden`: Authenticated identity lacks authorization for the requested resource.
+- `404 Not Found`: Resource does not exist, or hidden by uniform access policy.
+- `409 Conflict`: Conflict with current resource state that the client can resolve.
+- `422 Unprocessable Content`: Request syntax understood, but semantically invalid.
+- `429 Too Many Requests`: Rate limit exceeded; include `Retry-After` header when known.
 
-Modele erros com RFC 9457 usando `type` estável, `title`, `status`, `detail`
-seguro e `instance` quando útil. Extensões carregam código de domínio, campos
-inválidos e correlação; não coloque stack trace, SQL ou segredo.
+Model error responses using RFC 9457 Problem Details with stable `type`, `title`,
+`status`, sanitized `detail`, and optional `instance` URIs. Extensions provide domain
+error codes, field-level validation errors, and trace correlation IDs; never leak
+stack traces, internal SQL statements, or secrets.
 
-## Idempotência e retry
+## Idempotency and Retries
 
-Para uma operação POST com efeito externo:
+For non-idempotent POST operations with external side effects:
 
-1. cliente gera chave de idempotência de alta entropia por intenção;
-2. servidor vincula chave a identidade, operação e hash/fingerprint do payload;
-3. repetição equivalente recebe o resultado previamente materializado;
-4. repetição com payload diferente falha explicitamente;
-5. concorrência sobre a mesma chave é serializada ou rejeitada;
-6. retenção e expiração da chave são documentadas.
+1. Client generates a high-entropy idempotency key representing the unique intent;
+2. Server binds the key to client identity, operation name, and payload fingerprint/hash;
+3. Equivalent replays receive the previously computed and cached response;
+4. Replays with mismatched payloads fail explicitly with validation errors;
+5. Concurrent requests sharing the same key are serialized or rejected with conflict errors;
+6. Key retention duration and expiration policies are clearly documented.
 
-Teste o caso em que o commit ocorreu e a resposta se perdeu. Retry de transporte
-não pode significar duplicação de efeito.
+Always test network scenarios where transactions commit on the server but responses are lost.
+Transport retries must never cause duplicate side effects.
 
-## Paginação, filtro e ordenação
+## Pagination, Filtering, and Sorting
 
-- Ordene por chave determinística e única; acrescente ID como desempate.
-- Cursor deve representar posição/ordenação, ser opaco para o consumidor e ser
-  validado contra filtros incompatíveis.
-- Defina `limit` default e máximo, direção e comportamento de cursor inválido.
-- Não forneça total exato se o custo ou consistência não sustentam a promessa;
-  diferencie estimativa quando existir.
-- Defina sintaxe, tipos e allowlist de filtros; não exponha expressão SQL.
-- Teste inserção, remoção e atualização entre páginas.
+- Order by deterministic, unique sort keys; append primary `id` as tiebreaker.
+- Cursors must encode position/sorting, remain opaque to consumers, and be validated
+  against contradictory filter parameters.
+- Define default and maximum `limit` bounds, sort direction, and invalid cursor handling.
+- Do not provide exact record totals when database costs or consistency guarantees
+  make it unsustainable; provide approximate indicators instead.
+- Define syntax, types, and strict allowlists for query filters; never expose raw SQL expressions.
+- Test record insertions, updates, and deletions occurring between paginated requests.
 
-Offset é aceitável para coleção pequena/estável ou navegação por página cuja
-inconsistência seja tolerada. Não o escolha apenas por simplicidade do banco.
+Offset-based pagination is acceptable only for small, static datasets or views where
+eventual inconsistency is tolerated. Never choose it solely for query convenience.
 
-## Autorização e exposição
+## Authorization and Data Exposure
 
-- Autorize o recurso carregado e a ação concreta, não só o endpoint.
-- Inclua tenant/organização no lookup ou aplique política equivalente antes de
-  serializar.
-- Use allowlist de campos de request/response para impedir mass assignment e
-  exposição acidental.
-- Diferencie autenticação, autorização, entitlement e ownership.
-- Normalize erros de recursos secretos quando diferença entre 403/404 vazar
-  existência de forma relevante.
+- Authorize the loaded entity and concrete action, not merely the route endpoint.
+- Include tenant/organization scoping in database lookups or enforce equivalent row-level security.
+- Use explicit request/response field allowlists to prevent mass-assignment vulnerabilities
+  and accidental internal data leakage.
+- Explicitly differentiate authentication, authorization, entitlement, and data ownership.
+- Normalize error responses for sensitive resources when differing between 403 and 404
+  would leak resource existence.
 
 ## Webhooks
 
-- Assine o corpo bruto com segredo e algoritmo versionado.
-- Inclua ID do evento e timestamp; valide tolerância e proteja replay.
-- Consumidor deduplica pelo ID e processa de forma idempotente.
-- Entrega tem timeout curto, retry com backoff e política de expiração.
-- Ordenação não é presumida sem garantia explícita; payload inclui versão e
-  identidade suficiente para reconciliar.
-- Rotação de segredo aceita janela controlada de chaves.
+- Cryptographically sign the raw request body with a versioned secret and HMAC algorithm.
+- Include unique event IDs and timestamps; enforce clock-drift tolerance and replay protection.
+- Consumer deduplicates incoming events by ID and processes them idempotently.
+- Webhook delivery uses short timeouts, exponential backoff retries, and dead-letter expiration.
+- Event sequence cannot be assumed without explicit guarantees; payloads should include
+  event versions and sufficient identity to reconcile out-of-order deliveries.
+- Support seamless secret rotation with overlapping key validity windows.
 
-## Evolução compatível
+## Backwards-Compatible Evolution
 
-Geralmente aditivos:
+Generally additive and safe:
 
-- endpoint/operação nova;
-- campo opcional novo em resposta quando clientes toleram desconhecidos;
-- valor novo apenas quando consumidores tratam enum aberto.
+- Introducing new endpoints or operations;
+- Adding optional fields in responses (when consumers tolerate unknown fields);
+- Adding enum values (only when clients handle open/extensible enums).
 
-Potencialmente breaking:
+Potentially breaking:
 
-- remover/renomear campo ou operação;
-- tornar opcional obrigatório ou restringir formato;
-- mudar unidade, timezone, ordenação ou semântica de `null`;
-- adicionar enum quando clientes usam switch exaustivo;
-- alterar regra de autorização, retry ou consistência.
+- Removing or renaming fields or operations;
+- Making optional request fields required, or tightening validation constraints;
+- Altering units, timezones, sorting order, or `null` semantics;
+- Adding enum values when consumers use exhaustive pattern matching;
+- Modifying authorization rules, retry semantics, or consistency guarantees.
 
-Publique depreciação, telemetria de uso, alternativa, prazo e canal de migração.
-Compare OpenAPI estruturalmente e rode contract tests de consumidores antes de
-remover.
+Publish clear deprecation notices, monitor client telemetry, provide migration paths,
+and enforce sunset schedules. Run automated OpenAPI diff tools and consumer contract
+tests before decommissioning endpoints.
 
-## Evidência mínima
+## Minimum Verification Proof
 
-- OpenAPI 3.1 e JSON Schemas validam exemplos positivos e negativos;
-- testes cobrem status, headers, Problem Details e limites;
-- replay e concorrência provam idempotência;
-- testes cruzados provam isolamento por tenant/recurso;
-- paginação permanece coerente sob mutação;
-- diff de contrato classifica mudanças compatíveis e breaking;
-- logs correlacionam request sem registrar segredo ou payload sensível.
+- OpenAPI 3.1 and JSON Schemas validating positive and negative payload examples;
+- Contract tests verifying status codes, headers, Problem Details, and parameter limits;
+- Automated replay and concurrency tests demonstrating idempotency;
+- Cross-tenant authorization tests verifying isolation;
+- Pagination coherence verified during concurrent dataset mutations;
+- Schema diff classification verifying breaking vs non-breaking changes;
+- Structured logs correlating request IDs without logging sensitive credentials or tokens.
 
-## Fontes primárias
+## Primary Sources
 
 - HTTP Semantics, RFC 9110: https://www.rfc-editor.org/rfc/rfc9110
 - HTTP Caching, RFC 9111: https://www.rfc-editor.org/rfc/rfc9111

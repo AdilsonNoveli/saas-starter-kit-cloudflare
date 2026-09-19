@@ -1,159 +1,151 @@
-# Drizzle no Nuxfire — o que existe de fato no código
+# Drizzle in Nuxfire — What Actually Exists in the Codebase
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento.
+Each statement includes concrete file evidence. The codebase supersedes this document.
 
-## 1. Versões e driver
+## 1. Versions and Database Driver
 
 - `drizzle-orm` `^0.45.2`, `drizzle-kit` `^0.31.10`, `postgres` (postgres.js)
-  `^3.4.5` — `apps/functions/package.json`. Dialeto `postgresql`
-  (`apps/functions/drizzle.config.ts`). Só `pgTable`/`pgEnum`.
-- Conexão em runtime: `drizzle-orm/postgres-js` sobre um cliente `postgres.js`
-  com `{ max: 5, fetch_types: false }`, via Cloudflare **Hyperdrive**
-  (`infra/database.ts`). Origem: qualquer Postgres padrão; PostGIS já está
-  habilitado desde a migração inicial.
-- **Não existe** Prisma, D1 para dados da aplicação, nem `hubDatabase()` do
-  NuxtHub (o D1 `DB` só serve ao `@nuxt/content` do `apps/web`).
-- **Não existe tabela `sessions`.** Sessão e credenciais vivem no KV `AuthKV`
-  (ver `$fireskill-specialist-openauth`).
+  `^3.4.5` — `apps/functions/package.json`. Dialect is `postgresql`
+  (`apps/functions/drizzle.config.ts`). Only `pgTable`/`pgEnum`.
+- Runtime Connection: `drizzle-orm/postgres-js` atop a `postgres.js` client
+  configured with `{ max: 5, fetch_types: false }`, routed through Cloudflare
+  **Hyperdrive** (`infra/database.ts`). Origin: standard Postgres; PostGIS is
+  enabled from the initial migration.
+- **No Prisma**, no D1 for application entities, and no NuxtHub `hubDatabase()`
+  (D1 `DB` serves `@nuxt/content` in `apps/web` exclusively).
+- **No `sessions` table exists.** Sessions and authentication credentials live in `AuthKV`
+  (see `$fireskill-specialist-openauth`).
 
-## 2. Onde o schema mora
+## 2. Where Schemas Reside
 
-| Arquivo | Papel |
+| File | Purpose |
 |---|---|
-| `apps/functions/src/database/core-schema.ts` | Só o que não é de domínio: `User`, `WaitlistEmail`, `Job`, `Log`, `DeadLetterRecord` |
-| `apps/functions/src/database/schema.ts` | **Barrel** (`export *`): `core-schema` + **uma linha escrita à mão por layer** |
-| `layers/<layer>/server/database/schema.ts` | Tabelas do domínio da layer (teams, billing, notifications, admin, kanban) |
+| `apps/functions/src/database/core-schema.ts` | Non-domain core tables: `User`, `WaitlistEmail`, `Job`, `Log`, `DeadLetterRecord` |
+| `apps/functions/src/database/schema.ts` | **Barrel file** (`export *`): `core-schema` + **one explicit line per layer** |
+| `layers/<layer>/server/database/schema.ts` | Domain tables owned by each layer (teams, billing, notifications, admin, kanban) |
 
-- Todo consumidor importa `@nuxfire/functions/schema` e enxerga um módulo
-  achatado. No app, `useDB()` e `tables` vêm de `apps/app/server/utils/db.ts`
-  (`export const tables = schema`; reexporta `sql, eq, ne, and, or, count`).
-- `drizzle.config.ts` lê `./src/database/core-schema.ts` **e**
-  `../../layers/*/server/database/schema.ts` (glob), então uma layer nova entra
-  nas migrações sozinha; já no **barrel** a linha é manual.
-- As linhas do barrel são **incondicionais**: desativar uma layer de feature em
-  `config.ts` tira páginas e componentes do bundle, **não** remove tabelas nem
-  o tipo do cliente ("desativado" ≠ "apagado"; dado órfão é intencional).
-- **Especificador de pacote, nunca caminho relativo**, no barrel e no
-  `core-schema.ts`:
+- Every consumer imports `@nuxfire/functions/schema` and sees a flattened module.
+  Inside the app, `useDB()` and `tables` originate from `apps/app/server/utils/db.ts`
+  (`export const tables = schema`; re-exports `sql, eq, ne, and, or, count`).
+- `drizzle.config.ts` reads `./src/database/core-schema.ts` **and**
+  `../../layers/*/server/database/schema.ts` (glob pattern); new layers enter
+  migrations automatically, but the **barrel file** requires an explicit import line.
+- Barrel imports are **unconditional**: disabling a feature layer in `config.ts`
+  strips pages and components from the client bundle, but **does not** drop tables
+  or client database types ("disabled" ≠ "dropped"; preserving orphan data is intentional).
+- **Package specifier, never a relative path**, in the barrel and `core-schema.ts`:
   `export * from "@nuxfire/layer-kanban/server/database/schema";`.
-  O relativo (`../../../../layers/...`) passa em `tsc`, `vitest`, `drizzle-kit`,
-  Nitro e esbuild puro, mas **falha no `sst deploy`** (o bundler do SST empacota
-  `cron.ts`, `jobs-consumer.ts` e `dlq-consumer.ts`, que importam o barrel).
-  Exige `@nuxfire/layer-<nome>: workspace:*` no `package.json` de
-  `apps/functions`.
-- Dentro de uma layer, importe a **tabela dona** pelo arquivo de origem
+  Relative paths (`../../../../layers/...`) pass `tsc`, `vitest`, `drizzle-kit`,
+  Nitro, and esbuild locally, but **fail during `sst deploy`** (SST bundler packages
+  `cron.ts`, `jobs-consumer.ts`, and `dlq-consumer.ts`, which consume the barrel).
+  Requires `@nuxfire/layer-<name>: workspace:*` in `apps/functions/package.json`.
+- Inside a layer, import the **owner table** from its source file
   (`@nuxfire/layer-teams/server/database/schema`,
-  `@nuxfire/functions/database/core-schema`), **nunca** pelo barrel
-  `@nuxfire/functions/schema`, que reexporta a própria layer e cria laço.
+  `@nuxfire/functions/database/core-schema`), **never** from the barrel
+  `@nuxfire/functions/schema` (which re-exports the layer itself, creating a circular loop).
 
-## 3. Convenções de tabela (observadas em `core-schema.ts`, `teams`, `kanban`)
+## 3. Table Conventions (Observed in `core-schema.ts`, `teams`, `kanban`)
 
-- Nome SQL em PascalCase: `pgTable("Team", …)`, `pgTable("KanbanBoard", …)`.
-- `id`: `text("id").$default(() => cuid()).primaryKey().notNull()` com
-  `createId` de `@paralleldrive/cuid2`. Exceção: `User` usa
-  `crypto.randomUUID()` (o id vem do emissor de auth, ver `openauth`).
-- Datas: ``timestamp("created_at", { withTimezone: true }).notNull().default(sql`now()`)``
-  e `updated_at` com `.$onUpdate(() => new Date())`.
-- FK: `.references(() => tabela.id)` sempre em **callback**.
-- Estado que ganha valores com o tempo: `text` com `default`, não `pgEnum`
-  (`Team.status = "ACTIVE" | "SUSPENDED"`). Enum só onde é fechado
-  (`platform_role`).
-- Convenção de nome de coluna **não é uniforme**: há `teamId`/`mfaSecret`
-  (camelCase) e `created_at`/`updated_at` (snake_case) na mesma tabela. Siga o
-  arquivo em que está trabalhando; não "normalize" — renomear coluna gera
-  migração destrutiva.
-- Relações com `relations(tabela, ({ one, many }) => ({ … }))`, ao lado da
-  tabela.
-- Tipos: `typeof tabela.$inferSelect` / `$inferInsert`
-  (ex.: `jobs-consumer.ts`, `InsertRole` em `db.ts`).
-- Papéis do sistema: `Role.teamId = null` = papel de sistema, compartilhado.
-- `AuditLog.actorUserId` **não** é FK de propósito; `Notification.userId`
-  idem (só relação Drizzle).
+- SQL table names in PascalCase: `pgTable("Team", …)`, `pgTable("KanbanBoard", …)`.
+- `id`: `text("id").$default(() => cuid()).primaryKey().notNull()` using
+  `createId` from `@paralleldrive/cuid2`. Exception: `User` uses
+  `crypto.randomUUID()` (originates from OpenAuth issuer; see `openauth`).
+- Timestamps: ``timestamp("created_at", { withTimezone: true }).notNull().default(sql`now()`)``
+  and `updated_at` with `.$onUpdate(() => new Date())`.
+- Foreign Keys: `.references(() => table.id)` always wrapped in a **callback**.
+- Evolving status values: use `text` with `default`, not `pgEnum`
+  (`Team.status = "ACTIVE" | "SUSPENDED"`). Enums are reserved for closed sets (`platform_role`).
+- Column naming convention is **intentionally mixed**: `teamId`/`mfaSecret` (camelCase)
+  and `created_at`/`updated_at` (snake_case) coexist on the same table. Match the
+  conventions of the file being edited; do not "normalize" — renaming columns generates
+  destructive migrations.
+- Relations declared alongside tables using `relations(table, ({ one, many }) => ({ … }))`.
+- Types: `typeof table.$inferSelect` / `$inferInsert`
+  (e.g., `jobs-consumer.ts`, `InsertRole` in `db.ts`).
+- System Roles: `Role.teamId = null` denotes a shared system role.
+- `AuditLog.actorUserId` is intentionally **not** a foreign key constraint;
+  `Notification.userId` likewise (declared purely via Drizzle relations).
 
-## 4. Os três ciclos de schema (deliberados) e a única regra que os mantém seguros
+## 4. The Three Schema Cycles (Deliberate) and the Rule Keeping Them Safe
 
-1. `core-schema.ts` ↔ `layers/teams`: `Job`/`DeadLetterRecord` ficam no core com
-   FK para `Team`; `TeamMembership`/`TeamInvite` ficam na layer com FK para
-   `User`.
+1. `core-schema.ts` ↔ `layers/teams`: `Job`/`DeadLetterRecord` reside in core with
+   FK to `Team`; `TeamMembership`/`TeamInvite` reside in layer with FK to `User`.
 2. `layers/teams` ↔ `layers/billing`: `Subscription.teamId` → `Team`;
    `Team.planId`, `plan`/`subscriptions` → billing.
 3. `core-schema.ts` ↔ `layers/notifications`: `usersRelations.notifications`
-   ↔ `notificationRelations`. É par de **relations** apenas, **sem FK**: não
-   "complete" com `.references()` (geraria migração).
+   ↔ `notificationRelations`. Pair of **relations** only, **no FK**: do not add
+   `.references()` (would generate unnecessary migrations).
 
-**Regra**: toda referência entre arquivos fica **dentro de callback**
-(`.references(() => x.id)`, `relations(t, ({ one }) => …)`). Ler um binding
-importado no topo do módulo vira crash por TDZ no import.
-`layers/admin` não criou ciclo: `core-schema.ts` nunca referencia
-`platformAdmins`/`auditLogs` — após mexer no core, faça grep por esses dois
-nomes; um hit em **código** (não comentário) é um ciclo novo sem necessidade.
-Ciclos de schema têm ciclo de dependência de workspace correspondente
-(`teams` ⇄ `billing`, `functions` ⇄ `notifications`); o Bun resolve por symlink.
+**Rule**: All cross-file references must be placed **inside callbacks**
+(`.references(() => x.id)`, `relations(t, ({ one }) => …)`). Reading an imported
+binding at module root triggers TDZ import runtime crashes.
+`layers/admin` introduces no cycles: `core-schema.ts` never references
+`platformAdmins`/`auditLogs` — after editing core, grep for those names; any hit
+in active **code** (not comments) represents an avoidable new cycle.
+Schema cycles have corresponding workspace dependency cycles (`teams` ⇄ `billing`,
+`functions` ⇄ `notifications`); Bun resolves them via symlinks.
 
-Mover um `pgTable` entre arquivos **não gera migração** (o drizzle-kit compara
-identidade de tabela/coluna com o snapshot). Se a mudança gerar uma, alguma
-coluna mudou sem querer.
+Moving a `pgTable` between files **generates no migrations** (drizzle-kit tracks
+table/column identities against snapshot schemas). If a move produces a migration,
+a column attribute was unintentionally altered.
 
-## 5. Migrações
+## 5. Migrations
 
-- Histórico consolidado em `apps/functions/src/database/migrations/0000_init.sql`
-  (2026-09-16); `meta/_journal.json` tem uma entrada.
-- **Gerar** (de `apps/functions`), com as credenciais em variáveis de ambiente:
+- Consolidated baseline at `apps/functions/src/database/migrations/0000_init.sql`
+  (2026-09-16); `meta/_journal.json` contains one entry.
+- **Generate** (from `apps/functions`), providing credentials via environment variables:
   `DATABASE_HOST=… DATABASE_PORT=5432 DATABASE_USER=… DATABASE_PASSWORD=… DATABASE_NAME=… bunx drizzle-kit generate`
-  (`generate-migrations` no `package.json`). **Leia o SQL gerado**: o kit não
-  sabe se foi rename ou drop+add.
-- **Aplicar**: automático a cada deploy do `App` — `drizzle-kit migrate` num
-  `command.local.Command` (`infra/utils/nuxt.ts`), com os secrets `Database*`.
-  Não se aplica migração à mão em stage compartilhado.
-- **Sem migração de volta.** Rollback = expand/contract
-  (`apps/functions/src/database/MIGRATIONS.md`): mudança aditiva pode ficar;
-  mudança destrutiva (drop, `NOT NULL` em coluna existente, troca de tipo) vai
-  numa migração própria, **depois** de o código que deixou de depender da forma
-  antiga estar no ar. Erro em produção se corrige com nova migração para frente.
-- Ambiente que aplicou o histórico antigo (`0000`–`0009`) precisa ter os schemas
-  `public`/`drizzle` zerados antes do próximo `migrate`.
-- Backup/snapshot antes de qualquer migração que apague ou altere colunas com
-  dados.
+  (`generate-migrations` script in `package.json`). **Inspect generated SQL**: drizzle-kit
+  cannot distinguish renames from drop + add operations.
+- **Apply**: runs automatically on every `App` deployment — `drizzle-kit migrate`
+  inside a `command.local.Command` (`infra/utils/nuxt.ts`), using `Database*` secrets.
+  Never run manual migrations on shared staging databases.
+- **No down-migrations.** Rollback follows expand/contract patterns
+  (`apps/functions/src/database/MIGRATIONS.md`): additive changes remain in place;
+  destructive changes (drop, adding `NOT NULL` to existing columns, type alterations)
+  ship in separate subsequent migrations **after** consuming code is deployed.
+  Production issues are remediated by rolling forward.
+- Any environment that applied previous migration history (`0000`–`0009`) requires
+  its `public`/`drizzle` schemas reset prior to the next `migrate` run.
+- Create automated database snapshots prior to any migration altering populated columns.
 
-## 6. Seed e scripts manuais
+## 6. Seed Data and Manual Utility Scripts
 
-- `seed/index.ts` roda **a cada deploy** (logo após as migrações,
-  `infra/utils/nuxt.ts`), é idempotente e cria só o plano **Free** e os papéis
-  de sistema (Owner/Admin/Member). Os dados vêm de `seed/data.ts`, o mesmo que
-  `ensureSystemRoles()` (`layers/teams/server/utils/roles.ts`) e `ensureFreePlan()`
-  (`layers/billing/server/utils/plans.ts`) usam como rede de segurança reativa.
-  Mantenha as duas vias lendo o mesmo `data.ts`.
-- **Nunca** ligar criação de admin ao seed nem a passo de deploy:
-  `grant-platform-admin.ts` (concede `SUPER_ADMIN`/`SUPPORT` a um usuário que já
-  se cadastrou, sem tocar credenciais) e `seed/demo-accounts.ts` (senhas
-  conhecidas, só dev/demo) são **manuais de propósito**.
-- Planos são linhas do banco criadas em `/admin/plans`, não objeto fixo.
+- `seed/index.ts` runs **on every deployment** (immediately following migrations,
+  `infra/utils/nuxt.ts`), is idempotent, and provisions the default **Free** plan
+  and system roles (Owner/Admin/Member). Data originates from `seed/data.ts`, which
+  `ensureSystemRoles()` (`layers/teams/server/utils/roles.ts`) and `ensureFreePlan()`
+  (`layers/billing/server/utils/plans.ts`) share as runtime safety nets.
+  Keep both mechanisms reading from identical `data.ts` definitions.
+- **Never** tie admin account provisioning to seed scripts or deploy pipelines:
+  `grant-platform-admin.ts` (promotes `SUPER_ADMIN`/`SUPPORT` to an already-registered user
+  without modifying credentials) and `seed/demo-accounts.ts` (known test credentials,
+  dev/demo environments only) are **strictly manual utilities by design**.
+- Subscription plans are mutable database records managed via `/admin/plans`, not hardcoded constants.
 
-## 7. Resetar dados de `User` (armadilha)
+## 7. Resetting User Data (Pitfall)
 
-Zerar/truncar `User` sem limpar também as duas chaves do `AuthKV`
-(`["email", email, "password"]` e `["users", email]`) gera split-brain: cadastro
-novo falha com `email_taken` ou colide em `User_email_unique` (`23505`). Em
-reset de dev, limpe as duas chaves de cada e-mail afetado na mesma passada (ou
-todo o namespace de um stage descartável). Detalhes em
-`$fireskill-specialist-openauth`.
+Truncating or wiping `User` rows without purging the two corresponding `AuthKV` keys
+(`["email", email, "password"]` and `["users", email]`) causes split-brain state:
+subsequent registrations fail with `email_taken` or violate `User_email_unique` (`23505`).
+During dev database resets, wipe both keys for affected emails simultaneously (or flush
+the entire KV namespace on disposable test stages). Details in `$fireskill-specialist-openauth`.
 
-## 8. Uso em runtime
+## 8. Runtime Execution
 
-- Aplicação: `useDB()` (por requisição, encerrado em `closeDB`) — ver
+- Application: `useDB()` (request-scoped, closed via `closeDB`) — see
   `$fireskill-specialist-cloudflare-workers`.
-- Workers puros: cliente criado por invocação a partir de
-  `env.AppDB.connectionString`.
-- Erro de unicidade: `error.code === "23505"` (postgres.js).
-- Script de deploy (`seed`, `drizzle-kit`): conexão direta, `ssl: "require"`,
-  `max: 1` (seed), pelas variáveis `DATABASE_*` — não passa por Hyperdrive.
-- Para origem com pooler próprio, use a conexão **direta**: a Hyperdrive já faz
-  pooling na borda. Misturar host de um modo com usuário de outro só falha
-  quando a Cloudflare provisiona a Hyperdrive, com "Invalid database
-  credentials" (erro 2013) que parece senha errada.
+- Pure Workers: client created per invocation using `env.AppDB.connectionString`.
+- Uniqueness Violation: `error.code === "23505"` (postgres.js error code).
+- Deployment Scripts (`seed`, `drizzle-kit`): direct connection, `ssl: "require"`,
+  `max: 1` (seed), using `DATABASE_*` variables — bypasses Hyperdrive.
+- For databases with their own connection pooler, use direct connections: Hyperdrive
+  already pools connections at Cloudflare's edge. Mixing pooler hosts with direct-user
+  credentials fails only during Hyperdrive provisioning with "Invalid database credentials"
+  (error 2013), mimicking incorrect passwords.
 
-## 9. O que NÃO existe
+## 9. What Does NOT Exist
 
-- Suíte de teste de schema/queries. Os testes existentes cobrem cobrança,
-  assentos de equipe e habilidades (RBAC), não o banco.
-- Down-migrations, CI de migração, ORM alternativo.
+- Database query/schema test suite. Existing tests cover billing logic, team seats,
+  and RBAC abilities, not direct SQL execution.
+- Down-migrations, automated migration CI checks, alternative ORMs.

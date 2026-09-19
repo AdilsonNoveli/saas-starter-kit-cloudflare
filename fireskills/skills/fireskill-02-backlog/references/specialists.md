@@ -1,18 +1,17 @@
-# Especialistas sob demanda
+# Specialists on Demand
 
-Especialistas usam o prefixo `fireskill-specialist-`. Proponha somente os
-necessários à decisão:
+Specialists use the `fireskill-specialist-` prefix. Propose only those
+strictly required for the decision at hand:
 
-- stack detectada: `nuxt`, `nuxt-ui`, `nuxfire-layers`, `trpc`, `drizzle`,
+- Detected stack: `nuxt`, `nuxt-ui`, `nuxfire-layers`, `trpc`, `drizzle`,
   `postgres`, `sst`, `cloudflare-workers`, `openauth`, `nuxt-authorization`,
-  `pinia`, `typescript` ou `tailwind-css`;
-- interface: `ui-design`, `ux-design`, `nuxt-ui` e `web-accessibility`;
-- risco transversal: `application-security`, `software-architecture`,
-  `web-api-design`, `observability` ou `performance-engineering`;
-- descoberta complexa: `domain-modeling`, `prototyping` ou `technical-research`.
+  `pinia`, `typescript`, or `tailwind-css`;
+- Interface: `ui-design`, `ux-design`, `nuxt-ui`, and `web-accessibility`;
+- Cross-cutting risk: `application-security`, `software-architecture`,
+  `web-api-design`, `observability`, or `performance-engineering`;
+- Complex discovery: `domain-modeling`, `prototyping`, or `technical-research`.
 
-Os especialistas ficam em `specialists/` deste repositório. Se o necessário não
-estiver disponível para o agente, informe nome, finalidade e dependências e peça
-autorização específica antes de instalar ou copiar; nunca carregue especialista
-sem relação com a tarefa. Se já estiver disponível, anuncie a transição
-automática e carregue-o na mesma conversa.
+Specialists reside in `specialists/` in this repository. If the required specialist
+is not yet available to the agent, state its name, purpose, and dependencies and request
+explicit user authorization before installing or copying; never load specialists
+unrelated to the task. If already present, announce automatic transition and load it within the same conversation.

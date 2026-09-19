@@ -1,111 +1,52 @@
 ---
 name: fireskill-specialist-postgres
-description: Modelar, consultar, migrar e operar PostgreSQL com integridade, índices, concorrência, segurança, performance e recuperação. Use para schemas, SQL, EXPLAIN, locks, isolation levels, migrations, roles, backup ou tuning em Postgres; não use para outro banco relacional sem confirmar a semântica específica, e combine com `fireskill-specialist-drizzle` para schema, migrações e queries via Drizzle no Nuxfire.
+description: Model, query, migrate, and operate PostgreSQL with integrity, indices, concurrency, security, performance, and recovery. Use for schemas, SQL, EXPLAIN, locks, isolation levels, migrations, roles, backups, or tuning in Postgres; do not use for other relational databases without confirming engine-specific semantics, and combine with `fireskill-specialist-drizzle` for Drizzle schema, migrations, and queries in Nuxfire.
 ---
 
 # PostgreSQL
 
-## Quando usar
+## When to Use
 
-- Acionar para desenhar schema, escrever ou revisar SQL, escolher índice,
-  analisar plano (`EXPLAIN`), diagnosticar lock/deadlock, planejar migration
-  ou dimensionar backup/restore em Postgres.
-- Acionar também quando um ORM (Drizzle) gerar SQL
-  ineficiente e a causa raiz for modelagem ou índice, não a API do ORM.
-- Combinar com `$fireskill-specialist-drizzle` quando o ponto de entrada for o
-  schema/queries Drizzle e com `$fireskill-specialist-performance-engineering` quando o
-  gargalo abranger além do banco (aplicação, rede, cache).
+- Trigger to design schemas, write or review SQL, select index strategies, analyze
+  execution plans (`EXPLAIN`), diagnose locks/deadlocks, plan migrations, or size
+  backups and restore procedures in Postgres.
+- Trigger when an ORM (Drizzle) generates inefficient queries whose root cause is
+  relational modeling or missing indexes.
+- Combine with `$fireskill-specialist-drizzle` when the entry point is Drizzle schema/queries,
+  and with `$fireskill-specialist-performance-engineering` when bottlenecks span outside the database (app, network, cache).
 
-## Fluxo
+## Workflow
 
-1. Descobrir versão do Postgres, extensões instaladas, volume atual,
-   crescimento esperado, workload (OLTP, analítico, misto) e quem é o owner
-   dos dados antes de recomendar.
-2. Modelar invariantes com tipos precisos, `NOT NULL`, `CHECK`, `UNIQUE`,
-   chaves estrangeiras e normalização adequada ao caso de uso.
-3. Escrever a consulta mais simples que expressa a regra e medir o plano
-   real com `EXPLAIN (ANALYZE, BUFFERS)` sobre dados representativos, nunca
-   sobre uma tabela vazia ou de desenvolvimento.
-4. Selecionar índice pelo workload observado (predicados do `WHERE`,
-   `ORDER BY`, `JOIN`) — nunca por "essa coluna é consultada" isoladamente.
-5. Analisar isolation level, duração de transação, ordem de aquisição de
-   locks e concorrência esperada sob a carga real.
-6. Planejar a migration com compatibilidade entre a versão antiga e nova da
-   aplicação durante o deploy, e um caminho de rollback testável.
-7. Marcar a execução como `[MIGRATION]`, apontar o arquivo versionado, aplicar
-   em uma base de teste e consultar o histórico do migrador antes de concluir.
-8. Validar backup, restore, monitoramento e capacidade no ambiente alvo antes
-   de declarar a mudança pronta para produção.
+1. Determine Postgres version, installed extensions, current dataset volume,
+   projected growth, workload profile (OLTP, analytical, mixed), and data ownership before recommending changes.
+2. Model invariants using precise column types, `NOT NULL`, `CHECK`, `UNIQUE`, foreign keys,
+   and normalization appropriate to the access patterns.
+3. Write the simplest SQL query expressing the business rule and inspect the actual
+   plan using `EXPLAIN (ANALYZE, BUFFERS)` on representative datasets, never on empty test tables.
+4. Select indexes based on observed workload predicates (`WHERE`, `ORDER BY`, `JOIN`) — never
+   speculatively based on column presence alone.
+5. Analyze transaction isolation levels, transaction duration, lock acquisition ordering,
+   and expected concurrency under production load.
+6. Plan migrations ensuring dual-version compatibility (old and new application versions
+   coexisting during rolling deploys), with tested rollback strategies.
+7. Tag execution tasks with `[MIGRATION]`, point to versioned migration scripts, apply
+   to test environments, and verify migrator history before declaring completion.
+8. Validate backup, restore, monitoring, and capacity in the target environment before
+   marking changes production-ready.
 
-## Padrões
+## Core Rules
 
-- Preferir constraint do banco (`NOT NULL`, `CHECK`, `UNIQUE`, FK, `EXCLUDE`)
-  para toda invariante que sempre deve valer — validação só na aplicação
-  permite dado inconsistente por qualquer segundo caminho de escrita.
-- Evitar `SELECT *` em código de produção, tipos imprecisos (`text` para
-  enum fechado, `float` para dinheiro) e índice redundante que duplica outro
-  já existente com prefixo igual.
-- Nunca adicionar índice sem ler padrão de escrita, tamanho da tabela,
-  seletividade do predicado e o plano antes/depois — índice mal escolhido
-  piora escrita sem acelerar leitura.
-- Manter transação curta (evitar I/O externo, espera de usuário ou chamada de
-  rede dentro dela) e ordem de aquisição de locks consistente entre todos os
-  caminhos de código para evitar deadlock.
-- Rodar `EXPLAIN (ANALYZE, BUFFERS)` somente em ambiente onde executar a
-  consulta de verdade é seguro (não em produção sem `ROLLBACK`/replica).
-- Aplicar expand/contract em mudança de schema incompatível ou em tabela de
-  alto volume: nunca renomear/remover coluna lida em produção no mesmo passo
-  que a adiciona.
-- Conceder o menor privilégio necessário e separar papéis de migration
-  (DDL), aplicação (DML) e leitura (`SELECT` apenas) — a aplicação nunca
-  conecta com um role que pode `DROP TABLE`.
-
-## Antipadrões
-
-- Índice criado por "essa coluna aparece no WHERE", ignorando seletividade —
-  em coluna de baixa cardinalidade (booleano, status com poucos valores) o
-  planner frequentemente prefere seq scan e o índice só custa em escrita.
-- `ALTER TABLE ... ADD COLUMN ... NOT NULL DEFAULT` em versão antiga do
-  Postgres (< 11) reescrevendo a tabela inteira sob lock — em versões atuais
-  isso é otimizado para `DEFAULT` constante, mas `DEFAULT` com função
-  volátil ainda reescreve.
-- Transação longa mantendo lock enquanto espera resposta de rede ou
-  confirmação do usuário — bloqueia autovacuum de limpar tuplas mortas e
-  aumenta bloat.
-- Paginação por `OFFSET` grande em tabela que cresce — custo cresce
-  linearmente com o offset; preferir paginação por keyset (`WHERE id >
-  :cursor ORDER BY id LIMIT :n`).
-- Backup automatizado nunca restaurado — "temos backup" sem um restore
-  completo testado é uma suposição não verificada, não uma garantia.
-
-## Validação
-
-- Testar integridade (constraints violadas geram erro esperado),
-  concorrência (dois writers simultâneos não corrompem invariante) e as
-  queries críticas do caminho quente.
-- Comparar `EXPLAIN (ANALYZE, BUFFERS)` antes/depois com cardinalidade
-  realista, não com a tabela vazia do ambiente de desenvolvimento.
-- Estimar o lock e o tempo de rewrite de qualquer DDL contra o tamanho real
-  da tabela em produção antes de agendar a janela de deploy.
-- Conferir cada tarefa `[MIGRATION]` pelo arquivo, pelo comando de aplicação e
-  pela consulta do histórico do migrador, todos registrados com saída zero.
-- Provar restore periodicamente a partir do backup real, incluindo o tempo
-  que o processo leva (RTO) — backup sem restore testado não é uma garantia
-  de recuperação.
-- Não declarar uma mudança "sem impacto de performance" sem o plano
-  comparado; não declarar um schema "íntegro" sem os testes de constraint e
-  concorrência acima.
-
-## Skills relacionadas
-
-- `$fireskill-specialist-data-modeling` para entidades, relações e ciclo de vida
-  antes dos detalhes específicos do Postgres.
-- `$fireskill-specialist-application-security` define ameaça, autorização e
-  isolamento que constraints, roles e RLS materializam no banco.
-- `$fireskill-specialist-performance-engineering` quando o gargalo não se
-  resolver só com índice/plano (rede, cache, aplicação).
-- `$fireskill-specialist-observability` para métricas e alertas de banco em
-  produção (conexões, locks, replicação, lag).
-
-Leia [references/standards.md](references/standards.md) para tipos, índices,
-concorrência, segurança, migrations, operação e fontes oficiais.
+- Prefer database-level constraints (`NOT NULL`, `CHECK`, `UNIQUE`, FK, `EXCLUDE`) for all
+  invariants that must always hold — app-only validation allows corrupt state via alternative write paths.
+- Avoid `SELECT *` in production queries, imprecise types (`text` for closed enums, `float` for currency),
+  and redundant indexes mirroring existing index prefixes.
+- Never add indexes without inspecting write frequency, table size, predicate selectivity,
+  and before/after execution plans — poorly chosen indexes degrade write throughput without improving reads.
+- Keep transactions short (no external I/O, user input, or network calls inside transactions)
+  and maintain consistent lock ordering across all code paths to eliminate deadlocks.
+- Run `EXPLAIN (ANALYZE, BUFFERS)` only where executing statements is safe (never in
+  production without read replicas or rollback transactions).
+- Apply expand/contract migrations for breaking schema changes or high-volume tables:
+  never drop or rename a column read by production code in the same deployment step.
+- Grant least privilege: separate migration roles (DDL), application roles (DML), and
+  read-only analytics roles (`SELECT` only).

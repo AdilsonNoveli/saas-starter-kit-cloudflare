@@ -1,266 +1,159 @@
 ---
 name: fireskill-07-implement
-description: "Use quando o usuário pede para implementar, executar ou concluir tarefas da seção `14. Tarefas` de `specs/{id}-{slug}/spec.md`, criar o código definido pela fonte única, continuar a próxima tarefa pronta ou finalizar a feature. Use também quando uma transição automática iniciar ou retomar a entrega. Use para produção; para apenas criar testes use fireskill-06-tdd-bdd, e para apenas decompor use fireskill-05-tasks."
+description: "Use when the user asks to implement, execute, or complete tasks in section `14. Tasks` of `specs/{id}-{slug}/spec.md`, write production code specified by the single source of truth, continue the next ready task, or finalize a feature. Also use when an automatic transition initiates or resumes delivery. Use for production code; to create tests only use fireskill-06-tdd-bdd, and to decompose only use fireskill-05-tasks."
 ---
 
-# Implementar as tarefas e criar o código
+# Implement Tasks and Write Production Code
 
-## Preparação obrigatória
+## Mandatory Preparation
 
-Antes de executar esta skill, carregue obrigatoriamente `$fireskill-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Before executing this skill, you must load `$fireskill-setup` at the project root.
+On automatic handoff, reload it before this step.
+Reuse the root confirmed in conversation and do not proceed if setup reports a pending blocker.
 
-## Modo de interação
+## Interaction Mode
 
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `fireskills/skills/Spec.md`.
+Interaction mode: `questions`.
+Before formulating any question, read and apply the `Numbered Questions Protocol` from `fireskills/skills/Spec.md`.
 
-Execute a seção `14. Tarefas` de `spec.md` em ordem de dependência, mantendo a fonte única, testes, código, evidências e checkboxes coerentes.
+Execute section `14. Tasks` in `spec.md` in dependency order, keeping the single source of truth, test suites, production code, evidence, and task checkboxes fully aligned.
 
-Consulte `.fireskills/PACKAGES.md`, `docs/packages/README.md` e as fichas
-existentes antes de adicionar ou substituir uma dependência. Se a tarefa trouxer
-uma URL GitHub ou mudar `package.json`/`bun.lock`, reutilize pacotes já
-instalados quando eles atenderem ao requisito e declare no `package.json` de
-cada pacote do workspace tudo o que o código dele importa diretamente.
+Consult `.fireskills/PACKAGES.md`, `docs/packages/README.md`, and package cards before adding or replacing any dependency. If the task introduces a GitHub URL or modifies `package.json`/`bun.lock`, reuse existing packages whenever they satisfy requirements, declaring in each workspace package's `package.json` everything imported by its code.
 
-## Proteção obrigatória do banco
+## Mandatory Database Protection
 
-Antes de executar qualquer teste, suíte, regressão ou migration, rode:
+Before running any test suite, regression run, or migration command, execute:
 
 ```bash
 node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs \
-  --project <raiz> --command "<comando-pretendido>"
+  --project <root> --command "<target-command>"
 ```
 
-Para testes que acessem Postgres, exija um banco de teste explicitamente
-diferente do configurado nos secrets do stage (`DATABASE_*`); os testes Vitest
-atuais não acessam o banco. Enquanto o estado for `PENDING`, não execute teste algum. Corrija o ambiente, repita a
-conferência e continue somente após `SAFE`.
+For tests accessing Postgres, require a dedicated test database explicitly separate from staging secrets (`DATABASE_*`); existing Vitest test suites do not connect to the database. While the safety state is `PENDING`, do not execute any tests. Fix the environment, rerun verification, and proceed only after `SAFE`.
 
-Ignore todo comando classificado como `IGNORED`. Não execute, não transforme em
-tarefa e não peça autorização para rodar `migrate:fresh`, `migrate:refresh`,
-`migrate:reset`, `migrate:rollback`, `db:wipe`, `schema:drop`,
-`prisma migrate reset`, `drizzle-kit push --force`, `drizzle-kit drop`,
-`DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`,
-`TRUNCATE` ou equivalentes. A mesma recusa vale para scripts indiretos e para
-testes com `RefreshDatabase` ou `DatabaseMigrations`. Use isolamento
-transacional e fixtures mínimas sem apagar o banco.
+Discard all commands classified as `IGNORED`. Never run, convert into tasks, or seek authorization to execute `migrate:fresh`, `migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`, `schema:drop`, `prisma migrate reset`, `drizzle-kit push --force`, `drizzle-kit drop`, `DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`, `TRUNCATE`, or equivalents. The same strict prohibition applies to indirect scripts and tests relying on `RefreshDatabase` or `DatabaseMigrations`. Use transactional isolation and minimal fixtures without clearing the database.
 
-## Revisão visual obrigatória
+## Mandatory Visual Review
 
-Toda tarefa de desenvolvimento executa uma revisão visual, mesmo sem pedido da
-pessoa. O item `VISUAL` vem depois de `VERIFY` e precisa estar concluído antes
-de `EVIDENCE`.
+Every task touching UI surfaces executes visual review, even without user request. The `VISUAL` checklist item follows `VERIFY` and must be complete before `EVIDENCE`.
 
-Para qualquer alteração com interface, leia `.fireskills/DESIGNSYSTEM.MD`, `.fireskills/INTERFACE.md` e
-os componentes afetados. Inspecione a renderização ou o DOM nos viewports e
-estados relevantes. Confira bordas, espaçamentos, margens, padding e tipografia
-do sistema, além de alinhamento, largura, overflow, foco, zoom e quebra de
-texto. Registre método, viewport, estados, ajustes e resultado na tarefa.
+For any modification with interface, consult `.fireskills/DESIGNSYSTEM.MD`, `.fireskills/INTERFACE.md`, and affected components. Inspect the rendered DOM across relevant viewports and states. Verify borders, spacing, margins, padding, and typography, alongside alignment, width, overflow, focus rings, zoom, and text wrapping. Record method, viewport, states, adjustments, and outcome in the task.
 
-Quando a tarefa não alterar interface, conclua `VISUAL` com `Não aplicável` e
-um motivo concreto. Nunca pule esse item porque a pessoa não pediu revisão
-visual.
+When a task introduces no UI changes, complete `VISUAL` with `Not applicable` and concrete rationale. Never skip this item simply because the user did not explicitly ask for a visual review.
 
-## Orquestrar a conversa
+## Orchestrating the Conversation
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $fireskill-07-implement → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill de
-destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa. Depois de uma correção necessária a esta etapa, anuncie `Retomada
-automática: $<destino> → $fireskill-07-implement — pendência resolvida:
-<resultado>` e retome-a imediatamente. Reavalie o estado após cada handoff para
-evitar ciclos. Não peça confirmação para o handoff; ações sensíveis continuam
-exigindo autorização específica.
+When concluding this stage or detecting work belonging to another stage, announce
+`Pending blocker detected: <description> — action: resolving in this stage` and resolve it
+if it falls within scope. When responsibility transfers, announce
+`Automatic transition: $fireskill-07-implement → $<target> — reason: <reason> — expected result: <result>`
+and immediately load the destination skill, without asking for confirmation or repeating the command. Continue in the same conversation.
 
-## Gate inicial
+After a necessary fix in this stage, announce
+`Automatic resumption: $<target> → $fireskill-07-implement — resolved blocker: <result>`
+and resume immediately. Re-evaluate state after each handoff to prevent cycles. Handoffs do not require confirmation; sensitive actions still require explicit authorization.
 
-1. Resolva a raiz pelo caminho confirmado no `$fireskill-setup`. Se a pessoa
-   informar um subdiretório, trate-o como projeto e não o promova para a raiz
-   Git. Leia `<raiz>/specs/planned/<NNNN>-<slug>/spec.md`, evidências indexadas
-   em `research/`, instruções do repositório e código relevante. Não procure
-   `tasks.md`, `plan.md`, `research.md` ou `data-model.md`.
-2. Exija `Formato: Specsfy/2.0`, `Status: Planned` ou `Implementing`,
-   `Definition Gate: Passed` e `Plan Gate: Passed`.
-3. Se `Interface para pessoas` for `Sim`, leia a seção 10 e confirme que o
-   plano contém tarefas para stack local, telas, menus e navegação principal,
-   formulários, ações, componentes Vue SFC, componentes @nuxt/ui (UModal, UForm,
-   UTable, UCard, UButton, etc.), estados e testes de interação. Compare a stack,
-   as telas e os fluxos atuais com o projeto antes de alterar código. Preserve
-   componentes, rotas, conteúdo, permissões e comportamentos existentes fora do
-   alcance registrado. Se faltar algum deles ou a tecnologia proposta divergir sem
-   confirmação, retorne automaticamente para `$fireskill-05-tasks`; não implemente
-   um CRUD somente como API ou persistência.
-   Antes de programar, confirme os itens escolhidos na tabela da seção 10 e em
-   `.fireskills/INTERFACE.md`; depois de programar, atualize `.fireskills/INTERFACE.md` com todos os
-   blocos criados, alterados ou reaproveitados.
-   Em todo componente Vue, carregue obrigatoriamente `$fireskill-specialist-nuxt-ui`
-   antes de escrever `.vue` com componentes U*. Se a skill não estiver instalada,
-   retorne ao `$fireskill-setup` para carregar o especialista e não implemente a
-   tela até concluir esse preparo.
-   Para um CRUD, confirme também um único `PageHeader` reutilizável em todas as
-   telas, `UTable` com `enterpriseTableUi` em largura total, coluna `ID` sempre visível,
-   link da linha para o detalhe e botões de editar e apagar independentes na linha.
-4. Execute os validadores contra `specs/<estado>/<NNNN>-<slug>/spec.md`. Se um gate
-   falhar por tarefa, predecessor TDD ou RED ausente em um plano antes aprovado,
-   anuncie a pendência e retorne automaticamente para
-   `$fireskill-05-tasks`; não altere produção. Essa skill reabre o Ato II, chama
-   TDD/BDD e retoma esta implementação depois de validar novamente o plano. Para
-   outra falha, carregue automaticamente a skill responsável pelo gate.
-5. Confira o comando da suíte base com `check_database_safety.mjs`. Execute-a
-   somente após `SAFE`; sem ambiente de teste separado, não rode nenhum teste.
-   Registre falhas preexistentes e não as atribua à nova mudança.
-6. Antes da primeira alteração de produção, defina `Status: Implementing`,
-   `Delivery Gate: In Progress` e execute `bun run fireskill transition <id> in-progress`.
-7. Selecione trabalho pronto com:
+## Initial Gate
+
+1. Resolve the root via path confirmed by `$fireskill-setup`. If the user provided a subdirectory, treat it as project root and do not promote it to a Git root. Read `<root>/specs/planned/<NNNN>-<slug>/spec.md`, evidence indexed in `research/`, repository instructions, and relevant code. Never look for `tasks.md`, `plan.md`, `research.md`, or `data-model.md`.
+2. Require `Format: Specsfy/2.0`, `Status: Planned` or `Implementing`, `Definition Gate: Passed`, and `Plan Gate: Passed`.
+3. If `Human Interface` is `Yes`, read section 10 and confirm the plan includes tasks for local stack, screens, menus and primary navigation, forms, actions, Vue SFC components, @nuxt/ui components (`UModal`, `UForm`, `UTable`, `UCard`, `UButton`, etc.), states, and interaction tests. Compare current stack, screens, and flows before modifying code. Preserve existing components, routes, content, permissions, and behaviors outside the documented scope. If any are missing or proposed technology diverges without confirmation, automatically return to `$fireskill-05-tasks`; do not implement a CRUD purely as an API or persistence layer.
+   Prior to coding, confirm selected items in section 10 table and `.fireskills/INTERFACE.md`; after coding, update `.fireskills/INTERFACE.md` with all created, modified, or reused blocks.
+   In every Vue component, load `$fireskill-specialist-nuxt-ui` before writing `.vue` files with `U*` components. If the skill is not installed, return to `$fireskill-setup` to load it before implementing the screen.
+   For CRUD, confirm a single reusable `PageHeader` across all screens, full-width `UTable` with `enterpriseTableUi`, always-visible `ID` column, row-level detail navigation link, and independent edit/delete buttons on the row.
+4. Run validators against `specs/<state>/<NNNN>-<slug>/spec.md`. If a gate fails due to missing task, TDD predecessor, or RED status in a previously approved plan, announce the blocker and automatically return to `$fireskill-05-tasks`; do not modify production code. That skill reopens Act II, calls TDD/BDD, and resumes implementation after validating the updated plan. For other failures, automatically load the responsible gate skill.
+5. Verify test command with `check_database_safety.mjs`. Execute only after `SAFE`; without a separate test database, run no tests. Record pre-existing test failures and do not attribute them to new changes.
+6. Before the first production code modification, set `Status: Implementing`, `Delivery Gate: In Progress`, and run `bun run fireskill transition <id> in-progress`.
+7. Select ready work with:
 
 ```bash
 node fireskills/skills/fireskill-07-implement/scripts/next_task.mjs \
-  <raiz>/specs/<estado>/<NNNN>-<slug>/spec.md
+  <root>/specs/<state>/<NNNN>-<slug>/spec.md
 ```
 
-Se não houver tarefa pronta, diferencie `concluído` de `bloqueado por dependência`.
+If no task is ready, distinguish between `complete` and `blocked by dependency`.
 
-## Executar uma tarefa
+## Executing a Task
 
-1. Confirme ID, tipo, referências, dependências, arquivos e resultado verificável; marque `PREP` imediatamente após essa confirmação.
-2. Para `[TEST]`, siga `$fireskill-06-tdd-bdd`: leia o Gherkin de referência na
-   spec e use-o para desenhar o teste TDD; adicione marcadores e observe RED
-   válido. Nunca crie ou execute `.feature`. Use **Vitest** como runner de testes
-   (já instalado em todo workspace do Nuxfire: `vitest ^5.0.0`).
-3. Para `[CODE]`, confirme o predecessor TDD concluído cobrindo os mesmos IDs,
-   com RED registrado na seção 11. Sem isso, pare e não altere produção.
-   Anuncie a pendência e retorne automaticamente para
-   `$fireskill-05-tasks`, que reabre o plano, chama `$fireskill-06-tdd-bdd` e
-   retoma esta skill depois do novo `Plan Gate: Passed`.
-4. Escreva a menor mudança de produção que torna o teste TDD verde.
-   Para uma tarefa de interface, implemente a tela, os menus, o formulário e a interação
-   definidos na spec com os estados descritos; não substitua o fluxo por uma
-   rota de API, um componente vazio ou um atalho sem a tela acordada.
-   Em Vue/Nuxt, siga `$fireskill-specialist-nuxt-ui` para localizar,
-   reaproveitar, adaptar e registrar os componentes @nuxt/ui antes de criar uma nova
-   composição.
-   Quando a tarefa usa `[MIGRATION]`, crie primeiro o arquivo versionado no
-   caminho planejado. Passe o comando pelo `check_database_safety.mjs`, aplique
-   a migration no banco de teste e consulte o estado logo depois. Registre os
-   dois comandos com saída zero no comentário `specsfy:evidence` da tarefa.
-5. Depois de alterar produção e antes de marcar `EXECUTE`, monitore o contexto:
+1. Confirm ID, type, references, dependencies, files, and verifiable outcome; check `PREP` immediately upon confirmation.
+2. For `[TEST]`, follow `$fireskill-06-tdd-bdd`: read reference Gherkin in the spec and use it to design TDD tests; add markers and observe valid RED. Never create or execute raw `.feature` files. Use **Vitest** as test runner (configured in Nuxfire: `vitest ^5.0.0`).
+3. For `[CODE]`, confirm completed TDD predecessor covering the same IDs, with RED documented in section 11. Without this, stop and do not touch production code. Announce blocker and automatically return to `$fireskill-05-tasks`, which reopens the plan, calls `$fireskill-06-tdd-bdd`, and resumes this skill after the new `Plan Gate: Passed`.
+4. Write minimal production code making the TDD test green.
+   For interface tasks, implement the screen, menus, forms, and interactions defined in the spec with documented states; do not substitute the flow with a bare API route, empty component, or shortcut skipping the agreed screen.
+   In Vue/Nuxt, follow `$fireskill-specialist-nuxt-ui` to locate, reuse, adapt, and register `@nuxt/ui` components before creating new compositions.
+   When a task includes `[MIGRATION]`, first create the versioned file in the planned path. Validate the command through `check_database_safety.mjs`, apply the migration to the test database, and query migration status immediately after. Record both exit-0 commands in the task's `specsfy:evidence` comment.
+5. After modifying production and before checking `EXECUTE`, monitor context:
 
 ```bash
 node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs \
-  --project <raiz> --check
+  --project <root> --check
 ```
 
-   Para stack pendente, faça handoff a `$fireskill-aux-stack`; para persistência,
-   a `$fireskill-aux-database`; para regra confirmada, a
-   `$fireskill-aux-rules`. Revise `.fireskills/PROJECT.md` em toda mudança de aplicação. Se
-   não houver impacto material na história, finalidade, capacidades ou limites,
-   registre a avaliação na evidência da tarefa e repita com
-   `--acknowledge-project-no-change`. Não marque a tarefa enquanto o monitor
-   retornar `PENDING`.
-6. Depois de cada tarefa `[CODE]`, anuncie
-   `Transição automática: $fireskill-07-implement → $fireskill-documentator —
-   motivo: implementação alterou o sistema — resultado esperado: docs/
-   reconstruído e atual` e carregue `$fireskill-documentator`. Reconstrua a
-   documentação a partir de todo o código existente, execute seu `--check` e
-   retome esta skill somente quando a documentação estiver atual.
-7. Para `[DOC]` ou `[OPS]`, produza a evidência específica pedida.
-8. Marque `EXECUTE` somente quando a entrega e a documentação exigida existirem
-   nos caminhos declarados.
-9. Confira novamente cada comando de teste com `check_database_safety.mjs`.
-   Execute o teste TDD focal, a suite relacionada e checks estáticos somente
-   após `SAFE`;
-   marque `VERIFY` somente com o resultado esperado.
-10. Refatore somente com tudo verde.
-11. Registre comando, resultado e IDs nas seções 11–13 e então marque `EVIDENCE`.
-   Quando houver `Evidence Contract: 1`, grave também o comentário JSON
-   `specsfy:evidence` no bloco da tarefa e execute:
+   For pending stack changes, hand off to `$fireskill-aux-stack`; for persistence changes, to `$fireskill-aux-database`; for confirmed rules, to `$fireskill-aux-rules`. Review `.fireskills/PROJECT.md` on every application change. If there is no material impact on purpose, capabilities, or constraints, record justification in task evidence and repeat with `--acknowledge-project-no-change`. Do not check off the task while monitor reports `PENDING`.
+6. After each `[CODE]` task, announce:
+   `Automatic transition: $fireskill-07-implement → $fireskill-documentator — reason: implementation altered system — expected result: docs/ reconstructed and current`
+   and load `$fireskill-documentator`. Rebuild documentation from full codebase, run `--check`, and resume this skill only when documentation is current.
+7. For `[DOC]` or `[OPS]`, produce requested specific evidence.
+8. Check `EXECUTE` only when the deliverable and required documentation exist in declared paths.
+9. Re-verify each test command with `check_database_safety.mjs`. Run focal TDD test, related test suites, and static typechecks only after `SAFE`; check `VERIFY` only upon matching expected outcome.
+10. Refactor only with all tests passing green.
+11. Record command, result, and IDs in sections 11–13, then check `EVIDENCE`.
+    When `Evidence Contract: 1` applies, write the `specsfy:evidence` JSON comment inside the task block and run:
 
 ```bash
 node fireskills/skills/fireskill-07-implement/scripts/verify_evidence.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md . --task TNNN
+  specs/<state>/<NNNN>-<slug>/spec.md . --task TNNN
 ```
 
-Quando uma execução completa produzir atestação schema 2, verifique novamente
-com `--attestation PATH`. Exija commit compatível, binding da mesma spec/tarefa,
-refs e comandos idênticos, checks realmente aprovados e SHA-256 atual de cada
-arquivo. Atestação de `--self-test` não prova entrega.
-12. Faça uma micro-retrospectiva: aplique uma melhoria segura encontrada ou registre “nenhuma melhoria necessária” com justificativa; então marque `IMPROVE`.
-13. Na seção 14 de `specs/<estado>/<NNNN>-<slug>/spec.md`, altere o pai de `- [ ]` para `- [x]` somente quando os seis itens estiverem concluídos, incluindo `VISUAL`.
-14. Execute `validate_tasks.mjs`, recalcule a próxima tarefa e confira o próximo item retornado por `next_task.mjs`.
+When a full run generates a schema 2 attestation, verify again with `--attestation PATH`. Require matching commit, binding for the same spec/task, identical refs and commands, passing checks, and current SHA-256 for each file. Attestations from `--self-test` do not prove delivery.
+12. Conduct a micro-retrospective: apply a safe identified improvement or document "no improvement needed" with rationale; then check `IMPROVE`.
+13. In section 14 of `specs/<state>/<NNNN>-<slug>/spec.md`, change parent from `- [ ]` to `- [x]` only when all six items are complete, including `VISUAL`.
+14. Run `validate_tasks.mjs`, recalculate next task, and inspect next item returned by `next_task.mjs`.
 
-Uma tarefa `[MIGRATION]` não pode ser concluída apenas porque o model, a query
-ou o teste existe. `verify_evidence.mjs` exige o arquivo da migration, o comando
-que a aplicou e a consulta que confirma seu estado. Se faltar qualquer um,
-mantenha `EXECUTE`, `VERIFY` e a tarefa abertos.
+A `[MIGRATION]` task cannot be completed merely because the model, query, or test exists. `verify_evidence.mjs` requires the migration file, the command applying it, and the query confirming its status. If any are missing, keep `EXECUTE`, `VERIFY`, and the parent task open.
 
-Atualize os itens conforme o trabalho acontece; não os marque em lote no encerramento. Tarefas `[P]` podem ser agrupadas apenas quando não tocam os mesmos arquivos ou estado. Se a execução revelar dependência oculta, torne-a explícita na seção 14.
+Update checklist items incrementally as work progresses; never check items in bulk upon completion. `[P]` tasks may be grouped only when they touch disjoint files and state. If execution uncovers hidden dependencies, document them explicitly in section 14.
 
-## Controlar mudança de escopo
+## Controlling Scope Creep
 
-Pare quando a implementação exigir comportamento não descrito, contradizer um
-`AC` ou mudar interface pública, dados, segurança ou fora de escopo. Anuncie a
-pendência e carregue automaticamente `$fireskill-update-spec`. Essa skill
-preserva o pedido, decide se precisa refinar a pessoa, atualiza a fonte
-normativa, reabre somente os gates afetados e percorre validação, tarefas e
-TDD/BDD. Retome esta skill somente com os gates novamente aprovados. Atualize na
-ordem:
+Stop immediately when implementation demands undescribed behavior, contradicts an `AC`, or alters public interfaces, data schemas, security invariants, or out-of-scope boundaries. Announce the blocker and automatically load `$fireskill-update-spec`. That skill captures user intent, decides if user clarification is required, updates normative specifications, reopens only affected gates, and traverses validation, tasks, and TDD/BDD. Resume this skill only after gates are approved again. Update in exact order:
 
 ```text
-specs/<estado>/<NNNN>-<slug>/spec.md (seções 1–13) → tarefas (seção 14) → testes → código → evidências na mesma spec
+specs/<state>/<NNNN>-<slug>/spec.md (sections 1–13) → tasks (section 14) → tests → code → evidence in same spec
 ```
 
-Correções internas reversíveis podem ser decididas no código e registradas no relato sem reabrir a especificação.
+Reversible internal refactorings may be decided in code and recorded in reports without reopening the specification.
 
-## Gate de conclusão
+## Completion Gate
 
-Quando todas as tarefas da seção 14 estiverem marcadas:
+When all tasks in section 14 are marked complete:
 
-1. execute a suite completa disponível, lint, tipos e build;
-2. execute a rastreabilidade de testes;
-3. compare cada `AC`, `FR`, `NFR` e item da Definition of Done com evidência atual;
-4. procure tarefas abertas, placeholders, testes pulados e falhas conhecidas;
-5. execute novamente `monitor_context.mjs --project <raiz> --check` e resolva toda
-   documentação pendente;
-6. carregue `$fireskill-documentator`, reconstrua `docs/` e exija que o
-   `build_documentation.mjs --project <raiz> --check` passe;
-7. não declare conclusão se alguma evidência estiver ausente;
-8. para toda tarefa `[MIGRATION]`, execute `verify_evidence.mjs` e confirme o
-   arquivo, a aplicação e a consulta de estado;
-9. altere `Delivery Gate` para `Passed` somente com rastreabilidade completa,
-   defina `Status: Reviewing` e execute `bun run fireskill transition <id> review`.
-   `$fireskill-04-validate` conclui o aceite e move a spec para `completed`.
+1. Run full test suite, linter, typecheck, and build;
+2. Verify test traceability;
+3. Compare each `AC`, `FR`, `NFR`, and Definition of Done item against current evidence;
+4. Scan for open tasks, placeholders, skipped tests, or known defects;
+5. Rerun `monitor_context.mjs --project <root> --check` and resolve all pending documentation flags;
+6. Load `$fireskill-documentator`, rebuild `docs/`, and require `build_documentation.mjs --project <root> --check` to pass;
+7. Never declare completion if any evidence is missing;
+8. For every `[MIGRATION]` task, run `verify_evidence.mjs` and confirm migration file, application, and status check;
+9. Update `Delivery Gate` to `Passed` only with complete traceability, set `Status: Reviewing`, and run `bun run fireskill transition <id> review`.
+   `$fireskill-04-validate` completes acceptance and transitions the spec to `completed`.
 
-Depois do gate final, projete o resumo de entrega sem criar arquivo:
+After final gate, project the delivery summary without writing files:
 
 ```bash
 node fireskills/skills/fireskill-07-implement/scripts/render_delivery.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md --format markdown
+  specs/<state>/<NNNN>-<slug>/spec.md --format markdown
 ```
 
-Use `--preview` enquanto a entrega estiver aberta. Publicar o texto em PR,
-commit ou ferramenta externa exige pedido explícito; o script escreve somente
-em stdout.
+Use `--preview` while delivery is open. Publishing text into PRs, commits, or external tools requires explicit user authorization; the script outputs exclusively to stdout.
 
-Leia `references/completion-gates.md` para o fechamento.
+Read `references/completion-gates.md` for closeout criteria.
 
-## Relatar
+## Reporting
 
-Informe tarefas concluídas, arquivos alterados, comandos e resultados, cobertura
-de IDs, falhas preexistentes, próxima tarefa pronta ou o gate final. Ao final,
-anuncie e carregue automaticamente `$fireskill-progress` para conferir a
-visão global derivada da fonte. Em falha, anuncie a pendência, carregue
-automaticamente a skill responsável quando necessário e deixe a tarefa aberta
-até a correção e retomada.
+Report completed tasks, modified files, commands and outcomes, ID coverage, pre-existing failures, next ready task, or final gate status. Upon closeout, announce and automatically load `$fireskill-progress` to inspect global state. On failure, announce the blocker, automatically load the responsible skill when necessary, and leave the task open until fixed.
 
-## Especialistas sob demanda
+## Specialists on Demand
 
-Leia [references/specialists.md](references/specialists.md) antes de executar
-uma tarefa cuja tecnologia ou risco não esteja coberto pelo contexto local.
-Instale somente com autorização no projeto consumidor.
+Read [references/specialists.md](references/specialists.md) before executing tasks whose technology or risk is not fully covered by local context. Install specialists only with explicit authorization in the consumer project.

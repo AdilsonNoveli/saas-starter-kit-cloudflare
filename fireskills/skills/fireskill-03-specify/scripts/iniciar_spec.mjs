@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Cria uma spec em `specs/draft/` a partir do template instalado. */
+/** Creates a spec in `specs/draft/` from the installed template. */
 
 import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -22,20 +22,20 @@ function parseArgs(argv) {
   const values = {};
   for (let index = 0; index < argv.length; index += 1) {
     const key = argv[index];
-    if (!key.startsWith("--")) fail(`argumento inválido: ${key}`);
+    if (!key.startsWith("--")) fail(`invalid argument: ${key}`);
     const value = argv[index + 1];
-    if (!value || value.startsWith("--")) fail(`valor ausente para ${key}`);
+    if (!value || value.startsWith("--")) fail(`missing value for ${key}`);
     values[key.slice(2)] = value;
     index += 1;
   }
-  if (!values.title) fail("--title é obrigatório");
+  if (!values.title) fail("--title is required");
   return values;
 }
 
 function normalizedTitle(raw) {
   const title = raw.trim();
-  if (!title) fail("o título não pode ficar vazio");
-  if (/\r|\n/u.test(title)) fail("o título deve ocupar uma única linha");
+  if (!title) fail("title cannot be empty");
+  if (/\r|\n/u.test(title)) fail("title must occupy a single line");
   return title;
 }
 
@@ -45,14 +45,14 @@ function slugify(title) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/gu, "-")
     .replace(/^-+|-+$/gu, "");
-  if (!slug) fail("o título deve conter ao menos um caractere alfanumérico");
+  if (!slug) fail("title must contain at least one alphanumeric character");
   return slug;
 }
 
 function validatedSlug(raw, title) {
   if (raw === undefined) return slugify(title);
   const slug = raw.trim();
-  if (!SLUG_PATTERN.test(slug)) fail(`slug inválido ${JSON.stringify(raw)}; utilize caracteres ASCII em kebab-case`);
+  if (!SLUG_PATTERN.test(slug)) fail(`invalid slug ${JSON.stringify(raw)}; use ASCII characters in kebab-case`);
   return slug;
 }
 
@@ -84,7 +84,7 @@ async function template(root) {
       if (error?.code !== "ENOENT") throw error;
     }
   }
-  fail("template não encontrado; restaure fireskills/skills/templates/Spec.md");
+  fail("template not found; restore fireskills/skills/templates/Spec.md");
 }
 
 function render(content, number, title, slug) {
@@ -97,11 +97,11 @@ function render(content, number, title, slug) {
   };
   let rendered = content;
   for (const [token, value] of Object.entries(replacements)) {
-    if (!rendered.includes(token)) fail(`token obrigatório ausente no modelo: ${token}`);
+    if (!rendered.includes(token)) fail(`required token missing in template: ${token}`);
     rendered = rendered.replaceAll(token, value);
   }
   const unresolved = [...new Set(rendered.match(/\{\{[A-Z0-9_]+\}\}/gu) ?? [])];
-  if (unresolved.length) fail(`tokens não preenchidos no modelo: ${unresolved.join(", ")}`);
+  if (unresolved.length) fail(`unresolved tokens in template: ${unresolved.join(", ")}`);
   return rendered;
 }
 
@@ -118,13 +118,13 @@ async function initialize(root, title, slug) {
       if (error?.code !== "EEXIST") throw error;
       await new Promise((resolveWait) => setTimeout(resolveWait, 10));
     }
-    if (attempt === 499) fail("não foi possível reservar o próximo ID da spec");
+    if (attempt === 499) fail("could not allocate the next spec ID");
   }
   let directory;
   let number;
   try {
     number = Math.max(0, ...(await existingNumbers(root))) + 1;
-    if (number > MAX_SPEC_NUMBER) fail(`a sequência atingiu o limite ${MAX_SPEC_NUMBER}`);
+    if (number > MAX_SPEC_NUMBER) fail(`sequence reached limit of ${MAX_SPEC_NUMBER}`);
     directory = join(destinationRoot, `${String(number).padStart(4, "0")}-${slug}`);
     try {
       await mkdir(directory);
@@ -152,6 +152,6 @@ try {
   const root = resolve(args.root ?? process.cwd());
   console.log(await initialize(root, title, validatedSlug(args.slug, title)));
 } catch (error) {
-  console.error(`erro: ${error instanceof Error ? error.message : String(error)}`);
+  console.error(`error: ${error instanceof Error ? error.message : String(error)}`);
   process.exitCode = 1;
 }

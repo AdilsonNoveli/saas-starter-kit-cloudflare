@@ -1,8 +1,7 @@
 /**
- * Execução dos testes do projeto consumidor.
+ * Consumer project test execution.
  *
- * Substitui o detector do Specsfy (que só conhecia Laravel + Pest): no Nuxfire
- * o runner é o Vitest, exposto pelo script `test` do `package.json` da raiz.
+ * Runs Vitest exposed via the root `package.json` test script (`bun run test`).
  */
 
 import { spawn } from "node:child_process";
@@ -11,7 +10,7 @@ import { join } from "node:path";
 import { performance } from "node:perf_hooks";
 import { isFile, pathExists, resolvePath } from "./filesystem.js";
 
-/** Comando de teste detectado, sem interpretação por shell. */
+/** Detected test command without shell interpretation. */
 export interface TestCommand {
   label: string;
   argv: readonly string[];
@@ -19,41 +18,41 @@ export interface TestCommand {
   display: string;
 }
 
-/** Resultado de uma execução do runner do projeto. */
+/** Result of executing the project runner. */
 export interface TestRun {
   command: TestCommand;
   exit_code: number;
   duration_seconds: number;
 }
 
-/** Detecta `bun run test` a partir do `package.json` da raiz. */
+/** Detects `bun run test` from root `package.json`. */
 export async function detectProjectTestCommand(
   project: string,
 ): Promise<TestCommand> {
   const root = resolvePath(project);
   if (!(await pathExists(root))) {
-    throw new Error(`projeto não encontrado: ${root}`);
+    throw new Error(`project not found: ${root}`);
   }
   const manifest = join(root, "package.json");
   if (!(await isFile(manifest))) {
-    throw new Error(`package.json não encontrado em ${root}`);
+    throw new Error(`package.json not found in ${root}`);
   }
   const parsed = JSON.parse(await readFile(manifest, "utf8")) as {
     scripts?: Record<string, string>;
   };
   if (!parsed.scripts?.test) {
-    throw new Error("o package.json da raiz não define o script `test`");
+    throw new Error("root package.json does not define a `test` script");
   }
   const argv = ["bun", "run", "test"] as const;
   return { label: "Vitest (bun)", argv, cwd: root, display: argv.join(" ") };
 }
 
-/** Executa o runner detectado, repassa a saída e preserva o exit code. */
+/** Executes detected test runner, pipes stdout/stderr and preserves exit code. */
 export async function runProjectTests(project: string): Promise<TestRun> {
   const command = await detectProjectTestCommand(project);
   const startedAt = performance.now();
   const [executable, ...arguments_] = command.argv;
-  if (!executable) throw new Error("comando de teste vazio");
+  if (!executable) throw new Error("empty test command");
   const exitCode = await new Promise<number>((resolve, reject) => {
     const child = spawn(executable, arguments_, {
       cwd: command.cwd,
@@ -65,6 +64,6 @@ export async function runProjectTests(project: string): Promise<TestRun> {
   return {
     command,
     exit_code: exitCode,
-    duration_seconds: (performance.now() - startedAt) / 1000,
+    duration_seconds: Number(((performance.now() - startedAt) / 1000).toFixed(2)),
   };
 }

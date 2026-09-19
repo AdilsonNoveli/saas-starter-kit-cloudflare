@@ -1,5 +1,5 @@
 /**
- * Projeção de progresso das especificações Markdown.
+ * Progress projection for Markdown specifications.
  */
 
 import { createHash } from "node:crypto";
@@ -14,7 +14,7 @@ const CHECKLIST_ITEM = /^\s*[-*+]\s*\[([ xX])\]\s+(.+?)\s*$/;
 const TASK_ID = /^(?:\*\*|`)?T\d+\b/i;
 const GATE_NAMES = ["definition gate", "plan gate", "delivery gate"] as const;
 
-/** Métricas e conteúdo de uma especificação. */
+/** Specification metrics and content. */
 export interface SpecProgress {
   slug: string;
   title: string;
@@ -37,7 +37,7 @@ export interface SpecProgress {
   percent: number;
 }
 
-/** Totais consolidados de uma coleção de specs. */
+/** Aggregated totals across a spec collection. */
 export interface ProgressSummary {
   total_specs: number;
   completed_specs: number;
@@ -52,13 +52,13 @@ export interface ProgressSummary {
   percent: number;
 }
 
-/** Lê specs no layout canônico e no layout legado. */
+/** Reads specs in canonical and legacy layouts. */
 export async function scanSpecs(project: string): Promise<SpecProgress[]> {
   const root = resolvePath(project);
   return Promise.all((await scanSpecPaths(root)).map(parseSpec));
 }
 
-/** Consolida as métricas das specs fornecidas. */
+/** Consolidates metrics from provided specs. */
 export function summarizeSpecs(specs: SpecProgress[]): ProgressSummary {
   const completedItems = sum(specs, "completed_items");
   const totalItems = sum(specs, "total_items");
@@ -85,7 +85,7 @@ export function summarizeSpecs(specs: SpecProgress[]): ProgressSummary {
   };
 }
 
-/** Calcula o fingerprint dos caminhos e conteúdos de spec. */
+/** Computes sha256 fingerprint of spec paths and contents. */
 export async function specsFingerprint(project: string): Promise<string> {
   const root = resolvePath(project);
   const digest = createHash("sha256");
@@ -102,7 +102,7 @@ export async function specsFingerprint(project: string): Promise<string> {
   return digest.digest("hex");
 }
 
-/** Remove o conteúdo bruto antes de serializar a resposta pública. */
+/** Strips raw content before serializing public response. */
 export function serializeSpec(spec: SpecProgress): Omit<SpecProgress, "content"> {
   const { content: _content, ...serialized } = spec;
   return serialized;
@@ -163,10 +163,19 @@ async function parseSpec(path: string): Promise<SpecProgress> {
   };
 }
 
-function parsedEffort(value: string | undefined): number | null {
-  if (!value || !/^\d+$/u.test(value)) return null;
-  const effort = Number(value);
-  return effort >= 1 && effort <= 10 ? effort : null;
+function sum(specs: SpecProgress[], key: keyof SpecProgress): number {
+  return specs.reduce((total, spec) => total + Number(spec[key] ?? 0), 0);
+}
+
+function ratio(part: number, total: number): number {
+  if (!total) return 0;
+  return Math.round((part / total) * 100);
+}
+
+function parsedEffort(value?: string): number | null {
+  if (!value) return null;
+  const parsed = Number(value.trim());
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 10 ? parsed : null;
 }
 
 function effortProfile(
@@ -177,26 +186,4 @@ function effortProfile(
   if (effort <= 6) return "standard";
   if (effort <= 8) return "high";
   return "maximum";
-}
-
-function sum(
-  specs: SpecProgress[],
-  key:
-    | "completed_items"
-    | "total_items"
-    | "completed_tasks"
-    | "total_tasks"
-    | "passed_gates"
-    | "total_gates",
-): number {
-  return specs.reduce((total, spec) => total + spec[key], 0);
-}
-
-function ratio(completed: number, total: number): number {
-  if (!total) return 0;
-  const value = (completed * 100) / total;
-  const floor = Math.floor(value);
-  const fraction = value - floor;
-  if (fraction !== 0.5) return Math.round(value);
-  return floor % 2 === 0 ? floor : floor + 1;
 }

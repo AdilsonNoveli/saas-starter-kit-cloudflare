@@ -1,52 +1,46 @@
-# Receita: adicionar uma permissão/habilidade
+# Recipe: Adding a Permission / Ability
 
-Baseada em `layers/kanban` (permissões e habilidades de uma layer de feature) e
-`layers/teams` (as três funções de papel de sistema).
+Based on `layers/kanban` (feature layer permissions and abilities) and `layers/teams` (the three system role functions).
 
-## Passos (numa layer existente)
+## Steps (in an existing layer)
 
-1. **String da permissão** — `layer:recurso:ação`. Acrescente:
-   - ao `permissions` de `layer.manifest.ts`;
-   - ao objeto de constantes em `shared/utils/permissions.ts`
-     (`PERMISSIONS`/`<LAYER>_PERMISSIONS`).
-2. **Habilidade** — em `shared/utils/abilities.ts`, **com prefixo da layer**:
+1. **Permission string** — `layer:resource:action`. Add to:
+   - `permissions` array in `layer.manifest.ts`;
+   - Constants object in `shared/utils/permissions.ts` (`PERMISSIONS` / `<LAYER>_PERMISSIONS`).
+2. **Ability** — in `shared/utils/abilities.ts`, **with layer prefix**:
 
 ```ts
-export const minhaLayerCriarCoisa = defineAbility(
+export const myLayerCreateThing = defineAbility(
   (user: User | null, teamId: string) =>
-    hasTeamPermission(user, teamId, MINHA_PERMISSIONS.COISAS.CREATE),
+    hasTeamPermission(user, teamId, MY_PERMISSIONS.THINGS.CREATE),
 );
 ```
 
-3. **Papéis** — quem recebe a permissão:
-   - Layer **core** (`teams`/`billing`…): acrescente ao `SYSTEM_ROLES` em
-     `apps/functions/src/database/seed/data.ts` (constante espelhada como string).
-   - Layer **de feature** ou permissão nova numa instalação já semeada: faça um
-     `ensure<Layer>Permissions()` em `server/utils/permissions.ts` (modelo:
-     `ensureKanbanPermissions`), chamado no início das procedures da layer
-     (`listBoards` chama). Ele é **idempotente** (`onConflictDoNothing`) e usa
-     *flag* em processo.
-   - Se ambos, mantenha `data.ts` e o `ensure…` **coerentes**: são duas vias
-     para o mesmo estado.
-4. **Servidor** — na procedure (`abilityProcedure`):
-   `await authorize(minhaLayerCriarCoisa, team.id)` **depois** de provar
-   associação à equipe e **antes** de escrever.
-5. **Cliente** — `<Can :ability="minhaLayerCriarCoisa" :args="[team.id]">` para
-   esconder a UI, e/ou um wrapper `useXAbility(team)` com `allows` em
-   `useAsyncData`, no `app/composables/use-ability.ts` **da layer que define a
-   habilidade**.
-6. **Teste** — `shared/utils/abilities.test.ts`: caso permitido, caso negado
-   (sem permissão), caso de fora da equipe (`outsider`), e, se a ação tem alvo,
-   o caso "não pode agir sobre si mesmo".
-7. `bun run test` e o typecheck de `apps/app`.
+3. **Roles** — assign who receives the permission:
+   - **Core** layer (`teams`/`billing`…): add to `SYSTEM_ROLES` in
+     `apps/functions/src/database/seed/data.ts` (mirrored string constant).
+   - **Feature** layer or new permission in an existing seeded database: implement
+     `ensure<Layer>Permissions()` in `server/utils/permissions.ts` (following
+     `ensureKanbanPermissions`), called at the beginning of layer procedures (e.g., `listBoards`).
+     It must be **idempotent** (`onConflictDoNothing`) with an in-memory process flag.
+   - If both, keep `data.ts` and `ensure…` **coherent**: they are two paths to the same state.
+4. **Server** — inside the procedure (`abilityProcedure`):
+   `await authorize(myLayerCreateThing, team.id)` **after** proving team membership
+   and **before** writing data.
+5. **Client** — `<Can :ability="myLayerCreateThing" :args="[team.id]">` to conditionally
+   render UI, and/or a `useXAbility(team)` composable using `allows` in `useAsyncData`,
+   located in `app/composables/use-ability.ts` **in the owning layer**.
+6. **Test** — `shared/utils/abilities.test.ts`: test allowed, denied (no permission),
+   outsider (different team), and self-action restrictions where applicable.
+7. Run `bun run test` and `apps/app` typechecks.
 
 ## Checklist
 
-- [ ] Nome com o prefixo da **layer** (não da permissão).
-- [ ] `hasTeamPermission` local; só constantes importadas de outra layer.
-- [ ] Manifesto, constantes e `SYSTEM_ROLES` com a **mesma** string.
-- [ ] Papéis de sistema recebem a permissão (seed **e/ou** `ensure…`).
-- [ ] `authorize` no servidor; `<Can>` é só cosmético.
-- [ ] Importada por `@nuxfire/layer-<nome>/shared/utils/abilities` fora da layer.
-- [ ] Teste cobre permitido, negado e fora da equipe.
-- [ ] Nada de plataforma passando por `abilityProcedure`.
+- [ ] Ability export named with **layer** prefix (not permission name).
+- [ ] `hasTeamPermission` is local; only constants imported across layers.
+- [ ] Manifest, constants, and `SYSTEM_ROLES` share the **exact same** string.
+- [ ] System roles receive the permission (seed **and/or** `ensure…`).
+- [ ] `authorize` called on server; `<Can>` is purely for UX.
+- [ ] Imported via `@nuxfire/layer-<name>/shared/utils/abilities` outside the layer.
+- [ ] Tests cover allowed, denied, and outsider cases.
+- [ ] Platform admin procedures do not use `abilityProcedure`.

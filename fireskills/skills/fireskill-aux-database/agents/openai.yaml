@@ -1,4 +1,4 @@
 interface:
-  display_name: "Fireskill - Banco de Dados Auxiliar"
-  short_description: "Monitora e mantém a documentação do banco"
-  default_prompt: "Use $fireskill-aux-database para monitorar persistência e atualizar .fireskills/DATABASE.md após mudanças de dados."
+  display_name: "Fireskill - Aux Database"
+  short_description: "Monitors and maintains database documentation"
+  default_prompt: "Use $fireskill-aux-database to monitor persistence and update .fireskills/DATABASE.md after data changes."

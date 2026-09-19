@@ -1,57 +1,54 @@
-# Autorização no Nuxfire — o que existe de fato no código
+# Authorization in Nuxfire — What Actually Exists in Code
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento.
-Há **dois sistemas separados**; não os misture:
+Every statement cites its evidence file. Code supersedes this document.
+There are **two distinct systems**; never confuse them:
 
-| Sistema | Pergunta | Onde |
+| System | Question | Where |
 |---|---|---|
-| **RBAC de equipe (tenant)** | "este usuário pode X **nesta equipe**?" | `nuxt-authorization` + `defineAbility()` + `abilityProcedure` |
-| **Autoridade de plataforma** | "este é o dono/operador do SaaS?" | `platformAdminProcedure` + `PlatformAdmin` + MFA elevada |
+| **Team RBAC (tenant)** | "can this user do X **in this team**?" | `nuxt-authorization` + `defineAbility()` + `abilityProcedure` |
+| **Platform Authority** | "is this the SaaS owner/operator?" | `platformAdminProcedure` + `PlatformAdmin` + elevated MFA |
 
-Este documento cobre o primeiro. O segundo está em `$fireskill-specialist-trpc`
-(§3) e `$fireskill-specialist-openauth`.
+This document covers the first. The second is documented in `$fireskill-specialist-trpc`
+(§3) and `$fireskill-specialist-openauth`.
 
 ## 1. Stack
 
-- `nuxt-authorization` `^0.3.5` (`apps/app/package.json`), módulo em
-  `apps/app/nuxt.config.ts`. Estilo Bouncer: `defineAbility(fn)`.
-- **Não existe CASL.** A permissão de cada usuário vem de linhas do banco
-  (`Role`/`Permission`), não de constantes em código.
+- `nuxt-authorization` `^0.3.5` (`apps/app/package.json`), module in
+  `apps/app/nuxt.config.ts`. Bouncer style: `defineAbility(fn)`.
+- **CASL is not used.** User permissions come from database rows
+  (`Role`/`Permission`), not hardcoded in source code.
 
-## 2. Modelo de dados
+## 2. Data Model
 
-- `Role`: papel por equipe; `Role.teamId = null` = **papel de sistema**
-  (compartilhado). Três papéis de sistema: **Owner**, **Admin**, **Member**
-  (`Member` é `isDefault`). `Permission`: `(action, roleId)` com chave composta
-  (`onConflictDoNothing()` torna backfill idempotente); `action` é a string
-  `layer:recurso:ação`.
-- Origem dos dados: `apps/functions/src/database/seed/data.ts` (`SYSTEM_ROLES`),
-  usado pelo seed de deploy **e** por `ensureSystemRoles()`
-  (`layers/teams/server/utils/roles.ts`), a rede de segurança reativa.
-- `data.ts` **espelha como string literal** as ações de
-  `layers/teams/shared/utils/permissions.ts` (o pacote `functions` não depende do
-  `shared/` da layer). Se um lado mudar um valor, o outro muda junto.
-- Layer de feature que nasce depois do seed acrescenta o seu backfill:
+- `Role`: role per team; `Role.teamId = null` = **system role** (shared across teams).
+  Three system roles: **Owner**, **Admin**, **Member** (`Member` is `isDefault`).
+  `Permission`: `(action, roleId)` composite primary key (`onConflictDoNothing()` enables
+  idempotent backfills); `action` is the string `layer:resource:action`.
+- Source of truth: `apps/functions/src/database/seed/data.ts` (`SYSTEM_ROLES`),
+  used by deployment seed **and** by `ensureSystemRoles()`
+  (`layers/teams/server/utils/roles.ts`), the reactive safety net.
+- `data.ts` **mirrors as literal strings** the actions from
+  `layers/teams/shared/utils/permissions.ts` (the `functions` package does not depend
+  on layer `shared/`). When one side changes, both must be updated.
+- Feature layers created after initial seed add their own backfill:
   `ensure<Layer>Permissions()` (`layers/kanban/server/utils/permissions.ts`):
-  mapa papel→permissões, *flag* em processo para pagar um `SELECT` por processo,
+  role→permissions map, in-process boolean flag to pay one `SELECT` per process,
   `onConflictDoNothing()`.
 
-## 3. Como o usuário chega ao check
+## 3. How Users Reach Authorization Checks
 
-- **Servidor**: `apps/app/server/plugins/authorization-resolver.ts` põe
-  `event.context.$authorization.resolveServerUser = () => getUser(event)` a cada
-  requisição. `getUser` (`server/utils/auth.ts`) devolve `{ id, name, email,
-  image, permissions, teams, isPlatformAdmin, mfaEnabled }`, onde
-  `permissions: Record<teamId, string[]>` e `teams: string[]`
-  (`getUserPermissions`).
-- **Cliente**: `apps/app/app/plugins/authorization-resolver.ts` →
+- **Server**: `apps/app/server/plugins/authorization-resolver.ts` sets
+  `event.context.$authorization.resolveServerUser = () => getUser(event)` per request.
+  `getUser` (`server/utils/auth.ts`) returns `{ id, name, email, image, permissions, teams, isPlatformAdmin, mfaEnabled }`,
+  where `permissions: Record<teamId, string[]>` and `teams: string[]` (`getUserPermissions`).
+- **Client**: `apps/app/app/plugins/authorization-resolver.ts` →
   `resolveClientUser = () => useSession().user.value`.
-- **Consequência**: as permissões vêm **da sessão carregada**. Mudou papel/
-  permissão no banco? O usuário só enxerga depois que a sessão é relida.
+- **Consequence**: permissions are sourced **from the loaded session**. Database changes
+  take effect only after the session is reloaded.
 
-## 4. Como uma habilidade é escrita (convenção real)
+## 4. Writing an Ability (Actual Convention)
 
-Arquivo: `layers/<layer>/shared/utils/abilities.ts`.
+File: `layers/<layer>/shared/utils/abilities.ts`.
 
 ```ts
 import { PERMISSIONS } from "./permissions";
@@ -72,74 +69,66 @@ export const teamsDeleteTeam = defineAbility(
 );
 ```
 
-- **Todo nome exportado leva o prefixo da layer** (`teamsDeleteTeam`,
-  `kanbanCreateBoard`, `billingGetBillingInfo`). `nuxt-authorization` usa o
-  auto-import de `shared/utils/` do Nuxt, que atravessa layers num único espaço de
-  nomes por nome de export: dois `createBoard` se sobrepõem em silêncio, sem erro
-  de build. **O prefixo é o da LAYER, não o da permissão**: `billingGetBillingInfo`
-  guarda a string `teams:billing:view` (que é de `teams`).
-- **`hasTeamPermission` é duplicado de propósito** em cada layer (quatro linhas de
-  predicado puro), para a layer de feature carregar mesmo sem a layer `teams` no
-  build; importar do módulo de outra layer acopla a internals dela. Importe só as
-  **constantes** de permissão se precisar (`@nuxfire/layer-teams/shared/utils/permissions`).
-- `PERMISSIONS`/`KANBAN_PERMISSIONS` espelham o `permissions` do manifesto da
-  layer (`layer.manifest.ts`).
-- Ações que dependem do **alvo** recebem mais argumentos e os checam:
-  `teamsUpdateMemberRole(user, teamId, memberId?)` e `teamsRemoveMember` **negam
-  agir sobre si mesmo** (`memberId !== user.id`).
-- `teamsListTeams` é `() => true`; `teamsGetTeamDetails` só exige pertencer à
-  equipe.
-- Estrutura (colunas de quadro) usa a permissão do **pai**
-  (`kanbanUpdateBoard`), não uma própria.
-- Import fora da layer: `@nuxfire/layer-<nome>/shared/utils/abilities`.
-  **Nunca `#shared/utils/abilities`**: `#shared` aponta para o `shared/` do
-  Composition Root, jamais o de uma layer.
+- **Every exported name MUST carry the layer prefix** (`teamsDeleteTeam`,
+  `kanbanCreateBoard`, `billingGetBillingInfo`). `nuxt-authorization` leverages Nuxt
+  `shared/utils/` auto-imports across layers in a single namespace per export name:
+  two `createBoard` exports collide silently without build errors. **The prefix is
+  the owning LAYER, not the permission name**: `billingGetBillingInfo` checks
+  `teams:billing:view` (which belongs to `teams`).
+- **`hasTeamPermission` is intentionally duplicated** in each layer (four lines of pure
+  predicate logic) so feature layers can build without a hard dependency on `teams`;
+  importing across layers couples internals. Import only permission **constants**
+  when needed (`@nuxfire/layer-teams/shared/utils/permissions`).
+- `PERMISSIONS` / `KANBAN_PERMISSIONS` mirror the `permissions` array in `layer.manifest.ts`.
+- Actions depending on a **target** inspect arguments:
+  `teamsUpdateMemberRole(user, teamId, memberId?)` and `teamsRemoveMember` **deny acting
+  on oneself** (`memberId !== user.id`).
+- `teamsListTeams` returns `() => true`; `teamsGetTeamDetails` requires only team membership.
+- Structural resources (e.g., board columns) inherit the permission of the **parent**
+  (`kanbanUpdateBoard`), rather than having dedicated permissions.
+- Imports outside the layer: `@nuxfire/layer-<name>/shared/utils/abilities`.
+  **Never `#shared/utils/abilities`**: `#shared` resolves to the Composition Root, never a layer.
 
-## 5. Uso no servidor (tRPC)
+## 5. Server Usage (tRPC)
 
-`abilityProcedure` (`apps/app/server/trpc/trpc.ts`) acrescenta ao `ctx`:
+`abilityProcedure` (`apps/app/server/trpc/trpc.ts`) decorates `ctx`:
 
-- `await ctx.authorize(ability, ...args)` — lança `TRPCError FORBIDDEN` (mensagem
-  do erro original) e registra `console.warn("authz denied", { userId, ability,
-  args })`;
-- `await ctx.allows(ability, ...args)` / `ctx.denies(...)` — booleanos, sem lançar.
+- `await ctx.authorize(ability, ...args)` — throws `TRPCError FORBIDDEN` (original error
+  message) and logs `console.warn("authz denied", { userId, ability, args })`;
+- `await ctx.allows(ability, ...args)` / `ctx.denies(...)` — boolean checks without throwing.
 
-Padrão de procedure: primeiro provar que a equipe existe e que o usuário
-pertence a ela (query com `memberships`), **depois** `authorize`. Habilidade
-responde "pode X na equipe T", nunca "T existe" nem "ele é membro" — ver
-`$fireskill-specialist-trpc`.
+Procedure pattern: first verify team existence and user membership (query with `memberships`),
+**then** invoke `authorize`. Abilities answer "can user do X in team T", never "T exists"
+or "user belongs to T" — see `$fireskill-specialist-trpc`.
 
-## 6. Uso no cliente
+## 6. Client Usage
 
-- **Renderização condicional**: componente `<Can :ability="..." :args="[...]">`
-  (ex.: `layers/teams/app/pages/[[team]]/settings/members.vue`:
-  `<Can :ability="sendInviteAbility" :args="[team?.id || '']">`), importando a
-  habilidade como `import { teamsSendInvite as sendInviteAbility } from
-  "@nuxfire/layer-teams/shared/utils/abilities"`. `<Can>` esconde a UI; **não
-  protege nada**: o servidor decide de novo.
-- **Lógica**: `allows(ability, ...args)` dentro de `useAsyncData`
+- **Conditional Rendering**: `<Can :ability="..." :args="[...]">` component
+  (e.g., `layers/teams/app/pages/[[team]]/settings/members.vue`:
+  `<Can :ability="sendInviteAbility" :args="[team?.id || '']">`), importing the ability as
+  `import { teamsSendInvite as sendInviteAbility } from "@nuxfire/layer-teams/shared/utils/abilities"`.
+  `<Can>` controls UI presentation only; **it provides zero security**: the server makes
+  the authoritative decision.
+- **Logic**: `allows(ability, ...args)` inside `useAsyncData`
   (`layers/teams/app/composables/use-ability.ts`):
   `useAsyncData(() => allows(teamsDeleteTeam, team.value), { watch: [team] })`.
-- O *wrapper* cliente **acompanha a habilidade, não quem o chama**:
-  `useGetBillingInfoAbility` fica em `layers/billing/app/composables/use-ability.ts`
-  mesmo que seu único uso seja em `layers/teams`
-  (`use-team-settings-links.ts`, que decide se a aba Billing aparece).
+- Client wrappers **belong to the layer defining the ability, not the consumer**:
+  `useGetBillingInfoAbility` resides in `layers/billing/app/composables/use-ability.ts`
+  even though used in `layers/teams` (`use-team-settings-links.ts` to show/hide Billing tab).
 
-## 7. Testes
+## 7. Testing
 
-- `shared/utils/abilities.test.ts` por layer (teams, billing, kanban); import de
-  `allows` de `nuxt-authorization/utils`; usuários fabricados
-  (`member([...permissões])`, `outsider`).
-- `defineAbility` é auto-import do Nuxt; o `vitest.setup.ts` da layer o coloca em
-  `globalThis` (`Object.assign(globalThis, { defineAbility })`), duplicado de
-  propósito para a layer rodar sozinha.
-- Ao renomear/mover habilidade, **não altere as asserções**: só os
-  identificadores; suíte verde = comportamento intacto (foi assim nas Fases 3.1a e
-  3.1b).
+- `shared/utils/abilities.test.ts` per layer (teams, billing, kanban); import `allows`
+  from `nuxt-authorization/utils`; mock users (`member([...permissions])`, `outsider`).
+- `defineAbility` is auto-imported by Nuxt; layer `vitest.setup.ts` assigns it to
+  `globalThis` (`Object.assign(globalThis, { defineAbility })`), intentionally duplicated
+  for isolated layer test execution.
+- When renaming or moving an ability, **do not modify test assertions**: only identifiers;
+  green test suite proves intact behavior.
 
-## 8. O que NÃO existe
+## 8. What Does NOT Exist
 
-- Diferenciação de papéis `SUPER_ADMIN`/`SUPPORT` de plataforma (o enum existe; a
-  procedure não os distingue).
-- Cache/invalidations de permissões além de reler a sessão.
-- Testes de router que exercitem `authorize` de ponta a ponta.
+- Distinction between `SUPER_ADMIN` / `SUPPORT` platform roles (enum exists; procedure
+  treats them identically).
+- In-memory permission invalidation/caching beyond reloading session.
+- End-to-end tRPC router integration tests covering `authorize`.

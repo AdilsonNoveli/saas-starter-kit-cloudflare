@@ -1,73 +1,58 @@
-# Padrões e referências de modelagem de domínio
+# Domain Modeling Standards and References
 
-## Blocos de construção táticos (DDD)
+## Tactical Building Blocks (DDD)
 
-- **Entidade**: tem identidade estável ao longo do tempo, mesmo quando seus
-  atributos mudam. Duas entidades são iguais se têm a mesma identidade,
-  nunca pelos valores dos campos.
-- **Value object**: definido inteiramente pelo seu valor, imutável, sem
-  identidade própria. Duas instâncias com o mesmo valor são intercambiáveis
-  (ex.: `Dinheiro(100, "BRL")`, `Endereço`).
-- **Aggregate**: cluster de entidades e value objects tratado como uma
-  unidade de consistência transacional. O **aggregate root** é o único ponto
-  de entrada para mutação; nada fora do aggregate referencia diretamente um
-  membro interno dele.
-- **Domain event**: registro imutável de um fato que já ocorreu no domínio,
-  nomeado no passado, usado para comunicar mudança entre aggregates ou
-  bounded contexts sem acoplamento direto de escrita.
-- **Domain service**: comportamento que não pertence naturalmente a uma
-  entidade ou value object porque envolve mais de um agregado — usar como
-  exceção, não como destino padrão de toda regra.
-- **Repository**: abstração de persistência por aggregate root, não por
-  tabela — o resto do domínio nunca deve montar consultas cross-aggregate
-  diretamente.
+- **Entity**: Possesses stable identity over time, even as attributes change. Two entities
+  are equal if and only if they share identity, never by equality of field values.
+- **Value Object**: Defined entirely by its attributes, immutable, lacking independent identity.
+  Two instances with identical attributes are interchangeable (e.g., `Money(100, "USD")`, `Address`).
+- **Aggregate**: A cluster of entities and value objects treated as a cohesive unit of
+  transactional consistency. The **aggregate root** is the sole gate for state mutations;
+  external objects never hold direct references to internal aggregate members.
+- **Domain Event**: An immutable record of an event that has occurred in the domain,
+  named in the past tense, used to communicate state changes across aggregates or bounded
+  contexts without synchronous write coupling.
+- **Domain Service**: Domain behavior that does not naturally belong to an individual entity
+  or value object because it orchestrates multiple aggregates. Use as an exception, not
+  a dumping ground for business logic.
+- **Repository**: Persistence abstraction per aggregate root, not per database table —
+  domain code must not assemble cross-aggregate query mutations directly.
 
-## Bounded context e context map
+## Bounded Context and Context Mapping
 
-- Um **bounded context** é a fronteira dentro da qual um termo tem exatamente
-  um significado. Fora dela, o mesmo termo pode (e frequentemente deve) ter
-  outro modelo.
-- Padrões de relação entre contextos (context mapping): **Partnership**
-  (times coordenam como iguais), **Customer-Supplier** (um depende do
-  contrato do outro), **Conformist** (aceita o modelo do outro sem
-  influência), **Anticorruption Layer** (traduz na fronteira para proteger o
-  modelo próprio de um modelo externo ruim ou legado), **Shared Kernel**
-  (parte do modelo é literalmente compartilhada — usar com cautela, cria
-  acoplamento de mudança).
-- Use Anticorruption Layer sempre que integrar com um sistema legado ou
-  externo cujo modelo violaria as invariantes do contexto atual.
+- A **bounded context** is the boundary within which a given domain model applies consistently.
+  Beyond that boundary, the same term may legitimately carry a distinct model.
+- Context Mapping patterns: **Partnership** (teams coordinate cooperatively),
+  **Customer-Supplier** (downstream depends on upstream contract), **Conformist** (adopts
+  upstream model without influence), **Anticorruption Layer** (translates at boundaries
+  to isolate domain models from legacy or external schemas), **Shared Kernel** (shared subset
+  of code — use with caution as it introduces change coupling).
+- Always use an Anticorruption Layer (ACL) when integrating with third-party or legacy systems.
 
-## Artefatos de modelagem
+## Modeling Artifacts
 
-- **Glossário**: termo, definição, contexto em que vale, sinônimos
-  rejeitados (e por quê) e um exemplo de uso real.
-- **Cenário** (formato Given/When/Then ou equivalente): estado inicial,
-  comando/evento disparador, regra aplicada, evento resultante, novo estado.
-- **Context map**: contextos identificados e o padrão de relação entre cada
-  par (dos listados acima).
-- **Event storming**: sessão colaborativa que mapeia eventos de domínio em
-  ordem cronológica antes de desenhar comandos e aggregates — útil quando o
-  domínio ainda não tem modelo nenhum ou está sendo redesenhado.
-- **ADR**: decisão estrutural pontual e suas consequências — não é
-  substituto do glossário nem repositório de todo o conhecimento de domínio.
+- **Glossary**: Term, definition, valid bounded context, rejected synonyms (with rationale),
+  and concrete usage example.
+- **Scenario**: Given / When / Then format capturing preconditions, triggering commands,
+  enforced invariants, resulting domain events, and new states.
+- **Context Map**: Identified bounded contexts and interaction patterns between each pair.
+- **Event Storming**: Collaborative timeline mapping of domain events prior to designing
+  commands and aggregates.
+- **ADR**: Architecture Decision Records capturing targeted architectural and domain choices.
 
-## Perguntas-guia para toda decisão de modelo
+## Guiding Questions for Model Decisions
 
-- Quem decide, e quem é o owner capaz de garantir isso na escrita?
-- O que precisa ser consistente imediatamente (mesmo aggregate) versus o que
-  pode ser consistente eventualmente (evento + projeção)?
-- O que muda sempre junto, na mesma transação?
-- Que fato já ocorreu, de forma irreversível, que merece virar evento?
-- Qual bounded context dá significado a este termo especificamente?
-- Que exemplo concreto quebraria esta definição se ela estiver errada ou
-  incompleta?
+- Who makes this decision, and which aggregate root enforces it upon write?
+- What must be immediately consistent (same aggregate) vs eventually consistent (domain event + projection)?
+- Which attributes always mutate together in a single transaction?
+- Which bounded context provides the definitive meaning for this concept?
+- Which counter-example would invalidate this model definition?
 
-## Fontes oficiais e primárias
+## Authoritative Documentation
 
 - Domain-Driven Design Reference (Eric Evans): https://www.domainlanguage.com/ddd/reference/
-- Implementing Domain-Driven Design (Vaughn Vernon) — resumo e padrões:
-  https://www.informit.com/store/implementing-domain-driven-design-9780321834577
-- DDD Crew — Context Mapping (padrões e cartas): https://github.com/ddd-crew/context-mapping
+- Implementing Domain-Driven Design (Vaughn Vernon): https://www.informit.com/store/implementing-domain-driven-design-9780321834577
+- DDD Crew — Context Mapping: https://github.com/ddd-crew/context-mapping
 - DDD Crew — Bounded Context Canvas: https://github.com/ddd-crew/bounded-context-canvas
 - EventStorming (Alberto Brandolini): https://www.eventstorming.com/
 - Architecture Decision Records: https://adr.github.io/

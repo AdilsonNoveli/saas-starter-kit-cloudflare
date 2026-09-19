@@ -1,8 +1,8 @@
 /**
- * validator.ts - Linter determinístico de especificações (spec.md) no Fireskills.
+ * validator.ts - Deterministic specification linter (spec.md) in Fireskills.
  *
- * Transforma a validação do Definition Gate e do Plan Gate em uma checagem
- * programática antes que o agente ou desenvolvedor avance o estado da spec.
+ * Transforms Definition Gate and Plan Gate validation into a programmatic
+ * check before the agent or developer advances the spec state.
  */
 
 import { existsSync, promises as fs } from "node:fs";
@@ -27,11 +27,11 @@ export interface ValidationResult {
 }
 
 const REQUIRED_SECTIONS = [
-  { name: "Contexto ou Problema", pattern: /#+\s*(?:\d+[.\s]*)?(?:contexto|problema|visão|objetivo)/i },
-  { name: "Atores, Histórias ou Requisitos", pattern: /#+\s*(?:\d+[.\s]*)?(?:atores|histórias|requisitos|escopo)/i },
-  { name: "Cenários BDD", pattern: /#+\s*(?:\d+[.\s]*)?(?:cenários|bdd|comportamento|aceite)/i },
-  { name: "Fases de Tarefas", pattern: /#+\s*(?:\d+[.\s]*)?(?:tarefas|tasks|plano|fases)/i },
-  { name: "Testes e Evidências", pattern: /#+\s*(?:\d+[.\s]*)?(?:[^\n]*\btestes?\b|evid[eê]ncias?|provas?|valida)/i },
+  { name: "Context or Problem", pattern: /#+\s*(?:\d+[.\s]*)?(?:context|problem|vision|objective|contexto|problema|visão|objetivo)/i },
+  { name: "Actors, Stories or Requirements", pattern: /#+\s*(?:\d+[.\s]*)?(?:actors|stories|requirements|scope|atores|histórias|requisitos|escopo)/i },
+  { name: "BDD Scenarios", pattern: /#+\s*(?:\d+[.\s]*)?(?:scenarios|bdd|behavior|acceptance|cenários|comportamento|aceite)/i },
+  { name: "Task Phases", pattern: /#+\s*(?:\d+[.\s]*)?(?:tasks|phases|plan|tarefas|fases|plano)/i },
+  { name: "Tests and Evidence", pattern: /#+\s*(?:\d+[.\s]*)?(?:[^\n]*\btests?\b|evidence|verification|testes?|evid[eê]ncias?|provas?|valida)/i },
 ];
 
 const PLACEHOLDER_PATTERNS = [
@@ -40,9 +40,11 @@ const PLACEHOLDER_PATTERNS = [
   /\[TBD\]/i,
   /\[em aberto\]/i,
   /\[descrever\]/i,
+  /\[fill\]/i,
+  /\[describe\]/i,
 ];
 
-/** Localiza o caminho completo para o spec.md dado um caminho ou ID. */
+/** Locates full path to spec.md given a path or ID. */
 export async function resolveSpecPath(
   projectRoot: string,
   target: string,
@@ -58,12 +60,12 @@ export async function resolveSpecPath(
     return stat.isDirectory() ? join(direct, "spec.md") : direct;
   }
 
-  // Busca em specs/<estado>/<target>/spec.md
+  // Searches in specs/<state>/<target>/spec.md
   for (const folder of SPEC_FOLDERS) {
     const candidate = join(projectRoot, "specs", folder, target, "spec.md");
     if (existsSync(candidate)) return candidate;
 
-    // Busca parcial por slug
+    // Partial search by slug
     const stateDir = join(projectRoot, "specs", folder);
     if (existsSync(stateDir)) {
       const entries = await fs.readdir(stateDir);
@@ -79,7 +81,7 @@ export async function resolveSpecPath(
   return null;
 }
 
-/** Valida integralmente uma spec.md. */
+/** Comprehensively validates a spec.md file. */
 export async function validateSpec(
   specPath: string,
   options: { strict?: boolean } = {},
@@ -90,7 +92,7 @@ export async function validateSpec(
     return {
       path: specPath,
       valid: false,
-      issues: [{ level: "error", message: `Arquivo não encontrado: ${specPath}` }],
+      issues: [{ level: "error", message: `File not found: ${specPath}` }],
       summary: { errors: 1, warnings: 0 },
     };
   }
@@ -98,19 +100,19 @@ export async function validateSpec(
   const content = await fs.readFile(specPath, "utf-8");
   const lines = content.split("\n");
 
-  // 1. Validação da Tabela de Metadados
+  // 1. Metadata Table Validation
   validateMetadata(lines, issues);
 
-  // 2. Validação de Seções Obrigatórias
+  // 2. Required Sections Validation
   validateSections(content, issues);
 
-  // 3. Detecção de Placeholders Não Preenchidos
+  // 3. Draft Placeholder Detection
   validatePlaceholders(lines, issues);
 
-  // 4. Validação de Cenários BDD
+  // 4. BDD Scenarios Validation
   validateBdd(content, issues);
 
-  // 5. Validação de Tarefas
+  // 5. Tasks Checklist Validation
   validateTasks(content, issues);
 
   const errors = issues.filter((i) => i.level === "error").length;
@@ -134,31 +136,31 @@ function validateMetadata(lines: string[], issues: ValidationIssue[]) {
     if (match && match[1] && match[2]) {
       const key = match[1].trim().toLowerCase();
       const value = match[2].trim();
-      if (key !== "campo" && key !== "---") {
+      if (key !== "field" && key !== "campo" && key !== "---") {
         meta[key] = value;
       }
     }
   }
 
-  // Verifica Effort
+  // Check Effort
   if (!meta.effort) {
-    issues.push({ level: "error", message: "Metadado obrigatório 'Effort' não encontrado no cabeçalho." });
+    issues.push({ level: "error", message: "Required metadata 'Effort' not found in header table." });
   } else {
     const score = parseInt(meta.effort, 10);
     if (isNaN(score) || score < 1 || score > 10) {
-      issues.push({ level: "error", message: `Effort inválido '${meta.effort}': deve ser um número inteiro de 1 a 10.` });
+      issues.push({ level: "error", message: `Invalid Effort '${meta.effort}': must be an integer between 1 and 10.` });
     }
   }
 
-  // Verifica Effort rationale
+  // Check Effort rationale
   const rationale = meta["effort rationale"] || meta.rationale;
   if (!rationale || rationale.length < 5) {
-    issues.push({ level: "error", message: "Metadado 'Effort rationale' ausente ou vazio. É obrigatório justificar o esforço." });
+    issues.push({ level: "error", message: "Metadata 'Effort rationale' is missing or too short. A justification is required." });
   }
 
-  // Verifica Status
+  // Check Status
   if (!meta.status) {
-    issues.push({ level: "error", message: "Metadado obrigatório 'Status' não encontrado no cabeçalho." });
+    issues.push({ level: "error", message: "Required metadata 'Status' not found in header table." });
   }
 }
 
@@ -167,7 +169,7 @@ function validateSections(content: string, issues: ValidationIssue[]) {
     if (!section.pattern.test(content)) {
       issues.push({
         level: "error",
-        message: `Seção obrigatória ausente: '${section.name}'.`,
+        message: `Required section missing: '${section.name}'.`,
       });
     }
   }
@@ -180,7 +182,7 @@ function validatePlaceholders(lines: string[], issues: ValidationIssue[]) {
         issues.push({
           level: "warn",
           line: idx + 1,
-          message: `Placeholder de rascunho detectado na linha ${idx + 1}: ${line.trim()}`,
+          message: `Draft placeholder detected on line ${idx + 1}: ${line.trim()}`,
         });
       }
     }
@@ -196,7 +198,7 @@ function validateBdd(content: string, issues: ValidationIssue[]) {
   if (!hasGherkin) {
     issues.push({
       level: "warn",
-      message: "Nenhum cenário de comportamento no formato BDD (Given-When-Then ou Dado-Quando-Então) detectado.",
+      message: "No BDD scenario detected in Given-When-Then format.",
     });
   }
 }
@@ -204,13 +206,13 @@ function validateBdd(content: string, issues: ValidationIssue[]) {
 function validateTasks(content: string, issues: ValidationIssue[]) {
   const hasTasks =
     /-\s*\[[ xX]\]/i.test(content) ||
-    /Fase\s*\d+/i.test(content) ||
+    /(?:Phase|Fase)\s*\d+/i.test(content) ||
     /Task|Tarefa/i.test(content);
 
   if (!hasTasks) {
     issues.push({
       level: "warn",
-      message: "Nenhuma lista de tarefas identificada na spec (esperado checklist `- [ ]` ou fases estruturadas).",
+      message: "No task checklist detected in spec (expected checklist `- [ ]` or structured task phases).",
     });
   }
 }

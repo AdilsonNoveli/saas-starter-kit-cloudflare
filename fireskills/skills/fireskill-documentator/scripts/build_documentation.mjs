@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Uso: node build_documentation.mjs [--project <raiz>] [--check]  Reconstrói docs/ e .fireskills/PACKAGES.md; --check só verifica."); process.exit(0); }
-/** Reconstrói documentação técnica a partir do código existente, sem sobrescrever notas humanas. */
+if (process.argv.includes("--help") || process.argv.includes("-h")) { console.log("Usage: node build_documentation.mjs [--project <root>] [--check]  Rebuilds docs/ and .fireskills/PACKAGES.md; --check only verifies."); process.exit(0); }
+/** Rebuilds technical documentation from existing code without overwriting human notes. */
 import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, extname, join, relative, resolve } from "node:path";
@@ -50,7 +50,7 @@ function symbols(content) {
 }
 
 if (!existsSync(project)) {
-  console.error(`projeto inexistente: ${project}`);
+  console.error(`project not found: ${project}`);
   process.exitCode = 2;
 } else {
   const files = await walk(project);
@@ -122,5 +122,5 @@ if (!existsSync(project)) {
     if (current !== expected) stale.push(relative(project, path));
     if (!check && current !== expected) { await mkdir(dirname(path), { recursive: true }); await writeFile(path, expected); }
   }
-  if (check && stale.length) { console.error(`Documentação desatualizada: ${stale.join(", ")}`); process.exitCode = 1; }
+  if (check && stale.length) { console.error(`Outdated documentation: ${stale.join(", ")}`); process.exitCode = 1; }
 }

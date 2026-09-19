@@ -1,13 +1,13 @@
-# Padrões de modelagem de dados
+# Data Modeling Standards
 
-## Fontes oficiais
+## Authoritative Documentation
 
-- [SQL standard overview](https://www.iso.org/standard/76583.html)
-- [PostgreSQL documentation](https://www.postgresql.org/docs/current/)
-- [Drizzle ORM: migrations](https://orm.drizzle.team/docs/migrations)
+- [SQL Standard Overview](https://www.iso.org/standard/76583.html)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/current/)
+- [Drizzle ORM: Migrations](https://orm.drizzle.team/docs/migrations)
 
-## Conferência mínima
+## Minimum Verification Checklist
 
-- Compare o schema atual, migrations, models, factories e testes.
-- Registre chaves, relações, índices, nulabilidade, retenção e migração.
-- Rode a migration em uma base descartável antes de aplicá-la no projeto.
+- Compare current schema, migrations, models, factories, and tests.
+- Record keys, relations, indexes, nullability, retention, and migration strategy.
+- Run migrations on a disposable test database before applying to the project.

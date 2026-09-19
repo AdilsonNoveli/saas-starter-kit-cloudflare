@@ -1,12 +1,16 @@
 #!/usr/bin/env node
-/** Renderiza um resumo de entrega para stdout, sem criar uma nova fonte. */
+/** Renders a delivery summary to stdout without creating a new file. */
 
 import { readFile } from "node:fs/promises";
 
-function metadata(text, key) {
-  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = text.match(new RegExp(`^\\|\\s*${escaped}\\s*\\|\\s*(.+?)\\s*\\|\\s*$`, "im"));
-  return match ? match[1].trim() : "Unknown";
+function metadata(text, keys) {
+  const keyList = Array.isArray(keys) ? keys : [keys];
+  for (const key of keyList) {
+    const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const match = text.match(new RegExp(`^\\|\\s*${escaped}\\s*\\|\\s*(.+?)\\s*\\|\\s*$`, "im"));
+    if (match?.[1]) return match[1].trim();
+  }
+  return "Unknown";
 }
 
 function ids(text) {
@@ -22,7 +26,7 @@ function build(text, preview) {
   const tasks = [...text.matchAll(/^-\s+\[([ xX])\]\s+(T\d{3,})\b(.+)$/gm)].map((match) => ({
     id: match[2], complete: match[1].toLowerCase() === "x", summary: match[3].trim(),
   }));
-  const risks = text.match(/^####\s+Riscos\s*$\n([\s\S]*?)(?=^####\s+|^###\s+|$)/m);
+  const risks = text.match(/^####\s+(?:Risks and Rollback|Riscos e rollback|Riscos)\s*$\n([\s\S]*?)(?=^####\s+|^###\s+|$)/im);
   const evidence = [...text.matchAll(/^\s*<!--\s*specsfy:evidence\s+(\{.*\})\s*-->\s*$/gm)]
     .flatMap((match) => { try { return [JSON.parse(match[1])]; } catch { return []; } })
     .sort((left, right) => String(left.task ?? "").localeCompare(String(right.task ?? "")));
@@ -35,14 +39,14 @@ function build(text, preview) {
 
 function markdown(payload) {
   const lines = [
-    "# Resumo de entrega Specsfy", "", `- Status: ${payload.status}`,
+    "# Specsfy Delivery Summary", "", `- Status: ${payload.status}`,
     `- Definition Gate: ${payload.gates.definition}`, `- Plan Gate: ${payload.gates.plan}`,
-    `- Delivery Gate: ${payload.gates.delivery}`, "", "## IDs entregues", "",
-    payload.delivered_ids.join(", ") || "Nenhum.", "", "## Tarefas", "",
+    `- Delivery Gate: ${payload.gates.delivery}`, "", "## Delivered IDs", "",
+    payload.delivered_ids.join(", ") || "None.", "", "## Tasks", "",
     ...payload.tasks.map((task) => `- [${task.complete ? "x" : " "}] ${task.id}${task.summary}`),
-    "", "## Evidências", "",
-    ...payload.evidence.map((item) => `- ${item.task ?? "sem task"}: ${(item.commands ?? []).filter((command) => command && typeof command === "object").map((command) => String(command.run ?? "")).join(", ")}`),
-    "", "## Riscos e rollback", "", payload.risks_and_rollback || "Nenhum risco/rollback registrado.",
+    "", "## Evidence", "",
+    ...payload.evidence.map((item) => `- ${item.task ?? "no task"}: ${(item.commands ?? []).filter((command) => command && typeof command === "object").map((command) => String(command.run ?? "")).join(", ")}`),
+    "", "## Risks and Rollback", "", payload.risks_and_rollback || "No risks/rollback documented.",
   ];
   return lines.join("\n");
 }
@@ -55,23 +59,23 @@ function parseArgs(argv) {
 
 const { spec, format, preview } = parseArgs(process.argv.slice(2));
 if (!spec || !["markdown", "json"].includes(format)) {
-  console.error("Uso: node render_delivery.mjs <spec> [--format markdown|json] [--preview]");
+  console.error("Usage: node render_delivery.mjs <spec> [--format markdown|json] [--preview]");
   process.exitCode = 2;
 } else {
   try {
     const payload = build(await readFile(spec, "utf8"), preview);
     const openTasks = payload.tasks.filter((task) => !task.complete).map((task) => task.id);
     if (!preview && (payload.gates.delivery !== "Passed" || openTasks.length > 0)) {
-      const error = "resumo final exige Delivery Gate Passed e nenhuma tarefa aberta";
+      const error = "final summary requires Delivery Gate Passed and no open tasks";
       if (format === "json") console.log(JSON.stringify({ ...payload, result: "failed", errors: [error] }, null, 2));
-      else console.error(`ERRO: ${error}`);
+      else console.error(`ERROR: ${error}`);
       process.exitCode = 1;
     } else {
       const result = { ...payload, result: "passed", errors: [] };
       console.log(format === "json" ? JSON.stringify(result, null, 2) : markdown(result));
     }
   } catch (error) {
-    console.error("ERRO: spec inexistente.");
+    console.error("ERROR: non-existent spec.");
     process.exitCode = 2;
   }
 }

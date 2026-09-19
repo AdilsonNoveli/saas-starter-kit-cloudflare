@@ -1,4 +1,4 @@
-/** Regressões da configuração persistente do projeto. */
+/** Regressions for persistent project configuration. */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
@@ -9,8 +9,8 @@ import {
 } from "../src/config.js";
 import { temporaryDirectory } from "./helpers.js";
 
-describe("configuração", () => {
-  test("aplica padrão e preserva campos desconhecidos", async () => {
+describe("configuration", () => {
+  test("applies default and preserves unknown fields", async () => {
     const project = await temporaryDirectory();
     expect((await loadConfig(project)).watch_interval).toBe(
       DEFAULT_WATCH_INTERVAL,
@@ -34,11 +34,11 @@ describe("configuração", () => {
   });
 
   test.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])(
-    "recusa intervalo inválido %s",
+    "rejects invalid interval %s",
     async (value) => {
       const project = await temporaryDirectory();
       await expect(updateConfig(project, value)).rejects.toThrow(
-        "número finito maior que zero",
+        "finite number greater than zero",
       );
     },
   );

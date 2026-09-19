@@ -1,63 +1,55 @@
-# Padrões e referências de pesquisa técnica
+# Technical Research Standards and References
 
-## Hierarquia de fontes, da mais à menos autoritativa
+## Source Hierarchy, from Most to Least Authoritative
 
-1. **Especificação e standard** (RFC, W3C TR, ECMA, ISO) ou fonte
-   proprietária de quem controla o comportamento (ex.: docs de um vendor
-   para uma API só dele).
-2. **Documentação oficial versionada** do projeto/framework/serviço em
-   questão, na versão que o ambiente alvo realmente usa.
-3. **Código-fonte, testes e changelog oficiais** — quando a documentação é
-   ambígua ou omissa, o comportamento real está no código e nos testes que
-   o exercitam.
-4. **Experimento reproduzível no ambiente alvo** — quando nenhuma fonte
-   documental resolve a dúvida, um experimento controlado no mesmo runtime,
-   versão e configuração do projeto é a próxima melhor evidência.
-5. **Fonte secundária com metodologia explícita** (post técnico, talk,
-   artigo) — só serve como evidência quando descreve como o autor chegou à
-   conclusão (ambiente, versão, medição) de forma verificável; sem isso, é
-   opinião, não evidência.
+1. **Specifications and Standards** (RFC, W3C TR, ECMA, ISO) or vendor proprietary
+   specifications for platform-exclusive behavior (e.g., vendor docs for proprietary APIs).
+2. **Versioned Official Documentation** of the project/framework/service, matching the
+   exact version used by the target environment.
+3. **Official Source Code, Tests, and Changelogs** — when documentation is ambiguous
+   or omitted, actual behavior resides in the source code and its test suite.
+4. **Reproducible Experiments in the Target Environment** — when no written sources
+   resolve uncertainty, a controlled test under the same runtime, version, and configuration
+   serves as the next best evidence.
+5. **Secondary Sources with Explicit Methodology** (technical write-ups, conference talks,
+   articles) — acceptable only when describing verifiable methods (environment, version,
+   benchmark setup); otherwise, it constitutes opinion rather than evidence.
 
-Uma fonte de nível inferior nunca sobrepõe uma de nível superior sem uma
-razão explícita (ex.: a documentação oficial está desatualizada e o
-changelog mais recente contradiz).
+A lower-tier source never overrides a higher-tier source without explicit justification
+(e.g., official docs are proven outdated and contradicted by recent release commits).
 
-## Matriz de avaliação de uma fonte
+## Source Evaluation Matrix
 
-- **Autoridade**: quem controla de fato o comportamento descrito — o mesmo
-  projeto/vendor, ou um terceiro reproduzindo de fora?
-- **Atualidade**: qual versão exata e qual data de publicação? O
-  comportamento descrito ainda vale para a versão em uso no projeto?
-- **Aplicabilidade**: a fonte descreve o mesmo runtime, configuração, escala
-  e modo de uso do projeto, ou uma condição diferente o suficiente para
-  invalidar a generalização?
-- **Reprodutibilidade**: outra pessoa, com a mesma fonte e o mesmo ambiente,
-  chegaria à mesma conclusão?
-- **Incentivo**: existe interesse comercial, seleção de dados favorável, ou
-  benchmark patrocinado por quem vende a tecnologia comparada?
+- **Authority**: Who controls the described behavior — the original creator/vendor,
+  or an external third party observing from outside?
+- **Recency**: What exact version and publication date? Does the behavior still hold
+  for the version deployed in the project?
+- **Applicability**: Does the source reflect the same runtime, config, scale, and
+  usage patterns, or do operational differences invalidate generalization?
+- **Reproducibility**: Would another engineer with the same source and environment
+  arrive at identical conclusions?
+- **Incentive**: Are there commercial interests, selective benchmarking, or vendor
+  sponsorship affecting conclusions?
 
-Uma fonte que falha em "aplicabilidade" ou tem alto "incentivo" não é
-descartada automaticamente, mas exige triangulação com uma segunda fonte
-independente antes de sustentar uma conclusão importante.
+Sources failing "applicability" or having substantial commercial incentive are not
+automatically dismissed, but strictly require triangulation with an independent secondary
+source before supporting critical decisions.
 
-## Formato de síntese
+## Synthesis Format
 
-Pergunta → Decisão suportada → Conclusão (fato / inferência / lacuna,
-rotulado explicitamente) → Evidência (link direto à seção específica +
-versão + data) → Conflito entre fontes, se houver, e como foi resolvido →
-Implicação prática para a decisão → Lacunas residuais que permanecem sem
-resposta.
+Question → Supported Decision → Conclusion (Fact / Inference / Knowledge Gap, explicitly
+labeled) → Evidence (direct anchor link + version + date) → Source Conflict (if any, and
+resolution rationale) → Practical Implication for Decision → Residual Gaps.
 
-Nunca apresentar "inferência" com a mesma confiança textual de "fato" — o
-rótulo precisa aparecer na síntese, não só existir na cabeça de quem
-pesquisou.
+Never present an "inference" with textual certainty equivalent to a "fact" — explicit
+status labels must appear in the final summary document.
 
-## Fontes oficiais para localizar fontes primárias
+## Official Sources for Locating Primary References
 
 - RFC Editor: https://www.rfc-editor.org/
 - W3C Technical Reports: https://www.w3.org/TR/
-- ECMA International (ECMAScript e outros standards): https://ecma-international.org/publications-and-standards/standards/
+- ECMA International (ECMAScript and other standards): https://ecma-international.org/publications-and-standards/standards/
 - NIST Publications: https://www.nist.gov/publications
-- Crossref metadata (localizar publicação e DOI): https://www.crossref.org/documentation/retrieve-metadata/
-- GitHub Releases (changelog oficial de projetos open source): https://docs.github.com/repositories/releasing-projects-on-github
-- Semantic Versioning (interpretar o que uma mudança de versão garante): https://semver.org/
+- Crossref Metadata (locating publications and DOIs): https://www.crossref.org/documentation/retrieve-metadata/
+- GitHub Releases (official open source changelogs): https://docs.github.com/repositories/releasing-projects-on-github
+- Semantic Versioning (interpreting version guarantees): https://semver.org/

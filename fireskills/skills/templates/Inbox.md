@@ -1,70 +1,70 @@
 # Inbox: {{INBOX_NAME}}
 
-| Metadado | Valor |
+| Metadata | Value |
 | --- | --- |
-| Status | Capturada |
-| Capturada em | {{CAPTURED_AT}} |
+| Status | Captured |
+| Captured at | {{CAPTURED_AT}} |
 | Slug | {{INBOX_SLUG}} |
-| Origem | Input do usuário |
-| Processamento | Análise inicial sem perguntas |
-| Sessão de descoberta | {{DISCOVERY_SESSION}} |
-| Turno da conversa | {{CONVERSATION_TURN}} |
-| Integridade do original | SHA-256 `{{ORIGINAL_INPUT_SHA256}}` |
-| Backlog derivado | Nenhum |
-| Spec derivada | Nenhuma |
+| Origin | User input |
+| Processing | Initial analysis without questions |
+| Discovery session | {{DISCOVERY_SESSION}} |
+| Conversation turn | {{CONVERSATION_TURN}} |
+| Original integrity | SHA-256 `{{ORIGINAL_INPUT_SHA256}}` |
+| Derived backlog | None |
+| Derived spec | None |
 
-## Texto original
+## Original Text
 
 {{ORIGINAL_INPUT}}
 
-## Contexto consultado
+## Consulted Context
 
 {{CONSULTED_SOURCES}}
 
-## Resumo processado
+## Processed Summary
 
-**Inferência:** {{SUMMARY}}
+**Inference:** {{SUMMARY}}
 
-## Análise inicial
+## Initial Analysis
 
-### Problema ou oportunidade
+### Problem or Opportunity
 
-**Declaração ou inferência identificada:** {{PROBLEM_OR_OPPORTUNITY}}
+**Statement or identified inference:** {{PROBLEM_OR_OPPORTUNITY}}
 
-### Pessoas afetadas ou beneficiadas
+### Affected or Benefited People
 
-**Declaração ou inferência identificada:** {{AFFECTED_PEOPLE}}
+**Statement or identified inference:** {{AFFECTED_PEOPLE}}
 
-### Resultado ou valor esperado
+### Expected Result or Value
 
-**Declaração ou inferência identificada:** {{EXPECTED_VALUE}}
+**Statement or identified inference:** {{EXPECTED_VALUE}}
 
-### Sinais de escopo, regras ou solução
+### Signals of Scope, Rules, or Solution
 
-**Sinais extraídos, não decisões:** {{EXTRACTED_SIGNALS}}
+**Extracted signals, not decisions:** {{EXTRACTED_SIGNALS}}
 
-### Informações que talvez precisem ser guardadas
+### Information That May Need Storage
 
-**Sinais para conversar depois, não confirmação:** {{DATA_SIGNALS}}
+**Signals to discuss later, not confirmation:** {{DATA_SIGNALS}}
 
-### Riscos e dependências
+### Risks and Dependencies
 
-**Análise preliminar:** {{RISKS_AND_DEPENDENCIES}}
+**Preliminary analysis:** {{RISKS_AND_DEPENDENCIES}}
 
-## Possíveis direções futuras
+## Possible Future Directions
 
-**Hipóteses para backlog ou spec, não requisitos:** {{FUTURE_DIRECTIONS}}
+**Hypotheses for backlog or spec, not requirements:** {{FUTURE_DIRECTIONS}}
 
-## Pontos a revisar no futuro
+## Points to Review in the Future
 
-**A revisar:** {{FUTURE_REVIEW}}
+**To review:** {{FUTURE_REVIEW}}
 
-## Rastreabilidade
+## Traceability
 
-- Formulação original preservada integralmente nesta captura.
-- Análises não substituem decisões do usuário.
-- Backlogs e specs derivados devem referenciar este arquivo.
+- Original formulation fully preserved in this capture.
+- Analyses do not replace user decisions.
+- Derived backlogs and specs must reference this file.
 
-## Próximo passo
+## Next Step
 
-Manter em `specs/inbox/` ou refinar com `$fireskill-02-backlog`.
+Keep in `specs/inbox/` or refine with `$fireskill-02-backlog`.

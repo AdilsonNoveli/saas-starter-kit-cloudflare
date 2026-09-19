@@ -1,281 +1,252 @@
 # Fireskills Skills
 
-Este módulo mantém a metodologia executável do Fireskills (derivada do
-Specsfy): skills, scripts determinísticos, referências, assets e metadata para
-agentes.
+This module maintains the executable methodology of Fireskills: skills,
+deterministic scripts, references, assets, and metadata for agents.
 
-A visão geral está em [`README.md`](../README.md). A documentação pública de uso
-(o que digitar na IDE em cada etapa) está em
-`apps/web/content/docs/2.fireskills/` (site: `/docs/fireskills`).
+The overall overview is in [`README.md`](../README.md). Public usage documentation
+is in `apps/web/content/docs/2.fireskills/` (site: `/docs/fireskills`).
 
-## Responsabilidade
+## Responsibilities
 
-Este módulo possui:
+This module contains:
 
-- as instruções operacionais das skills do fluxo (01 a 07, `update-spec`,
-  `progress`, `interviewer`, milestones e `data-discovery`), do setup, do
-  documentador, das três auxiliares e das skills de governança (`lessons`,
-  `the-fool`, `the-jury`, `the-judge`).
-- os templates de inbox, backlog, spec, tarefas, projeto, stack, regras, banco,
-  interface, perfil e design system em `templates/`, e o exemplo em
+- Operational instructions for workflow skills (01 to 07, `update-spec`, `progress`,
+  `interviewer`, milestones, and `data-discovery`), setup, documentator, three
+  auxiliary skills, and governance skills (`lessons`, `the-fool`, `the-jury`,
+  `the-judge`).
+- Templates for inbox, backlog, spec, tasks, project, stack, rules, database,
+  interface, user profile, and design system in `templates/`, and the example in
   `examples/Spec.md`.
-- o MCR-10 e referências dos gates.
-- scripts de validação, rastreabilidade, evidência e progresso.
-- metadata de descoberta em `agents/openai.yaml`.
-- o exemplo `examples/Spec.md` (fixture preenchida). As skills não têm suíte de
-  testes própria; a checagem delas é `fireskill-04-validate/scripts/verify_repo.mjs`.
+- MCR-10 and quality gate references.
+- Validation, traceability, evidence, and progress scripts.
+- Discovery metadata in `agents/openai.yaml`.
+- Example fixture `examples/Spec.md`. Skills check repo integrity via
+  `fireskill-04-validate/scripts/verify_repo.mjs`.
 
-Specs pertencem ao projeto consumidor (aqui, o Nuxfire). Conhecimento técnico
-pertence a [`specialists/`](../specialists/).
+Specs belong to the consumer project (here, Nuxfire). Technical knowledge belongs
+to [`specialists/`](../specialists/).
 
-## Metodologia executável
+## Executable Methodology
 
-O fluxo preservado pelas skills é:
+The workflow preserved by the skills is:
 
 ```text
-capturar imediatamente em specs/inbox
-  → refinar no backlog
-  → refinar
-  → especificar
-  → validar definição
-  → planejar tarefas
-  → usar o BDD da spec para provar TDD RED
-  → implementar GREEN
-  ↳ atualizar a spec e reabrir o fluxo quando surgir um pedido tardio
-  → reconstruir a documentação técnica
-  → validar entrega
-  → consultar progresso
+capture immediately in specs/inbox
+  → refine in backlog
+  → specify
+  → validate definition
+  → plan tasks
+  → use spec BDD to prove TDD RED
+  → implement GREEN
+  ↳ update spec and reopen workflow when a late request emerges
+  → rebuild technical documentation
+  → validate delivery
+  → query progress
 ```
 
-Cada fatia usa uma única fonte normativa em
-`specs/<estado>/<NNNN>-<slug>/spec.md` e atravessa:
+Each slice uses a single normative source in `specs/<state>/<NNNN>-<slug>/spec.md`
+and traverses:
 
 ```text
 Draft → Defined → Planned → Implementing → Complete
 ```
 
-Nenhum `Definition Gate`, `Plan Gate` ou `Delivery Gate` passa sem evidência
-compatível com o ato correspondente.
+No `Definition Gate`, `Plan Gate`, or `Delivery Gate` passes without evidence
+compatible with the corresponding act.
 
-Tarefas de implementação usam o checklist `PREP`, `EXECUTE`, `VERIFY`,
-`VISUAL`, `EVIDENCE` e `IMPROVE`. A etapa `VISUAL` é obrigatória para toda
-tarefa que possa alterar a interface, mesmo sem pedido específico, e registra a
-conferência de bordas, espaçamentos, margens, padding e tipografia. Tarefas sem
-interface registram o motivo concreto da não aplicação.
+Implementation tasks use the checklist: `PREP`, `EXECUTE`, `VERIFY`, `VISUAL`,
+`EVIDENCE`, and `IMPROVE`. The `VISUAL` step is mandatory for every task that could
+alter the interface, even without explicit request, and records inspection of
+borders, spacing, margins, padding, and typography. Tasks without interface changes
+record the concrete reason for non-application.
 
-## Orquestração conversacional
+## Conversational Orchestration
 
-As skills fazem handoff dentro da mesma conversa. Quando uma responsabilidade
-termina ou encontra uma pendência de outra etapa, a skill atual:
+Skills perform handoffs within the same conversation. When a responsibility
+concludes or encounters a blocker from another step, the current skill:
 
-1. anuncia `Pendência detectada` quando houver trabalho bloqueante.
-2. apresenta `Transição automática`, com origem, destino, motivo e resultado.
-3. carrega imediatamente a skill responsável sem pedir confirmação nem exigir
-   que a pessoa repita o comando.
-4. preserva o contexto e resolve a pendência na mesma conversa.
-5. apresenta `Retomada automática` e retorna à etapa de origem quando a correção
-   terminar.
+1. Announces `Pending blocker detected` when blocking work is found.
+2. Announces `Automatic transition`, with origin, destination, reason, and expected outcome.
+3. Immediately loads the destination skill without asking confirmation or repeating commands.
+4. Preserves context and resolves the blocker in the same conversation.
+5. Announces `Automatic resumption` and returns to origin step once correction finishes.
 
-O protocolo também vale para retornos. Pedido tardio entra por
-`fireskill-update-spec`. Mudança de comportamento reabre definição e
-validação, mudança de plano retorna às tarefas e ausência de teste ou RED chama
-TDD/BDD. O handoff é automático, mas não autoriza instalação, deploy,
-publicação ou ação destrutiva, que continuam exigindo autorização específica.
+The protocol also applies to returns. Late requests enter through `fireskill-update-spec`.
+Behavior changes reopen definition and validation, plan changes return to tasks,
+and missing tests or RED call TDD/BDD. Handoff is automatic, but does not authorize
+installation, deployment, publishing, or destructive actions, which still require
+explicit user authorization.
 
-Toda decisão material ausente é tratada por `fireskill-02-backlog`. A skill
-reanalisa o contexto depois de cada rodada e pergunta novamente enquanto
-existir lacuna aplicável, até o máximo de oito perguntas por área. Cada rodada
-contém exatamente uma pergunta numerada. Ela oferece três ou mais opções
-numeradas, `Escrever outra resposta`, `Gere outras opções` e `Avançar` desde a
-primeira rodada. O avanço
-preserva as lacunas em Draft e não aprova o Definition Gate.
+Every missing material decision is handled by `fireskill-02-backlog`. The skill
+re-evaluates context after each round and asks again while applicable gaps exist,
+up to a maximum of eight questions per area. Each round contains exactly one
+numbered question with three or more options, `Write another answer`, `Generate more options`,
+and `Advance` from the first round. Advancing preserves gaps in Draft and does not
+approve the Definition Gate.
 
-No setup, o agente lê `.fireskills/USER-PROFILE.md`, a conversa e os contextos do
-projeto antes de perguntar. Respostas já confirmadas não voltam para a rodada.
-O perfil registra o nível de conhecimento e orienta a profundidade: iniciantes
-recebem explicações dos termos e efeitos práticos, enquanto pessoas experientes
-podem responder diretamente sobre versões, arquitetura, testes e integrações.
-O setup também confirma quando uma entidade precisa de CRUD, mapeia o acesso às
-telas pelos menus do sistema e pergunta quando essas duas informações não
-estiverem claras. Ao final de toda execução completa, ele chama o documentador
-para reconstruir a documentação técnica do sistema existente.
+In setup, the agent reads `.fireskills/USER-PROFILE.md`, the conversation, and
+project contexts before asking. Confirmed answers are not asked again. The profile
+records technical knowledge level and guides depth: beginners receive explanations
+of terms and practical effects, while experienced developers can answer directly
+about versions, architecture, tests, and integrations. Setup also confirms when an
+entity requires CRUD, maps screen access via system menus, and asks when these two
+pieces of information are unclear. At the conclusion of full execution, it calls the
+documentator to rebuild system technical documentation.
 
-## Catálogo
+## Catalog
 
-| Skill | Responsabilidade | Limite principal |
+| Skill | Responsibility | Primary Boundary |
 | --- | --- | --- |
-| [`fireskill-01-inbox`](fireskill-01-inbox/SKILL.md) | preservar e pré-processar o input sem perguntas | não refina, promove ou implementa |
-| [`fireskill-02-backlog`](fireskill-02-backlog/SKILL.md) | refinar entradas, registrar backlog e fechar lacunas em ciclo adaptativo com MCR-10 | não cria especificações |
-| [`fireskill-03-specify`](fireskill-03-specify/SKILL.md) | promover decisões para `spec.md` e research | não implementa nem captura ideia vaga |
-| [`fireskill-04-validate`](fireskill-04-validate/SKILL.md) | auditar o Definition Gate | não decide requisitos |
-| [`fireskill-05-tasks`](fireskill-05-tasks/SKILL.md) | manter tarefas nas seções 14–15 | não cria `tasks.md` nem código |
-| [`fireskill-06-tdd-bdd`](fireskill-06-tdd-bdd/SKILL.md) | usar o BDD da spec para criar TDD e provar RED/GREEN | não executa Gherkin nem inventa comportamento |
-| [`fireskill-07-implement`](fireskill-07-implement/SKILL.md) | executar tarefas prontas e evidenciar | não trabalha sem RED |
-| [`fireskill-update-spec`](fireskill-update-spec/SKILL.md) | incorporar pedido tardio e reabrir somente os atos afetados | não cria nova spec nem implementa |
-| [`fireskill-progress`](fireskill-progress/SKILL.md) | projetar o estado global | não altera gates ou checkboxes |
-| [`fireskill-mvp-milestone-interviewer`](fireskill-mvp-milestone-interviewer/SKILL.md) | entrevistar e definir o MVP por milestones | não planeja tarefas ou código |
-| [`fireskill-data-discovery`](fireskill-data-discovery/SKILL.md) | conversar sobre informações que o produto precisa guardar | não escolhe tecnologia ou implementação |
-| [`fireskill-roadmap-milestone-interviewer`](fireskill-roadmap-milestone-interviewer/SKILL.md) | entrevistar a evolução pós-MVP | não altera o núcleo sem confirmação |
-| [`fireskill-milestone-governor`](fireskill-milestone-governor/SKILL.md) | sincronizar a projeção de milestones | não inventa condição de saída |
-| [`fireskill-setup`](fireskill-setup/SKILL.md) | detectar o stack, criar contexto ausente, preparar `.fireskills/DESIGNSYSTEM.MD`, manter o perfil de interação e reconciliar blocos de agentes | não sobrescreve arquivos de contexto existentes |
-| [`fireskill-documentator`](fireskill-documentator/SKILL.md) | reconstruir `docs/` e o inventário `.fireskills/PACKAGES.md` | não inventa decisões, relações, finalidades ou referências |
-| [`fireskill-aux-stack`](fireskill-aux-stack/SKILL.md) | manter `.fireskills/STACK.md` a partir de evidência executável | não inventa nem copia toda dependência |
-| [`fireskill-aux-rules`](fireskill-aux-rules/SKILL.md) | ajudar a registrar regras confirmadas em `.fireskills/RULES.md` | não decide regras pela pessoa |
-| [`fireskill-aux-database`](fireskill-aux-database/SKILL.md) | manter `.fireskills/DATABASE.md` após toda mudança persistente | não copia dados ou segredos |
-| [`fireskill-lessons`](fireskill-lessons/SKILL.md) | registrar lições aprendidas com sinal, regra preventiva e origem em `.fireskills/LESSONS.md` | só registra lição fundamentada em falha real |
-| [`fireskill-the-fool`](fireskill-the-fool/SKILL.md) | atacar spec, plano ou decisão (pre-mortem, premissas não verificadas) | não corrige nem aprova gates |
-| [`fireskill-the-jury`](fireskill-the-jury/SKILL.md) | deliberação colegiada de 3 a 5 subagentes para decisão de alto impacto | não serve para tarefa trivial |
-| [`fireskill-the-judge`](fireskill-the-judge/SKILL.md) | revisar diff ou PR com evidência `arquivo:linha` e veredito | não comenta o que linters e testes já pegam |
+| [`fireskill-01-inbox`](fireskill-01-inbox/SKILL.md) | Preserve and pre-process input without questions | Does not refine, promote, or implement |
+| [`fireskill-02-backlog`](fireskill-02-backlog/SKILL.md) | Refine entries, record backlog, and close gaps in adaptive cycle with MCR-10 | Does not create specifications |
+| [`fireskill-03-specify`](fireskill-03-specify/SKILL.md) | Promote decisions to `spec.md` and research | Does not implement or capture vague ideas |
+| [`fireskill-04-validate`](fireskill-04-validate/SKILL.md) | Audit Definition Gate | Does not decide requirements |
+| [`fireskill-05-tasks`](fireskill-05-tasks/SKILL.md) | Maintain tasks in sections 14–15 | Does not create `tasks.md` or code |
+| [`fireskill-06-tdd-bdd`](fireskill-06-tdd-bdd/SKILL.md) | Use spec BDD to create TDD and prove RED/GREEN | Does not execute Gherkin or invent behavior |
+| [`fireskill-07-implement`](fireskill-07-implement/SKILL.md) | Execute ready tasks and record evidence | Does not work without RED |
+| [`fireskill-update-spec`](fireskill-update-spec/SKILL.md) | Incorporate late request and reopen only affected acts | Does not create new spec or implement |
+| [`fireskill-progress`](fireskill-progress/SKILL.md) | Project global status | Does not alter gates or checkboxes |
+| [`fireskill-mvp-milestone-interviewer`](fireskill-mvp-milestone-interviewer/SKILL.md) | Interview and define MVP by milestones | Does not plan tasks or code |
+| [`fireskill-data-discovery`](fireskill-data-discovery/SKILL.md) | Converse about information product needs to store | Does not choose technology or implementation |
+| [`fireskill-roadmap-milestone-interviewer`](fireskill-roadmap-milestone-interviewer/SKILL.md) | Interview post-MVP evolution | Does not alter core without confirmation |
+| [`fireskill-milestone-governor`](fireskill-milestone-governor/SKILL.md) | Synchronize milestone projection | Does not invent exit conditions |
+| [`fireskill-setup`](fireskill-setup/SKILL.md) | Detect stack, create missing context, prepare `.fireskills/DESIGNSYSTEM.MD`, maintain interaction profile, and reconcile agent instructions | Does not overwrite existing context files |
+| [`fireskill-documentator`](fireskill-documentator/SKILL.md) | Rebuild `docs/` and inventory `.fireskills/PACKAGES.md` | Does not invent decisions, relations, or references |
+| [`fireskill-aux-stack`](fireskill-aux-stack/SKILL.md) | Maintain `.fireskills/STACK.md` from executable evidence | Does not invent or copy all dependencies |
+| [`fireskill-aux-rules`](fireskill-aux-rules/SKILL.md) | Help record confirmed rules in `.fireskills/RULES.md` | Does not decide rules for the user |
+| [`fireskill-aux-database`](fireskill-aux-database/SKILL.md) | Maintain `.fireskills/DATABASE.md` after persistence changes | Does not copy data or secrets |
+| [`fireskill-lessons`](fireskill-lessons/SKILL.md) | Record lessons learned with signal, preventive rule, and source in `.fireskills/LESSONS.md` | Only records lessons grounded in actual failures |
+| [`fireskill-the-fool`](fireskill-the-fool/SKILL.md) | Stress-test spec, plan, or decision (pre-mortem, unverified assumptions) | Does not fix or approve gates |
+| [`fireskill-the-jury`](fireskill-the-jury/SKILL.md) | Collegial deliberation of 3 to 5 subagents for high-impact decisions | Not for trivial tasks |
+| [`fireskill-the-judge`](fireskill-the-judge/SKILL.md) | Review diff or PR with `file:line` evidence and verdict | Does not comment on issues local tools catch |
 
-Todos os arquivos de contexto (`PROJECT.md`, `INTERFACE.md`, `DESIGNSYSTEM.MD`,
-`STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md`, `USER-PROFILE.md`,
-`LESSONS.md`) ficam em `.fireskills/`. O setup pode ser executado
-novamente para garantir os contextos iniciais; o documentador garante o
-inventário de pacotes. Ambos preservam arquivos existentes e todo conteúdo fora
-dos blocos gerenciados.
+All context files (`PROJECT.md`, `INTERFACE.md`, `DESIGNSYSTEM.MD`, `STACK.md`,
+`RULES.md`, `DATABASE.md`, `PACKAGES.md`, `USER-PROFILE.md`, `LESSONS.md`) reside
+in `.fireskills/`. Setup can be re-run to ensure initial contexts; the documentator
+ensures package inventory. Both preserve existing files and content outside
+managed blocks.
 
-Quando o projeto já usa GitHub Spec Kit, a constituição em
-`.specify/memory/constitution.md` ativa uma ponte de leitura. O setup percorre
-todos os arquivos regulares em `specs/`, cria `.fireskills/SPECKIT.md` com os
-caminhos e fingerprints encontrados e orienta os agentes a ler as fontes
-originais. Nenhum arquivo de `.specify/` ou `specs/` é movido, convertido,
-substituído ou removido.
+When the project uses GitHub Spec Kit, the constitution in
+`.specify/memory/constitution.md` activates a read bridge. Setup traverses regular
+files in `specs/`, creates `.fireskills/SPECKIT.md` with found paths and fingerprints,
+and directs agents to read original sources. No file in `.specify/` or `specs/` is
+moved, converted, replaced, or removed.
 
-Durante planejamento, implementação e projeção de progresso,
-`fireskill-setup/scripts/monitor_context.mjs` classifica mudanças staged, unstaged
-e untracked. Alterações estruturais exigem `STACK.md`. Alterações de
-persistência exigem `DATABASE.md`. Código de aplicação exige revisão de
-`.fireskills/PROJECT.md`. A ausência de impacto material é registrada na evidência da
-tarefa, nunca presumida silenciosamente.
+During planning, implementation, and progress projection,
+`fireskill-setup/scripts/monitor_context.mjs` classifies staged, unstaged, and
+untracked changes. Structural changes require `STACK.md`. Persistence changes
+require `DATABASE.md`. Application code requires review of `.fireskills/PROJECT.md`.
+The absence of material impact is recorded in task evidence, never silently assumed.
 
-`fireskill-documentator` funciona de forma independente e também é um handoff
-obrigatório após cada tarefa de implementação. Em toda execução, ele reavalia o
-código existente e reconstrói arquitetura, aplicação, banco, fluxos, testes,
-frontend, pacotes, integrações e decisões dentro dos blocos gerenciados de
-`docs/`. A mesma execução preenche `.fireskills/PACKAGES.md` com todos os pacotes
-npm/Bun observados, diretos ou transitivos, e suas finalidades locais,
-preservando texto humano externo.
+`fireskill-documentator` works independently and is also a mandatory handoff after
+each implementation task. In every execution, it re-evaluates existing code and
+rebuilds architecture, application, database, flows, tests, frontend, packages,
+integrations, and decisions within managed blocks of `docs/`. The same execution
+fills `.fireskills/PACKAGES.md` with all observed npm/Bun packages, direct or
+transitive, and their local purposes, preserving external human text.
 
-## Capacidades nativas
+## Native Capabilities
 
-As skills incorporam capacidades inspiradas em extensões de specification
-development sem instalar outro runtime ou criar fontes paralelas:
+Skills incorporate capabilities inspired by specification development extensions
+without requiring an extra runtime or parallel sources:
 
-| Capacidade | Responsável |
+| Capability | Responsible |
 | --- | --- |
-| Gates de qualidade | `fireskill-04-validate` |
-| Proteção de CI | `fireskill-04-validate` |
-| Verificação de tarefas | `fireskill-07-implement` |
-| Revisão visual da interface | `fireskill-07-implement` e especialistas de interface |
-| Rastreabilidade da spec | `fireskill-06-tdd-bdd` |
-| Carregamento de referências da spec | `fireskill-03-specify` |
-| Estrutura de pesquisa | `fireskill-03-specify` |
-| Análise de cenários hipotéticos | `fireskill-update-spec` |
-| Changelog da spec | `fireskill-update-spec` |
-| Crítica da spec | `fireskill-04-validate` |
-| Proteção arquitetural | `fireskill-04-validate` |
-| Revisão de segurança | `fireskill-04-validate` |
-| Testes de qualidade | `fireskill-06-tdd-bdd` |
-| Análise de consumo de tokens | `fireskill-progress` |
-| Integração com PR | `fireskill-07-implement` |
+| Quality gates | `fireskill-04-validate` |
+| CI protection | `fireskill-04-validate` |
+| Task verification | `fireskill-07-implement` |
+| Interface visual review | `fireskill-07-implement` and interface specialists |
+| Spec traceability | `fireskill-06-tdd-bdd` |
+| Spec reference loading | `fireskill-03-specify` |
+| Research structure | `fireskill-03-specify` |
+| What-if scenario analysis | `fireskill-update-spec` |
+| Spec changelog | `fireskill-update-spec` |
+| Spec critique | `fireskill-04-validate` |
+| Architectural protection | `fireskill-04-validate` |
+| Security review | `fireskill-04-validate` |
+| Quality testing | `fireskill-06-tdd-bdd` |
+| Token consumption analysis | `fireskill-progress` |
+| PR integration | `fireskill-07-implement` |
 
-## Especialistas sob demanda
+## Specialists on Demand
 
-Cada skill base possui `references/specialists.md` com condições para recomendar
-contexto técnico. Os especialistas ficam em `fireskills/specialists/` e são
-carregados pelo nome (`$fireskill-specialist-<nome>`) na mesma conversa. Um
-especialista ausente exige nome, finalidade, dependências e autorização
-específica antes de ser copiado; a cópia nunca ocorre como efeito implícito do
-handoff.
+Each base skill includes `references/specialists.md` with conditions to recommend
+technical context. Specialists reside in `fireskills/specialists/` and are loaded
+by name (`$fireskill-specialist-<name>`) in the same conversation. An absent
+specialist requires name, purpose, dependencies, and explicit authorization before
+being copied; copying never occurs as an implicit side effect of a handoff.
 
-## Estrutura
+## Structure
 
 ```text
 templates/
-├── Inbox.md, Backlog.md, Spec.md e Tasks.md
-└── Project.md, Stack.md, Rules.md, Database.md, UserProfile.md, Interface.md e .fireskills/DESIGNSYSTEM.MD
+├── Inbox.md, Backlog.md, Spec.md, and Tasks.md
+└── Project.md, Stack.md, Rules.md, Database.md, UserProfile.md, Interface.md, and .fireskills/DESIGNSYSTEM.MD
 examples/
-└── Spec.md        # fixture preenchida para agentes, CLI e testes
-fireskill-{<etapa>|setup|documentator|aux-<responsabilidade>|<governança>}/
+└── Spec.md        # filled fixture for agents, CLI, and tests
+fireskill-{<stage>|setup|documentator|aux-<responsibility>|<governance>}/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
-├── scripts/       # quando há automação determinística
-├── references/    # conhecimento consultado pela skill
-└── assets/        # templates e materiais de saída
+├── scripts/       # deterministic automation
+├── references/    # skill reference knowledge
+└── assets/        # templates and output materials
 ```
 
-- `SKILL.md` possui frontmatter com `name` e `description`.
-- `agents/openai.yaml` menciona `$<nome-da-skill>` no prompt padrão.
-- Scripts usam Python 3 e biblioteca padrão, sem rede ou ação destrutiva por
-  padrão.
-- Referências extensas vivem a um nível da skill e possuem gatilho explícito de
-  leitura.
-- Uma regra normativa possui uma única fonte. Outros arquivos apontam para ela.
-- O CLI publica os templates e o exemplo sob `.fireskills/`. Somente uma spec
-  criada a partir do template se torna normativa para uma feature.
-- `.fireskills/DESIGNSYSTEM.MD` orienta regras macro de interface no projeto consumidor;
-  `.fireskills/INTERFACE.md` mantém o registro local de componentes e telas.
+- `SKILL.md` contains frontmatter with `name` and `description`.
+- `agents/openai.yaml` references `$<skill-name>` in the default prompt.
+- Scripts use Python 3 or Node.js with standard libraries, avoiding network access or destructive actions by default.
+- Extensive references live one level below the skill and have explicit read triggers.
+- Normative rules have a single source of truth; other files link to it.
+- The CLI publishes templates and example under `.fireskills/`. Only a spec created from the template becomes normative for a feature.
+- `.fireskills/DESIGNSYSTEM.MD` guides macro interface rules in the consumer project; `.fireskills/INTERFACE.md` maintains the local inventory of components and screens.
 
-## Disponibilizar as skills
+## Available Commands
 
-O motor do fluxo é o CLI `fireskill` (código em `fireskills/cli/`), executado
-da raiz do projeto com `bun run fireskill <comando>`: `transition`, `migrate`,
-`effort`, `progress`, `milestones sync`, `test` e `config`. Não há instalação
-das skills: elas já estão neste repositório.
+The workflow engine is the `fireskill` CLI (code in `fireskills/cli/`), executed
+from project root with `bun run fireskill <command>`: `transition`, `migrate`,
+`effort`, `progress`, `milestones sync`, `test`, and `config`. Skills do not
+require separate installation: they reside in this repository.
 
-## Desenvolver
+## Development Workflow
 
-Uma mudança de comportamento segue:
+Behavior changes follow:
 
 ```text
-spec → Gherkin → teste TDD → RED → skill/script → GREEN → regressão → evidência
+spec → Gherkin → TDD test → RED → skill/script → GREEN → regression → evidence
 ```
 
-O ciclo técnico permanece `RED → GREEN → REFACTOR`.
+The technical cycle remains `RED → GREEN → REFACTOR`.
 
-Testes e fixtures das skills permanecem neste módulo e criam specs somente
-em diretórios temporários.
+Skill tests and fixtures reside in this module and only create specs in temporary
+directories.
 
-Nos projetos consumidores, o runner dos testes derivados do BDD é selecionado
-pela stack. No Nuxfire o runner é o Vitest (`bun run test`). Em outras stacks,
-o agente preserva o runner existente ou pergunta qual adotar antes de criar ou
-executar testes. O Gherkin permanece
-somente na `spec.md` como referência: agentes derivam testes executáveis dele,
-sem criar ou executar `.feature`. No Nuxfire a decisão do runner já está tomada: Vitest (`bun run test`). Cada feature, história e requisito recebe no mínimo três cenários
-BDD distintos e três casos TDD executáveis. Cada caso TDD possui seu próprio
-marcador `SPECSFY:`.
+In consumer projects, the test runner for tests derived from BDD is selected by
+the stack. In Nuxfire, the runner is Vitest (`bun run test`). Gherkin remains only
+in `spec.md` as reference: agents derive executable tests from it without creating
+or executing `.feature` files. In Nuxfire, the runner decision is Vitest (`bun run test`).
+Each feature, story, and requirement receives at least three distinct BDD scenarios
+and three executable TDD cases. Each TDD case has its own `SPECSFY:` marker.
 
-## Validar
+## Validation
 
-Valide cada skill alterada:
+Validate each altered skill:
 
 ```bash
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  specsfy-<NN>-<nome>
+node fireskill-04-validate/scripts/verify_repo.mjs . --boundary local
 ```
 
-Execute os contratos das skills a partir desta raiz:
+The repository verifier checks all base skills, catalog contracts, setup,
+documentator, auxiliary skills, and installed specialists.
 
-```bash
-node -m unittest discover -s tests -p 'test_*.py'
-node fireskill-04-validate/scripts/verify_repo.mjs . \
-  --boundary local
-```
+## Publishing Checklist
 
-O verificador exige as skills base. Os contratos do catálogo também
-validam o setup, o documentador e as três auxiliares. Especialistas instalados
-são validados sem limitar o tamanho total do catálogo.
+Before publishing:
 
-## Publicação
-
-Antes de publicar:
-
-- frontmatter e metadata são válidos.
-- gatilhos positivos e limites negativos estão claros.
-- não existem placeholders, caches ou links locais quebrados.
-- os testes TDD informados pelo BDD tiveram RED válido e estão verdes.
-- requisitos, testes, tarefas e evidências estão rastreáveis.
-- a regressão do workspace passou.
-- o diff integrado mantém este módulo e seus consumidores coerentes.
+- Frontmatter and metadata are valid.
+- Positive triggers and negative boundaries are clear.
+- No placeholders, caches, or broken local links exist.
+- TDD tests informed by BDD had a valid RED phase and are green.
+- Requirements, tests, tasks, and evidence are traceable.
+- Workspace regression tests pass.
+- The integrated diff maintains coherence across this module and consumers.

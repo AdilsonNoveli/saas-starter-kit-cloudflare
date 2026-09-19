@@ -106,7 +106,7 @@ Evidência
     const result = await validateSpec(specPath);
 
     expect(result.summary.warnings).toBeGreaterThan(0);
-    expect(result.issues.some((i) => i.message.includes("Placeholder"))).toBe(true);
+    expect(result.issues.some((i) => i.message.toLowerCase().includes("placeholder"))).toBe(true);
 
     // Em modo strict, avisos invalidam a spec
     const strictResult = await validateSpec(specPath, { strict: true });

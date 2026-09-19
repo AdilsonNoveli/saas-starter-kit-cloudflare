@@ -1,83 +1,78 @@
-# Padrões e referências de observabilidade
+# Observability Standards and References
 
-## Os três pilares e quando cada um resolve o quê
+## The Three Pillars and What Each Solves
 
-| Pilar | Responde | Não substitui |
+| Pillar | Answers | Does Not Replace |
 |---|---|---|
-| Logs estruturados | "O que exatamente aconteceu neste evento específico?" | Não mostra tendência agregada nem caminho entre serviços sem correlação |
-| Métricas | "Como o sistema se comporta ao longo do tempo, agregado?" | Não explica o evento individual que causou um pico |
-| Traces | "Por onde essa requisição passou e onde ela gastou tempo?" | Não é barato o suficiente para reter 100% em alto volume; depende de sampling |
+| Structured Logs | "What exactly happened in this specific event?" | Does not show aggregated trends or multi-service paths without correlation |
+| Metrics | "How is the system behaving over time, in aggregate?" | Does not explain the individual event that caused a spike |
+| Traces | "Where did this request travel and where was time spent?" | Not cheap enough to retain 100% at high volume; relies on sampling |
 
-Um incidente típico usa os três em sequência: a métrica detecta o desvio, o
-trace localiza o serviço/etapa responsável, o log explica o evento exato.
+A typical incident uses all three in sequence: the metric detects deviation, the trace isolates the responsible service or step, and the log explains the exact event.
 
-## Frameworks de dashboard
+## Dashboard Frameworks
 
-- **RED** (por requisição/serviço): **R**ate (taxa de requisições), **E**rrors
-  (taxa de erro), **D**uration (latência, em percentis). Ideal para serviços
-  request-driven (APIs, web).
-- **USE** (por recurso): **U**tilization, **S**aturation, **E**rrors. Ideal
-  para recursos finitos (CPU, memória, conexões de pool, disco).
-- Combine os dois: RED no nível do serviço para detectar impacto ao usuário,
-  USE no nível do recurso para localizar o gargalo depois que o RED indicou
-  degradação.
+- **RED** (per request/service): **R**ate (request rate), **E**rrors (error rate),
+  **D**uration (latency, in percentiles). Ideal for request-driven services (APIs, web).
+- **USE** (per resource): **U**tilization, **S**aturation, **E**rrors. Ideal for
+  finite resources (CPU, memory, connection pools, disk).
+- Combine both: RED at the service level to detect user impact, USE at the resource
+  level to locate bottlenecks once RED indicates degradation.
 
-## SLI, SLO e orçamento de erro
+## SLI, SLO, and Error Budgets
 
-- **SLI** (Service Level Indicator): a métrica medida (ex.: proporção de
-  requisições respondidas em menos de 300ms).
-- **SLO** (Service Level Objective): o alvo aceitável para o SLI num período
-  (ex.: 99.9% das requisições em 30 dias).
-- **Error budget**: o complemento do SLO (0.1% no exemplo acima) é o quanto o
-  serviço pode "gastar" de falha antes de violar o objetivo; um budget
-  esgotado é sinal para priorizar confiabilidade sobre novas features, não
-  apenas um número decorativo em dashboard.
-- Defina SLOs por jornada crítica de usuário, não por métrica de
-  infraestrutura isolada — "CPU abaixo de 80%" não é um SLO, é um sinal de
-  saturação que pode ou não afetar o SLO real.
+- **SLI** (Service Level Indicator): the measured metric (e.g., proportion of
+  requests served under 300ms).
+- **SLO** (Service Level Objective): the acceptable target for the SLI over a time
+  window (e.g., 99.9% of requests over 30 days).
+- **Error budget**: the complement of the SLO (0.1% in the example above) representing
+  how much failure the service can "spend" before violating objectives; an exhausted
+  budget is a signal to prioritize reliability over new features, not just a decorative
+  number on a dashboard.
+- Define SLOs per critical user journey, not per isolated infrastructure metric —
+  "CPU below 80%" is not an SLO; it is a saturation signal that may or may not impact
+  the real user SLO.
 
-## Sinais por tipo de componente
+## Signals by Component Type
 
-- **Request/API**: taxa, taxa de erro por código de status, duração em
-  p50/p95/p99, saturação de conexões.
-- **Fila/mensageria**: profundidade da fila, idade da mensagem mais antiga,
-  throughput de consumo, taxa de retry, taxa de dead-letter.
-- **Banco de dados**: conexões ativas vs limite do pool, locks e tempo de
-  espera, latência de query, taxa de erro, lag de replicação.
-- **Cache**: hit rate, latência de hit vs miss, taxa de eviction, uso de
-  memória, falhas de conexão.
-- **Deployment**: versão em execução por instância, progresso do rollout,
-  health check, comparação de taxa de erro antes/depois do deploy.
+- **Request/API**: throughput, error rate by status code, duration at p50/p95/p99,
+  connection pool saturation.
+- **Queue/Messaging**: queue depth, age of oldest message, consumer throughput,
+  retry rate, dead-letter rate.
+- **Database**: active connections vs pool limit, locks and wait times, query
+  latency, error rate, replication lag.
+- **Cache**: hit rate, hit vs miss latency, eviction rate, memory utilization,
+  connection failures.
+- **Deployment**: running version per instance, rollout progress, health checks,
+  pre/post deploy error rate comparison.
 
-## Cardinalidade e custo
+## Cardinality and Cost
 
-- Cardinalidade de uma métrica é o produto do número de valores possíveis de
-  cada label; um label com 10 valores e outro com 1000 gera até 10.000
-  séries só para essa métrica.
-- Nunca use como label: identificador de usuário, e-mail, URL não
-  normalizada (com IDs ou query string), mensagem de erro livre. Normalize a
-  rota (`/users/{id}`, não `/users/123`) antes de usá-la como label.
-- Trate cardinalidade como orçamento explícito: revise antes de adicionar um
-  novo label a uma métrica de alto volume, não depois que o backend de
-  métricas já degradou.
+- Cardinality of a metric is the Cartesian product of possible values across each
+  label; a label with 10 values and another with 1,000 generates up to 10,000 series
+  for that metric alone.
+- Never use as labels: user IDs, emails, unnormalized URLs (with IDs or query
+  strings), arbitrary freeform error messages. Normalize routes (`/users/{id}`,
+  not `/users/123`) before using them as labels.
+- Treat cardinality as an explicit budget: review before adding a new label to a
+  high-volume metric, not after the metrics backend has already degraded.
 
-## Correlação e contexto distribuído
+## Correlation and Distributed Context
 
-- Propague o contexto de trace (W3C Trace Context: `traceparent`/
-  `tracestate`) por todos os boundaries síncronos (HTTP) e assíncronos
-  (mensagem de fila, job agendado) para que um trace único cubra a jornada
-  completa.
-- Sampling: preserve 100% dos traces com erro e das transações marcadas como
-  criticamente importantes para o negócio; aplique amostragem estatística
-  apenas no volume "feliz" de alto tráfego.
+- Propagate trace context (W3C Trace Context: `traceparent`/`tracestate`) across
+  all synchronous boundaries (HTTP) and asynchronous boundaries (queue messages,
+  scheduled jobs) so that a single trace spans the complete journey.
+- Sampling: preserve 100% of error traces and transactions marked as critically
+  important to the business; apply statistical sampling only to high-traffic
+  happy paths.
 
-## Fontes primárias
+## Primary Sources
 
-- OpenTelemetry (instrumentação): https://opentelemetry.io/docs/
-- Semantic conventions (nomes padronizados de atributos): https://opentelemetry.io/docs/specs/semconv/
+- OpenTelemetry (instrumentation): https://opentelemetry.io/docs/
+- Semantic conventions (standardized attribute names): https://opentelemetry.io/docs/specs/semconv/
 - W3C Trace Context: https://www.w3.org/TR/trace-context/
-- Prometheus practices (nomeação e cardinalidade de métricas): https://prometheus.io/docs/practices/
+- Prometheus practices (metric naming and cardinality): https://prometheus.io/docs/practices/
 - Google SRE Book — SLOs: https://sre.google/workbook/implementing-slos/
-- Google SRE Book — Monitoring Distributed Systems (RED/USE na prática): https://sre.google/sre-book/monitoring-distributed-systems/
-- OpenMetrics (formato de exposição): https://openmetrics.io/
+- Google SRE Book — Monitoring Distributed Systems (RED/USE in practice): https://sre.google/sre-book/monitoring-distributed-systems/
+- OpenMetrics (exposition format): https://openmetrics.io/
 - Brendan Gregg, USE Method: https://www.brendangregg.com/usemethod.html

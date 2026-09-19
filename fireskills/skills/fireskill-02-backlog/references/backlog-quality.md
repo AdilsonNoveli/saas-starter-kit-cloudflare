@@ -1,195 +1,189 @@
-# Qualidade e refinamento do backlog
+# Backlog Quality and Refinement
 
-Leia esta referência ao organizar, refinar, priorizar ou avaliar a prontidão de
-um item. O backlog conecta necessidades de negócio ao trabalho verificável de
-produto, desenvolvimento e testes. Ele não é uma lista solta de telas ou
-funcionalidades e não substitui a `spec.md`.
+Read this reference when organizing, refining, prioritizing, or evaluating the readiness of
+an item. The backlog connects business needs to verifiable work across
+product, engineering, and testing. It is not an uncoordinated list of screens or
+features and does not replace `spec.md`.
 
-## Hierarquia e tipos
+## Hierarchy and Types
 
-Use a hierarquia somente até o nível que ajuda a navegação:
+Use hierarchy only to the depth that aids navigation:
 
 ```text
-Produto
-└── Épico
-    └── Funcionalidade
-        ├── História ou requisito
-        ├── Regra
-        ├── Item técnico
-        └── Melhoria
+Product
+└── Epic
+    └── Feature
+        ├── Story or requirement
+        ├── Rule
+        ├── Technical item
+        └── Improvement
 ```
 
-- **Épico** representa um objetivo amplo e agrupador.
-- **Funcionalidade** delimita uma capacidade do produto.
-- **História ou requisito** descreve uma entrega menor e verificável.
-- **Regra** explicita uma restrição transversal ou de negócio.
-- **Técnico** viabiliza qualidade, operação ou entregas dependentes.
-- **Melhoria** incrementa uma capacidade existente.
+- **Epic** represents a broad, umbrella goal.
+- **Feature** bounds a product capability.
+- **Story or requirement** describes a smaller, verifiable delivery.
+- **Rule** makes an architectural or business cross-cutting constraint explicit.
+- **Technical** enables quality, operations, or dependent deliverables.
+- **Improvement** enhances an existing capability.
 
-Não force todos os níveis quando a relação ainda for desconhecida. Registre `A
-esclarecer` e preserve a ideia.
+Do not force all levels when relationships remain unknown. Record `To be clarified`
+and preserve the idea.
 
-Uma visão resumida pode combinar ordem, prioridade e tipo:
+A summary table can combine order, priority, and type:
 
-| Ordem | Prioridade | Tipo | Item | Objetivo |
+| Order | Priority | Type | Item | Objective |
 | --- | --- | --- | --- | --- |
-| 1 | Alta | Épico | Gestão de usuários | Administrar acesso |
-| 2 | Alta | História | Realizar login | Acessar áreas privadas |
-| 3 | Alta | Regra | Controlar permissões | Restringir operações |
-| 4 | Média | Técnico | Processar notificações em fila | Evitar requisições lentas |
-| 5 | Baixa | Melhoria | Preferências de notificação | Escolher canais |
+| 1 | High | Epic | User Management | Administer system access |
+| 2 | High | Story | Perform Login | Access authenticated areas |
+| 3 | High | Rule | Enforce Permissions | Restrict privileged operations |
+| 4 | Medium | Technical | Process Queue Notifications | Avoid slow request cycles |
+| 5 | Low | Improvement | Notification Preferences | Choose notification channels |
 
-## Anatomia adaptativa
+## Adaptive Anatomy
 
-Um item pode conter:
+An item may contain:
 
-- título claro;
-- contexto do problema;
-- objetivo ou história do usuário;
-- comportamento esperado;
-- regras de negócio;
-- critérios de aceitação;
-- segurança, privacidade, desempenho, volume, auditoria e observabilidade;
-- dependências;
-- situações de erro e exceções;
-- dentro e fora de escopo;
-- tipo e prioridade.
+- Clear title;
+- Problem context;
+- User objective or story;
+- Expected behavior;
+- Business rules;
+- Acceptance criteria;
+- Security, privacy, performance, volume, audit, and observability;
+- Dependencies;
+- Error conditions and exceptions;
+- In scope and out of scope;
+- Type and priority.
 
-A profundidade acompanha risco e complexidade. Capture primeiro; refine quando
-a decisão for necessária. Não invente um campo para produzir aparência de
-completude.
+Depth scales with risk and complexity. Capture first; refine when decisions
+are required. Never invent fields simply to give an illusion of completeness.
 
-### Captura mínima
+### Minimum Capture
 
-Antes de persistir um item, confirme somente:
+Before persisting an item, confirm only:
 
-- problema percebido;
-- pessoa afetada ou beneficiada;
-- resultado ou valor esperado;
-- contexto suficiente para distinguir a ideia.
+- Perceived problem;
+- Affected or benefited person;
+- Expected result or value;
+- Sufficient context to distinguish the idea.
 
-Reaproveite tudo o que já estiver claro no pedido. Se faltar algo ou houver
-mais de uma interpretação material, pergunte uma lacuna por vez e reavalie
-depois da resposta. Não persista placeholders nesses quatro campos e não
-invente respostas. Hierarquia, prioridade, regras detalhadas, aceite e solução
-técnica não pertencem a esse mínimo.
+Reuse everything already clear in the request. If missing or admitting multiple
+material interpretations, ask one gap per round and re-evaluate after each answer.
+Do not persist placeholders in these four fields and do not invent answers.
+Hierarchy, priority, detailed rules, acceptance criteria, and technical solutions
+do not belong to this minimum baseline.
 
-### Duplicatas e referências
+### Duplicates and References
 
-Pesquise termos do pedido em backlogs, specs e documentação do projeto antes de
-criar um item. Compare problema, pessoa, resultado e contexto para separar
-possível duplicata de mera semelhança lexical. Specs e documentação podem
-fornecer vocabulário, decisões vigentes e limites; não substituem a intenção
-declarada pelo usuário.
+Search request terms across project backlogs, specs, and documentation before
+creating an item. Compare problem, persona, outcome, and context to distinguish
+potential duplicates from mere lexical overlap. Specs and documentation provide
+vocabulary, active decisions, and constraints; they do not replace user-declared intent.
 
-Confirme se uma possível duplicata deve receber atualização ou se a nova ideia
-possui uma diferença real. Registre caminhos e relações úteis em `Referências
-relacionadas`; não funda, mova ou apague itens sem confirmação.
+Confirm whether a potential duplicate should receive updates or if the new idea
+embodies a genuine distinction. Record useful paths and relationships in `Related references`;
+never merge, move, or delete items without confirmation.
 
-## Padrões de análise
+## Analysis Patterns
 
-### Autenticação
+### Authentication
 
-Considere estado da conta, comparação de identidade, proteção de credenciais,
-limite de tentativas, sessão, desativação, mensagens seguras e autorização.
-“Criar login” ou “criar tela” não descreve esse comportamento.
+Consider account lifecycle, identity verification, credential hashing, rate limiting,
+session persistence, revocation, secure error messages, and authorization.
+"Create login" or "create screen" does not describe this behavior.
 
-### Notificações
+### Notifications
 
-Defina propriedade, contagem, momento de leitura, ação individual e em lote,
-histórico e isolamento entre usuários. Transforme “zerar ao ler” em um evento
-objetivo: abrir menu, abrir item ou marcar tudo.
+Define ownership, badge count, read timestamps, single and batch actions,
+history retention, and tenant isolation. Convert "reset on read" into an objective event:
+open menu, view item, or mark all as read.
 
-### Permissões
+### Permissions
 
-Quando operação, perfil, organização e alvo se combinarem, use uma matriz.
-Autorize no servidor, impeça autoelevação, proteja invariantes como o último
-administrador e registre mudanças sensíveis em auditoria.
+When operations, roles, tenants, and targets intersect, use an authorization matrix.
+Enforce authorization on the server, prevent self-elevation, protect invariants such as
+the last administrator, and record sensitive mutations in audit logs.
 
-| Operação | Admin | Manager | Member |
+| Operation | Admin | Manager | Member |
 | --- | --- | --- | --- |
-| Listar usuários | Sim | Mesma organização | Não |
-| Editar member | Sim | Mesma organização | Não |
-| Editar admin | Sim | Não | Não |
-| Elevar o próprio perfil | Não | Não | Não |
+| List users | Yes | Same organization | No |
+| Edit member | Yes | Same organization | No |
+| Edit admin | Yes | No | No |
+| Self-elevate role | No | No | No |
 
-### Pagamentos e integrações
+### Payments and Integrations
 
-Descreva fluxo principal, estados e transições, idempotência, autenticação de
-callbacks, retries, falhas externas, vínculo com entidades internas e proteção
-de credenciais e dados sensíveis.
+Describe primary flow, states and transitions, idempotency keys, webhook signature verification,
+retries, external outages, entity bindings, and credential/secret protection.
 
-Exemplo de fluxo: receber valor → solicitar cobrança → vinculá-la ao cliente →
-apresentar PIX → confirmar por webhook autenticado → atualizar o estado uma
-única vez. Modele ao menos pendente, paga, expirada, cancelada e falhou, sem
-permitir que uma cobrança paga volte a pendente.
+Example flow: receive amount → create charge → link to customer →
+present payment interface → confirm via signed webhook → transition state exactly once.
+Model at least pending, paid, expired, cancelled, and failed, preventing paid charges
+from reverting to pending.
 
-### Exportações e processamento pesado
+### Exports and Heavy Processing
 
-Considere filtros, autorização por campo, fuso horário, limite para execução
-síncrona, processamento em segundo plano, expiração, notificação e exposição de
-dados sensíveis.
+Consider filters, field-level authorization, timezones, synchronous execution thresholds,
+background job delegation, expiration, notifications, and sensitive data leakage.
 
-## Funcional e não funcional
+## Functional vs Non-Functional
 
-Requisito funcional descreve o que acontece: autenticar, cobrar, notificar,
-exportar ou cancelar. Requisito não funcional define uma condição mensurável de
-qualidade e operação: latência, volume, isolamento, criptografia, auditoria,
-retenção ou recuperação após falha.
+A functional requirement describes what happens: authenticate, charge, notify,
+export, or cancel. A non-functional requirement specifies a measurable condition of
+quality and operations: latency, throughput, tenant isolation, encryption, auditability,
+retention, or fault recovery.
 
-Substitua adjetivos vagos por condições verificáveis. Exemplo: “responder em
-até dois segundos para consultas de até 50 mil registros no ambiente de
-produção definido pelo projeto”.
+Replace vague adjectives with verifiable conditions. Example: "respond in under
+two seconds for queries up to 50,000 records under the project production baseline".
 
-## Critérios de aceitação
+## Acceptance Criteria
 
-Escreva condições observáveis, sem prescrever a implementação:
+Write observable conditions without prescribing internal implementation:
 
 ```gherkin
-Scenario: Login de uma conta ativa
-  Given uma conta ativa com credenciais válidas
-  When a pessoa informa e-mail e senha corretos
-  Then o acesso é autorizado conforme seu perfil
+Scenario: Login with active account
+  Given an active user account with valid credentials
+  When the user submits correct email and password
+  Then access is granted according to their role
 
-Scenario: Repetição de um webhook de pagamento
-  Given uma cobrança já confirmada como paga
-  When o mesmo evento autenticado é recebido novamente
-  Then nenhum pagamento adicional é registrado
+Scenario: Replay of payment webhook
+  Given a charge already confirmed as paid
+  When the same signed webhook event is received again
+  Then no duplicate payment is recorded
 ```
 
-Na captura inicial, cenários podem permanecer ausentes. Para um item refinado,
-use-os quando forem a forma mais clara de tornar sucesso, falha ou limite
-verificável.
+In initial capture, scenarios may be omitted. For a refined item,
+use them whenever they provide the clearest way to make success, failure, or limits verifiable.
 
-## Priorização
+## Prioritization
 
-Ordene os itens considerando:
+Order items considering:
 
-1. valor para usuário ou negócio;
-2. risco de segurança, privacidade ou operação;
-3. dependências e quantidade de entregas desbloqueadas;
-4. urgência;
-5. esforço;
-6. incerteza.
+1. Value to user or business;
+2. Security, privacy, or operational risk;
+3. Dependencies and number of unlocked deliverables;
+4. Urgency;
+5. Effort;
+6. Uncertainty.
 
-Prioridade é relativa. Se muitos itens parecem igualmente altos, compare-os e
-registre a ordem. Infraestrutura ou autorização podem preceder melhorias
-visuais quando habilitam ou protegem outras entregas.
+Priority is relative. If multiple items seem equally high, compare them and
+record sequence. Infrastructure or authorization work may precede visual features
+when enabling or protecting dependent deliverables.
 
-## Diagnóstico de prontidão
+## Readiness Diagnosis
 
-Antes de afirmar que um item está refinado, confirme:
+Before declaring an item refined, confirm:
 
-- problema e pessoa beneficiada;
-- evento que inicia o comportamento e resultado produzido;
-- ator autorizado;
-- regras, erros e exceções;
-- verificação objetiva;
-- implicações de segurança, privacidade e desempenho;
-- fora de escopo;
-- dependências e decisões pendentes.
+- Problem and benefited person;
+- Triggering event and produced outcome;
+- Authorized actor;
+- Rules, errors, and exceptions;
+- Objective verification;
+- Security, privacy, and performance implications;
+- Out of scope boundaries;
+- Dependencies and open decisions.
 
-O agente pergunta sobre lacunas materiais uma por vez. Uma decisão que muda
-segurança, escopo, arquitetura ou experiência nunca é inventada silenciosamente.
-Prontidão no backlog indica que o item pode seguir para especificação;
-não autoriza implementação sem spec e gates.
+The agent queries material gaps one at a time. A decision affecting security,
+scope, architecture, or user experience is never silently assumed.
+Backlog readiness indicates the item may proceed to specification;
+it does not authorize implementation without an approved spec and gates.

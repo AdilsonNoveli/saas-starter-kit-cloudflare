@@ -1,27 +1,27 @@
 ---
 name: fireskill-specialist-versioning
-description: Preparar e conferir a versão do Nuxfire pelo arquivo VERSION da raiz e, com autorização, a tag Git v<versão>. Use ao preparar uma release, junto de `$fireskill-specialist-delivery-engineering` e `$fireskill-specialist-sst`.
+description: Prepare and verify the Nuxfire version via the root VERSION file and, upon authorization, the Git tag v<version>. Use when preparing a release, alongside `$fireskill-specialist-delivery-engineering` and `$fireskill-specialist-sst`.
 ---
 
-# Versionamento
+# Versioning
 
-## O que existe
+## What Exists
 
-- `VERSION` na raiz: uma linha `MAJOR.MINOR.PATCH` (hoje `0.1.0`). `fireskills/VERSION` é a versão do próprio Fireskills.
+- `VERSION` at root: single line `MAJOR.MINOR.PATCH` (currently `0.1.0`). `fireskills/VERSION` is the version of Fireskills itself.
 - Deploy: `bun run deploy -- --stage <stage>` (`$fireskill-specialist-sst`).
 
-## O que NÃO existe
+## What Does NOT Exist
 
-Arquivo `SEMVER`, imagem Docker/OCI, registry, changelog e tags Git no repositório. Não crie nada disso sem pedido.
+`SEMVER` file, Docker/OCI image, registry, changelog, and Git tags in repository. Do not create any of these without explicit request.
 
-## Regras
+## Rules
 
-- `patch`: correção compatível; `minor`: capacidade compatível; `major`: mudança incompatível.
-- Classifique a mudança, proponha a próxima versão e só então grave.
-- Preparar a versão localmente é livre. Tag Git, GitHub Release e deploy exigem autorização explícita.
-- Nunca reutilize uma versão já publicada; incremente.
+- `patch`: compatible fix; `minor`: compatible capability; `major`: incompatible breaking change.
+- Classify the change, propose the next version, and only then write to file.
+- Preparing the version locally is free to proceed. Git tags, GitHub Releases, and deployments require explicit user authorization.
+- Never reuse an already published version; always increment.
 
-## Comandos
+## Commands
 
 ```bash
 node fireskills/specialists/fireskill-specialist-versioning/scripts/semver.mjs current
@@ -29,8 +29,8 @@ node fireskills/specialists/fireskill-specialist-versioning/scripts/semver.mjs b
 node fireskills/specialists/fireskill-specialist-versioning/scripts/semver.mjs verify 0.1.1
 ```
 
-## Validação
+## Validation
 
-- `current` e `verify` confirmam o conteúdo de `VERSION`.
-- Rode `bun run test` antes de propor a tag.
-- A tag, se autorizada, é `v<VERSION>` e aponta para o commit testado.
+- `current` and `verify` confirm the content of `VERSION`.
+- Run `bun run test` before proposing the tag.
+- The tag, if authorized, is `v<VERSION>` pointing to the tested commit.

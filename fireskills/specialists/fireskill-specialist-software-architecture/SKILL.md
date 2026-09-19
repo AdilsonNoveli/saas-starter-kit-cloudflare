@@ -1,107 +1,103 @@
 ---
 name: fireskill-specialist-software-architecture
-description: Analisar e evoluir arquitetura com boundaries, direção de dependência, atributos de qualidade mensuráveis, ADRs, custo operacional, migração e trade-offs entre monólito modular e serviços distribuídos. Use para modularização, coupling, escalabilidade, resiliência ou decisões caras de reverter; não use para renomeação local sem impacto estrutural nem para escolher a fronteira de um único domínio, use `$fireskill-specialist-domain-modeling` para isso primeiro.
+description: "Analyze and evolve architecture using boundaries, dependency direction, measurable quality attributes, ADRs, operational cost, migration paths, and trade-offs between modular monoliths and distributed services. Use for modularization, coupling, scalability, resilience, or expensive-to-reverse decisions; do not use for local renames without structural impact or for deciding a single domain boundary (use `$fireskill-specialist-domain-modeling` first)."
 ---
 
-# Arquitetura de software
+# Software Architecture
 
-## Quando usar
+## When to Use
 
-- Acionar para decisão com custo alto de reverter: introduzir um serviço,
-  uma fila, um cache distribuído, mudar o boundary entre módulos ou a
-  direção de uma dependência estrutural.
-- Acionar também quando um atributo de qualidade (latência, disponibilidade,
-  consistência, capacidade) precisar virar critério explícito de decisão.
-- Não acionar para renomear, mover arquivo ou refatorar localmente sem
-  impacto de boundary — isso é manutenção, não decisão arquitetural.
-- Rodar `$fireskill-specialist-domain-modeling` primeiro quando o boundary em
-  disputa for de um conceito de domínio ainda não modelado — a arquitetura
-  decide onde colocar um boundary já definido pelo domínio, não o inventa.
+- Trigger for decisions carrying high reversal cost: introducing a new service,
+  message queue, distributed cache, changing module boundaries, or altering structural
+  dependency direction.
+- Also trigger when a quality attribute (latency, availability, consistency,
+  capacity) must become an explicit decision criterion.
+- Do not trigger to rename, move files, or refactor locally without boundary
+  impact — that is everyday maintenance, not an architectural decision.
+- Run `$fireskill-specialist-domain-modeling` first when the boundary in question
+  belongs to an unmodeled domain concept — architecture decides where to place a
+  boundary already established by domain modeling, not invent it out of thin air.
 
-## Fluxo
+## Workflow
 
-1. Definir finalidade do sistema, restrições reais (orçamento, prazo, time
-   disponível) e cenários de atributo de qualidade mensuráveis (não
-   adjetivos como "escalável").
-2. Mapear o estado observado: owners de dados, dependências existentes entre
-   módulos/serviços, fluxos de runtime críticos e onde a dor atual está.
-3. Identificar as forças em conflito, as decisões que seriam caras de
-   reverter depois e os riscos de cada caminho.
-4. Comparar opções pelos mesmos critérios (os cenários do passo 1) e pelo
-   custo operacional real de cada uma — rede, consistência distribuída,
-   observabilidade adicional, times a coordenar.
-5. Escolher a menor estrutura que satisfaz os cenários definidos — a opção
-   mais simples que atende o atributo de qualidade vence por padrão.
-6. Definir plano de transição: compatibilidade durante a migração,
-   observabilidade para detectar regressão e um caminho de rollback real.
-7. Registrar a decisão (ADR) e verificar os boundaries propostos por teste
-   de dependência automatizado ou análise estática, quando possível.
+1. Define system purpose, real constraints (budget, timeline, team capacity), and
+   measurable quality attribute scenarios (avoid subjective adjectives like "scalable").
+2. Map the observed state: data owners, existing dependencies between modules/services,
+   critical runtime flows, and where active friction exists.
+3. Identify competing architectural forces, decisions that would be expensive to
+   reverse later, and risks inherent to each path.
+4. Compare alternatives using identical criteria (scenarios from step 1) and realistic
+   operational cost — network overhead, distributed consistency, extra observability,
+   and multi-team coordination.
+5. Select the smallest architecture that satisfies the defined scenarios — the simplest
+   option meeting quality attributes wins by default.
+6. Define transition plans: migration backwards compatibility, regression observability,
+   and a viable rollback path.
+7. Document the decision (ADR) and verify proposed boundaries using automated dependency
+   tests or static analysis where possible.
 
-## Padrões
+## Patterns
 
-- Dar a cada módulo responsabilidade, dados e interface claros — um módulo
-  sem contrato explícito vira acoplamento implícito para quem o consome.
-- Direcionar dependências das políticas voláteis para as estáveis (regra de
-  dependência): módulo de negócio não deve depender de detalhe de
-  framework/infra; o inverso é o padrão saudável.
-- Evitar introduzir serviço, fila, cache ou camada de abstração sem um
-  cenário consumidor real e mensurável que a justifique — abstração
-  especulativa cria custo permanente por benefício hipotético.
-- Separar explicitamente a arquitetura implementada (o que existe hoje) da
-  arquitetura desejada (para onde está migrando) — tratá-las como a mesma
-  coisa esconde dívida e trabalho pendente.
-- Expressar todo atributo de qualidade como cenário mensurável: estímulo,
-  ambiente, resposta esperada, medida (ex.: "sob 200 req/s, p99 < 300ms"),
-  nunca como adjetivo solto.
-- Manter decisões facilmente substituíveis como locais e reversíveis, e
-  tornar explícitas (ADR) apenas as decisões realmente caras de mudar depois.
-- Evoluir arquitetura por seams verificáveis e incrementais (strangler fig,
-  expand/contract) em vez de reescrita completa — reescrita total raramente
-  entrega no prazo e perde conhecimento acumulado no sistema atual.
+- Assign each module explicit responsibilities, data ownership, and public interfaces
+  — a module without an explicit contract introduces implicit coupling for consumers.
+- Direct dependencies from volatile policies toward stable policies (dependency rule):
+  business domain code must not depend on framework/infrastructure details; the
+  inverse is healthy architecture.
+- Avoid introducing services, queues, caches, or abstraction layers without a real,
+  measurable consumer scenario justifying them — speculative abstractions incur
+  permanent maintenance costs for hypothetical benefits.
+- Explicitly distinguish implemented architecture (what exists today) from target
+  architecture (the migration destination) — treating them as identical obscures
+  debt and unfinished work.
+- Express every quality attribute as a measurable scenario: stimulus, source,
+  environment, artifact, expected response, and response measure (e.g., "under
+  200 req/s, p99 < 300ms"), never as detached adjectives.
+- Keep easily replaceable decisions local and reversible, making explicit (ADR)
+  only decisions that are truly expensive to alter later.
+- Evolve architecture through verifiable, incremental seams (strangler fig,
+  expand/contract) rather than ground-up rewrites — full rewrites rarely ship on
+  schedule and lose institutional knowledge embedded in current systems.
 
-## Antipadrões
+## Anti-Patterns
 
-- Adotar microsserviços porque "é o padrão da indústria" sem um cenário de
-  escala, time ou deployment independente que o justifique — o custo de
-  consistência distribuída e operação multiplicada é real e imediato; o
-  benefício é hipotético até que o cenário apareça.
-- Big ball of mud: módulos sem fronteira nem direção de dependência
-  definida, onde qualquer parte pode chamar qualquer outra diretamente.
-- Big design up front sem cenário de qualidade mensurável — arquitetura
-  "para o futuro" sem estímulo concreto que a justifique tende a resolver o
-  problema errado e travar decisões reversíveis cedo demais.
-- Adicionar uma camada de indireção genérica "para flexibilidade futura"
-  quando existe apenas um consumidor real hoje — paga o custo de
-  complexidade antes de haver qualquer evidência de que a flexibilidade
-  será usada.
+- Adopting microservices because "it is industry standard" without concrete scale,
+  team independence, or autonomous deployment requirements — distributed consistency
+  and operational overhead are real and immediate; benefits remain hypothetical
+  until the scenario materializes.
+- Big ball of mud: modules lacking boundaries or defined dependency directions, where
+  any component can invoke any other component directly.
+- Big design up front without measurable quality scenarios — "future-proof" architecture
+  unbacked by concrete stimuli tends to solve the wrong problems and locks reversible
+  decisions prematurely.
+- Adding generic indirection layers "for future flexibility" when only a single
+  consumer exists today — incurs complexity overhead long before any evidence shows
+  flexibility will ever be needed.
 
-## Validação
+## Validation
 
-- Caminhos críticos, modos de falha, requisitos de consistência e
-  capacidade foram avaliados contra os cenários definidos, não só o caminho
-  feliz.
-- Existem testes de arquitetura ou de dependência (quando a linguagem/
-  ferramenta permitir) que travam a direção de dependência decidida.
-- Há ensaio da migração: compatibilidade durante a transição, plano de
-  rollback testado, não apenas descrito.
-- Impactos em segurança, dados e operação foram revisados como parte da
-  decisão, não como reflexão posterior.
-- Não declarar uma arquitetura "escalável" ou "resiliente" sem o cenário
-  mensurável e a evidência que o comprova — linguagem absoluta sem prova é
-  proibida.
+- Critical execution paths, failure modes, consistency constraints, and capacity
+  limits evaluated against defined scenarios, not just happy paths.
+- Architecture or dependency tests (where runtime/tooling supports) enforcing
+  approved dependency directions.
+- Migration rehearsal: backward compatibility verified during transition, rollback
+  plan tested rather than merely documented.
+- Security, data integrity, and operational impacts reviewed as part of the decision,
+  never as post-implementation reflections.
+- Do not declare an architecture "scalable" or "resilient" without measurable scenarios
+  and verifiable evidence — absolute statements without proof are forbidden.
 
-## Skills relacionadas
+## Related Skills
 
-- `$fireskill-specialist-technical-research` reúne evidência primária quando a
-  decisão depende de capacidade, limite ou compatibilidade externa.
-- `$fireskill-specialist-domain-modeling` para decidir o boundary de um
-  conceito de domínio antes de decidir o boundary de serviço/módulo.
-- `$fireskill-specialist-delivery-engineering` para o plano de rollout e
-  rollback de uma migração arquitetural.
-- `$fireskill-specialist-performance-engineering` quando o atributo de
-  qualidade em disputa for latência ou capacidade sob carga real.
-- `$fireskill-specialist-code-review` para verificar que o código implementado
-  respeita os boundaries decididos aqui.
+- `$fireskill-specialist-technical-research` gathers primary evidence when decisions
+  depend on third-party capacity, limits, or compatibility.
+- `$fireskill-specialist-domain-modeling` to establish domain concept boundaries
+  before finalizing service or module boundaries.
+- `$fireskill-specialist-delivery-engineering` for rollout and rollback execution
+  of architectural migrations.
+- `$fireskill-specialist-performance-engineering` when the contested quality attribute
+  concerns latency or capacity under load.
+- `$fireskill-specialist-code-review` to verify that implemented code respects boundaries
+  established here.
 
-Leia [references/standards.md](references/standards.md) para views
-arquiteturais, formato de ADR, atributos de qualidade e fontes primárias.
+Read [references/standards.md](references/standards.md) for architectural
+views, ADR templates, quality attribute scenarios, and primary sources.

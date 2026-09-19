@@ -1,74 +1,72 @@
-# Pinia no Nuxfire — o que existe de fato no código
+# Pinia in Nuxfire — What Actually Exists in Code
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento.
-O uso hoje é **pequeno**: três stores.
+Every statement cites its evidence file. Code supersedes this document.
+Usage today is **minimal**: three stores.
 
-## 1. Versões e registro
+## 1. Versions and Registration
 
-- `pinia` `^2.3.1` e `@pinia/nuxt` `^0.9.0` (`apps/app/package.json`); módulo em
-  `apps/app/nuxt.config.ts`. Layers que têm store declaram `pinia` no próprio
+- `pinia` `^2.3.1` and `@pinia/nuxt` `^0.9.0` (`apps/app/package.json`); module in
+  `apps/app/nuxt.config.ts`. Layers containing stores declare `pinia` in their own
   `package.json` (`teams`, `notifications`).
-- **Não existe** plugin de persistência (`pinia-plugin-persistedstate` ou
-  similar).
+- **No** persistence plugins exist (`pinia-plugin-persistedstate` or similar).
 
-## 2. As três stores
+## 2. The Three Stores
 
-| Store | Arquivo | Estado | Consumidores |
+| Store | File | State | Consumers |
 |---|---|---|---|
-| `useTeamsStore` (id `"teams"`) | `layers/teams/app/composables/use-teams-store.ts` | `teams` (registro por **slug**), `currentTeamId`, `loaded` | `apps/app/app/middleware/1.teams.global.ts`, `TeamSwitcher*.vue`, `TeamCreateModal.vue`, páginas de settings |
-| `useInviteStore` (`"invite"`) | `layers/teams/app/composables/use-invite-store.ts` | `invite` (tipado `any`) | `layers/teams/app/middleware/invite.ts`, `pages/invite/[[id]].vue` |
-| `useNotificationsStore` (`"notifications"`) | `layers/notifications/app/composables/use-notifications-store.ts` | `notifications` (registro por id), `unread`, `enabled` | `NotificationsSlideover.vue`, `pages/account-settings/notifications.vue`, `plugins/ws-notifications.client.ts`, dashboard |
+| `useTeamsStore` (id `"teams"`) | `layers/teams/app/composables/use-teams-store.ts` | `teams` (record indexed by **slug**), `currentTeamId`, `loaded` | `apps/app/app/middleware/1.teams.global.ts`, `TeamSwitcher*.vue`, `TeamCreateModal.vue`, settings pages |
+| `useInviteStore` (`"invite"`) | `layers/teams/app/composables/use-invite-store.ts` | `invite` (typed as `any`) | `layers/teams/app/middleware/invite.ts`, `pages/invite/[[id]].vue` |
+| `useNotificationsStore` (`"notifications"`) | `layers/notifications/app/composables/use-notifications-store.ts` | `notifications` (record indexed by id), `unread`, `enabled` | `NotificationsSlideover.vue`, `pages/account-settings/notifications.vue`, `plugins/ws-notifications.client.ts`, dashboard |
 
-Além disso: `useCurrentTeam = () => storeToRefs(useTeamsStore()).currentTeam`
-(atalho reativo no mesmo arquivo).
+Additionally: `useCurrentTeam = () => storeToRefs(useTeamsStore()).currentTeam`
+(reactive shortcut in the same file).
 
-`layers/kanban` **não usa store**: `app/composables/useKanban.ts` expõe a fatia
-do cliente tRPC direto. Nem todo dado de servidor precisa de store.
+`layers/kanban` **does not use Pinia**: `app/composables/useKanban.ts` wraps the
+tRPC client directly. Not all server data requires a store.
 
-## 3. Convenções observadas
+## 3. Observed Conventions
 
-- **Estilo de opções**: `defineStore(id, { state: () => ({...}), getters, actions })`.
-  Não há *setup store* (`defineStore(id, () => {...})`) no projeto.
-- **Onde**: `layers/<layer>/app/composables/use-<nome>-store.ts` — dentro de
-  `composables/`, então o Nuxt auto-importa o `useXStore` no app inteiro. O nome do
-  arquivo é kebab (`use-teams-store.ts`); o export é `use<Nome>Store`; o `id` é o
-  substantivo em minúsculas.
-- `defineStore` é importado de `"pinia"` nos arquivos de store; `storeToRefs` é
-  usado **sem import** (auto-import do `@pinia/nuxt`).
-- **Estado normalizado como registro** (`Record<chave, entidade>`) com *getters*
-  para lista ordenada (`ordered`, `allTeams`) e busca (`getTeam(id)`).
-  Cuidado: `useTeamsStore` chaveia por **`team.slug`** (`setTeam`, `setTeams`), e
-  `currentTeamId` guarda o **slug** (`setCurrentTeamId(teamSlug)` no middleware),
-  apesar do nome "Id".
-- **Tipos derivados do servidor**: `import type { RouterOutput } from
-  "~~/server/trpc/routers"` e `RouterOutput["teams"]["get"]`. Não redeclare o tipo
-  à mão (a exceção `invite: any` é dívida, não modelo).
-- **Dados vêm do tRPC dentro das actions**:
-  `await useTrpcClient().teams.get.query({ teamIdentifier })`, com `try/catch`
-  que faz `console.error(error)` e devolve `null`/`undefined`. Mutações
-  (`markAsRead`) atualizam o estado **antes** da chamada e **reconciliam** no
-  erro (recalculam `unread` a partir do estado).
-- Separação `set*` (síncrono, só muda estado) vs `fetch*` (assíncrono, chama a
-  API e depois `set*`).
+- **Options Style**: `defineStore(id, { state: () => ({...}), getters, actions })`.
+  No *setup stores* (`defineStore(id, () => {...})`) exist in the project.
+- **Location**: `layers/<layer>/app/composables/use-<name>-store.ts` — inside
+  `composables/`, so Nuxt auto-imports `useXStore` application-wide. File name is kebab-case
+  (`use-teams-store.ts`); export is `use<Name>Store`; `id` is a lowercase noun.
+- `defineStore` is imported from `"pinia"` in store files; `storeToRefs` is used
+  **without explicit import** (auto-imported by `@pinia/nuxt`).
+- **Normalized State as Record** (`Record<key, entity>`) with *getters* for sorted
+  lists (`ordered`, `allTeams`) and lookups (`getTeam(id)`).
+  Note: `useTeamsStore` indexes by **`team.slug`** (`setTeam`, `setTeams`), and
+  `currentTeamId` holds the **slug** (`setCurrentTeamId(teamSlug)` in middleware),
+  despite being named "Id".
+- **Types Derived from Server**: `import type { RouterOutput } from "~~/server/trpc/routers"`
+  and `RouterOutput["teams"]["get"]`. Never manually redeclare types (the exception
+  `invite: any` is technical debt, not a pattern).
+- **Data Sourced from tRPC Inside Actions**:
+  `await useTrpcClient().teams.get.query({ teamIdentifier })`, with `try/catch`
+  logging `console.error(error)` and returning `null`/`undefined`. Mutations
+  (`markAsRead`) update state **before** the network call and **reconcile** on
+  error (recalculate `unread` from state).
+- Separation between `set*` (synchronous, state only) vs `fetch*` (asynchronous, calls
+  API then `set*`).
 
-## 4. SSR e hidratação
+## 4. SSR and Hydration
 
-- O estado das stores é serializado no payload do Nuxt e hidratado no cliente.
-  `useTeamsStore.fetchTeam` roda no **middleware global** `1.teams.global.ts`
-  (servidor no primeiro acesso, cliente nas navegações) e por isso o middleware
-  **fica no Composition Root**, depois de `0.auth.global.ts` (ver
+- Store state is serialized into the Nuxt payload and hydrated on the client.
+  `useTeamsStore.fetchTeam` runs in **global middleware** `1.teams.global.ts`
+  (server on initial visit, client during SPA navigations) and therefore resides
+  **in the Composition Root**, sequenced after `0.auth.global.ts` (see
   `$fireskill-specialist-nuxfire-layers`).
-- **Código de browser dentro de action é client-only.** `useNotificationsStore`
-  usa `localStorage` em `initializeNotificationSettings`/`setNotificationsEnabled`;
-  por isso é chamado do plugin `ws-notifications.client.ts` (sufixo `.client`) e de
-  `onMounted`-like de página, nunca em código que roda no servidor.
-- `useTrpcClient()` cria um cliente novo por chamada no servidor e reaproveita um
-  no browser (`use-trpc-client.ts`); não guarde esse cliente no estado.
-- Não há carga preguiçosa de store nem `acceptHMRUpdate` no projeto.
+- **Browser code inside actions is client-only.** `useNotificationsStore` uses
+  `localStorage` in `initializeNotificationSettings`/`setNotificationsEnabled`;
+  it is invoked exclusively from `ws-notifications.client.ts` (`.client` suffix)
+  and page `onMounted` hooks, never in code executing on the server.
+- `useTrpcClient()` creates a new client per server invocation and reuses a single
+  client in the browser (`use-trpc-client.ts`); do not retain this client in store state.
+- No lazy loading of stores or `acceptHMRUpdate` is configured in the codebase.
 
-## 5. O que NÃO existe (não assuma)
+## 5. What Does NOT Exist (Do Not Assume)
 
-- Persistência de estado, *setup stores*, plugins de Pinia, testes de store.
-- Store para o dado do Kanban.
-- Estado global fora de Pinia além de `useSession()` (`apps/app/app/utils/auth.ts`,
-  baseado em `useState`) e do cookie de sessão.
+- State persistence plugins, *setup stores*, Pinia plugins, store unit test suites.
+- Stores for Kanban data.
+- Global client state outside Pinia other than `useSession()` (`apps/app/app/utils/auth.ts`,
+  backed by `useState`) and the session cookie.

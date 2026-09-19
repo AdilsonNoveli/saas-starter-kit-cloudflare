@@ -1,8 +1,8 @@
 /**
- * Utilitários compartilhados de filesystem.
+ * Shared filesystem utilities.
  *
- * Centraliza resolução de caminhos, escrita atômica e varreduras pequenas
- * usadas pelo CLI sem esconder operações destrutivas.
+ * Centralizes path resolution, atomic writes, and file system scans
+ * used by the CLI without hiding destructive operations.
  */
 
 import { constants } from "node:fs";
@@ -18,7 +18,7 @@ import {
 import { homedir } from "node:os";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 
-/** Expande `~` e retorna um caminho absoluto normalizado. */
+/** Expands `~` and returns a normalized absolute path. */
 export function resolvePath(value: string): string {
   const expanded =
     value === "~"
@@ -29,7 +29,7 @@ export function resolvePath(value: string): string {
   return isAbsolute(expanded) ? resolve(expanded) : resolve(process.cwd(), expanded);
 }
 
-/** Informa se um caminho existe, sem propagar a ausência como erro. */
+/** Checks whether a path exists without throwing on absence. */
 export async function pathExists(path: string): Promise<boolean> {
   try {
     await access(path, constants.F_OK);
@@ -39,7 +39,7 @@ export async function pathExists(path: string): Promise<boolean> {
   }
 }
 
-/** Informa se um caminho existente é um arquivo regular. */
+/** Checks whether a path exists and is a regular file. */
 export async function isFile(path: string): Promise<boolean> {
   try {
     return (await stat(path)).isFile();
@@ -48,7 +48,7 @@ export async function isFile(path: string): Promise<boolean> {
   }
 }
 
-/** Escreve texto UTF-8 por arquivo temporário no mesmo diretório. */
+/** Atomically writes UTF-8 text via a temporary file in the same directory. */
 export async function writeTextAtomic(
   target: string,
   content: string,
@@ -57,30 +57,25 @@ export async function writeTextAtomic(
   await mkdir(dirname(target), { recursive: true });
   const temporary = join(
     dirname(target),
-    `.${basename(target) || "arquivo"}.${process.pid}.tmp`,
+    `.${basename(target) || "file"}.${process.pid}.tmp`,
   );
   await writeFile(temporary, content, { encoding: "utf8", mode });
   await rename(temporary, target);
 }
 
-/** Lê JSON e mantém o tipo como desconhecido até a validação do chamador. */
+/** Reads and parses a JSON file into an unknown object. */
 export async function readJson(path: string): Promise<unknown> {
-  return JSON.parse(await readFile(path, "utf8")) as unknown;
+  return JSON.parse(await readFile(path, "utf8"));
 }
 
-/** Lista arquivos recursivamente em ordem estável. */
-export async function listFiles(root: string): Promise<string[]> {
-  if (!(await pathExists(root))) {
+/** Lists files directly inside a directory. */
+export async function listDirectoryFiles(directory: string): Promise<string[]> {
+  try {
+    const entries = await readdir(directory, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile())
+      .map((entry) => join(directory, entry.name));
+  } catch {
     return [];
   }
-  const output: string[] = [];
-  for (const entry of await readdir(root, { withFileTypes: true })) {
-    const path = join(root, entry.name);
-    if (entry.isDirectory()) {
-      output.push(...(await listFiles(path)));
-    } else if (entry.isFile() || entry.isSymbolicLink()) {
-      output.push(path);
-    }
-  }
-  return output.sort();
 }

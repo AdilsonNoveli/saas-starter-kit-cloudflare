@@ -1,24 +1,23 @@
-# Classificar uma atualização de spec
+# Classifying a Specification Update
 
-Leia esta referência quando um pedido chegar depois de a spec já ter obtido
+Read this reference when a request arrives after the spec has already obtained
 `Definition Gate: Passed`.
 
-| Classe | Sinal observável | Ação | Retomada |
+| Class | Observable Signal | Action | Resumption |
 | --- | --- | --- | --- |
-| Correção interna | não muda saída, contrato, dado, risco ou aceite | não editar a spec; registrar na evidência | `implement` |
-| Esclarecimento editorial | mesma decisão e mesmos testes continuam suficientes | ajustar redação sem invalidar gates | origem |
-| Mudança de comportamento | muda resultado, ator, escopo, AC, FR, NFR, dados, segurança ou interface | atualizar a spec e reabrir Ato I | `validate` |
-| Mudança de plano | mantém o comportamento aprovado, mas muda solução, tarefa ou estratégia TDD | atualizar a spec e reabrir Ato II | `tasks` |
-| Nova fatia | possui finalidade, atores ou entrega demonstrável independentes | não ampliar a spec atual; encaminhar a backlog ou nova spec | `backlog` ou `specify` |
-| Decisão ausente | duas respostas plausíveis mudam comportamento, risco ou teste | perguntar uma decisão por vez | `backlog`, depois `update-spec` |
+| Internal fix | Does not change output, contract, data, risk, or acceptance | Do not edit spec; record in task evidence | `implement` |
+| Editorial clarification | Same decision and same tests remain sufficient | Adjust wording without invalidating gates | Origin |
+| Behavior change | Changes outcome, actor, scope, AC, FR, NFR, data, security, or interface | Update spec and reopen Act I | `validate` |
+| Plan change | Keeps approved behavior, but changes solution, task, or TDD strategy | Update spec and reopen Act II | `tasks` |
+| New slice | Has independent purpose, actors, or demonstrable delivery | Do not expand current spec; route to backlog or new spec | `backlog` or `specify` |
+| Missing decision | Two plausible answers change behavior, risk, or tests | Ask one decision at a time | `backlog`, then `update-spec` |
 
-## Regras de decisão
+## Decision Rules
 
-- Classifique pelo efeito, não pelas palavras “pequeno”, “rápido” ou “só”.
-- Trate remoção de comportamento aprovado como mudança de comportamento.
-- Trate compatibilidade, privacidade, autorização e persistência como Ato I.
-- Trate mudança de biblioteca sem efeito normativo como Ato II.
-- Quando uma mudança tocar áreas de classes diferentes, use a reabertura mais
-  anterior.
-- Em dúvida entre esclarecimento editorial e comportamento, reabra o Ato I.
-- Uma nova fatia exige intenção explícita antes de criar outra spec.
+- Classify by effect, not by words such as "small", "quick", or "just".
+- Treat removal of approved behavior as a behavior change.
+- Treat compatibility, privacy, authorization, and persistence as Act I.
+- Treat library change without normative effect as Act II.
+- When a change touches areas of different classes, use the earliest reopening point.
+- When in doubt between editorial clarification and behavior change, reopen Act I.
+- A new slice requires explicit intent before creating another spec.

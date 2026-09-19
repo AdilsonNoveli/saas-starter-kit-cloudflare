@@ -1,86 +1,78 @@
-# tRPC no Nuxfire — o que existe de fato no código
+# tRPC in Nuxfire — What Actually Exists in the Codebase
 
-Cada afirmação tem o arquivo de evidência. O código vence este documento.
+Each statement includes concrete file evidence. The codebase supersedes this document.
 
-## 1. Versões e ligação com o Nuxt
+## 1. Versions and Nuxt Integration
 
-- `@trpc/server` e `@trpc/client` **v10.45.x**, `trpc-nuxt` **0.10.22**
-  (`apps/app/package.json`), com `build.transpile: ["trpc-nuxt"]`
-  (`apps/app/nuxt.config.ts`). Não use API do tRPC v11 (`initTRPC` com
-  `.create({ transformer })` em outro formato, `createTRPCClient`, `httpBatchStreamLink`…).
-- Handler HTTP: `apps/app/server/api/trpc/[trpc].ts` →
-  `createNuxtApiHandler({ router: appRouter, createContext })`. Endpoint
-  `/api/trpc`.
-- Cliente: `apps/app/app/composables/use-trpc-client.ts` →
-  `createTRPCNuxtClient<AppRouter>` com `httpBatchLink({ url: "/api/trpc" })`.
-  Um cliente por browser (`import.meta.client && client`), um novo por chamada no
-  servidor (SSR). Expõe `useTrpcClient()`, `useTeamsList()`, `useTeam(id)`.
-- **Não há `transformer` (superjson).** Nada no projeto o configura: `Date`,
-  `Map`, `BigInt` atravessam como JSON puro (data vira string). Trate isso no
-  tipo de retorno; adicionar superjson é decisão nova, nos dois lados.
+- `@trpc/server` and `@trpc/client` **v10.45.x**, `trpc-nuxt` **0.10.22**
+  (`apps/app/package.json`), with `build.transpile: ["trpc-nuxt"]`
+  (`apps/app/nuxt.config.ts`). Do not use tRPC v11 APIs (`initTRPC` with
+  `.create({ transformer })` in alternate format, `createTRPCClient`, `httpBatchStreamLink`…).
+- HTTP Handler: `apps/app/server/api/trpc/[trpc].ts` →
+  `createNuxtApiHandler({ router: appRouter, createContext })`. Endpoint: `/api/trpc`.
+- Client: `apps/app/app/composables/use-trpc-client.ts` →
+  `createTRPCNuxtClient<AppRouter>` with `httpBatchLink({ url: "/api/trpc" })`.
+  One singleton client in browser (`import.meta.client && client`), a new instance per server-side call (SSR).
+  Exports `useTrpcClient()`, `useTeamsList()`, `useTeam(id)`.
+- **No `transformer` (superjson).** Nothing in the project configures it: `Date`,
+  `Map`, `BigInt` travel as plain JSON (`Date` becomes string). Handle this in
+  return types; introducing superjson is a new decision on both ends.
 
-## 2. Contexto (`apps/app/server/trpc/context.ts`)
+## 2. Context (`apps/app/server/trpc/context.ts`)
 
-`createContext(event)` devolve: `ip`, `event` (H3), `origin`, `session`
-(resultado de `getUser(event)`), `sendEmail` (service binding `Emails`),
+`createContext(event)` returns: `ip`, `event` (H3), `origin`, `session`
+(result of `getUser(event)`), `sendEmail` (service binding `Emails`),
 `sendWebsocketsEvent(topic, data)` (binding `Websockets`, `publish`),
-`runtimeConfig`, `jobsQueue` (binding `JobQueue`). `Context` é
+`runtimeConfig`, `jobsQueue` (binding `JobQueue`). `Context` is
 `inferAsyncReturnType<typeof createContext>`.
-Os bindings vêm de `event.context.cloudflare.env.*` e podem ser `undefined` se a
-flag da feature estiver desligada em `config.ts` (`websockets`, `jobsQueue`):
-`sendWebsocketsEvent` já trata; `ctx.jobsQueue.send(...)` (usado em
-`layers/admin/server/trpc/admin-queue.ts`) não.
+Bindings originate from `event.context.cloudflare.env.*` and may be `undefined` if
+feature flags are disabled in `config.ts` (`websockets`, `jobsQueue`):
+`sendWebsocketsEvent` handles this safely; `ctx.jobsQueue.send(...)` (used in
+`layers/admin/server/trpc/admin-queue.ts`) does not.
 
-## 3. As quatro procedures (`apps/app/server/trpc/trpc.ts`)
+## 3. The Four Procedures (`apps/app/server/trpc/trpc.ts`)
 
-| Procedure | Exige | Acrescenta ao `ctx` | Use para |
+| Procedure | Requires | Adds to `ctx` | Use For |
 |---|---|---|---|
-| `publicProcedure` | nada | — | Rotas sem login (`public.addToWaitlist`) |
-| `protectedProcedure` | `ctx.session.email`; se `session.mfaEnabled`, MFA de usuário válida | `user` (a sessão) | Qualquer coisa autenticada sem checagem de permissão de equipe (ex.: `teams.create`, `account.*`) |
-| `abilityProcedure` | `protectedProcedure` | `allows`, `denies`, `authorize` | Tudo que age dentro de uma equipe: `await authorize(ability, ...args)` |
-| `platformAdminProcedure` | `protectedProcedure` + linha ativa em `PlatformAdmin` com MFA + cookie de sessão elevada (TOTP nos últimos 30 min) | `platformAdmin` | Tudo sob `admin.*`. Grava auditoria automática de toda mutação |
+| `publicProcedure` | nothing | — | Unauthenticated routes (`public.addToWaitlist`) |
+| `protectedProcedure` | `ctx.session.email`; if `session.mfaEnabled`, valid user MFA | `user` (the session) | Any authenticated action without team permission checks (e.g., `teams.create`, `account.*`) |
+| `abilityProcedure` | `protectedProcedure` | `allows`, `denies`, `authorize` | Everything scoped to a team: `await authorize(ability, ...args)` |
+| `platformAdminProcedure` | `protectedProcedure` + active row in `PlatformAdmin` with MFA + elevated session cookie (TOTP in last 30 min) | `platformAdmin` | Everything under `admin.*`. Records automated audit log for every mutation |
 
-- **`platformAdminProcedure` é paralela ao RBAC de equipe, não derivada de
-  `abilityProcedure`**, de propósito: passar pela camada de habilidades de tenant
-  é como uma permissão de tenant acabaria concedendo acesso de plataforma.
-  Nunca a reconstrua sobre `abilityProcedure`.
-- Falha do `platformAdminProcedure` é um `FORBIDDEN` sem mensagem, igual nos
-  três casos: não revele qual gate falhou.
-- `authorize` converte qualquer erro em `TRPCError FORBIDDEN` e registra
-  `console.warn("authz denied", …)`.
-- MFA exigida devolve `FORBIDDEN` com `message: "MFA_REQUIRED"`.
+- **`platformAdminProcedure` is parallel to team RBAC, not derived from
+  `abilityProcedure`**, by deliberate design: routing through tenant ability layers
+  is how tenant permissions could inadvertently grant platform access. Never rebuild it atop `abilityProcedure`.
+- Failure in `platformAdminProcedure` produces a silent `FORBIDDEN` without error message,
+  identically across all three checks: never reveal which specific security gate failed.
+- `authorize` converts errors into `TRPCError FORBIDDEN` and logs `console.warn("authz denied", …)`.
+- Enforced MFA returns `FORBIDDEN` with `message: "MFA_REQUIRED"`.
 
-## 4. Composição de routers e layers
+## 4. Router Composition and Layers
 
-- `apps/app/server/trpc/routers/index.ts` monta `appRouter = router({ account,
-  public: pub, ...layerRouters })` e exporta `AppRouter`, `RouterInput`,
-  `RouterOutput`.
-- `routers/.composition/layer-routers.ts` é **GERADO** por
-  `scripts/compose-layers.ts` a cada carga do `nuxt.config.ts`. Não edite à mão;
-  ele muda sozinho conforme `config.ts` (`layers.core` + `layers.features`).
-- Cada layer exporta de `layers/<layer>/server/trpc/router.ts` exatamente
-  `export const routers = { <chave>: <router> } satisfies Record<string, AnyRouter>`.
-  **Um mapa, não um router solto**: uma layer pode ser dona de mais de uma chave
-  de topo (`teams` é dona de `teams` e `invites`).
-- **`satisfies`, nunca `: Record<string, AnyRouter>`.** A anotação alarga o tipo e
-  o cliente perde input/output de toda chamada (`AppRouter` é inferido através
-  desse objeto). Páginas derivam tipos disso
-  (`RouterOutput["admin"]["teams"]["listTeams"][number]`).
-- Routers de outra layer montados sob `admin.*` (`admin.plans`,
-  `admin.notifications`) são exports nomeados **fora** do mapa `routers` da
-  layer dona, importados por `layers/admin/server/trpc/router.ts`. Tudo de
-  plataforma mora sob `admin.*`; o caminho da procedure diz se ela está atrás de
-  `platformAdminProcedure`.
+- `apps/app/server/trpc/routers/index.ts` constructs `appRouter = router({ account, public: pub, ...layerRouters })`
+  and exports `AppRouter`, `RouterInput`, `RouterOutput`.
+- `routers/.composition/layer-routers.ts` is **AUTOMATICALLY GENERATED** by
+  `scripts/compose-layers.ts` on every `nuxt.config.ts` invocation. Do not edit manually;
+  it dynamically updates based on `config.ts` (`layers.core` + `layers.features`).
+- Each layer exports from `layers/<layer>/server/trpc/router.ts` strictly:
+  `export const routers = { <key>: <router> } satisfies Record<string, AnyRouter>`.
+  **A map, never a loose router**: a single layer can own multiple top-level keys
+  (`teams` owns both `teams` and `invites`).
+- **`satisfies`, never `: Record<string, AnyRouter>`.** Explicit type annotations widen
+  types and break input/output inference on caller clients (`AppRouter` is inferred through this object).
+  Pages derive types directly (`RouterOutput["admin"]["teams"]["listTeams"][number]`).
+- Routers from other layers mounted under `admin.*` (`admin.plans`, `admin.notifications`)
+  are named exports **outside** the layer's primary `routers` map, imported directly by
+  `layers/admin/server/trpc/router.ts`. Platform concerns live under `admin.*`; procedure
+  paths indicate whether they are guarded by `platformAdminProcedure`.
 
-Mapa de namespaces hoje: `account`, `public` (app) · `teams`, `invites`
-(layer-teams) · `billing`, `stripe` (layer-billing) · `notifications`
-(layer-notifications) · `kanban` (layer-kanban, feature) · `admin` com
-`teams`, `plans`, `queue`, `auditLog`, `notifications` (layer-admin).
+Namespace map today: `account`, `public` (app) · `teams`, `invites` (layer-teams) ·
+`billing`, `stripe` (layer-billing) · `notifications` (layer-notifications) ·
+`kanban` (layer-kanban, feature) · `admin` with `teams`, `plans`, `queue`, `auditLog`, `notifications` (layer-admin).
 
-## 5. Como uma layer importa o backend
+## 5. How Layers Import the Backend
 
-Layers importam **explicitamente** as primitivas do Composition Root, sem
-depender do merge de Nitro entre layers:
+Layers **explicitly** import Composition Root primitives, avoiding reliance on Nitro cross-layer merging:
 
 ```ts
 import { abilityProcedure, router } from "~~/server/trpc/trpc";
@@ -88,47 +80,38 @@ import { useDB } from "~~/server/utils/db";
 import { teams } from "@nuxfire/functions/schema";
 ```
 
-Decisão: "Layers cuidam do frontend; o backend usa import explícito" (o plano
-original continua no histórico do git). Auto-imports do NuxtHub
-(`hubBlob()`) e do `nuxt-authorization` (`defineAbility`) são a exceção: não têm
-caminho importável.
+Decision: "Layers manage the frontend; the backend uses explicit imports".
+NuxtHub auto-imports (`hubBlob()`) and `nuxt-authorization` (`defineAbility`) are exceptions:
+they lack statically importable package paths.
 
-## 6. Padrões de código reais
+## 6. Real Code Patterns
 
-- **Validação**: `zod` em `.input(z.object({...}))`, com mensagens no schema
+- **Validation**: `zod` via `.input(z.object({...}))`, with error messages embedded in schema
   (`.min(2, "Board name must be at least 2 characters")`).
-- **Escopo de tenant**: procedures que recebem `teamIdentifier` (id **ou** slug)
-  resolvem a equipe e provam associação no próprio query
-  (`requireTeamMembership`, `requireBoard`, `requireColumn` em
-  `layers/kanban/server/trpc/router.ts`). Habilidade responde "este usuário pode
-  X na equipe T", nunca "T existe e ele pertence a T": as duas checagens são
-  necessárias.
-- **Isolamento entre tenants**: `moveCard` recusa mover cartão para coluna de
-  outro quadro (`BAD_REQUEST`), senão quem é membro de duas equipes relocaria
-  dados entre tenants.
-- **Erros**: sempre `TRPCError` com `code` (`NOT_FOUND`, `FORBIDDEN`, `CONFLICT`,
-  `BAD_REQUEST`, `UNAUTHORIZED`, `INTERNAL_SERVER_ERROR`). Violação de unicidade
-  do Postgres é `error.code === "23505"` (postgres.js), não `P2002` do Prisma
-  (`routers/public.ts`).
-- **Equipe suspensa**: a única checagem está em `teams.get`, que resolve "que
-  equipe é esta URL" para todo o app (`middleware/1.teams.global.ts`). Não repita
-  em outras procedures.
-- **Banco**: `useDB()` (escopo de requisição). Ver
-  `$fireskill-specialist-cloudflare-workers` e `$fireskill-specialist-drizzle`.
-- **Tempo real e e-mail**: `ctx.sendWebsocketsEvent(userId, payload)`,
-  `ctx.sendEmail(authEmail, to, subject, …)`.
+- **Tenant Scoping**: procedures receiving `teamIdentifier` (ID **or** slug) resolve the
+  team and verify membership in the query itself (`requireTeamMembership`, `requireBoard`,
+  `requireColumn` in `layers/kanban/server/trpc/router.ts`). Ability checks answer "can this user
+  perform X in team T", never "does T exist and does the user belong to T": both checks are required.
+- **Tenant Isolation**: `moveCard` rejects moving cards to columns of another board (`BAD_REQUEST`),
+  preventing multi-team members from leaking data across tenants.
+- **Errors**: always `TRPCError` with standard `code` (`NOT_FOUND`, `FORBIDDEN`, `CONFLICT`,
+  `BAD_REQUEST`, `UNAUTHORIZED`, `INTERNAL_SERVER_ERROR`). Postgres uniqueness violation is
+  `error.code === "23505"` (postgres.js), not Prisma's `P2002` (`routers/public.ts`).
+- **Suspended Teams**: the sole check resides in `teams.get`, which resolves active team context
+  globally (`middleware/1.teams.global.ts`). Do not duplicate across individual procedures.
+- **Database**: `useDB()` (request-scoped). See `$fireskill-specialist-cloudflare-workers` and `$fireskill-specialist-drizzle`.
+- **Realtime & Email**: `ctx.sendWebsocketsEvent(userId, payload)`, `ctx.sendEmail(authEmail, to, subject, …)`.
 
-## 7. Cliente
+## 7. Client Usage
 
-- `useTrpcClient().<namespace>.<proc>.useQuery(input)` (SSR/`useAsyncData`) e
-  `.mutate(input)` para mutações — ex.: `useTrpcClient().teams.create.mutate`.
-- Tipos: `RouterInput` / `RouterOutput` de `~~/server/trpc/routers`.
-- Não existe tratamento central de `TRPCClientError` no front hoje (0 usos de
-  `TRPCClientError`); cada tela trata o erro e mostra `useToast()`.
+- `useTrpcClient().<namespace>.<proc>.useQuery(input)` (SSR/`useAsyncData`) and
+  `.mutate(input)` for mutations — e.g., `useTrpcClient().teams.create.mutate`.
+- Types: `RouterInput` / `RouterOutput` from `~~/server/trpc/routers`.
+- No centralized frontend `TRPCClientError` handling currently exists (0 usages of `TRPCClientError`);
+  each view handles errors locally with `useToast()`.
 
-## 8. Não existe (não assuma)
+## 8. What Does NOT Exist (Do Not Assume)
 
-- Testes de router tRPC: nenhum `*.test.ts` sob `server/trpc`. Os testes do
-  domínio estão em `shared/utils/abilities.test.ts` e `server/utils/*.test.ts`
-  das layers.
+- tRPC router unit tests: no `*.test.ts` files under `server/trpc`. Domain tests reside
+  in `shared/utils/abilities.test.ts` and layer `server/utils/*.test.ts`.
 - `superjson`/`transformer`, subscriptions, `httpBatchStreamLink`, tRPC v11.

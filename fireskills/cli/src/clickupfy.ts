@@ -1,4 +1,4 @@
-/** Integração opcional com ClickUpfy, sem substituir a spec local. */
+/** Optional integration with ClickUpfy without replacing local specifications. */
 import { access, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -9,7 +9,7 @@ export interface ClickUpfyHandoff {
   action?: "transition" | "effort";
 }
 
-/** Detecta a skill instalada e lê o vínculo de tarefa do metadado da spec. */
+/** Detects installed ClickUpfy skill and reads task link from spec metadata. */
 export async function clickUpfyHandoff(
   project: string,
   specPath: string,
@@ -22,11 +22,11 @@ export async function clickUpfyHandoff(
 }
 
 /**
- * Verifica as instalações atual e legada do ClickUpfy.
+ * Checks current and legacy ClickUpfy skill installations.
  *
- * A versão atual usa `clickup-issue-implement` em `.codex/skills`, com
- * instalação local ou global. A pasta `.agents/skills` permanece como
- * compatibilidade para projetos que ainda usam a integração anterior.
+ * Current version uses `clickup-issue-implement` in `.codex/skills`,
+ * installed locally or globally. The `.agents/skills` folder remains
+ * for backwards compatibility with earlier setups.
  */
 export async function hasClickUpfySkill(
   project: string,
@@ -43,7 +43,7 @@ export async function hasClickUpfySkill(
       await access(candidate);
       return true;
     } catch {
-      // A ausência de uma candidata apenas leva à próxima instalação possível.
+      // Absence simply moves to next candidate.
     }
   }
 

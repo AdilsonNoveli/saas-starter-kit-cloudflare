@@ -158,7 +158,7 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Componentes | apps/web/app/components/landing/LandingAvatars.vue | — |
 | Componentes | apps/web/app/components/landing/LandingComparisonTable.vue | FeatureItem, getCategoryItems, getCategoryCount |
 | Componentes | apps/web/app/components/landing/LandingCTA.vue | — |
-| Componentes | apps/web/app/components/landing/LandingDatabaseArchitecture.vue | getTablesList |
+| Componentes | apps/web/app/components/landing/LandingDatabaseArchitecture.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFAQs.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFeatureBadges.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFeatureCard.vue | Subfeature |

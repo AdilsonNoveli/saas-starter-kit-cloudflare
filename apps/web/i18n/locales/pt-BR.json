@@ -649,6 +649,170 @@
           "tag": "core & workers"
         }
       },
+      "diagramTitle": "Diagrama Visual de Relacionamento (ERD)",
+      "diagramSubtitle": "Como as entidades se conectam de forma limpa entre multi-tenancy, faturamento, governança e tarefas assíncronas.",
+      "diagramClusters": {
+        "governance": {
+          "title": "Governança da Plataforma",
+          "badge": "layers/admin",
+          "desc": "Operadores da plataforma gerenciam tenants com trilha de auditoria imutável."
+        },
+        "tenancy": {
+          "title": "Núcleo Multi-Tenant",
+          "badge": "layers/teams",
+          "desc": "Empresas com isolamento estrito, cotas de assentos e vínculo a membros."
+        },
+        "rbac": {
+          "title": "RBAC Granular",
+          "badge": "layers/teams",
+          "desc": "Papéis de sistema e permissões personalizadas para cada ação do tenant."
+        },
+        "billing": {
+          "title": "Monetização & Planos",
+          "badge": "layers/billing",
+          "desc": "Assinaturas recorrentes, planos multi-tier e cotas de recursos."
+        },
+        "async": {
+          "title": "Filas Assíncronas & DLQ",
+          "badge": "core / workers",
+          "desc": "Tarefas em background com logs de execução e replay de falhas."
+        },
+        "identity": {
+          "title": "Identidade & Tempo Real",
+          "badge": "core / notifications",
+          "desc": "Usuários, sementes TOTP criptografadas e alertas ao vivo."
+        }
+      },
+      "tableDictionaryTitle": "Dicionário Completo das 20 Tabelas",
+      "tableDictionarySubtitle": "Cada tabela do esquema Nuxfire auditada e explicada no código real com suas regras e integridade referencial.",
+      "tableHeaders": {
+        "table": "Tabela",
+        "domain": "Domínio",
+        "purpose": "Finalidade & Regra de Negócio",
+        "relationships": "Relacionamentos / Chaves Estrangeiras"
+      },
+      "tablesList": {
+        "team": {
+          "name": "Team",
+          "domain": "Multi-Tenancy",
+          "role": "Entidade central de empresa/workspace com slug, status ativo/suspenso e vínculo a plano.",
+          "fks": "planId -> Plan.id"
+        },
+        "teamMembership": {
+          "name": "TeamMembership",
+          "domain": "Multi-Tenancy",
+          "role": "Vínculo usuário-empresa com papel atribuído e restrição de unicidade (teamId, userId).",
+          "fks": "teamId -> Team.id, userId -> User.id, roleId -> Role.id"
+        },
+        "teamInvite": {
+          "name": "TeamInvite",
+          "domain": "Multi-Tenancy",
+          "role": "Convites tokenizados de equipe por e-mail com prazo de expiração de 30 dias.",
+          "fks": "teamId -> Team.id, invitedById -> User.id, roleId -> Role.id"
+        },
+        "role": {
+          "name": "Role",
+          "domain": "Multi-Tenancy",
+          "role": "Cargos no tenant. Papéis de sistema (Owner, Admin, Member) possuem teamId = null e são compartilhados.",
+          "fks": "teamId (anulável)"
+        },
+        "permission": {
+          "name": "Permission",
+          "domain": "Multi-Tenancy",
+          "role": "Permissões de ação de granularidade fina com chave primária composta (action, roleId).",
+          "fks": "roleId -> Role.id"
+        },
+        "plan": {
+          "name": "Plan",
+          "domain": "Faturamento",
+          "role": "Catálogo de planos (Free/Pro/Enterprise), limites de assento (maxSeats) e cotas JSONB.",
+          "fks": "Referenciado por Team e Subscription"
+        },
+        "subscription": {
+          "name": "Subscription",
+          "domain": "Faturamento",
+          "role": "Contrato de assinatura recorrente com Stripe ou Paddle, datas de período e status.",
+          "fks": "teamId -> Team.id, planId -> Plan.id"
+        },
+        "benefit": {
+          "name": "Benefit",
+          "domain": "Faturamento",
+          "role": "Direitos e recursos funcionais (entitlements) associados aos planos.",
+          "fks": "Referenciado por BenefitsOnPlan"
+        },
+        "benefitsOnPlan": {
+          "name": "BenefitsOnPlan",
+          "domain": "Faturamento",
+          "role": "Tabela de junção muitos-para-muitos entre Plan e Benefit.",
+          "fks": "planId -> Plan.id, benefitId -> Benefit.id"
+        },
+        "platformAdmin": {
+          "name": "PlatformAdmin",
+          "domain": "Governança",
+          "role": "Operadores globais da plataforma (SUPER_ADMIN, SUPPORT) com MFA TOTP (AES-GCM).",
+          "fks": "userId -> User.id"
+        },
+        "auditLog": {
+          "name": "AuditLog",
+          "domain": "Governança",
+          "role": "Trilha imutável append-only de ações de operadores com ator, IP e metadados JSON.",
+          "fks": "actorUserId (desacoplado p/ retenção)"
+        },
+        "user": {
+          "name": "User",
+          "domain": "Identidade & Núcleo",
+          "role": "Perfil com semente MFA criptografada. Sessões salvas no Cloudflare KV (AuthKV).",
+          "fks": "Referenciado por TeamMembership e PlatformAdmin"
+        },
+        "job": {
+          "name": "Job",
+          "domain": "Filas Assíncronas",
+          "role": "Tarefas em background com escopo de tenant processadas via Cloudflare Queues.",
+          "fks": "teamId -> Team.id"
+        },
+        "log": {
+          "name": "Log",
+          "domain": "Filas Assíncronas",
+          "role": "Registros detalhados de execução vinculados a tarefas assíncronas ou crons.",
+          "fks": "jobId -> Job.id"
+        },
+        "deadLetterRecord": {
+          "name": "DeadLetterRecord",
+          "domain": "Filas Assíncronas",
+          "role": "Mensagens com falha retidas na DLQ com payload intacto para replay pelo admin.",
+          "fks": "teamId -> Team.id"
+        },
+        "waitlistEmail": {
+          "name": "WaitlistEmail",
+          "domain": "Crescimento & Lead",
+          "role": "Captura de e-mails para lançamentos e lista de espera.",
+          "fks": "Nenhuma"
+        },
+        "notification": {
+          "name": "Notification",
+          "domain": "Mensageria",
+          "role": "Notificações no app entregues aos usuários com status de leitura.",
+          "fks": "userId (desacoplado p/ performance)"
+        },
+        "kanbanBoard": {
+          "name": "KanbanBoard",
+          "domain": "Produtividade",
+          "role": "Quadros de gestão ágil vinculados ao tenant.",
+          "fks": "teamId -> Team.id"
+        },
+        "kanbanColumn": {
+          "name": "KanbanColumn",
+          "domain": "Produtividade",
+          "role": "Colunas de fluxo de trabalho ordenadas dentro de um quadro.",
+          "fks": "boardId -> KanbanBoard.id"
+        },
+        "kanbanCard": {
+          "name": "KanbanCard",
+          "domain": "Produtividade",
+          "role": "Cartões de tarefas com ordenação por posição e descrição.",
+          "fks": "columnId -> KanbanColumn.id"
+        }
+      },
       "summaryCallout": {
         "lead": "Projetado para ambientes corporativos de alto tráfego — ",
         "tail": "comece com uma arquitetura de dados relacional que nunca precisará ser reescrita quando o seu SaaS escalar."

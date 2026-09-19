@@ -649,6 +649,170 @@
           "tag": "core & workers"
         }
       },
+      "diagramTitle": "Visual Relationship Architecture (ERD)",
+      "diagramSubtitle": "How entities connect cleanly across tenant, billing, governance, and real-time asynchronous boundaries.",
+      "diagramClusters": {
+        "governance": {
+          "title": "Platform Governance",
+          "badge": "layers/admin",
+          "desc": "Platform operators manage tenant states with immutable audit logs."
+        },
+        "tenancy": {
+          "title": "Multi-Tenant Core",
+          "badge": "layers/teams",
+          "desc": "Company workspaces with strict isolation, seat limits, and member mappings."
+        },
+        "rbac": {
+          "title": "Granular RBAC",
+          "badge": "layers/teams",
+          "desc": "System roles and custom permissions per tenant action."
+        },
+        "billing": {
+          "title": "Monetization & Plans",
+          "badge": "layers/billing",
+          "desc": "Recurring subscriptions, multi-tier pricing, and entitlement limits."
+        },
+        "async": {
+          "title": "Async Queues & DLQ",
+          "badge": "core / workers",
+          "desc": "Background tasks with execution logs and dead-letter replay."
+        },
+        "identity": {
+          "title": "Identity & Realtime",
+          "badge": "core / notifications",
+          "desc": "Users, encrypted TOTP secrets, and live notifications."
+        }
+      },
+      "tableDictionaryTitle": "Complete 20-Table Database Dictionary",
+      "tableDictionarySubtitle": "Every table in the Nuxfire schema verified in production code with its role and integrity constraints.",
+      "tableHeaders": {
+        "table": "Table",
+        "domain": "Domain",
+        "purpose": "Purpose & Business Rule",
+        "relationships": "Relationships / Foreign Keys"
+      },
+      "tablesList": {
+        "team": {
+          "name": "Team",
+          "domain": "Multi-Tenancy",
+          "role": "Tenant root representing customer company workspace with slug, active/suspended status, and plan binding.",
+          "fks": "planId -> Plan.id"
+        },
+        "teamMembership": {
+          "name": "TeamMembership",
+          "domain": "Multi-Tenancy",
+          "role": "Associates users with teams and assigned roles. Enforces unique (teamId, userId) constraint.",
+          "fks": "teamId -> Team.id, userId -> User.id, roleId -> Role.id"
+        },
+        "teamInvite": {
+          "name": "TeamInvite",
+          "domain": "Multi-Tenancy",
+          "role": "Tokenized pending invitations sent by email with 30-day expiration timestamp.",
+          "fks": "teamId -> Team.id, invitedById -> User.id, roleId -> Role.id"
+        },
+        "role": {
+          "name": "Role",
+          "domain": "Multi-Tenancy",
+          "role": "Tenant roles. System roles (Owner, Admin, Member) have teamId = null and are shared globally.",
+          "fks": "teamId (nullable)"
+        },
+        "permission": {
+          "name": "Permission",
+          "domain": "Multi-Tenancy",
+          "role": "Fine-grained permissions mapped to roles using composite primary key (action, roleId).",
+          "fks": "roleId -> Role.id"
+        },
+        "plan": {
+          "name": "Plan",
+          "domain": "Billing",
+          "role": "Pricing tiers (Free/Pro/Enterprise), seat limits (maxSeats), and JSONB quotas.",
+          "fks": "Referenced by Team & Subscription"
+        },
+        "subscription": {
+          "name": "Subscription",
+          "domain": "Billing",
+          "role": "Active recurring billing contract with Stripe or Paddle, period timestamps, and status.",
+          "fks": "teamId -> Team.id, planId -> Plan.id"
+        },
+        "benefit": {
+          "name": "Benefit",
+          "domain": "Billing",
+          "role": "Feature entitlements and feature flags available to plans.",
+          "fks": "Referenced by BenefitsOnPlan"
+        },
+        "benefitsOnPlan": {
+          "name": "BenefitsOnPlan",
+          "domain": "Billing",
+          "role": "Many-to-many junction joining Plan and Benefit entities.",
+          "fks": "planId -> Plan.id, benefitId -> Benefit.id"
+        },
+        "platformAdmin": {
+          "name": "PlatformAdmin",
+          "domain": "Governance",
+          "role": "Global SaaS operator authority (SUPER_ADMIN, SUPPORT) with AES-GCM encrypted TOTP MFA.",
+          "fks": "userId -> User.id"
+        },
+        "auditLog": {
+          "name": "AuditLog",
+          "domain": "Governance",
+          "role": "Append-only immutable record of operator actions with actor ID, IP address, and JSON metadata.",
+          "fks": "actorUserId (decoupled for retention)"
+        },
+        "user": {
+          "name": "User",
+          "domain": "Core & Identity",
+          "role": "User account profile with encrypted TOTP MFA secret. Auth sessions stored in Cloudflare KV.",
+          "fks": "Referenced by TeamMembership, PlatformAdmin"
+        },
+        "job": {
+          "name": "Job",
+          "domain": "Async Engine",
+          "role": "Tenant-scoped background tasks executed via Cloudflare Queues with status lifecycle tracking.",
+          "fks": "teamId -> Team.id"
+        },
+        "log": {
+          "name": "Log",
+          "domain": "Async Engine",
+          "role": "Detailed execution logs attached to async jobs or periodic scheduled cron tasks.",
+          "fks": "jobId -> Job.id"
+        },
+        "deadLetterRecord": {
+          "name": "DeadLetterRecord",
+          "domain": "Async Engine",
+          "role": "Captures failed messages after retries with full payload for 1-click admin replay.",
+          "fks": "teamId -> Team.id"
+        },
+        "waitlistEmail": {
+          "name": "WaitlistEmail",
+          "domain": "Core & Growth",
+          "role": "Pre-launch landing page waitlist subscribers.",
+          "fks": "None"
+        },
+        "notification": {
+          "name": "Notification",
+          "domain": "Messaging",
+          "role": "In-app alerts and notifications delivered in real-time to users.",
+          "fks": "userId (decoupled for delivery speed)"
+        },
+        "kanbanBoard": {
+          "name": "KanbanBoard",
+          "domain": "Productivity",
+          "role": "Team-scoped project boards for agile workflow management.",
+          "fks": "teamId -> Team.id"
+        },
+        "kanbanColumn": {
+          "name": "KanbanColumn",
+          "domain": "Productivity",
+          "role": "Ordered workflow columns within a kanban board.",
+          "fks": "boardId -> KanbanBoard.id"
+        },
+        "kanbanCard": {
+          "name": "KanbanCard",
+          "domain": "Productivity",
+          "role": "Task cards with draggable positions, descriptions, and timestamps.",
+          "fks": "columnId -> KanbanColumn.id"
+        }
+      },
       "summaryCallout": {
         "lead": "Engineered for high-volume enterprise production — ",
         "tail": "start with a bulletproof database schema that will never need a painful rewrite when you reach millions of requests."

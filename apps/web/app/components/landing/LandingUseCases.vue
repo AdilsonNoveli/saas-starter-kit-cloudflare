@@ -21,29 +21,33 @@
         </p>
       </div>
 
-      <!-- Fireskills Senior Engineer Persona Card (Aligned with 3-column max-w-7xl, red style, flame icon) -->
-      <div class="max-w-7xl mx-auto mb-8 sm:mb-10 p-5 sm:p-6 lg:p-7 rounded-2xl border border-red-500/30 bg-gradient-to-r from-red-500/10 via-elevated to-elevated dark:from-red-950/25 dark:via-night-900/60 dark:to-night-950 shadow-lg shadow-red-500/5">
-        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 lg:gap-8">
-          <div class="flex items-start gap-4 flex-1">
-            <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center shrink-0 mt-0.5">
-              <UIcon name="i-lucide-flame" class="w-6 h-6 text-red-500 dark:text-red-400" />
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-red-600 dark:text-red-400 bg-red-500/10 px-2.5 py-0.5 rounded border border-red-500/20">
-                  {{ $t("landing.useCases.seniorPersona.badge") }}
-                </span>
-                <h3 class="text-base sm:text-lg font-bold text-highlighted">
-                  {{ $t("landing.useCases.seniorPersona.title") }}
-                </h3>
-              </div>
-              <p class="text-xs sm:text-sm text-muted leading-relaxed">
-                {{ $t("landing.useCases.seniorPersona.description") }}
-              </p>
-            </div>
+      <!-- Fireskills Senior Engineer Persona Card (Fully Centered, Aligned with max-w-7xl, Red Style, Button Below) -->
+      <div class="max-w-7xl mx-auto mb-10 sm:mb-12 p-6 sm:p-8 lg:p-10 rounded-2xl border border-red-500/30 bg-gradient-to-b from-red-500/10 via-elevated to-elevated dark:from-red-950/25 dark:via-night-900/60 dark:to-night-950 shadow-lg shadow-red-500/5 text-center">
+        <div class="max-w-3xl mx-auto flex flex-col items-center">
+          <!-- Centered Flame Icon -->
+          <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center mb-3.5">
+            <UIcon name="i-lucide-flame" class="w-6 h-6 text-red-500 dark:text-red-400" />
           </div>
 
-          <div class="flex items-center gap-2 text-xs sm:text-sm font-semibold text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2.5 rounded-xl shrink-0 self-stretch sm:self-auto justify-center">
+          <!-- Centered Badge -->
+          <div class="mb-2.5">
+            <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-red-600 dark:text-red-400 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+              {{ $t("landing.useCases.seniorPersona.badge") }}
+            </span>
+          </div>
+
+          <!-- Centered Title -->
+          <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-highlighted mb-3">
+            {{ $t("landing.useCases.seniorPersona.title") }}
+          </h3>
+
+          <!-- Centered Description -->
+          <p class="text-xs sm:text-sm lg:text-base text-muted leading-relaxed mb-6">
+            {{ $t("landing.useCases.seniorPersona.description") }}
+          </p>
+
+          <!-- Button Below (Centered) -->
+          <div class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-red-600 dark:text-red-400 bg-red-500/10 hover:bg-red-500/15 border border-red-500/25 px-5 py-2.5 rounded-xl transition-colors shadow-xs">
             <UIcon name="i-lucide-flame" class="w-4 h-4 text-red-500 shrink-0" />
             <span>{{ $t("landing.useCases.seniorPersona.cta") }}</span>
             <UIcon name="i-lucide-arrow-down" class="w-3.5 h-3.5 animate-bounce shrink-0" />

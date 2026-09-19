@@ -2,14 +2,14 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Every English page under content/docs/2.fireskills must have a pt-br and an
-// es counterpart with the same structure: same headings, table rows, fenced
-// code blocks and internal links. Code blocks are compared verbatim, so a
-// command changed in English cannot silently stay stale in a translation.
-// Run with `bun scripts/check-docs-translations.ts` or `bun run check:i18n`.
+// Every English page under content/docs/{1.saas-starter-kit,2.fireskills} must
+// have a pt-br and an es counterpart with the same structure: same headings,
+// table rows, fenced code blocks and internal links. Code blocks are compared
+// verbatim, so a command changed in English cannot silently stay stale in a
+// translation. Run with `bun scripts/check-docs-translations.ts` or `bun run check:i18n`.
 const here = fileURLToPath(new URL(".", import.meta.url));
 const content = resolve(here, "..", "apps/web/content");
-const SOURCE = join(content, "docs/2.fireskills");
+const SOURCES = ["docs/1.saas-starter-kit", "docs/2.fireskills"];
 const LOCALES = ["pt-br", "es"];
 
 function list(root: string): string[] {
@@ -50,33 +50,40 @@ function shape(text: string) {
 
 export function checkDocsTranslations(): string[] {
   const problems: string[] = [];
-  const english = list(SOURCE);
-  for (const locale of LOCALES) {
-    const target = join(content, locale, "docs/2.fireskills");
-    const translated = list(target);
-    for (const file of english.filter((f) => !translated.includes(f))) {
-      problems.push(`${locale}: missing ${file}`);
-    }
-    for (const file of translated.filter((f) => !english.includes(f))) {
-      problems.push(`${locale}: ${file} has no English source`);
-    }
-    for (const file of english.filter(
-      (f) => f.endsWith(".md") && translated.includes(f),
-    )) {
-      const en = shape(readFileSync(join(SOURCE, file), "utf8"));
-      const tr = shape(readFileSync(join(target, file), "utf8"));
-      const diffs: string[] = [];
-      if (en.headings !== tr.headings) diffs.push("headings");
-      if (en.rows !== tr.rows) diffs.push("table rows");
-      if (en.blocks.join("\0") !== tr.blocks.join("\0"))
-        diffs.push("code blocks");
-      if (en.links.join("\0") !== tr.links.join("\0")) diffs.push("links");
-      if (diffs.length)
-        problems.push(
-          `${locale}: ${file} differs from English in ${diffs.join(", ")}`,
-        );
+
+  for (const srcRel of SOURCES) {
+    const sourceDir = join(content, srcRel);
+    const english = list(sourceDir);
+
+    for (const locale of LOCALES) {
+      const target = join(content, locale, srcRel);
+      const translated = list(target);
+
+      for (const file of english.filter((f) => !translated.includes(f))) {
+        problems.push(`${locale}: missing ${srcRel}/${file}`);
+      }
+      for (const file of translated.filter((f) => !english.includes(f))) {
+        problems.push(`${locale}: ${srcRel}/${file} has no English source`);
+      }
+      for (const file of english.filter(
+        (f) => f.endsWith(".md") && translated.includes(f),
+      )) {
+        const en = shape(readFileSync(join(sourceDir, file), "utf8"));
+        const tr = shape(readFileSync(join(target, file), "utf8"));
+        const diffs: string[] = [];
+        if (en.headings !== tr.headings) diffs.push("headings");
+        if (en.rows !== tr.rows) diffs.push("table rows");
+        if (en.blocks.join("\0") !== tr.blocks.join("\0"))
+          diffs.push("code blocks");
+        if (en.links.join("\0") !== tr.links.join("\0")) diffs.push("links");
+        if (diffs.length)
+          problems.push(
+            `${locale}: ${srcRel}/${file} differs from English in ${diffs.join(", ")}`,
+          );
+      }
     }
   }
+
   return problems;
 }
 
@@ -89,7 +96,11 @@ if (import.meta.main) {
     );
     process.exit(1);
   }
+  const totalEnglish = SOURCES.reduce(
+    (acc, src) => acc + list(join(content, src)).length,
+    0,
+  );
   console.log(
-    `check-docs-translations OK — ${LOCALES.join(" and ")} match ${list(SOURCE).length} English files.`,
+    `check-docs-translations OK — ${LOCALES.join(" and ")} match ${totalEnglish} English files across ${SOURCES.join(", ")}.`,
   );
 }

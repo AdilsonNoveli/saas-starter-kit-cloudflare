@@ -119,83 +119,90 @@
       "calloutRest": "Ya resolvimos las partes difíciles para que tú te concentres en construir tu idea."
     },
     "useCases": {
-      "badge": "Oportunidades de negocio y casos de uso",
+      "badge": "Metodología Guiada por IA • De la Idea al SaaS",
       "title": "¿Qué puedes construir con Nuxfire?",
       "subtitle": "La mayoría de los boilerplates de SaaS se rompen en cuanto necesitas WebSockets con estado, colas de trabajos asíncronos o multitenencia empresarial de verdad. Nuxfire está diseñado para llevar tu proyecto desde el MVP del primer día hasta millones de solicitudes diarias sin refactorizar tu arquitectura central.",
-      "examplesLabel": "Ejemplos de producto:",
-      "superpowerLabel": "Superpoder incluido:",
+      "promptLabel": "Cómo ordenas en tu IDE:",
+      "examplesLabel": "Evidencias y Destacados:",
+      "superpowerLabel": "Garantía del paso:",
       "items": {
         "b2b": {
-          "category": "Núcleo SaaS B2B",
-          "title": "SaaS B2B y espacios de trabajo en equipo",
-          "description": "Vende planes de suscripción con cobro por asiento o por espacio de trabajo. El aislamiento estricto entre inquilinos, las invitaciones de equipo con token y el control de acceso por roles (RBAC) granular ya están auditados y listos para producción desde el primer día.",
+          "category": "Paso 01 • Ideación",
+          "title": "Captura Rápida en Inbox",
+          "description": "Simplemente escribe tu idea en bruto en el chat del IDE sin barreras técnicas ni jerga. El agente guarda el borrador en segundos sin interrumpirte con preguntas invasivas.",
+          "prompt": "Use $fireskill-01-inbox: Quiero crear un SaaS de tareas con cobro por asiento e invitaciones de equipo.",
           "examples": {
-            "1": "CRM verticales",
-            "2": "Sistemas de ATS y reclutamiento",
-            "3": "Gestores de tareas y proyectos (Linear/Asana)",
-            "4": "Centros de soporte y ticketing"
+            "1": "specs/inbox/",
+            "2": "Cero fricción",
+            "3": "Captura instantánea",
+            "4": "Sin preguntas"
           },
-          "superpower": "Capa nativa de equipos, nuxt-authorization, Stripe Checkout/Portal y capa de Kanban integrada."
+          "superpower": "Borrador guardado en tu repositorio, listo para refinarse cuando decidas."
         },
         "realtime": {
-          "category": "Motor en tiempo real",
-          "title": "Aplicaciones en tiempo real con estado",
-          "description": "Crea aplicaciones colaborativas multiusuario sin clústeres de Redis costosos ni servidores Socket.io dedicados. Cada sala o canal funciona en un Durable Object aislado de Cloudflare, respaldado por SQLite embebido de baja latencia.",
+          "category": "Paso 02 • Alcance",
+          "title": "Refinamiento y Backlog Ágil",
+          "description": "El agente evalúa el impacto en el código y hace 2 o 3 preguntas de opción múltiple para cerrar decisiones de negocio sin reuniones interminables.",
+          "prompt": "Use $fireskill-02-backlog en el borrador de tareas para analizar impactos y resolver dudas.",
           "examples": {
-            "1": "Pizarras colaborativas",
-            "2": "Paneles de telemetría en vivo",
-            "3": "Chats de soporte y mensajería",
-            "4": "Lienzos y documentos multiusuario"
+            "1": "specs/backlog/",
+            "2": "Opción múltiple",
+            "3": "Análisis de impacto",
+            "4": "Alcance cerrado"
           },
-          "superpower": "Durable Objects con almacenamiento SQLite, handshake por ticket firmado con HMAC y latencia global por debajo de 50 ms."
+          "superpower": "Promovido al backlog con impacto arquitectónico mapeado y cero ambigüedad."
         },
         "ai": {
-          "category": "IA y procesamiento en segundo plano",
-          "title": "Plataformas de IA y agentes autónomos",
-          "description": "Ejecuta completions de LLM de larga duración y cargas de cómputo intensas sin bloquear la interfaz ni chocar con los tiempos de espera de las solicitudes HTTP. Cloudflare Queues procesa trabajos asíncronos con backoff exponencial y captura en Dead Letter Queue.",
+          "category": "Paso 03 • Contrato BDD",
+          "title": "Especificación Normativa (Spec)",
+          "description": "Genera una especificación ejecutable en Gherkin BDD (Dado/Cuando/Entonces) y valida las reglas en el Definition Gate antes de escribir código.",
+          "prompt": "Use $fireskill-03-specify para crear la spec normativa y validar el Definition Gate.",
           "examples": {
-            "1": "Generadores de medios por lotes",
-            "2": "Copilotos de IA para sectores específicos",
-            "3": "Pipelines de audio y vídeo",
-            "4": "Analizadores de PDF y contratos"
+            "1": "specs/defined/",
+            "2": "Gherkin BDD",
+            "3": "Definition Gate",
+            "4": "Fuente de verdad"
           },
-          "superpower": "Cloudflare Queues con DLQ, almacenamiento R2 ilimitado sin costes de salida y actualizaciones en vivo por WebSockets."
+          "superpower": "Garantía de que la IA no alucinará ni inventará reglas fuera de la spec."
         },
         "micro": {
-          "category": "Monetización rápida",
-          "title": "Micro-SaaS y portales de membresía",
-          "description": "Lanza herramientas de suscripción ligeras y muy rentables en un solo fin de semana. La autenticación con OpenAuth.js corre en Cloudflare KV sin ninguna sobrecarga de conexión a la base de datos, y Nuxt Content v3 ofrece documentación y blogs ultrarrápidos.",
+          "category": "Paso 04 • TDD Anticipado",
+          "title": "Pruebas que Fallan Primero (Red)",
+          "description": "El agente crea las pruebas unitarias y de integración (Vitest) que primero fallan. Cada escenario BDD se convierte en test antes de implementar.",
+          "prompt": "Use $fireskill-06-tdd-bdd para crear la suite de tests Vitest que fallen antes del código.",
           "examples": {
-            "1": "Directorios premium curados",
-            "2": "Herramientas de SEO y automatización",
-            "3": "Comunidades de miembros de pago",
-            "4": "Portales de cursos y productos digitales"
+            "1": "Ciclo Red-Green",
+            "2": "Vitest",
+            "3": "Plan Gate",
+            "4": "Checklist de tareas"
           },
-          "superpower": "OpenAuth con sesiones sin base de datos, búsqueda de texto completo en D1 SQL y Stripe Billing preconfigurado."
+          "superpower": "Ningún código entra al repositorio sin un test automatizado probando que funciona."
         },
         "enterprise": {
-          "category": "Empresa y gobernanza",
-          "title": "Portales de clientes y backoffices internos",
-          "description": "Entrega portales de autoservicio y backoffices operativos capaces de superar auditorías corporativas de seguridad exigentes. Incluye de serie una consola de Super-Admin dedicada, autenticación multifactor TOTP y registro de auditoría completo.",
+          "category": "Paso 05 • Especialistas",
+          "title": "Construcción con 34 Especialistas",
+          "description": "Especialistas de dominio en Nuxt 4, SST, Drizzle, tRPC y Cloudflare escriben el código hasta que todas las pruebas pasen (Green).",
+          "prompt": "Use $fireskill-07-implement para codificar la tarea 1 con los especialistas de Drizzle y tRPC.",
           "examples": {
-            "1": "Portales de clientes para agencias",
-            "2": "Backoffices financieros",
-            "3": "Paneles de cumplimiento y auditoría",
-            "4": "Consolas de operaciones internas"
+            "1": "34 Especialistas",
+            "2": "100% Type-Safe",
+            "3": "Fases 1..3",
+            "4": "Tests en Verde"
           },
-          "superpower": "Portal /admin aislado con MFA por TOTP, tabla audit_logs en PostgreSQL y seguridad de tipos de extremo a extremo."
+          "superpower": "Código limpio, empresarial, alineado a la stack y validado por typecheck y Vitest."
         },
         "api": {
-          "category": "API de alto volumen",
-          "title": "API a gran escala y pipelines de eventos",
-          "description": "Procesa millones de webhooks y trabajos en segundo plano con un coste de infraestructura inactiva casi nulo. El pooling de conexiones de Hyperdrive acelera las consultas a PostgreSQL sin agotar las conexiones, y los correos transaccionales gestionan los failovers.",
+          "category": "Paso 06 • Despliegue Edge",
+          "title": "Documentación y Despliegue Global",
+          "description": "El agente sincroniza la documentación viva, valida el Delivery Gate y tu SaaS se publica en 300+ data centers con un solo comando.",
+          "prompt": "Use $fireskill-documentator para sincronizar la doc viva y luego: bun run deploy",
           "examples": {
-            "1": "Despachadores de webhooks",
-            "2": "Motores de notificaciones transaccionales",
-            "3": "Pipelines de ingesta de métricas",
-            "4": "Crons programados cada hora"
+            "1": "Delivery Gate",
+            "2": "Doc sincronizada",
+            "3": "Cloudflare Edge",
+            "4": "bun run deploy"
           },
-          "superpower": "Pooling de conexiones TCP con Cloudflare Hyperdrive, React Email multiproveedor (Resend/Brevo/SES) y Crons en el edge."
+          "superpower": "Despliegue sin sorpresas: documentación sincronizada, base migrada y cero regresiones."
         }
       },
       "banner": {

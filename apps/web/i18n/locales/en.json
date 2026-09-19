@@ -119,83 +119,90 @@
       "calloutRest": "We've already handled the hard parts so you can focus on building your idea."
     },
     "useCases": {
-      "badge": "Business Opportunities & Use Cases",
+      "badge": "AI-Driven Engineering Flow • From Idea to SaaS",
       "title": "What Can You Build with Nuxfire?",
       "subtitle": "Most SaaS boilerplates break the moment you need stateful WebSockets, async job queues, or true enterprise multi-tenancy. Nuxfire is engineered to carry your project from day-one MVP all the way to millions of daily requests without refactoring your core architecture.",
-      "examplesLabel": "Product Examples:",
-      "superpowerLabel": "Included Superpower:",
+      "promptLabel": "How you prompt in your IDE:",
+      "examplesLabel": "Artifacts & Highlights:",
+      "superpowerLabel": "Step guarantee:",
       "items": {
         "b2b": {
-          "category": "B2B SaaS Core",
-          "title": "B2B SaaS & Team Workspaces",
-          "description": "Sell subscription tiers with per-seat or workspace billing. Strict tenant isolation, tokenized team invitations, and fine-grained role-based access control (RBAC) are fully audited and production-ready on day one.",
+          "category": "Step 01 • Ideation",
+          "title": "Instant Raw Inbox Capture",
+          "description": "Simply drop your raw product idea into the IDE chat with zero technical friction. The agent records the draft in seconds without interrupting you with intrusive questions.",
+          "prompt": "Use $fireskill-01-inbox: I want to build a task management SaaS with per-seat billing and team invites.",
           "examples": {
-            "1": "Vertical CRMs",
-            "2": "ATS & Recruiting Systems",
-            "3": "Task & Project Managers (Linear/Asana)",
-            "4": "Helpdesks & Ticketing"
+            "1": "specs/inbox/",
+            "2": "Zero friction",
+            "3": "Instant capture",
+            "4": "No questions"
           },
-          "superpower": "Native teams layer, nuxt-authorization, Stripe Checkout/Portal, and integrated Kanban layer."
+          "superpower": "Draft safely saved in your repository, ready to be refined whenever you want."
         },
         "realtime": {
-          "category": "Realtime Engine",
-          "title": "Stateful Realtime Applications",
-          "description": "Build multiplayer collaborative apps without expensive Redis clusters or dedicated Socket.io servers. Each room or channel operates in an isolated Cloudflare Durable Object backed by low-latency embedded SQLite.",
+          "category": "Step 02 • Scope",
+          "title": "Refinement & Agile Backlog",
+          "description": "The agent evaluates codebase impacts and asks 2-3 focused multiple-choice questions to settle business rules without endless meetings.",
+          "prompt": "Use $fireskill-02-backlog on the tasks draft to analyze impacts and clarify questions.",
           "examples": {
-            "1": "Collaborative Whiteboards",
-            "2": "Live Telemetry Dashboards",
-            "3": "Support Chats & Messaging",
-            "4": "Multiplayer Canvas & Docs"
+            "1": "specs/backlog/",
+            "2": "Multiple-choice",
+            "3": "Impact analysis",
+            "4": "Closed scope"
           },
-          "superpower": "Durable Objects with SQLite storage, HMAC-signed ticket handshake, and sub-50ms global edge latency."
+          "superpower": "Promoted to backlog with mapped architectural impact and zero ambiguity."
         },
         "ai": {
-          "category": "AI & Background Processing",
-          "title": "AI Platforms & Autonomous Agents",
-          "description": "Execute long-running LLM completions and heavy compute without blocking the UI or hitting HTTP request timeouts. Cloudflare Queues process async jobs with exponential backoff and Dead Letter Queue capture.",
+          "category": "Step 03 • BDD Contract",
+          "title": "Normative Living Spec",
+          "description": "Generates an executable spec with Gherkin BDD scenarios (Given/When/Then) and validates rules at the Definition Gate before writing any code.",
+          "prompt": "Use $fireskill-03-specify to generate the normative spec and validate Definition Gate.",
           "examples": {
-            "1": "Batch Media Generators",
-            "2": "Domain-Specific AI Copilots",
-            "3": "Audio / Video Pipelines",
-            "4": "PDF & Contract Analyzers"
+            "1": "specs/defined/",
+            "2": "Gherkin BDD",
+            "3": "Definition Gate",
+            "4": "Single source of truth"
           },
-          "superpower": "Cloudflare Queues with DLQ, unlimited R2 storage with zero egress fees, and live updates via WebSockets."
+          "superpower": "Guarantees the AI will never hallucinate or invent rules outside the spec."
         },
         "micro": {
-          "category": "Rapid Monetization",
-          "title": "Micro-SaaS & Membership Portals",
-          "description": "Ship lean, highly profitable subscription tools in a single weekend. OpenAuth.js authentication runs in Cloudflare KV with zero database connection overhead, and Nuxt Content v3 provides lightning-fast documentation and blogs.",
+          "category": "Step 04 • Ahead TDD",
+          "title": "Tests That Fail First (Red)",
+          "description": "The agent writes automated unit and integration tests (Vitest) that initially fail. Every BDD scenario becomes a verified test before implementation.",
+          "prompt": "Use $fireskill-06-tdd-bdd to create the Vitest test suite that fails before implementation.",
           "examples": {
-            "1": "Curated Premium Directories",
-            "2": "SEO & Automation Tools",
-            "3": "Paid Member Communities",
-            "4": "Courses & Digital Product Portals"
+            "1": "Red-Green cycle",
+            "2": "Vitest",
+            "3": "Plan Gate",
+            "4": "Task checklist"
           },
-          "superpower": "OpenAuth with zero-DB sessions, D1 SQL Full-Text Search, and pre-configured Stripe Billing."
+          "superpower": "Zero code enters the repository without an automated test proving it works."
         },
         "enterprise": {
-          "category": "Enterprise & Governance",
-          "title": "Client Portals & Internal Backoffices",
-          "description": "Deliver self-service portals and operational backoffices that pass stringent corporate security audits. Comes standard with a dedicated Super-Admin console, TOTP Multi-Factor Authentication, and full audit logging.",
+          "category": "Step 05 • Specialists",
+          "title": "Implementation by 34 Specialists",
+          "description": "Domain specialists in Nuxt 4, SST, Drizzle, tRPC, and Cloudflare write surgical code until all automated tests turn green.",
+          "prompt": "Use $fireskill-07-implement to code task 1 with the Drizzle and tRPC specialists.",
           "examples": {
-            "1": "Agency Client Portals",
-            "2": "Financial Backoffices",
-            "3": "Compliance & Audit Dashboards",
-            "4": "Internal Operations Consoles"
+            "1": "34 Specialists",
+            "2": "100% Type-Safe",
+            "3": "Phases 1..3",
+            "4": "Green Tests"
           },
-          "superpower": "Isolated /admin portal with TOTP MFA, audit_logs table in PostgreSQL, and end-to-end type safety."
+          "superpower": "Clean code, aligned with stack best practices and validated by typecheck and Vitest."
         },
         "api": {
-          "category": "High-Throughput APIs",
-          "title": "High-Scale APIs & Event Pipelines",
-          "description": "Process millions of webhooks and background jobs with near-zero idle infrastructure cost. Hyperdrive connection pooling accelerates PostgreSQL queries without connection exhaustion, and transactional emails handle failovers.",
+          "category": "Step 06 • Edge Delivery",
+          "title": "Auto-Docs & Global Deploy",
+          "description": "The agent updates living documentation, passes the Delivery Gate, and your SaaS is deployed to 300+ edge data centers with one command.",
+          "prompt": "Use $fireskill-documentator to sync living docs and then run: bun run deploy",
           "examples": {
-            "1": "Webhook Dispatchers",
-            "2": "Transactional Notification Engines",
-            "3": "Metric Ingestion Pipelines",
-            "4": "Scheduled Hourly Crons"
+            "1": "Delivery Gate",
+            "2": "Synced living docs",
+            "3": "Cloudflare Edge",
+            "4": "bun run deploy"
           },
-          "superpower": "Cloudflare Hyperdrive TCP connection pooling, multi-provider React Email (Resend/Brevo/SES), and edge Crons."
+          "superpower": "Surprise-free deploy: synchronized docs, applied migrations, and zero regressions."
         }
       },
       "banner": {

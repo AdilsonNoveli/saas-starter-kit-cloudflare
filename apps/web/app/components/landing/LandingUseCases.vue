@@ -21,7 +21,7 @@
         </p>
       </div>
 
-      <!-- Grid of 6 SaaS Application Archetypes -->
+      <!-- Grid of 6 SaaS Engineering Process Steps -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-16">
         <div
           v-for="useCase in useCases"
@@ -29,7 +29,7 @@
           class="flex flex-col justify-between rounded-xl border border-default bg-elevated p-6 sm:p-7 hover:border-accented transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/5 group"
         >
           <div>
-            <!-- Top: Icon & Category Badge -->
+            <!-- Top: Icon & Step Badge -->
             <div class="flex items-center justify-between gap-4 mb-4">
               <div
                 class="w-12 h-12 rounded-lg flex items-center justify-center border transition-colors shrink-0"
@@ -37,30 +37,43 @@
               >
                 <UIcon :name="useCase.icon" class="w-6 h-6" :class="useCase.iconClass" />
               </div>
-              <span class="text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold px-2.5 py-1 rounded bg-muted border border-default text-muted">
+              <span class="text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold px-2.5 py-1 rounded bg-muted border border-default text-toned">
                 {{ t(`landing.useCases.items.${useCase.id}.category`) }}
               </span>
             </div>
 
-            <!-- Title & Pitch -->
+            <!-- Title & Simple Fast Pitch -->
             <h3 class="text-lg sm:text-xl font-bold text-highlighted mb-2.5 group-hover:text-emerald-500 transition-colors">
               {{ t(`landing.useCases.items.${useCase.id}.title`) }}
             </h3>
 
-            <p class="text-sm text-muted leading-relaxed mb-5">
+            <p class="text-sm text-muted leading-relaxed mb-4">
               {{ t(`landing.useCases.items.${useCase.id}.description`) }}
             </p>
 
-            <!-- Examples Pill List -->
+            <!-- IDE Command / Prompt Model Box -->
+            <div class="mb-4">
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span class="text-[11px] font-mono uppercase tracking-wider font-semibold text-muted">
+                  {{ $t("landing.useCases.promptLabel") }}
+                </span>
+              </div>
+              <div class="p-3 rounded-lg bg-muted/60 dark:bg-night-950/70 border border-default font-mono text-xs text-toned leading-relaxed break-words select-all group-hover:border-emerald-500/30 transition-colors">
+                <span class="text-emerald-500 dark:text-emerald-400 font-semibold mr-1.5">$</span>{{ t(`landing.useCases.items.${useCase.id}.prompt`) }}
+              </div>
+            </div>
+
+            <!-- Artifacts / Highlights Pill List -->
             <div class="mb-5">
-              <span class="text-xs font-semibold text-dimmed block mb-2 font-mono uppercase tracking-wider">
+              <span class="text-[11px] font-semibold text-dimmed block mb-2 font-mono uppercase tracking-wider">
                 {{ $t("landing.useCases.examplesLabel") }}
               </span>
               <div class="flex flex-wrap gap-1.5">
                 <span
                   v-for="example in EXAMPLE_SLOTS"
                   :key="example"
-                  class="text-xs px-2.5 py-0.5 rounded-full bg-muted border border-default text-toned font-medium"
+                  class="text-xs px-2.5 py-0.5 rounded-full bg-muted border border-default text-toned font-mono font-medium"
                 >
                   {{ t(`landing.useCases.items.${useCase.id}.examples.${example}`) }}
                 </span>
@@ -68,7 +81,7 @@
             </div>
           </div>
 
-          <!-- Superpower Box -->
+          <!-- Step Guarantee (Superpower Box) -->
           <div class="pt-4 border-t border-default mt-auto">
             <div class="flex items-start gap-2">
               <UIcon name="i-lucide-check-circle-2" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
@@ -182,37 +195,37 @@ const localePath = useLocalePath();
 const useCases = [
   {
     id: "b2b",
-    icon: "i-lucide-building-2",
-    iconContainerClass: "border-emerald-500/30 bg-emerald-500/10",
-    iconClass: "text-emerald-400",
+    icon: "i-lucide-lightbulb",
+    iconContainerClass: "border-amber-500/30 bg-amber-500/10",
+    iconClass: "text-amber-400",
   },
   {
     id: "realtime",
-    icon: "i-lucide-zap",
-    iconContainerClass: "border-teal-500/30 bg-teal-500/10",
-    iconClass: "text-teal-400",
+    icon: "i-lucide-message-square",
+    iconContainerClass: "border-blue-500/30 bg-blue-500/10",
+    iconClass: "text-blue-400",
   },
   {
     id: "ai",
-    icon: "i-lucide-bot",
+    icon: "i-lucide-file-code",
     iconContainerClass: "border-purple-500/30 bg-purple-500/10",
     iconClass: "text-purple-400",
   },
   {
     id: "micro",
-    icon: "i-lucide-credit-card",
-    iconContainerClass: "border-sky-500/30 bg-sky-500/10",
-    iconClass: "text-sky-400",
+    icon: "i-lucide-flask-conical",
+    iconContainerClass: "border-teal-500/30 bg-teal-500/10",
+    iconClass: "text-teal-400",
   },
   {
     id: "enterprise",
-    icon: "i-lucide-shield-check",
-    iconContainerClass: "border-amber-500/30 bg-amber-500/10",
-    iconClass: "text-amber-400",
+    icon: "i-lucide-cpu",
+    iconContainerClass: "border-emerald-500/30 bg-emerald-500/10",
+    iconClass: "text-emerald-400",
   },
   {
     id: "api",
-    icon: "i-lucide-activity",
+    icon: "i-lucide-rocket",
     iconContainerClass: "border-orange-500/30 bg-orange-500/10",
     iconClass: "text-orange-400",
   },

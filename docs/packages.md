@@ -57,7 +57,7 @@
 | Terceiro | produção | @nuxfire/emails | workspace:* | Finalidade não descrita nos metadados locais. |  | — |
 | Terceiro | produção | @paralleldrive/cuid2 | ^2.2.2 | Finalidade não descrita nos metadados locais. | https://github.com/ericelliott/cuid2 | https://github.com/ericelliott/cuid2 |
 | Terceiro | produção | ofetch | ^1.4.1 | A better fetch API. Works on node, browser and workers. | unjs/ofetch | — |
-| Terceiro | produção | valibot | 1.0.0-beta.14 | The modular and type safe schema library for validating structural data | https://github.com/fabian-hiller/valibot | https://github.com/fabian-hiller/valibot |
+| Terceiro | produção | valibot | 1.4.2 | The modular and type safe schema library for validating structural data | https://github.com/fabian-hiller/valibot | https://github.com/fabian-hiller/valibot |
 | Terceiro | desenvolvimento | drizzle-kit | ^0.31.10 | Finalidade não descrita nos metadados locais. | https://github.com/drizzle-team/drizzle-orm | https://github.com/drizzle-team/drizzle-orm |
 | Terceiro | produção | @nuxt/content | ^3.16.0 | Write your content inside your Nuxt app | https://github.com/nuxt/content | https://github.com/nuxt/content |
 | Terceiro | produção | @nuxt/fonts | ^0.14.0 | Automatic font configuration for Nuxt apps | https://github.com/nuxt/fonts | https://github.com/nuxt/fonts |

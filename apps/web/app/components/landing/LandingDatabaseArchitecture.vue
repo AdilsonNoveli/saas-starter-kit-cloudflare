@@ -1,7 +1,7 @@
 <template>
   <section id="database" class="py-16 md:py-24 px-4 sm:px-6 lg:px-8 xl:px-40 w-full relative overflow-hidden">
     <div class="mx-auto w-full">
-      <!-- Section Header: Clean, Enterprise-Grade Title & Description (No badges, No cards) -->
+      <!-- Section Header -->
       <div class="text-center max-w-3xl mx-auto mb-12 lg:mb-16">
         <h2 class="text-pretty text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight lg:leading-[1.12em] text-highlighted mb-4">
           {{ $t("landing.databaseArchitecture.title") }}
@@ -12,9 +12,10 @@
         </p>
       </div>
 
-      <!-- Unified Hero Showcase: Platform Admin Console & Tenant Governance -->
-      <div class="max-w-7xl mx-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 via-elevated to-elevated dark:from-emerald-950/25 dark:via-night-900/60 dark:to-night-950 p-6 sm:p-8 lg:p-10 mb-12 shadow-xl shadow-emerald-500/5">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <!-- Unified Enterprise Architecture & Governance Structure (Single Master Card) -->
+      <div class="max-w-7xl mx-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 via-elevated to-elevated dark:from-emerald-950/25 dark:via-night-900/60 dark:to-night-950 p-6 sm:p-8 lg:p-10 shadow-xl shadow-emerald-500/5">
+        <!-- Part 1: Platform Admin Console & Multi-Tenancy Governance -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pb-8 lg:pb-12 border-b border-default">
           <!-- Left: Value Proposition & 4 Core Pillars -->
           <div class="lg:col-span-5">
             <h3 class="text-2xl sm:text-3xl font-extrabold text-highlighted tracking-tight mb-3">
@@ -180,80 +181,72 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Clean Structured Overview: The 20 Audited Tables (Single Unified Matrix, No Card Clutter) -->
-      <div class="max-w-7xl mx-auto rounded-2xl border border-default bg-elevated/70 backdrop-blur-sm p-6 sm:p-8 mb-8 shadow-sm">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-default">
-          <div>
-            <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-highlighted mb-1">
-              {{ $t("landing.databaseArchitecture.domainsTitle") }}
-            </h3>
-            <p class="text-xs sm:text-sm text-muted">
-              {{ $t("landing.databaseArchitecture.domainsSubtitle") }}
-            </p>
+        <!-- Part 2: Audited Domain Architecture (The 20 Tables Unified Matrix) -->
+        <div class="pt-8 lg:pt-10">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-default/70">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-highlighted mb-1">
+                {{ $t("landing.databaseArchitecture.domainsTitle") }}
+              </h3>
+              <p class="text-xs sm:text-sm text-muted">
+                {{ $t("landing.databaseArchitecture.domainsSubtitle") }}
+              </p>
+            </div>
+            <span class="text-xs font-mono font-bold px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0 self-start sm:self-center">
+              20 PostgreSQL Tables • Drizzle ORM
+            </span>
           </div>
-          <span class="text-xs font-mono font-bold px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0 self-start sm:self-center">
-            20 PostgreSQL Tables • Drizzle ORM
-          </span>
-        </div>
 
-        <!-- Unified Responsive Table / Matrix -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b border-default text-[11px] font-mono text-muted uppercase tracking-wider">
-                <th class="py-3 pr-4 font-semibold">{{ $t("landing.databaseArchitecture.tableHeaders.domain") }}</th>
-                <th class="py-3 px-4 font-semibold">{{ $t("landing.databaseArchitecture.tableHeaders.table") }}</th>
-                <th class="py-3 pl-4 font-semibold">{{ $t("landing.databaseArchitecture.tableHeaders.purpose") }}</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-default/50 text-xs sm:text-sm">
-              <tr
-                v-for="domain in domainRows"
-                :key="domain.id"
-                class="hover:bg-muted/30 transition-colors"
-              >
-                <!-- Domain Column -->
-                <td class="py-3.5 pr-4 align-top">
-                  <div class="flex items-center gap-2 font-bold text-highlighted">
-                    <UIcon :name="domain.icon" class="w-4 h-4 shrink-0" :class="domain.iconColor" />
-                    <span class="whitespace-nowrap">{{ domain.name }}</span>
-                  </div>
-                  <span class="text-[10px] font-mono text-muted block pl-6">
-                    {{ domain.count }}
-                  </span>
-                </td>
-
-                <!-- Tables List Column -->
-                <td class="py-3.5 px-4 align-top">
-                  <div class="flex flex-wrap gap-1.5">
-                    <span
-                      v-for="tbl in domain.tables"
-                      :key="tbl"
-                      class="text-xs px-2 py-0.5 rounded bg-muted/80 border border-default text-highlighted font-mono font-medium"
-                    >
-                      {{ tbl }}
+          <!-- Unified Responsive Table / Matrix -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-default text-[11px] font-mono text-muted uppercase tracking-wider">
+                  <th class="py-3 pr-4 font-semibold">{{ $t("landing.databaseArchitecture.tableHeaders.domain") }}</th>
+                  <th class="py-3 px-4 font-semibold">{{ $t("landing.databaseArchitecture.tableHeaders.table") }}</th>
+                  <th class="py-3 pl-4 font-semibold">{{ $t("landing.databaseArchitecture.tableHeaders.purpose") }}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-default/50 text-xs sm:text-sm">
+                <tr
+                  v-for="domain in domainRows"
+                  :key="domain.id"
+                  class="hover:bg-muted/30 transition-colors"
+                >
+                  <!-- Domain Column -->
+                  <td class="py-3.5 pr-4 align-top">
+                    <div class="flex items-center gap-2 font-bold text-highlighted">
+                      <UIcon :name="domain.icon" class="w-4 h-4 shrink-0" :class="domain.iconColor" />
+                      <span class="whitespace-nowrap">{{ domain.name }}</span>
+                    </div>
+                    <span class="text-[10px] font-mono text-muted block pl-6">
+                      {{ domain.count }}
                     </span>
-                  </div>
-                </td>
+                  </td>
 
-                <!-- Purpose Column -->
-                <td class="py-3.5 pl-4 align-top text-muted leading-relaxed text-xs sm:text-sm">
-                  {{ domain.purpose }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <!-- Tables List Column -->
+                  <td class="py-3.5 px-4 align-top">
+                    <div class="flex flex-wrap gap-1.5">
+                      <span
+                        v-for="tbl in domain.tables"
+                        :key="tbl"
+                        class="text-xs px-2 py-0.5 rounded bg-muted/80 border border-default text-highlighted font-mono font-medium"
+                      >
+                        {{ tbl }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- Purpose Column -->
+                  <td class="py-3.5 pl-4 align-top text-muted leading-relaxed text-xs sm:text-sm">
+                    {{ domain.purpose }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-
-      <!-- Closing Callout Bar: Simple, Reassuring, Single Line -->
-      <div class="rounded-xl border border-default bg-elevated/70 backdrop-blur-sm p-4 sm:p-5 text-center max-w-4xl mx-auto shadow-sm">
-        <p class="text-xs sm:text-sm leading-relaxed">
-          <strong class="text-highlighted">{{ $t("landing.databaseArchitecture.summaryCallout.lead") }}</strong>
-          <span class="text-muted">{{ $t("landing.databaseArchitecture.summaryCallout.tail") }}</span>
-        </p>
       </div>
     </div>
   </section>

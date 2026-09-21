@@ -1,17 +1,17 @@
 # Fluxos
 
 <!-- specsfy:documentator:start -->
-## Fluxo principal
+## Main Flow
 
 ```mermaid
 flowchart LR
-  Entrada --> Aplicação --> Saída
+  Input --> Application --> Output
 ```
 
 ```mermaid
 sequenceDiagram
-  participant Cliente
-  participant Aplicação
-  Cliente->>Aplicação: requisição
+  participant Client
+  participant Application
+  Client->>Application: request
 ```
 <!-- specsfy:documentator:end -->

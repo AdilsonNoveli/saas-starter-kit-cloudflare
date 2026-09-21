@@ -1,13 +1,13 @@
 # Testes
 
 <!-- specsfy:documentator:start -->
-## Resumo
+## Summary
 
-- Arquivos de teste: 11.
+- Test files: 11.
 - Runner: Vitest.
 - Scripts: doctor: bun scripts/doctor.ts; deploy: bun scripts/deploy.ts; format: prettier -w .; test: vitest run; check:i18n: bun scripts/check-i18n-completeness.ts && bun scripts/check-docs-translations.ts; fireskill: bun fireskills/cli/src/main.ts; web: sst shell -- bun scripts/dev.ts web; web-remote: sst shell -- bun scripts/dev.ts web remote; app: sst shell -- bun scripts/dev.ts app; app-remote: sst shell -- bun scripts/dev.ts app remote.
 
-| Arquivo |
+| File |
 | --- |
 | layers\billing\server\utils\billing\event-ledger.test.ts |
 | layers\billing\server\utils\billing\subscription-repository.test.ts |

@@ -1,7 +1,7 @@
 # Integrações
 
 <!-- specsfy:documentator:start -->
-## Configuração
+## Configuration
 
-Valores de ambiente e integrações são documentados apenas pelos nomes declarados localmente, sem segredos.
+Environment values and integrations are documented only by their locally declared names, without secrets.
 <!-- specsfy:documentator:end -->

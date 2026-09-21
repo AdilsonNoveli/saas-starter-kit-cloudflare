@@ -1,17 +1,17 @@
 # Documentação técnica
 
 <!-- specsfy:documentator:start -->
-## Visão geral
+## Overview
 
-- Frameworks detectados: não identificados.
-- Arquivos de código: 393.
-- Arquivos de teste: 11.
+- Detected frameworks: unidentified.
+- Code files: 393.
+- Test files: 11.
 
-## Roteiro
+## Reading Roadmap
 
-- [Arquitetura](architecture.md)
-- [Aplicação](application.md)
-- [Banco de dados](database.md)
-- [Testes](testing.md)
-- [Pacotes](packages.md)
+- [Architecture](architecture.md)
+- [Application](application.md)
+- [Database](database.md)
+- [Testing](testing.md)
+- [Packages](packages.md)
 <!-- specsfy:documentator:end -->

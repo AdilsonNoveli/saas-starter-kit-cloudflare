@@ -1,32 +1,39 @@
-# Stack do sistema
+# System Stack
 
-Documente tecnologias estruturais e a evidência executável que confirma cada
-uma. Preserve decisões humanas nas seções livres deste arquivo.
+Document structural technologies and the executable evidence that confirms each
+one. Preserve human decisions in the freeform sections of this file.
 
-## Inventário detectado
+## Detected Inventory
 
 <!-- specsfy:stack:start -->
-| Camada | Tecnologia | Evidência |
+| Layer | Technology | Evidence |
 | --- | --- | --- |
-| Framework | Nuxt | `package.json` (workspaces) |
-| Biblioteca | @nuxt/ui | `package.json` (workspaces) |
-| API | tRPC (trpc-nuxt) | `package.json` (workspaces) |
-| Persistência | Drizzle ORM | `package.json` (workspaces) |
-| Estado | Pinia | `package.json` (workspaces) |
-| Runtime | Cloudflare Workers (SST) | `sst.config.ts` |
-| Biblioteca | React | `package.json` |
+| Framework | Nuxt | `package.json` (`nuxt`) |
+| Library | Vue | `package.json` (`vue`) |
+| Library | @nuxt/ui | `package.json` (`@nuxt/ui`) |
+| API | tRPC (trpc-nuxt) | `package.json` (`trpc-nuxt`) |
+| State | Pinia | `package.json` (`pinia`) |
+| Authorization | nuxt-authorization | `package.json` (`nuxt-authorization`) |
+| Authentication | OpenAuth.js | `package.json` (`@openauthjs/openauth`) |
+| Infrastructure | SST | `package.json` (`sst`) |
+| Library | React | `package.json` (`react`) |
+| Language | TypeScript | `package.json` (`typescript`) |
+| Tests | Vitest | `package.json` (`vitest`) |
+| Persistence | Drizzle ORM | `package.json` (`drizzle-orm`) |
 | Runtime | Node.js | `package.json` |
+| Package Manager | Bun | `bun.lock` |
+| Runtime | Cloudflare Workers (SST) | `sst.config.ts` |
 <!-- specsfy:stack:end -->
 
-## Decisões e observações do projeto
+## Project Decisions and Notes
 
-O detalhe técnico de cada item está no especialista correspondente (`fireskills/specialists/`). Aqui ficam só as decisões que o código não deixa óbvias.
+Technical details for each item live in the corresponding specialist (`fireskills/specialists/`). Here are only the decisions that the code does not make obvious.
 
-- **Runtime**: Cloudflare Workers via SST, sem `wrangler.toml`, sem Docker, sem servidor Linux.
-- **Banco**: PostgreSQL por Hyperdrive com Drizzle (ver `.fireskills/DATABASE.md`). Não é `hubDatabase()` nem Prisma.
-- **Autenticação**: OpenAuth.js em Worker próprio (`PasswordProvider` + `CodeProvider`, mais GitHub e Google quando há credenciais). Não é NextAuth/Lucia/Clerk.
-- **Autorização**: `nuxt-authorization` (estilo Bouncer, `defineAbility`); não é CASL.
-- **KV e cache**: `hubKV()`/`hubCache()` do NuxtHub.
-- **E-mail**: React Email; Resend ativo. Mailgun, SES, SparkPost e SMTP existem no fork do mailer (`packages/emails/mailer`), desligados em `config.ts` e comentados em `apps/functions/src/emails.ts`.
-- **React** só existe em `packages/emails`; a UI do produto é Vue.
-- **Testes**: Vitest; sem Playwright nem Cypress.
+- **Runtime**: Cloudflare Workers via SST, no `wrangler.toml`, no Docker, no Linux server.
+- **Database**: PostgreSQL via Hyperdrive with Drizzle (see `.fireskills/DATABASE.md`). Not `hubDatabase()` nor Prisma.
+- **Authentication**: OpenAuth.js in dedicated Worker (`PasswordProvider` + `CodeProvider`, plus GitHub and Google when credentials exist). Not NextAuth/Lucia/Clerk.
+- **Authorization**: `nuxt-authorization` (Bouncer style, `defineAbility`); not CASL.
+- **KV and cache**: NuxtHub's `hubKV()`/`hubCache()`.
+- **Email**: React Email; Resend active. Mailgun, SES, SparkPost, and SMTP exist in the mailer fork (`packages/emails/mailer`), disabled in `config.ts` and commented out in `apps/functions/src/emails.ts`.
+- **React** exists solely in `packages/emails`; product UI is Vue.
+- **Testing**: Vitest; no Playwright or Cypress.

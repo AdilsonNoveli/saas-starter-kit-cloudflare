@@ -1,35 +1,35 @@
-# Interface do projeto
+# Project Interface
 
 <!-- markdownlint-disable MD013 -->
 
-Fonte canônica para construir e reaproveitar a interface. Atualize-o antes e depois de cada tarefa que criar ou mudar uma tela Vue. Tokens, tema e regras de customização: `.fireskills/DESIGNSYSTEM.MD`.
+Canonical source for building and reusing the user interface. Update it before and after each task that creates or modifies a Vue screen. Tokens, theme, and customization rules: `.fireskills/DESIGNSYSTEM.MD`.
 
-## Base observada
+## Observed Baseline
 
-- Toda interface é composta por Vue Single-File Components com `@nuxt/ui` v4.
-- Ícones Lucide (`i-lucide-*`).
-- Componentes compartilhados em `apps/app/app/components/`; composições de domínio em `layers/<layer>/app/components/`. Rotas por arquivo em `apps/app/app/pages/` e `layers/*/app/pages/`.
+- All interfaces are composed of Vue Single-File Components with `@nuxt/ui` v4.
+- Lucide icons (`i-lucide-*`).
+- Shared components in `apps/app/app/components/`; domain compositions in `layers/<layer>/app/components/`. File-based routes in `apps/app/app/pages/` and `layers/*/app/pages/`.
 
-## Blocos criados e reaproveitáveis
+## Created and Reusable Blocks
 
-Registre todo bloco criado, inclusive os internos de uma feature: componente Vue com responsabilidade própria, como grade, formulário, filtro, cabeçalho, cartão, diálogo, painel lateral, estado vazio, upload ou ação em lote. Os blocos que o starter já traz estão nos diretórios acima; leia-os antes de criar um equivalente.
+Register all created UI blocks, including feature internals: Vue components with single responsibility, such as grids, forms, filters, headers, cards, dialogs, slide-overs, empty states, uploads, or batch actions. Blocks provided by the starter reside in the directories above; read them before creating an equivalent.
 
-| Bloco | Tipo | Arquivo | Origem | Finalidade e API pública | Estados e acessibilidade | Consumidores | Reaproveitar ou estender |
+| Block | Type | File | Origin | Purpose and Public API | States and Accessibility | Consumers | Reuse or Extend |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `ConfirmDialog` | Composição de domínio (app) | `apps/app/app/components/ConfirmDialog.vue` | próprio, sobre `@nuxt/ui` | Diálogo de confirmação singleton, montado uma vez em `app.vue`. Nunca é importado por uma página: chame `useNotification().confirm({ title, ... })`. | A mapear | `apps/app/app/app.vue` | Usar `useNotification().confirm` em vez de criar outro diálogo |
+| `ConfirmDialog` | Domain composition (app) | `apps/app/app/components/ConfirmDialog.vue` | custom, on top of `@nuxt/ui` | Singleton confirmation dialog, mounted once in `app.vue`. Never imported directly by a page: call `useNotification().confirm({ title, ... })`. | To be mapped | `apps/app/app/app.vue` | Use `useNotification().confirm` instead of creating another dialog |
 
-## Telas e composição
+## Screens and Composition
 
-Registre cada tela criada ou alterada.
+Register each created or modified screen.
 
-| Tela ou rota | Arquivo | Componentes Vue usados | Dados e ações | Estados |
+| Screen or Route | File | Used Vue Components | Data and Actions | States |
 | --- | --- | --- | --- | --- |
 
-## Regras de composição
+## Composition Rules
 
-1. Páginas e rotas coordenam dados e compõem componentes; não concentram a grade, formulário, filtros, overlays ou cartões reutilizáveis.
-2. Antes de criar um componente, consulte esta tabela e os diretórios de componentes; reaproveite o existente quando ele atender à mesma intenção.
-3. Todo componente `@nuxt/ui` reaproveitado ou criado entra na tabela com seu arquivo, origem, explicação, API, estados e consumidores reais.
-4. Ao criar um bloco, registre-o nesta tabela na mesma tarefa. Ao alterar ou remover um bloco, atualize seus consumidores e a orientação de reuso.
+1. Pages and routes coordinate data and compose components; they do not concentrate reusable grids, forms, filters, overlays, or cards.
+2. Before creating a component, consult this table and the component directories; reuse existing ones when they fulfill the same intent.
+3. Every `@nuxt/ui` component reused or created enters the table with its file, origin, explanation, API, states, and real consumers.
+4. When creating a block, register it in this table in the same task. When modifying or removing a block, update its consumers and reuse guidance.
 
 <!-- markdownlint-enable MD013 -->

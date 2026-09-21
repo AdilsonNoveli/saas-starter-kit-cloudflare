@@ -1,47 +1,47 @@
-# Projeto
+# Project
 
-## História e motivação
+## History and Motivation
 
-Descreva a origem do projeto, o problema que motivou sua criação e os marcos de evolução.
+Describe origin of the project, problem that motivated its creation, and major evolution milestones.
 
-## Finalidade
+## Purpose
 
-Explique o que o sistema realiza e o valor central que entrega.
+Explain what the system accomplishes and what core value it delivers.
 
-## Pessoas e contexto de uso
+## Users and Operational Context
 
-Registre as personas, as permissões e os ambientes em que interagem com o produto.
+Record target user personas, permissions, and environments in which they interact with the product.
 
-## Capacidades principais
+## Core Capabilities
 
-Base fornecida pelo starter kit Nuxfire (Nuxt 4 + Cloudflare Workers + SST). Acrescente aqui as capacidades do seu produto.
+Base provided by the Nuxfire starter kit (Nuxt 4 + Cloudflare Workers + SST). Add your product capabilities here.
 
-| Capacidade | Onde vive |
+| Capability | Location |
 |---|---|
-| Identidade e sessão: OpenAuth (senha, código por e-mail, GitHub, Google), MFA TOTP opcional, rate limit de login | `apps/functions/src/auth.ts`, `apps/login`, `apps/app/server/utils/auth.ts` |
-| Equipes, convites (expiram em 30 dias), assentos por plano, RBAC `Owner`/`Admin`/`Member`, suspensão de equipe | `layers/teams` |
-| Console de plataforma (`/admin`, MFA + sessão elevada de 30 minutos): empresas, planos, fila/DLQ com replay, auditoria, notificações globais | `layers/admin`, `layers/billing`, `layers/notifications` |
-| Cobrança: planos em banco, checkout Stripe e Paddle, webhooks com ledger de idempotência em KV | `layers/billing` |
-| Notificações no app e em tempo real (WebSocket/Durable Object) | `layers/notifications`, `apps/functions/src/websockets.js` |
-| Jobs em fila com DLQ e cron horário (o cron só grava uma linha em `Log`) | `infra/jobs.ts`, `infra/cron.ts`, `apps/functions/src/` |
-| E-mail transacional (React Email; só o Resend está ativo) | `packages/emails`, `apps/functions/src/emails.ts` |
-| Site público, blog, docs e páginas legais (Nuxt Content v3) | `apps/web` |
-| Kanban (feature layer desligável em `config.ts`) | `layers/kanban` |
+| Identity and session: OpenAuth (password, email code, GitHub, Google), optional TOTP MFA, login rate limiting | `apps/functions/src/auth.ts`, `apps/login`, `apps/app/server/utils/auth.ts` |
+| Teams, invitations (expire in 30 days), seats per plan, RBAC `Owner`/`Admin`/`Member`, team suspension | `layers/teams` |
+| Platform console (`/admin`, MFA + elevated 30-minute session): companies, plans, queue/DLQ with replay, audit log, global notifications | `layers/admin`, `layers/billing`, `layers/notifications` |
+| Billing: database-driven plans, Stripe and Paddle checkout, webhooks with KV idempotency ledger | `layers/billing` |
+| In-app and real-time notifications (WebSocket/Durable Object) | `layers/notifications`, `apps/functions/src/websockets.js` |
+| Queued jobs with DLQ and hourly cron (cron only writes a row to `Log`) | `infra/jobs.ts`, `infra/cron.ts`, `apps/functions/src/` |
+| Transactional email (React Email; only Resend is active) | `packages/emails`, `apps/functions/src/emails.ts` |
+| Public website, blog, docs, and legal pages (Nuxt Content v3) | `apps/web` |
+| Kanban (toggleable feature layer in `config.ts`) | `layers/kanban` |
 
-## Limites
+## Boundaries and Non-Goals
 
-O que o starter não faz ou ainda não tem (ausência verificada no código):
+What the starter does not do or does not have yet (absence verified in code):
 
-- Sem CI/CD: `.github/workflows/` não existe; o deploy é manual.
-- Sem lista nem download de faturas: a aba Billing só cita "invoices" no texto.
-- Sem troca de senha dentro do app: o botão leva ao fluxo "esqueci minha senha" do emissor.
-- Sem códigos de recuperação de MFA; MFA travado exige edição direta no banco.
-- Sem feed RSS, error tracking (Sentry etc.), impersonação de tenant, allowlist de IP em `/admin` nem gráficos de MRR/ARR.
-- Analytics: a página de documentação é "coming soon".
-- A página de preços do site (`LandingPricing.vue`) é estática; não lê os `Plan` do banco.
-- O gráfico do dashboard da equipe é ilustrativo (random walk), não dado real.
-- i18n: `apps/app` só extraiu a chave `welcome`; o resto da interface está em inglês fixo.
+- No CI/CD: `.github/workflows/` does not exist; deployment is manual.
+- No invoice list or download: the Billing tab only mentions "invoices" in text.
+- No in-app password change: button leads to the issuer's "forgot password" flow.
+- No MFA recovery codes; locked MFA requires direct database edit.
+- No RSS feed, error tracking (Sentry etc.), tenant impersonation, IP allowlist in `/admin`, or MRR/ARR charts.
+- Analytics: documentation page is "coming soon".
+- Pricing page on website (`LandingPricing.vue`) is static; does not read `Plan` records from database.
+- Team dashboard chart is illustrative (random walk), not real data.
+- i18n: `apps/app` only extracted the `welcome` key; the rest of the interface is fixed in English.
 
-## Contexto técnico
+## Technical Context
 
-Detalhes verificáveis em `.fireskills/STACK.md` e `.fireskills/DATABASE.md`. Para cada área, carregue o especialista correspondente em `fireskills/specialists/` (ver `AGENTS.md`).
+Verifiable details in `.fireskills/STACK.md` and `.fireskills/DATABASE.md`. For each area, load the corresponding specialist in `fireskills/specialists/` (see `AGENTS.md`).

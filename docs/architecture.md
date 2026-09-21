@@ -1,18 +1,18 @@
 # Arquitetura
 
 <!-- specsfy:documentator:start -->
-## Componentes
+## Components
 
-| Tipo | Quantidade |
+| Type | Quantity |
 | --- | --- |
-| Código | 393 |
-| Testes | 11 |
+| Code | 393 |
+| Tests | 11 |
 
-## Diagramas
+## Diagrams
 
 ```mermaid
 flowchart TD
-  Application[Aplicação]
+  Application[Application]
 ```
 
 ```mermaid

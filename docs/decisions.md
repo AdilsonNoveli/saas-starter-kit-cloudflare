@@ -1,7 +1,7 @@
 # Decisões técnicas
 
 <!-- specsfy:documentator:start -->
-## Política
+## Policy
 
-Decisões explícitas em `PROJECT.md` e `.fireskills/` prevalecem sobre inferências deste documento.
+Explicit decisions in `PROJECT.md` and `.fireskills/` take precedence over inferences in this document.
 <!-- specsfy:documentator:end -->

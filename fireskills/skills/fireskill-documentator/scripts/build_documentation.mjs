@@ -11,7 +11,7 @@ const ignored = new Set([".git", ".venv", "_docs", "fireskills", ".nuxt", ".outp
 const args = process.argv.slice(2);
 const project = resolve(args.includes("--project") ? args[args.indexOf("--project") + 1] : process.cwd());
 const check = args.includes("--check");
-const blank = "Finalidade não descrita nos metadados locais.";
+const blank = "Purpose not described in local metadata.";
 
 async function json(path) { try { return JSON.parse(await readFile(path, "utf8")); } catch { return {}; } }
 async function text(path) { try { return await readFile(path, "utf8"); } catch { return ""; } }
@@ -38,12 +38,12 @@ function repo(value) {
 }
 function category(path) {
   const value = path.replaceAll("\\", "/");
-  if (/\/(Services?|service)\//i.test(value)) return "Serviços";
-  if (/\/(routes|api|trpc)\//i.test(value) || /route\.(?:ts|js)$/.test(value)) return "Rotas e APIs";
-  if (/\/(components?)\//i.test(value)) return "Componentes";
-  if (/\/(pages?|views?|app)\//i.test(value) || /page\.(?:tsx?|jsx?)$/.test(value)) return "Páginas";
-  if (/(^|\/)(tests?|spec)\//i.test(value) || /\.(test|spec)\./.test(value)) return "Testes";
-  return "Outras fontes";
+  if (/\/(Services?|service)\//i.test(value)) return "Services";
+  if (/\/(routes|api|trpc)\//i.test(value) || /route\.(?:ts|js)$/.test(value)) return "Routes and APIs";
+  if (/\/(components?)\//i.test(value)) return "Components";
+  if (/\/(pages?|views?|app)\//i.test(value) || /page\.(?:tsx?|jsx?)$/.test(value)) return "Pages";
+  if (/(^|\/)(tests?|spec)\//i.test(value) || /\.(test|spec)\./.test(value)) return "Tests";
+  return "Other sources";
 }
 function symbols(content) {
   return [...new Set([...content.matchAll(/\b(?:class|function|interface|enum)\s+([A-Z_a-z][\w]*)|\b(?:const|function)\s+([A-Z][\w]*)/g)].map((match) => match[1] ?? match[2]).filter(Boolean))].slice(0, 8).join(", ");
@@ -60,17 +60,17 @@ if (!existsSync(project)) {
   const rows = [];
   const push = (manager, scope, name, version, purpose = blank, source = "") => rows.push([manager, scope, name, version, purpose, source]);
   const addManifest = (manifest, nodeScope = false) => {
-    for (const [scope, values] of [["produção", manifest.dependencies], ["desenvolvimento", manifest.devDependencies], ["opcional", manifest.optionalDependencies], ["peer", manifest.peerDependencies]]) for (const [name, version] of Object.entries(values ?? {})) push("npm", scope, name, version);
+    for (const [scope, values] of [["production", manifest.dependencies], ["development", manifest.devDependencies], ["optional", manifest.optionalDependencies], ["peer", manifest.peerDependencies]]) for (const [name, version] of Object.entries(values ?? {})) push("npm", scope, name, version);
   };
   addManifest(rootPackage);
   for (const path of manifests.filter((path) => path !== join(project, "package.json"))) addManifest(await json(path));
-  for (const [scope, values] of [["produção", composer.require], ["desenvolvimento", composer["require-dev"]]]) for (const [name, version] of Object.entries(values ?? {})) push("Composer", scope, name, version);
+  for (const [scope, values] of [["production", composer.require], ["development", composer["require-dev"]]]) for (const [name, version] of Object.entries(values ?? {})) push("Composer", scope, name, version);
   const composerLock = await json(join(project, "composer.lock"));
-  for (const item of [...(composerLock.packages ?? []), ...(composerLock["packages-dev"] ?? [])]) push("Composer", "transitiva", item.name, item.version, item.description ?? blank, repo(item.source));
-  function legacyLock(dependencies) { for (const [name, item] of Object.entries(dependencies ?? {})) { push("npm", "transitiva", name, item?.version ?? "—", item?.description ?? blank, repo(item?.repository)); legacyLock(item?.dependencies); } }
+  for (const item of [...(composerLock.packages ?? []), ...(composerLock["packages-dev"] ?? [])]) push("Composer", "transitive", item.name, item.version, item.description ?? blank, repo(item.source));
+  function legacyLock(dependencies) { for (const [name, item] of Object.entries(dependencies ?? {})) { push("npm", "transitive", name, item?.version ?? "—", item?.description ?? blank, repo(item?.repository)); legacyLock(item?.dependencies); } }
   for (const lockPath of files.filter((path) => path.endsWith("package-lock.json"))) {
     const lock = await json(lockPath);
-    for (const [key, item] of Object.entries(lock.packages ?? {})) if (key.includes("node_modules/")) push("npm", "transitiva", key.split("node_modules/").at(-1), item?.version ?? "—", item?.description ?? blank, repo(item?.repository));
+    for (const [key, item] of Object.entries(lock.packages ?? {})) if (key.includes("node_modules/")) push("npm", "transitive", key.split("node_modules/").at(-1), item?.version ?? "—", item?.description ?? blank, repo(item?.repository));
     legacyLock(lock.dependencies);
   }
   const metadataRoots = [...new Set([project, ...manifests.map(dirname)])];
@@ -88,11 +88,11 @@ if (!existsSync(project)) {
   const seen = new Set();
   const packages = rows.filter((row) => { const key = `${row[0]}:${row[1]}:${row[2]}:${row[3]}`; if (seen.has(key)) return false; seen.add(key); return true; });
   const code = files.filter((path) => [".astro", ".css", ".go", ".js", ".jsx", ".php", ".rb", ".rs", ".ts", ".tsx", ".vue"].includes(extname(path)) || path.endsWith(".blade.php"));
-  const testFiles = code.filter((path) => category(relative(project, path)) === "Testes");
+  const testFiles = code.filter((path) => category(relative(project, path)) === "Tests");
   const declared = Object.keys({ ...(rootPackage.dependencies ?? {}), ...(rootPackage.devDependencies ?? {}), ...(composer.require ?? {}), ...(composer["require-dev"] ?? {}) });
   const frameworks = [["astro", "Astro"], ["next", "Next.js"], ["react", "React"], ["laravel/framework", "Laravel"]].flatMap(([key, label]) => declared.includes(key) ? [label] : []);
-  const runner = declared.includes("pestphp/pest") ? "Pest" : declared.includes("vitest") ? "Vitest" : "não identificado";
-  const scripts = Object.entries({ ...(rootPackage.scripts ?? {}), ...(composer.scripts ?? {}) }).map(([name, value]) => `${name}: ${typeof value === "string" ? value : "comando composto"}`);
+  const runner = declared.includes("pestphp/pest") ? "Pest" : declared.includes("vitest") ? "Vitest" : "unidentified";
+  const scripts = Object.entries({ ...(rootPackage.scripts ?? {}), ...(composer.scripts ?? {}) }).map(([name, value]) => `${name}: ${typeof value === "string" ? value : "compound command"}`);
   const applicationRows = [];
   for (const path of code.slice(0, 250)) {
     const local = relative(project, path).replaceAll("\\", "/");
@@ -103,18 +103,18 @@ if (!existsSync(project)) {
   const tailwind = declared.includes("tailwindcss") || frontendFiles.some((path) => /tailwind\.config/.test(path)) || frontendContent.some((item) => item.includes("tailwindcss"));
   const tokens = [...new Set(frontendContent.flatMap((item) => [...item.matchAll(/--[\w-]+/g)].map((match) => match[0])))];
   const docData = {
-    "README.md": ["Documentação técnica", `## Visão geral\n\n- Frameworks detectados: ${frameworks.join(", ") || "não identificados"}.\n- Arquivos de código: ${code.length}.\n- Arquivos de teste: ${testFiles.length}.\n\n## Roteiro\n\n- [Arquitetura](architecture.md)\n- [Aplicação](application.md)\n- [Banco de dados](database.md)\n- [Testes](testing.md)\n- [Pacotes](packages.md)`],
-    "architecture.md": ["Arquitetura", `## Componentes\n\n${table(["Tipo", "Quantidade"], [["Código", code.length], ["Testes", testFiles.length]])}\n\n## Diagramas\n\n\`\`\`mermaid\nflowchart TD\n  Application[Aplicação]\n\`\`\`\n\n\`\`\`mermaid\nclassDiagram\n  class Application\n\`\`\``],
-    "application.md": ["Aplicação e implementações", `## Superfícies\n\nCategorias: Serviços, Rotas e APIs, Páginas, Componentes, Testes e Outras fontes.\n\nRelação: relaciona cada arquivo observado à sua superfície.\n\n${table(["Categoria", "Arquivo", "Símbolos"], applicationRows.length ? applicationRows : [["Outras fontes", "—", "Nenhum arquivo de código encontrado"]])}`],
-    "database.md": ["Banco de dados", `## Fontes de persistência\n\n${table(["Arquivo"], files.filter((path) => /migration|prisma|\.sql$/i.test(path)).map((path) => [relative(project, path)]).concat([["Nenhuma estrutura confirmada além das fontes listadas."]]))}\n\n\`\`\`mermaid\nerDiagram\n  ENTITY { string id }\n\`\`\``],
-    "flows.md": ["Fluxos", "## Fluxo principal\n\n```mermaid\nflowchart LR\n  Entrada --> Aplicação --> Saída\n```\n\n```mermaid\nsequenceDiagram\n  participant Cliente\n  participant Aplicação\n  Cliente->>Aplicação: requisição\n```"],
-    "testing.md": ["Testes", `## Resumo\n\n- Arquivos de teste: ${testFiles.length}.\n- Runner: ${runner}.\n- Scripts: ${scripts.join("; ") || "não declarados"}.\n\n${table(["Arquivo"], testFiles.map((path) => [relative(project, path)]).concat(testFiles.length ? [] : [["Nenhum teste identificado"]]))}`],
-    "frontend.md": ["Frontend e design system", `## Superfícies observadas\n\n- Componentes, páginas ou views: ${frontendFiles.length}.\n- Tailwind: ${tailwind ? "detectado" : "não identificado"}.\n- Tokens CSS: ${tokens.join(", ") || "não identificados"}.\n\n${table(["Arquivo"], frontendFiles.map((path) => [relative(project, path)]).concat(frontendFiles.length ? [] : [["Nenhuma superfície frontend identificada"]]))}`],
-    "packages.md": ["Pacotes e bibliotecas", `## Inventário\n\n${table(["Categoria", "Escopo", "Pacote", "Versão", "Finalidade", "Fonte", "GitHub"], packages.map((row) => [row[0] === "npm" ? "Terceiro" : row[0], row[1], row[2], row[3], row[4], row[5], row[5].includes("github.com") ? row[5] : "—"]))}`],
-    "integrations.md": ["Integrações", "## Configuração\n\nValores de ambiente e integrações são documentados apenas pelos nomes declarados localmente, sem segredos."],
-    "decisions.md": ["Decisões técnicas", "## Política\n\nDecisões explícitas em `PROJECT.md` e `.fireskills/` prevalecem sobre inferências deste documento."],
+    "README.md": ["Technical Documentation", `## Overview\n\n- Detected frameworks: ${frameworks.join(", ") || "unidentified"}.\n- Code files: ${code.length}.\n- Test files: ${testFiles.length}.\n\n## Reading Roadmap\n\n- [Architecture](architecture.md)\n- [Application](application.md)\n- [Database](database.md)\n- [Testing](testing.md)\n- [Packages](packages.md)`],
+    "architecture.md": ["Architecture", `## Components\n\n${table(["Type", "Quantity"], [["Code", code.length], ["Tests", testFiles.length]])}\n\n## Diagrams\n\n\`\`\`mermaid\nflowchart TD\n  Application[Application]\n\`\`\`\n\n\`\`\`mermaid\nclassDiagram\n  class Application\n\`\`\``],
+    "application.md": ["Application and Implementations", `## Surfaces\n\nCategories: Services, Routes and APIs, Pages, Components, Tests, and Other sources.\n\nInventory: maps each observed file to its surface.\n\n${table(["Category", "File", "Symbols"], applicationRows.length ? applicationRows : [["Other sources", "—", "No code files found"]])}`],
+    "database.md": ["Database", `## Persistence Sources\n\n${table(["File"], files.filter((path) => /migration|prisma|\.sql$/i.test(path)).map((path) => [relative(project, path)]).concat([["No confirmed structure beyond listed sources."]]))}\n\n\`\`\`mermaid\nerDiagram\n  ENTITY { string id }\n\`\`\``],
+    "flows.md": ["Flows", "## Main Flow\n\n```mermaid\nflowchart LR\n  Input --> Application --> Output\n```\n\n```mermaid\nsequenceDiagram\n  participant Client\n  participant Application\n  Client->>Application: request\n```"],
+    "testing.md": ["Testing", `## Summary\n\n- Test files: ${testFiles.length}.\n- Runner: ${runner}.\n- Scripts: ${scripts.join("; ") || "undeclared"}.\n\n${table(["File"], testFiles.map((path) => [relative(project, path)]).concat(testFiles.length ? [] : [["No tests identified"]]))}`],
+    "frontend.md": ["Frontend and Design System", `## Observed Surfaces\n\n- Components, pages, or views: ${frontendFiles.length}.\n- Tailwind: ${tailwind ? "detected" : "unidentified"}.\n- CSS tokens: ${tokens.join(", ") || "unidentified"}.\n\n${table(["File"], frontendFiles.map((path) => [relative(project, path)]).concat(frontendFiles.length ? [] : [["No frontend surfaces identified"]]))}`],
+    "packages.md": ["Packages and Libraries", `## Inventory\n\n${table(["Category", "Scope", "Package", "Version", "Purpose", "Source", "GitHub"], packages.map((row) => [row[0] === "npm" ? "Third-party" : row[0], row[1], row[2], row[3], row[4], row[5], row[5].includes("github.com") ? row[5] : "—"]))}`],
+    "integrations.md": ["Integrations", "## Configuration\n\nEnvironment values and integrations are documented only by their locally declared names, without secrets."],
+    "decisions.md": ["Technical Decisions", "## Policy\n\nExplicit decisions in `PROJECT.md` and `.fireskills/` take precedence over inferences in this document."],
   };
-  const targets = {...Object.fromEntries(Object.entries(docData).map(([name, [title]]) => [join(project, "docs", name), [title, docData[name][1]]])), [join(project, ".fireskills", "PACKAGES.md")]: ["Pacotes e bibliotecas", `# Pacotes e bibliotecas\n\n${table(["Gerenciador", "Escopo", "Pacote", "Versão", "Finalidade", "Fonte"], packages)}`]};
+  const targets = {...Object.fromEntries(Object.entries(docData).map(([name, [title]]) => [join(project, "docs", name), [title, docData[name][1]]])), [join(project, ".fireskills", "PACKAGES.md")]: ["Packages and libraries", `# Packages and libraries\n\n${table(["Manager", "Scope", "Package", "Version", "Purpose", "Source"], packages)}`]};
   const stale = [];
   for (const [path, [title, generated]] of Object.entries(targets)) {
     const current = await text(path);

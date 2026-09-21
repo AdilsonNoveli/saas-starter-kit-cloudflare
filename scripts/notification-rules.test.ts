@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
-// RULES.md: user notifications go through `useNotification`, never `useToast()` at the call
+// RULES.md: user notifications go through `useNotification`, never `useToast` at the call
 // site (the wrapper owns the colour/icon pairing) and never `window.confirm`.
 const root = join(import.meta.dirname, "..");
 const WRAPPERS = new Set([

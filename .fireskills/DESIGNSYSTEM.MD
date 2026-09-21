@@ -1,36 +1,36 @@
-# Design system do produto
+# Product Design System
 
-`packages/tokens` (`@nuxfire/tokens`) é a única fonte de verdade para customização visual. Este arquivo diz onde ela vive e as regras para usá-la; os valores (paletas, raio, fontes, overrides de componente) ficam no código, nunca aqui.
+`packages/tokens` (`@nuxfire/tokens`) is the single source of truth for visual customization. This file defines where it lives and the rules for using it; concrete values (palettes, radius, fonts, component overrides) reside in code, never here.
 
-## Fonte única
+## Single Source of Truth
 
-- `packages/tokens/theme.css`: fontes, paletas (`flame`, `fire`, `night`), raio de borda (`--ui-radius`) e o mapeamento de superfície, texto e borda dos modos claro e escuro (`--ui-*`, bloco `.dark`).
-- `packages/tokens/index.ts`: `sharedUiConfig` (o bloco `ui` de cada `app.config.ts`, incluindo `colors`: `primary` → `flame`, `secondary` → `fire`, `neutral` → `night`) e `enterpriseTableUi` (o `:ui` da `UTable`). Os motivos de cada override estão nos comentários do arquivo.
-- `packages/tokens/index.ts` também exporta `themeColor` (a cor do `<meta name="theme-color">`, que não aceita variável CSS); `theme-color.test.ts` falha se ela divergir do `--ui-bg` de `theme.css`.
-- `apps/app`, `apps/web` e `apps/login` importam, nesta ordem, `tailwindcss`, `@nuxt/ui` e `@nuxfire/tokens/theme.css` no `main.css`. O `theme.css` vem depois para sobrescrever os defaults do Nuxt UI.
-- `theme.css` declara `@source "./index.ts";`: sem essa linha o Tailwind não escaneia o pacote (chega por symlink) e uma classe que só existe em `index.ts` vai para o DOM sem regra de CSS.
+- `packages/tokens/theme.css`: fonts, palettes (`flame`, `fire`, `night`), border radius (`--ui-radius`), and the surface, text, and border mapping for light and dark modes (`--ui-*`, `.dark` block).
+- `packages/tokens/index.ts`: `sharedUiConfig` (the `ui` block of each `app.config.ts`, including `colors`: `primary` → `flame`, `secondary` → `fire`, `neutral` → `night`) and `enterpriseTableUi` (the `:ui` prop of `UTable`). The rationale for each override is documented in the file's comments.
+- `packages/tokens/index.ts` also exports `themeColor` (the color for `<meta name="theme-color">`, which does not accept CSS variables); `theme-color.test.ts` fails if it diverges from `--ui-bg` in `theme.css`.
+- `apps/app`, `apps/web`, and `apps/login` import, in this order, `tailwindcss`, `@nuxt/ui`, and `@nuxfire/tokens/theme.css` in their `main.css`. `theme.css` comes last to override Nuxt UI defaults.
+- `theme.css` declares `@source "./index.ts";`: without this line, Tailwind does not scan the package (which arrives via symlink), and a class that only exists in `index.ts` would be emitted to the DOM without matching CSS rules.
 
-## Regras
+## Rules
 
-1. Toda customização visual (cor, tipografia, raio, modo escuro, defaults de componente) vive só em `packages/tokens`. O `main.css` de um app não redeclara token; serve ao que é genuinamente local (uma animação, um efeito de componente).
-2. Em todos os apps e em `layers/`, use apenas as classes e cores semânticas do `@nuxt/ui` (`primary`, `success`, `text-default`, `bg-elevated`, `border-default`...); nunca paleta bruta (`text-red-500`) nem hex ou `rgba` no CSS: derive de um token (`var(--ui-*)`, `color-mix`). Exceção documentada no código: o QR code do MFA fica preto sobre branco nos dois temas.
-3. Reaproveite os tokens antes de criar valores locais.
-4. Toda `UTable` recebe `enterpriseTableUi` por `:ui`.
-5. Não comunique erro ou sucesso só por cor; mantenha foco visível por teclado; respeite `prefers-reduced-motion`.
+1. All visual customization (color, typography, radius, dark mode, component defaults) lives exclusively in `packages/tokens`. An app's `main.css` never redeclares tokens; it is reserved for what is genuinely local (an animation, a component effect).
+2. Across all apps and `layers/`, use only semantic classes and colors from `@nuxt/ui` (`primary`, `success`, `text-default`, `bg-elevated`, `border-default`...); never raw palette colors (`text-red-500`) or hex / `rgba` in CSS: derive from a token (`var(--ui-*)`, `color-mix`). Documented exception in code: the MFA QR code stays black on white in both themes.
+3. Reuse existing tokens before creating local values.
+4. Every `UTable` receives `enterpriseTableUi` via `:ui`.
+5. Do not communicate error or success by color alone; maintain visible keyboard focus; respect `prefers-reduced-motion`.
 
-## Revisão visual
+## Visual Review
 
-Antes do item `EVIDENCE` da tarefa, confirme bordas, espaçamentos, margens, padding e tipografia contra os tokens. Componentes reaproveitados ou criados são registrados em `.fireskills/INTERFACE.md`.
+Before the task's `EVIDENCE` item, verify borders, spacing, margins, padding, and typography against the tokens. Reused or created components are recorded in `.fireskills/INTERFACE.md`.
 
-## Como rebrandar
+## How to Rebrand
 
-- Cor de acento e neutros: paletas em `theme.css`. Se renomear uma paleta, atualize `ui.colors` em `index.ts`.
-- Raio: `--ui-radius` em `theme.css`.
-- Default de um componente Nuxt UI: `sharedUiConfig` ou `enterpriseTableUi` em `index.ts`.
+- Accent and neutral colors: palettes in `theme.css`. If renaming a palette, update `ui.colors` in `index.ts`.
+- Radius: `--ui-radius` in `theme.css`.
+- Nuxt UI component default: `sharedUiConfig` or `enterpriseTableUi` in `index.ts`.
 
-## Exceções da entrega
+## Delivery Exceptions
 
-Registre aqui toda exceção às regras acima, com motivo e alcance.
+Record here any exceptions to the rules above, along with rationale and scope.
 
-| Data | Tela ou fluxo | Regra substituída | Nova regra | Alcance | Motivo | Autor |
+| Date | Screen or Flow | Overridden Rule | New Rule | Scope | Rationale | Author |
 | --- | --- | --- | --- | --- | --- | --- |

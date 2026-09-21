@@ -104,7 +104,6 @@ useSeoMeta({
   ogDescription: docsConfig.description,
   twitterCard: "summary_large_image",
 });
-defineOgImageComponent("NuxtSeo");
 
 const { t, locale } = useI18n();
 

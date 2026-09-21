@@ -32,7 +32,7 @@
           />
           <div
             v-else
-            class="w-full h-full flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-br from-emerald-500/10 via-primary/5 to-sky-500/10"
+            class="w-full h-full flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-br from-success/10 via-primary/5 to-info/10"
           >
             <UIcon name="i-lucide-newspaper" class="w-10 h-10 text-muted" />
           </div>

@@ -903,7 +903,7 @@
         },
         "admin": {
           "highlight": "Dedicated Super-Admin Portal",
-          "text": "Protected with TOTP MFA, user impersonation, and audit logs."
+          "text": "Protected with TOTP MFA and audit logs."
         },
         "database": {
           "highlight": "Drizzle ORM & Hyperdrive Postgres",
@@ -955,7 +955,7 @@
         },
         "engineering": {
           "title": "15,000+ Lines of Tested Senior Engineering",
-          "desc": "Saves 3 to 6 months of architectural trial and error. 4 Cloudflare Workers, 5 modular Nuxt Layers, SST v4 IaC, Drizzle ORM and 100% type-safe tRPC."
+          "desc": "Saves 3 to 6 months of architectural trial and error. 6 Cloudflare Workers, 5 modular Nuxt Layers, SST v4 IaC, Drizzle ORM and 100% type-safe tRPC."
         }
       },
       "cta": "Get Immediate Access to Code",

@@ -903,7 +903,7 @@
         },
         "admin": {
           "highlight": "Portal de Super-Admin dedicado",
-          "text": "Protegido con MFA por TOTP, suplantación de usuarios y registros de auditoría."
+          "text": "Protegido con MFA por TOTP y registros de auditoría."
         },
         "database": {
           "highlight": "Drizzle ORM y Postgres con Hyperdrive",
@@ -955,7 +955,7 @@
         },
         "engineering": {
           "title": "15.000+ Líneas de Ingeniería Senior Probada",
-          "desc": "Ahorra de 3 a 6 meses de prueba y error arquitectónico. 4 Cloudflare Workers, 5 Nuxt Layers modulares, SST v4 IaC, Drizzle ORM y tRPC 100% tipado."
+          "desc": "Ahorra de 3 a 6 meses de prueba y error arquitectónico. 6 Cloudflare Workers, 5 Nuxt Layers modulares, SST v4 IaC, Drizzle ORM y tRPC 100% tipado."
         }
       },
       "cta": "Garantizar Acceso Inmediato al Código",

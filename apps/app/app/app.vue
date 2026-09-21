@@ -10,11 +10,13 @@
 </template>
 
 <script setup lang="ts">
+import { themeColor as tokensThemeColor } from "@nuxfire/tokens";
+
 const colorMode = useColorMode();
 const appConfig = useAppConfig();
 
 const themeColor = computed(() =>
-  colorMode.value === "dark" ? "#1c1917" : "#ffffff",
+  colorMode.value === "dark" ? tokensThemeColor.dark : tokensThemeColor.light,
 );
 
 useHead({

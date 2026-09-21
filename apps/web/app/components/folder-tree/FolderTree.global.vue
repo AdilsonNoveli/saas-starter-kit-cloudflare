@@ -16,6 +16,7 @@
 <script setup lang="ts">
 import hints from "~~/constants/hints.json";
 import paths from "~~/constants/paths.json";
+import type { FolderTreeNode } from "./FolderTreeItem.vue";
 
 const { filter = "", showHints = false } = defineProps<{
   filter?: string;
@@ -23,7 +24,7 @@ const { filter = "", showHints = false } = defineProps<{
 }>();
 
 const processedPaths = computed(() => {
-  const pathMap = new Map<string, any>();
+  const pathMap = new Map<string, FolderTreeNode>();
   const filteredPaths = paths.filter(
     (path) => path.startsWith(filter) || filter.startsWith(path),
   );
@@ -33,14 +34,13 @@ const processedPaths = computed(() => {
   for (const path of filteredPaths) {
     const trimmedPath = path.replace(/\/$/, "");
     const parentPath = trimmedPath.slice(0, trimmedPath.lastIndexOf("/") + 1);
-    if (parentPath && pathMap.has(parentPath)) {
-      const parent = pathMap.get(parentPath);
-      parent.children.push(pathMap.get(path));
-    }
+    const parent = parentPath ? pathMap.get(parentPath) : undefined;
+    const node = pathMap.get(path);
+    if (parent && node) parent.children.push(node);
   }
 
   // Sort children to put directories first, then sort alphabetically
-  const sortChildren = (items: any[]) => {
+  const sortChildren = (items: FolderTreeNode[]): FolderTreeNode[] => {
     return items
       .sort((a, b) => {
         const aIsDir = a.path.endsWith("/");

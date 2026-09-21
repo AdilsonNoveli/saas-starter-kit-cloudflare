@@ -13,7 +13,7 @@
       </div>
 
       <!-- Unified Enterprise Architecture & Governance Structure (Single Master Card) -->
-      <div class="max-w-7xl mx-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 via-elevated to-elevated dark:from-emerald-950/25 dark:via-night-900/60 dark:to-night-950 p-6 sm:p-8 lg:p-10 shadow-xl shadow-emerald-500/5">
+      <div class="max-w-7xl mx-auto rounded-2xl border border-success/30 bg-gradient-to-b from-success/10 via-elevated to-elevated dark:from-success/25 dark:via-night-900/60 dark:to-night-950 p-6 sm:p-8 lg:p-10 shadow-xl shadow-success/5">
         <!-- Part 1: Platform Admin Console & Multi-Tenancy Governance -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center pb-8 lg:pb-12 border-b border-default">
           <!-- Left: Value Proposition & 4 Core Pillars -->
@@ -32,8 +32,8 @@
                 :key="featureKey"
                 class="flex items-start gap-3"
               >
-                <div class="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-500" />
+                <div class="w-6 h-6 rounded-full bg-success/15 border border-success/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-success" />
                 </div>
                 <div>
                   <h4 class="text-xs sm:text-sm font-semibold text-highlighted">
@@ -49,20 +49,20 @@
 
           <!-- Right: High-Fidelity Admin Mockup (Adaptive in Light and Dark Mode) -->
           <div class="lg:col-span-7">
-            <div class="rounded-xl border border-slate-200 dark:border-default bg-white dark:bg-night-950/95 shadow-xl overflow-hidden font-mono text-xs transition-colors">
+            <div class="rounded-xl border border-default bg-white dark:bg-night-950/95 shadow-xl overflow-hidden font-mono text-xs transition-colors">
               <!-- Mockup Window Header -->
-              <div class="px-4 py-3 bg-slate-50 dark:bg-muted/40 border-b border-slate-200 dark:border-default flex items-center justify-between gap-3">
+              <div class="px-4 py-3 bg-muted dark:bg-muted/40 border-b border-default flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-                  <span class="ml-2 text-[11px] text-slate-800 dark:text-toned font-semibold">
+                  <span class="w-2.5 h-2.5 rounded-full bg-error/80" />
+                  <span class="w-2.5 h-2.5 rounded-full bg-warning/80" />
+                  <span class="w-2.5 h-2.5 rounded-full bg-success/80" />
+                  <span class="ml-2 text-[11px] text-highlighted dark:text-toned font-semibold">
                     {{ $t("landing.databaseArchitecture.adminConsole.mockup.heading") }}
                   </span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-                  <span class="text-[10px] uppercase text-emerald-600 dark:text-emerald-400 font-bold tracking-wider">
+                  <span class="w-2 h-2 rounded-full bg-success dark:bg-success animate-pulse" />
+                  <span class="text-[10px] uppercase text-success font-bold tracking-wider">
                     MFA Elevated (30m)
                   </span>
                 </div>
@@ -72,7 +72,7 @@
               <div class="overflow-x-auto p-4">
                 <table class="w-full text-left border-collapse">
                   <thead>
-                    <tr class="border-b border-slate-200 dark:border-default/60 text-[11px] text-slate-500 dark:text-dimmed uppercase tracking-wider">
+                    <tr class="border-b border-default dark:border-default/60 text-[11px] text-muted dark:text-dimmed uppercase tracking-wider">
                       <th class="pb-2.5 font-medium">{{ $t("landing.databaseArchitecture.adminConsole.mockup.colCompany") }}</th>
                       <th class="pb-2.5 font-medium">{{ $t("landing.databaseArchitecture.adminConsole.mockup.colPlan") }}</th>
                       <th class="pb-2.5 font-medium text-center">{{ $t("landing.databaseArchitecture.adminConsole.mockup.colMembers") }}</th>
@@ -80,65 +80,65 @@
                       <th class="pb-2.5 font-medium text-right">{{ $t("landing.databaseArchitecture.adminConsole.mockup.colAction") }}</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-100 dark:divide-default/40 text-[11px]">
+                  <tbody class="divide-y divide-default dark:divide-default/40 text-[11px]">
                     <!-- Tenant Row 1 -->
-                    <tr class="hover:bg-slate-50/80 dark:hover:bg-muted/30 transition-colors">
+                    <tr class="hover:bg-muted/80 dark:hover:bg-muted/30 transition-colors">
                       <td class="py-3 font-semibold text-highlighted">
                         <div class="flex items-center gap-2">
-                          <UIcon name="i-lucide-building" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <UIcon name="i-lucide-building" class="w-3.5 h-3.5 text-success" />
                           <span>Acme Cloud Inc.</span>
                         </div>
                         <span class="text-[10px] text-muted font-normal block pl-5.5">acme-cloud</span>
                       </td>
                       <td class="py-3">
-                        <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold">
+                        <span class="px-2 py-0.5 rounded bg-success/10 text-success border border-success/20 text-[10px] font-semibold">
                           PRO TIER
                         </span>
                       </td>
                       <td class="py-3 text-center font-bold text-highlighted">14</td>
                       <td class="py-3">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-success">
+                          <span class="w-1.5 h-1.5 rounded-full bg-success dark:bg-success" />
                           {{ $t("landing.databaseArchitecture.adminConsole.mockup.statusActive") }}
                         </span>
                       </td>
                       <td class="py-3 text-right">
-                        <button type="button" class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors text-[10px] font-semibold">
+                        <button type="button" class="px-2.5 py-1 rounded bg-warning/10 border border-warning/30 text-warning hover:bg-warning/20 transition-colors text-[10px] font-semibold">
                           {{ $t("landing.databaseArchitecture.adminConsole.mockup.btnSuspend") }}
                         </button>
                       </td>
                     </tr>
 
                     <!-- Tenant Row 2 -->
-                    <tr class="hover:bg-slate-50/80 dark:hover:bg-muted/30 transition-colors">
+                    <tr class="hover:bg-muted/80 dark:hover:bg-muted/30 transition-colors">
                       <td class="py-3 font-semibold text-highlighted">
                         <div class="flex items-center gap-2">
-                          <UIcon name="i-lucide-building" class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                          <UIcon name="i-lucide-building" class="w-3.5 h-3.5 text-primary" />
                           <span>Globex Labs</span>
                         </div>
                         <span class="text-[10px] text-muted font-normal block pl-5.5">globex-labs</span>
                       </td>
                       <td class="py-3">
-                        <span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 text-[10px] font-semibold">
+                        <span class="px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[10px] font-semibold">
                           ENTERPRISE
                         </span>
                       </td>
                       <td class="py-3 text-center font-bold text-highlighted">58</td>
                       <td class="py-3">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-success">
+                          <span class="w-1.5 h-1.5 rounded-full bg-success dark:bg-success" />
                           {{ $t("landing.databaseArchitecture.adminConsole.mockup.statusActive") }}
                         </span>
                       </td>
                       <td class="py-3 text-right">
-                        <button type="button" class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors text-[10px] font-semibold">
+                        <button type="button" class="px-2.5 py-1 rounded bg-warning/10 border border-warning/30 text-warning hover:bg-warning/20 transition-colors text-[10px] font-semibold">
                           {{ $t("landing.databaseArchitecture.adminConsole.mockup.btnSuspend") }}
                         </button>
                       </td>
                     </tr>
 
                     <!-- Tenant Row 3 (Suspended) -->
-                    <tr class="hover:bg-slate-50/80 dark:hover:bg-muted/30 transition-colors bg-amber-500/[0.04] dark:bg-amber-500/[0.03]">
+                    <tr class="hover:bg-muted/80 dark:hover:bg-muted/30 transition-colors bg-warning/[0.04] dark:bg-warning/[0.03]">
                       <td class="py-3 font-semibold text-highlighted">
                         <div class="flex items-center gap-2">
                           <UIcon name="i-lucide-building" class="w-3.5 h-3.5 text-muted" />
@@ -147,19 +147,19 @@
                         <span class="text-[10px] text-dimmed font-normal block pl-5.5">initech-dev</span>
                       </td>
                       <td class="py-3">
-                        <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-muted text-muted border border-slate-200 dark:border-default text-[10px]">
+                        <span class="px-2 py-0.5 rounded bg-accented dark:bg-muted text-muted border border-default text-[10px]">
                           FREE TIER
                         </span>
                       </td>
                       <td class="py-3 text-center font-bold text-muted">2</td>
                       <td class="py-3">
-                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 dark:text-amber-400">
-                          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
+                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-warning">
+                          <span class="w-1.5 h-1.5 rounded-full bg-warning dark:bg-warning" />
                           {{ $t("landing.databaseArchitecture.adminConsole.mockup.statusSuspended") }}
                         </span>
                       </td>
                       <td class="py-3 text-right">
-                        <button type="button" class="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors text-[10px] font-semibold">
+                        <button type="button" class="px-2.5 py-1 rounded bg-success/10 border border-success/30 text-success hover:bg-success/20 transition-colors text-[10px] font-semibold">
                           {{ $t("landing.databaseArchitecture.adminConsole.mockup.btnReactivate") }}
                         </button>
                       </td>
@@ -169,12 +169,12 @@
               </div>
 
               <!-- Mockup Footer: Tracing & Audit Proof -->
-              <div class="px-4 py-2.5 bg-slate-50 dark:bg-muted/20 border-t border-slate-200 dark:border-default/60 flex items-center justify-between text-[10px] text-slate-500 dark:text-dimmed">
+              <div class="px-4 py-2.5 bg-muted dark:bg-muted/20 border-t border-default dark:border-default/60 flex items-center justify-between text-[10px] text-muted dark:text-dimmed">
                 <span class="flex items-center gap-1.5">
-                  <UIcon name="i-lucide-terminal" class="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                  <UIcon name="i-lucide-terminal" class="w-3 h-3 text-success" />
                   <code>useDB().select({ memberCount: count() }).groupBy()</code>
                 </span>
-                <span class="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">
+                <span class="text-success font-mono font-semibold">
                   AuditLog: append-only
                 </span>
               </div>
@@ -193,7 +193,7 @@
                 {{ $t("landing.databaseArchitecture.domainsSubtitle") }}
               </p>
             </div>
-            <span class="text-xs font-mono font-bold px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0 self-start sm:self-center">
+            <span class="text-xs font-mono font-bold px-3 py-1 rounded-md bg-success/10 border border-success/20 text-success shrink-0 self-start sm:self-center">
               20 PostgreSQL Tables • Drizzle ORM
             </span>
           </div>
@@ -263,7 +263,7 @@ const domainRows = computed(() => [
     name: t("landing.databaseArchitecture.diagramClusters.tenancy.title"),
     count: "5 tables",
     icon: "i-lucide-users",
-    iconColor: "text-blue-500",
+    iconColor: "text-info",
     tables: ["Team", "TeamMembership", "TeamInvite", "Role", "Permission"],
     purpose: t("landing.databaseArchitecture.domains.tenancy.description"),
   },
@@ -272,7 +272,7 @@ const domainRows = computed(() => [
     name: t("landing.databaseArchitecture.diagramClusters.billing.title"),
     count: "4 tables",
     icon: "i-lucide-credit-card",
-    iconColor: "text-emerald-500",
+    iconColor: "text-success",
     tables: ["Plan", "Subscription", "Benefit", "BenefitsOnPlan"],
     purpose: t("landing.databaseArchitecture.domains.billing.description"),
   },
@@ -281,7 +281,7 @@ const domainRows = computed(() => [
     name: t("landing.databaseArchitecture.diagramClusters.governance.title"),
     count: "2 tables",
     icon: "i-lucide-shield-alert",
-    iconColor: "text-amber-500",
+    iconColor: "text-warning",
     tables: ["PlatformAdmin", "AuditLog"],
     purpose: t("landing.databaseArchitecture.domains.governance.description"),
   },
@@ -290,7 +290,7 @@ const domainRows = computed(() => [
     name: t("landing.databaseArchitecture.diagramClusters.async.title"),
     count: "3 tables",
     icon: "i-lucide-cpu",
-    iconColor: "text-purple-500",
+    iconColor: "text-primary",
     tables: ["Job", "Log", "DeadLetterRecord"],
     purpose: t("landing.databaseArchitecture.domains.jobs.description"),
   },
@@ -299,7 +299,7 @@ const domainRows = computed(() => [
     name: t("landing.databaseArchitecture.diagramClusters.identity.title"),
     count: "3 tables",
     icon: "i-lucide-user-check",
-    iconColor: "text-cyan-500",
+    iconColor: "text-info",
     tables: ["User", "Notification", "WaitlistEmail"],
     purpose: t("landing.databaseArchitecture.tablesList.user.role"),
   },
@@ -308,7 +308,7 @@ const domainRows = computed(() => [
     name: "Kanban & Productivity",
     count: "3 tables",
     icon: "i-lucide-kanban",
-    iconColor: "text-indigo-500",
+    iconColor: "text-info",
     tables: ["KanbanBoard", "KanbanColumn", "KanbanCard"],
     purpose: t("landing.databaseArchitecture.tablesList.kanbanBoard.role"),
   },

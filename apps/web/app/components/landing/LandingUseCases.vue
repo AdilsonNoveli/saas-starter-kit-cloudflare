@@ -17,7 +17,7 @@
         <div
           v-for="useCase in useCases"
           :key="useCase.id"
-          class="flex flex-col justify-between rounded-xl border border-default bg-elevated p-6 sm:p-7 hover:border-accented transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/5 group"
+          class="flex flex-col justify-between rounded-xl border border-default bg-elevated p-6 sm:p-7 hover:border-accented transition-all duration-200 hover:shadow-lg hover:shadow-success/5 group"
         >
           <div>
             <!-- Top: Icon & Step Badge (same height h-12) -->
@@ -34,7 +34,7 @@
             </div>
 
             <!-- Title & Simple Fast Pitch -->
-            <h3 class="text-lg sm:text-xl font-bold text-highlighted mb-2.5 group-hover:text-emerald-500 transition-colors">
+            <h3 class="text-lg sm:text-xl font-bold text-highlighted mb-2.5 group-hover:text-success transition-colors">
               {{ t(`landing.useCases.items.${useCase.id}.title`) }}
             </h3>
 
@@ -45,13 +45,13 @@
             <!-- IDE Command / Prompt Model Box -->
             <div class="mb-4">
               <div class="flex items-center gap-1.5 mb-1.5">
-                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-success shrink-0" />
                 <span class="text-[11px] font-mono uppercase tracking-wider font-semibold text-muted">
                   {{ $t("landing.useCases.promptLabel") }}
                 </span>
               </div>
-              <div class="p-3 rounded-lg bg-muted/60 dark:bg-night-950/70 border border-default font-mono text-xs text-toned leading-relaxed break-words select-all group-hover:border-emerald-500/30 transition-colors">
-                <span class="text-emerald-500 dark:text-emerald-400 font-semibold mr-1.5">$</span>{{ t(`landing.useCases.items.${useCase.id}.prompt`) }}
+              <div class="p-3 rounded-lg bg-muted/60 dark:bg-night-950/70 border border-default font-mono text-xs text-toned leading-relaxed break-words select-all group-hover:border-success/30 transition-colors">
+                <span class="text-success dark:text-success font-semibold mr-1.5">$</span>{{ t(`landing.useCases.items.${useCase.id}.prompt`) }}
               </div>
             </div>
 
@@ -75,7 +75,7 @@
           <!-- Step Guarantee (Superpower Box) -->
           <div class="pt-4 border-t border-default mt-auto">
             <div class="flex items-start gap-2">
-              <UIcon name="i-lucide-check-circle-2" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+              <UIcon name="i-lucide-check-circle-2" class="w-4 h-4 text-success shrink-0 mt-0.5" />
               <div>
                 <span class="text-xs font-semibold text-highlighted block">{{ $t("landing.useCases.superpowerLabel") }}</span>
                 <span class="text-xs text-muted leading-tight block">{{ t(`landing.useCases.items.${useCase.id}.superpower`) }}</span>
@@ -93,7 +93,7 @@
       </div>
 
       <!-- Trust & ROI Value Banner -->
-      <div class="max-w-5xl mx-auto rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/5 via-elevated to-elevated dark:from-emerald-950/20 dark:via-night-900/60 dark:to-night-950 p-8 sm:p-10 text-center relative overflow-hidden shadow-xl shadow-emerald-500/5">
+      <div class="max-w-5xl mx-auto rounded-2xl border border-success/30 bg-gradient-to-b from-success/5 via-elevated to-elevated dark:from-success/20 dark:via-night-900/60 dark:to-night-950 p-8 sm:p-10 text-center relative overflow-hidden shadow-xl shadow-success/5">
         <div class="relative z-10">
           <UBadge color="success" variant="subtle" size="md" class="mb-4">
             <span class="font-mono text-xs uppercase tracking-wider font-semibold">{{ $t("landing.useCases.banner.badge") }}</span>
@@ -105,7 +105,7 @@
 
           <p class="text-muted text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
             {{ $t("landing.useCases.banner.descriptionLead") }}<strong class="text-highlighted">{{ $t("landing.useCases.banner.descriptionCost") }}</strong>{{ $t("landing.useCases.banner.descriptionTail") }}<br class="hidden sm:inline" />
-            <code class="text-emerald-600 dark:text-emerald-400 font-mono text-xs bg-muted border border-default px-2 py-0.5 rounded whitespace-nowrap">$ bun run deploy</code>.
+            <code class="text-success font-mono text-xs bg-muted border border-default px-2 py-0.5 rounded whitespace-nowrap">$ bun run deploy</code>.
           </p>
 
           <!-- 2 Columns: Modo Stage vs. Modo Production (Clear & Clean) -->
@@ -115,12 +115,12 @@
               <div>
                 <div class="flex items-center justify-between gap-2 mb-3">
                   <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shrink-0" />
+                    <span class="w-2.5 h-2.5 rounded-full bg-warning animate-pulse shrink-0" />
                     <h4 class="text-base font-bold text-highlighted font-mono">
                       {{ $t("landing.useCases.banner.environments.stage.title") }}
                     </h4>
                   </div>
-                  <span class="text-[11px] font-mono text-amber-500/90 font-semibold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
+                  <span class="text-[11px] font-mono text-warning/90 font-semibold px-2 py-0.5 rounded bg-warning/10 border border-warning/20">
                     {{ $t("landing.useCases.banner.environments.stage.badge") }}
                   </span>
                 </div>
@@ -129,22 +129,22 @@
                 </p>
               </div>
               <div class="pt-3 border-t border-default/60 flex items-center gap-2 text-[11px] font-mono text-muted">
-                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-warning shrink-0" />
                 <code>{{ $t("landing.useCases.banner.environments.stage.command") }}</code>
               </div>
             </div>
 
             <!-- Coluna 2: Modo Production -->
-            <div class="p-5 sm:p-6 rounded-xl bg-default/80 border border-emerald-500/30 shadow-xs flex flex-col justify-between">
+            <div class="p-5 sm:p-6 rounded-xl bg-default/80 border border-success/30 shadow-xs flex flex-col justify-between">
               <div>
                 <div class="flex items-center justify-between gap-2 mb-3">
                   <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                    <span class="w-2.5 h-2.5 rounded-full bg-success shrink-0" />
                     <h4 class="text-base font-bold text-highlighted font-mono">
                       {{ $t("landing.useCases.banner.environments.prod.title") }}
                     </h4>
                   </div>
-                  <span class="text-[11px] font-mono text-emerald-500/90 font-semibold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                  <span class="text-[11px] font-mono text-success/90 font-semibold px-2 py-0.5 rounded bg-success/10 border border-success/20">
                     {{ $t("landing.useCases.banner.environments.prod.badge") }}
                   </span>
                 </div>
@@ -153,7 +153,7 @@
                 </p>
               </div>
               <div class="pt-3 border-t border-default/60 flex items-center gap-2 text-[11px] font-mono text-muted">
-                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <UIcon name="i-lucide-terminal" class="w-3.5 h-3.5 text-success shrink-0" />
                 <code>{{ $t("landing.useCases.banner.environments.prod.command") }}</code>
               </div>
             </div>
@@ -187,38 +187,38 @@ const useCases = [
   {
     id: "b2b",
     icon: "i-lucide-lightbulb",
-    iconContainerClass: "border-amber-500/30 bg-amber-500/10",
-    iconClass: "text-amber-400",
+    iconContainerClass: "border-warning/30 bg-warning/10",
+    iconClass: "text-warning",
   },
   {
     id: "realtime",
     icon: "i-lucide-message-square",
-    iconContainerClass: "border-blue-500/30 bg-blue-500/10",
-    iconClass: "text-blue-400",
+    iconContainerClass: "border-info/30 bg-info/10",
+    iconClass: "text-info",
   },
   {
     id: "ai",
     icon: "i-lucide-file-code",
-    iconContainerClass: "border-purple-500/30 bg-purple-500/10",
-    iconClass: "text-purple-400",
+    iconContainerClass: "border-primary/30 bg-primary/10",
+    iconClass: "text-primary",
   },
   {
     id: "micro",
     icon: "i-lucide-flask-conical",
-    iconContainerClass: "border-teal-500/30 bg-teal-500/10",
-    iconClass: "text-teal-400",
+    iconContainerClass: "border-success/30 bg-success/10",
+    iconClass: "text-success",
   },
   {
     id: "enterprise",
     icon: "i-lucide-cpu",
-    iconContainerClass: "border-emerald-500/30 bg-emerald-500/10",
-    iconClass: "text-emerald-400",
+    iconContainerClass: "border-success/30 bg-success/10",
+    iconClass: "text-success",
   },
   {
     id: "api",
     icon: "i-lucide-rocket",
-    iconContainerClass: "border-orange-500/30 bg-orange-500/10",
-    iconClass: "text-orange-400",
+    iconContainerClass: "border-secondary/30 bg-secondary/10",
+    iconClass: "text-secondary",
   },
 ];
 

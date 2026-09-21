@@ -17,7 +17,7 @@ const localePath = useLocalePath();
           class="border border-default bg-elevated/80 text-muted px-4 py-1.5 shadow-sm"
         >
           <div class="flex gap-2 items-center text-xs lg:text-sm font-semibold tracking-wider uppercase">
-            <UIcon name="i-lucide-shield-check" class="w-4 h-4 text-emerald-500" />
+            <UIcon name="i-lucide-shield-check" class="w-4 h-4 text-success" />
             <span>{{ $t("landing.hero.badge") }}</span>
           </div>
         </UBadge>

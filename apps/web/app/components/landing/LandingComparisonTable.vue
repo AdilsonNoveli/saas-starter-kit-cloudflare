@@ -6,7 +6,7 @@
         <div class="inline-flex items-center justify-center mb-3">
           <UBadge color="primary" variant="subtle" size="md">
             <div class="flex gap-2 items-center text-xs lg:text-sm">
-              <UIcon name="i-lucide-scale" class="w-4 h-4 text-emerald-400" />
+              <UIcon name="i-lucide-scale" class="w-4 h-4 text-success" />
               <span>{{ $t("landing.comparison.badge") }}</span>
             </div>
           </UBadge>
@@ -24,7 +24,7 @@
       <!-- Quick Metrics Highlight Bar -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
         <div class="p-4 rounded-lg bg-elevated border border-default text-center shadow-sm">
-          <span class="block text-2xl lg:text-3xl font-extrabold text-emerald-500">{{ $t("landing.comparison.metrics.featuresValue") }}</span>
+          <span class="block text-2xl lg:text-3xl font-extrabold text-success">{{ $t("landing.comparison.metrics.featuresValue") }}</span>
           <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.featuresLabel") }}</span>
         </div>
         <div class="p-4 rounded-lg bg-elevated border border-default text-center shadow-sm">
@@ -32,7 +32,7 @@
           <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.timeLabel") }}</span>
         </div>
         <div class="p-4 rounded-lg bg-elevated border border-default text-center shadow-sm">
-          <span class="block text-2xl lg:text-3xl font-extrabold text-amber-500">{{ $t("landing.comparison.metrics.missingValue") }}</span>
+          <span class="block text-2xl lg:text-3xl font-extrabold text-warning">{{ $t("landing.comparison.metrics.missingValue") }}</span>
           <span class="text-xs sm:text-sm text-muted">{{ $t("landing.comparison.metrics.missingLabel") }}</span>
         </div>
       </div>
@@ -48,7 +48,7 @@
             v-model="searchQuery"
             type="text"
             :placeholder="$t('landing.comparison.searchPlaceholder')"
-            class="w-full bg-elevated border border-default ring-1 ring-default hover:border-accented focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/25 rounded-lg pl-12 pr-10 py-3 text-sm sm:text-base text-highlighted placeholder:text-muted transition-all outline-none shadow-sm"
+            class="w-full bg-elevated border border-default ring-1 ring-default hover:border-accented focus:border-success focus:ring-2 focus:ring-success/25 rounded-lg pl-12 pr-10 py-3 text-sm sm:text-base text-highlighted placeholder:text-muted transition-all outline-none shadow-sm"
           />
           <button
             v-if="searchQuery"
@@ -72,7 +72,7 @@
             :class="[
               'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg whitespace-nowrap transition-all cursor-pointer',
               activeCategory === category.id && !searchQuery
-                ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 shadow-sm font-semibold'
+                ? 'bg-success/15 text-success border border-success/40 shadow-sm font-semibold'
                 : 'bg-elevated text-muted hover:text-highlighted border border-default hover:border-accented'
             ]"
             @click="activeCategory = category.id; searchQuery = ''"
@@ -82,7 +82,7 @@
               :class="[
                 'ml-1.5 text-[11px] px-1.5 py-0.5 rounded border transition-colors',
                 activeCategory === category.id && !searchQuery
-                  ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-semibold'
+                  ? 'bg-success/20 text-success border-success/30 font-semibold'
                   : 'bg-muted text-muted border-default'
               ]"
             >
@@ -101,9 +101,9 @@
                 <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-muted uppercase tracking-wider w-1/2">
                   {{ $t("landing.comparison.columns.feature") }}
                 </th>
-                <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider text-center bg-emerald-500/5 border-x border-emerald-500/20 w-1/4">
+                <th class="py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold text-success uppercase tracking-wider text-center bg-success/5 border-x border-success/20 w-1/4">
                   <div class="flex items-center justify-center gap-1.5">
-                    <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-emerald-500" />
+                    <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-success" />
                     <span>{{ $t("landing.comparison.columns.nuxfire") }}</span>
                   </div>
                 </th>
@@ -118,7 +118,7 @@
                 <tr class="bg-muted/40">
                   <td colspan="3" class="py-2.5 px-4 sm:px-6 font-bold text-xs uppercase tracking-wider text-toned">
                     <div class="flex items-center gap-2">
-                      <UIcon :name="category.icon" class="w-4 h-4 text-emerald-500" />
+                      <UIcon :name="category.icon" class="w-4 h-4 text-success" />
                       <span>{{ t(`landing.comparison.categories.${category.id}`) }}</span>
                     </div>
                   </td>
@@ -141,9 +141,9 @@
                   </td>
 
                   <!-- Nuxfire Column -->
-                  <td class="py-3.5 px-4 sm:px-6 text-center bg-emerald-500/5 border-x border-emerald-500/20">
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-medium text-xs">
-                      <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-500" />
+                  <td class="py-3.5 px-4 sm:px-6 text-center bg-success/5 border-x border-success/20">
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/15 border border-success/30 text-success font-medium text-xs">
+                      <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-success" />
                       <span>{{ $t("landing.comparison.status.included") }}</span>
                     </div>
                   </td>
@@ -155,16 +155,16 @@
                       v-if="item.scratch === 'ready'"
                       class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted border border-default text-toned font-medium text-xs"
                     >
-                      <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-emerald-500" />
+                      <UIcon name="i-lucide-check" class="w-3.5 h-3.5 text-success" />
                       <span>{{ $t("landing.comparison.status.ready") }}</span>
                     </div>
 
                     <!-- Partial -->
                     <div
                       v-else-if="item.scratch === 'partial'"
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-700 dark:text-amber-300 font-medium text-xs"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10 border border-warning/25 text-warning font-medium text-xs"
                     >
-                      <UIcon name="i-lucide-alert-circle" class="w-3.5 h-3.5 text-amber-500" />
+                      <UIcon name="i-lucide-alert-circle" class="w-3.5 h-3.5 text-warning" />
                       <span>{{ $t("landing.comparison.status.partial") }}</span>
                     </div>
 
@@ -194,11 +194,11 @@
         <div class="py-3 px-6 bg-muted/40 border-t border-default flex flex-wrap items-center justify-between gap-4 text-xs text-muted">
           <div class="flex items-center gap-4">
             <span class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-check" class="w-4 h-4 text-emerald-500" />
+              <UIcon name="i-lucide-check" class="w-4 h-4 text-success" />
               <span>{{ $t("landing.comparison.legend.verified") }}</span>
             </span>
             <span class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-amber-500" />
+              <UIcon name="i-lucide-alert-circle" class="w-4 h-4 text-warning" />
               <span>{{ $t("landing.comparison.legend.basic") }}</span>
             </span>
             <span class="flex items-center gap-1.5">

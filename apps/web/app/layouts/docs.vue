@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-defineOgImageComponent("NuxtSeo");
 const {
   docs: { description },
 } = useAppConfig();

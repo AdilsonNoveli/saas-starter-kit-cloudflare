@@ -9,6 +9,3 @@
     <LayoutFooter />
   </BackgroundDots>
 </template>
-<script setup lang="ts">
-defineOgImageComponent("NuxtSeo");
-</script>

@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-const toast = useToast();
+const notification = useNotification();
 const { code } = defineProps<{
   code: string;
 }>();
@@ -30,9 +30,7 @@ const copied = ref(false);
 async function handleCopy() {
   await copy(code);
   copied.value = true;
-  toast.add({
-    title: "Copied to clipboard!",
-  });
+  notification.success("Copied to clipboard!");
 }
 
 const checkIconRef = ref<HTMLElement>();

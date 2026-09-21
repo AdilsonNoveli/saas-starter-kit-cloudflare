@@ -11,7 +11,7 @@
 
       <DocsTocTree
         v-if="link.children"
-        :links="(link.children || []).filter((x: any) => x.id !== 'hide-toc')"
+        :links="(link.children || []).filter((x) => x.id !== 'hide-toc')"
         :level="level + 1"
       />
     </li>

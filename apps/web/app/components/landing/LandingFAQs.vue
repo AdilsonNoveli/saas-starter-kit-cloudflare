@@ -16,7 +16,7 @@
           color="neutral"
           variant="ghost"
           :ui="{
-            base: 'rounded-none py-4 px-0 hover:bg-transparent dark:hover:bg-transparent text-left w-full justify-between items-center',
+            base: 'rounded-none py-4 px-0 hover:bg-transparent text-left w-full justify-between items-center',
           }"
         >
           <span class="text-left text-base sm:text-lg font-medium text-highlighted flex-1 pr-4 leading-snug">

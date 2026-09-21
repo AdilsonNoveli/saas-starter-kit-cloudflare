@@ -21,6 +21,6 @@ body {
 }
 
 .auth-dots {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-image: radial-gradient(color-mix(in oklab, var(--ui-text-highlighted) 5%, transparent) 1px, transparent 0);
   background-size: 24px 24px;
 }

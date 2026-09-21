@@ -230,3 +230,10 @@ export const enterpriseTableUi = {
   td: "border-b border-default",
   separator: "h-0",
 } as const;
+
+/**
+ * `<meta name="theme-color">` tints the browser chrome and, unlike everything else
+ * here, cannot use a CSS variable. Each value must equal the `--ui-bg` of its mode in
+ * theme.css; `theme-color.test.ts` fails when they drift.
+ */
+export const themeColor = { light: "#ffffff", dark: "#0d0d0d" } as const;

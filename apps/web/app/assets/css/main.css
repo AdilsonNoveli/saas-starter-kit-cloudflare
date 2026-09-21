@@ -3,14 +3,14 @@
 @import "@nuxfire/tokens/theme.css";
 
 /*
- * Local to this component only (the animated shiny CTA button below) —
- * not design tokens, so they stay out of @nuxfire/tokens. Brand
- * hues reference the shared flame/fire palette instead of repeating hex.
+ * Local to this component only (the animated shiny CTA button below), so they
+ * stay out of @nuxfire/tokens. Every value derives from a token (`--ui-*`,
+ * `--color-flame/fire-*`, `--ui-success`); nothing here repeats a hex code.
  */
 :root {
-  --background: #ffffff;
-  --shiny-text: #09090b;
-  --shiny-dot: rgba(0, 0, 0, 0.15);
+  --background: var(--ui-bg);
+  --shiny-text: var(--ui-text-highlighted);
+  --shiny-dot: color-mix(in oklab, var(--ui-text-highlighted) 15%, transparent);
 
   --color-brand: var(--color-flame-700);
   --color-brand-hover: var(--color-flame-600);
@@ -19,9 +19,7 @@
 }
 
 .dark {
-  --background: var(--color-night-800);
-  --shiny-text: #ffffff;
-  --shiny-dot: rgba(255, 255, 255, 0.5);
+  --shiny-dot: color-mix(in oklab, var(--ui-text-highlighted) 50%, transparent);
 }
 
 /* Hide scrollbars cross-browser while preserving scrolling */
@@ -88,8 +86,8 @@
 .shiny-button {
   --gradient-angle: 0deg;
   --gradient-angle-offset: 0deg;
-  --gradient-shine: var(--color-brand-secondary, #f09237);
-  --gradient-brand: var(--color-brand, #dd2c00);
+  --gradient-shine: var(--color-brand-secondary);
+  --gradient-brand: var(--color-brand);
 
   /* Estrutura base */
   position: relative;
@@ -97,7 +95,7 @@
 
   /* Animated conic-gradient background */
   background:
-    linear-gradient(var(--background, #ffffff), var(--background, #ffffff)) padding-box,
+    linear-gradient(var(--background), var(--background)) padding-box,
     conic-gradient(
       from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
       transparent 0%,
@@ -110,7 +108,7 @@
 
   /* Borda e sombras */
   border: 2px solid transparent;
-  box-shadow: inset 0 0 0 1px rgba(221, 44, 0, 0.2);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-brand) 20%, transparent);
   isolation: isolate;
 
   /* Border animation */
@@ -123,27 +121,11 @@
 /* Variante verde do shiny-button (Nuxt / Emerald brand) */
 .shiny-button.shiny-button-green,
 .shiny-button-green {
-  --gradient-shine: #34d399;
-  --gradient-brand: #059669;
-  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.35);
-  color: #ffffff;
+  --gradient-shine: color-mix(in oklab, var(--ui-success) 70%, white);
+  --gradient-brand: var(--ui-success);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ui-success) 35%, transparent);
+  color: white;
 }
-.dark .shiny-button.shiny-button-green,
-.dark .shiny-button-green {
-  background:
-    linear-gradient(var(--background, #0d0d0d), var(--background, #0d0d0d)) padding-box,
-    conic-gradient(
-      from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
-      transparent 0%,
-      #059669 5%,
-      #34d399 15%,
-      #059669 30%,
-      transparent 40%,
-      transparent 100%
-    ) border-box;
-  color: #ffffff;
-}
-
 /* Pseudo-elemento ::before - Grade de pontos animada */
 .shiny-button::before {
   content: "";
@@ -157,7 +139,7 @@
   height: calc(100% - 6px);
   background: radial-gradient(
     circle at 2px 2px,
-    var(--shiny-dot, rgba(255, 255, 255, 0.6)) 0.5px,
+    var(--shiny-dot) 0.5px,
     transparent 0
   ) padding-box;
   background-size: 4px 4px;
@@ -227,7 +209,9 @@
 
 .shiny-button:hover {
   transform: translateY(-1px);
-  box-shadow: inset 0 0 0 1px rgba(240, 146, 55, 0.4), 0 6px 24px rgba(221, 44, 0, 0.25);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--color-brand-secondary) 40%, transparent),
+    0 6px 24px color-mix(in oklab, var(--color-brand) 25%, transparent);
 }
 
 /* Estado :active - Feedback de clique */
@@ -246,19 +230,21 @@
   background: conic-gradient(
     from var(--gradient-angle),
     transparent 0%,
-    #10b981 12%,
-    #34d399 22%,
-    #fbbf24 35%,
-    #f59e0b 45%,
+    var(--ui-success) 12%,
+    color-mix(in oklab, var(--ui-success) 70%, white) 22%,
+    color-mix(in oklab, var(--ui-warning) 70%, white) 35%,
+    var(--ui-warning) 45%,
     transparent 60%,
     transparent 100%
   );
   animation: border-spin 5s linear infinite;
-  box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.12);
+  box-shadow: 0 25px 50px -12px color-mix(in oklab, var(--ui-success) 12%, transparent);
 }
 
 .dark .pricing-card-animated {
-  box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.2), 0 0 35px -5px rgba(245, 158, 11, 0.1);
+  box-shadow:
+    0 25px 50px -12px color-mix(in oklab, var(--ui-success) 20%, transparent),
+    0 0 35px -5px color-mix(in oklab, var(--ui-warning) 10%, transparent);
 }
 
 

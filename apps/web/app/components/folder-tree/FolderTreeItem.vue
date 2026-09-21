@@ -37,9 +37,15 @@
 </template>
 
 <script setup lang="ts">
+/** A node of the path tree: the props an item needs minus the ones every level shares. */
+export interface FolderTreeNode {
+  path: string;
+  children: FolderTreeNode[];
+}
+
 export interface FolderTreeItemProps {
   path: string;
-  children?: FolderTreeItemProps[];
+  children?: FolderTreeNode[];
   hints: Record<string, string>;
   showHints?: boolean;
 }

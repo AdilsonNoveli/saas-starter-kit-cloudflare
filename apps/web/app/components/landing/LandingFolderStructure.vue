@@ -26,7 +26,7 @@
           <!-- Item 1: Immediate access to your Members Area -->
           <div class="space-y-2.5">
             <div class="flex items-center gap-2.5">
-              <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-emerald-500 shrink-0" />
+              <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-success shrink-0" />
               <h4 class="text-base font-bold text-highlighted">
                 {{ $t("landing.showcase.features.membersArea.title") }}
               </h4>
@@ -49,7 +49,7 @@
                 <span>{{ $t("landing.showcase.features.membersArea.point4") }}</span>
               </li>
               <li class="flex items-center gap-2 font-medium text-highlighted">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                <span class="w-1.5 h-1.5 rounded-full bg-success shrink-0" />
                 <span>{{ $t("landing.showcase.features.membersArea.point5") }}</span>
               </li>
             </ul>
@@ -58,7 +58,7 @@
           <!-- Item 2: 15,000+ lines of tested senior engineering -->
           <div class="space-y-1.5">
             <div class="flex items-center gap-2.5">
-              <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-emerald-500 shrink-0" />
+              <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-success shrink-0" />
               <h4 class="text-base font-bold text-highlighted">
                 {{ $t("landing.showcase.features.engineering.title") }}
               </h4>
@@ -88,9 +88,9 @@
         <!-- Window Header Bar -->
         <div class="flex items-center justify-between px-4 py-3 border-b border-default bg-muted/40 select-none">
           <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
-            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
-            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+            <span class="w-3 h-3 rounded-full bg-error/80 inline-block" />
+            <span class="w-3 h-3 rounded-full bg-warning/80 inline-block" />
+            <span class="w-3 h-3 rounded-full bg-success/80 inline-block" />
             <span class="ml-2 font-mono text-xs text-muted font-medium">nuxfire — Bun Monorepo</span>
           </div>
           <div class="flex items-center gap-1.5">

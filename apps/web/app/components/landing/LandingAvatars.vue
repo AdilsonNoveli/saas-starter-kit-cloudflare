@@ -8,11 +8,11 @@
       <UAvatar src="/static/FJkauyEa.jpeg" alt="Michael Chen" />
     </UAvatarGroup>
     <div class="flex flex-col items-start justify-center">
-      <div class="flex items-center gap-1 text-amber-400">
+      <div class="flex items-center gap-1 text-warning">
         <svg
           v-for="i in 5"
           :key="i"
-          class="w-4 h-4 fill-amber-400 text-amber-400 shrink-0"
+          class="w-4 h-4 fill-warning text-warning shrink-0"
           viewBox="0 0 20 20"
           aria-hidden="true"
         >

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { platformAdminProcedure, router } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";
 import { recordAuditLog } from "~~/server/utils/audit-log";
-// `Job`, `Log` and `DeadLetterRecord` stay in packages/functions core-schema and
+// `Job`, `Log` and `DeadLetterRecord` stay in apps/functions core-schema and
 // did NOT move with this router: they are generic async-job-processing
 // infrastructure, written by src/jobs-consumer.ts and src/dlq-consumer.ts, not
 // admin-domain data. This module only reads them — same reasoning that kept

@@ -54,7 +54,7 @@ import { z } from "zod";
 
 const open = defineModel<boolean>("open", { default: false });
 
-const toast = useToast();
+const notification = useNotification();
 const teamsStore = useTeamsStore();
 const createMutation = useTrpcClient().teams.create;
 
@@ -112,13 +112,7 @@ async function create() {
       navigateTo(`/${slug}/dashboard`);
     }
   } catch (error) {
-    toast.add({
-      title: "Failed to create team",
-      description:
-        error instanceof Error ? error.message : "Something went wrong",
-      color: "error",
-      icon: "i-lucide-circle-x",
-    });
+    notification.error("Failed to create team", error instanceof Error ? error.message : "Something went wrong");
   } finally {
     loading.value = false;
   }

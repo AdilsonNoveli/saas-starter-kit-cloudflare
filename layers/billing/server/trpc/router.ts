@@ -39,7 +39,7 @@ export const routers = {
  * sync — billing domain, merely admin-gated) while the admin layer owns the
  * mount point. A named export is how a layer offers a router it does not own
  * the mount point for. (That aggregator lived in
- * `packages/app/server/trpc/routers/admin/index.ts` when this comment was first
+ * `apps/app/server/trpc/routers/admin/index.ts` when this comment was first
  * written; Fase 3 passo 4 moved it into `layers/admin` — and this import needed
  * no change at all, because it was always a package specifier.)
  */

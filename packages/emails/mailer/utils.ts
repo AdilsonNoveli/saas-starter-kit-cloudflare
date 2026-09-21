@@ -103,7 +103,7 @@ export function resolveAttachmentContent(mail: MailMessage, index: number): Prom
  */
 export function streamToBlob(stream: NodeJS.ReadableStream, mimeType: string) {
   return new Promise<Blob>((resolve, reject) => {
-    const chunks: any = [];
+    const chunks: Array<string | Uint8Array> = [];
 
     stream
       .on("data", (chunk) => chunks.push(chunk))
@@ -138,4 +138,16 @@ export function validateConfig(
       `Invalid config for "${transportName}" transport. The "baseUrl" property is missing`,
     );
   }
+}
+
+/**
+ * Fails a nodemailer transport the way Node callbacks are failed: with the error alone.
+ * Nodemailer types `info` as required even though nothing exists to report on failure, so
+ * the callback is viewed as the one-argument function it is at that point.
+ */
+export function failTransport<Info>(
+  callback: (err: Error | null, info: Info) => void,
+  error: Error,
+): void {
+  (callback as (err: Error) => void)(error);
 }

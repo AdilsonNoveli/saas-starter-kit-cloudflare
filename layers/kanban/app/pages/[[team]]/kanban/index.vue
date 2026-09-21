@@ -121,8 +121,8 @@ async function onDeleteBoard(board: { id: string; name: string }) {
   try {
     await kanban.deleteBoard(board.id);
     await refresh();
-  } catch (error: any) {
-    notification.error("Error deleting board", error?.message || "Something went wrong");
+  } catch (error) {
+    notification.error("Error deleting board", getErrorMessage(error));
   }
 }
 

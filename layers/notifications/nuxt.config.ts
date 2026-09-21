@@ -17,7 +17,7 @@ export default defineNuxtConfig({
       // The filename already carries the namespace.
       //
       // This directory is FLAT, unlike layers/billing's. The file used to live
-      // at `packages/app/app/components/notifications/NotificationsSlideover.vue`
+      // at `apps/app/app/components/notifications/NotificationsSlideover.vue`
       // and registered as `<NotificationsSlideover>` — Nuxt's DIRECTORY-based
       // auto-prefix (unlike the `prefix` option above) does de-duplicate a
       // segment the filename already repeats, so the `notifications/` folder
@@ -27,7 +27,7 @@ export default defineNuxtConfig({
       // from the Composition Root and must not be edited. Contrast
       // layers/billing, which KEEPS `admin/plans/` because there the nesting is
       // what produces `<AdminPlansCreateEditModal>`. Verified by diffing
-      // `packages/app/.nuxt/components.d.ts` before and after the move, not
+      // `apps/app/.nuxt/components.d.ts` before and after the move, not
       // assumed.
     },
   ],

@@ -76,7 +76,7 @@ definePageMeta({
   middleware: "admin",
 });
 
-const toast = useToast();
+const notification = useNotification();
 
 const { data: teams, status: teamsStatus } = await useTrpcClient().admin.teams.listTeams.useQuery({});
 const teamItems = computed(
@@ -118,21 +118,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   sending.value = true;
   try {
     await useTrpcClient().admin.notifications.send.mutate(event.data);
-    toast.add({
-      title: "Notification sent",
-      description: "The member's bell will update in real time.",
-      color: "success",
-      icon: "i-lucide-check",
-    });
+    notification.success("Notification sent", "The member's bell will update in real time.");
     state.title = "";
     state.message = "";
-  } catch (error: any) {
-    toast.add({
-      title: "Failed to send notification",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+  } catch (error) {
+    notification.error("Failed to send notification", getErrorMessage(error));
   } finally {
     sending.value = false;
   }

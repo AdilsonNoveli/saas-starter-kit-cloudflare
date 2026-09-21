@@ -32,28 +32,17 @@ const props = defineProps<{ team: { id: string; name: string } }>();
 const open = defineModel<boolean>("open", { default: false });
 const emit = defineEmits<{ success: [] }>();
 
-const toast = useToast();
+const notification = useNotification();
 const reactivateMutation = useTrpcClient().admin.teams.reactivateTeam;
 
 async function confirm() {
   try {
     await reactivateMutation.mutate({ teamId: props.team.id });
     open.value = false;
-    toast.add({
-      title: "Company reactivated",
-      description: `${props.team.name} is active again.`,
-      color: "success",
-      icon: "i-lucide-check",
-    });
+    notification.success("Company reactivated", `${props.team.name} is active again.`);
     emit("success");
   } catch (error) {
-    toast.add({
-      title: "Failed to reactivate company",
-      description:
-        error instanceof Error ? error.message : "Something went wrong",
-      color: "error",
-      icon: "i-lucide-circle-x",
-    });
+    notification.error("Failed to reactivate company", error instanceof Error ? error.message : "Something went wrong");
   }
 }
 </script>

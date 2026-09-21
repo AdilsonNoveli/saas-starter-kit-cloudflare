@@ -8,7 +8,7 @@
  */
 
 import { Message } from "./message";
-import { type Recipient, type MailerContract } from "./types";
+import { type Recipient, type MailerContract, type MailTransportContract } from "./types";
 
 /**
  * Class based emails are self contained dispatchable
@@ -110,10 +110,10 @@ export abstract class BaseMail {
   /**
    * Sends the mail
    */
-  async send<T extends MailerContract<any>>(
-    mailer: T,
-    config?: Parameters<T["send"]>[1],
-  ): Promise<Awaited<ReturnType<T["transport"]["send"]>>> {
+  async send<Transport extends MailTransportContract>(
+    mailer: MailerContract<Transport>,
+    config?: Parameters<MailerContract<Transport>["send"]>[1],
+  ): Promise<Awaited<ReturnType<Transport["send"]>>> {
     await this.build();
     return mailer.sendCompiled(this.message.toObject(), config);
   }
@@ -122,9 +122,9 @@ export abstract class BaseMail {
    * Sends the mail by using the background
    * messenger
    */
-  async sendLater<T extends MailerContract<any>>(
-    mailer: T,
-    config?: Parameters<T["send"]>[1],
+  async sendLater<Transport extends MailTransportContract>(
+    mailer: MailerContract<Transport>,
+    config?: Parameters<MailerContract<Transport>["send"]>[1],
   ): Promise<void> {
     await this.build();
     return mailer.sendLaterCompiled(this.message.toObject(), config);

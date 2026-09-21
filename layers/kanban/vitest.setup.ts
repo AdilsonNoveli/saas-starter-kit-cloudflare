@@ -4,6 +4,6 @@ import { defineAbility } from "nuxt-authorization/utils";
 // because Nuxt auto-imports it. Vitest runs these files as plain Node modules
 // with no Nuxt build pipeline, so the auto-import never happens — this shim
 // puts the real implementation on `globalThis` before any test file loads.
-// Same shim as packages/app/vitest.setup.ts, deliberately duplicated: a layer
+// Same shim as apps/app/vitest.setup.ts, deliberately duplicated: a layer
 // has to be runnable on its own, without reaching into the Composition Root.
 Object.assign(globalThis, { defineAbility });

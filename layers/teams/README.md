@@ -8,8 +8,8 @@ extractions in Fase 3 of `nuxfire-layers.md`, and first on purpose —
 > **Status: complete.** Fase 3 passo 1a moved the schema, the tRPC routers, the
 > server utils and the RBAC abilities here; passo 1b moved the Pinia stores, the
 > composables, the Vue components and the pages, renamed every ability to the
-> `teams*` convention and deleted the `packages/app/shared/utils/abilities.ts`
-> re-export bridge (`packages/app/shared/` no longer exists).
+> `teams*` convention and deleted the `apps/app/shared/utils/abilities.ts`
+> re-export bridge (`apps/app/shared/` no longer exists).
 >
 > Two things stayed in the Composition Root on purpose, both documented below:
 > `app/middleware/1.teams.global.ts` (global middleware ordering) and
@@ -28,7 +28,7 @@ export const layers = {
 ```
 
 `core` and `features` feed the same `activeLayerNames` set in
-`packages/app/nuxt.config.ts`, so a core layer needs no hand-written import
+`apps/app/nuxt.config.ts`, so a core layer needs no hand-written import
 anywhere: `extends`, the generated tRPC composition and the generated sidebar
 navigation all pick it up from that one array.
 
@@ -67,13 +67,13 @@ navigation all pick it up from that one array.
   `layers/kanban`'s does. They are imported as plain modules by the generated
   `.composition/layer-routers.ts`, outside any auto-import scope.
 - **`server/utils/*.ts` deliberately do NOT do that.** They still call `useDB()`
-  as a bare Nitro auto-import, exactly as they did inside `packages/app` —
+  as a bare Nitro auto-import, exactly as they did inside `apps/app` —
   Nitro's scan covers every active layer's `server/` dir
   (`scanDirs: layerDirs.map((dirs) => dirs.server)`, `@nuxt/nitro-server`). They
   were relocated byte-for-byte on purpose: `team-seats.test.ts` stubs `useDB` on
   `globalThis`, and that net only proves the move changed nothing if the moved
   code is genuinely unchanged.
-- **`server/database/schema.ts` and `packages/functions/src/database/core-schema.ts`
+- **`server/database/schema.ts` and `apps/functions/src/database/core-schema.ts`
   import each other.** That cycle is real and deliberate: `Subscription`, `Job`
   and `DeadLetterRecord` stay in core holding FKs to `Team`, while
   `TeamMembership`/`TeamInvite` live here holding FKs to `User`. It is safe only
@@ -99,7 +99,7 @@ navigation all pick it up from that one array.
   real alias — the `Team*` component namespace comes from the FILENAMES, exactly
   as `layers/kanban`'s `Kanban*.vue` always really worked. Keep new components
   named `Team*.vue`. Full detail in the comment at the bottom of that file.
-- **`1.teams.global.ts` stays in `packages/app/app/middleware/`.** Nuxt runs
+- **`1.teams.global.ts` stays in `apps/app/app/middleware/`.** Nuxt runs
   every layer's global middleware BEFORE the Composition Root's, sorting by
   filename only within a single directory, so from here it would run before
   `0.auth.global.ts` — which silently rewrites the post-login redirect for any
@@ -111,12 +111,12 @@ navigation all pick it up from that one array.
 ## Tests
 
 Run under the root aggregator (`vitest.config.mts` →
-`test.projects: ["packages/app", "layers/*"]`):
+`test.projects: ["apps/app", "layers/*"]`):
 
 ```bash
 bun run test            # from the repo root
 ```
 
-Typechecking is `bun run typecheck` in `packages/app`: Nuxt puts every active
+Typechecking is `bun run typecheck` in `apps/app`: Nuxt puts every active
 layer's `server/**` and `shared/**` into the app's tsconfig program, so this
 layer has no typecheck script of its own.

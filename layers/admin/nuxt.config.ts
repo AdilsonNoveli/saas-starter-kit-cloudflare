@@ -26,7 +26,7 @@ export default defineNuxtConfig({
       // `<AdminDataTable>`, not `<AdminAdminDataTable>`, so its folder
       // contributes nothing to its name — it stays put only so all four admin
       // components live under one root.) Verified against
-      // `packages/app/.nuxt/components.d.ts` before and after the move, not
+      // `apps/app/.nuxt/components.d.ts` before and after the move, not
       // assumed.
     },
   ],

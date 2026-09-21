@@ -135,7 +135,7 @@ const emit = defineEmits<{
   success: [];
 }>();
 
-const toast = useToast();
+const notification = useNotification();
 const { copy, copied } = useClipboard();
 
 const isEnrolling = computed(() => props.mode === "enroll");
@@ -223,12 +223,7 @@ async function startSetup() {
     );
     otpauthUri.value = uri;
   } catch {
-    toast.add({
-      title: "Could not start setup",
-      description: "Close this and try again.",
-      color: "error",
-      icon: "i-lucide-circle-x",
-    });
+    notification.error("Could not start setup", "Close this and try again.");
   }
 }
 
@@ -250,16 +245,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
     await $fetch(endpoint, { method: "POST", body: { code: event.data.code } });
 
-    toast.add({
-      title: isEnrolling.value
+    notification.success(isEnrolling.value
         ? "Two-factor authentication enabled"
-        : "Verified",
-      description: isEnrolling.value
+        : "Verified", isEnrolling.value
         ? "You'll be asked for a code again next time you log in."
-        : "You're all set for this session.",
-      color: "success",
-      icon: "i-lucide-check",
-    });
+        : "You're all set for this session.");
     emit("success");
     emit("update:open", false);
   } catch (error) {
@@ -270,14 +260,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       error.statusCode === 429;
 
     state.code = "";
-    toast.add({
-      title: rateLimited ? "Too many attempts" : "That code didn't work",
-      description: rateLimited
+    notification.error(rateLimited ? "Too many attempts" : "That code didn't work", rateLimited
         ? "Wait a few minutes before trying again."
-        : "Check your authenticator app and enter the current code.",
-      color: "error",
-      icon: "i-lucide-circle-x",
-    });
+        : "Check your authenticator app and enter the current code.");
   } finally {
     submitting.value = false;
   }

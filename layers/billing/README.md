@@ -12,10 +12,10 @@ core-layer extractions in Fase 3 of `nuxfire-layers.md`, after
 > `usePayments()`, `useGetBillingInfoAbility()`) live here.
 >
 > Both temporary bridges passo 2a left behind are closed: the re-export at the
-> bottom of `packages/app/types/enums.ts` is deleted (its last two importers
+> bottom of `apps/app/types/enums.ts` is deleted (its last two importers
 > moved here), and `srcDir: "app"` is gone from `nuxt.config.ts` now that
 > `app/` actually exists and the Nuxt 4 default resolves to it — confirmed by
-> `packages/app/.nuxt/tsconfig.json` including `layers/billing/app/**/*`, not
+> `apps/app/.nuxt/tsconfig.json` including `layers/billing/app/**/*`, not
 > `layers/billing/**/*`.
 
 ## Activation
@@ -81,7 +81,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   `__name:"AdminPlansCreateEditModal"` on the component whose SSR module id is
   `layers/billing/app/components/admin/plans/CreateEditModal.vue`, and all six
   names are byte-identical to their pre-move entries in
-  `packages/app/.nuxt/components.d.ts`.
+  `apps/app/.nuxt/components.d.ts`.
 - **`useGetBillingInfoAbility` lives in `app/composables/use-ability.ts` here,
   but its only caller is in `layers/teams`.** It wraps `billingGetBillingInfo`,
   so it follows the ability by domain ownership;
@@ -95,7 +95,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 - **The settings route family is contributed by THREE layers.** One parent
   (`layers/teams/app/pages/[[team]]/settings.vue`) with five children:
   `index`/`members`/`security` from `layers/teams`, `notifications` from
-  `layers/notifications` (it lived in `packages/app` until Fase 3 passo 3), and
+  `layers/notifications` (it lived in `apps/app` until Fase 3 passo 3), and
   `billing` from here.
   Verified in the built route manifest, not assumed — two-way page-tree merging
   working did not guarantee three-way would.
@@ -107,7 +107,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   logic), but its mount point belongs to
   `@nuxfire/layer-admin/server/trpc/router`, which imports it from here by name
   and keeps it at `admin.plans`. (That aggregator was
-  `packages/app/server/trpc/routers/admin/index.ts` until Fase 3 passo 4 moved
+  `apps/app/server/trpc/routers/admin/index.ts` until Fase 3 passo 4 moved
   it into `layers/admin`; the import needed no change, because it was always a
   package specifier.) Extracting a domain must never reshape the public API.
 - **This layer's schema and `layers/teams`' schema import each other.** The
@@ -129,7 +129,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   the same category as `hubBlob()` in `layers/teams/server/trpc/teams.ts`.
 - **`server/utils/*.ts` deliberately do NOT do that.** They still call `useDB()`
   and `hubKV()` as bare Nitro auto-imports, exactly as they did inside
-  `packages/app` — Nitro's scan covers every active layer's `server/` dir. They
+  `apps/app` — Nitro's scan covers every active layer's `server/` dir. They
   were relocated byte-for-byte on purpose (only `~~/...` specifiers were
   rewritten to relative ones), so the three suites that stub those globals still
   prove the move changed nothing.
@@ -158,15 +158,15 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 ## Tests
 
 Run under the root aggregator (`vitest.config.mts` →
-`test.projects: ["packages/app", "layers/*"]`):
+`test.projects: ["apps/app", "layers/*"]`):
 
 ```bash
 bun run test            # from the repo root
 ```
 
-Typechecking is `bun run typecheck` in `packages/app`: Nuxt puts every active
+Typechecking is `bun run typecheck` in `apps/app`: Nuxt puts every active
 layer's `server/**` and `shared/**` into the app's tsconfig program, so this
 layer has no typecheck script of its own. Note that `nuxt typecheck` checks the
-**app** program only — `packages/app/server/tsconfig.json` (which is what covers
+**app** program only — `apps/app/server/tsconfig.json` (which is what covers
 every layer's `server/**`) has to be run separately with
 `bunx vue-tsc --noEmit -p server/tsconfig.json` if you want that half checked.

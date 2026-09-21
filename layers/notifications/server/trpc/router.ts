@@ -38,7 +38,7 @@ export const routers = {
  * `platformAdminProcedure`-gated) while the admin layer owns the mount point. A
  * named export is how a layer offers a router it does not own the mount point
  * for — exactly the shape `layers/billing` uses for `adminPlansRouter`. (That
- * aggregator lived in `packages/app/server/trpc/routers/admin/index.ts` when
+ * aggregator lived in `apps/app/server/trpc/routers/admin/index.ts` when
  * this comment was first written; Fase 3 passo 4, the step right after this
  * one, moved it into `layers/admin` — and this import needed no change at all,
  * because it was always a package specifier.)

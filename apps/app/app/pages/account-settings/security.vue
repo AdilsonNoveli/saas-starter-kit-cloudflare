@@ -166,7 +166,7 @@
 </template>
 
 <script setup lang="ts">
-const toast = useToast();
+const notification = useNotification();
 const { user } = useSession();
 const runtimeConfig = useRuntimeConfig();
 
@@ -200,19 +200,9 @@ async function onDisableMfa() {
     const result = await disableMfaMutation.mutate();
     await useSession().refresh();
     showDisableMfaConfirm.value = false;
-    toast.add({
-      title: "Two-Factor Authentication Disabled",
-      description: result.message,
-      color: "success",
-      icon: "i-lucide-check",
-    });
-  } catch (error: any) {
-    toast.add({
-      title: "Failed",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.success("Two-Factor Authentication Disabled", result.message);
+  } catch (error) {
+    notification.error("Failed", getErrorMessage(error));
   } finally {
     disablingMfa.value = false;
   }
@@ -225,19 +215,9 @@ async function onSignOutOthers() {
   signingOut.value = true;
   try {
     const result = await signOutOthersMutation.mutate();
-    toast.add({
-      title: "Done",
-      description: result.message,
-      color: "success",
-      icon: "i-lucide-check",
-    });
-  } catch (error: any) {
-    toast.add({
-      title: "Failed",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.success("Done", result.message);
+  } catch (error) {
+    notification.error("Failed", getErrorMessage(error));
   } finally {
     signingOut.value = false;
   }
@@ -263,13 +243,8 @@ async function onDeleteAccount() {
     // way sign-out does (AccountUserDropdown.vue).
     await useSession().clear();
     await navigateTo("/", { external: true });
-  } catch (error: any) {
-    toast.add({
-      title: "Account Deletion Failed",
-      description: error?.message || "Something went wrong.",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+  } catch (error) {
+    notification.error("Account Deletion Failed", getErrorMessage(error, "Something went wrong."));
     deleting.value = false;
   }
 }

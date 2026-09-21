@@ -1,4 +1,3 @@
-import { flags } from "#nuxfire/config";
 import { appUrl, appDomain, authUrl, websocketsUrl } from "./dns";
 import { secret } from "./secret";
 import { deployWorker } from "./utils/nuxt";
@@ -27,10 +26,10 @@ await deployWorker("App", {
     // reaches the browser bundle. Authorises account deletion against the
     // auth Worker (infra/auth.ts).
     NUXT_AUTH_ADMIN_SECRET: adminSecret.result,
-    ...(flags.websockets
+    ...(websocketsUrl && wsTicketSecret
       ? {
           NUXT_PUBLIC_WEBSOCKETS_ENDPOINT: websocketsUrl.properties.value,
-          NUXT_WS_TICKET_SECRET: wsTicketSecret!.result,
+          NUXT_WS_TICKET_SECRET: wsTicketSecret.result,
         }
       : {}),
     // Server-side only, like NUXT_AUTH_ADMIN_SECRET above: one seals the

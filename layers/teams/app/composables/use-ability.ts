@@ -1,7 +1,7 @@
 // `@nuxfire/layer-teams/shared/...`, not `#shared/utils/abilities`: `#shared`
 // is aliased by Nuxt to the Composition Root's own `shared/` directory
-// (packages/app/shared) and never reaches a layer's. This file used to live in
-// packages/app and relied on a re-export bridge there; the bridge was deleted
+// (apps/app/shared) and never reaches a layer's. This file used to live in
+// apps/app and relied on a re-export bridge there; the bridge was deleted
 // with this move (Fase 3, passo 1b).
 import {
   teamsDeleteTeam,

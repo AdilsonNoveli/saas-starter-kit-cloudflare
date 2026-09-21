@@ -14,7 +14,7 @@ export default defineLayerManifest({
 
   // `navigation` is deliberately absent, not an empty sidebar: team settings
   // are reached from the team switcher and the settings pages, never from a
-  // top-level nav item. (This layer's frontend is still in packages/app — it
+  // top-level nav item. (This layer's frontend is still in apps/app — it
   // moves in Fase 3, passo 1b.)
 
   permissions: [

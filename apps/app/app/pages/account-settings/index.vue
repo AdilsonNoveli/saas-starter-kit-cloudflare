@@ -67,7 +67,7 @@ const removeProfilePictureMutation =
 const updateProfilePictureMutation =
   useTrpcClient().account.updateProfilePicture;
 
-const toast = useToast();
+const notification = useNotification();
 const { user } = useSession();
 
 const updatingProfilePicture = ref(false);
@@ -86,18 +86,9 @@ async function handleAvatarUpload(file: File) {
       });
     }
     useSession().refresh();
-    toast.add({
-      title: "Profile Picture Updated",
-      color: "success",
-      icon: "i-lucide-check",
-    });
-  } catch (error: any) {
-    toast.add({
-      title: "Failed to Upload Profile Picture",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.success("Profile Picture Updated");
+  } catch (error) {
+    notification.error("Failed to Upload Profile Picture", getErrorMessage(error));
   }
   updatingProfilePicture.value = false;
 }
@@ -107,18 +98,9 @@ async function handleAvatarRemove() {
   try {
     await removeProfilePictureMutation.mutate();
     useSession().refresh();
-    toast.add({
-      title: "Profile Picture Removed",
-      color: "success",
-      icon: "i-lucide-check",
-    });
-  } catch (error: any) {
-    toast.add({
-      title: "Failed to Remove Profile Picture",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.success("Profile Picture Removed");
+  } catch (error) {
+    notification.error("Failed to Remove Profile Picture", getErrorMessage(error));
   }
   updatingProfilePicture.value = false;
 }
@@ -141,13 +123,8 @@ async function saveProfile() {
       name: profileState.name,
     });
     await useSession().refresh();
-  } catch (error: any) {
-    toast.add({
-      title: "Profile Update Failed",
-      description: error?.message || "Something went wrong.",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+  } catch (error) {
+    notification.error("Profile Update Failed", getErrorMessage(error, "Something went wrong."));
   } finally {
     profileLoading.value = false;
   }

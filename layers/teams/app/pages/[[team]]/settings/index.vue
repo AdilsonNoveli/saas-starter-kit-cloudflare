@@ -59,7 +59,7 @@ const updatingTeamLogo = ref(false);
 const uploadProfilePicture = useUpload("/api/upload/profile-picture", {
   method: "PUT",
 });
-const toast = useToast();
+const notification = useNotification();
 
 const schema = z.object({
   name: z.string(),
@@ -75,20 +75,10 @@ async function save() {
       teamIdentifier: team.value?.slug || "",
       name: state.name,
     });
-    toast.add({
-      title: "Team Settings Updated",
-      description: "Your team settings have been successfully saved",
-      color: "success",
-      icon: "i-lucide-check",
-    });
+    notification.success("Team Settings Updated", "Your team settings have been successfully saved");
     await teamsStore.fetchCurrentTeam();
-  } catch (error: any) {
-    toast.add({
-      title: "Failed to Update Team Settings",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+  } catch (error) {
+    notification.error("Failed to Update Team Settings", getErrorMessage(error));
   } finally {
     loading.value = false;
   }
@@ -105,18 +95,9 @@ async function handleAvatarUpload(file: File) {
       });
     }
     await teamsStore.fetchCurrentTeam();
-    toast.add({
-      title: "Profile Picture Updated",
-      color: "success",
-      icon: "i-lucide-check",
-    });
-  } catch (error: any) {
-    toast.add({
-      title: "Failed to Upload Profile Picture",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.success("Profile Picture Updated");
+  } catch (error) {
+    notification.error("Failed to Upload Profile Picture", getErrorMessage(error));
   }
   updatingTeamLogo.value = false;
 }
@@ -128,18 +109,9 @@ async function handleAvatarRemove() {
       teamIdentifier: team.value?.slug || "",
     });
     await teamsStore.fetchCurrentTeam();
-    toast.add({
-      title: "Team Logo Removed",
-      color: "success",
-      icon: "i-lucide-check",
-    });
-  } catch (error: any) {
-    toast.add({
-      title: "Failed to Remove Team Logo",
-      description: error?.message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.success("Team Logo Removed");
+  } catch (error) {
+    notification.error("Failed to Remove Team Logo", getErrorMessage(error));
   }
   updatingTeamLogo.value = false;
 }

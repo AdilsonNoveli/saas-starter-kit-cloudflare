@@ -11,7 +11,7 @@ after `teams` and `billing` and before `admin`.
 > domain moved backend **and** frontend in a single step — ~580 lines total, the
 > same scope class as one of those layers' two steps. No temporary bridge was
 > needed and none was left behind: no `srcDir: "app"` line (the `app/` directory
-> exists from the first commit), no re-export shim in `packages/app`.
+> exists from the first commit), no re-export shim in `apps/app`.
 
 ## Activation
 
@@ -37,7 +37,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 | `server/trpc/router.ts`                         | exports `routers` = `{ notifications }`, **plus** `adminNotificationsRouter` by name       |
 | `server/trpc/notifications.ts`                  | `notificationsRouter` — `list` / `create` / `updateReadStatus`, all user-scoped            |
 | `server/trpc/admin-notifications.ts`            | `adminNotificationsRouter` — `send`, mounted at `admin.notifications`                      |
-| `app/components/NotificationsSlideover.vue`     | `<NotificationsSlideover>` — the bell panel, rendered by `packages/app`'s dashboard layout |
+| `app/components/NotificationsSlideover.vue`     | `<NotificationsSlideover>` — the bell panel, rendered by `apps/app`'s dashboard layout |
 | `app/composables/use-notifications-store.ts`    | `useNotificationsStore()` — the Pinia store behind the bell and its unread badge           |
 | `app/plugins/ws-notifications.client.ts`        | subscribes to the user's WS topic and pushes arrivals into the store                       |
 | `app/pages/account-settings/notifications.vue`  | `/account-settings/notifications` — the real preference toggle                             |
@@ -48,19 +48,19 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 
 - **This layer's `app/components/` is FLAT, and that is what preserved the
   name.** The file lived at
-  `packages/app/app/components/notifications/NotificationsSlideover.vue` and
+  `apps/app/app/components/notifications/NotificationsSlideover.vue` and
   registered as `<NotificationsSlideover>` — Nuxt's **directory**-based
   auto-prefix de-duplicates a segment the filename already repeats, so the
   `notifications/` folder contributed nothing to the registered name. (The
   `prefix` **option** does _not_ de-duplicate — that is the f27adc9 finding, and
   the reason no layer here sets it.) Flattening therefore kept the name
   byte-identical, which is the only thing that mattered:
-  `packages/app/app/layouts/dashboard.vue` renders `<NotificationsSlideover />`
+  `apps/app/app/layouts/dashboard.vue` renders `<NotificationsSlideover />`
   by name and was **not edited by this extraction** (`git diff` on it is empty).
   Contrast `layers/billing`, which keeps `admin/plans/` because there the
   nesting is what produces `<AdminPlansCreateEditModal>`. Rule unchanged:
   preserve the subpath whenever the registered name depends on it. Proven by
-  diffing `packages/app/.nuxt/components.d.ts` before and after, and against a
+  diffing `apps/app/.nuxt/components.d.ts` before and after, and against a
   real `nuxt build` — the emitted chunk carries `__name:"NotificationsSlideover"`
   on the component whose SSR module id is
   `layers/notifications/app/components/NotificationsSlideover.vue`.
@@ -73,7 +73,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   `platformAdminProcedure`-gated, but its mount point belongs to
   `@nuxfire/layer-admin/server/trpc/router`, which imports it from here by name
   and keeps it at `admin.notifications`. (That aggregator was
-  `packages/app/server/trpc/routers/admin/index.ts` until Fase 3 passo 4 moved
+  `apps/app/server/trpc/routers/admin/index.ts` until Fase 3 passo 4 moved
   it into `layers/admin`; the import needed no change, because it was always a
   package specifier.) Same shape `layers/billing` uses for `adminPlansRouter`.
   Verified in the built bundle, not assumed: the admin router literal is
@@ -82,7 +82,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   at the time — after passo 4 `admin` moved inside the spread, to
   `{account,public,...{{admin},{billing,stripe},{kanban},{notifications},{teams,invites}}}`,
   with every client-facing path unchanged.
-- **This layer's schema and `packages/functions`' `core-schema.ts` import each
+- **This layer's schema and `apps/functions`' `core-schema.ts` import each
   other.** The THIRD deliberate cycle in this codebase, after
   `core-schema.ts` ↔ `layers/teams` and `layers/teams` ↔ `layers/billing`.
   `notificationRelations`' join to `User` here; `usersRelations`'
@@ -97,11 +97,11 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
   relative path. That is not style: a relative path in `core-schema.ts` or the
   schema barrel breaks a real `sst deploy` and nothing short of one catches it
   (d0dac0a; see `nuxfire-layers.md`).
-- **Two notification-adjacent files deliberately stayed in `packages/app`.**
+- **Two notification-adjacent files deliberately stayed in `apps/app`.**
   `app/composables/use-notification.ts` is a naming trap — despite the name it
-  is a generic `useToast()` wrapper (success/error/info) with nothing to do with
+  is a generic `useToast()` wrapper (success/error/info/warning/message, plus `confirm`) with nothing to do with
   the `Notification` entity or the bell; it mirrors the composable of the same
-  name in `packages/auth-frontend`. And `app/plugins/websockets.client.ts` is
+  name in `apps/login`. And `app/plugins/websockets.client.ts` is
   the **generic** WebSocket transport (topic pub/sub, provides `$ws`) —
   cross-cutting real-time infrastructure, not notifications-domain logic. Fase 4
   of the plan lists a future `layer-chat` that also needs real-time, which is
@@ -140,12 +140,12 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 ## Tests
 
 This layer ships **none**, and neither did the domain before the move — it had
-zero test files in `packages/app` and still has zero here (the suite count is
+zero test files in `apps/app` and still has zero here (the suite count is
 unchanged at 7 files / 131 tests). There is no `vitest.config.ts` in this
 directory; the root aggregator's `layers/*` project glob tolerates a layer
 without one.
 
-Typechecking is `bun run typecheck` in `packages/app` for the client program,
+Typechecking is `bun run typecheck` in `apps/app` for the client program,
 plus `bunx vue-tsc --noEmit -p server/tsconfig.json` for the server program —
 `nuxt typecheck` does **not** cover the latter, which is the half that contains
 every layer's `server/**`.

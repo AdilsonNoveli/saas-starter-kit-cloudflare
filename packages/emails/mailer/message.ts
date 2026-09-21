@@ -53,7 +53,7 @@ export class Message extends Macroable {
   }: {
     message: NodeMailerMessage;
     views: MessageBodyTemplates;
-    sharedState: Record<string, any>;
+    sharedState: Record<string, unknown>;
   }) {
     const getTemplateEngine = () => {
       if (!this.templateEngine) {
@@ -473,7 +473,7 @@ export class Message extends Macroable {
   /**
    * Compute email html from defined view
    */
-  htmlView(template: string, data?: any): this {
+  htmlView(template: string, data?: unknown): this {
     this.contentViews.html = { template, data };
     return this;
   }
@@ -481,7 +481,7 @@ export class Message extends Macroable {
   /**
    * Compute email text from defined view
    */
-  textView(template: string, data?: any): this {
+  textView(template: string, data?: unknown): this {
     this.contentViews.text = { template, data };
     return this;
   }
@@ -489,7 +489,7 @@ export class Message extends Macroable {
   /**
    * Compute apple watch html from defined view
    */
-  watchView(template: string, data?: any): this {
+  watchView(template: string, data?: unknown): this {
     this.contentViews.watch = { template, data };
     return this;
   }
@@ -908,7 +908,7 @@ export class Message extends Macroable {
    * Computes email contents by rendering the configured
    * templates
    */
-  async computeContents(sharedState?: Record<string, any>) {
+  async computeContents(sharedState?: Record<string, unknown>) {
     await Message.computeContentsFor({
       message: this.nodeMailerMessage,
       views: this.contentViews,

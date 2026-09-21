@@ -12,7 +12,7 @@ export default defineNuxtPlugin({
   name: "ws-notifications",
   dependsOn: ["websockets"],
   setup() {
-    const toast = useToast();
+    const notification = useNotification();
     const { user } = useSession();
     const { $ws } = useNuxtApp();
     const notificationsStore = useNotificationsStore();
@@ -26,12 +26,7 @@ export default defineNuxtPlugin({
       notificationsStore.addNotification(message.payload);
       if (!notificationsStore.enabled) return;
 
-      toast.add({
-        title: message.payload.title,
-        description: message.payload.message,
-        duration: 3000,
-        color: "primary",
-      });
+      notification.message(message.payload.title, message.payload.message, 3000);
     };
 
     let subscribedTopic: string | null = null;

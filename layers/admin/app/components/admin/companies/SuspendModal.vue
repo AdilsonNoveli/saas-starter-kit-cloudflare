@@ -36,29 +36,18 @@ const props = defineProps<{ team: { id: string; name: string } }>();
 const open = defineModel<boolean>("open", { default: false });
 const emit = defineEmits<{ success: [] }>();
 
-const toast = useToast();
+const notification = useNotification();
 const suspendMutation = useTrpcClient().admin.teams.suspendTeam;
 
 async function confirm() {
   try {
     await suspendMutation.mutate({ teamId: props.team.id });
     open.value = false;
-    toast.add({
-      title: "Company suspended",
-      description: `${props.team.name} is now suspended.`,
-      color: "success",
-      icon: "i-lucide-check",
-    });
+    notification.success("Company suspended", `${props.team.name} is now suspended.`);
     // The caller owns the data, so it owns the refetch.
     emit("success");
   } catch (error) {
-    toast.add({
-      title: "Failed to suspend company",
-      description:
-        error instanceof Error ? error.message : "Something went wrong",
-      color: "error",
-      icon: "i-lucide-circle-x",
-    });
+    notification.error("Failed to suspend company", error instanceof Error ? error.message : "Something went wrong");
   }
 }
 </script>

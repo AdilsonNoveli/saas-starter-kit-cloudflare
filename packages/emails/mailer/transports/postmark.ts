@@ -16,7 +16,7 @@ import debug from "../debug";
 import { MailResponse } from "../mail-response";
 import { E_MAIL_TRANSPORT_ERROR } from "../errors";
 import { BaseApiTransport } from "./base-api-transport";
-import { normalizeBaseUrl, extractMessageHeaders, resolveAttachmentContent } from "../utils";
+import { normalizeBaseUrl, extractMessageHeaders, resolveAttachmentContent, failTransport } from "../utils";
 
 import type {
   PostmarkConfig,
@@ -60,11 +60,9 @@ class NodeMailerTransport implements Transport {
       return;
     }
 
-    if (!Array.isArray(recipients)) {
-      recipients = [recipients] as any;
-    }
+    const list = Array.isArray(recipients) ? recipients : [recipients];
 
-    const formatted = (recipients as any[]).map((recipient) => {
+    const formatted = list.map((recipient) => {
       if (typeof recipient === "string") {
         return recipient;
       }
@@ -84,7 +82,7 @@ class NodeMailerTransport implements Transport {
    * accepted by the Postmark API
    */
   async #preparePayload(mail: MailMessage) {
-    let payload: Record<string, any> = {
+    let payload: Record<string, unknown> = {
       From: this.#formatRecipients(mail.data.from),
       To: this.#formatRecipients(mail.data.to),
       Subject: mail.data.subject,
@@ -143,7 +141,7 @@ class NodeMailerTransport implements Transport {
            * only populates it while building the MIME message, so we fall back
            * to detecting it from the filename.
            */
-          const item: Record<string, any> = {
+          const item: Record<string, unknown> = {
             Name: attachment.filename,
             Content: content.toString("base64"),
             ContentType:
@@ -222,11 +220,11 @@ class NodeMailerTransport implements Transport {
 
       callback(null, { messageId, envelope, ...body });
     } catch (error) {
-      callback(
+      failTransport(
+        callback,
         new E_MAIL_TRANSPORT_ERROR("Unable to send email using the postmark transport", {
           cause: error,
         }),
-        undefined as any,
       );
     }
   }

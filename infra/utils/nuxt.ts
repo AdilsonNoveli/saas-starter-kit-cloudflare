@@ -1,5 +1,7 @@
 import * as path from "node:path";
-import { flags } from "#nuxfire/config";
+// Type-only: SST does not export its `Input`/`Link` types as globals. Erased at build time.
+import type { Input } from "../../.sst/platform/src/components/input";
+import type { Link } from "../../.sst/platform/src/components/link";
 import { emails } from "../emails";
 import { websockets } from "../websockets";
 import { jobsQueue } from "../jobs";
@@ -20,8 +22,8 @@ export async function deployWorker(
     root: string;
     domain: string;
     app?: boolean;
-    vars?: Record<string, any>;
-    link?: any[];
+    vars?: Record<string, Input<string> | undefined>;
+    link?: Link.Linkable[];
   },
 ) {
   const nuxtHubSecret = new random.RandomUuid(`${name}NuxtHubSecret`);
@@ -41,7 +43,7 @@ export async function deployWorker(
 
   const built = await buildPackage(name, { dir: root, environment });
 
-  const link: any[] = [...extraLink];
+  const link: Link.Linkable[] = [...extraLink];
   if (app) {
     // NuxtHub's self-hosted mode (apps/app/nuxt.config.ts's `hub:` block)
     // expects these bindings named exactly BLOB/KV/CACHE — that's fixed by
@@ -54,8 +56,9 @@ export async function deployWorker(
       new sst.cloudflare.Kv("CACHE"),
       emails,
     );
-    if (flags.websockets) link.push(websockets);
-    if (flags.jobsQueue) link.push(jobsQueue);
+    // Guarded by the resource itself: it only exists when its flag is on.
+    if (websockets) link.push(websockets);
+    if (jobsQueue) link.push(jobsQueue);
   }
 
   const worker = new sst.cloudflare.Worker(

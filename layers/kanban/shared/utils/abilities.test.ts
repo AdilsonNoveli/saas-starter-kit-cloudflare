@@ -13,7 +13,7 @@ import {
 import { KANBAN_PERMISSIONS } from "./permissions";
 import manifest from "../../layer.manifest";
 
-// Mirrors packages/app/shared/utils/abilities.test.ts. Every one of these is a
+// Mirrors apps/app/shared/utils/abilities.test.ts. Every one of these is a
 // tenant-scoped `hasTeamPermission` check, so the table below pairs each
 // ability with the exact permission string it must gate on — the cross-tenant
 // case being the one that actually matters.

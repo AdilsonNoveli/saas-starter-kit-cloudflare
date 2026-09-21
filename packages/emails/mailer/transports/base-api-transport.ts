@@ -25,5 +25,5 @@ export abstract class BaseApiTransport<Config extends { key: string; baseUrl: st
     validateConfig(name, config);
   }
 
-  abstract send(message: NodeMailerMessage, config?: any): Promise<MailResponse<any>>;
+  abstract send(message: NodeMailerMessage, config?: unknown): Promise<MailResponse<unknown>>;
 }

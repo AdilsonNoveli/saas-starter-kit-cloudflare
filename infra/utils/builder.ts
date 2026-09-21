@@ -1,4 +1,6 @@
 import * as path from "node:path";
+// Type-only: SST does not export its `Input`/`Link` types as globals. Erased at build time.
+import type { Input } from "../../.sst/platform/src/components/input";
 import { Semaphore } from "./semaphore";
 
 const limiter = new Semaphore(
@@ -15,17 +17,26 @@ const limiter = new Semaphore(
 // the files it deploys.
 export async function build(
   name: string,
-  { dir, environment }: { dir: string; environment?: Record<string, any> },
-): Promise<any> {
+  {
+    dir,
+    environment,
+  }: { dir: string; environment?: Record<string, Input<string> | undefined> },
+): Promise<command.local.Command> {
   return new Promise((res) => {
     $resolve({ environment }).apply(async ({ environment }) => {
       await limiter.acquire();
+      // An unset variable (e.g. a flag-gated secret) is simply not passed to the build.
+      const defined = Object.fromEntries(
+        Object.entries(environment ?? {}).filter(
+          (entry): entry is [string, string] => entry[1] !== undefined,
+        ),
+      );
       const cmd = new command.local.Command(`${name}Build`, {
         dir: path.resolve(dir),
         create: "bun run build",
         update: "bun run build",
         triggers: [new Date().toString()],
-        environment,
+        environment: defined,
       });
       cmd.urn.apply(() => {
         limiter.release();

@@ -14,7 +14,7 @@ import { type Transport, createTransport } from "nodemailer";
 import type MailMessage from "nodemailer/lib/mailer/mail-message.js";
 
 import debug from "../debug";
-import { normalizeBaseUrl } from "../utils";
+import { normalizeBaseUrl, failTransport } from "../utils";
 import { MailResponse } from "../mail-response";
 import { E_MAIL_TRANSPORT_ERROR } from "../errors";
 import { BaseApiTransport } from "./base-api-transport";
@@ -113,7 +113,7 @@ class NodeMailerTransport implements Transport {
    * Returns an object of options accepted by the sparkpost mail API
    */
   #getOptions(config: SparkPostConfig) {
-    const options = new ObjectBuilder<Record<string, any>>({});
+    const options = new ObjectBuilder<Record<string, unknown>>({});
 
     options.add("start_time", config.startTime);
     options.add("initial_open", config.initialOpen);
@@ -169,11 +169,11 @@ class NodeMailerTransport implements Transport {
 
       callback(null, { messageId, envelope, ...body.results });
     } catch (error) {
-      callback(
+      failTransport(
+        callback,
         new E_MAIL_TRANSPORT_ERROR("Unable to send email using the sparkpost transport", {
           cause: error,
         }),
-        undefined as any,
       );
     }
   }

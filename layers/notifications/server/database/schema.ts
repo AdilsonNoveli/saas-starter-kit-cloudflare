@@ -1,7 +1,7 @@
 import { pgTable, text, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
-// `User` stays in packages/functions core-schema. `notificationRelations` below
+// `User` stays in apps/functions core-schema. `notificationRelations` below
 // joins to it, and `usersRelations` over there declares
 // `notifications: many(notifications)` back into this file — the THIRD
 // deliberate schema import cycle in this codebase, after
@@ -22,11 +22,11 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // this file may read `users` at module top level, or the cycle turns into a TDZ
 // crash at import time.
 //
-// PACKAGE SPECIFIER, never a relative path (`../../../../packages/functions/...`).
+// PACKAGE SPECIFIER, never a relative path (`../../../../apps/functions/...`).
 // A relative path resolves fine under tsc, vitest, drizzle-kit, nuxt build and
 // even plain `esbuild --bundle` — none of which is the bundler that actually
-// ships `packages/functions`. See the caution in
-// packages/functions/src/database/schema.ts and nuxfire-layers.md for the real deploy failure this rule comes from (d0dac0a).
+// ships `apps/functions`. See the caution in
+// apps/functions/src/database/schema.ts and nuxfire-layers.md for the real deploy failure this rule comes from (d0dac0a).
 // Requires `@nuxfire/functions: workspace:*` in this layer's own package.json,
 // which every other layer already declares for the same reason.
 import { users } from "@nuxfire/functions/database/core-schema";

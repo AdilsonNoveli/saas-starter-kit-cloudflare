@@ -16,7 +16,7 @@ import debug from "../debug";
 import { MailResponse } from "../mail-response";
 import { E_MAIL_TRANSPORT_ERROR } from "../errors";
 import { BaseApiTransport } from "./base-api-transport";
-import { streamToBlob, normalizeBaseUrl } from "../utils";
+import { streamToBlob, normalizeBaseUrl, failTransport } from "../utils";
 
 import type {
   MailgunConfig,
@@ -142,7 +142,7 @@ class NodeMailerTransport implements Transport<MailgunSentMessageInfo> {
    *
    * This method will append each value separately
    */
-  #appendValue(form: FormData, key: string, value: any) {
+  #appendValue(form: FormData, key: string, value: string | string[]) {
     if (Array.isArray(value)) {
       value.forEach((item) => form.append(key, item));
     } else {
@@ -209,11 +209,11 @@ class NodeMailerTransport implements Transport<MailgunSentMessageInfo> {
 
       callback(null, { id: mailgunMessageId, messageId, envelope });
     } catch (error) {
-      callback(
+      failTransport(
+        callback,
         new E_MAIL_TRANSPORT_ERROR("Unable to send email using the mailgun transport", {
           cause: error,
         }),
-        undefined as any,
       );
     }
   }

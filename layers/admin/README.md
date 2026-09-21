@@ -9,7 +9,7 @@ and last** of the core-layer extractions in Fase 3 of
 > **Status: complete (Fase 3 passo 4).** Backend and frontend in one step, like
 > `notifications` and unlike `teams`/`billing`. No temporary bridge was needed
 > and none was left behind: no `srcDir: "app"` line (the `app/` directory exists
-> from the first commit), no re-export shim in `packages/app`.
+> from the first commit), no re-export shim in `apps/app`.
 
 Extracted last on purpose. `admin` is an **aggregation** layer, not a leaf: its
 router already imported `adminPlansRouter` from `@nuxfire/layer-billing` and
@@ -33,7 +33,7 @@ export const layers = {
 
 That array is the whole registration: `extends`, the generated tRPC composition
 and the generated sidebar navigation all read the same `activeLayerNames` set.
-With `admin` on it, `layers.core` is complete — `packages/app` is a Composition
+With `admin` on it, `layers.core` is complete — `apps/app` is a Composition
 Root with no domain logic left in it.
 
 ## Layout
@@ -89,13 +89,13 @@ Root with no domain logic left in it.
   `*.global.*` middleware has the cross-layer ordering problem (layers are
   concatenated with the Composition Root last, so a layer's global middleware
   can never run after `0.auth.global.ts` — see `nuxfire-layers.md` and why
-  `1.teams.global.ts` stays in `packages/app`). Named middleware always runs
+  `1.teams.global.ts` stays in `apps/app`). Named middleware always runs
   after every global one. Confirmed unchanged in the build: the global array is
   still `[<teams store init>, 0.auth.global, 1.teams.global, <noop>]` and gained
   nothing from this layer.
 - **`server/trpc/router.ts` exports the `routers` map, and that is the point of
   the file.** Until this step the aggregator was a bare default export that
-  `packages/app/server/trpc/routers/index.ts` imported by hand
+  `apps/app/server/trpc/routers/index.ts` imported by hand
   (`import admin from "./admin"`) — the last hardcoded layer-ish import in the
   Composition Root, and the one remaining exception to "core layers and feature
   layers are the same mechanism". It now flows through the generated
@@ -116,20 +116,20 @@ Root with no domain logic left in it.
   symmetry" with a `platformAdmin` relation on `usersRelations`: it would
   manufacture a fourth cycle for no behavioural gain.
 - **Package specifier, never a relative path**, in both this layer's schema file
-  and the barrel line it added to `packages/functions/src/database/schema.ts`.
+  and the barrel line it added to `apps/functions/src/database/schema.ts`.
   A relative path resolves fine under tsc, vitest, drizzle-kit, `nuxt build` and
   plain `esbuild --bundle` — none of which is SST's own Worker bundler, the one
-  that actually ships `packages/functions`. Real deploy failure, d0dac0a; see
+  that actually ships `apps/functions`. Real deploy failure, d0dac0a; see
   `nuxfire-layers.md`. Gate used here in place of a live deploy:
-  `bunx esbuild packages/functions/src/{cron,jobs-consumer,dlq-consumer}.ts --bundle --platform=node`,
+  `bunx esbuild apps/functions/src/{cron,jobs-consumer,dlq-consumer}.ts --bundle --platform=node`,
   each individually, grepped for `Could not resolve` — zero, and
   `layers/admin/server/database/schema.ts` is present in the resulting bundle.
 - **`Job`, `Log` and `DeadLetterRecord` did NOT move with `admin-queue.ts`.**
   They are generic async-job-processing infrastructure written by
-  `packages/functions/src/{jobs-consumer,dlq-consumer}.ts`, not admin-domain
+  `apps/functions/src/{jobs-consumer,dlq-consumer}.ts`, not admin-domain
   data. This layer only reads them, through the `@nuxfire/functions/schema`
   barrel — same reasoning that kept them in core through every prior extraction.
-- **Three files stayed in `packages/app` on purpose.**
+- **Three files stayed in `apps/app` on purpose.**
   `server/utils/mfa-crypto.ts` is generic AES-GCM for TOTP seeds, shared by
   `PlatformAdmin.mfaSecret` **and** `User.mfaSecret` (regular-user self-service
   2FA, an unrelated concern). `server/utils/audit-log.ts` holds
@@ -167,7 +167,7 @@ suite count is unchanged at 7 files / 131 tests. There is no `vitest.config.ts`
 here; the root aggregator's `layers/*` project glob tolerates a layer without
 one.
 
-Typechecking is `bun run typecheck` in `packages/app` for the client program,
+Typechecking is `bun run typecheck` in `apps/app` for the client program,
 plus `bunx vue-tsc --noEmit -p server/tsconfig.json` for the server program —
 `nuxt typecheck` does **not** cover the latter, which is the half that contains
 every layer's `server/**`.

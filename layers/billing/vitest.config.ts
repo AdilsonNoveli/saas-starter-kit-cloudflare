@@ -7,5 +7,9 @@ export default defineConfig({
     environment: "node",
     include: ["shared/**/*.test.ts", "server/**/*.test.ts"],
     setupFiles: ["./vitest.setup.ts"],
+    // The first test of a file pays for importing drizzle-orm/nuxt-authorization on a cold
+    // transform cache, which can exceed Vitest's default 5s when the machine is busy
+    // (a full `bun run test` right after edits): a timeout there is not a failing test.
+    testTimeout: 20_000,
   },
 });

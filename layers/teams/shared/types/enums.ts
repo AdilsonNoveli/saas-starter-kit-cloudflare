@@ -1,4 +1,4 @@
-// Teams-domain enums, relocated from `packages/app/types/enums.ts` in Fase 3
+// Teams-domain enums, relocated from `apps/app/types/enums.ts` in Fase 3
 // passo 2a as a fix-forward: `InviteStatus` describes `TeamInvite.status`,
 // whose table moved here in passo 1a, and it should have come along then.
 // Moved verbatim — same `namespace $Enums` shape, same members, same order.

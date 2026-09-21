@@ -8,7 +8,7 @@ export default defineNuxtConfig({
       path: "./components",
       // No `prefix` option, same reasoning as layers/kanban/nuxt.config.ts:
       // every file here is already named `Team*.vue` (singular — they
-      // predate this layer, moved from packages/app/app/components/team+
+      // predate this layer, moved from apps/app/app/components/team+
       // members/ in Fase 3 passo 1b, and TeamSwitcherDropdown is referenced
       // by name from the Composition Root's layouts/dashboard.vue). `prefix`
       // prepends unconditionally with no de-dup, so adding "Team" here would

@@ -1,7 +1,7 @@
 import { pgTable, pgEnum, text, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
-// `User` stays in packages/functions core-schema. `platformAdminRelations`
+// `User` stays in apps/functions core-schema. `platformAdminRelations`
 // below joins to it, and `PlatformAdmin.userId` carries a real foreign key to
 // it.
 //
@@ -17,11 +17,11 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // adding a `platformAdmin` relation to `usersRelations` over there: it would
 // manufacture a fourth cycle for no behavioural gain.
 //
-// PACKAGE SPECIFIER, never a relative path (`../../../../packages/functions/...`).
+// PACKAGE SPECIFIER, never a relative path (`../../../../apps/functions/...`).
 // A relative path resolves fine under tsc, vitest, drizzle-kit, nuxt build and
 // even plain `esbuild --bundle` — none of which is the bundler that actually
-// ships `packages/functions`. See the caution in
-// packages/functions/src/database/schema.ts and nuxfire-layers.md for the real deploy failure this rule comes from (d0dac0a).
+// ships `apps/functions`. See the caution in
+// apps/functions/src/database/schema.ts and nuxfire-layers.md for the real deploy failure this rule comes from (d0dac0a).
 // Requires `@nuxfire/functions: workspace:*` in this layer's own package.json,
 // which every other layer already declares for the same reason.
 import { users } from "@nuxfire/functions/database/core-schema";
@@ -52,7 +52,7 @@ export const platformAdmins = pgTable("PlatformAdmin", {
     .references(() => users.id),
   role: platformRoleEnum("role").notNull(),
   // TOTP secret, always stored encrypted (AES-GCM, see
-  // packages/app/server/utils/mfa-crypto.ts — that helper is shared with
+  // apps/app/server/utils/mfa-crypto.ts — that helper is shared with
   // regular-user 2FA and stays in the Composition Root) — never plaintext,
   // and never serialised to any client.
   mfaSecret: text("mfaSecret"),

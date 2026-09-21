@@ -9,7 +9,7 @@ import auditLog from "./admin-audit-log";
 // calls) rather than be republished at the top level.
 //
 // This import needed ZERO changes when this file moved out of
-// `packages/app/server/trpc/routers/admin/index.ts`: it was already a package
+// `apps/app/server/trpc/routers/admin/index.ts`: it was already a package
 // specifier, already portable. Same for `plans` below. That was the point of
 // leaving those two mount points pointing at the layers that own the logic, and
 // the reason `admin` was extracted last.
@@ -35,7 +35,7 @@ const adminRouter = router({ teams, plans, queue, auditLog, notifications });
  *
  * One key, `admin`, and the whole reason this file exists in this shape: until
  * Fase 3 passo 4 the aggregator above was a bare default export that
- * `packages/app/server/trpc/routers/index.ts` imported by hand
+ * `apps/app/server/trpc/routers/index.ts` imported by hand
  * (`import admin from "./admin/index"`), the last hardcoded layer-ish import
  * left in the Composition Root. Exporting the same `routers` map every other
  * layer exports puts `admin` through the SAME generated

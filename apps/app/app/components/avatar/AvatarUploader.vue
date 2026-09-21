@@ -85,7 +85,7 @@ const emit = defineEmits<{
   remove: [];
 }>();
 
-const toast = useToast();
+const notification = useNotification();
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const sizeClass = computed(
@@ -103,12 +103,7 @@ function onFileChange(event: Event) {
   if (!file) return;
 
   if (file.size > props.maxSizeMb * 1024 * 1024) {
-    toast.add({
-      title: "File too large",
-      description: `Image must be less than ${props.maxSizeMb}MB`,
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.error("File too large", `Image must be less than ${props.maxSizeMb}MB`);
     return;
   }
 

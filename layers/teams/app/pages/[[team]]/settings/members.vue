@@ -105,7 +105,7 @@ import { z } from "zod";
 // Composition Root's own shared/ dir, never a layer's (Fase 3, passo 1b).
 import { teamsSendInvite as sendInviteAbility } from "@nuxfire/layer-teams/shared/utils/abilities";
 
-const toast = useToast();
+const notification = useNotification();
 const route = useRoute();
 const teamSlug = computed(() => route.params.team as string);
 const team = useCurrentTeam();
@@ -143,20 +143,11 @@ async function sendInvite() {
       email: inviteForm.email,
       roleId: inviteForm.role,
     });
-    toast.add({
-      title: "Invite Sent",
-      description: `Invitation sent to ${inviteForm.email}`,
-      color: "success",
-    });
+    notification.success("Invite Sent", `Invitation sent to ${inviteForm.email}`);
     await refresh();
     inviteForm.email = "";
   } catch {
-    toast.add({
-      title: "Invite Failed",
-      description: "Unable to send invitation. Please try again.",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.error("Invite Failed", "Unable to send invitation. Please try again.");
   } finally {
     sendingInvite.value = false;
   }
@@ -170,20 +161,11 @@ async function updateMemberRole(memberId: string, newRoleId: string) {
         memberId,
         newRoleId,
       });
-      toast.add({
-        title: "Role Updated",
-        description: "Member role has been successfully updated",
-        color: "success",
-      });
+      notification.success("Role Updated", "Member role has been successfully updated");
       await refresh();
     }
   } catch {
-    toast.add({
-      title: "Role Update Failed",
-      description: "Unable to update member role. Please try again.",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.error("Role Update Failed", "Unable to update member role. Please try again.");
   }
 }
 
@@ -194,18 +176,9 @@ async function removeMember(memberId: string) {
       memberId,
     });
     await refresh();
-    toast.add({
-      title: "Member Removed",
-      description: "Member has been successfully removed from the team",
-      color: "success",
-    });
+    notification.success("Member Removed", "Member has been successfully removed from the team");
   } catch {
-    toast.add({
-      title: "Remove Member Failed",
-      description: "Unable to remove member. Please try again.",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.error("Remove Member Failed", "Unable to remove member. Please try again.");
   }
 }
 
@@ -218,19 +191,10 @@ async function updateInviteRole(inviteId: string, newRoleId: string) {
         newRoleId,
       });
       await refresh();
-      toast.add({
-        title: "Invite Role Updated",
-        description: "Invite role has been successfully updated",
-        color: "success",
-      });
+      notification.success("Invite Role Updated", "Invite role has been successfully updated");
     }
   } catch {
-    toast.add({
-      title: "Invite Role Update Failed",
-      description: "Unable to update invite role. Please try again.",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.error("Invite Role Update Failed", "Unable to update invite role. Please try again.");
   }
 }
 
@@ -241,18 +205,9 @@ async function removeInvite(inviteId: string) {
       inviteId,
     });
     await refresh();
-    toast.add({
-      title: "Invite Removed",
-      description: "Invite has been successfully deleted",
-      color: "success",
-    });
+    notification.success("Invite Removed", "Invite has been successfully deleted");
   } catch {
-    toast.add({
-      title: "Remove Invite Failed",
-      description: "Unable to delete invite. Please try again.",
-      color: "error",
-      icon: "i-lucide-x",
-    });
+    notification.error("Remove Invite Failed", "Unable to delete invite. Please try again.");
   }
 }
 </script>

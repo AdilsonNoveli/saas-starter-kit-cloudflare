@@ -18,7 +18,7 @@ export default defineLayerManifest({
 
   // `navigation` is deliberately absent: billing is reached from the team
   // settings pages and from /admin, never from a top-level sidebar item. (This
-  // layer's frontend is still in packages/app — it moves in Fase 3 passo 2b.)
+  // layer's frontend is still in apps/app — it moves in Fase 3 passo 2b.)
 
   // Empty on purpose, not an oversight. The one RBAC gate on this domain is
   // `teams:billing:view`, which is already declared by the teams manifest and

@@ -2,7 +2,7 @@ import { and, count, eq, gt, isNull, or } from "drizzle-orm";
 import { teamInvites, teamMemberships } from "@nuxfire/functions/schema";
 
 // `useDB()` below has no import on purpose, exactly as it had in
-// packages/app/server/utils/: Nitro's auto-import scan covers EVERY active
+// apps/app/server/utils/: Nitro's auto-import scan covers EVERY active
 // layer's `server/` directory, not just the Composition Root's
 // (`scanDirs: layerDirs.map((dirs) => dirs.server)` in
 // @nuxt/nitro-server). So this file is a byte-for-byte relocation — which is

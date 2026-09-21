@@ -1,4 +1,4 @@
-// Billing-domain enums, relocated from `packages/app/types/enums.ts` in Fase 3
+// Billing-domain enums, relocated from `apps/app/types/enums.ts` in Fase 3
 // passo 2a. That file mixed three domains in one module (identity, teams,
 // billing) and was missed by the teams extraction; this is its billing slice,
 // moved verbatim — same `namespace $Enums` shape, same members, same order, so

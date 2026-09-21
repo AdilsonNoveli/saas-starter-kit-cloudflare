@@ -1,10 +1,10 @@
 // Plain .ts, deliberately free of JSX/React imports. Consumers that only
-// need to know an email template's expected props (packages/functions/src/
-// emails.ts, and transitively packages/app) import from here instead of
+// need to know an email template's expected props (apps/functions/src/
+// emails.ts, and transitively apps/app) import from here instead of
 // from the .tsx template files — pulling in a .tsx file forces whatever
 // TypeScript program does the importing to type-check its JSX under its
 // own `jsx`/`jsxImportSource` setting, which breaks for a Vue app
-// (packages/app) checking React email templates. This file is the single
+// (apps/app) checking React email templates. This file is the single
 // source of truth for each template's prop shape; the .tsx files import
 // their own interface from here rather than redeclaring it.
 

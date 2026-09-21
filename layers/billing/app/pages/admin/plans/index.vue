@@ -63,7 +63,7 @@ const UButton = resolveComponent("UButton");
 const UCheckbox = resolveComponent("UCheckbox");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 
-const toast = useToast();
+const notification = useNotification();
 const client = useTrpcClient();
 
 // Unlike the status dropdown on Companies, this one refetches: `listPlans`
@@ -97,21 +97,10 @@ async function setArchived(plan: Plan, archived: boolean) {
       : client.admin.plans.unarchivePlan;
     await mutation.mutate({ id: plan.id });
 
-    toast.add({
-      title: archived ? "Plan archived" : "Plan restored",
-      description: `${plan.name} is now ${archived ? "archived" : "active"}.`,
-      color: "success",
-      icon: "i-lucide-check",
-    });
+    notification.success(archived ? "Plan archived" : "Plan restored", `${plan.name} is now ${archived ? "archived" : "active"}.`);
     await refresh();
   } catch (error) {
-    toast.add({
-      title: archived ? "Failed to archive plan" : "Failed to restore plan",
-      description:
-        error instanceof Error ? error.message : "Something went wrong",
-      color: "error",
-      icon: "i-lucide-circle-x",
-    });
+    notification.error(archived ? "Failed to archive plan" : "Failed to restore plan", error instanceof Error ? error.message : "Something went wrong");
   }
 }
 
@@ -125,20 +114,9 @@ async function setupStripePortal() {
     const { configurationId } =
       await client.admin.plans.setupStripeCancelConfiguration.mutate();
 
-    toast.add({
-      title: "Stripe portal configured",
-      description: configurationId,
-      color: "success",
-      icon: "i-lucide-check",
-    });
+    notification.success("Stripe portal configured", configurationId);
   } catch (error) {
-    toast.add({
-      title: "Failed to configure Stripe portal",
-      description:
-        error instanceof Error ? error.message : "Something went wrong",
-      color: "error",
-      icon: "i-lucide-circle-x",
-    });
+    notification.error("Failed to configure Stripe portal", error instanceof Error ? error.message : "Something went wrong");
   }
 }
 

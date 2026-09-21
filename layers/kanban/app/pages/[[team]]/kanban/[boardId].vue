@@ -92,8 +92,8 @@ const showInitialLoader = computed(
 async function run(action: () => Promise<unknown>, failureTitle: string) {
   try {
     await action();
-  } catch (error: any) {
-    notification.error(failureTitle, error?.message || "Something went wrong");
+  } catch (error) {
+    notification.error(failureTitle, getErrorMessage(error));
   } finally {
     await refresh();
   }

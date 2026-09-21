@@ -14,20 +14,20 @@ export const layers = {
 };
 ```
 
-`packages/app/nuxt.config.ts` turns that into `extends: ["@nuxfire/layer-kanban"]`.
+`apps/app/nuxt.config.ts` turns that into `extends: ["@nuxfire/layer-kanban"]`.
 Setting it to `false` drops this layer's pages, components and `nuxt.config.ts`
 from the build entirely.
 
 What `false` does **not** do:
 
-- it does not drop the tables. `packages/functions/src/database/schema.ts`
+- it does not drop the tables. `apps/functions/src/database/schema.ts`
   re-exports `server/database/schema.ts` unconditionally, so the Drizzle client
   stays typed and existing rows stay put. Disabling means "out of the UI", never
   "erased" (plan §4, "orphaned data").
 
 What `false` **does** also do, and must keep doing: it drops the tRPC router and
 the sidebar entry too. `scripts/compose-layers.ts` is handed `activeLayerNames`
-from `packages/app/nuxt.config.ts` — the same set that builds `extends` — so all
+from `apps/app/nuxt.config.ts` — the same set that builds `extends` — so all
 three mechanisms agree. (An earlier version discovered layers from disk alone;
 that left the router callable and the sidebar link live, pointing at a page
 `extends` had correctly removed. Fixed in Fase 2 — do not reintroduce it.)
@@ -68,7 +68,7 @@ that left the router callable and the sidebar link live, pointing at a page
 ## Tests
 
 `shared/utils/abilities.test.ts` runs under the root aggregator
-(`vitest.config.mts` → `test.projects: ["packages/app", "layers/*"]`):
+(`vitest.config.mts` → `test.projects: ["apps/app", "layers/*"]`):
 
 ```bash
 bun run test            # from the repo root

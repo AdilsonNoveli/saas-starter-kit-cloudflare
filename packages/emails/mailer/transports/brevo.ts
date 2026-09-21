@@ -13,7 +13,7 @@ import type { Address } from "nodemailer/lib/mailer/index.js";
 import type MailMessage from "nodemailer/lib/mailer/mail-message.js";
 
 import debug from "../debug";
-import { normalizeBaseUrl, extractMessageHeaders, resolveAttachmentContent } from "../utils";
+import { normalizeBaseUrl, extractMessageHeaders, resolveAttachmentContent, failTransport } from "../utils";
 import { MailResponse } from "../mail-response";
 import { E_MAIL_TRANSPORT_ERROR } from "../errors";
 import { BaseApiTransport } from "./base-api-transport";
@@ -73,7 +73,7 @@ class NodeMailerTransport implements Transport {
    * Convert the Mail message to the format accepted by the Brevo API
    */
   async #preparePayload(mail: MailMessage) {
-    let payload: Record<string, any> = {
+    let payload: Record<string, unknown> = {
       sender: this.#formatAddresses(mail.data.from)[0],
       to: this.#formatAddresses(mail.data.to),
       subject: mail.data.subject,
@@ -169,11 +169,11 @@ class NodeMailerTransport implements Transport {
 
       callback(null, { envelope, messageId });
     } catch (error) {
-      callback(
+      failTransport(
+        callback,
         new E_MAIL_TRANSPORT_ERROR("Unable to send email using the brevo transport", {
           cause: error,
         }),
-        undefined as any,
       );
     }
   }

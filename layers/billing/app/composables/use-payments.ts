@@ -9,7 +9,7 @@ interface PaddlePayments {
   init: () => Promise<Paddle>;
   checkout: (
     items: PaymentItem[],
-    options?: { discountCode?: string; theme?: "light" | "dark"; data?: any },
+    options?: { discountCode?: string; theme?: "light" | "dark"; data?: Record<string, unknown> },
   ) => Promise<void>;
 }
 
@@ -72,7 +72,7 @@ export function usePayments(provider: string) {
       options: {
         discountCode?: string;
         theme?: "light" | "dark";
-        data?: any;
+        data?: Record<string, unknown>;
       } = {},
     ) {
       if (!Paddle.value) {

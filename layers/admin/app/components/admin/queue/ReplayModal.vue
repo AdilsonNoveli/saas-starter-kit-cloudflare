@@ -49,19 +49,14 @@ const emit = defineEmits<{ success: [] }>();
 /** The literal the backend throws when `replayedAt` is already set. */
 const ALREADY_REPLAYED = "This message has already been replayed";
 
-const toast = useToast();
+const notification = useNotification();
 const replayMutation = useTrpcClient().admin.queue.replayDeadLetter;
 
 async function confirm() {
   try {
     await replayMutation.mutate({ id: props.record.id });
     open.value = false;
-    toast.add({
-      title: "Message replayed",
-      description: "It is back in the job queue.",
-      color: "success",
-      icon: "i-lucide-check",
-    });
+    notification.success("Message replayed", "It is back in the job queue.");
     // The caller owns the data, so it owns the refetch.
     emit("success");
   } catch (error) {
@@ -72,22 +67,12 @@ async function confirm() {
     // is just stale. Close and refetch so the table stops offering the action.
     if (message === ALREADY_REPLAYED) {
       open.value = false;
-      toast.add({
-        title: "Already replayed",
-        description: "This message was sent back to the queue earlier.",
-        color: "warning",
-        icon: "i-lucide-info",
-      });
+      notification.warning("Already replayed", "This message was sent back to the queue earlier.");
       emit("success");
       return;
     }
 
-    toast.add({
-      title: "Failed to replay message",
-      description: message || "Something went wrong",
-      color: "error",
-      icon: "i-lucide-circle-x",
-    });
+    notification.error("Failed to replay message", message || "Something went wrong");
   }
 }
 </script>

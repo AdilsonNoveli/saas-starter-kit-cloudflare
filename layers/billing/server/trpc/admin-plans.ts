@@ -211,7 +211,7 @@ async function resolvePlanPricing(
  * ./router.ts as an extra NAMED export alongside `routers`, and the admin
  * layer's own `server/trpc/router.ts` imports it from there instead of from a
  * neighbouring file. (When this was written that aggregator still lived in
- * packages/app; Fase 3 passo 4 moved it into `layers/admin` without touching
+ * apps/app; Fase 3 passo 4 moved it into `layers/admin` without touching
  * this import, which was already a package specifier.)
  */
 export const adminPlansRouter = router({

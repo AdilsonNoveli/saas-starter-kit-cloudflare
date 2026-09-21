@@ -23,7 +23,7 @@ import type { MailResponse } from "./mail-response";
  * Class constructor type, used by the fake mailer's assertion helpers
  * (`assertSent(SomeMailClass, ...)`).
  */
-export type Constructor<T = unknown> = new (...args: any[]) => T;
+export type Constructor<T = unknown> = new (...args: never[]) => T;
 
 /**
  * Shape of the envelope node after the email has been
@@ -62,9 +62,9 @@ export type CalendarEventOptions = {
  * Shape of data view defined on the message
  */
 export type MessageBodyTemplates = {
-  html?: { template: string; data?: any };
-  text?: { template: string; data?: any };
-  watch?: { template: string; data?: any };
+  html?: { template: string; data?: unknown };
+  text?: { template: string; data?: unknown };
+  watch?: { template: string; data?: unknown };
 };
 
 /**
@@ -177,14 +177,14 @@ export type MailEvents = {
     views: MessageBodyTemplates;
   };
   "mail:queued": {
-    metaData?: any;
+    metaData?: unknown;
     mailerName: string;
     message: NodeMailerMessage;
     views: MessageBodyTemplates;
   };
   "queued:mail:error": {
-    error: any;
-    metaData?: any;
+    error: unknown;
+    metaData?: unknown;
     mailerName: string;
   };
 };
@@ -196,7 +196,7 @@ export type MailEvents = {
  * container), so `generate.ts` wires a no-op implementation — see `Emitter`
  * there.
  */
-export interface EmitterLike<EventsList extends Record<string, any>> {
+export interface EmitterLike<EventsList extends Record<string, unknown>> {
   emit<Name extends keyof EventsList>(event: Name, data: EventsList[Name]): Promise<void> | void;
   emitSerial<Name extends keyof EventsList>(
     event: Name,
@@ -279,7 +279,7 @@ export type MailerConfig = {
    * Global data to share with email templates when rendering
    * them using the template engine.
    */
-  globals?: Record<string, any>;
+  globals?: Record<string, unknown>;
 };
 
 /**
@@ -290,7 +290,7 @@ export interface MailerTemplateEngine {
   /**
    * Render a template to contents
    */
-  render(templatePath: string, sharedState?: any, data?: any): string | Promise<string>;
+  render(templatePath: string, sharedState?: unknown, data?: unknown): string | Promise<string>;
 }
 
 /**
@@ -300,7 +300,7 @@ export interface MailerMessenger {
   queue(
     mail: { message: NodeMailerMessage; views: MessageBodyTemplates },
     sendConfig?: unknown,
-  ): Promise<any>;
+  ): Promise<unknown>;
 }
 
 /*

@@ -522,7 +522,10 @@ function getIssuer(env: Env) {
           redirect.pathname = "/login";
           if (devUrl)
             redirect.searchParams.set("origin", new URL(req.url).origin);
-          const email = form?.get("email") || (state as any)?.claims?.email;
+          const submitted = form?.get("email");
+          const email =
+            (typeof submitted === "string" ? submitted : undefined) ||
+            (state?.type === "code" ? state.claims.email : undefined);
           if (email) redirect.searchParams.set("email", email);
           if (state?.type) redirect.searchParams.set("state", state?.type);
           if (err?.type) redirect.searchParams.set("err", err?.type);
@@ -595,12 +598,15 @@ function getIssuer(env: Env) {
             },
           });
           if (!data.email) {
-            const emails = (await ofetch("https://api.github.com/user/emails", {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                "User-Agent": "nuxfire",
+            const emails = await ofetch<{ email: string; primary: boolean }[]>(
+              "https://api.github.com/user/emails",
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                  "User-Agent": "nuxfire",
+                },
               },
-            })) as any[];
+            );
             data.email = (emails.find((email) => email.primary) || emails[0])
               ?.email;
           }

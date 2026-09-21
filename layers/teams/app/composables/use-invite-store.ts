@@ -1,9 +1,13 @@
+import type { RouterOutput } from "~~/server/trpc/routers";
+
+type Invite = RouterOutput["invites"]["getInvite"];
+
 export const useInviteStore = defineStore("invite", {
   state: () => ({
-    invite: null as any | null,
+    invite: null as Invite | null,
   }),
   actions: {
-    setInvite(invite: any) {
+    setInvite(invite: Invite) {
       this.invite = invite;
     },
   },

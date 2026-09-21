@@ -12,7 +12,7 @@ import { createTransport, type Transport } from "nodemailer";
 import type MailMessage from "nodemailer/lib/mailer/mail-message.js";
 
 import debug from "../debug";
-import { normalizeBaseUrl, extractMessageHeaders, resolveAttachmentContent } from "../utils";
+import { normalizeBaseUrl, extractMessageHeaders, resolveAttachmentContent, failTransport } from "../utils";
 import { MailResponse } from "../mail-response";
 import { E_MAIL_TRANSPORT_ERROR } from "../errors";
 import { BaseApiTransport } from "./base-api-transport";
@@ -86,7 +86,7 @@ class NodeMailerTransport implements Transport {
    * accepted by Resend
    */
   async #preparePayload(mail: MailMessage) {
-    let payload: Record<string, any> = {
+    let payload: Record<string, unknown> = {
       from: this.#formatRecipients(mail.data.from)[0],
       to: this.#formatRecipients(mail.data.to),
       subject: mail.data.subject,
@@ -116,7 +116,7 @@ class NodeMailerTransport implements Transport {
       payload.attachments = await Promise.all(
         mail.data.attachments.map(async (attachment, index) => {
           const content = await resolveAttachmentContent(mail, index);
-          const item: Record<string, any> = {
+          const item: Record<string, unknown> = {
             filename: attachment.filename,
             content: content.toString("base64"),
           };
@@ -186,11 +186,11 @@ class NodeMailerTransport implements Transport {
 
       callback(null, { messageId, envelope, ...body });
     } catch (error) {
-      callback(
+      failTransport(
+        callback,
         new E_MAIL_TRANSPORT_ERROR("Unable to send email using the resend transport", {
           cause: error,
         }),
-        undefined as any,
       );
     }
   }

@@ -3,7 +3,7 @@
  * components never repeat the team-identifier plumbing.
  *
  * `useTrpcClient` and `useCurrentTeam` are auto-imported from the Composition
- * Root (packages/app): Nuxt's auto-import registry is shared across every
+ * Root (apps/app): Nuxt's auto-import registry is shared across every
  * layer in the build, which is exactly the property this pilot layer exercises.
  */
 export function useKanban() {

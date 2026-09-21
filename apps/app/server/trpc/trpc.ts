@@ -1,6 +1,13 @@
 import { TRPCError, initTRPC } from "@trpc/server";
-import type { BouncerAbility, BouncerArgs } from "nuxt-authorization/utils";
+import type { BouncerArgs, allows as coreAllows } from "nuxt-authorization/utils";
 import type { Context } from "~~/server/trpc/context";
+
+// The ability type that nuxt-authorization's core `allows` accepts. Each layer declares its
+// own structural `User`, so no single user type fits; deriving it from the library keeps its
+// constraint in one place instead of restating it in every signature. The core function is
+// used (not the auto-imported wrappers) because it is the same in the server program and in
+// the Nuxt client program.
+type AnyAbility = Parameters<typeof coreAllows>[0];
 
 const t = initTRPC.context<Context>().create();
 
@@ -43,19 +50,19 @@ export const abilityProcedure = protectedProcedure.use(async (opts) => {
   return opts.next({
     ctx: {
       ...ctx,
-      allows: async function allow<Ability extends BouncerAbility<any>>(
+      allows: async function allow<Ability extends AnyAbility>(
         ability: Ability,
         ...args: BouncerArgs<Ability>
       ) {
         return await allows(ctx.event, ability, ...args);
       },
-      denies: async function deny<Ability extends BouncerAbility<any>>(
+      denies: async function deny<Ability extends AnyAbility>(
         ability: Ability,
         ...args: BouncerArgs<Ability>
       ) {
         return await denies(ctx.event, ability, ...args);
       },
-      authorize: async function auth<Ability extends BouncerAbility<any>>(
+      authorize: async function auth<Ability extends AnyAbility>(
         ability: Ability,
         ...args: BouncerArgs<Ability>
       ) {

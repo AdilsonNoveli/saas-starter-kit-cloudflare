@@ -64,6 +64,24 @@ export function useNotification() {
         icon: "i-lucide-info",
       });
     },
+    warning(title: string, description?: string) {
+      toast.add({
+        title,
+        description,
+        color: "warning",
+        icon: "i-lucide-triangle-alert",
+      });
+    },
+    /** A toast that is not a severity — e.g. a real-time push from the server. */
+    message(title: string, description?: string, duration?: number) {
+      toast.add({
+        title,
+        description,
+        duration,
+        color: "primary",
+        icon: "i-lucide-bell",
+      });
+    },
     confirm(options: ConfirmDialogOptions) {
       return new Promise<boolean>((resolve) => {
         dialog.value = { options, resolve };

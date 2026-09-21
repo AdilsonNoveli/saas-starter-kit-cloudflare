@@ -1,15 +1,12 @@
 import { Resource } from "sst";
 import { resolve } from "path";
-import { Subprocess } from "bun";
 import { flags } from "#nuxfire/config";
-
-let proc: Subprocess<any>;
 
 const packageName = process.argv[2];
 const customCommand = process.argv[3] === "--";
 const isRemote = process.argv[3] === "remote";
 
-proc = Bun.spawn(
+const proc = Bun.spawn(
   customCommand
     ? process.argv.slice(4)
     : ["bun", "run", "dev", ...(isRemote ? ["--remote"] : [])],

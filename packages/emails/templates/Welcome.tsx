@@ -1,6 +1,6 @@
 /** @jsxImportSource react */
-// This file is reachable from packages/app's TS program (via
-// packages/functions/src/sender.ts's type-only import of EmailsWorker),
+// This file is reachable from apps/app's TS program (via
+// apps/functions/src/sender.ts's type-only import of EmailsWorker),
 // whose own tsconfig sets `jsxImportSource: "vue"` — without this pragma,
 // every element below gets checked against Vue's JSX namespace instead of
 // React's.

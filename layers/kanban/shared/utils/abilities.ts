@@ -19,7 +19,7 @@ interface User {
 /**
  * Local copy of the same membership + permission check
  * `layers/teams/shared/utils/abilities.ts` uses (that path was
- * `packages/app/shared/utils/abilities.ts` until Fase 3 extracted the `teams`
+ * `apps/app/shared/utils/abilities.ts` until Fase 3 extracted the `teams`
  * domain into its own layer). Still deliberately duplicated rather than
  * imported: it is a four-line predicate, and importing it would make this
  * feature layer's ability definitions fail to load whenever the teams layer

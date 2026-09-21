@@ -75,10 +75,10 @@ async function create() {
     if (!board) throw new Error("No board returned");
     emit("created", board);
     close();
-  } catch (error: any) {
+  } catch (error) {
     notification.error(
       "Error creating board",
-      error?.message || "Something went wrong",
+      getErrorMessage(error),
     );
   } finally {
     loading.value = false;

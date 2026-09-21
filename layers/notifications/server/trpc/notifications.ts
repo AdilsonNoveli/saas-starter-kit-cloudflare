@@ -1,12 +1,12 @@
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
-// `~~` is the Composition Root (packages/app). Layers import the shared tRPC
+// `~~` is the Composition Root (apps/app). Layers import the shared tRPC
 // primitives and server utils explicitly instead of relying on Nitro's
 // cross-layer merge — the decision recorded at the top of
 // nuxfire-layers.md (layers own the frontend; the backend uses
 // explicit imports), and the same pattern layers/teams' and layers/billing's
 // routers use. `useDB` and `eq` were bare auto-imports while this file lived in
-// packages/app; a router module is imported as a plain module by the generated
+// apps/app; a router module is imported as a plain module by the generated
 // `.composition/layer-routers.ts`, so both are explicit here.
 import { protectedProcedure, router } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";

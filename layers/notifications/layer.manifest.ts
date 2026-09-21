@@ -11,14 +11,14 @@ export default defineLayerManifest({
   //
   // `nuxfire-layers.md` (Fase 3, item 3) predicted this layer would
   // depend on `teams`. It does not: `Notification` has exactly one cross-table
-  // reference, `userId` -> `User`, which lives in `packages/functions`
+  // reference, `userId` -> `User`, which lives in `apps/functions`
   // core-schema, and no file in this layer imports `@nuxfire/layer-teams` at
   // all. The only
   // teams-shaped coupling is in `app/pages/admin/notifications.vue`, which CALLS
   // `trpc.admin.teams.*` at runtime to populate its team/member pickers — and
   // that router lives in the admin layer
   // (`layers/admin/server/trpc/admin-teams.ts` since Fase 3 passo 4; it was
-  // `packages/app/server/trpc/routers/admin/teams.ts` when this was written),
+  // `apps/app/server/trpc/routers/admin/teams.ts` when this was written),
   // not in the teams layer.
   // A runtime tRPC call is not a layer dependency; `requires` documents the
   // `extends`/import direction, so listing `teams` here would be a claim the

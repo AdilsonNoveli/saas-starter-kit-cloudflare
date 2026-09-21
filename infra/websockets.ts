@@ -58,7 +58,7 @@ export const websockets = flags.websockets
     )
   : undefined;
 
-export const outputs = flags.websockets
+export const outputs = websocketsUrl
   ? {
       Websockets: websocketsUrl.properties.value,
     }

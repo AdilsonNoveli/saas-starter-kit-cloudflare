@@ -23,7 +23,7 @@
 
         <!-- Feature List: Clean Checkpoints without bulky cards -->
         <div class="space-y-6 pt-1">
-          <!-- Item 1: Acesso imediato à sua Área de Membros -->
+          <!-- Item 1: Immediate access to your Members Area -->
           <div class="space-y-2.5">
             <div class="flex items-center gap-2.5">
               <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-emerald-500 shrink-0" />
@@ -55,7 +55,7 @@
             </ul>
           </div>
 
-          <!-- Item 2: 15.000+ Linhas de Engenharia Sênior Testada -->
+          <!-- Item 2: 15,000+ lines of tested senior engineering -->
           <div class="space-y-1.5">
             <div class="flex items-center gap-2.5">
               <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-emerald-500 shrink-0" />

@@ -4,7 +4,7 @@ export default defineLayerManifest({
   name: "admin",
   displayName: "Platform Admin",
   description:
-    "Console do dono da plataforma: visão cross-tenant de empresas, monitoramento da fila de jobs, trilha de auditoria e o gate de MFA elevado do /admin",
+    "Platform-owner console: cross-tenant view of companies, job queue monitoring, audit trail and the elevated-MFA gate of /admin",
   version: "1.0.0",
 
   // Documentational only — nothing validates `extends` order automatically

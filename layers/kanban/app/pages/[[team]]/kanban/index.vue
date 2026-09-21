@@ -27,7 +27,7 @@
           @click="showCreateModal = true"
         >
           <UIcon name="i-lucide-circle-plus" class="size-8" />
-          <span class="text-sm font-medium">Novo board</span>
+          <span class="text-sm font-medium">New board</span>
         </button>
 
         <NuxtLink
@@ -45,7 +45,7 @@
             <UButton
               color="neutral"
               icon="i-lucide-ellipsis-vertical"
-              aria-label="Opções do board"
+              aria-label="Board options"
             />
           </UDropdownMenu>
 
@@ -112,9 +112,9 @@ function boardMenuItems(board: { id: string; name: string }): DropdownMenuItem[]
 
 async function onDeleteBoard(board: { id: string; name: string }) {
   const confirmed = await notification.confirm({
-    title: "Excluir board",
-    description: `Deseja realmente excluir o board "${board.name}" e todo o seu conteúdo? Esta ação não pode ser desfeita.`,
-    confirmLabel: "Excluir",
+    title: "Delete board",
+    description: `Are you sure you want to delete the board "${board.name}" and all of its content? This action cannot be undone.`,
+    confirmLabel: "Delete",
   });
   if (!confirmed) return;
 
@@ -122,7 +122,7 @@ async function onDeleteBoard(board: { id: string; name: string }) {
     await kanban.deleteBoard(board.id);
     await refresh();
   } catch (error: any) {
-    notification.error("Erro ao excluir board", error?.message || "Algo deu errado");
+    notification.error("Error deleting board", error?.message || "Something went wrong");
   }
 }
 

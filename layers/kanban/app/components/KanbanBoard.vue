@@ -7,7 +7,7 @@
       <div class="flex items-center gap-3 flex-1 min-w-0">
         <!-- Search -->
         <div class="relative w-full max-w-xs h-9 shrink-0">
-          <label for="board-search" class="sr-only">Pesquisar</label>
+          <label for="board-search" class="sr-only">Search</label>
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <UIcon name="i-lucide-search" class="w-4 h-4 text-muted" />
           </div>
@@ -16,7 +16,7 @@
             v-model="searchQuery"
             type="text"
             class="block w-full h-full pl-9 pr-8 border border-default rounded bg-default text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-            placeholder="Pesquisar cards..."
+            placeholder="Search cards..."
           >
           <button
             v-if="searchQuery"
@@ -31,7 +31,7 @@
         <!-- Counters -->
         <div class="hidden sm:flex items-center gap-1.5 text-xs text-muted">
           <span class="rounded bg-muted px-2 py-0.5 font-semibold text-highlighted border border-default tabular-nums">
-            {{ board.columns.length }} coluna(s)
+            {{ board.columns.length }} column(s)
           </span>
           <span class="rounded bg-muted px-2 py-0.5 font-semibold text-highlighted border border-default tabular-nums">
             {{ totalCardsCount }} card(s)
@@ -44,7 +44,7 @@
     </div>
 
 
-    <!-- Board: área de scroll lateral (grab-to-scroll) -->
+    <!-- Board: horizontal scroll area (grab-to-scroll) -->
     <div
       ref="boardWrapper"
       class="flex-1 overflow-x-auto overflow-y-hidden p-4 cursor-grab active:cursor-grabbing bg-default"
@@ -63,7 +63,7 @@
           @delete-column="emit('deleteColumn', $event)"
         />
 
-        <!-- Adicionar nova coluna (estilo quadrado tracejado com circle-plus do template) -->
+        <!-- Add new column (dashed square style with the template's circle-plus) -->
         <div
           v-if="isAddingColumn"
           class="flex w-64 shrink-0 flex-col rounded border border-dashed border-default bg-elevated p-3 self-start shadow-xs transition-colors"
@@ -71,7 +71,7 @@
           <div class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-muted">
             <div class="flex items-center gap-1.5">
               <UIcon name="i-lucide-columns-3" class="size-3.5" />
-              <span>Nova coluna</span>
+              <span>New column</span>
             </div>
             <button
               type="button"
@@ -90,14 +90,14 @@
               ref="newColumnInputRef"
               v-model="columnState.name"
               type="text"
-              placeholder="Nome da coluna..."
+              placeholder="Column name..."
               class="flex-1 h-8 px-2 border border-default rounded bg-default text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
             />
             <button
               type="submit"
               class="shrink-0 size-8 flex items-center justify-center rounded border border-default bg-muted text-muted hover:text-highlighted hover:bg-elevated transition-colors focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               :disabled="!columnState.name.trim()"
-              aria-label="Salvar coluna"
+              aria-label="Save column"
             >
               <UIcon name="i-lucide-plus" class="size-4" />
             </button>
@@ -108,8 +108,8 @@
           v-else
           type="button"
           class="flex flex-col items-center justify-center size-11 shrink-0 self-start rounded border border-dashed border-default text-muted hover:text-highlighted hover:border-accented hover:bg-elevated transition-colors cursor-pointer"
-          aria-label="Adicionar coluna"
-          title="Adicionar coluna"
+          aria-label="Add column"
+          title="Add column"
           @click="startAddColumn"
         >
           <UIcon name="i-lucide-circle-plus" class="size-5" />

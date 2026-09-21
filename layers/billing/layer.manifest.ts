@@ -4,7 +4,7 @@ export default defineLayerManifest({
   name: "billing",
   displayName: "Billing",
   description:
-    "Assinaturas, planos e catálogo de preços: Stripe/Paddle, webhooks e o console de planos do platform admin",
+    "Subscriptions, plans and price catalog: Stripe/Paddle, webhooks and the platform admin plans console",
   version: "1.0.0",
 
   // Documentational only — nothing validates `extends` order automatically

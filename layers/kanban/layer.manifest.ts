@@ -3,7 +3,7 @@ import { defineLayerManifest } from "@nuxfire/manifest";
 export default defineLayerManifest({
   name: "kanban",
   displayName: "Kanban Board",
-  description: "Gestão visual de tarefas e projetos com drag-and-drop",
+  description: "Visual task and project management with drag-and-drop",
   version: "1.0.0",
 
   // Documentational only — nothing validates `extends` order automatically

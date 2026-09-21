@@ -9,12 +9,12 @@
         class="kanban-column-header flex-1 rounded-t flex flex-col items-center gap-2.5 py-2.5 select-none transition-colors"
         :style="headerStyle"
       >
-        <!-- Botão Expandir -->
+        <!-- Expand button -->
         <button
           type="button"
           class="p-1 rounded hover:brightness-110 transition-[filter] focus:outline-none cursor-pointer"
-          :title="`Abrir coluna ${column.name}`"
-          :aria-label="`Abrir coluna ${column.name}`"
+          :title="`Open column ${column.name}`"
+          :aria-label="`Open column ${column.name}`"
           @click="toggleCollapse"
         >
           <UIcon name="i-lucide-chevron-last" class="size-4" />
@@ -36,7 +36,7 @@
 
     <!-- ===== EXPANDIDA ===== -->
     <template v-else>
-      <!-- Header com recolher, título, contador, editar e excluir -->
+      <!-- Header with collapse, title, counter, edit and delete -->
       <KanbanColumnHeader
         :name="column.name"
         :card-count="column.cards.length"
@@ -76,7 +76,7 @@
         </div>
       </div>
 
-      <!-- Adicionar card -->
+      <!-- Add card -->
       <div class="p-2.5 pt-0 shrink-0 border-t border-default/50 mt-auto bg-elevated">
         <form
           class="flex items-center gap-1.5 pt-2"
@@ -85,7 +85,7 @@
           <input
             v-model="cardState.title"
             type="text"
-            placeholder="Adicionar card..."
+            placeholder="Add card..."
             class="flex-1 h-8 px-2 border border-default rounded bg-default text-sm text-highlighted placeholder:text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
           />
           <button

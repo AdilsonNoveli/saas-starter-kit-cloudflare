@@ -15,7 +15,7 @@
         <template #right>
           <UButton
             :to="`${baseRoute}/kanban`"
-            label="Todos os boards"
+            label="All boards"
             icon="i-lucide-arrow-left"
             color="neutral"
             variant="ghost"
@@ -93,7 +93,7 @@ async function run(action: () => Promise<unknown>, failureTitle: string) {
   try {
     await action();
   } catch (error: any) {
-    notification.error(failureTitle, error?.message || "Algo deu errado");
+    notification.error(failureTitle, error?.message || "Something went wrong");
   } finally {
     await refresh();
   }
@@ -150,38 +150,38 @@ function moveCard(payload: {
   position: number;
 }) {
   applyOptimisticMove(payload);
-  return run(() => kanban.moveCard(payload), "Erro ao mover card");
+  return run(() => kanban.moveCard(payload), "Error moving card");
 }
 
 function createCard(payload: { columnId: string; title: string }) {
   return run(
     () => kanban.createCard(payload.columnId, payload.title),
-    "Erro ao criar card",
+    "Error creating card",
   );
 }
 
 function createColumn(name: string) {
   return run(
     () => kanban.createColumn(boardId.value, name),
-    "Erro ao criar coluna",
+    "Error creating column",
   );
 }
 
 function updateColumn(payload: { columnId: string; name: string }) {
   return run(
     () => kanban.updateColumn(payload.columnId, payload.name),
-    "Erro ao renomear coluna",
+    "Error renaming column",
   );
 }
 
 function deleteColumn(columnId: string) {
   return run(
     () => kanban.deleteColumn(columnId),
-    "Erro ao excluir coluna",
+    "Error deleting column",
   );
 }
 
 function deleteCard(cardId: string) {
-  return run(() => kanban.deleteCard(cardId), "Erro ao excluir card");
+  return run(() => kanban.deleteCard(cardId), "Error deleting card");
 }
 </script>

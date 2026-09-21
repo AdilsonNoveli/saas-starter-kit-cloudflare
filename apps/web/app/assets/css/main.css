@@ -59,21 +59,21 @@
   inherits: false;
 }
 
-/* Animação da borda girando */
+/* Spinning border animation */
 @keyframes border-spin {
   to {
     --gradient-angle: 360deg;
   }
 }
 
-/* Animação do brilho deslizante */
+/* Sliding shine animation */
 @keyframes shimmer {
   to {
     transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 
-/* Animação de respiração do texto */
+/* Text breathing animation */
 @keyframes breathe {
   0%,
   100% {
@@ -95,7 +95,7 @@
   position: relative;
   overflow: hidden;
 
-  /* Background com gradiente cônico animado */
+  /* Animated conic-gradient background */
   background:
     linear-gradient(var(--background, #ffffff), var(--background, #ffffff)) padding-box,
     conic-gradient(
@@ -113,7 +113,7 @@
   box-shadow: inset 0 0 0 1px rgba(221, 44, 0, 0.2);
   isolation: isolate;
 
-  /* Animação da borda */
+  /* Border animation */
   animation: border-spin 2.5s linear infinite;
   cursor: pointer;
   color: var(--shiny-text, currentColor);
@@ -196,8 +196,8 @@
   animation: shimmer 4s linear infinite;
 }
 
-/* Conteúdo (span) - Texto com z-index correto */
-/* IMPORTANTE: sem width/height 100% — o span cresce pelo conteúdo (intrinsic) */
+/* Content (span) - text with the correct z-index */
+/* IMPORTANT: no width/height 100% — the span grows with its content (intrinsic) */
 .shiny-button > span {
   position: relative;
   z-index: 2;
@@ -208,7 +208,7 @@
   color: var(--shiny-text, currentColor);
 }
 
-/* Conteúdo ::before - Brilho respirando */
+/* Content ::before - breathing shine */
 .shiny-button > span::before {
   content: "";
   pointer-events: none;

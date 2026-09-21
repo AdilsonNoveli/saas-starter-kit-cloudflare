@@ -4,7 +4,7 @@ export default defineLayerManifest({
   name: "notifications",
   displayName: "Notifications",
   description:
-    "Notificações in-app: a tabela Notification, o sino do dashboard, a preferência por usuário e o push em tempo real sobre WebSockets",
+    "In-app notifications: the Notification table, the dashboard bell, the per-user preference and real-time push over WebSockets",
   version: "1.0.0",
 
   // Empty, and that is what the code actually says — not an oversight.

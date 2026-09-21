@@ -13,7 +13,7 @@
       widthClasses,
     ]"
   >
-    <!-- O span direto é obrigatório para o efeito shiny funcionar corretamente -->
+    <!-- The direct span is required for the shiny effect to work correctly -->
     <span class="flex items-center justify-center gap-2">
       <slot name="leading">
         <UIcon v-if="leadingIcon" :name="leadingIcon" class="w-4 h-4 shrink-0" />

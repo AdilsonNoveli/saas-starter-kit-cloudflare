@@ -4,8 +4,7 @@
  * There is deliberately no `infrastructure` field: Cloudflare resources are
  * provisioned only by the `flags` object in the root `config.ts`, read directly
  * by `infra/*.ts`. A manifest field describing infrastructure would have no
- * code reading it. See "Registro de Decisões da Auditoria" in
- * `nuxfire-layers.md`.
+ * code reading it. See `nuxfire-layers.md`.
  */
 
 /** A single item a layer injects into the application sidebar. */

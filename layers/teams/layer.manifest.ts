@@ -4,7 +4,7 @@ export default defineLayerManifest({
   name: "teams",
   displayName: "Teams",
   description:
-    "Multi-tenancy: equipes, associações, convites e o RBAC por tenant (Role/Permission)",
+    "Multi-tenancy: teams, memberships, invitations and per-tenant RBAC (Role/Permission)",
   version: "1.0.0",
 
   // Empty on purpose — teams is the base every other layer depends on, so it

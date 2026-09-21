@@ -3,8 +3,8 @@ import { z } from "zod";
 // `~~` is the Composition Root (packages/app). Layers import the shared tRPC
 // primitives and server utils explicitly instead of relying on Nitro's
 // cross-layer merge — the decision recorded at the top of
-// nuxfire-layers.md ("Layers cuidam do frontend; o backend usa
-// import explícito"), and the same pattern layers/teams' and layers/billing's
+// nuxfire-layers.md (layers own the frontend; the backend uses
+// explicit imports), and the same pattern layers/teams' and layers/billing's
 // routers use. `useDB` and `eq` were bare auto-imports while this file lived in
 // packages/app; a router module is imported as a plain module by the generated
 // `.composition/layer-routers.ts`, so both are explicit here.

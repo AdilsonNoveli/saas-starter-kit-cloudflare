@@ -23,7 +23,7 @@ What `false` does **not** do:
 - it does not drop the tables. `packages/functions/src/database/schema.ts`
   re-exports `server/database/schema.ts` unconditionally, so the Drizzle client
   stays typed and existing rows stay put. Disabling means "out of the UI", never
-  "erased" (plan §4, "dado órfão").
+  "erased" (plan §4, "orphaned data").
 
 What `false` **does** also do, and must keep doing: it drops the tRPC router and
 the sidebar entry too. `scripts/compose-layers.ts` is handed `activeLayerNames`

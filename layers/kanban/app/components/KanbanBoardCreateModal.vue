@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :dismissible="false" title="Novo board">
+  <UModal v-model:open="open" :dismissible="false" title="New board">
     <template #content>
       <UForm
         :schema="schema"
@@ -10,7 +10,7 @@
         <UCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <span class="font-semibold">Novo board</span>
+              <span class="font-semibold">New board</span>
               <UButton
                 icon="i-lucide-x"
                 variant="ghost"
@@ -20,10 +20,10 @@
             </div>
           </template>
 
-          <UFormField label="Nome" name="name" required>
+          <UFormField label="Name" name="name" required>
             <UInput
               v-model="state.name"
-              placeholder="Nome do board"
+              placeholder="Board name"
               class="w-full"
               autofocus
             />
@@ -31,7 +31,7 @@
 
           <template #footer>
             <div class="w-full flex justify-end">
-              <UButton :loading="loading" type="submit" label="Criar" />
+              <UButton :loading="loading" type="submit" label="Create" />
             </div>
           </template>
         </UCard>
@@ -53,8 +53,8 @@ const notification = useNotification();
 const schema = z.object({
   name: z
     .string()
-    .min(2, "O nome deve ter pelo menos 2 caracteres")
-    .max(80, "O nome deve ter no máximo 80 caracteres"),
+    .min(2, "The name must be at least 2 characters")
+    .max(80, "The name must be at most 80 characters"),
 });
 const state = reactive({ name: "" });
 const loading = ref(false);
@@ -77,8 +77,8 @@ async function create() {
     close();
   } catch (error: any) {
     notification.error(
-      "Erro ao criar board",
-      error?.message || "Algo deu errado",
+      "Error creating board",
+      error?.message || "Something went wrong",
     );
   } finally {
     loading.value = false;

@@ -4,8 +4,8 @@ import { z } from "zod";
 // `~~` is the Composition Root (packages/app). Layers import the shared tRPC
 // primitives and server utils explicitly instead of relying on Nitro's
 // cross-layer merge — the decision recorded at the top of
-// nuxfire-layers.md ("Layers cuidam do frontend; o backend usa
-// import explícito"), and the same pattern layers/kanban's router uses.
+// nuxfire-layers.md (layers own the frontend; the backend uses
+// explicit imports), and the same pattern layers/kanban's router uses.
 import {
   abilityProcedure,
   protectedProcedure,

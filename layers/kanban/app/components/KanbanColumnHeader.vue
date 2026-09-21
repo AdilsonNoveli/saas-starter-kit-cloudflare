@@ -3,18 +3,18 @@
     class="shrink-0 pl-3 pr-2 py-2 flex items-center justify-between gap-1.5 border-b select-none rounded-t transition-colors"
     :style="headerStyle"
   >
-    <!-- Ícone de recolher coluna (lado esquerdo, igual ao modelo do template) -->
+    <!-- Collapse column icon (left side, as in the template) -->
     <button
       type="button"
       class="p-1 rounded hover:brightness-110 transition-[filter] shrink-0 focus:outline-none cursor-pointer"
-      :title="`Recolher coluna ${name}`"
-      :aria-label="`Recolher coluna ${name}`"
+      :title="`Collapse column ${name}`"
+      :aria-label="`Collapse column ${name}`"
       @click="emit('collapse')"
     >
       <UIcon name="i-lucide-chevron-first" class="size-3.5" />
     </button>
 
-    <!-- Modo de Edição Inline do Título -->
+    <!-- Inline title edit mode -->
     <div v-if="isEditing" class="flex-1 flex items-center gap-1 min-w-0">
       <input
         ref="inputRef"
@@ -27,7 +27,7 @@
       <button
         type="button"
         class="p-0.5 rounded hover:brightness-110 transition-[filter] shrink-0"
-        title="Salvar"
+        title="Save"
         @click="saveEdit"
       >
         <UIcon name="i-lucide-check" class="size-3.5 text-success" />
@@ -35,14 +35,14 @@
       <button
         type="button"
         class="p-0.5 rounded hover:brightness-110 transition-[filter] shrink-0"
-        title="Cancelar"
+        title="Cancel"
         @click="cancelEdit"
       >
         <UIcon name="i-lucide-x" class="size-3.5 text-muted" />
       </button>
     </div>
 
-    <!-- Título normal + Contador -->
+    <!-- Regular title + counter -->
     <div v-else class="flex-1 min-w-0 flex items-center gap-1.5">
       <span class="text-xs font-bold uppercase tracking-wider truncate">
         {{ name }}
@@ -54,13 +54,13 @@
       </span>
     </div>
 
-    <!-- Ações no canto direito: Editar lápis e Excluir lixeira -->
+    <!-- Right-hand actions: edit (pencil) and delete (trash) -->
     <div v-if="!isEditing" class="flex items-center gap-0.5 shrink-0">
       <button
         type="button"
         class="p-1 rounded hover:brightness-110 transition-[filter] focus:outline-none cursor-pointer"
-        title="Editar nome da coluna"
-        aria-label="Editar coluna"
+        title="Edit column name"
+        aria-label="Edit column"
         @click="startEdit"
       >
         <UIcon name="i-lucide-pencil" class="size-3.5" />
@@ -69,8 +69,8 @@
       <button
         type="button"
         class="p-1 rounded hover:brightness-110 hover:text-error transition-[filter,color] focus:outline-none cursor-pointer"
-        title="Excluir coluna"
-        aria-label="Excluir coluna"
+        title="Delete column"
+        aria-label="Delete column"
         @click="confirmDelete"
       >
         <UIcon name="i-lucide-trash-2" class="size-3.5" />
@@ -126,9 +126,9 @@ function cancelEdit() {
 
 async function confirmDelete() {
   const confirmed = await notification.confirm({
-    title: "Excluir coluna",
-    description: `Deseja realmente excluir a coluna "${props.name}" e seus cards? Esta ação não pode ser desfeita.`,
-    confirmLabel: "Excluir",
+    title: "Delete column",
+    description: `Are you sure you want to delete the column "${props.name}" and its cards? This action cannot be undone.`,
+    confirmLabel: "Delete",
   });
   if (confirmed) emit("delete");
 }

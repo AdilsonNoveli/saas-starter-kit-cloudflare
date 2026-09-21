@@ -7,7 +7,7 @@
         : 'border-secondary-200 dark:border-secondary-400/20 hover:border-secondary-300 dark:hover:border-secondary-400/40 hover:-translate-y-0.5 hover:shadow-md'
     "
   >
-    <!-- Topo: ícone + título + deletar -->
+    <!-- Top: icon + title + delete -->
     <div class="flex items-start justify-between gap-1.5 min-w-0">
       <div class="flex items-center gap-1.5 min-w-0 flex-1">
         <UIcon
@@ -33,7 +33,7 @@
       </button>
     </div>
 
-    <!-- Descrição -->
+    <!-- Description -->
     <p
       v-if="card.description"
       class="text-xs text-muted line-clamp-3 leading-relaxed"

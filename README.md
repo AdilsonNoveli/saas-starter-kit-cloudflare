@@ -1,5 +1,3 @@
-# Nuxfire - 
+# Nuxfire
 
-Monorepo Nuxt + SST, rodando 100% em Cloudflare Workers (Postgres via Hyperdrive, KV, R2, Queues, Durable Objects) — `sst.cloudflare.Worker` nativo ponta a ponta, um único caminho de deploy (sem `wrangler.toml`/`wrangler.json` gerado na mão, sem CI paralelo). Passo a passo completo em: https://nuxfire.com/docs
-
-
+Nuxt + SST monorepo running 100% on Cloudflare Workers (Postgres via Hyperdrive, KV, R2, Queues, Durable Objects) — native `sst.cloudflare.Worker` end to end, a single deploy path (no hand-written `wrangler.toml`/`wrangler.json`, no parallel CI). Full step-by-step guide: https://nuxfire.com/docs

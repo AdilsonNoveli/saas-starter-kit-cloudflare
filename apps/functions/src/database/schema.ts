@@ -6,7 +6,7 @@ export * from "./core-schema";
 // Layer schemas. Unconditional on purpose — NOT gated by `layers.features` in
 // config.ts. Turning a feature layer off removes its pages/components from the
 // Nuxt bundle; it never removes its tables from the database or from the typed
-// Drizzle client. See nuxfire-drizzle.md ("dado órfão"): disabling
+// Drizzle client. See nuxfire-drizzle.md ("orphan data"): disabling
 // means "out of the UI", not "erased".
 //
 // Unlike the tRPC composition (server/trpc/routers/.composition/), this file is

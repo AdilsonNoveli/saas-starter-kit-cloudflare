@@ -1,7 +1,6 @@
-// `bun run deploy [-- --stage <nome>]`: roda o preflight (scripts/doctor.ts) e só então o
-// `sst deploy`, repassando os mesmos argumentos aos dois — o doctor precisa do --stage para
-// conferir o arquivo de secrets certo. Um único caminho de deploy: quem chamar `sst deploy`
-// direto pula o preflight, e tudo bem.
+// `bun run deploy [-- --stage <name>]`: runs the preflight (scripts/doctor.ts) and only then
+// `sst deploy`, forwarding the same arguments to both — the doctor needs the --stage to check
+// the right secrets file. Calling `sst deploy` directly skips the preflight, which is fine.
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "..");

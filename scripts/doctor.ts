@@ -1,13 +1,19 @@
-// Preflight de deploy: falha ANTES do `sst deploy` com a instrução exata de correção.
-// Uso: `bun run doctor [-- --stage <nome>]`. `bun run deploy` roda este script sozinho
-// (scripts/deploy.ts) e repassa o mesmo --stage.
+// Deploy preflight: fails BEFORE `sst deploy`, with the exact fix for each problem.
+// Usage: `bun run doctor [-- --stage <name>]`. `bun run deploy` runs it automatically
+// (scripts/deploy.ts) and forwards the same --stage.
 //
-// Só bloqueia (exit 1) o que com certeza quebra o deploy. O que não dá para provar daqui
-// (zona do domínio, Cloudflare fora do ar) vira aviso `!` e não impede o deploy.
-// Nunca imprime valores de secrets.
+// It only blocks (exit 1) on what is certain to break the deploy. Whatever it cannot prove
+// from here (the domain's zone, Cloudflare being unreachable) is printed as a `!` warning and
+// does not stop the deploy. It never prints secret values.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { BrandingError, envFileName as stageEnvFile, loadBranding, type Branding } from "./branding";
+import {
+  BrandingError,
+  envFileName as stageEnvFile,
+  loadBranding,
+  parseEnvFile,
+  type Branding,
+} from "./branding";
 
 const root = join(import.meta.dir, "..");
 const problems: string[] = [];
@@ -16,8 +22,8 @@ const fail = (what: string, fix: string) => problems.push(`✗ ${what}\n    → 
 const warn = (what: string, hint: string) => warnings.push(`! ${what}\n    → ${hint}`);
 const ok = (what: string) => console.log(`✓ ${what}`);
 
-// Stage vem de `--stage <nome>` / `--stage=<nome>` (mesma flag do sst). Sem flag, o SST usa
-// o usuário do sistema — um stage de desenvolvimento.
+// The stage comes from `--stage <name>` / `--stage=<name>` (the same flag as sst). Without
+// the flag SST uses the system user name, i.e. a development stage.
 const args = process.argv.slice(2);
 const stageFlag = args.findIndex((a) => a === "--stage" || a.startsWith("--stage="));
 const stage =
@@ -27,15 +33,15 @@ const stage =
       ? args[stageFlag].slice("--stage=".length)
       : (args[stageFlag + 1] ?? "dev");
 const isProduction = stage === "production";
-// Produção tem arquivo próprio e NUNCA usa --fallback (senão vazaria como default para os
-// outros stages). Todo outro stage usa .env.stage com --fallback.
+// Production has its own file and NEVER uses --fallback (it would leak as the default for
+// every other stage). Every other stage uses .env.stage with --fallback.
 const envFileName = stageEnvFile(stage);
 const loadCommand = isProduction
   ? "bunx sst secret load .env.production --stage production"
   : "bunx sst secret load .env.stage --fallback";
-console.log(`Stage: ${isProduction ? "production" : `${stage} (desenvolvimento)`}\n`);
+console.log(`Stage: ${isProduction ? "production" : `${stage} (development)`}\n`);
 
-// 1. Links dos workspaces (@nuxfire/*) — ausentes quando node_modules foi copiado ou está velho.
+// 1. Workspace links (@nuxfire/*) — missing when node_modules was copied or is stale.
 const missing: string[] = [];
 for (const dir of ["apps", "packages", "layers"]) {
   for (const entry of readdirSync(join(root, dir), { withFileTypes: true })) {
@@ -47,50 +53,42 @@ for (const dir of ["apps", "packages", "layers"]) {
 }
 missing.length
   ? fail(
-      `Workspaces sem link em node_modules: ${missing.join(", ")}`,
-      "Rode `bun install` na raiz (nunca copie a pasta node_modules).",
+      `Workspaces not linked in node_modules: ${missing.join(", ")}`,
+      "Run `bun install` at the repository root (never copy a node_modules folder).",
     )
-  : ok("Workspaces @nuxfire/* linkados");
+  : ok("Workspaces @nuxfire/* linked");
 
-// 2. Credenciais Cloudflare no shell (não podem ser sst.Secret).
+// 2. Cloudflare credentials in the shell (they cannot be an sst.Secret).
 const token = process.env.CLOUDFLARE_API_TOKEN;
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 !token || !accountId
   ? fail(
-      "CLOUDFLARE_API_TOKEN e/ou CLOUDFLARE_ACCOUNT_ID ausentes no shell",
+      "CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID are not set in the shell",
       'PowerShell: $env:CLOUDFLARE_API_TOKEN="..."; $env:CLOUDFLARE_ACCOUNT_ID="..."  |  bash: export CLOUDFLARE_API_TOKEN=...',
     )
-  : ok("Credenciais Cloudflare presentes no shell");
+  : ok("Cloudflare credentials present in the shell");
 
-// 3. Arquivo de secrets do stage com o banco preenchido. Sem valor, o Hyperdrive é criado
-// com credenciais vazias e a Cloudflare recusa o deploy com um 400 pouco claro.
+// 3. The stage's secrets file with the database filled in. With empty values the Hyperdrive
+// is created with empty credentials and Cloudflare rejects the deploy with an unclear 400.
 const required = ["DATABASE_HOST", "DATABASE_PORT", "DATABASE_NAME", "DATABASE_USER", "DATABASE_PASSWORD"];
 const envFile = join(root, envFileName);
 if (!existsSync(envFile)) {
-  // Quem carregou os secrets com `sst secret set` não tem o arquivo: não dá para provar
-  // que falta algo, então só avisa.
+  // Whoever loaded the secrets with `sst secret set` has no file: nothing can be proven
+  // missing, so this is only a warning.
   warn(
-    `${envFileName} não existe — não foi possível conferir o DATABASE_*`,
-    `Copie .env.example para ${envFileName}, preencha e rode \`${loadCommand}\`.`,
+    `${envFileName} does not exist — DATABASE_* could not be checked`,
+    `Copy .env.example to ${envFileName}, fill it in and run \`${loadCommand}\`.`,
   );
 } else {
-  const values = new Map(
-    readFileSync(envFile, "utf8")
-      .split(/\r?\n/)
-      .filter((l) => l.trim() && !l.trim().startsWith("#") && l.includes("="))
-      .map((l): [string, string] => [
-        l.slice(0, l.indexOf("=")).trim(),
-        l.slice(l.indexOf("=") + 1).trim().replace(/^["']|["']$/g, ""),
-      ]),
-  );
-  const empty = required.filter((k) => !values.get(k));
+  const values = parseEnvFile(readFileSync(envFile, "utf8"));
+  const empty = required.filter((key) => !values.get(key));
   empty.length
-    ? fail(`${envFileName} com valores vazios: ${empty.join(", ")}`, `Preencha e rode \`${loadCommand}\`.`)
-    : ok(`${envFileName} com DATABASE_* preenchidos`);
+    ? fail(`${envFileName} has empty values: ${empty.join(", ")}`, `Fill them in and run \`${loadCommand}\`.`)
+    : ok(`${envFileName} has DATABASE_* filled in`);
 }
 
-// 4. Branding (BRAND_NAME / BRAND_DOMAIN / BRAND_EMAIL) — a mesma leitura e validação que o
-// deploy faz em infra/branding.ts, para falhar aqui, com todos os problemas de uma vez.
+// 4. Branding (BRAND_NAME / BRAND_DOMAIN / BRAND_EMAIL) — the same reading and validation the
+// deploy does in infra/branding.ts, so it fails here, with every problem at once.
 let branding: Branding | undefined;
 try {
   branding = loadBranding({ stage, root });
@@ -98,19 +96,19 @@ try {
   const senderHost = branding.email.slice(branding.email.lastIndexOf("@") + 1);
   if (senderHost !== branding.domain && !senderHost.endsWith(`.${branding.domain}`)) {
     warn(
-      `BRAND_EMAIL usa outro domínio (${senderHost}) que não é ${branding.domain} nem subdomínio dele`,
-      "Está correto se o seu provedor de e-mail verificou esse domínio; senão os envios serão recusados.",
+      `BRAND_EMAIL is on another domain (${senderHost}), neither ${branding.domain} nor a subdomain of it`,
+      "That is fine if your e-mail provider verified that domain; otherwise sending will be rejected.",
     );
   }
 } catch (e) {
   if (!(e instanceof BrandingError)) throw e;
   fail(
-    `Branding inválido em ${e.file}`,
-    `${e.issues.join("\n      ")}\n      (modelo: seção "Branding" do .env.example)`,
+    `Invalid branding in ${e.file}`,
+    `${e.issues.join("\n      ")}\n      (template: the "Branding" section of .env.example)`,
   );
 }
 
-// 5. Token válido (bloqueia) e zona do domínio visível (só avisa).
+// 5. Valid token (blocks) and the domain's zone being visible (warns only).
 if (token && accountId) {
   type CloudflareReply = { success: boolean; result?: { status?: string } | unknown[] };
   const api = async (path: string): Promise<CloudflareReply> =>
@@ -120,43 +118,43 @@ if (token && accountId) {
   const isActive = (r: CloudflareReply) =>
     r.success && !Array.isArray(r.result) && r.result?.status === "active";
   try {
-    // O passo a passo cria um Account API Token, que só é verificável pela rota da conta.
-    // A rota de usuário cobre quem usou um token pessoal.
+    // The setup guide creates an Account API Token, which is only verifiable through the
+    // account route. The user route covers whoever used a personal token instead.
     const verified =
       isActive(await api(`/accounts/${accountId}/tokens/verify`)) ||
       isActive(await api("/user/tokens/verify"));
     if (!verified) {
       fail(
-        "CLOUDFLARE_API_TOKEN inválido, expirado ou de outra conta",
-        "Crie um Account API Token em Manage Account → Account API Tokens (veja https://nuxfire.com/docs/saas-starter-kit/getting-started/cloudflare-access) e confira o CLOUDFLARE_ACCOUNT_ID.",
+        "CLOUDFLARE_API_TOKEN is invalid, expired or belongs to another account",
+        "Create an Account API Token under Manage Account → Account API Tokens (see https://nuxfire.com/docs/saas-starter-kit/getting-started/cloudflare-access) and check CLOUDFLARE_ACCOUNT_ID.",
       );
     } else {
-      ok("Token Cloudflare válido");
-      // O token do passo a passo pode não ter Zone:Read, então zona não listada não prova
-      // erro — mas um domínio que não está na conta derruba o deploy mais adiante.
+      ok("Cloudflare token is valid");
+      // The guide's token may lack Zone:Read, so an unlisted zone proves nothing — but a
+      // domain that is not in the account breaks the deploy further along.
       if (branding) {
         const zones = await api(
           `/zones?name=${encodeURIComponent(branding.domain)}&account.id=${accountId}`,
         );
         Array.isArray(zones.result) && zones.result.length
-          ? ok(`Zona ${branding.domain} encontrada na conta`)
+          ? ok(`Zone ${branding.domain} found in the account`)
           : warn(
-              `Zona "${branding.domain}" não apareceu na conta ${accountId}`,
-              `Confirme que ${branding.domain} (BRAND_DOMAIN) foi adicionado à MESMA conta Cloudflare do token e está com nameservers ativos. Se já está, talvez o token só não tenha Zone:Read.`,
+              `Zone "${branding.domain}" did not show up in account ${accountId}`,
+              `Make sure ${branding.domain} (BRAND_DOMAIN) was added to the SAME Cloudflare account as the token, with active nameservers. If it was, the token may simply lack Zone:Read.`,
             );
       }
     }
   } catch (e) {
     warn(
-      `Não foi possível consultar a API da Cloudflare (${(e as Error).message})`,
-      "Verifique a conexão; token e zona não foram conferidos.",
+      `Could not reach the Cloudflare API (${(e as Error).message})`,
+      "Check your connection; the token and the zone were not verified.",
     );
   }
 }
 
-if (warnings.length) console.warn(`\n${warnings.length} aviso(s):\n\n${warnings.join("\n\n")}`);
+if (warnings.length) console.warn(`\n${warnings.length} warning(s):\n\n${warnings.join("\n\n")}`);
 if (problems.length) {
-  console.error(`\n${problems.length} problema(s) impedem o deploy:\n\n${problems.join("\n\n")}\n`);
+  console.error(`\n${problems.length} problem(s) prevent the deploy:\n\n${problems.join("\n\n")}\n`);
   process.exit(1);
 }
-console.log("\nTudo certo para o deploy.");
+console.log("\nAll set for the deploy.");

@@ -7,7 +7,7 @@ import { BrandingError, envFileName, loadBranding, parseEnvFile } from "./brandi
 const VALID = [
   "BRAND_NAME=Acme",
   "BRAND_DOMAIN=acme.io",
-  "BRAND_EMAIL=contato@acme.io",
+  "BRAND_EMAIL=contact@acme.io",
 ].join("\n");
 
 let root: string;
@@ -66,7 +66,7 @@ describe("parseEnvFile", () => {
 describe("loadBranding", () => {
   it("reads the stage file for development stages", () => {
     write(".env.stage", VALID);
-    expect(load("alex")).toEqual({ name: "Acme", domain: "acme.io", email: "contato@acme.io" });
+    expect(load("alex")).toEqual({ name: "Acme", domain: "acme.io", email: "contact@acme.io" });
   });
 
   it("reads the production file only for the production stage", () => {
@@ -86,7 +86,7 @@ describe("loadBranding", () => {
     expect(load("dev", { BRAND_NAME: "Other" })).toEqual({
       name: "Other",
       domain: "acme.io",
-      email: "contato@acme.io",
+      email: "contact@acme.io",
     });
   });
 
@@ -111,8 +111,8 @@ describe("loadBranding", () => {
   });
 
   it("normalizes the case of the domain and of the address's domain", () => {
-    write(".env.stage", "BRAND_NAME=Acme\nBRAND_DOMAIN=ACME.io\nBRAND_EMAIL=Contato@ACME.io");
-    expect(load("dev")).toEqual({ name: "Acme", domain: "acme.io", email: "Contato@acme.io" });
+    write(".env.stage", "BRAND_NAME=Acme\nBRAND_DOMAIN=ACME.io\nBRAND_EMAIL=Contact@ACME.io");
+    expect(load("dev")).toEqual({ name: "Acme", domain: "acme.io", email: "Contact@acme.io" });
   });
 
   it.each([
@@ -131,22 +131,22 @@ describe("loadBranding", () => {
   });
 
   it.each([
-    "contato",
+    "contact",
     "@acme.io",
-    "contato@",
-    "contato@acme",
-    "Acme <contato@acme.io>",
+    "contact@",
+    "contact@acme",
+    "Acme <contact@acme.io>",
     "con tato@acme.io",
-    "contato@@acme.io",
-    ".contato@acme.io",
-    "contato..x@acme.io",
+    "contact@@acme.io",
+    ".contact@acme.io",
+    "contact..x@acme.io",
   ])("rejects the address %s", (email) => {
-    write(".env.stage", VALID.replace("BRAND_EMAIL=contato@acme.io", `BRAND_EMAIL=${email}`));
+    write(".env.stage", VALID.replace("BRAND_EMAIL=contact@acme.io", `BRAND_EMAIL=${email}`));
     expect(issuesOf(() => load("dev")).join()).toContain("BRAND_EMAIL");
   });
 
   it("accepts addresses on subdomains and with tags", () => {
-    write(".env.stage", VALID.replace("contato@acme.io", "no-reply+app@mail.acme.io"));
+    write(".env.stage", VALID.replace("contact@acme.io", "no-reply+app@mail.acme.io"));
     expect(load("dev").email).toBe("no-reply+app@mail.acme.io");
   });
 

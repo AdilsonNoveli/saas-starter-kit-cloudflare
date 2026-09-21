@@ -6,33 +6,14 @@
 
 declare module "sst" {
   export interface Resource {
-    "AppAuthClientID": {
-      "type": "random.index/randomUuid.RandomUuid"
-      "value": string
-    }
-    "AppDB": import("@cloudflare/workers-types").Hyperdrive
-    "AppNuxtHubSecret": {
-      "type": "random.index/randomUuid.RandomUuid"
-      "value": string
-    }
     "AppUrl": {
       "type": "sst.sst.Linkable"
       "value": string
     }
-    "AppWorker": import("@cloudflare/workers-types").Service
-    "Auth": import("@cloudflare/workers-types").Service
-    "AuthAdminSecret": {
-      "type": "random.index/randomUuid.RandomUuid"
-      "value": string
-    }
-    "AuthKV": import("@cloudflare/workers-types").KVNamespace
     "AuthUrl": {
       "type": "sst.sst.Linkable"
       "value": string
     }
-    "BLOB": import("@cloudflare/workers-types").R2Bucket
-    "CACHE": import("@cloudflare/workers-types").KVNamespace
-    "CronHandler": import("@cloudflare/workers-types").Service
     "DATABASE_HOST": {
       "type": "sst.sst.Secret"
       "value": string
@@ -53,8 +34,6 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
-    "DB": import("@cloudflare/workers-types").D1Database
-    "Emails": import("@cloudflare/workers-types").Service
     "GITHUB_CLIENT_ID": {
       "type": "sst.sst.Secret"
       "value": string
@@ -71,9 +50,6 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
-    "JobDLQ": import("@cloudflare/workers-types").Queue
-    "JobQueue": import("@cloudflare/workers-types").Queue
-    "KV": import("@cloudflare/workers-types").KVNamespace
     "PADDLE_API_KEY": {
       "type": "sst.sst.Secret"
       "value": string
@@ -118,22 +94,12 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
-    "WebNuxtHubSecret": {
-      "type": "random.index/randomUuid.RandomUuid"
-      "value": string
-    }
     "WebUrl": {
       "type": "sst.sst.Linkable"
       "value": string
     }
-    "WebWorker": import("@cloudflare/workers-types").Service
-    "Websockets": import("@cloudflare/workers-types").Service
     "WebsocketsUrl": {
       "type": "sst.sst.Linkable"
-      "value": string
-    }
-    "WsTicketSecret": {
-      "type": "random.index/randomUuid.RandomUuid"
       "value": string
     }
   }

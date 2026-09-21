@@ -2,7 +2,7 @@
   "name": "@nuxfire/fireskill-cli",
   "version": "0.1.0",
   "private": true,
-  "description": "CLI do Fireskills: estados de spec, esforço, progresso e milestones. Derivado do CLI do Specsfy (MIT).",
+  "description": "Fireskills CLI: spec states, effort, progress and milestones. Derived from the Specsfy CLI (MIT).",
   "license": "MIT",
   "type": "module",
   "bin": {

@@ -1,4 +1,4 @@
-/** Regressões da descoberta da integração entre Specsfy e ClickUpfy. */
+/** Regressions in the discovery of the Specsfy and ClickUpfy integration. */
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";

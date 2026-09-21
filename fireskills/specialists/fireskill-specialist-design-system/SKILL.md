@@ -22,6 +22,7 @@ registry belongs in `.fireskills/INTERFACE.md`, which links to macro design choi
 
 Read in this order:
 
+0. In Nuxfire, [references/nuxfire-design-system.md](references/nuxfire-design-system.md): where customization lives and which components do **not** exist.
 1. `.fireskills/DESIGNSYSTEM.MD` at the project root, if present.
 2. `skills/templates/DESIGNSYSTEM.MD` if creating the document.
 3. `.fireskills/INTERFACE.md` to review existing registered components and screens.
@@ -127,7 +128,7 @@ Cover these scenarios in `.fireskills/DESIGNSYSTEM.MD` or delivery specs:
 
 ## Validation
 
-Before handoff, verify:
+Before handoff, verify (in Nuxfire, the `PageHeader`, `Breadcrumb` and `DetailLists` items apply only to a screen whose task creates those components; see [references/nuxfire-design-system.md](references/nuxfire-design-system.md)):
 
 - `.fireskills/DESIGNSYSTEM.MD` exists at project root with policy, defaults, states, and scenarios.
 - List views use `UTable` and `PageHeader`.

@@ -72,7 +72,7 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Rotas e APIs | apps/app/server/trpc/routers/account.ts | — |
 | Rotas e APIs | apps/app/server/trpc/routers/index.ts | — |
 | Rotas e APIs | apps/app/server/trpc/routers/public.ts | — |
-| Rotas e APIs | apps/app/server/trpc/trpc.ts | allow, deny, auth |
+| Rotas e APIs | apps/app/server/trpc/trpc.ts | is, allow, deny, auth |
 | Páginas | apps/app/server/utils/audit-log.ts | AuditLogEntry, recordAuditLog |
 | Páginas | apps/app/server/utils/auth.ts | getUser, getUserSession, getUserPermissions |
 | Páginas | apps/app/server/utils/db.ts | setHyperdriveBinding, createDB, useDB, closeDB |
@@ -81,6 +81,8 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Páginas | apps/app/server/utils/user-mfa-session.ts | USER_MFA_COOKIE_NAME, USER_MFA_MAX_AGE_SECONDS, UserMfaSessionData, sessionConfig, getUserMfaSession, startUserMfaSession |
 | Páginas | apps/app/server/utils/user-mfa.ts | getUserMfaRecord |
 | Páginas | apps/app/server/utils/ws-ticket.ts | TICKET_TTL_MS, WsTicketUser, toBase64Url, hmacSign, createWsTicket |
+| Páginas | apps/app/shared/utils/error-message.test.ts | — |
+| Páginas | apps/app/shared/utils/error-message.ts | getErrorMessage |
 | Páginas | apps/app/sst-env.d.ts | — |
 | Páginas | apps/app/tailwind.config.ts | — |
 | Páginas | apps/app/types/enums.ts | UserStatus, from |
@@ -97,7 +99,7 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Outras fontes | apps/functions/src/database/seed/index.ts | main |
 | Outras fontes | apps/functions/src/dlq-consumer.ts | Environment, FALLBACK_ERROR |
 | Outras fontes | apps/functions/src/emails-types.ts | EmailsWorker |
-| Outras fontes | apps/functions/src/emails.ts | Worker |
+| Outras fontes | apps/functions/src/emails.ts | Env, Worker |
 | Outras fontes | apps/functions/src/jobs-consumer.ts | Environment |
 | Outras fontes | apps/functions/src/rate-limit.ts | rateLimit, clientIp |
 | Outras fontes | apps/functions/src/sender.ts | — |
@@ -153,19 +155,16 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Componentes | apps/web/app/components/content/ProseUl.vue | — |
 | Componentes | apps/web/app/components/CTAButton.vue | Props |
 | Componentes | apps/web/app/components/folder-tree/FolderTree.global.vue | — |
-| Componentes | apps/web/app/components/folder-tree/FolderTreeItem.vue | FolderTreeItemProps, toggleExpand, getFileIcon |
+| Componentes | apps/web/app/components/folder-tree/FolderTreeItem.vue | FolderTreeNode, FolderTreeItemProps, toggleExpand, getFileIcon |
 | Componentes | apps/web/app/components/landing/LandingArchitecture.vue | — |
 | Componentes | apps/web/app/components/landing/LandingAvatars.vue | — |
 | Componentes | apps/web/app/components/landing/LandingComparisonTable.vue | FeatureItem, getCategoryItems, getCategoryCount |
-| Componentes | apps/web/app/components/landing/LandingCTA.vue | — |
 | Componentes | apps/web/app/components/landing/LandingDatabaseArchitecture.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFAQs.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFeatureBadges.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFeatureCard.vue | Subfeature |
-| Componentes | apps/web/app/components/landing/LandingFeatures.vue | — |
 | Componentes | apps/web/app/components/landing/LandingFolderStructure.vue | — |
 | Componentes | apps/web/app/components/landing/LandingHero.vue | — |
-| Componentes | apps/web/app/components/landing/LandingPageLogos.vue | — |
 | Componentes | apps/web/app/components/landing/LandingPricing.vue | — |
 | Componentes | apps/web/app/components/landing/LandingTestimonials.vue | Testimonial |
 | Componentes | apps/web/app/components/landing/LandingUseCases.vue | EXAMPLE_SLOTS |
@@ -175,7 +174,6 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Componentes | apps/web/app/components/layout/LayoutSection.vue | — |
 | Componentes | apps/web/app/components/loader/LoaderSpin.vue | — |
 | Componentes | apps/web/app/components/navigation/NavigationBar.vue | — |
-| Componentes | apps/web/app/components/OgImage/NuxtSeo.satori.vue | — |
 | Componentes | apps/web/app/components/pricing/PricingCard.vue | PricingFeature, Props |
 | Componentes | apps/web/app/components/search/Search.vue | SearchProps |
 | Componentes | apps/web/app/components/testimonial/TestimonialCard.vue | — |
@@ -184,6 +182,7 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Páginas | apps/web/app/composables/use-collapsed-map.ts | useCollapsedMap |
 | Páginas | apps/web/app/composables/use-content-navigation.ts | DocsNavBadge, DocsNavigationItem, findNavItemByPath |
 | Páginas | apps/web/app/composables/use-docs-locale.ts | docsCollectionFor, queryDocsPage, queryDocsNavigation |
+| Páginas | apps/web/app/composables/use-notification.ts | useNotification |
 | Páginas | apps/web/app/composables/use-page.ts | — |
 | Páginas | apps/web/app/composables/use-scrollspy.ts | useScrollspy |
 | Páginas | apps/web/app/error.vue | — |
@@ -208,6 +207,7 @@ Relação: relaciona cada arquivo observado à sua superfície.
 | Outras fontes | config.ts | — |
 | Outras fontes | infra/app.ts | — |
 | Outras fontes | infra/auth.ts | — |
+| Outras fontes | infra/branding.ts | — |
 | Outras fontes | infra/cron.ts | — |
 | Outras fontes | infra/database.ts | — |
 | Outras fontes | infra/dns.ts | — |

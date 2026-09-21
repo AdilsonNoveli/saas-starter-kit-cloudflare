@@ -168,5 +168,3 @@ it must be a literal string matching the directory name.
 - Infrastructure declaration blocks in manifests.
 - Test suites for layer tRPC routers or UI components (coverage focuses on billing,
   team seats, and RBAC abilities).
-- `packages/app`: legacy name of the Composition Root (some older layer READMEs reference it;
-  active location is `apps/app`).

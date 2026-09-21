@@ -10,7 +10,7 @@ This file records user expertise level and confirmed architectural preferences c
 | Confirmation source | To be confirmed |
 | Last confirmed at | To be confirmed |
 
-Allowed values: `beginner`, `intermediate`, and `expert`.
+Allowed values: `beginner`, `intermediate`, and `experienced`.
 
 ## Confirmed Responses
 

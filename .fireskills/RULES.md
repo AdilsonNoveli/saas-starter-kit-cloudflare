@@ -1,6 +1,6 @@
 # System Rules
 
-These rules complement agent instructions without superseding specs or acceptance criteria. They contain engineering rules verified against actual codebase files (details and evidence for each reside in the referenced specialist).
+These rules complement agent instructions without superseding specs or acceptance criteria. Evidence for each lives in the referenced specialist.
 
 ## Architecture
 
@@ -14,14 +14,14 @@ These rules complement agent instructions without superseding specs or acceptanc
 
 ## Code and Quality
 
-- Strict typing, **zero `any`**.
+- Strict typing, **zero `any`**, enforced by `scripts/no-explicit-any.test.ts` (parses every tracked `.ts`/`.vue`). Third-party constraints that require `any` are derived from the library (see `AnyAbility` in `apps/app/server/trpc/trpc.ts`), never restated.
 - Zero dead or speculative code; clean, verified, optimized implementation.
-- Only semantic `@nuxt/ui` tokens (`text-default`, `bg-elevated`...), never raw color palettes; theming centralized in `packages/tokens`. See `fireskill-specialist-nuxt-ui`.
+- Styling and customization rules (semantic tokens only, `packages/tokens` as the single source): `.fireskills/DESIGNSYSTEM.MD`. See `fireskill-specialist-nuxt-ui`.
 - Inside Workers, never log raw `Error` objects: serialize `message`, `name`, `stack`.
 
 ## Testing
 
-- Vitest is the test runner (`bun run test`). Each layer executes independently with its own `vitest.config.ts`; `defineAbility` is mocked in `vitest.setup.ts`.
+- Vitest is the test runner (`bun run test`). Each layer with tests has its own `vitest.config.ts`, and its `vitest.setup.ts` exposes `defineAbility` as a global (Nuxt's auto-import does not exist in Vitest). `scripts/` and `packages/tokens` are their own projects.
 - `nuxt typecheck` does **not** cover server routes: also run `bunx vue-tsc --noEmit -p server/tsconfig.json` in `apps/app`.
 - Green `tsc`/`vitest`/`nuxt build` does **not** prove deployment: for `apps/functions` and `layers/`, the real verification gate is `sst deploy` on a test stage.
 - Tests never run against development database (`fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs`).
@@ -33,7 +33,7 @@ These rules complement agent instructions without superseding specs or acceptanc
 - Empty secret routes **fail closed** (platform and user MFA).
 - Internal Worker `Auth` endpoints require constant-time `x-admin-secret`.
 - `platformAdminProcedure` requires active `PlatformAdmin` + MFA + elevated 30-minute session; never derived from `abilityProcedure`.
-- Never attach admin creation or hardcoded credentials to database seeds or deployments.
+- Seeds that run on deploy (`apps/functions/src/database/seed/index.ts`) never create admins or carry credentials. `apps/functions/src/database/seed/demo-accounts.ts` and `apps/functions/src/database/grant-platform-admin.ts` are manual-only; the demo script's default passwords are throwaway.
 - Data reset of `User` requires purging both `AuthKV` keys (`["email", email, "password"]` and `["users", email]`).
 
 ## Operations
@@ -47,6 +47,6 @@ These rules complement agent instructions without superseding specs or acceptanc
 ## Specific Project Rules
 
 - **Dark mode mandatory across all UI surfaces.**
-- **User notifications via `useNotification`** (`success`/`error`/`info`/`confirm`); never `window.confirm`. Legacy `useToast()` occurrences must be migrated to `useNotification` when touched.
+- **User notifications via `useNotification`** (`success`/`error`/`info`/`warning`/`message`/`confirm`); `useToast()` is called only inside the three `useNotification` wrappers (`apps/app`, `apps/login`, `apps/web`) and `window.confirm` is never used, enforced by `scripts/notification-rules.test.ts`. Error messages from `catch` come from `getErrorMessage(error)` (`apps/app/shared/utils/error-message.ts`).
 - **Media and file storage via Cloudflare R2** (`hubBlob()` in NuxtHub, S3-compatible API); there is no AWS S3 bucket in this project.
 - Always apply clean-up improvements to files within touched scope.

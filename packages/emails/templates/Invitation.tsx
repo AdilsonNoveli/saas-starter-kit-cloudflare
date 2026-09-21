@@ -21,6 +21,7 @@ import {
 } from "@react-email/components";
 import React from "react";
 import type { InviteEmailProps } from "../props";
+import { emailBrand } from "../brand";
 
 export const InviteEmail = ({
   teamName = "My Team",
@@ -39,8 +40,8 @@ export const InviteEmail = ({
           <Container className="p-4 border border-solid border-[#eaeaea] rounded my-[40px] mx-auto max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src="https://nuxfire.com/pwa-192x192.png"
-                alt="Nuxfire"
+                src={emailBrand.logoUrl}
+                alt={emailBrand.name}
                 className="my-0 mx-auto"
               />
             </Section>

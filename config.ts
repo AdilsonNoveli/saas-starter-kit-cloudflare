@@ -1,18 +1,25 @@
-// this is the domain where the 'production' environment is deployed
+// this is the domain where the 'production' environment is deployed.
+// It is the ONLY line to edit when installing Nuxfire for a new domain:
+// devDomain, the auth e-mail sender, the site URLs and the e-mail templates'
+// logo all derive from it. The domain must be an active zone in the same Cloudflare account
+// that owns the API token.
 export const prodDomain = "nuxfire.com";
 
 // all other stages are deployed to the devDomain
 // for example, in this config, the stage 'tanay' would be deployed to:
 // tanay.dev.nuxfire.com
-export const devDomain = "dev.nuxfire.com";
+export const devDomain = `dev.${prodDomain}`;
+
+// domain of the sender address below — it must be verified in your e-mail
+// provider (Resend, Mailgun, SES...)
+export const authEmailDomain = prodDomain;
 
 // this email is used by the auth service for
 // sending codes, welcome email, and invitations
 export const authEmail = {
   name: "Nuxfire",
-  address: "contato@nuxfire.com",
+  address: `contato@${authEmailDomain}`,
 };
-export const authEmailDomain = "nuxfire.com";
 
 // Path on the auth Worker that erases an identity — credentials and every
 // session. It lives here because both sides have to agree on it: the auth

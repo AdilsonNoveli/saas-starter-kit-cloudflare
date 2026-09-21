@@ -2,7 +2,8 @@
   "name": "nuxfire",
   "version": "0.0.0",
   "scripts": {
-    "deploy": "sst deploy",
+    "doctor": "bun scripts/doctor.ts",
+    "deploy": "bun scripts/deploy.ts",
     "format": "prettier -w .",
     "test": "vitest run",
     "check:i18n": "bun scripts/check-i18n-completeness.ts && bun scripts/check-docs-translations.ts",

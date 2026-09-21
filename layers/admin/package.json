@@ -22,7 +22,7 @@
     "drizzle-orm": "^0.45.2",
     "h3": "^1.15.11",
     "otpauth": "^9.5.2",
-    "vue": "latest",
+    "vue": "3.5.42",
     "zod": "^3.24.1"
   },
   "devDependencies": {

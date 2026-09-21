@@ -18,6 +18,7 @@ import {
   Text,
 } from "@react-email/components";
 import type { WelcomeProps } from "../props";
+import { emailBrand } from "../brand";
 
 export const WelcomeEmail = ({ username }: WelcomeProps) => {
   const previewText = `Welcome aboard, ${username}!`;
@@ -30,8 +31,8 @@ export const WelcomeEmail = ({ username }: WelcomeProps) => {
           <Container className="p-4 border border-solid border-[#eaeaea] rounded my-[40px] mx-auto max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src="https://nuxfire.com/pwa-192x192.png"
-                alt="Nuxfire"
+                src={emailBrand.logoUrl}
+                alt={emailBrand.name}
                 className="my-0 mx-auto"
               />
             </Section>
@@ -57,6 +58,6 @@ export const WelcomeEmail = ({ username }: WelcomeProps) => {
 export default WelcomeEmail;
 
 export const template = (props: WelcomeProps) => ({
-  subject: `Welcome to Nuxfire ${props.username}!`,
+  subject: `Welcome to ${emailBrand.name} ${props.username}!`,
   body: <WelcomeEmail {...props} />,
 });

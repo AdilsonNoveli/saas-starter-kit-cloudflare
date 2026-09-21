@@ -27,8 +27,10 @@
 //
 //   cd apps/functions
 //   bun run src/database/seed/demo-accounts.ts \
-//     --owner-email=owner@nuxfire.com --owner-password=owner@12345678 \
-//     --client-email=client@nuxfire.com --client-password=client@12345678
+//     --owner-email=owner@yourdomain.com --owner-password=owner@12345678 \
+//     --client-email=client@yourdomain.com --client-password=client@12345678
+//
+// Without the --*-email flags the defaults are owner@ / client@ your prodDomain.
 //
 // Idempotent end to end: run it again and it resets the passwords, reuses the
 // identity ids already in KV, and leaves a single demo team behind.
@@ -36,7 +38,7 @@ import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../schema";
-import { seedAccountPath } from "../../../../../config";
+import { prodDomain, seedAccountPath } from "../../../../../config";
 
 const DEMO_TEAM_NAME = "Demo Company";
 const DEMO_TEAM_SLUG = "demo-company";
@@ -48,9 +50,9 @@ function parseArgs() {
     if (match) args.set(match[1], match[2]);
   }
   return {
-    ownerEmail: args.get("owner-email") ?? "owner@nuxfire.com",
+    ownerEmail: args.get("owner-email") ?? `owner@${prodDomain}`,
     ownerPassword: args.get("owner-password") ?? "owner@12345678",
-    clientEmail: args.get("client-email") ?? "client@nuxfire.com",
+    clientEmail: args.get("client-email") ?? `client@${prodDomain}`,
     clientPassword: args.get("client-password") ?? "client@12345678",
   };
 }

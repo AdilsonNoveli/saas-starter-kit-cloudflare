@@ -1,4 +1,5 @@
 import { sharedUiConfig } from "@nuxfire/tokens";
+import { prodDomain } from "../../../config";
 
 export default defineAppConfig({
   ui: {
@@ -6,7 +7,7 @@ export default defineAppConfig({
   },
 
   site: {
-    url: "https://nuxfire.com",
+    url: `https://${prodDomain}`,
     name: "Nuxfire",
     description: "Production-ready enterprise-grade Nuxt starter kit for Cloudflare.",
   },

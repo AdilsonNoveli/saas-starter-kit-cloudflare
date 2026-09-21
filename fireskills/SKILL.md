@@ -80,7 +80,8 @@ Stack-agnostic engineering specialists (security, accessibility, performance, ob
 | Lessons learned | `bun run fireskill lesson add/list/status/prune` |
 | Context monitor | `node fireskills/skills/fireskill-setup/scripts/monitor_context.mjs --project . --check` |
 | Database safety check | `node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs --project . --command "<command>"` |
-| Deploy (**only with authorization**) | `bun run deploy -- --stage <stage>` |
+| Deploy preflight (read-only checks) | `bun run doctor [-- --stage <stage>]` |
+| Deploy (**only with authorization**) | `bun run deploy -- --stage <stage>` (runs the preflight first) |
 
 ## Keeping Fireskills Alive
 

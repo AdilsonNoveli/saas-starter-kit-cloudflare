@@ -42,7 +42,10 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
   **Not** `SST_STAGE=production`.
 - Dev stages default to the system username; domain is `<stage>.<devDomain>`
   (`infra/dns.ts`: `production` → `prodDomain`). Domains configured in `config.ts`:
-  `prodDomain = "nuxfire.com"`, `devDomain = "dev.nuxfire.com"`; subdomains `app.`, `auth.`, `websockets.`.
+  only `prodDomain` is a literal (the one line an installation edits); `devDomain`
+  (`dev.${prodDomain}`), `authEmailDomain` and the `authEmail` address derive from it;
+  subdomains `app.`, `auth.`, `websockets.`. Site URLs in `app.config.ts`, `apps/web/nuxt.config.ts`
+  and the e-mail branding (`packages/emails/brand.ts`) also read `prodDomain` — never hardcode a domain.
 - `production`: `removal: "retain"` and `protect: true`; other stages: `remove`,
   unprotected (`sst.config.ts`).
 - New Cloudflare accounts require the `workers.dev` subdomain initialized once
@@ -137,7 +140,11 @@ Authentication providers only activate if credentials exist: the `Auth` Worker a
 - Patches in `patches/` are pinned to **exact versions** (currently: `nodemailer@9.1.1`
   and `@openauthjs/openauth@0.3.9`); re-verify `patchedDependencies` after regenerating `bun.lock`.
 - Workspaces: `apps/*`, `packages/*`, `layers/*`.
-- Root CLI scripts: `bun run deploy`, `bun run app` (`sst shell -- bun scripts/dev.ts app`),
+- Root CLI scripts: `bun run deploy` (`scripts/deploy.ts`: runs the preflight `scripts/doctor.ts`,
+  then `sst deploy`, forwarding the same args, e.g. `--stage`; `bun run doctor [-- --stage <s>]` runs it alone —
+  blocks on missing workspace links, missing Cloudflare env vars, invalid token, empty `DATABASE_*` in
+  `.env.stage`/`.env.production`, `authEmail` outside `authEmailDomain`; unprovable items such as the zone
+  not being listed are warnings only), `bun run app` (`sst shell -- bun scripts/dev.ts app`),
   `bun run web`, `-remote` variants, `bun run test`, `bun run check:i18n`, `bun run format`.
 
 ## 8. What Does NOT Exist

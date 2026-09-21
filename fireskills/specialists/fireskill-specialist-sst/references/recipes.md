@@ -55,7 +55,7 @@ All recipes stem from existing patterns in `infra/`. Confirm the reference file 
 
 1. Export `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in shell.
 2. Load stage secrets (`sst secret load`).
-3. `bun run deploy -- --stage <stage>`.
+3. `bun run deploy -- --stage <stage>` (runs the `scripts/doctor.ts` preflight first; fix what it reports).
 4. Migrations and seeds execute automatically at the end of `App`.
 5. Confirm the live deployment outcome (not merely the typecheck).
 

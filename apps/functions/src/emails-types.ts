@@ -9,8 +9,8 @@ import type { EmailProps } from "@nuxfire/emails/props";
 // dependency-free file keeps that import from also pulling in Worker-only
 // module resolution that apps/app's TypeScript program can't (and
 // shouldn't have to) resolve.
+// No `from`: the Emails Worker owns the sender identity (BRAND_EMAIL / BRAND_NAME).
 export type SendEmailType = <Type extends keyof EmailProps>(
-  from: string | { address: string; name: string },
   to: string,
   template: Type,
   props: EmailProps[Type],

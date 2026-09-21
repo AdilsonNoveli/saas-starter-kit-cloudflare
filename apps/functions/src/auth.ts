@@ -18,7 +18,6 @@ import type { FullUser } from "./subjects";
 import { sender } from "./sender";
 import { EmailsWorker } from "./emails";
 import {
-  authEmail,
   identityDeletePath,
   seedAccountPath,
   signOutOthersPath,
@@ -28,7 +27,7 @@ let environment: Env;
 
 async function sendVerificationCode(email: string, code: string) {
   const sendEmail = sender(environment.Emails);
-  await sendEmail(authEmail, email, "VerificationCode", {
+  await sendEmail(email, "VerificationCode", {
     code,
   });
 }
@@ -658,7 +657,7 @@ function getIssuer(env: Env) {
             ],
           };
           const sendEmail = sender(environment.Emails);
-          await sendEmail(authEmail, userObject.email, "Welcome", {
+          await sendEmail(userObject.email, "Welcome", {
             username: userObject.name || "User",
           });
         }

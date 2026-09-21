@@ -17,10 +17,13 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import type { WelcomeProps } from "../props";
-import { emailBrand } from "../brand";
+import type { EmailBrand, WelcomeProps } from "../props";
+import { previewBrand } from "../brand";
 
-export const WelcomeEmail = ({ username }: WelcomeProps) => {
+export const WelcomeEmail = ({
+  username,
+  brand,
+}: WelcomeProps & { brand: EmailBrand }) => {
   const previewText = `Welcome aboard, ${username}!`;
   return (
     <Html>
@@ -31,8 +34,8 @@ export const WelcomeEmail = ({ username }: WelcomeProps) => {
           <Container className="p-4 border border-solid border-[#eaeaea] rounded my-[40px] mx-auto max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src={emailBrand.logoUrl}
-                alt={emailBrand.name}
+                src={brand.logoUrl}
+                alt={brand.name}
                 className="my-0 mx-auto"
               />
             </Section>
@@ -55,9 +58,11 @@ export const WelcomeEmail = ({ username }: WelcomeProps) => {
   );
 };
 
+WelcomeEmail.PreviewProps = { username: "Ana", brand: previewBrand };
+
 export default WelcomeEmail;
 
-export const template = (props: WelcomeProps) => ({
-  subject: `Welcome to ${emailBrand.name} ${props.username}!`,
-  body: <WelcomeEmail {...props} />,
+export const template = (props: WelcomeProps, brand: EmailBrand) => ({
+  subject: `Welcome to ${brand.name} ${props.username}!`,
+  body: <WelcomeEmail {...props} brand={brand} />,
 });

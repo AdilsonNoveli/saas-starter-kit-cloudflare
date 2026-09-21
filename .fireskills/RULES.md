@@ -29,6 +29,7 @@ These rules complement agent instructions without superseding specs or acceptanc
 ## Security and Privacy
 
 - Secrets in `SCREAMING_SNAKE_CASE`, identical across `.env.example`, `infra/secret.ts`, and `Resource.<NAME>`; only public values carry `NUXT_PUBLIC_`. Never commit or expose `.env.stage` / `.env.production`.
+- Installation identity (product name, domain, full sender e-mail) is only the `BRAND_*` variables of the stage env file, read solely by `scripts/branding.ts`; never hardcode a domain, sender or brand name in code, and never add defaults for them.
 - Empty secret routes **fail closed** (platform and user MFA).
 - Internal Worker `Auth` endpoints require constant-time `x-admin-secret`.
 - `platformAdminProcedure` requires active `PlatformAdmin` + MFA + elevated 30-minute session; never derived from `abilityProcedure`.

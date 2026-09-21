@@ -1,4 +1,5 @@
 import { secret } from "./secret";
+import { branding } from "./branding";
 
 // handler must stay relative — SST resolves it from the project root itself;
 // an absolute path (path.resolve(...)) breaks its artifact-staging directory
@@ -25,4 +26,11 @@ import { secret } from "./secret";
 export const emails = new sst.cloudflare.Worker("Emails", {
   handler: "apps/functions/src/emails.ts",
   link: [secret.ResendApiKey, secret.MailgunApiKey].filter(Boolean),
+  // Owns the sender identity: callers only say who receives what, this Worker decides
+  // who it comes from. Plain values (not secrets), straight from scripts/branding.ts.
+  environment: {
+    BRAND_NAME: branding.name,
+    BRAND_DOMAIN: branding.domain,
+    BRAND_EMAIL: branding.email,
+  },
 });

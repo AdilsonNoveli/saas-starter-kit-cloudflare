@@ -7,7 +7,7 @@
 // Nunca imprime valores de secrets.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { authEmail, authEmailDomain, prodDomain } from "../config";
+import { BrandingError, envFileName as stageEnvFile, loadBranding, type Branding } from "./branding";
 
 const root = join(import.meta.dir, "..");
 const problems: string[] = [];
@@ -29,7 +29,7 @@ const stage =
 const isProduction = stage === "production";
 // Produção tem arquivo próprio e NUNCA usa --fallback (senão vazaria como default para os
 // outros stages). Todo outro stage usa .env.stage com --fallback.
-const envFileName = isProduction ? ".env.production" : ".env.stage";
+const envFileName = stageEnvFile(stage);
 const loadCommand = isProduction
   ? "bunx sst secret load .env.production --stage production"
   : "bunx sst secret load .env.stage --fallback";
@@ -89,13 +89,26 @@ if (!existsSync(envFile)) {
     : ok(`${envFileName} com DATABASE_* preenchidos`);
 }
 
-// 4. Identidade de e-mail coerente com o domínio configurado.
-authEmail.address.endsWith(`@${authEmailDomain}`)
-  ? ok(`authEmail (${authEmail.address}) pertence a ${authEmailDomain}`)
-  : fail(
-      `authEmail.address (${authEmail.address}) não pertence a authEmailDomain (${authEmailDomain})`,
-      "Ajuste config.ts: o remetente precisa ser de um domínio verificado no provedor de e-mail.",
+// 4. Branding (BRAND_NAME / BRAND_DOMAIN / BRAND_EMAIL) — a mesma leitura e validação que o
+// deploy faz em infra/branding.ts, para falhar aqui, com todos os problemas de uma vez.
+let branding: Branding | undefined;
+try {
+  branding = loadBranding({ stage, root });
+  ok(`Branding: ${branding.name} · ${branding.domain} · ${branding.email}`);
+  const senderHost = branding.email.slice(branding.email.lastIndexOf("@") + 1);
+  if (senderHost !== branding.domain && !senderHost.endsWith(`.${branding.domain}`)) {
+    warn(
+      `BRAND_EMAIL usa outro domínio (${senderHost}) que não é ${branding.domain} nem subdomínio dele`,
+      "Está correto se o seu provedor de e-mail verificou esse domínio; senão os envios serão recusados.",
     );
+  }
+} catch (e) {
+  if (!(e instanceof BrandingError)) throw e;
+  fail(
+    `Branding inválido em ${e.file}`,
+    `${e.issues.join("\n      ")}\n      (modelo: seção "Branding" do .env.example)`,
+  );
+}
 
 // 5. Token válido (bloqueia) e zona do domínio visível (só avisa).
 if (token && accountId) {
@@ -121,13 +134,17 @@ if (token && accountId) {
       ok("Token Cloudflare válido");
       // O token do passo a passo pode não ter Zone:Read, então zona não listada não prova
       // erro — mas um domínio que não está na conta derruba o deploy mais adiante.
-      const zones = await api(`/zones?name=${encodeURIComponent(prodDomain)}&account.id=${accountId}`);
-      Array.isArray(zones.result) && zones.result.length
-        ? ok(`Zona ${prodDomain} encontrada na conta`)
-        : warn(
-            `Zona "${prodDomain}" não apareceu na conta ${accountId}`,
-            `Confirme que ${prodDomain} (config.ts) foi adicionado à MESMA conta Cloudflare do token e está com nameservers ativos. Se já está, o token só não tem Zone:Read — o deploy não depende disso.`,
-          );
+      if (branding) {
+        const zones = await api(
+          `/zones?name=${encodeURIComponent(branding.domain)}&account.id=${accountId}`,
+        );
+        Array.isArray(zones.result) && zones.result.length
+          ? ok(`Zona ${branding.domain} encontrada na conta`)
+          : warn(
+              `Zona "${branding.domain}" não apareceu na conta ${accountId}`,
+              `Confirme que ${branding.domain} (BRAND_DOMAIN) foi adicionado à MESMA conta Cloudflare do token e está com nameservers ativos. Se já está, talvez o token só não tenha Zone:Read.`,
+            );
+      }
     }
   } catch (e) {
     warn(

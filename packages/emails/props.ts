@@ -8,6 +8,14 @@
 // source of truth for each template's prop shape; the .tsx files import
 // their own interface from here rather than redeclaring it.
 
+// Identity shown in every e-mail. Built once by the Emails Worker from the deployed
+// branding (see brand.ts) and passed to each template — callers of `sendEmail` never
+// supply it.
+export interface EmailBrand {
+  name: string;
+  logoUrl: string;
+}
+
 export interface WelcomeProps {
   username: string;
 }

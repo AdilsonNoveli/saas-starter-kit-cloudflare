@@ -1,10 +1,19 @@
-import { authEmail, prodDomain } from "../../config";
+import type { EmailBrand } from "./props";
 
-// Branding shared by every e-mail template. Derived from the root config.ts so
-// installing Nuxfire for a new domain never leaves another product's name or
-// logo host in the messages (the logo is served by apps/web at the production
-// domain — apps/web/public/pwa-192x192.png).
-export const emailBrand = {
-  name: authEmail.name,
-  logoUrl: `https://${prodDomain}/pwa-192x192.png`,
+// The deployed values are handed to the Emails Worker by infra/emails.ts (which gets
+// them from scripts/branding.ts). Templates never read config themselves: they
+// receive the brand as an argument, so they stay pure and previewable.
+export const emailBrand = (env: {
+  BRAND_NAME: string;
+  BRAND_DOMAIN: string;
+}): EmailBrand => ({
+  name: env.BRAND_NAME,
+  // Served by apps/web at the production domain (apps/web/public/pwa-192x192.png).
+  logoUrl: `https://${env.BRAND_DOMAIN}/pwa-192x192.png`,
+});
+
+// Sample data for `bun run dev` in this package (react-email's preview server) only.
+export const previewBrand: EmailBrand = {
+  name: "Acme",
+  logoUrl: "https://example.com/pwa-192x192.png",
 };

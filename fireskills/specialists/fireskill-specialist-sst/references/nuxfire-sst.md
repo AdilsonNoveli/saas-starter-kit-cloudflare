@@ -40,12 +40,16 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
 - Stage is specified via **CLI flag**, never an environment variable:
   `bun run deploy -- --stage production` (the `--` argument separator is mandatory).
   **Not** `SST_STAGE=production`.
-- Dev stages default to the system username; domain is `<stage>.<devDomain>`
-  (`infra/dns.ts`: `production` → `prodDomain`). Domains configured in `config.ts`:
-  only `prodDomain` is a literal (the one line an installation edits); `devDomain`
-  (`dev.${prodDomain}`), `authEmailDomain` and the `authEmail` address derive from it;
-  subdomains `app.`, `auth.`, `websockets.`. Site URLs in `app.config.ts`, `apps/web/nuxt.config.ts`
-  and the e-mail branding (`packages/emails/brand.ts`) also read `prodDomain` — never hardcode a domain.
+- Dev stages default to the system username; domain is `<stage>.dev.<BRAND_DOMAIN>`
+  (`infra/dns.ts`: `production` → `BRAND_DOMAIN`); subdomains `app.`, `auth.`, `websockets.`.
+- **Branding is `BRAND_NAME` / `BRAND_DOMAIN` / `BRAND_EMAIL` (full address) in the stage's env file**
+  (`.env.production` for `production`, `.env.stage` otherwise; a real env var overrides the file) — the single
+  source of truth, with **no** counterpart in `config.ts` and no defaults. `scripts/branding.ts` is the only
+  loader/validator (used by `infra/branding.ts`, the doctor, tests in `scripts/branding.test.ts`); it throws
+  `BrandingError` naming the variable. It is deploy-time only: Workers can't read files, so infra hands the
+  values over as plain `environment` (`infra/emails.ts` → the Emails Worker, which owns the sender:
+  `sendEmail(to, template, props)` has no `from`). Never hardcode a domain/sender/brand name, and never add a
+  `Resource` for it (`sst-env.d.ts` is generated).
 - `production`: `removal: "retain"` and `protect: true`; other stages: `remove`,
   unprotected (`sst.config.ts`).
 - New Cloudflare accounts require the `workers.dev` subdomain initialized once
@@ -143,7 +147,7 @@ Authentication providers only activate if credentials exist: the `Auth` Worker a
 - Root CLI scripts: `bun run deploy` (`scripts/deploy.ts`: runs the preflight `scripts/doctor.ts`,
   then `sst deploy`, forwarding the same args, e.g. `--stage`; `bun run doctor [-- --stage <s>]` runs it alone —
   blocks on missing workspace links, missing Cloudflare env vars, invalid token, empty `DATABASE_*` in
-  `.env.stage`/`.env.production`, `authEmail` outside `authEmailDomain`; unprovable items such as the zone
+  `.env.stage`/`.env.production`, missing/malformed `BRAND_*` (same validation as the deploy); unprovable items such as the zone
   not being listed are warnings only), `bun run app` (`sst shell -- bun scripts/dev.ts app`),
   `bun run web`, `-remote` variants, `bun run test`, `bun run check:i18n`, `bun run format`.
 

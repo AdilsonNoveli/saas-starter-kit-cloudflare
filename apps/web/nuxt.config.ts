@@ -2,7 +2,6 @@ import { readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { generatePaths } from "../../scripts/generate-paths";
-import { prodDomain } from "../../config";
 
 // Regenerates constants/paths.json (the docs "project structure" tree, see
 // generate-paths.ts) from the real repo tree every time this config loads —
@@ -114,9 +113,9 @@ export default defineNuxtConfig({
     autoImportPath: "~/assets/icons",
   },
   site: {
-    // overridden per-stage at build time by infra/web.ts (falls back to the
-    // production domain for local `nuxt dev`/`nuxt build`)
-    url: process.env.SITE_URL || `https://${prodDomain}`,
+    // set per stage at build time by infra/web.ts (from the branding domain);
+    // the sitemap needs *a* URL, so a local build outside the deploy gets localhost
+    url: process.env.SITE_URL ?? "http://localhost:3000",
     name: "Nuxfire",
   },
 

@@ -100,7 +100,7 @@ they lack statically importable package paths.
 - **Suspended Teams**: the sole check resides in `teams.get`, which resolves active team context
   globally (`middleware/1.teams.global.ts`). Do not duplicate across individual procedures.
 - **Database**: `useDB()` (request-scoped). See `$fireskill-specialist-cloudflare-workers` and `$fireskill-specialist-drizzle`.
-- **Realtime & Email**: `ctx.sendWebsocketsEvent(userId, payload)`, `ctx.sendEmail(authEmail, to, subject, …)`.
+- **Realtime & Email**: `ctx.sendWebsocketsEvent(userId, payload)`, `ctx.sendEmail(to, template, props)` (the sender is the installation's `BRAND_EMAIL`, applied by the Emails Worker — never passed by the caller).
 
 ## 7. Client Usage
 

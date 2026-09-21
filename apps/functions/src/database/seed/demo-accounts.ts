@@ -30,7 +30,8 @@
 //     --owner-email=owner@yourdomain.com --owner-password=owner@12345678 \
 //     --client-email=client@yourdomain.com --client-password=client@12345678
 //
-// Without the --*-email flags the defaults are owner@ / client@ your prodDomain.
+// Both --*-email flags are required (no default address). The passwords default to
+// throwaway values — always pass your own on an environment anyone can reach.
 //
 // Idempotent end to end: run it again and it resets the passwords, reuses the
 // identity ids already in KV, and leaves a single demo team behind.
@@ -38,7 +39,7 @@ import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../schema";
-import { prodDomain, seedAccountPath } from "../../../../../config";
+import { seedAccountPath } from "../../../../../config";
 
 const DEMO_TEAM_NAME = "Demo Company";
 const DEMO_TEAM_SLUG = "demo-company";
@@ -49,10 +50,17 @@ function parseArgs() {
     const match = /^--([^=]+)=(.*)$/.exec(arg);
     if (match) args.set(match[1], match[2]);
   }
+  const ownerEmail = args.get("owner-email");
+  const clientEmail = args.get("client-email");
+  if (!ownerEmail || !clientEmail) {
+    throw new Error(
+      "--owner-email and --client-email are required: there is no default address, the demo accounts are created on real addresses of yours",
+    );
+  }
   return {
-    ownerEmail: args.get("owner-email") ?? `owner@${prodDomain}`,
+    ownerEmail,
     ownerPassword: args.get("owner-password") ?? "owner@12345678",
-    clientEmail: args.get("client-email") ?? `client@${prodDomain}`,
+    clientEmail,
     clientPassword: args.get("client-password") ?? "client@12345678",
   };
 }

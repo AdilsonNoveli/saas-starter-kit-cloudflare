@@ -1,7 +1,12 @@
-import { flags, prodDomain, devDomain } from "#nuxfire/config";
+import { flags } from "#nuxfire/config";
+import { branding } from "./branding";
 
+// `production` answers on the brand domain itself; every other stage on
+// `<stage>.dev.<domain>` (e.g. stage 'alex' → alex.dev.acme.io).
 export const domain =
-  { production: prodDomain }[$app.stage] || `${$app.stage}.${devDomain}`;
+  $app.stage === "production"
+    ? branding.domain
+    : `${$app.stage}.dev.${branding.domain}`;
 
 export const appDomain = `app.${domain}`;
 export const authDomain = `auth.${domain}`;

@@ -12,7 +12,7 @@ export const sender = (Emails: EmailsWorker) => {
     try {
       return await Emails.sendEmail(...args);
     } catch (error) {
-      const [, to, template] = args;
+      const [to, template] = args;
       // Error instances serialize to `{}` in Workers structured logs
       // (message/stack are non-enumerable) — pull them out explicitly so
       // wrangler tail shows the real failure instead of an empty object.

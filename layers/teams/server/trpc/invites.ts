@@ -1,10 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
-// Relative to the repo root's config.ts — four levels up from
-// layers/teams/server/trpc/, where it was five from
-// packages/app/server/trpc/routers/.
-import { authEmail } from "../../../../config";
 // See the note in teams.ts: layers reach the Composition Root's tRPC
 // primitives and server utils by explicit import, never by Nitro's merge.
 import {
@@ -116,7 +112,7 @@ export const invitesRouter = router({
           });
         }
         const inviteLink = `${origin}/invite/${invite.id}`;
-        await sendEmail(authEmail, invite.email, "Invitation", {
+        await sendEmail(invite.email, "Invitation", {
           teamName: team.name,
           invitedBy: user.name,
           inviteLink,

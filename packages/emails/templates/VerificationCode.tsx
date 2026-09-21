@@ -17,13 +17,14 @@ import {
   Tailwind,
 } from "@react-email/components";
 import * as React from "react";
-import type { VerificationEmailProps } from "../props";
-import { emailBrand } from "../brand";
+import type { EmailBrand, VerificationEmailProps } from "../props";
+import { previewBrand } from "../brand";
 
 export const VerificationEmail = ({
   code = "123456",
   username = "there",
-}: VerificationEmailProps) => {
+  brand,
+}: VerificationEmailProps & { brand: EmailBrand }) => {
   const previewText = "Your verification code";
   return (
     <Html>
@@ -34,8 +35,8 @@ export const VerificationEmail = ({
           <Container className="p-4 border border-solid border-[#eaeaea] rounded my-[40px] mx-auto max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src={emailBrand.logoUrl}
-                alt={emailBrand.name}
+                src={brand.logoUrl}
+                alt={brand.name}
                 className="my-0 mx-auto"
               />
             </Section>
@@ -58,9 +59,14 @@ export const VerificationEmail = ({
   );
 };
 
+VerificationEmail.PreviewProps = { brand: previewBrand };
+
 export default VerificationEmail;
 
-export const template = ({ code, username }: VerificationEmailProps) => ({
-  subject: `Your Verification Code - ${emailBrand.name}`,
-  body: <VerificationEmail code={code} username={username} />,
+export const template = (
+  { code, username }: VerificationEmailProps,
+  brand: EmailBrand,
+) => ({
+  subject: `Your Verification Code - ${brand.name}`,
+  body: <VerificationEmail code={code} username={username} brand={brand} />,
 });

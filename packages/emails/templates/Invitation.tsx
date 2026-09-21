@@ -20,15 +20,16 @@ import {
   Text,
 } from "@react-email/components";
 import React from "react";
-import type { InviteEmailProps } from "../props";
-import { emailBrand } from "../brand";
+import type { EmailBrand, InviteEmailProps } from "../props";
+import { previewBrand } from "../brand";
 
 export const InviteEmail = ({
   teamName = "My Team",
   invitedBy = "Team Admin",
   username = "User",
   inviteLink = "https://app.example.com/invite",
-}: InviteEmailProps) => {
+  brand,
+}: InviteEmailProps & { brand: EmailBrand }) => {
   const previewText = "You've been invited to join a team";
 
   return (
@@ -40,8 +41,8 @@ export const InviteEmail = ({
           <Container className="p-4 border border-solid border-[#eaeaea] rounded my-[40px] mx-auto max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src={emailBrand.logoUrl}
-                alt={emailBrand.name}
+                src={brand.logoUrl}
+                alt={brand.name}
                 className="my-0 mx-auto"
               />
             </Section>
@@ -82,14 +83,14 @@ export const InviteEmail = ({
   );
 };
 
+InviteEmail.PreviewProps = { brand: previewBrand };
+
 export default InviteEmail;
 
-export const template = ({
-  teamName,
-  invitedBy,
-  username,
-  inviteLink,
-}: InviteEmailProps) => ({
+export const template = (
+  { teamName, invitedBy, username, inviteLink }: InviteEmailProps,
+  brand: EmailBrand,
+) => ({
   subject: `You've been invited to join ${teamName}`,
   body: (
     <InviteEmail
@@ -97,6 +98,7 @@ export const template = ({
       invitedBy={invitedBy}
       username={username}
       inviteLink={inviteLink}
+      brand={brand}
     />
   ),
 });

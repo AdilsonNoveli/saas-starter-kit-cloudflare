@@ -10,17 +10,6 @@ export const wsTicketSecret = flags.websockets
   ? new random.RandomUuid("WsTicketSecret")
   : undefined;
 
-// Checked once per deploy, before constructing the Worker, so the
-// (synchronous) transform.worker callback below can decide from a plain
-// boolean rather than needing to be async itself. `$app.stage` scopes the
-// check to THIS stage's own script — an established stage's already-live
-// class is never resent (Cloudflare permanently rejects that, see
-// infra/utils/durable-objects.ts), while a genuinely new stage still gets
-// it provisioned automatically, with no manual step.
-const websocketsClassProvisioned = flags.websockets
-  ? await isDurableObjectClassProvisioned("Websockets", $app.stage)
-  : true;
-
 export const websockets = flags.websockets
   ? new sst.cloudflare.Worker(
       "Websockets",
@@ -42,16 +31,23 @@ export const websockets = flags.websockets
                 className: "Websockets",
               },
             ]);
-            // `new_sqlite_classes` is a ONE-TIME provisioning instruction,
-            // not a recurring declaration — Cloudflare permanently rejects
-            // resending it once the class has any existing Durable Object
-            // (error 10074: "already depended on by existing Durable
-            // Objects"), regardless of migration tags. Only include it
-            // when the live check above found the class doesn't exist yet
-            // for this stage.
-            if (!websocketsClassProvisioned) {
-              args.migrations = { newSqliteClasses: ["Websockets"] };
-            }
+            // Whether to send the migration is decided from Cloudflare itself,
+            // using the exact account and script name SST is about to PUT
+            // (see infra/utils/durable-objects.ts for why). `transform.worker`
+            // is synchronous, so the async check is deferred through
+            // `$resolve(...).apply(...)` — same pattern as infra/utils/builder.ts.
+            args.migrations = $resolve({
+              accountId: args.accountId,
+              scriptName: args.scriptName,
+            }).apply(async ({ accountId, scriptName }) =>
+              (await isDurableObjectClassProvisioned({
+                className: "Websockets",
+                accountId,
+                scriptName,
+              }))
+                ? undefined
+                : { newSqliteClasses: ["Websockets"] },
+            );
           },
         },
       },

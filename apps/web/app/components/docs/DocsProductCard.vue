@@ -10,7 +10,7 @@
   >
     <!-- Cover -->
     <div
-      class="relative h-36 shrink-0 overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary/10 p-4"
+      class="relative flex h-52 sm:h-56 shrink-0 flex-col justify-end items-center overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary/10 px-6 pt-12 pb-5 sm:px-8 sm:pb-6"
     >
       <div
         class="absolute inset-0 opacity-30 [background-image:radial-gradient(var(--ui-border)_1px,transparent_1px)] [background-size:16px_16px]"
@@ -21,30 +21,30 @@
         color="primary"
         variant="subtle"
         size="sm"
-        class="absolute right-3 top-3 z-10"
+        class="absolute right-3.5 top-3.5 sm:right-4 sm:top-4 z-10"
       >
         {{ badge }}
       </UBadge>
 
       <div
-        class="relative h-full w-full overflow-hidden rounded-lg border border-default/70 bg-default/85 shadow-sm backdrop-blur-sm"
+        class="relative flex h-full w-full max-w-[280px] flex-col overflow-hidden rounded-xl border border-default/70 bg-default/85 shadow-sm backdrop-blur-sm"
       >
         <div
-          class="flex items-center gap-1 border-b border-default/60 px-2.5 py-1.5"
+          class="flex items-center gap-1.5 border-b border-default/60 px-3 py-2"
         >
-          <span class="h-1.5 w-1.5 rounded-full bg-error/60" />
-          <span class="h-1.5 w-1.5 rounded-full bg-warning/60" />
-          <span class="h-1.5 w-1.5 rounded-full bg-success/60" />
+          <span class="h-2 w-2 rounded-full bg-error/70" />
+          <span class="h-2 w-2 rounded-full bg-warning/70" />
+          <span class="h-2 w-2 rounded-full bg-success/70" />
           <span
-            class="ml-2 h-1.5 max-w-24 flex-1 rounded-full border border-default/50 bg-default"
+            class="ml-2 h-2 max-w-28 flex-1 rounded-full border border-default/50 bg-default/60"
           />
         </div>
-        <div class="flex h-[calc(100%-1.75rem)] items-center justify-center gap-3">
+        <div class="flex flex-1 items-center justify-center gap-3.5 sm:gap-4 py-3">
           <UIcon
             v-for="mockIcon in previewIcons"
             :key="mockIcon"
             :name="mockIcon"
-            class="h-5 w-5 text-primary/70"
+            class="h-6 w-6 text-primary/75 transition-transform duration-200 group-hover:scale-110"
           />
         </div>
       </div>

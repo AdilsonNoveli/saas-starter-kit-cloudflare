@@ -58,7 +58,22 @@ missing.length
     )
   : ok("Workspaces @nuxfire/* linked");
 
-// 2. Cloudflare credentials in the shell (they cannot be an sst.Secret).
+// 2. sst.config.ts app identity — every Cloudflare resource is named
+// `<name>-<stage>-...`. A redistributed copy that keeps the literal seller
+// name risks exactly what infra/utils/durable-objects.ts guards against: a
+// stale deploy from a different installation, left under the same name in
+// the same Cloudflare account, silently matching this one's resources.
+const appNameMatch = /name:\s*"([^"]+)"/.exec(
+  readFileSync(join(root, "sst.config.ts"), "utf8"),
+);
+if (appNameMatch?.[1] === "nuxfire") {
+  warn(
+    'sst.config.ts still identifies this app as "nuxfire", the shared starter-kit name',
+    'If this is your own product (not the Nuxfire reference deploy), change `name: "nuxfire"` in sst.config.ts to a name unique to your installation BEFORE your first deploy to any stage — changing it later recreates every Cloudflare resource under the new name.',
+  );
+}
+
+// 3. Cloudflare credentials in the shell (they cannot be an sst.Secret).
 const token = process.env.CLOUDFLARE_API_TOKEN;
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
 !token || !accountId
@@ -68,7 +83,7 @@ const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
     )
   : ok("Cloudflare credentials present in the shell");
 
-// 3. The stage's secrets file with the database filled in. With empty values the Hyperdrive
+// 4. The stage's secrets file with the database filled in. With empty values the Hyperdrive
 // is created with empty credentials and Cloudflare rejects the deploy with an unclear 400.
 const required = ["DATABASE_HOST", "DATABASE_PORT", "DATABASE_NAME", "DATABASE_USER", "DATABASE_PASSWORD"];
 const envFile = join(root, envFileName);
@@ -87,7 +102,7 @@ if (!existsSync(envFile)) {
     : ok(`${envFileName} has DATABASE_* filled in`);
 }
 
-// 4. Branding (BRAND_NAME / BRAND_DOMAIN / BRAND_EMAIL) — the same reading and validation the
+// 5. Branding (BRAND_NAME / BRAND_DOMAIN / BRAND_EMAIL) — the same reading and validation the
 // deploy does in infra/branding.ts, so it fails here, with every problem at once.
 let branding: Branding | undefined;
 try {
@@ -108,7 +123,7 @@ try {
   );
 }
 
-// 5. Valid token (blocks) and the domain's zone being visible (warns only).
+// 6. Valid token (blocks) and the domain's zone being visible (warns only).
 if (token && accountId) {
   type CloudflareReply = { success: boolean; result?: { status?: string } | unknown[] };
   const api = async (path: string): Promise<CloudflareReply> =>

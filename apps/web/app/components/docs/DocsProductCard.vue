@@ -1,19 +1,15 @@
 <template>
-  <div
-    class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-default bg-elevated/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary cursor-pointer"
-    role="link"
-    tabindex="0"
+  <NuxtLink
+    :to="path"
+    class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-default bg-elevated/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     :aria-label="$t('docs.productCard.openAriaLabel', { title })"
-    @click="navigateTo(path)"
-    @keydown.enter.prevent="navigateTo(path)"
-    @keydown.space.prevent="navigateTo(path)"
   >
     <!-- Cover -->
     <div
-      class="relative flex h-52 sm:h-56 shrink-0 flex-col justify-end items-center overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-secondary/10 px-6 pt-12 pb-5 sm:px-8 sm:pb-6"
+      class="relative flex h-52 sm:h-56 shrink-0 flex-col justify-end items-center overflow-hidden bg-linear-to-br from-primary/15 via-primary/5 to-secondary/10 px-6 pt-12 pb-5 sm:px-8 sm:pb-6"
     >
       <div
-        class="absolute inset-0 opacity-30 [background-image:radial-gradient(var(--ui-border)_1px,transparent_1px)] [background-size:16px_16px]"
+        class="absolute inset-0 opacity-30 bg-[radial-gradient(var(--ui-border)_1px,transparent_1px)] bg-size-[16px_16px]"
       />
 
       <UBadge
@@ -27,7 +23,7 @@
       </UBadge>
 
       <div
-        class="relative flex h-full w-full max-w-[280px] flex-col overflow-hidden rounded-xl border border-default/70 bg-default/85 shadow-sm backdrop-blur-sm"
+        class="relative flex h-full w-full max-w-70 flex-col overflow-hidden rounded-xl border border-default/70 bg-default/85 shadow-sm backdrop-blur-sm"
       >
         <div
           class="flex items-center gap-1.5 border-b border-default/60 px-3 py-2"
@@ -83,9 +79,10 @@
         />
       </div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
 
+<!-- cSpell:ignore Nuxt lucide -->
 <script setup lang="ts">
 interface CardSection {
   path: string;

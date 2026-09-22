@@ -1,0 +1,15 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    "node_modules",
+    ".nuxt",
+    ".output",
+    ".sst",
+    ".data",
+    "dist",
+    "bun.lock",
+    "apps/web/constants/paths.json"
+  ],
+  "words": ["fireskills", "fireskill", "nuxfire", "Nuxfire"]
+}

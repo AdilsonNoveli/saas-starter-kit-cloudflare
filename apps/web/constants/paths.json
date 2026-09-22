@@ -1549,6 +1549,7 @@
   "scripts/deploy.ts",
   "scripts/dev.ts",
   "scripts/doctor.ts",
+  "scripts/durable-objects.test.ts",
   "scripts/generate-paths.ts",
   "scripts/no-explicit-any.test.ts",
   "scripts/notification-rules.test.ts",

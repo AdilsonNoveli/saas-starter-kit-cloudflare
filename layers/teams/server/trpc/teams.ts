@@ -34,6 +34,33 @@ import {
   teamsUpdateTeamDetails,
 } from "../../shared/utils/abilities";
 
+// Membership first, then the ability: abilities never check that the team exists
+// or that the caller belongs to it (see fireskill-specialist-nuxt-authorization).
+async function findTeamForLogoUpdate(
+  denies: (
+    ability: typeof teamsUpdateTeamDetails,
+    teamId: string,
+  ) => Promise<boolean>,
+  userId: string,
+  teamIdentifier: string,
+) {
+  const team = await useDB().query.teams.findFirst({
+    where: or(eq(teams.id, teamIdentifier), eq(teams.slug, teamIdentifier)),
+    with: { memberships: { where: eq(teamMemberships.userId, userId) } },
+  });
+  if (
+    !team ||
+    team.memberships.length === 0 ||
+    (await denies(teamsUpdateTeamDetails, team.id))
+  ) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "You do not have permission to update this team",
+    });
+  }
+  return team;
+}
+
 // `hubBlob()` further down stays unimported: it is a NuxtHub module
 // auto-import with no importable module path, registered globally in the Nitro
 // scope (which covers every active layer's server/ dir). Same category as
@@ -615,19 +642,18 @@ export const teamsRouter = router({
     .input(
       z.object({
         teamIdentifier: z.string(),
-        key: z.string(),
+        key: z.string().startsWith("profile/"),
       }),
     )
-    .mutation(async ({ input, ctx: { origin } }) => {
-      const team = await useDB().query.teams.findFirst({
-        where: or(
-          eq(teams.id, input.teamIdentifier),
-          eq(teams.slug, input.teamIdentifier),
-        ),
-      });
+    .mutation(async ({ input, ctx: { origin, denies, user } }) => {
+      const team = await findTeamForLogoUpdate(
+        denies,
+        user.id,
+        input.teamIdentifier,
+      );
 
       const baseUrl = `${origin}/api/profile-pictures?key=`;
-      if (team?.logo) {
+      if (team.logo) {
         const previousKey = team.logo.slice(baseUrl.length);
         if (previousKey.startsWith("profile/"))
           try {
@@ -640,12 +666,7 @@ export const teamsRouter = router({
       const [updatedTeam] = await useDB()
         .update(teams)
         .set({ logo: imageUrl })
-        .where(
-          or(
-            eq(teams.id, input.teamIdentifier),
-            eq(teams.slug, input.teamIdentifier),
-          ),
-        )
+        .where(eq(teams.id, team.id))
         .returning({
           id: teams.id,
           name: teams.name,
@@ -663,16 +684,15 @@ export const teamsRouter = router({
         teamIdentifier: z.string(),
       }),
     )
-    .mutation(async ({ ctx: { origin }, input }) => {
-      const team = await useDB().query.teams.findFirst({
-        where: or(
-          eq(teams.id, input.teamIdentifier),
-          eq(teams.slug, input.teamIdentifier),
-        ),
-      });
+    .mutation(async ({ ctx: { origin, denies, user }, input }) => {
+      const team = await findTeamForLogoUpdate(
+        denies,
+        user.id,
+        input.teamIdentifier,
+      );
 
       const baseUrl = `${origin}/api/profile-pictures?key=`;
-      if (team?.logo) {
+      if (team.logo) {
         const previousKey = team.logo.slice(baseUrl.length);
         if (previousKey.startsWith("profile/"))
           try {

@@ -74,7 +74,7 @@ Inventory: maps each observed file to its surface.
 | Routes and APIs | apps/app/server/trpc/routers/public.ts | — |
 | Routes and APIs | apps/app/server/trpc/trpc.ts | is, allow, deny, auth |
 | Pages | apps/app/server/utils/audit-log.ts | AuditLogEntry, recordAuditLog |
-| Pages | apps/app/server/utils/auth.ts | getUser, getUserSession, getUserPermissions |
+| Pages | apps/app/server/utils/auth.ts | SESSION_COOKIE_MAX_AGE_SECONDS, getUser, getUserSession, getUserPermissions |
 | Pages | apps/app/server/utils/db.ts | setHyperdriveBinding, createDB, useDB, closeDB |
 | Pages | apps/app/server/utils/mfa-crypto.ts | toBase64, fromBase64, importAesKey, encryptSecret, decryptSecret |
 | Pages | apps/app/server/utils/rate-limit.ts | rateLimit, assertNotRateLimited |
@@ -216,11 +216,11 @@ Inventory: maps each observed file to its surface.
 | Other sources | infra/secret.ts | — |
 | Other sources | infra/utils/builder.ts | build |
 | Other sources | infra/utils/constants.ts | COMPATIBILITY_DATE, COMPATIBILITY |
-| Other sources | infra/utils/durable-objects.ts | that, provisioned, before, isDurableObjectClassProvisioned |
+| Other sources | infra/utils/durable-objects.ts | that, is, isDurableObjectClassProvisioned |
 | Other sources | infra/utils/nuxt.ts | deployWorker |
 | Other sources | infra/utils/semaphore.ts | Semaphore |
 | Other sources | infra/web.ts | — |
-| Other sources | infra/websockets.ts | is, has, doesn |
+| Other sources | infra/websockets.ts | — |
 | Components | layers/admin/app/components/admin/AdminDataTable.vue | EDGE_GUTTER, unconditionally |
 | Components | layers/admin/app/components/admin/companies/ReactivateModal.vue | confirm |
 | Components | layers/admin/app/components/admin/companies/SuspendModal.vue | confirm |

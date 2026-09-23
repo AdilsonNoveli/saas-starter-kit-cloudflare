@@ -1,6 +1,6 @@
 import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 // `~~` is the Composition Root (apps/app). Layers import the shared tRPC
 // primitives and server utils explicitly instead of relying on Nitro's
@@ -10,6 +10,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";
 import { teamMemberships, teams } from "@nuxfire/functions/schema";
+import { signPaddleTeam } from "../utils/billing/paddle-team-signature";
 import { createStripeClient } from "../utils/stripe";
 import { STRIPE_CANCEL_CONFIG_KV_KEY } from "../utils/stripe-portal";
 
@@ -18,6 +19,33 @@ import { STRIPE_CANCEL_CONFIG_KV_KEY } from "../utils/stripe-portal";
 // covers every active layer's server/ dir). Same category as `hubBlob()` in
 // layers/teams/server/trpc/teams.ts.
 export const billingRouter = router({
+  // Paddle checkout runs entirely in the browser, so the team the subscription
+  // will attach to is otherwise whatever the client claims. The webhook only
+  // accepts a team_id carrying this signature, which is issued after the same
+  // membership check the Stripe checkout does.
+  createPaddleCheckoutData: protectedProcedure
+    .input(z.object({ teamId: z.string().min(1) }))
+    .mutation(async ({ ctx: { user, runtimeConfig }, input }) => {
+      const membership = await useDB().query.teamMemberships.findFirst({
+        where: and(
+          eq(teamMemberships.teamId, input.teamId),
+          eq(teamMemberships.userId, user.id),
+        ),
+      });
+      if (!membership) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have access to this team",
+        });
+      }
+      return {
+        team_id: input.teamId,
+        team_sig: await signPaddleTeam(
+          runtimeConfig.paddleWebhookSecret ?? "",
+          input.teamId,
+        ),
+      };
+    }),
   getBillingInfo: protectedProcedure
     .input(
       z.object({

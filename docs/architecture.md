@@ -5,8 +5,8 @@
 
 | Type | Quantity |
 | --- | --- |
-| Code | 393 |
-| Tests | 11 |
+| Code | 396 |
+| Tests | 13 |
 
 ## Diagrams
 

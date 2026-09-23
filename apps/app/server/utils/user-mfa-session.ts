@@ -23,7 +23,7 @@ export const USER_MFA_COOKIE_NAME = "nuxfire-mfa-verified";
 // — this cookie is meant to outlive the login it was issued for, not expire
 // on its own schedule. Logging out (deleteAccount, session.delete.ts) clears
 // it explicitly; it is never relied on to lapse mid-session.
-const USER_MFA_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+const USER_MFA_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 export interface UserMfaSessionData extends Record<string, unknown> {
   userId: string;

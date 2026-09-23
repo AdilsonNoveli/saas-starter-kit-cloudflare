@@ -38,11 +38,16 @@ export const getClient = (event: H3Event) => {
   }));
 };
 
+// Sliding: every verified request re-issues both cookies (getUserSession), so
+// this is an idle timeout, not an absolute session length.
+export const SESSION_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+
 export const setTokens = (event: H3Event, access: string, refresh: string) => {
   setCookie(event, "nuxfire-access-token", access, {
     path: "/",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 365,
+    secure: true,
+    maxAge: SESSION_COOKIE_MAX_AGE_SECONDS,
     // access token is also used by websockets
     // in the browser so can't be httpOnly
     httpOnly: false,
@@ -50,7 +55,8 @@ export const setTokens = (event: H3Event, access: string, refresh: string) => {
   setCookie(event, "nuxfire-refresh-token", refresh, {
     path: "/",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 365,
+    secure: true,
+    maxAge: SESSION_COOKIE_MAX_AGE_SECONDS,
     httpOnly: true,
   });
 };

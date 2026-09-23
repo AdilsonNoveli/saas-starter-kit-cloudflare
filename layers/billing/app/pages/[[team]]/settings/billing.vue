@@ -207,9 +207,11 @@ async function openCheckout(plan: Plan) {
 
   try {
     if (provider === PaymentProvider.PADDLE) {
-      await checkoutPaddle?.([{ priceId: plan.providerPriceId }], {
-        data: { team_id: team.value?.id },
-      });
+      const data =
+        await useTrpcClient().billing.createPaddleCheckoutData.mutate({
+          teamId: team.value?.id || "",
+        });
+      await checkoutPaddle?.([{ priceId: plan.providerPriceId }], { data });
       return;
     }
 

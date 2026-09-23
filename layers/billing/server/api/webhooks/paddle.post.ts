@@ -6,6 +6,7 @@ import {
   upsertSubscription,
   type SubscriptionUpsertInput,
 } from "../../utils/billing/subscription-repository";
+import { verifyPaddleTeam } from "../../utils/billing/paddle-team-signature";
 import {
   markEventProcessed,
   wasEventProcessed,
@@ -49,7 +50,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const outcome = await dispatch(paddle, eventData);
+    const outcome = await dispatch(paddle, eventData, secretKey);
     if (!outcome.ok) {
       console.error(`Paddle webhook ${eventData.eventType}: ${outcome.reason}`);
       return { status: "error", message: outcome.reason };
@@ -69,16 +70,25 @@ export default defineEventHandler(async (event) => {
 async function dispatch(
   paddle: Paddle,
   eventData: Awaited<ReturnType<Paddle["webhooks"]["unmarshal"]>>,
+  secretKey: string,
 ): Promise<{ ok: true } | { ok: false; reason: string }> {
   switch (eventData.eventType) {
     case EventName.SubscriptionCreated:
     case EventName.SubscriptionUpdated:
     case EventName.SubscriptionCanceled: {
       const subscriptionEvent = eventData.data;
-      const teamId = (subscriptionEvent.customData as { team_id: string })
-        ?.team_id;
+      const customData = subscriptionEvent.customData as {
+        team_id?: string;
+        team_sig?: string;
+      } | null;
+      const teamId = customData?.team_id;
       if (!teamId) {
         return { ok: false, reason: "Missing team ID" };
+      }
+      // team_id comes from the browser that opened the checkout; only a value
+      // signed by createPaddleCheckoutData (after a membership check) is trusted.
+      if (!(await verifyPaddleTeam(secretKey, teamId, customData?.team_sig ?? ""))) {
+        return { ok: false, reason: "Invalid team signature" };
       }
 
       const priceId = subscriptionEvent.items[0]?.price?.id;

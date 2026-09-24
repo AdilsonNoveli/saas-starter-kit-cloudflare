@@ -189,7 +189,7 @@
                   :to="ctaUrl"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="group w-full py-3.5 sm:py-4 px-6 rounded-xl bg-success hover:bg-success/90 active:bg-success text-white font-extrabold uppercase tracking-wider text-sm sm:text-base text-center shadow-lg shadow-success/25 hover:shadow-success/35 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2.5 select-none"
+                  class="group w-full py-3.5 sm:py-4 px-6 rounded-xl bg-success hover:bg-success/90 active:bg-success text-night-800 font-extrabold uppercase tracking-wider text-sm sm:text-base text-center shadow-lg shadow-success/25 hover:shadow-success/35 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2.5 select-none"
                 >
                   <span>{{ $t("landing.pricing.cta") }}</span>
                   <UIcon name="i-lucide-arrow-right" class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />

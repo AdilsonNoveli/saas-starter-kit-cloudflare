@@ -98,4 +98,4 @@ Para clientes B2B exigentes, o Nuxfire já inclui uma tabela dedicada de **Audit
 
 Construa seu SaaS sobre uma fundação que atende aos mais altos padrões de segurança corporativa desde o primeiro commit.
 
-[**Adquira sua licença do Nuxfire e obtenha o código completo na Área de Membros →**](/#pricing)
+[**Adquira sua licença do Nuxfire e garanta acesso imediato ao código e ao Grupo VIP →**](/#pricing)

@@ -57,7 +57,7 @@
     },
     "sidebar": {
       "badge": "Nuxfire Monorepo",
-      "description": "100% complete source code ownership in your Members Area.",
+      "description": "100% complete source code ownership and access to the VIP Group.",
       "cta": "GET ACCESS"
     },
     "banner": {
@@ -69,7 +69,7 @@
     "indexCta": {
       "badge": "Full Source Code Access",
       "title": "Ready to build your SaaS with Nuxfire?",
-      "description": "Instant download access in your Members Area right after confirmation. Start today with production-ready auth, payments, multi-tenancy, and database.",
+      "description": "Instant access to the complete source code and exclusive VIP Group. Start today with production-ready auth, payments, multi-tenancy, and database.",
       "cta": "Get Instant Access"
     },
     "onThisPage": "On this page",
@@ -826,7 +826,7 @@
       "items": {
         "item1": {
           "question": "How do I access and get started with Nuxfire?",
-          "answer": "Immediately after purchasing, you receive instant access to download the complete source code directly inside your exclusive Members Area. There is zero waiting for manual repository invites or access approvals.\n\nThe codebase comes complete with a 5-minute quickstart guide, setup scripts, and step-by-step Cloudflare deployment documentation so you can ship your SaaS to production on day one."
+          "answer": "You receive instant access to download the complete source code and direct entry into our exclusive VIP WhatsApp Group. There is zero waiting for manual repository invites or access approvals.\n\nThe codebase comes complete with a 5-minute quickstart guide, setup scripts, step-by-step deployment documentation, and direct engineering support so you can ship your SaaS to production on day one."
         },
         "item2": {
           "question": "Can I test the live demo before purchasing?",
@@ -846,7 +846,7 @@
         },
         "item6": {
           "question": "Do I receive updates and new features?",
-          "answer": "Yes! You will receive updates according to your purchased plan (annual or lifetime), including security patches, framework upgrades, and new architectural layers directly in your Members Area.\n\nWhenever Nuxt, Cloudflare Workers, or SST release major improvements, we update the starter kit so your foundation remains modern and battle-tested."
+          "answer": "Yes! You will receive updates according to your purchased plan (annual or lifetime), including security patches, framework upgrades, and new architectural layers, with priority announcements directly in the VIP Group.\n\nWhenever Nuxt, Cloudflare Workers, or SST release major improvements, we update the starter kit so your foundation remains modern and battle-tested."
         },
         "item7": {
           "question": "Can I build commercial SaaS projects with this license?",
@@ -855,9 +855,9 @@
       }
     },
     "pricing": {
-      "badge": "Annual & Lifetime Plans",
-      "title": "Simple, Transparent Pricing",
-      "subtitle": "Plans with continuous updates (annual or lifetime). No code royalties or hidden platform fees.",
+      "badge": "Early Access & Continuous Evolution",
+      "title": "Build million-dollar applications alone in days, not months",
+      "subtitle": "With Nuxfire, you don't spend months reinventing the wheel. We deliver an enterprise-grade foundation with continuous updates and new features, ready for you to replicate, enhance, and multiply — turning your vision into real market value in record time.",
       "cardTitle": "Nuxfire Production Kit",
       "cardSubtitle": "Full-stack enterprise SaaS codebase & cloud infrastructure",
       "lifetimeAccess": "Continuous updates",
@@ -868,10 +868,14 @@
       "includedTitle": "Everything Included in Your License:",
       "cta": "JOIN THE GROUP",
       "ctaUrl": "https://chat.whatsapp.com/KSKqVly5tFp2OpUtWrvccY",
+      "groupCallout": {
+        "headline": "Live demos and behind-the-scenes",
+        "text": "We share architecture updates and answer questions directly with our engineering team. Feel free to join if you'd like to follow along."
+      },
       "guarantee": {
         "refund": "14-Day Money-Back Guarantee",
         "projects": "Unlimited Personal & Commercial Projects",
-        "github": "Instant Members Area Code Access"
+        "github": "Instant access to the VIP Group"
       },
       "features": {
         "monorepo": {
@@ -925,7 +929,7 @@
       },
       "closingHeadline": "You can spend three months rebuilding what already exists. Or start with an enterprise-grade architecture from day one.",
       "bonusCallout": {
-        "title": "CLAIM IT, IT'S FREE:",
+        "title": "ENJOY THE GROUP, IT'S FREE:",
         "badge": "VIP Community • WhatsApp",
         "label": "Club Nuxfire on WhatsApp included",
         "details": "View details",
@@ -947,12 +951,12 @@
       "subtitle": "An enterprise-grade monorepo, ready for you to download, run, customize and build into your product — with no reliance on invitations, proprietary platforms or monthly fees for code.",
       "features": {
         "membersArea": {
-          "title": "Immediate access in your Member Area",
-          "point1": "No waiting for manual repository invites.",
-          "point2": "No code locked in a black box.",
-          "point3": "No subscription to keep using what you already bought.",
-          "point4": "Updates and new modules",
-          "point5": "Pay once. The code is yours."
+          "title": "Instant access to the monorepo & VIP Group",
+          "point1": "Zero waiting for manual access or bottlenecks.",
+          "point2": "Zero proprietary lock-in or black-box code.",
+          "point3": "Direct access to the community and Senior Engineers on WhatsApp.",
+          "point4": "Priority updates and new architectural modules.",
+          "point5": "Live walkthroughs and dedicated support along your journey."
         },
         "engineering": {
           "title": "15,000+ Lines of Tested Senior Engineering",

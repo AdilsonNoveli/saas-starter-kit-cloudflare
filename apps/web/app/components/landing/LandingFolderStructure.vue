@@ -23,7 +23,7 @@
 
         <!-- Feature List: Clean Checkpoints without bulky cards -->
         <div class="space-y-6 pt-1">
-          <!-- Item 1: Immediate access to your Members Area -->
+          <!-- Item 1: Immediate access to monorepo & VIP Group -->
           <div class="space-y-2.5">
             <div class="flex items-center gap-2.5">
               <UIcon name="i-lucide-circle-check" class="w-5 h-5 text-success shrink-0" />

@@ -1550,6 +1550,8 @@
   "patches/@openauthjs%2Fopenauth@0.3.9.patch",
   "patches/nodemailer@9.1.1.patch",
   "scripts/",
+  "scripts/app-identity.test.ts",
+  "scripts/app-identity.ts",
   "scripts/branding.test.ts",
   "scripts/branding.ts",
   "scripts/check-docs-translations.ts",

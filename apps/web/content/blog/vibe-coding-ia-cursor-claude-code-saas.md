@@ -82,4 +82,4 @@ Ao combinar a velocidade da IA gerativa com uma base arquitetural sólida de ní
 
 Chega de lutar contra alucinações da IA. Comece seu projeto sobre uma base profissional e testada.
 
-[**Garanta seu acesso imediato ao código-fonte do Nuxfire na Área de Membros →**](/#pricing)
+[**Garanta seu acesso imediato ao código-fonte do Nuxfire e entre no Grupo VIP →**](/#pricing)

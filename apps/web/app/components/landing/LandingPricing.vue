@@ -6,7 +6,7 @@
         <div class="inline-flex items-center justify-center mb-3">
           <UBadge color="primary" variant="subtle" size="md">
             <div class="flex gap-2 items-center text-xs lg:text-sm">
-              <UIcon name="i-lucide-tag" class="w-4 h-4 text-success" />
+              <UIcon name="i-lucide-sparkles" class="w-4 h-4 text-success" />
               <span>{{ $t("landing.pricing.badge") }}</span>
             </div>
           </UBadge>
@@ -169,6 +169,16 @@
                     <UIcon name="i-lucide-check" class="w-4 h-4 text-success shrink-0" />
                     <span class="text-highlighted font-medium">{{ $t("landing.pricing.checkmarks.noSubscription") }}</span>
                   </div>
+                </div>
+
+                <!-- Clean Direct Note Above CTA -->
+                <div class="mb-4 text-left">
+                  <h4 class="text-xs sm:text-sm font-bold text-highlighted leading-snug">
+                    {{ $t("landing.pricing.groupCallout.headline") }}
+                  </h4>
+                  <p class="text-[11px] sm:text-xs text-muted mt-1 leading-relaxed">
+                    {{ $t("landing.pricing.groupCallout.text") }}
+                  </p>
                 </div>
               </div>
 

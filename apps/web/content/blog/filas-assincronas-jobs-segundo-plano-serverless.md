@@ -76,4 +76,4 @@ O Nuxfire inclui um **CRON Worker** nativo configurado em `apps/functions`, disp
 
 Construa sistemas distribuídos profissionais sem surpresas operacionais.
 
-[**Acesse o monorepo do Nuxfire agora mesmo com entrega imediata na Área de Membros →**](/#pricing)
+[**Acesse o monorepo do Nuxfire agora mesmo com entrega imediata e suporte no Grupo VIP →**](/#pricing)

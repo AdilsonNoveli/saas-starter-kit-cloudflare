@@ -93,7 +93,7 @@ export function createDatabaseClient(connectionString: string) {
 Em vez de gastar de 3 a 6 meses configurando autenticação, WebSockets, filas de background, faturamento Stripe e permissões multi-tenant do zero, o **Nuxfire** entrega todo esse código pronto, testado e com tipagem estrita de ponta a ponta.
 
 - **Acesso Completo ao Código-Fonte**: Sem pacotes privados fechados ou mensalidades por desenvolvedor.
-- **Entrega Imediata**: Baixe o repositório na sua Área de Membros logo após a confirmação.
+- **Entrega Imediata**: Tenha acesso imediato ao repositório e ao Grupo VIP oficial logo após a confirmação.
 - **Licença Perpétua**: Crie projetos comerciais ilimitados.
 
 [**Garantir Acesso Imediato ao Código-Fonte no Preço Promocional →**](/#pricing)

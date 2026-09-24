@@ -86,4 +86,4 @@ O script de build inspeciona esse arquivo e monta a composição final em `apps/
 
 Pronto para transformar sua produtividade e construir com a arquitetura correta desde o início?
 
-[**Garanta acesso imediato ao código-fonte do Nuxfire na Área de Membros →**](/#pricing)
+[**Garanta acesso imediato ao código-fonte do Nuxfire e ao Grupo VIP →**](/#pricing)

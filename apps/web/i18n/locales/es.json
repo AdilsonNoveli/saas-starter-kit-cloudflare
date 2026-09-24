@@ -57,7 +57,7 @@
     },
     "sidebar": {
       "badge": "Nuxfire Monorepo",
-      "description": "100% de propiedad del código fuente en tu Área de Miembros.",
+      "description": "100% de propiedad del código fuente y acceso al Grupo VIP.",
       "cta": "OBTENER ACCESO"
     },
     "banner": {
@@ -69,7 +69,7 @@
     "indexCta": {
       "badge": "Acceso Completo al Código Fuente",
       "title": "¿Listo para construir tu SaaS con Nuxfire?",
-      "description": "Acceso de descarga inmediata en tu Área de Miembros tras la confirmación. Comienza hoy mismo con autenticación, pagos, multi-inquilino y base de datos listos para producción.",
+      "description": "Acceso inmediato al código fuente completo y al Grupo VIP exclusivo. Comienza hoy mismo con autenticación, pagos, multi-inquilino y base de datos listos para producción.",
       "cta": "Obtener acceso al código"
     },
     "onThisPage": "En esta página",
@@ -826,7 +826,7 @@
       "items": {
         "item1": {
           "question": "¿Cómo accedo y comienzo a usar Nuxfire?",
-          "answer": "Inmediatamente después de la compra, recibes acceso instantáneo para descargar el código fuente completo directamente dentro de tu exclusiva Área de Miembros. Sin esperas de invitaciones manuales de repositorio ni aprobaciones de acceso.\n\nEl código incluye una guía de inicio rápido de 5 minutos, scripts de configuración y documentación paso a paso para despliegue en Cloudflare para poner tu SaaS en producción desde el primer día."
+          "answer": "Recibes acceso instantáneo para descargar el código fuente completo y entras directamente a nuestro exclusivo Grupo VIP en WhatsApp. Sin esperas de invitaciones manuales de repositorio ni aprobaciones burocráticas.\n\nEl monorepositorio incluye una guía de inicio rápido de 5 minutos, scripts de configuración, documentación paso a paso y contacto directo con ingeniería para poner tu SaaS en producción desde el primer día."
         },
         "item2": {
           "question": "¿Puedo probar la demo en vivo antes de comprar?",
@@ -846,7 +846,7 @@
         },
         "item6": {
           "question": "¿Recibiré actualizaciones y nuevas funciones?",
-          "answer": "¡Sí! Recibirás actualizaciones de acuerdo con el plan adquirido (anual o de por vida), incluyendo parches de seguridad, mejoras de framework y nuevas capas arquitectónicas directamente en tu Área de Miembros.\n\nCada vez que Nuxt, Cloudflare Workers o SST lanzan mejoras importantes, actualizamos el starter kit para que tu base se mantenga moderna y probada."
+          "answer": "¡Sí! Recibirás actualizaciones de acuerdo con el plan adquirido (anual o de por vida), incluyendo parches de seguridad, mejoras de framework y nuevas capas arquitectónicas, con avisos y entregas prioritarias directamente en el Grupo VIP.\n\nCada vez que Nuxt, Cloudflare Workers o SST lanzan mejoras importantes, actualizamos el starter kit para que tu base se mantenga moderna y probada."
         },
         "item7": {
           "question": "¿Puedo crear proyectos comerciales de SaaS con esta licencia?",
@@ -855,9 +855,9 @@
       }
     },
     "pricing": {
-      "badge": "Planes Anual y de por vida",
-      "title": "Precios simples y transparentes",
-      "subtitle": "Planes con actualizaciones continuas (anual o de por vida). Sin cuotas por el código ni comisiones ocultas de plataforma.",
+      "badge": "Acceso Anticipado & Evolución Continua",
+      "title": "Crea en solitario y en días aplicaciones que valen millones",
+      "subtitle": "Con Nuxfire no pierdes meses reinventando la rueda. Te entregamos una infraestructura enterprise de alto nivel, con actualizaciones y nuevas funcionalidades continuas, lista para replicar, mejorar y multiplicar — transformando tu idea en oro puro y valor real de mercado en cuestión de semanas.",
       "cardTitle": "Nuxfire Production Kit",
       "cardSubtitle": "Código SaaS full-stack de nivel empresarial e infraestructura en la nube",
       "lifetimeAccess": "Actualizaciones constantes",
@@ -868,10 +868,14 @@
       "includedTitle": "Todo lo que incluye tu licencia:",
       "cta": "UNIRME AL GRUPO",
       "ctaUrl": "https://chat.whatsapp.com/KSKqVly5tFp2OpUtWrvccY",
+      "groupCallout": {
+        "headline": "Demostraciones en vivo y bastidores",
+        "text": "Compartimos novedades de la arquitectura y resolvemos dudas directamente con el equipo de ingeniería. Siéntete libre de entrar si deseas acompañar el proceso."
+      },
       "guarantee": {
         "refund": "Garantía de devolución en 14 días",
-        "projects": "Projetos pessoais e comerciais ilimitados",
-        "github": "Acceso inmediato en el Área de Miembros"
+        "projects": "Proyectos personales y comerciales ilimitados",
+        "github": "Acceso inmediato al Grupo VIP"
       },
       "features": {
         "monorepo": {
@@ -925,7 +929,7 @@
       },
       "closingHeadline": "Puedes pasar tres meses reconstruyendo lo que ya existe. O comenzar con una estructura de nivel empresarial desde el primer día.",
       "bonusCallout": {
-        "title": "APROVECHA, ES GRATUITO:",
+        "title": "APROVECHA EL GRUPO, ES GRATUITO:",
         "badge": "Comunidad VIP • WhatsApp",
         "label": "Club Nuxfire en WhatsApp incluido",
         "details": "Ver detalles",
@@ -947,12 +951,12 @@
       "subtitle": "Un monorepo de nivel enterprise, listo para que lo descargues, ejecutes, modifiques y transformes en tu producto — sin depender de invitaciones, plataformas propietarias o mensualidades por el código.",
       "features": {
         "membersArea": {
-          "title": "Acceso inmediato a tu Área de Miembros",
-          "point1": "Sin esperar invitaciones manuales al repositorio.",
+          "title": "Acceso inmediato al monorepo y Grupo VIP",
+          "point1": "Sin esperas de accesos manuales ni burocracias.",
           "point2": "Sin código atrapado en una caja negra.",
-          "point3": "Sin suscripción para seguir usando lo que ya compraste.",
-          "point4": "Actualizaciones y nuevos módulos",
-          "point5": "Pagas una vez. El código es tuyo."
+          "point3": "Acceso directo a la comunidad e Ingenieros Senior en WhatsApp.",
+          "point4": "Actualizaciones y nuevos módulos entregados con prioridad.",
+          "point5": "Demostraciones en vivo y soporte cercano a tu proceso."
         },
         "engineering": {
           "title": "15.000+ Líneas de Ingeniería Senior Probada",

@@ -4,6 +4,7 @@
     "module": "ESNext",
     "types": ["@cloudflare/workers-types"],
     "moduleResolution": "Bundler",
-    "jsx": "react"
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   }
 }

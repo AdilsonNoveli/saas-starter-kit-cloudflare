@@ -7,6 +7,7 @@
 // does not stop the deploy. It never prints secret values.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { REFERENCE_DOMAIN, SHARED_APP_NAME, sharesStarterKitAppName } from "./app-identity";
 import {
   BrandingError,
   envFileName as stageEnvFile,
@@ -63,15 +64,9 @@ missing.length
 // name risks exactly what infra/utils/durable-objects.ts guards against: a
 // stale deploy from a different installation, left under the same name in
 // the same Cloudflare account, silently matching this one's resources.
-const appNameMatch = /name:\s*"([^"]+)"/.exec(
-  readFileSync(join(root, "sst.config.ts"), "utf8"),
-);
-if (appNameMatch?.[1] === "nuxfire") {
-  warn(
-    'sst.config.ts still identifies this app as "nuxfire", the shared starter-kit name',
-    'If this is your own product (not the Nuxfire reference deploy), change `name: "nuxfire"` in sst.config.ts to a name unique to your installation BEFORE your first deploy to any stage — changing it later recreates every Cloudflare resource under the new name.',
-  );
-}
+// Decided at the end (section 6 proves whether this account owns the BRAND_DOMAIN zone).
+const appName = /name:\s*"([^"]+)"/.exec(readFileSync(join(root, "sst.config.ts"), "utf8"))?.[1];
+let zoneVerified = false;
 
 // 3. Cloudflare credentials in the shell (they cannot be an sst.Secret).
 const token = process.env.CLOUDFLARE_API_TOKEN;
@@ -151,7 +146,8 @@ if (token && accountId) {
         const zones = await api(
           `/zones?name=${encodeURIComponent(branding.domain)}&account.id=${accountId}`,
         );
-        Array.isArray(zones.result) && zones.result.length
+        zoneVerified = Array.isArray(zones.result) && zones.result.length > 0;
+        zoneVerified
           ? ok(`Zone ${branding.domain} found in the account`)
           : warn(
               `Zone "${branding.domain}" did not show up in account ${accountId}`,
@@ -165,6 +161,13 @@ if (token && accountId) {
       "Check your connection; the token and the zone were not verified.",
     );
   }
+}
+
+if (sharesStarterKitAppName({ appName, domain: branding?.domain, zoneVerified })) {
+  warn(
+    `sst.config.ts still identifies this app as "${SHARED_APP_NAME}", the shared starter-kit name`,
+    `If this is your own product, change \`name: "${SHARED_APP_NAME}"\` in sst.config.ts to a name unique to your installation BEFORE your first deploy to any stage — changing it later recreates every Cloudflare resource under the new name. (The Nuxfire reference deploy is recognised by BRAND_DOMAIN=${REFERENCE_DOMAIN} with that zone present in the account, and is not warned.)`,
+  );
 }
 
 if (warnings.length) console.warn(`\n${warnings.length} warning(s):\n\n${warnings.join("\n\n")}`);

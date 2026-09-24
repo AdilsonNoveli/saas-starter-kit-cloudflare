@@ -57,6 +57,11 @@ function blogRoutes(): string[] {
   return routes;
 }
 
+// Set per stage at build time by infra/web.ts (from the branding domain); a local build
+// outside the deploy gets localhost. Feeds both @nuxtjs/seo's `site.url` and i18n's
+// `baseUrl` below, so every absolute URL the site emits points at the same origin.
+const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -113,9 +118,7 @@ export default defineNuxtConfig({
     autoImportPath: "~/assets/icons",
   },
   site: {
-    // set per stage at build time by infra/web.ts (from the branding domain);
-    // the sitemap needs *a* URL, so a local build outside the deploy gets localhost
-    url: process.env.SITE_URL ?? "http://localhost:3000",
+    url: siteUrl,
     name: "Nuxfire",
   },
 
@@ -140,6 +143,11 @@ export default defineNuxtConfig({
   },
   i18n: {
     restructureDir: "i18n",
+    // Without it the canonical, og:url and hreflang tags are emitted relative
+    // (`href="/"`), which resolve to whichever hostname served the page: the
+    // production `www.` alias (infra/dns.ts → webAliases) would canonicalize to
+    // itself instead of the apex.
+    baseUrl: siteUrl,
     defaultLocale: "en",
     strategy: "prefix_except_default",
     locales: [

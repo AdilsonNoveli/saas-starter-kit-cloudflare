@@ -12,6 +12,11 @@ export const appDomain = `app.${domain}`;
 export const authDomain = `auth.${domain}`;
 export const websocketsDomain = `websockets.${domain}`;
 export const webDomain = `${domain}`;
+// Only the production apex also answers on `www.` (301 to the apex, see
+// deployWorker's `redirects`). Dev stages live under `<stage>.dev.<domain>`,
+// where a `www.` sibling has no purpose.
+export const webRedirects =
+  $app.stage === "production" ? [`www.${domain}`] : [];
 
 export const authUrl = new sst.Linkable("AuthUrl", {
   properties: {

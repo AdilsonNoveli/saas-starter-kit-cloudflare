@@ -8,6 +8,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { REFERENCE_DOMAIN, SHARED_APP_NAME, sharesStarterKitAppName } from "./app-identity";
+import { probeZonePermissions } from "./cloudflare-permissions";
 import {
   BrandingError,
   envFileName as stageEnvFile,
@@ -120,7 +121,7 @@ try {
 
 // 6. Valid token (blocks) and the domain's zone being visible (warns only).
 if (token && accountId) {
-  type CloudflareReply = { success: boolean; result?: { status?: string } | unknown[] };
+  type CloudflareReply = { success: boolean; result?: { status?: string } | { id?: string }[] };
   const api = async (path: string): Promise<CloudflareReply> =>
     (await fetch(`https://api.cloudflare.com/client/v4${path}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -146,13 +147,41 @@ if (token && accountId) {
         const zones = await api(
           `/zones?name=${encodeURIComponent(branding.domain)}&account.id=${accountId}`,
         );
-        zoneVerified = Array.isArray(zones.result) && zones.result.length > 0;
+        const zoneId = Array.isArray(zones.result) ? zones.result[0]?.id : undefined;
+        zoneVerified = zoneId !== undefined;
         zoneVerified
           ? ok(`Zone ${branding.domain} found in the account`)
           : warn(
               `Zone "${branding.domain}" did not show up in account ${accountId}`,
               `Make sure ${branding.domain} (BRAND_DOMAIN) was added to the SAME Cloudflare account as the token, with active nameservers. If it was, the token may simply lack Zone:Read.`,
             );
+
+        // Only production redirects `www.<domain>` (infra/dns.ts → webRedirects). That needs
+        // two zone permissions beyond Workers Routes, and Cloudflare would otherwise reject
+        // them with a 403 at the very end of the deploy.
+        if (isProduction) {
+          if (!zoneId) {
+            warn(
+              `The token's DNS / Page Rules permissions for the www redirect were not checked`,
+              `They need the zone above, which was not found. Required on the ${branding.domain} policy: DNS → Edit and Page Rules → Edit.`,
+            );
+          } else {
+            const { missing, unverified } = await probeZonePermissions({ token, zoneId });
+            if (missing.length) {
+              fail(
+                `The API token cannot manage ${branding.domain}'s www redirect — missing: ${missing.join(", ")}`,
+                `Cloudflare dashboard → Manage Account → Account API Tokens → your token → Edit → the policy scoped to ${branding.domain} ("Specified Domains") → add ${missing.join(" and ")} (the category is "DNS & Zones" for DNS; use the search box for "Page Rules"). Not the account-level "Account DNS Settings" / "DNS Firewall". Guide: https://nuxfire.com/docs/saas-starter-kit/getting-started/cloudflare-access`,
+              );
+            } else if (unverified.length) {
+              warn(
+                `Could not verify the token's ${unverified.join(", ")} permission on ${branding.domain}`,
+                "Cloudflare did not answer the check; the deploy will still fail with a 403 if they are missing.",
+              );
+            } else {
+              ok(`Token can manage the www redirect on ${branding.domain} (DNS, Page Rules)`);
+            }
+          }
+        }
       }
     }
   } catch (e) {

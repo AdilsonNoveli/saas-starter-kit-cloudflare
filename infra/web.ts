@@ -1,4 +1,4 @@
-import { webUrl, appUrl, webDomain, webRedirects } from "./dns";
+import { webUrl, appUrl, webDomain, webAliases } from "./dns";
 import { deployWorker } from "./utils/nuxt";
 
 /**
@@ -17,7 +17,7 @@ const contentDatabase = new sst.cloudflare.D1("DB");
 await deployWorker("Web", {
   root: "apps/web",
   domain: webDomain,
-  redirects: webRedirects,
+  aliases: webAliases,
   link: [contentDatabase],
   vars: {
     NUXT_PUBLIC_APP_URL: appUrl.properties.value,

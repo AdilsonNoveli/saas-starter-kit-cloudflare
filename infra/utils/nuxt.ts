@@ -15,7 +15,7 @@ export async function deployWorker(
   {
     root,
     domain,
-    redirects = [],
+    aliases = [],
     app,
     vars = {},
     link: extraLink = [],
@@ -23,12 +23,12 @@ export async function deployWorker(
     root: string;
     domain: string;
     /**
-     * Extra hostnames that 301 to `domain` (path preserved). SST provisions a
-     * proxied placeholder DNS record + a forwarding Page Rule per hostname, so
-     * the hostname must have no existing DNS record and the API token needs
-     * `DNS: Edit` + `Page Rules: Edit` on the zone.
+     * Extra hostnames served by the same Worker, each as its own Workers
+     * Custom Domain (same resource and token permission as `domain`). The
+     * hostname must have no existing A/AAAA/CNAME record. Visitors stay on the
+     * alias, so the app must emit absolute canonical URLs for `domain`.
      */
-    redirects?: string[];
+    aliases?: string[];
     app?: boolean;
     vars?: Record<string, Input<string> | undefined>;
     link?: Link.Linkable[];
@@ -78,7 +78,7 @@ export async function deployWorker(
       // relative — see infra/emails.ts for why (assets.directory below is
       // fine absolute, SST explicitly supports both there)
       handler: `${root}/${nitroOutputDirName}/server/index.mjs`,
-      domain: { name: domain, redirects },
+      domain: { name: domain, aliases },
       compatibility: COMPATIBILITY,
       assets: {
         directory: path.resolve(outputDir, "public"),

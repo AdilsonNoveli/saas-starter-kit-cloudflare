@@ -50,26 +50,24 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
   values over as plain `environment` (`infra/emails.ts` → the Emails Worker, which owns the sender:
   `sendEmail(to, template, props)` has no `from`). Never hardcode a domain/sender/brand name, and never add a
   `Resource` for it (`sst-env.d.ts` is generated).
-- **`www` redirect (production only)**: `infra/dns.ts` exports `webRedirects` (`["www.<domain>"]` on
-  `production`, `[]` elsewhere), passed by `infra/web.ts` to `deployWorker`'s `redirects`, which forwards
-  `domain: { name, redirects }` to `sst.cloudflare.Worker`. SST then creates a proxied `AAAA 100::` record and a
-  301 Page Rule (`https://<apex>/$1`) per hostname (`.sst/platform/src/components/cloudflare/worker.ts`,
-  `createRedirects`). Consequences: the token needs zone-scoped `DNS` + `Page Rules` (both **Edit**) on top of
-  `Workers Routes: Edit`, and the hostname must have **no** pre-existing record. A Workers Custom Domain (the
-  apex itself) likewise fails with Cloudflare error `100117` if the hostname already has an A/AAAA/CNAME.
-  Verified against Cloudflare's OpenAPI spec (`x-api-token-group`): `POST /zones/{id}/dns_records` needs
-  `DNS Write`; `POST /zones/{id}/pagerules` needs `Page Rules Write` (or the much broader `Zone Write`).
-  Deploy signatures of each missing piece: `403` code `10000` on `DnsRecord` = no DNS Edit; `403` code `9109`
-  on `PageRule` = no Page Rules Edit. `scripts/doctor.ts` blocks production on both before deploying
-  (`scripts/cloudflare-permissions.ts`, read-only probes: DNS Read|Write and Page Rules Read|Write accept them).
-  **Decision (kept on purpose): SST's native `redirects`, i.e. Page Rules.** Cloudflare labels Page Rules
-  deprecated (automatic migration announced, no date), but its docs still document `POST /pagerules` (updated
-  Aug 2026) and it is additive: one rule per hostname, nothing else in the zone is touched. The alternative
-  (a `cloudflare.Ruleset` in phase `http_request_dynamic_redirect`) is not: a zone has exactly ONE entrypoint
-  ruleset per phase and the resource is authoritative for its `rules` list, so it either collides with or
-  replaces redirect rules created in the dashboard — neither outcome is predictable, and it is untestable
-  without a live deploy. Revisit only if SST itself moves `redirects` off Page Rules (then the token
-  permissions, `scripts/cloudflare-permissions.ts` probes and the cloudflare-access guide change with it).
+- **`www` alias (production only)**: `infra/dns.ts` exports `webAliases` (`["www.<domain>"]` on `production`,
+  `[]` elsewhere), passed by `infra/web.ts` to `deployWorker`'s `aliases`, which forwards
+  `domain: { name, aliases }` to `sst.cloudflare.Worker`: one more Workers Custom Domain on the same Worker
+  (`createAliases` in `.sst/platform/src/components/cloudflare/worker.ts`) — same resource and same token
+  permission (`Workers Routes: Edit`) as the apex, nothing extra. The hostname must have **no** pre-existing
+  A/AAAA/CNAME record, exactly like the apex (Cloudflare error `100117` otherwise). Visitors stay on `www`;
+  `apps/web/nuxt.config.ts` feeds `SITE_URL` to both `site.url` and `i18n.baseUrl` so canonical, `og:url`
+  and `hreflang` are absolute and point at the apex (without `i18n.baseUrl` @nuxtjs/i18n 10.6 emits them
+  relative, `href="/"`, which would self-canonicalize on `www`).
+  **Decision: NOT SST's `redirects`.** They create a proxied `AAAA 100::` record plus a 301 **Page Rule**, and
+  Cloudflare's Page Rules API does not support Account API Tokens — the kind this project mandates: the
+  endpoint answers HTTP 400, error `1011` "Page Rules endpoint does not support account owned tokens" (the
+  deploy saw `403` code `9109` on `PageRule`), whatever permissions the token holds. Cloudflare's
+  account-owned-tokens compatibility matrix marks Page Rules unsupported and DNS, Workers and Rulesets
+  supported. A `cloudflare.Ruleset` (Single Redirects) would work with the token but a zone has exactly ONE
+  entrypoint ruleset per phase and the resource is authoritative for its `rules`, so it collides with or
+  replaces redirect rules created in the dashboard, and is untestable without a live deploy. Revisit a real
+  301 only with that trade-off decided explicitly (and Single Redirect Edit added to the zone policy).
 - `production`: `removal: "retain"` and `protect: true`; other stages: `remove`,
   unprotected (`sst.config.ts`).
 - New Cloudflare accounts require the `workers.dev` subdomain initialized once
@@ -166,8 +164,7 @@ Authentication providers only activate if credentials exist: the `Auth` Worker a
 - Workspaces: `apps/*`, `packages/*`, `layers/*`.
 - Root CLI scripts: `bun run deploy` (`scripts/deploy.ts`: runs the preflight `scripts/doctor.ts`,
   then `sst deploy`, forwarding the same args, e.g. `--stage`; `bun run doctor [-- --stage <s>]` runs it alone —
-  blocks on missing workspace links, missing Cloudflare env vars, invalid token, (production only) a token
-  without zone `DNS` / `Page Rules` Edit needed by the `www` redirect, empty `DATABASE_*` in
+  blocks on missing workspace links, missing Cloudflare env vars, invalid token, empty `DATABASE_*` in
   `.env.stage`/`.env.production`, missing/malformed `BRAND_*` (same validation as the deploy); unprovable items such as the zone
   not being listed are warnings only), `bun run app` (`sst shell -- bun scripts/dev.ts app`),
   `bun run web`, `-remote` variants, `bun run test`, `bun run check:i18n`, `bun run format`.

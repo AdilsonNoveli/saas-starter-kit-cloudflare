@@ -54,9 +54,22 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
   `production`, `[]` elsewhere), passed by `infra/web.ts` to `deployWorker`'s `redirects`, which forwards
   `domain: { name, redirects }` to `sst.cloudflare.Worker`. SST then creates a proxied `AAAA 100::` record and a
   301 Page Rule (`https://<apex>/$1`) per hostname (`.sst/platform/src/components/cloudflare/worker.ts`,
-  `createRedirects`). Consequences: the token needs zone-scoped `DNS: Edit` + `Page Rules: Edit` on top of
+  `createRedirects`). Consequences: the token needs zone-scoped `DNS` + `Page Rules` (both **Edit**) on top of
   `Workers Routes: Edit`, and the hostname must have **no** pre-existing record. A Workers Custom Domain (the
   apex itself) likewise fails with Cloudflare error `100117` if the hostname already has an A/AAAA/CNAME.
+  Verified against Cloudflare's OpenAPI spec (`x-api-token-group`): `POST /zones/{id}/dns_records` needs
+  `DNS Write`; `POST /zones/{id}/pagerules` needs `Page Rules Write` (or the much broader `Zone Write`).
+  Deploy signatures of each missing piece: `403` code `10000` on `DnsRecord` = no DNS Edit; `403` code `9109`
+  on `PageRule` = no Page Rules Edit. `scripts/doctor.ts` blocks production on both before deploying
+  (`scripts/cloudflare-permissions.ts`, read-only probes: DNS Read|Write and Page Rules Read|Write accept them).
+  **Decision (kept on purpose): SST's native `redirects`, i.e. Page Rules.** Cloudflare labels Page Rules
+  deprecated (automatic migration announced, no date), but its docs still document `POST /pagerules` (updated
+  Aug 2026) and it is additive: one rule per hostname, nothing else in the zone is touched. The alternative
+  (a `cloudflare.Ruleset` in phase `http_request_dynamic_redirect`) is not: a zone has exactly ONE entrypoint
+  ruleset per phase and the resource is authoritative for its `rules` list, so it either collides with or
+  replaces redirect rules created in the dashboard — neither outcome is predictable, and it is untestable
+  without a live deploy. Revisit only if SST itself moves `redirects` off Page Rules (then the token
+  permissions, `scripts/cloudflare-permissions.ts` probes and the cloudflare-access guide change with it).
 - `production`: `removal: "retain"` and `protect: true`; other stages: `remove`,
   unprotected (`sst.config.ts`).
 - New Cloudflare accounts require the `workers.dev` subdomain initialized once
@@ -153,7 +166,8 @@ Authentication providers only activate if credentials exist: the `Auth` Worker a
 - Workspaces: `apps/*`, `packages/*`, `layers/*`.
 - Root CLI scripts: `bun run deploy` (`scripts/deploy.ts`: runs the preflight `scripts/doctor.ts`,
   then `sst deploy`, forwarding the same args, e.g. `--stage`; `bun run doctor [-- --stage <s>]` runs it alone —
-  blocks on missing workspace links, missing Cloudflare env vars, invalid token, empty `DATABASE_*` in
+  blocks on missing workspace links, missing Cloudflare env vars, invalid token, (production only) a token
+  without zone `DNS` / `Page Rules` Edit needed by the `www` redirect, empty `DATABASE_*` in
   `.env.stage`/`.env.production`, missing/malformed `BRAND_*` (same validation as the deploy); unprovable items such as the zone
   not being listed are warnings only), `bun run app` (`sst shell -- bun scripts/dev.ts app`),
   `bun run web`, `-remote` variants, `bun run test`, `bun run check:i18n`, `bun run format`.

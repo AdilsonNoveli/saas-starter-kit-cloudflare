@@ -86,7 +86,8 @@
                   </span>
                 </div>
 
-                <!-- Price Numbers -->
+                <!-- Price Numbers (temporarily commented out per request) -->
+                <!--
                 <div class="mb-4">
                   <div class="flex items-baseline gap-3">
                     <span class="text-2xl sm:text-3xl text-dimmed line-through font-bold">
@@ -106,6 +107,7 @@
                     {{ $t("landing.pricing.earlyBirdNote") }}
                   </p>
                 </div>
+                -->
 
                 <!-- High-Converting Clear & Optimized Bonus Callout Box -->
                 <div class="mb-4 rounded-xl border border-warning/35 bg-gradient-to-br from-warning/10 via-warning/5 to-transparent p-3 sm:p-3.5 transition-all shadow-2xs">
@@ -174,7 +176,9 @@
               <div>
                 <!-- Solid Darker Green CTA Button -->
                 <NuxtLink
-                  :to="signupUrl"
+                  :to="ctaUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   class="group w-full py-3.5 sm:py-4 px-6 rounded-xl bg-success hover:bg-success/90 active:bg-success text-white font-extrabold uppercase tracking-wider text-sm sm:text-base text-center shadow-lg shadow-success/25 hover:shadow-success/35 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2.5 select-none"
                 >
                   <span>{{ $t("landing.pricing.cta") }}</span>
@@ -214,7 +218,7 @@
 const { t } = useI18n();
 const localePath = useLocalePath();
 const config = useRuntimeConfig();
-const signupUrl = computed(() => config.public.appUrl || localePath("/signup"));
+const ctaUrl = computed(() => t("landing.pricing.ctaUrl") || config.public.appUrl || localePath("/signup"));
 
 const isBonusInfoOpen = ref(false);
 

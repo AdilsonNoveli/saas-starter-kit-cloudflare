@@ -830,11 +830,11 @@
         },
         "item2": {
           "question": "Posso testar a demonstração ao vivo antes de comprar?",
-          "answer": "Sim! Toda esta aplicação ao vivo está rodando exatamente a mesma base de código do monorepo de nível enterprise que você recebe após a compra.\n\nCrie uma conta de teste para experimentar a autenticação OpenAuth, workspaces de equipe, fluxos de convite, permissões RBAC granulares e o console de administração da plataforma. O que você vê e testa aqui é exatamente o que você terá e implantará."
+          "answer": "Sim! Toda esta aplicação ao vivo está rodando exatamente a mesma base de código do monorepo de nível enterprise que você recebe após a compra.\n\nVocê pode criar uma conta como usuário porém o ideal é participar de uma demonstração ao vivo para ter acesso a área do admin e ver todas as funcionalidades já disponíveis."
         },
         "item3": {
           "question": "De qual stack técnica e experiência eu preciso?",
-          "answer": "O Nuxfire é construído com TypeScript moderno, Nuxt 4, Vue 3 e SST v4 declarativo para a Cloudflare.\n\n• Para Desenvolvedores Sênior: Você tem layers modulares limpos, tipagem ponta a ponta com tRPC e Drizzle ORM — com zero dependência proprietária e sem peso desnecessário de framework.\n• Para Construtores com IA & Vibe Coders: Se você constrói usando Cursor, Claude Code ou v0, o Nuxfire oferece o contexto arquitetural ideal. Contratos estritos de TypeScript, schemas tipados e Nuxt Layers isolados permitem que os modelos de IA gerem funcionalidades prontas para produção na primeira tentativa, sem quebrar a lógica existente."
+          "answer": "O Nuxfire é construído com TypeScript moderno, Nuxt 4, Vue 3 e SST v4 declarativo para a Cloudflare.\n\n• Para Desenvolvedores Sênior: Você tem layers modulares limpos, tipagem ponta a ponta com tRPC e Drizzle ORM — com zero dependência proprietária e sem peso desnecessário de framework.\n• Para Construtores com IA & Vibe Coders: Se você constrói usando Cursor, Claude Code ou v0, o Nuxfire conta com o Fireskills — nosso framework de governança e metodologia orientada a especificações com especialistas técnicos embarcados. Contratos estritos de TypeScript, schemas tipados e Nuxt Layers isolados permitem que agentes de IA gerem funcionalidades prontas para produção com máxima precisão. Veja mais detalhes na [documentação do Fireskills](/docs/fireskills)."
         },
         "item4": {
           "question": "Quão customizável é o starter kit?",
@@ -842,31 +842,32 @@
         },
         "item5": {
           "question": "Qual suporte e comunidade estão inclusos?",
-          "answer": "Toda licença inclui:\n\n• Documentação completa e pesquisável cobrindo arquitetura, secrets e configuração da Cloudflare.\n• Guias detalhados para desenvolvimento local, migrações e deploy.\n• Acesso direto à nossa comunidade no Discord para colaboração e dúvidas.\n• Suporte dedicado por e-mail para dúvidas de configuração e onboarding."
+          "answer": "Toda licença inclui:\n\n• Documentação completa e pesquisável cobrindo arquitetura, secrets e configuração da Cloudflare.\n• Guias detalhados para desenvolvimento local, migrações e deploy.\n• Acesso direto à nossa comunidade exclusiva no WhatsApp para networking, colaboração e novidades.\n• Suporte direto com Engenheiros Sênior do Nuxfire para dúvidas de arquitetura, configuração e onboarding."
         },
         "item6": {
           "question": "Receberei atualizações e novas funcionalidades?",
-          "answer": "Sim! Sua licença inclui acesso vitalício a todas as atualizações futuras, correções de segurança, upgrades de framework e novos layers arquiteturais diretamente na sua Área de Membros.\n\nSempre que o Nuxt, Cloudflare Workers ou SST lançarem melhorias importantes, atualizamos o starter kit para que sua base continue moderna e testada, sem nenhum custo adicional."
+          "answer": "Sim! Você receberá atualizações de acordo com o plano adquirido (anual ou vitalício), incluindo correções de segurança, upgrades de framework e novos layers arquiteturais diretamente na sua Área de Membros.\n\nSempre que o Nuxt, Cloudflare Workers ou SST lançarem melhorias importantes, atualizamos o starter kit para que sua base continue moderna e testada."
         },
         "item7": {
           "question": "Posso construir projetos comerciais de SaaS com esta licença?",
-          "answer": "Sim! A licença concede a você direitos perpétuos para construir projetos SaaS comerciais ilimitados, ferramentas internas e projetos para clientes.\n\n• Use o código em domínios ilimitados e projetos de clientes.\n• Receba 100% da receita de assinatura dos seus clientes, com zero royalties.\n• Pague uma única vez com posse vitalícia — nunca cobramos mensalidades por código.\n\nConsulte a documentação de licença para os termos e condições completos."
+          "answer": "Sim! A licença concede a você direitos perpétuos para construir projetos SaaS comerciais ilimitados, ferramentas internas e projetos para clientes.\n\n• Use o código em domínios ilimitados e projetos de clientes.\n• Receba 100% da receita de assinatura dos seus clientes, com zero royalties.\n• Atualizações de acordo com o plano adquirido (anual ou vitalício) — nunca cobramos mensalidades por código.\n\nConsulte a documentação de licença para os termos e condições completos."
         }
       }
     },
     "pricing": {
-      "badge": "Licença vitalícia",
+      "badge": "Planos Anual & Vitalício",
       "title": "Preço simples e transparente",
-      "subtitle": "Um único pagamento. Propriedade total. Sem mensalidades recorrentes nem taxa oculta de plataforma.",
+      "subtitle": "Planos com atualizações contínuas (anual ou vitalício). Sem mensalidades pelo código nem taxas ocultas de plataforma.",
       "cardTitle": "Nuxfire Production Kit",
       "cardSubtitle": "Base de código SaaS full-stack de nível empresarial & infraestrutura em nuvem",
-      "lifetimeAccess": "Acesso vitalício",
-      "earlyBirdBadge": "Lote de Lançamento",
+      "lifetimeAccess": "Atualizações constantes",
+      "earlyBirdBadge": "Acesso Antecipado",
       "earlyBirdNote": "Preço especial de acesso antecipado ($79 preço regular posterior)",
       "oneTimePayment": "Pagamento único",
       "neverMonthly": "Nunca mais pague mensalidade por código",
       "includedTitle": "Tudo o que está incluído na sua licença:",
-      "cta": "COMECE AGORA",
+      "cta": "ENTRAR NO GRUPO",
+      "ctaUrl": "https://chat.whatsapp.com/KSKqVly5tFp2OpUtWrvccY",
       "guarantee": {
         "refund": "Garantia de reembolso em 14 dias",
         "projects": "Projetos pessoais e comerciais ilimitados",
@@ -918,23 +919,23 @@
           "text": "Layer de Kanban pronto para produção, com cards de arrastar e soltar."
         },
         "updates": {
-          "highlight": "Atualizações vitalícias & documentação",
-          "text": "Documentação completa, atualizações futuras e comunidade privada de desenvolvedores."
+          "highlight": "Atualizações (Plano Anual ou Vitalício)",
+          "text": "Atualizações contínuas de acordo com o plano contratado (anual ou vitalício), documentação completa e suporte especializado."
         }
       },
       "closingHeadline": "Você pode passar três meses reconstruindo o que já existe. Ou começar com uma estrutura enterprise-grade desde o primeiro dia.",
       "bonusCallout": {
-        "title": "COMPRANDO HOJE GANHE:",
-        "badge": "Bônus Exclusivo • 12 Meses",
-        "label": "1 ano de Club Nuxfire incluso",
+        "title": "APROVEITE, É GRATUITO:",
+        "badge": "Comunidade VIP • WhatsApp",
+        "label": "Club Nuxfire no WhatsApp incluso",
         "details": "Ver detalhes",
         "hide": "Ocultar",
-        "info": "Um ano de acesso ao Club Nuxfire — um ecossistema em constante evolução, criado para continuar acelerando seus projetos depois que você começar a usar o Nuxfire."
+        "info": "Acesso exclusivo ao Club Nuxfire no WhatsApp: networking com desenvolvedores experientes, demonstrações ao vivo da plataforma, bastidores da arquitetura e condições especiais de lançamento. Vagas limitadas no grupo."
       },
       "checkmarks": {
-        "sourceCode": "Acesso vitalício ao código-fonte completo",
-        "instantDownload": "Download imediato na Área de Membros",
-        "noSubscription": "Sem assinatura para continuar usando o que comprou"
+        "sourceCode": "Networking direto com Engenheiros Sênior do Nuxfire",
+        "instantDownload": "Demonstrações ao vivo com visão completa do admin",
+        "noSubscription": "Condições exclusivas de acesso antecipado no WhatsApp"
       }
     },
     "cta": {

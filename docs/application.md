@@ -166,7 +166,7 @@ Inventory: maps each observed file to its surface.
 | Components | apps/web/app/components/landing/LandingAvatars.vue | — |
 | Components | apps/web/app/components/landing/LandingComparisonTable.vue | FeatureItem, getCategoryItems, getCategoryCount |
 | Components | apps/web/app/components/landing/LandingDatabaseArchitecture.vue | — |
-| Components | apps/web/app/components/landing/LandingFAQs.vue | — |
+| Components | apps/web/app/components/landing/LandingFAQs.vue | ContentToken, parseContent |
 | Components | apps/web/app/components/landing/LandingFeatureBadges.vue | — |
 | Components | apps/web/app/components/landing/LandingFeatureCard.vue | Subfeature |
 | Components | apps/web/app/components/landing/LandingFolderStructure.vue | — |

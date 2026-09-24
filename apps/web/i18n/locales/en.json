@@ -830,11 +830,11 @@
         },
         "item2": {
           "question": "Can I test the live demo before purchasing?",
-          "answer": "Yes! This entire live application is running the exact same production-grade monorepo codebase that you receive upon purchase.\n\nCreate a test account to experience the OpenAuth authentication, team workspaces, invite flows, granular RBAC permissions, and the platform admin console. What you see and test here is exactly what you will own and deploy."
+          "answer": "Yes! This entire live application is running the exact same production-grade monorepo codebase that you receive upon purchase.\n\nYou can create an account as a user, but the ideal way is to join a live demo to get access to the admin area and see all the features currently available."
         },
         "item3": {
           "question": "What technical stack and experience do I need?",
-          "answer": "Nuxfire is built with modern TypeScript, Nuxt 4, Vue 3, and declarative SST v4 for Cloudflare.\n\n• For Senior Developers: You get clean modular layers, end-to-end type safety with tRPC, and Drizzle ORM—with zero vendor lock-in and zero runtime framework bloat.\n• For AI Builders & Vibe Coders: If you build using Cursor, Claude Code, or v0, Nuxfire provides the ultimate architectural context. Strict TypeScript contracts, typed schemas, and isolated Nuxt Layers allow AI models to generate reliable, production-ready features on the first attempt without breaking existing logic."
+          "answer": "Nuxfire is built with modern TypeScript, Nuxt 4, Vue 3, and declarative SST v4 for Cloudflare.\n\n• For Senior Developers: You get clean modular layers, end-to-end type safety with tRPC, and Drizzle ORM—with zero vendor lock-in and zero runtime framework bloat.\n• For AI Builders & Vibe Coders: If you build using Cursor, Claude Code, or v0, Nuxfire features Fireskills — our spec-driven engineering methodology and agent governance framework with built-in technical specialists. Strict TypeScript contracts, typed schemas, and isolated Nuxt Layers allow AI agents to generate production-ready code with maximum precision. Learn more in the [Fireskills documentation](/docs/fireskills)."
         },
         "item4": {
           "question": "How customizable is the starter kit?",
@@ -842,31 +842,32 @@
         },
         "item5": {
           "question": "What support and community do I get?",
-          "answer": "Every license includes:\n\n• Complete, searchable documentation covering architecture, secrets, and Cloudflare configuration.\n• Detailed walkthrough guides for local development, migrations, and deployment.\n• Direct access to our Discord community for collaboration and troubleshooting.\n• Dedicated email assistance for setup and onboarding questions."
+          "answer": "Every license includes:\n\n• Complete, searchable documentation covering architecture, secrets, and Cloudflare configuration.\n• Detailed walkthrough guides for local development, migrations, and deployment.\n• Direct access to our exclusive WhatsApp community for networking, collaboration, and updates.\n• Direct support from Senior Nuxfire Engineers for architecture, setup, and onboarding questions."
         },
         "item6": {
           "question": "Do I receive updates and new features?",
-          "answer": "Yes! Your license includes lifetime access to all future updates, security patches, framework upgrades, and new architectural layers directly in your Members Area.\n\nWhenever Nuxt, Cloudflare Workers, or SST release major improvements, we update the starter kit so your foundation remains modern and battle-tested at no additional cost."
+          "answer": "Yes! You will receive updates according to your purchased plan (annual or lifetime), including security patches, framework upgrades, and new architectural layers directly in your Members Area.\n\nWhenever Nuxt, Cloudflare Workers, or SST release major improvements, we update the starter kit so your foundation remains modern and battle-tested."
         },
         "item7": {
           "question": "Can I build commercial SaaS projects with this license?",
-          "answer": "Yes! The license gives you perpetual rights to build unlimited commercial SaaS products, internal tools, and client projects.\n\n• Use the codebase across unlimited domains and client projects.\n• Collect 100% of your customer subscription revenue with zero royalties.\n• Pay once with lifetime ownership—there are never any monthly code subscription fees.\n\nReview the license documentation for full terms and conditions."
+          "answer": "Yes! The license gives you perpetual rights to build unlimited commercial SaaS products, internal tools, and client projects.\n\n• Use the codebase across unlimited domains and client projects.\n• Collect 100% of your customer subscription revenue with zero royalties.\n• Updates according to your chosen plan (annual or lifetime)—there are never any monthly code subscription fees.\n\nReview the license documentation for full terms and conditions."
         }
       }
     },
     "pricing": {
-      "badge": "Lifetime License",
+      "badge": "Annual & Lifetime Plans",
       "title": "Simple, Transparent Pricing",
-      "subtitle": "One payment. Complete ownership. No recurring monthly fees or hidden platform tax.",
+      "subtitle": "Plans with continuous updates (annual or lifetime). No code royalties or hidden platform fees.",
       "cardTitle": "Nuxfire Production Kit",
       "cardSubtitle": "Full-stack enterprise SaaS codebase & cloud infrastructure",
-      "lifetimeAccess": "Lifetime Access",
-      "earlyBirdBadge": "Early Adopter Batch",
+      "lifetimeAccess": "Continuous updates",
+      "earlyBirdBadge": "Early Access",
       "earlyBirdNote": "Launch pricing for early adopters ($79 regular price afterwards)",
       "oneTimePayment": "One-Time Payment",
       "neverMonthly": "Never pay monthly for code",
       "includedTitle": "Everything Included in Your License:",
-      "cta": "GET STARTED NOW",
+      "cta": "JOIN THE GROUP",
+      "ctaUrl": "https://chat.whatsapp.com/KSKqVly5tFp2OpUtWrvccY",
       "guarantee": {
         "refund": "14-Day Money-Back Guarantee",
         "projects": "Unlimited Personal & Commercial Projects",
@@ -918,23 +919,23 @@
           "text": "Included production-ready Kanban layer with drag & drop cards."
         },
         "updates": {
-          "highlight": "Lifetime Updates & Documentation",
-          "text": "Complete docs, future updates, and private developer community."
+          "highlight": "Updates (Annual or Lifetime Plan)",
+          "text": "Continuous updates according to your chosen plan (annual or lifetime), comprehensive documentation, and private developer community."
         }
       },
       "closingHeadline": "You can spend three months rebuilding what already exists. Or start with an enterprise-grade architecture from day one.",
       "bonusCallout": {
-        "title": "BUY TODAY & GET:",
-        "badge": "Exclusive Bonus • 12 Months",
-        "label": "1 year of Club Nuxfire included",
+        "title": "CLAIM IT, IT'S FREE:",
+        "badge": "VIP Community • WhatsApp",
+        "label": "Club Nuxfire on WhatsApp included",
         "details": "View details",
         "hide": "Hide",
-        "info": "One year of access to Club Nuxfire — a constantly evolving ecosystem, designed to keep accelerating your projects after you start using Nuxfire."
+        "info": "Exclusive access to Club Nuxfire on WhatsApp: connect with experienced developers, join live platform demos, explore architecture insights, and unlock special launch terms. Limited group spots."
       },
       "checkmarks": {
-        "sourceCode": "Lifetime access to full source code",
-        "instantDownload": "Instant download in Members Area",
-        "noSubscription": "No subscription to keep using what you bought"
+        "sourceCode": "Direct networking with Senior Nuxfire Engineers",
+        "instantDownload": "Live demonstrations with full admin area walkthrough",
+        "noSubscription": "Exclusive early access offers inside WhatsApp"
       }
     },
     "cta": {

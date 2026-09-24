@@ -33,7 +33,7 @@ These rules complement agent instructions without superseding specs or acceptanc
 - Empty secret routes **fail closed** (platform and user MFA).
 - Internal Worker `Auth` endpoints require constant-time `x-admin-secret`.
 - `platformAdminProcedure` requires active `PlatformAdmin` + MFA + elevated 30-minute session; never derived from `abilityProcedure`.
-- Seeds that run on deploy (`apps/functions/src/database/seed/index.ts`) never create admins or carry credentials. `apps/functions/src/database/seed/demo-accounts.ts` and `apps/functions/src/database/grant-platform-admin.ts` are manual-only; the demo script's default passwords are throwaway.
+- Seeds that run on deploy (`apps/functions/src/database/seed/index.ts`) never create admins or carry credentials. `apps/functions/src/database/seed/demo-accounts.ts` and `apps/functions/src/database/grant-platform-admin.ts` and `apps/functions/src/database/reset-mfa.ts` are manual-only; the demo script's default passwords are throwaway.
 - Data reset of `User` requires purging both `AuthKV` keys (`["email", email, "password"]` and `["users", email]`).
 
 ## Operations

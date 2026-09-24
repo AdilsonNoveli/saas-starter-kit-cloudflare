@@ -35,7 +35,7 @@ What the starter does not do or does not have yet (absence verified in code):
 - No CI/CD: `.github/workflows/` does not exist; deployment is manual.
 - No invoice list or download: the Billing tab only mentions "invoices" in text.
 - No in-app password change: button leads to the issuer's "forgot password" flow.
-- No MFA recovery codes; locked MFA requires direct database edit.
+- MFA recovery: ten single-use recovery codes per factor (user and platform admin), issued at enrolment, redeemable at the challenge and regenerable after a fresh authenticator code; losing both is handled by the manual, audited `apps/functions/src/database/reset-mfa.ts`.
 - No RSS feed, error tracking (Sentry etc.), tenant impersonation, IP allowlist in `/admin`, or MRR/ARR charts.
 - Analytics: documentation page is "coming soon".
 - Pricing page on website (`LandingPricing.vue`) is static; does not read `Plan` records from database.

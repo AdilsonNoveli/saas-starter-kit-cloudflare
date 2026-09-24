@@ -1,9 +1,12 @@
 import { z } from "zod";
-import { Secret, TOTP } from "otpauth/slim";
 
-const bodySchema = z.object({
-  code: z.string().regex(/^\d{6}$/),
-});
+// Either the current authenticator code or one recovery code. A single route,
+// so both share one rate-limit bucket: offering a second way in must not double
+// the guesses an attacker gets per account.
+const bodySchema = z.union([
+  z.object({ code: z.string().regex(/^\d{6}$/) }),
+  z.object({ recoveryCode: z.string().min(1).max(32) }),
+]);
 
 /**
  * Re-authenticates an *already enrolled* platform admin, issuing a fresh
@@ -41,7 +44,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { code } = await readValidatedBody(event, bodySchema.parse);
+  const body = await readValidatedBody(event, bodySchema.parse);
 
   const admin = await findActivePlatformAdmin(user.id);
   if (!admin) {
@@ -54,16 +57,48 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { platformAdminEncryptionKey } = useRuntimeConfig(event);
-  const totp = new TOTP({
-    issuer: "Nuxfire",
-    label: user.email ?? user.id,
-    secret: Secret.fromBase32(
-      await decryptSecret(admin.mfaSecret, platformAdminEncryptionKey),
-    ),
-  });
+  const ip = getRequestIP(event, { xForwardedFor: true }) ?? null;
 
-  if (totp.validate({ token: code }) === null) {
+  if ("recoveryCode" in body) {
+    const { platformAdminEncryptionKey } = useRuntimeConfig(event);
+    const redeemed = await consumeRecoveryCode(
+      platformAdminEncryptionKey,
+      "platform",
+      user.id,
+      body.recoveryCode,
+    );
+    if (!redeemed) {
+      console.warn("platform mfa recovery code rejected", { userId: user.id });
+      // Deliberately says nothing about why.
+      throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+    }
+
+    await startPlatformMfaSession(event, admin.id);
+    const remaining = await countRecoveryCodes("platform", user.id);
+    await recordAuditLog({
+      actorUserId: user.id,
+      action: "platformAdmin.mfa.recovery-code.used",
+      targetType: "platformAdmin",
+      targetId: admin.id,
+      metadata: { remaining },
+      ip,
+    });
+
+    return {
+      verified: true,
+      recoveryCodeUsed: true,
+      recoveryCodesRemaining: remaining,
+    };
+  }
+
+  if (
+    !(await isValidPlatformTotp(
+      event,
+      admin.mfaSecret,
+      user.email ?? user.id,
+      body.code,
+    ))
+  ) {
     // Deliberately says nothing about why.
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
@@ -77,7 +112,7 @@ export default defineEventHandler(async (event) => {
     action: "platformAdmin.mfa.challenge",
     targetType: "platformAdmin",
     targetId: admin.id,
-    ip: getRequestIP(event, { xForwardedFor: true }) ?? null,
+    ip,
   });
 
   return { verified: true };

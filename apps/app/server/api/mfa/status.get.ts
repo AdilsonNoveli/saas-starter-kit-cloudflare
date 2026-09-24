@@ -29,5 +29,6 @@ export default defineEventHandler(async (event) => {
   return {
     mfaEnabled: true,
     sessionVerified: session?.userId === user.id,
+    recoveryCodesRemaining: await countRecoveryCodes("user", user.id),
   };
 });

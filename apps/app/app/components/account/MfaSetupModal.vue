@@ -1,16 +1,10 @@
 <template>
   <UModal
     :open="open"
-    :dismissible="dismissible"
-    :close="dismissible ? undefined : false"
-    :title="
-      isEnrolling ? 'Set up two-factor authentication' : `Confirm it's you`
-    "
-    :description="
-      isEnrolling
-        ? 'Scan this with an authenticator app, then enter the six digits it shows.'
-        : 'Enter the current code from your authenticator app to continue.'
-    "
+    :dismissible="canDismiss"
+    :close="canDismiss ? undefined : false"
+    :title="title"
+    :description="description"
     :ui="{
       overlay: 'backdrop-blur-md bg-default/40',
       content: 'shadow-none ring ring-default/60 max-w-xl',
@@ -18,7 +12,23 @@
     @update:open="emit('update:open', $event)"
   >
     <template #body>
-      <div class="flex flex-col gap-6">
+      <div v-if="recoveryCodes" class="flex flex-col gap-6">
+        <AccountMfaRecoveryCodes :codes="recoveryCodes" />
+
+        <UCheckbox
+          v-model="acknowledged"
+          label="I've saved these codes somewhere safe"
+        />
+
+        <UButton
+          label="Done"
+          class="self-start"
+          :disabled="!acknowledged"
+          @click="finishEnrolment"
+        />
+      </div>
+
+      <div v-else class="flex flex-col gap-6">
         <UButton
           v-if="isEnrolling && !otpauthUri"
           label="Generate code"
@@ -73,7 +83,34 @@
         </div>
 
         <UForm
-          v-if="showCodeForm"
+          v-if="showCodeForm && useRecovery"
+          :schema="recoverySchema"
+          :state="recoveryState"
+          class="flex flex-col gap-4 sm:flex-row sm:items-start"
+          @submit="onRecoverySubmit"
+        >
+          <UFormField label="Recovery code" name="recoveryCode" class="flex-1">
+            <UInput
+              v-model="recoveryState.recoveryCode"
+              class="w-full font-mono"
+              autocomplete="off"
+              autocapitalize="characters"
+              spellcheck="false"
+              maxlength="32"
+              placeholder="ABCD-EFGH-JKMN"
+            />
+          </UFormField>
+
+          <UButton
+            label="Use recovery code"
+            type="submit"
+            :loading="submitting"
+            class="sm:mt-6"
+          />
+        </UForm>
+
+        <UForm
+          v-else-if="showCodeForm"
           :schema="schema"
           :state="state"
           class="flex flex-col gap-4 sm:flex-row sm:items-start"
@@ -97,6 +134,19 @@
             class="sm:mt-6"
           />
         </UForm>
+
+        <UButton
+          v-if="!isEnrolling"
+          :label="
+            useRecovery
+              ? 'Use an authenticator code instead'
+              : 'Lost your authenticator? Use a recovery code'
+          "
+          color="neutral"
+          variant="link"
+          class="self-start px-0"
+          @click="useRecovery = !useRecovery"
+        />
       </div>
     </template>
   </UModal>
@@ -141,6 +191,33 @@ const { copy, copied } = useClipboard();
 const isEnrolling = computed(() => props.mode === "enroll");
 const otpauthUri = ref<string | null>(null);
 const submitting = ref(false);
+// Shown once, right after enrolment completes; the modal cannot be dismissed
+// until the person confirms they saved them.
+const recoveryCodes = ref<string[] | null>(null);
+const acknowledged = ref(false);
+const useRecovery = ref(false);
+
+const canDismiss = computed(() => props.dismissible && !recoveryCodes.value);
+
+const title = computed(() => {
+  if (recoveryCodes.value) return "Save your recovery codes";
+  if (!isEnrolling.value && useRecovery.value) return "Use a recovery code";
+  return isEnrolling.value
+    ? "Set up two-factor authentication"
+    : `Confirm it's you`;
+});
+
+const description = computed(() => {
+  if (recoveryCodes.value) {
+    return "Use one of these if you ever lose access to your authenticator app.";
+  }
+  if (isEnrolling.value) {
+    return "Scan this with an authenticator app, then enter the six digits it shows.";
+  }
+  return useRecovery.value
+    ? "Enter one of the recovery codes you saved when you turned on two-factor authentication."
+    : "Enter the current code from your authenticator app to continue.";
+});
 // Enrolment has to provision a seed first; challenging asks straight away.
 const showCodeForm = computed(
   () => !isEnrolling.value || Boolean(otpauthUri.value),
@@ -198,6 +275,14 @@ type Schema = z.output<typeof schema>;
 
 const state = reactive<Schema>({ code: "" });
 
+// Length only: the server normalises case, dashes and look-alike letters, and
+// says nothing about why a code was refused.
+const recoverySchema = z.object({
+  recoveryCode: z.string().min(12, "Enter the full recovery code"),
+});
+
+const recoveryState = reactive({ recoveryCode: "" });
+
 // So a modal instance reused across a later challenge (or reopened after a
 // failed enrolment) never shows a stale QR or leftover digits from the
 // previous time it was open.
@@ -206,7 +291,11 @@ watch(
   (isOpen) => {
     if (!isOpen) {
       otpauthUri.value = null;
+      recoveryCodes.value = null;
+      acknowledged.value = false;
+      useRecovery.value = false;
       state.code = "";
+      recoveryState.recoveryCode = "";
     }
   },
 );
@@ -243,28 +332,86 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
   submitting.value = true;
   try {
-    await $fetch(endpoint, { method: "POST", body: { code: event.data.code } });
+    const result = await $fetch<{ recoveryCodes?: string[] }>(endpoint, {
+      method: "POST",
+      body: { code: event.data.code },
+    });
 
-    notification.success(isEnrolling.value
-        ? "Two-factor authentication enabled"
-        : "Verified", isEnrolling.value
+    if (isEnrolling.value && result.recoveryCodes?.length) {
+      // Enrolment is complete server-side; the codes step keeps the modal
+      // open, so `success` waits for it (callers close the modal on it).
+      notification.success(
+        "Two-factor authentication enabled",
+        "Save your recovery codes before you continue.",
+      );
+      recoveryCodes.value = result.recoveryCodes;
+      return;
+    }
+
+    notification.success(
+      isEnrolling.value ? "Two-factor authentication enabled" : "Verified",
+      isEnrolling.value
         ? "You'll be asked for a code again next time you log in."
-        : "You're all set for this session.");
+        : "You're all set for this session.",
+    );
     emit("success");
     emit("update:open", false);
   } catch (error) {
-    const rateLimited =
-      typeof error === "object" &&
-      error !== null &&
-      "statusCode" in error &&
-      error.statusCode === 429;
-
     state.code = "";
-    notification.error(rateLimited ? "Too many attempts" : "That code didn't work", rateLimited
-        ? "Wait a few minutes before trying again."
-        : "Check your authenticator app and enter the current code.");
+    notifyFailure(error, "Check your authenticator app and enter the current code.");
   } finally {
     submitting.value = false;
   }
+}
+
+function finishEnrolment() {
+  notification.info(
+    "You're all set",
+    "You'll be asked for a code again next time you log in.",
+  );
+  emit("success");
+  emit("update:open", false);
+}
+
+/**
+ * Redeems one recovery code in place of the authenticator. The account keeps
+ * its authenticator, so the message points at Security settings: a recovery code
+ * is meant to be followed by fixing whatever made it necessary.
+ */
+async function onRecoverySubmit(event: FormSubmitEvent<{ recoveryCode: string }>) {
+  submitting.value = true;
+  try {
+    const result = await $fetch<{ recoveryCodesRemaining: number }>(
+      `${apiBase.value}/challenge`,
+      { method: "POST", body: { recoveryCode: event.data.recoveryCode } },
+    );
+    const remaining = result.recoveryCodesRemaining;
+    notification.warning(
+      "Recovery code used",
+      remaining === 0
+        ? "That was your last code. Turn two-factor authentication off and on again in Security settings to get a new set."
+        : `${remaining} recovery ${remaining === 1 ? "code" : "codes"} left. Set up a new authenticator in Security settings.`,
+    );
+    emit("success");
+    emit("update:open", false);
+  } catch (error) {
+    recoveryState.recoveryCode = "";
+    notifyFailure(error, "Check the code and try again. Each code works only once.");
+  } finally {
+    submitting.value = false;
+  }
+}
+
+function notifyFailure(error: unknown, hint: string) {
+  const rateLimited =
+    typeof error === "object" &&
+    error !== null &&
+    "statusCode" in error &&
+    error.statusCode === 429;
+
+  notification.error(
+    rateLimited ? "Too many attempts" : "That code didn't work",
+    rateLimited ? "Wait a few minutes before trying again." : hint,
+  );
 }
 </script>

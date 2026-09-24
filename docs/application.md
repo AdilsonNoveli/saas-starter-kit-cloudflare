@@ -13,7 +13,9 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/app/app/app.vue | — |
 | Pages | apps/app/app/assets/css/main.css | — |
 | Components | apps/app/app/components/account/AccountUserDropdown.vue | — |
-| Components | apps/app/app/components/account/MfaSetupModal.vue | startSetup, onSubmit |
+| Components | apps/app/app/components/account/MfaRecoveryCodes.vue | download |
+| Components | apps/app/app/components/account/MfaRecoveryPanel.vue | loadRemaining, onSubmit |
+| Components | apps/app/app/components/account/MfaSetupModal.vue | startSetup, onSubmit, finishEnrolment, onRecoverySubmit, notifyFailure |
 | Components | apps/app/app/components/avatar/AvatarUploader.vue | triggerUpload, onFileChange |
 | Components | apps/app/app/components/background/BackgroundDots.vue | — |
 | Components | apps/app/app/components/ConfirmDialog.vue | settle |
@@ -58,6 +60,7 @@ Inventory: maps each observed file to its surface.
 | Routes and APIs | apps/app/server/api/auth/session.get.ts | — |
 | Routes and APIs | apps/app/server/api/auth/ws-ticket.get.ts | — |
 | Routes and APIs | apps/app/server/api/mfa/challenge.post.ts | — |
+| Routes and APIs | apps/app/server/api/mfa/recovery-codes.post.ts | — |
 | Routes and APIs | apps/app/server/api/mfa/setup.post.ts | — |
 | Routes and APIs | apps/app/server/api/mfa/status.get.ts | — |
 | Routes and APIs | apps/app/server/api/mfa/verify.post.ts | — |
@@ -77,9 +80,11 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/app/server/utils/auth.ts | SESSION_COOKIE_MAX_AGE_SECONDS, getUser, getUserSession, getUserPermissions |
 | Pages | apps/app/server/utils/db.ts | setHyperdriveBinding, createDB, useDB, closeDB |
 | Pages | apps/app/server/utils/mfa-crypto.ts | toBase64, fromBase64, importAesKey, encryptSecret, decryptSecret |
+| Pages | apps/app/server/utils/mfa-recovery.test.ts | KEY |
+| Pages | apps/app/server/utils/mfa-recovery.ts | RECOVERY_CODE_COUNT, ALPHABET, CODE_LENGTH, generateRecoveryCode, formatRecoveryCode, normalizeRecoveryCode, hashRecoveryCode, replaceRecoveryCodes |
 | Pages | apps/app/server/utils/rate-limit.ts | rateLimit, assertNotRateLimited |
 | Pages | apps/app/server/utils/user-mfa-session.ts | USER_MFA_COOKIE_NAME, USER_MFA_MAX_AGE_SECONDS, UserMfaSessionData, sessionConfig, getUserMfaSession, startUserMfaSession |
-| Pages | apps/app/server/utils/user-mfa.ts | getUserMfaRecord |
+| Pages | apps/app/server/utils/user-mfa.ts | getUserMfaRecord, isValidUserTotp |
 | Pages | apps/app/server/utils/ws-ticket.ts | TICKET_TTL_MS, WsTicketUser, toBase64Url, hmacSign, createWsTicket |
 | Pages | apps/app/shared/utils/error-message.test.ts | — |
 | Pages | apps/app/shared/utils/error-message.ts | getErrorMessage |
@@ -93,6 +98,7 @@ Inventory: maps each observed file to its surface.
 | Other sources | apps/functions/src/cron.ts | Environment |
 | Other sources | apps/functions/src/database/core-schema.ts | this |
 | Other sources | apps/functions/src/database/grant-platform-admin.ts | PLATFORM_ROLES, parseArgs, main |
+| Other sources | apps/functions/src/database/reset-mfa.ts | SCOPES, parseArgs, main |
 | Other sources | apps/functions/src/database/schema.ts | — |
 | Other sources | apps/functions/src/database/seed/data.ts | ACTIONS, FREE_PLAN, SYSTEM_ROLES |
 | Other sources | apps/functions/src/database/seed/demo-accounts.ts | DEMO_TEAM_NAME, DEMO_TEAM_SLUG, parseArgs, seedIdentity, main, upsertUser |
@@ -235,6 +241,7 @@ Inventory: maps each observed file to its surface.
 | Other sources | layers/admin/layer.manifest.ts | — |
 | Other sources | layers/admin/nuxt.config.ts | — |
 | Routes and APIs | layers/admin/server/api/admin/mfa/challenge.post.ts | — |
+| Routes and APIs | layers/admin/server/api/admin/mfa/recovery-codes.post.ts | — |
 | Routes and APIs | layers/admin/server/api/admin/mfa/setup.post.ts | — |
 | Routes and APIs | layers/admin/server/api/admin/mfa/status.get.ts | — |
 | Routes and APIs | layers/admin/server/api/admin/mfa/verify.post.ts | — |
@@ -243,7 +250,7 @@ Inventory: maps each observed file to its surface.
 | Routes and APIs | layers/admin/server/trpc/admin-queue.ts | CRON_JOB_ID, readJobId |
 | Routes and APIs | layers/admin/server/trpc/admin-teams.ts | setTeamStatus |
 | Routes and APIs | layers/admin/server/trpc/router.ts | — |
-| Other sources | layers/admin/server/utils/platform-admin.ts | findActivePlatformAdmin, rather, isActivePlatformAdmin |
+| Other sources | layers/admin/server/utils/platform-admin.ts | findActivePlatformAdmin, rather, isActivePlatformAdmin, isValidPlatformTotp |
 | Other sources | layers/admin/server/utils/platform-mfa-session.ts | PLATFORM_MFA_COOKIE_NAME, PLATFORM_MFA_MAX_AGE_SECONDS, PlatformMfaSessionData, sessionConfig, getPlatformMfaSession, startPlatformMfaSession |
 | Other sources | layers/admin/sst-env.d.ts | — |
 | Components | layers/billing/app/components/admin/plans/CreateEditModal.vue | CustomFeature, toProviderOption, addFeature, removeFeature, reset, onSubmit |
@@ -252,11 +259,4 @@ Inventory: maps each observed file to its surface.
 | Components | layers/billing/app/components/billing/BillingPortalActions.vue | PortalLinksObj, Props |
 | Components | layers/billing/app/components/billing/BillingTrialBanner.vue | Props, formatDate |
 | Components | layers/billing/app/components/pricing/PricingCard.vue | PricingFeature, Props |
-| Pages | layers/billing/app/composables/use-ability.ts | — |
-| Pages | layers/billing/app/composables/use-payments.ts | PaymentItem, PaddlePayments, StripePayments, usePayments, Paddle, init, checkoutPaddle, checkoutStripe |
-| Pages | layers/billing/app/pages/admin/plans/index.vue | UBadge, UButton, UCheckbox, UDropdownMenu, edit, setArchived, setupStripePortal, getRowItems |
-| Pages | layers/billing/app/pages/[[team]]/settings/billing.vue | openCheckout |
-| Other sources | layers/billing/layer.manifest.ts | — |
-| Other sources | layers/billing/nuxt.config.ts | — |
-| Routes and APIs | layers/billing/server/api/webhooks/paddle.post.ts | dispatch, mapPaddleStatus |
 <!-- specsfy:documentator:end -->

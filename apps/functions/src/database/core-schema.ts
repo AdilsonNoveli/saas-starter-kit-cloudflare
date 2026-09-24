@@ -1,6 +1,13 @@
 // `pgEnum` is gone from this import with `platform_role`, the only enum this
 // file ever declared — it left for layers/admin in Fase 3 passo 4.
-import { pgTable, text, timestamp, jsonb } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  jsonb,
+  index,
+  unique,
+} from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
 // `Team` and the rest of the multi-tenancy/RBAC tables live in the teams layer
@@ -52,6 +59,34 @@ export const users = pgTable("User", {
   // when this is set — a user who never opts in is unaffected.
   mfaEnabledAt: timestamp("mfaEnabledAt", { withTimezone: true }),
 });
+
+// Single-use recovery codes for a lost authenticator. One set per (user, scope):
+// "user" backs User.mfaSecret, "platform" backs PlatformAdmin.mfaSecret — two
+// independent factors, so each keeps its own codes. Only a keyed hash is stored
+// (see apps/app/server/utils/mfa-recovery.ts); the plaintext code exists once,
+// in the response that generates it. `usedAt` is set atomically on redemption.
+export const mfaRecoveryCodes = pgTable(
+  "MfaRecoveryCode",
+  {
+    id: text("id")
+      .$default(() => cuid())
+      .primaryKey()
+      .notNull(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    scope: text("scope").notNull(),
+    codeHash: text("codeHash").notNull(),
+    usedAt: timestamp("usedAt", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+  },
+  (table) => [
+    unique().on(table.userId, table.scope, table.codeHash),
+    index("MfaRecoveryCode_userId_scope_idx").on(table.userId, table.scope),
+  ],
+);
 
 export const usersRelations = relations(users, ({ many }) => ({
   notifications: many(notifications),

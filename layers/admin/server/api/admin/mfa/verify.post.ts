@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Secret, TOTP } from "otpauth/slim";
 import { platformAdmins } from "@nuxfire/functions/schema";
 
 const bodySchema = z.object({
@@ -9,7 +8,8 @@ const bodySchema = z.object({
 /**
  * Completes MFA enrolment: validates the first code against the pending seed,
  * marks the admin as enrolled, and issues the 30-minute elevated session that
- * `platformAdminProcedure` requires.
+ * `platformAdminProcedure` requires. Also issues the admin's recovery codes,
+ * returned once in this response.
  */
 export default defineEventHandler(async (event) => {
   const user = await getUser(event);
@@ -44,22 +44,28 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { platformAdminEncryptionKey } = useRuntimeConfig(event);
-  const totp = new TOTP({
-    issuer: "Nuxfire",
-    label: user.email ?? user.id,
-    secret: Secret.fromBase32(
-      await decryptSecret(admin.mfaSecret, platformAdminEncryptionKey),
-    ),
-  });
-
-  // Library default window (±1 step) — wide enough for ordinary clock drift,
-  // and every step it is widened by multiplies the codes an attacker's single
-  // guess can match.
-  if (totp.validate({ token: code }) === null) {
+  if (
+    !(await isValidPlatformTotp(
+      event,
+      admin.mfaSecret,
+      user.email ?? user.id,
+      code,
+    ))
+  ) {
     // Deliberately says nothing about why.
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
+
+  // Codes first, enrolment second: if the second write fails the admin is
+  // merely not enrolled yet (a retry replaces the codes), never enrolled with
+  // no recovery codes. Redemption requires `mfaEnabledAt`, so codes issued
+  // ahead of it cannot be used.
+  const { platformAdminEncryptionKey } = useRuntimeConfig(event);
+  const recoveryCodes = await replaceRecoveryCodes(
+    platformAdminEncryptionKey,
+    "platform",
+    user.id,
+  );
 
   await useDB()
     .update(platformAdmins)
@@ -76,5 +82,5 @@ export default defineEventHandler(async (event) => {
     ip: getRequestIP(event, { xForwardedFor: true }) ?? null,
   });
 
-  return { verified: true };
+  return { verified: true, recoveryCodes };
 });

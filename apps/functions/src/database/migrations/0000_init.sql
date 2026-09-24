@@ -227,4 +227,16 @@ ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_teamId_Team_id_fk" FOREIGN K
 ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_invitedById_User_id_fk" FOREIGN KEY ("invitedById") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TeamMembership" ADD CONSTRAINT "TeamMembership_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Team" ADD CONSTRAINT "Team_planId_Plan_id_fk" FOREIGN KEY ("planId") REFERENCES "public"."Plan"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "Team" ADD CONSTRAINT "Team_planId_Plan_id_fk" FOREIGN KEY ("planId") REFERENCES "public"."Plan"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE TABLE "MfaRecoveryCode" (
+	"id" text PRIMARY KEY NOT NULL,
+	"userId" text NOT NULL,
+	"scope" text NOT NULL,
+	"codeHash" text NOT NULL,
+	"usedAt" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "MfaRecoveryCode_userId_scope_codeHash_unique" UNIQUE("userId","scope","codeHash")
+);
+--> statement-breakpoint
+ALTER TABLE "MfaRecoveryCode" ADD CONSTRAINT "MfaRecoveryCode_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "MfaRecoveryCode_userId_scope_idx" ON "MfaRecoveryCode" USING btree ("userId","scope");

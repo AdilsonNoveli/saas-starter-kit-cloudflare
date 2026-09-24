@@ -3,7 +3,7 @@
 <!-- specsfy:documentator:start -->
 ## Observed Surfaces
 
-- Components, pages, or views: 147.
+- Components, pages, or views: 149.
 - Tailwind: detected.
 - CSS tokens: --reka-dropdown-menu-trigger-width, --ui-primary, --vis-crosshair-line-stroke-color, --vis-crosshair-circle-stroke-color, --ui-bg, --vis-axis-grid-color, --ui-border, --vis-axis-tick-color, --vis-axis-tick-label-color, --ui-text-dimmed, --vis-tooltip-background-color, --vis-tooltip-border-color, --vis-tooltip-text-color, --ui-text-highlighted, ---, --ui-text, --ui-, --color-flame, --ui-success, --background, --shiny-text, --shiny-dot, --color-brand, --color-flame-700, --color-brand-hover, --color-flame-600, --color-brand-secondary, --color-fire-500, --color-brand-light, --color-fire-50, --color-flame-500, --color-flame-800, --gradient-angle, --gradient-angle-offset, --gradient-shine, --gradient-brand, --ui-warning, --muted, --x, --y, --duration, --gap, --color-, --font-sans, --font-mono, --color-flame-50, --color-flame-100, --color-flame-200, --color-flame-300, --color-flame-400, --color-flame-900, --color-flame-950, --color-fire-100, --color-fire-200, --color-fire-300, --color-fire-400, --color-fire-600, --color-fire-700, --color-fire-800, --color-fire-900, --color-fire-950, --color-night-50, --color-night-100, --color-night-200, --color-night-300, --color-night-400, --color-night-500, --color-night-600, --color-night-700, --color-night-800, --color-night-900, --color-night-950, --radius-lg, --ui-radius, --ui-bg-muted, --ui-bg-elevated, --ui-bg-accented, --ui-border-muted, --ui-border-accented, --ui-text-muted.
 
@@ -12,6 +12,8 @@
 | apps\app\app\app.vue |
 | apps\app\app\assets\css\main.css |
 | apps\app\app\components\account\AccountUserDropdown.vue |
+| apps\app\app\components\account\MfaRecoveryCodes.vue |
+| apps\app\app\components\account\MfaRecoveryPanel.vue |
 | apps\app\app\components\account\MfaSetupModal.vue |
 | apps\app\app\components\avatar\AvatarUploader.vue |
 | apps\app\app\components\background\BackgroundDots.vue |

@@ -3,6 +3,8 @@ import { platformAdmins } from "@nuxfire/functions/schema";
 // also exports an `and` (the `logicAnd` alias) and wins the resolution,
 // which silently yields a ComputedRef instead of a SQL expression.
 import { and, eq, isNull } from "drizzle-orm";
+import type { H3Event } from "h3";
+import { Secret, TOTP } from "otpauth/slim";
 
 export type PlatformAdminRecord = typeof platformAdmins.$inferSelect;
 
@@ -62,4 +64,26 @@ export async function isActivePlatformAdmin(userId: string): Promise<boolean> {
     console.error("isActivePlatformAdmin failed", { userId, error });
     return false;
   }
+}
+
+/**
+ * Whether `code` is the current TOTP for this admin's seed. The library
+ * default window (±1 step) covers ordinary clock drift; widening it multiplies
+ * the codes a single guess can match.
+ */
+export async function isValidPlatformTotp(
+  event: H3Event,
+  encryptedSecret: string,
+  label: string,
+  code: string,
+) {
+  const { platformAdminEncryptionKey } = useRuntimeConfig(event);
+  const totp = new TOTP({
+    issuer: "Nuxfire",
+    label,
+    secret: Secret.fromBase32(
+      await decryptSecret(encryptedSecret, platformAdminEncryptionKey),
+    ),
+  });
+  return totp.validate({ token: code }) !== null;
 }

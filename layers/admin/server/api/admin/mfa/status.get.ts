@@ -40,5 +40,8 @@ export default defineEventHandler(async (event) => {
     isPlatformAdmin: true,
     mfaEnrolled: admin.mfaEnabledAt !== null,
     sessionElevated: session?.platformAdminId === admin.id,
+    recoveryCodesRemaining: admin.mfaEnabledAt
+      ? await countRecoveryCodes("platform", user.id)
+      : 0,
   };
 });

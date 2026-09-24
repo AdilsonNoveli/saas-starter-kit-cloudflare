@@ -5,7 +5,7 @@
 
 | Type | Quantity |
 | --- | --- |
-| Code | 396 |
+| Code | 403 |
 | Tests | 13 |
 
 ## Diagrams

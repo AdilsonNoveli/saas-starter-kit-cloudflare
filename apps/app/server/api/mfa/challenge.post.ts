@@ -1,9 +1,12 @@
 import { z } from "zod";
-import { Secret, TOTP } from "otpauth/slim";
 
-const bodySchema = z.object({
-  code: z.string().regex(/^\d{6}$/),
-});
+// Either the current authenticator code or one recovery code. A single route,
+// so both share one rate-limit bucket: offering a second way in must not double
+// the guesses an attacker gets per account.
+const bodySchema = z.union([
+  z.object({ code: z.string().regex(/^\d{6}$/) }),
+  z.object({ recoveryCode: z.string().min(1).max(32) }),
+]);
 
 /**
  * Verifies an *already enrolled* account for the current login, issuing a
@@ -36,7 +39,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { code } = await readValidatedBody(event, bodySchema.parse);
+  const body = await readValidatedBody(event, bodySchema.parse);
 
   const record = await getUserMfaRecord(user.id);
   if (!record?.mfaEnabledAt || !record.mfaSecret) {
@@ -46,16 +49,46 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { userMfaEncryptionKey } = useRuntimeConfig(event);
-  const totp = new TOTP({
-    issuer: "Nuxfire",
-    label: user.email ?? user.id,
-    secret: Secret.fromBase32(
-      await decryptSecret(record.mfaSecret, userMfaEncryptionKey),
-    ),
-  });
+  if ("recoveryCode" in body) {
+    const { userMfaEncryptionKey } = useRuntimeConfig(event);
+    const redeemed = await consumeRecoveryCode(
+      userMfaEncryptionKey,
+      "user",
+      user.id,
+      body.recoveryCode,
+    );
+    if (!redeemed) {
+      console.warn("mfa recovery code rejected", { userId: user.id });
+      // Deliberately says nothing about why.
+      throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+    }
 
-  if (totp.validate({ token: code }) === null) {
+    await startUserMfaSession(event, user.id);
+    const remaining = await countRecoveryCodes("user", user.id);
+    await recordAuditLog({
+      actorUserId: user.id,
+      action: "user.mfa.recovery-code.used",
+      targetType: "user",
+      targetId: user.id,
+      metadata: { remaining },
+      ip: getRequestIP(event, { xForwardedFor: true }) ?? null,
+    });
+
+    return {
+      verified: true,
+      recoveryCodeUsed: true,
+      recoveryCodesRemaining: remaining,
+    };
+  }
+
+  if (
+    !(await isValidUserTotp(
+      event,
+      record.mfaSecret,
+      user.email ?? user.id,
+      body.code,
+    ))
+  ) {
     // Deliberately says nothing about why.
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }

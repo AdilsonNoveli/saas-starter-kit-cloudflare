@@ -41,6 +41,8 @@
       />
     </UPageCard>
 
+    <AccountMfaRecoveryPanel v-if="mfaEnabled" />
+
     <UPageCard
       title="Sessions"
       description="Sign out of every other browser or device currently signed in to your account."

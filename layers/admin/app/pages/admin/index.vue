@@ -40,6 +40,8 @@
         class="self-start"
       />
 
+      <AccountMfaRecoveryPanel scope="admin" />
+
       <UCard>
         <template #header>
           <span class="text-sm font-semibold text-highlighted">Recent Companies</span>

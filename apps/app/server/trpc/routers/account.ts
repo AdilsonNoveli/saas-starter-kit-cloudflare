@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { and, count, eq, ne } from "drizzle-orm";
 import { protectedProcedure, router } from "../trpc";
 import {
+  mfaRecoveryCodes,
   notifications,
   roles,
   teamInvites,
@@ -239,10 +240,29 @@ export default router({
    * disabling never needs to.
    */
   disableMfa: protectedProcedure.mutation(async ({ ctx: { user, event } }) => {
-    await useDB()
-      .update(users)
-      .set({ mfaSecret: null, mfaEnabledAt: null })
-      .where(eq(users.id, user.id));
+    // One transaction: the codes belong to the factor being removed, and a
+    // half-applied disable must not leave either one behind.
+    await useDB().transaction(async (tx) => {
+      await tx
+        .update(users)
+        .set({ mfaSecret: null, mfaEnabledAt: null })
+        .where(eq(users.id, user.id));
+      await tx
+        .delete(mfaRecoveryCodes)
+        .where(
+          and(
+            eq(mfaRecoveryCodes.userId, user.id),
+            eq(mfaRecoveryCodes.scope, "user"),
+          ),
+        );
+    });
+    await recordAuditLog({
+      actorUserId: user.id,
+      action: "user.mfa.disable",
+      targetType: "user",
+      targetId: user.id,
+      ip: getRequestIP(event, { xForwardedFor: true }) ?? null,
+    });
     deleteCookie(event, "nuxfire-mfa-verified");
     return { message: "Two-factor authentication has been disabled." };
   }),

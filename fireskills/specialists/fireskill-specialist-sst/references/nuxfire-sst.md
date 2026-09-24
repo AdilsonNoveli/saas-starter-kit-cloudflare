@@ -50,6 +50,13 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
   values over as plain `environment` (`infra/emails.ts` → the Emails Worker, which owns the sender:
   `sendEmail(to, template, props)` has no `from`). Never hardcode a domain/sender/brand name, and never add a
   `Resource` for it (`sst-env.d.ts` is generated).
+- **`www` redirect (production only)**: `infra/dns.ts` exports `webRedirects` (`["www.<domain>"]` on
+  `production`, `[]` elsewhere), passed by `infra/web.ts` to `deployWorker`'s `redirects`, which forwards
+  `domain: { name, redirects }` to `sst.cloudflare.Worker`. SST then creates a proxied `AAAA 100::` record and a
+  301 Page Rule (`https://<apex>/$1`) per hostname (`.sst/platform/src/components/cloudflare/worker.ts`,
+  `createRedirects`). Consequences: the token needs zone-scoped `DNS: Edit` + `Page Rules: Edit` on top of
+  `Workers Routes: Edit`, and the hostname must have **no** pre-existing record. A Workers Custom Domain (the
+  apex itself) likewise fails with Cloudflare error `100117` if the hostname already has an A/AAAA/CNAME.
 - `production`: `removal: "retain"` and `protect: true`; other stages: `remove`,
   unprotected (`sst.config.ts`).
 - New Cloudflare accounts require the `workers.dev` subdomain initialized once

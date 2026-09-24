@@ -126,6 +126,7 @@ declare module "sst" {
       "type": "sst.sst.Linkable"
       "value": string
     }
+    "WebWorker": import("@cloudflare/workers-types").Service
     "Websockets": import("@cloudflare/workers-types").Service
     "WebsocketsUrl": {
       "type": "sst.sst.Linkable"

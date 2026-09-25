@@ -104,9 +104,8 @@
       "title": "Comece seu SaaS com login, cobrança e deploy já prontos.",
       "subtitle": "O Nuxfire é um kit em Nuxt para Cloudflare com times, permissões, pagamentos, painel de admin e um método para a sua IA construir o resto por especificação e teste.",
       "cta": "Quero o Nuxfire",
-      "ctaTalk": "Falar com a gente no WhatsApp",
-      "priceLine": "{launch} nas primeiras {limit} licenças, depois {regular}. Pagamento único, com {months} meses de atualizações.",
-      "visualLabel": "A estrutura real do projeto e o comando de deploy"
+      "ctaTalk": "Falar no WhatsApp",
+      "priceLine": "{launch} nas primeiras {limit} licenças, depois {regular}. Pagamento único, com {months} meses de atualizações."
     },
     "problem": {
       "title": "Sua ideia está clara. O que atrasa é o resto.",

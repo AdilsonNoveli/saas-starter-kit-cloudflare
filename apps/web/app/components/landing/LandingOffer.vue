@@ -7,7 +7,7 @@ const questions = ["needs", "commercial", "updates", "contact", "pay"];
 </script>
 
 <template>
-  <section id="offer" aria-labelledby="landing-offer" class="border-t border-default bg-elevated/40 scroll-mt-16">
+  <section id="offer" aria-labelledby="landing-offer" class="bg-elevated/40 scroll-mt-16">
     <div class="container mx-auto max-w-6xl px-4 md:px-8 py-20 md:py-28">
       <div class="mx-auto max-w-2xl text-center">
         <p class="text-sm font-semibold uppercase tracking-widest text-primary">{{ t("landing.offer.eyebrow") }}</p>
@@ -83,7 +83,7 @@ const questions = ["needs", "commercial", "updates", "contact", "pay"];
             variant="outline"
             size="lg"
             icon="i-lucide-message-circle"
-            class="mt-6"
+            class="mt-6 h-12 px-6 rounded-xl font-bold uppercase tracking-wider text-sm border-default hover:bg-elevated/80 transition-colors"
           >
             {{ t("landing.offer.talkCta") }}
           </UButton>

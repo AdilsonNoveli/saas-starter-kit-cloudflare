@@ -104,9 +104,8 @@
       "title": "Start your SaaS with login, billing and deploy already built.",
       "subtitle": "Nuxfire is a Nuxt kit for Cloudflare with teams, permissions, payments, an admin panel and a method for your AI to build the rest from a spec and tests.",
       "cta": "Get Nuxfire",
-      "ctaTalk": "Talk to us on WhatsApp",
-      "priceLine": "{launch} for the first {limit} licenses, then {regular}. One payment, with {months} months of updates.",
-      "visualLabel": "The real project structure and the deploy command"
+      "ctaTalk": "Talk to WhatsApp",
+      "priceLine": "{launch} for the first {limit} licenses, then {regular}. One payment, with {months} months of updates."
     },
     "problem": {
       "title": "Your idea is clear. What slows you down is the rest.",

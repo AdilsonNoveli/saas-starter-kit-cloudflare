@@ -3,9 +3,9 @@
 <!-- specsfy:documentator:start -->
 ## Observed Surfaces
 
-- Components, pages, or views: 149.
+- Components, pages, or views: 141.
 - Tailwind: detected.
-- CSS tokens: --reka-dropdown-menu-trigger-width, --ui-primary, --vis-crosshair-line-stroke-color, --vis-crosshair-circle-stroke-color, --ui-bg, --vis-axis-grid-color, --ui-border, --vis-axis-tick-color, --vis-axis-tick-label-color, --ui-text-dimmed, --vis-tooltip-background-color, --vis-tooltip-border-color, --vis-tooltip-text-color, --ui-text-highlighted, ---, --ui-text, --ui-, --color-flame, --ui-success, --background, --shiny-text, --shiny-dot, --color-brand, --color-flame-700, --color-brand-hover, --color-flame-600, --color-brand-secondary, --color-fire-500, --color-brand-light, --color-fire-50, --color-flame-500, --color-flame-800, --gradient-angle, --gradient-angle-offset, --gradient-shine, --gradient-brand, --ui-warning, --muted, --x, --y, --duration, --gap, --color-, --font-sans, --font-mono, --color-flame-50, --color-flame-100, --color-flame-200, --color-flame-300, --color-flame-400, --color-flame-900, --color-flame-950, --color-fire-100, --color-fire-200, --color-fire-300, --color-fire-400, --color-fire-600, --color-fire-700, --color-fire-800, --color-fire-900, --color-fire-950, --color-night-50, --color-night-100, --color-night-200, --color-night-300, --color-night-400, --color-night-500, --color-night-600, --color-night-700, --color-night-800, --color-night-900, --color-night-950, --radius-lg, --ui-radius, --ui-bg-muted, --ui-bg-elevated, --ui-bg-accented, --ui-border-muted, --ui-border-accented, --ui-text-muted.
+- CSS tokens: --reka-dropdown-menu-trigger-width, --ui-primary, --vis-crosshair-line-stroke-color, --vis-crosshair-circle-stroke-color, --ui-bg, --vis-axis-grid-color, --ui-border, --vis-axis-tick-color, --vis-axis-tick-label-color, --ui-text-dimmed, --vis-tooltip-background-color, --vis-tooltip-border-color, --vis-tooltip-text-color, --ui-text-highlighted, ---, --ui-text, --ui-, --color-flame, --ui-success, --background, --shiny-text, --shiny-dot, --color-brand, --color-flame-700, --color-brand-hover, --color-flame-600, --color-brand-secondary, --color-fire-500, --color-brand-light, --color-fire-50, --color-flame-500, --color-flame-800, --gradient-angle, --gradient-angle-offset, --gradient-shine, --gradient-brand, --ui-warning, --muted, --color-, --font-sans, --font-mono, --color-flame-50, --color-flame-100, --color-flame-200, --color-flame-300, --color-flame-400, --color-flame-900, --color-flame-950, --color-fire-100, --color-fire-200, --color-fire-300, --color-fire-400, --color-fire-600, --color-fire-700, --color-fire-800, --color-fire-900, --color-fire-950, --color-night-50, --color-night-100, --color-night-200, --color-night-300, --color-night-400, --color-night-500, --color-night-600, --color-night-700, --color-night-800, --color-night-900, --color-night-950, --radius-lg, --ui-radius, --ui-bg-muted, --ui-bg-elevated, --ui-bg-accented, --ui-border-muted, --ui-border-accented, --ui-text-muted.
 
 | File |
 | --- |
@@ -80,28 +80,20 @@
 | apps\web\app\components\CTAButton.vue |
 | apps\web\app\components\folder-tree\FolderTree.global.vue |
 | apps\web\app\components\folder-tree\FolderTreeItem.vue |
-| apps\web\app\components\landing\LandingArchitecture.vue |
-| apps\web\app\components\landing\LandingAvatars.vue |
-| apps\web\app\components\landing\LandingComparisonTable.vue |
-| apps\web\app\components\landing\LandingDatabaseArchitecture.vue |
-| apps\web\app\components\landing\LandingFAQs.vue |
-| apps\web\app\components\landing\LandingFeatureBadges.vue |
-| apps\web\app\components\landing\LandingFeatureCard.vue |
-| apps\web\app\components\landing\LandingFolderStructure.vue |
+| apps\web\app\components\landing\LandingAudience.vue |
 | apps\web\app\components\landing\LandingHero.vue |
-| apps\web\app\components\landing\LandingPricing.vue |
-| apps\web\app\components\landing\LandingTestimonials.vue |
-| apps\web\app\components\landing\LandingUseCases.vue |
+| apps\web\app\components\landing\LandingMethod.vue |
+| apps\web\app\components\landing\LandingOffer.vue |
+| apps\web\app\components\landing\LandingOutcomes.vue |
+| apps\web\app\components\landing\LandingProblem.vue |
+| apps\web\app\components\landing\LandingProof.vue |
 | apps\web\app\components\layout\LayoutBanner.vue |
 | apps\web\app\components\layout\LayoutContentPage.vue |
 | apps\web\app\components\layout\LayoutFooter.vue |
 | apps\web\app\components\layout\LayoutSection.vue |
 | apps\web\app\components\loader\LoaderSpin.vue |
 | apps\web\app\components\navigation\NavigationBar.vue |
-| apps\web\app\components\pricing\PricingCard.vue |
 | apps\web\app\components\search\Search.vue |
-| apps\web\app\components\testimonial\TestimonialCard.vue |
-| apps\web\app\components\testimonial\TestimonialRow.vue |
 | apps\web\app\error.vue |
 | apps\web\app\layouts\default.vue |
 | apps\web\app\layouts\docs.vue |

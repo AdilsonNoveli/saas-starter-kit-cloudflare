@@ -429,6 +429,15 @@ describe("testimonials need a person, a use, a consent and their own photo (AC-0
     expect(rules(found)).toContain("testimonial-shared-image");
   });
 
+  // SPECSFY: US-002 FR-006 AC-002
+  it("accepts a testimonial shown without a photo and does not call two of them a shared image", () => {
+    const noPhoto = { ...good, image: "" };
+    const other = { ...noPhoto, id: "t2", key: "landing.testimonials.items.item2", name: "Sam" };
+    expect(validateLedger(ledger({ claims: [], testimonials: [noPhoto, other] }))).toEqual([]);
+    expect(audit(ledger({ claims: [], testimonials: [noPhoto, other] }))).toEqual([]);
+    expect(rules(validateLedger(ledger({ claims: [], testimonials: [{ ...good, image: "static/a.jpeg" }] })))).toEqual(["ledger-invalid"]);
+  });
+
   // SPECSFY: US-003 US-004 FR-009 FR-010 AC-009
   it("reports an image of the static folder used in a marketing component that no record registers", () => {
     const files = { "apps/web/app/components/landing/LandingAvatars.vue": '<template><UAvatar src="/static/zzz.jpeg" alt="Someone" /></template>' };

@@ -68,15 +68,6 @@ const COUNT_SITES: { file: string; pattern: RegExp }[] = [
   { file: "apps/web/content/es/docs/2.fireskills/4.specialists/0.overview.md", pattern: /con (\d+) especialistas de dominio/ },
   { file: "apps/web/content/es/docs/2.fireskills/4.specialists/0.overview.md", pattern: /\*\*(\d+) Especialistas Técnicos\*\*/ },
   { file: "apps/web/content/es/docs/2.fireskills/4.specialists/0.overview.md", pattern: /Los (\d+) especialistas se dividen/ },
-  { file: "apps/web/i18n/locales/en.json", pattern: /Powered by (\d+) verified domain specialists/ },
-  { file: "apps/web/i18n/locales/en.json", pattern: /Implementation by (\d+) Specialists/ },
-  { file: "apps/web/i18n/locales/en.json", pattern: /"1": "(\d+) Specialists"/ },
-  { file: "apps/web/i18n/locales/pt-BR.json", pattern: /Composto por (\d+) especialistas/ },
-  { file: "apps/web/i18n/locales/pt-BR.json", pattern: /Construção com (\d+) Especialistas/ },
-  { file: "apps/web/i18n/locales/pt-BR.json", pattern: /"1": "(\d+) Especialistas"/ },
-  { file: "apps/web/i18n/locales/es.json", pattern: /Respaldado por (\d+) especialistas/ },
-  { file: "apps/web/i18n/locales/es.json", pattern: /Construcción con (\d+) Especialistas/ },
-  { file: "apps/web/i18n/locales/es.json", pattern: /"1": "(\d+) Especialistas"/ },
 ];
 
 describe("the specialist count is the same everywhere (AC-008)", () => {

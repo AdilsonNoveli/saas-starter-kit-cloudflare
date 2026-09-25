@@ -38,7 +38,7 @@ What the starter does not do or does not have yet (absence verified in code):
 - MFA recovery: ten single-use recovery codes per factor (user and platform admin), issued at enrolment, redeemable at the challenge and regenerable after a fresh authenticator code; losing both is handled by the manual, audited `apps/functions/src/database/reset-mfa.ts`.
 - No RSS feed, error tracking (Sentry etc.), tenant impersonation, IP allowlist in `/admin`, or MRR/ARR charts.
 - Analytics: documentation page is "coming soon".
-- Pricing page on website (`LandingPricing.vue`) is static; does not read `Plan` records from database.
+- The offer on the home page (`LandingOffer.vue`) reads one static configuration (`apps/web/app/utils/offer.ts`); it does not read `Plan` records from the database and has no checkout yet (`runtimeConfig.public.checkoutUrl` is empty).
 - Team dashboard chart is illustrative (random walk), not real data.
 - i18n: `apps/app` only extracted the `welcome` key; the rest of the interface is fixed in English.
 

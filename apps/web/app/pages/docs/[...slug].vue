@@ -63,7 +63,7 @@
           </div>
           <div class="shrink-0">
             <CTAButton
-              :to="`${localePath('/')}#pricing`"
+              :to="`${localePath('/')}#offer`"
               size="md"
               radius="lg"
               trailing-icon="i-lucide-arrow-right"

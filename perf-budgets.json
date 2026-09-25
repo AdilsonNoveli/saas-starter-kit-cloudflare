@@ -29,136 +29,124 @@
     {
       "route": "/",
       "metric": "html",
-      "limit": 23429,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 14000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/",
       "metric": "js",
-      "limit": 280276,
+      "limit": 259386,
       "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25 after the refactor; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "removedBy": "SPEC-0003",
       "since": "2026-09-25"
     },
     {
       "route": "/",
       "metric": "css",
-      "limit": 33150,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 40000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/",
       "metric": "images",
-      "limit": 3447493,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 60000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/",
       "metric": "requests",
       "limit": 64,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/pt-br",
       "metric": "html",
-      "limit": 25236,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 14000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/pt-br",
       "metric": "js",
-      "limit": 280276,
+      "limit": 259386,
       "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25 after the refactor; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "removedBy": "SPEC-0003",
       "since": "2026-09-25"
     },
     {
       "route": "/pt-br",
       "metric": "css",
-      "limit": 33150,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 40000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/pt-br",
       "metric": "images",
-      "limit": 3447493,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 60000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/pt-br",
       "metric": "requests",
       "limit": 64,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/es",
       "metric": "html",
-      "limit": 25107,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 14000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/es",
       "metric": "js",
-      "limit": 280276,
+      "limit": 259386,
       "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25 after the refactor; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "removedBy": "SPEC-0003",
       "since": "2026-09-25"
     },
     {
       "route": "/es",
       "metric": "css",
-      "limit": 33150,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 40000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/es",
       "metric": "images",
-      "limit": 3447493,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "limit": 60000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     },
     {
       "route": "/es",
       "metric": "requests",
       "limit": 64,
-      "kind": "baseline",
-      "source": "specs/*/0002-web-performance-search-copy-specialists/research/baseline-measurements.md (M1-M3; brotli quality 9 of this gate, not the wire)",
-      "removedBy": "BACKLOG-landing-refactor",
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
       "since": "2026-09-25"
     }
   ],
@@ -399,62 +387,6 @@
       "where": "(site)",
       "match": "/images/docs/Get-started-with-R2.webp",
       "removedBy": "BACKLOG-web-image-dimensions",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "img-dimensions",
-      "where": "(site)",
-      "match": "/svg/architecture_diagram_white.svg",
-      "removedBy": "BACKLOG-landing-refactor",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "img-dimensions",
-      "where": "(site)",
-      "match": "/svg/architecture_diagram_darck.svg",
-      "removedBy": "BACKLOG-landing-refactor",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "img-max-bytes",
-      "where": "(site)",
-      "match": "/static/FJkauyEa.jpeg",
-      "removedBy": "BACKLOG-landing-refactor",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "img-max-bytes",
-      "where": "(site)",
-      "match": "/static/xZ4wg2Xj.jpeg",
-      "removedBy": "BACKLOG-landing-refactor",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "img-max-bytes",
-      "where": "(site)",
-      "match": "/static/VUMBKh1U.jpeg",
-      "removedBy": "BACKLOG-landing-refactor",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "img-max-bytes",
-      "where": "(site)",
-      "match": "/static/AVQ0V28X.jpeg",
-      "removedBy": "BACKLOG-landing-refactor",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "img-max-bytes",
-      "where": "(site)",
-      "match": "/static/N4aA96n.jpeg",
-      "removedBy": "BACKLOG-landing-refactor",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "img-max-bytes",
-      "where": "(site)",
-      "match": "/static/KtCFjlD4.jpeg",
-      "removedBy": "BACKLOG-landing-refactor",
       "since": "2026-09-25"
     }
   ]

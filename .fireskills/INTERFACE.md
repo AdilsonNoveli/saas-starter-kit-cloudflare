@@ -17,6 +17,7 @@ Register all created UI blocks, including feature internals: Vue components with
 | Block | Type | File | Origin | Purpose and Public API | States and Accessibility | Consumers | Reuse or Extend |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `ConfirmDialog` | Domain composition (app) | `apps/app/app/components/ConfirmDialog.vue` | custom, on top of `@nuxt/ui` | Singleton confirmation dialog, mounted once in `app.vue`. Never imported directly by a page: call `useNotification().confirm({ title, ... })`. | To be mapped | `apps/app/app/app.vue` | Use `useNotification().confirm` instead of creating another dialog |
+| `LandingHero`, `LandingProblem`, `LandingOutcomes`, `LandingMethod`, `LandingAudience`, `LandingProof`, `LandingOffer` | Marketing sections (web) | `apps/web/app/components/landing/*.vue` | custom, on top of `@nuxt/ui` and native elements | One idea per section, text from `landing.*` locale keys, numbers from `useOffer()` | Landmarks with `aria-labelledby`, one `<h1>` (hero), native `<details>` for the FAQ (no script), visible focus, dark mode | `apps/web/app/pages/index.vue` | Extend only if the section keeps one idea and the box count stays low (SPEC-0003 NFR-003) |
 
 ## Screens and Composition
 
@@ -24,6 +25,7 @@ Register each created or modified screen.
 
 | Screen or Route | File | Used Vue Components | Data and Actions | States |
 | --- | --- | --- | --- | --- |
+| Home `/`, `/pt-br`, `/es` | `apps/web/app/pages/index.vue` | the seven landing sections | Offer from `apps/web/app/utils/offer.ts`; checkout address from `runtimeConfig.public.checkoutUrl`; support by WhatsApp link | Offer button disabled with a visible text while no checkout address is set |
 
 ## Composition Rules
 

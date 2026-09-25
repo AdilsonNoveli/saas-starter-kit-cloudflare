@@ -3,7 +3,7 @@
 | Metadata | Value |
 | --- | --- |
 | ID | BACKLOG-0001 |
-| Status | Captured |
+| Status | Promoted |
 | Product | To be clarified |
 | Epic | To be clarified |
 | Feature | To be clarified |
@@ -11,7 +11,7 @@
 | Priority | Unprioritized |
 | Milestones | |
 | Created at | 2026-09-25 |
-| Promoted spec | None |
+| Promoted spec | specs/draft/0003-landing-refactor-one-offer/spec.md |
 
 ## Original Idea
 

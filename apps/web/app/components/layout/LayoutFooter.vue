@@ -60,10 +60,12 @@ const currentYear = new Date().getFullYear();
 const { t } = useI18n();
 const localePath = useLocalePath();
 
+// The legal pages are English-only and have no localized routes (i18n: false), so `localePath`
+// returns an empty string for them and the footer rendered anchors without an href.
 const legal = computed(() => [
-  { label: t("footer.legal.terms"), to: localePath("/terms-of-service") },
-  { label: t("footer.legal.privacy"), to: localePath("/privacy-policy") },
-  { label: t("footer.legal.license"), to: localePath("/license") },
+  { label: t("footer.legal.terms"), to: "/terms-of-service" },
+  { label: t("footer.legal.privacy"), to: "/privacy-policy" },
+  { label: t("footer.legal.license"), to: "/license" },
 ]);
 const links = computed(() => [
   { label: t("nav.home"), to: localePath("/") },

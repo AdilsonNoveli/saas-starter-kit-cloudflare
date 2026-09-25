@@ -10,10 +10,30 @@
 #
 # `notClaims` lists a key whose number is not a claim (a version, a year) with the reason.
 # `testimonials` holds a record per testimonial: the person exists, used the product, gave
-# consent, has their own photo, and where it came from (16 CFR 465.2).
+# consent, has their own photo (image "" when shown without one), and where it came from (16 CFR 465.2).
 # `offers` holds the dated limit that backs an urgency phrase (Directive 2005/29/EC Annex I(7)).
 schema: 1
-claims: []
+claims:
+  - id: testers-more-than-ten
+    keys:
+      - landing.testimonials.subtitle
+    statement: "More than 10 developers tested Nuxfire"
+    evidence:
+      kind: owner-statement
+      by: "Owner of Nuxfire (chat, corrects the earlier 40+)"
+      on: "2026-09-25"
+    verifiedAt: "2026-09-25"
+    owner: "Owner of Nuxfire"
+  - id: testimonial-elena-two-months
+    keys:
+      - landing.testimonials.items.item3.quote
+    statement: "A user quoted on the page said the kit saved 2 months of work"
+    evidence:
+      kind: owner-statement
+      by: "Owner of Nuxfire (the quote is real, kept as given)"
+      on: "2026-09-25"
+    verifiedAt: "2026-09-25"
+    owner: "Owner of Nuxfire"
 notClaims: []
 testimonials: []
 offers: []

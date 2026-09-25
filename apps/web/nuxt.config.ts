@@ -115,6 +115,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       appUrl: "",
+      // Address of the Stripe checkout for the offer; empty until the checkout exists (SPEC-0003 FR-001).
+      checkoutUrl: "",
     },
   },
   fonts: {

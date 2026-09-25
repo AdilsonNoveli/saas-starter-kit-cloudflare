@@ -35,7 +35,7 @@
             size="sm"
             icon="i-lucide-languages"
             :label="currentLocaleCode"
-            :aria-label="$t('nav.language')"
+            :aria-label="`${currentLocaleCode} - ${$t('nav.language')}`"
             class="cursor-pointer font-semibold tracking-wide"
           />
         </UDropdownMenu>
@@ -58,7 +58,7 @@
             size="sm"
             icon="i-lucide-languages"
             :label="currentLocaleCode"
-            :aria-label="$t('nav.language')"
+            :aria-label="`${currentLocaleCode} - ${$t('nav.language')}`"
             class="cursor-pointer font-semibold tracking-wide"
           />
         </UDropdownMenu>
@@ -130,13 +130,13 @@ const links = computed(() => [
     label: t("nav.home"),
     to: localePath("/"),
     exact: true,
-    active: isHome.value && route.hash !== "#pricing",
+    active: isHome.value && route.hash !== "#offer",
   },
   {
     label: t("nav.pricing"),
-    to: `${localePath("/")}#pricing`,
+    to: `${localePath("/")}#offer`,
     exact: true,
-    active: isHome.value && route.hash === "#pricing",
+    active: isHome.value && route.hash === "#offer",
   },
   {
     label: t("nav.docs"),

@@ -2,8 +2,7 @@
  * `@nuxfire/emails/mailer` — a fork of @adonisjs/mail@10.4.0 (see
  * LICENSE.md), vendored so the multi-provider mailer engine used by
  * `apps/functions/src/emails.ts` is owned source instead of a dependency
- * on a single-maintainer's unofficial standalone fork
- * (`@tanayvk/mailer`). See the git history of packages/emails for the full
+ * on a third-party fork. See the git history of packages/emails for the full
  * history and rationale.
  *
  * Dropped from upstream on purpose (framework/build-tool glue with zero

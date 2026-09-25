@@ -51,7 +51,7 @@
           {{ $t("docs.sidebar.description") }}
         </p>
         <NuxtLink
-          :to="`${localePath('/')}#pricing`"
+          :to="`${localePath('/')}#offer`"
           class="inline-flex items-center justify-center w-full py-2 px-3 rounded-lg text-xs font-bold uppercase tracking-wider bg-success hover:bg-success/90 text-night-950 shadow-sm transition-all duration-150 active:scale-95 text-center gap-1.5 whitespace-nowrap"
         >
           <span>{{ $t("docs.sidebar.cta") }}</span>

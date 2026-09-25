@@ -4,6 +4,7 @@
       color="neutral"
       variant="ghost"
       :icon="icons[colorMode.preference]"
+      :aria-label="$t('nav.colorMode')"
       @click="switchMode"
     />
     <template #fallback>
@@ -11,6 +12,7 @@
         color="neutral"
         variant="ghost"
         :icon="icons['dark']"
+        :aria-label="$t('nav.colorMode')"
         @click="switchMode"
       />
     </template>

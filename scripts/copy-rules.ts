@@ -158,7 +158,8 @@ export function validateLedger(raw: unknown): Violation[] {
     for (const flag of ["personExists", "usedProduct", "consent"] as const) {
       if (typeof t[flag] !== "boolean") found.push(bad("ledger-invalid", where, `${flag} must be true or false`));
     }
-    if (!text(t.image) || !t.image.startsWith("/")) found.push(bad("ledger-invalid", where, "image must be a root-relative path"));
+    // "" means the testimonial is shown without a photo, which is honest; a photo is a root-relative path
+    if (typeof t.image !== "string" || (t.image !== "" && !t.image.startsWith("/"))) found.push(bad("ledger-invalid", where, "image must be empty (no photo) or a root-relative path"));
     if (typeof t.provenance !== "string") found.push(bad("ledger-invalid", where, "provenance must be text (where the testimonial came from)"));
   });
   return found;
@@ -391,7 +392,7 @@ export function auditTestimonials(input: TestimonialInput): Violation[] {
     }
   }
   const byImage = new Map<string, Set<string>>();
-  for (const t of ledger.testimonials) byImage.set(t.image, new Set([...(byImage.get(t.image) ?? []), t.name]));
+  for (const t of ledger.testimonials) if (t.image !== "") byImage.set(t.image, new Set([...(byImage.get(t.image) ?? []), t.name]));
   for (const [image, names] of byImage) {
     if (names.size > 1) found.push(bad("testimonial-shared-image", image, `the same photo is registered for ${[...names].join(" and ")}`));
   }

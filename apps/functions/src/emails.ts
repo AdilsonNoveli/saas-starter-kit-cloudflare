@@ -22,11 +22,11 @@ const config: Parameters<typeof generateMailer>[0] = {
   // NOTE: you can optionally configure default from/reply to addresses
   // from: {
   //   address: "example@domain.com",
-  //   name: "Tanay Karnik",
+  //   name: "Your Name",
   // },
   // replyTo: {
   //   address: "example@domain.com",
-  //   name: "Tanay Karnik",
+  //   name: "Your Name",
   // },
   mailers: {
     ...(flags.resend && {

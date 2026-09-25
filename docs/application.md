@@ -162,34 +162,27 @@ Inventory: maps each observed file to its surface.
 | Components | apps/web/app/components/CTAButton.vue | Props |
 | Components | apps/web/app/components/folder-tree/FolderTree.global.vue | — |
 | Components | apps/web/app/components/folder-tree/FolderTreeItem.vue | FolderTreeNode, FolderTreeItemProps, toggleExpand, getFileIcon |
-| Components | apps/web/app/components/landing/LandingArchitecture.vue | — |
-| Components | apps/web/app/components/landing/LandingAvatars.vue | — |
-| Components | apps/web/app/components/landing/LandingComparisonTable.vue | FeatureItem, getCategoryItems, getCategoryCount |
-| Components | apps/web/app/components/landing/LandingDatabaseArchitecture.vue | — |
-| Components | apps/web/app/components/landing/LandingFAQs.vue | ContentToken, parseContent |
-| Components | apps/web/app/components/landing/LandingFeatureBadges.vue | — |
-| Components | apps/web/app/components/landing/LandingFeatureCard.vue | Subfeature |
-| Components | apps/web/app/components/landing/LandingFolderStructure.vue | — |
+| Components | apps/web/app/components/landing/LandingAudience.vue | — |
 | Components | apps/web/app/components/landing/LandingHero.vue | — |
-| Components | apps/web/app/components/landing/LandingPricing.vue | — |
-| Components | apps/web/app/components/landing/LandingTestimonials.vue | Testimonial |
-| Components | apps/web/app/components/landing/LandingUseCases.vue | EXAMPLE_SLOTS |
+| Components | apps/web/app/components/landing/LandingMethod.vue | — |
+| Components | apps/web/app/components/landing/LandingOffer.vue | — |
+| Components | apps/web/app/components/landing/LandingOutcomes.vue | — |
+| Components | apps/web/app/components/landing/LandingProblem.vue | — |
+| Components | apps/web/app/components/landing/LandingProof.vue | — |
 | Components | apps/web/app/components/layout/LayoutBanner.vue | — |
 | Components | apps/web/app/components/layout/LayoutContentPage.vue | isBlogPost |
 | Components | apps/web/app/components/layout/LayoutFooter.vue | — |
 | Components | apps/web/app/components/layout/LayoutSection.vue | — |
 | Components | apps/web/app/components/loader/LoaderSpin.vue | — |
 | Components | apps/web/app/components/navigation/NavigationBar.vue | — |
-| Components | apps/web/app/components/pricing/PricingCard.vue | PricingFeature, Props |
 | Components | apps/web/app/components/search/Search.vue | SearchProps |
-| Components | apps/web/app/components/testimonial/TestimonialCard.vue | — |
-| Components | apps/web/app/components/testimonial/TestimonialRow.vue | Testimonial |
 | Pages | apps/web/app/composables/use-breadcrumb.ts | useBreadcrumb |
 | Pages | apps/web/app/composables/use-collapsed-map.ts | useCollapsedMap |
 | Pages | apps/web/app/composables/use-content-navigation.ts | DocsNavBadge, DocsNavigationItem, findNavItemByPath |
 | Pages | apps/web/app/composables/use-content-seo.ts | useSeoContext, useDefaultSocialMeta, useArticleSeo, usePageSeo |
 | Pages | apps/web/app/composables/use-docs-locale.ts | docsCollectionFor, queryDocsPage, queryDocsNavigation |
 | Pages | apps/web/app/composables/use-notification.ts | useNotification |
+| Pages | apps/web/app/composables/use-offer.ts | LAUNCH_OPEN, INTL, useOffer |
 | Pages | apps/web/app/composables/use-page.ts | — |
 | Pages | apps/web/app/composables/use-scrollspy.ts | useScrollspy |
 | Pages | apps/web/app/error.vue | — |
@@ -209,6 +202,9 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/web/app/utils/breadcrumb.ts | BreadcrumbNavItem, BreadcrumbItem, breadcrumbFromNavigation |
 | Pages | apps/web/app/utils/date.test.ts | — |
 | Pages | apps/web/app/utils/date.ts | — |
+| Pages | apps/web/app/utils/landing-contract.test.ts | WEB, LOCALES, flatten, FORBIDDEN, docExists |
+| Pages | apps/web/app/utils/offer.test.ts | OFFER |
+| Pages | apps/web/app/utils/offer.ts | Offer, OFFER, validateOffer, activePrice, formatPrice, whatsappUrl, offerSchema |
 | Pages | apps/web/app/utils/seo/content-seo.test.ts | — |
 | Pages | apps/web/app/utils/seo/content-seo.ts | OG_IMAGE_SIZE, BLOG_BASE, SeoContext, BlogPostInput, AlternateLink, SocialImage, SeoMeta, BlogPostingSchema |
 | Pages | apps/web/app/utils/title-case.ts | toTitleCase |
@@ -259,4 +255,8 @@ Inventory: maps each observed file to its surface.
 | Other sources | layers/admin/server/database/schema.ts | — |
 | Routes and APIs | layers/admin/server/trpc/admin-audit-log.ts | — |
 | Routes and APIs | layers/admin/server/trpc/admin-queue.ts | CRON_JOB_ID, readJobId |
+| Routes and APIs | layers/admin/server/trpc/admin-teams.ts | setTeamStatus |
+| Routes and APIs | layers/admin/server/trpc/router.ts | — |
+| Other sources | layers/admin/server/utils/platform-admin.ts | findActivePlatformAdmin, rather, isActivePlatformAdmin, isValidPlatformTotp |
+| Other sources | layers/admin/server/utils/platform-mfa-session.ts | PLATFORM_MFA_COOKIE_NAME, PLATFORM_MFA_MAX_AGE_SECONDS, PlatformMfaSessionData, sessionConfig, getPlatformMfaSession, startPlatformMfaSession |
 <!-- specsfy:documentator:end -->

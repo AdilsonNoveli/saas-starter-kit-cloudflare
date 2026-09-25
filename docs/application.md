@@ -203,6 +203,8 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/web/app/pages/privacy-policy.vue | — |
 | Pages | apps/web/app/pages/signup.vue | — |
 | Pages | apps/web/app/pages/terms-of-service.vue | — |
+| Pages | apps/web/app/utils/blog-locale.test.ts | GIT |
+| Pages | apps/web/app/utils/blog-locale.ts | BlogListEntry, clusterKey, postsForLocale |
 | Pages | apps/web/app/utils/breadcrumb.test.ts | — |
 | Pages | apps/web/app/utils/breadcrumb.ts | BreadcrumbNavItem, BreadcrumbItem, breadcrumbFromNavigation |
 | Pages | apps/web/app/utils/date.test.ts | — |
@@ -257,6 +259,4 @@ Inventory: maps each observed file to its surface.
 | Other sources | layers/admin/server/database/schema.ts | — |
 | Routes and APIs | layers/admin/server/trpc/admin-audit-log.ts | — |
 | Routes and APIs | layers/admin/server/trpc/admin-queue.ts | CRON_JOB_ID, readJobId |
-| Routes and APIs | layers/admin/server/trpc/admin-teams.ts | setTeamStatus |
-| Routes and APIs | layers/admin/server/trpc/router.ts | — |
 <!-- specsfy:documentator:end -->

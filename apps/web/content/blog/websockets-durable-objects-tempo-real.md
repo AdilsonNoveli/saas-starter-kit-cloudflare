@@ -9,6 +9,10 @@ tags: ["WebSockets", "Durable Objects", "Cloudflare", "Tempo Real"]
 image: "/images/blog/websockets-durable-objects.svg"
 lang: pt-br
 ogImage: "/images/blog/websockets-durable-objects.png"
+translations:
+  en: realtime-websockets-durable-objects
+  pt-br: websockets-durable-objects-tempo-real
+  es: websockets-durable-objects-tiempo-real
 ---
 
 Construir funcionalidades em tempo real (como notificações instantâneas, cursores colaborativos ou dashboards ao vivo) sempre foi um dos maiores pesadelos em arquiteturas serverless.
@@ -92,4 +96,4 @@ Com os Durable Objects, você elimina completamente os custos de servidores Redi
 
 Todo esse fluxo — desde os workers de backend até os composables reativos do Nuxt — já vem 100% implementado e testado no **Nuxfire**.
 
-[**Garanta sua licença vitalícia e baixe o código agora mesmo →**](/#pricing)
+[**Garanta sua licença vitalícia e baixe o código agora mesmo →**](/pt-br#pricing)

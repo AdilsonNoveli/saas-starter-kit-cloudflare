@@ -77,7 +77,7 @@ Every content page (blog post, blog index, legal page, docs page) declares accur
 
 #### Resolved Questions
 
-- **Q**: Should the blog index be filtered by active locale? → **A**: No. It would leave English and Spanish visitors with one post each. Each card shows a language label instead (DEC-004).
+- **Q**: Should the blog index follow the active locale? → **A**: Yes, one card per post, like the docs: the version in the active language, else English, else the post as written (DEC-004, superseding the first answer, which listed every version and showed three copies of one post).
 - **Q**: Should `lang` have a silent default? → **A**: No. It is required, so a post can never be published with an assumed language (DEC-002).
 
 #### Open Questions
@@ -98,7 +98,7 @@ Every content page (blog post, blog index, legal page, docs page) declares accur
 #### Out of Scope
 
 - Runtime-generated OG images (`nuxt-og-image` stays disabled).
-- Filtering the blog index by locale or a blog language switcher.
+- Per-locale blog URLs or a blog language switcher (the blog index does follow the active locale, DEC-004).
 - RSS/Atom feeds, per-locale blog URLs, `lastmod` for docs pages (they have no dates).
 - Multiple image aspect ratios (1:1, 4:3) for structured data (DEC-006).
 - The stale headings of `fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs` (reported, not changed).
@@ -581,6 +581,8 @@ fireskills/specialists/fireskill-specialist-content-seo/
 | Server typecheck | `bunx vue-tsc --noEmit -p server/tsconfig.json` in `apps/app` | exit 0 |
 | Production build | `SITE_URL=https://nuxfire.com bun run build` in `apps/web` | exit 0 (the first two builds failed and exposed defects, see DEC-015 and the gate false positives DEC-013, DEC-014) |
 | Gate on the real build | `SITE_URL=https://nuxfire.com bun run check:seo` | `10 post(s) linted, 95 page(s) and 83 sitemap URL(s) audited, check:seo passed` (the first audit reported 80 violations of 10 rules) |
+| Blog index per locale | `/blog`, `/pt-br/blog`, `/es/blog` on the dev server; `bunx vitest run apps/web/app/utils/blog-locale.test.ts` | 6 passed (RED first: module missing); each locale lists 8 cards and the three Git posts appear once, in that locale's language |
+| Every post in every language | `bunx vitest run scripts/seo-rules.test.ts` (RED: 2 failed, then 62 passed); `bun run check:seo` | 24 posts linted (7 posts x 3 languages + the 3 Git posts); the 14 new covers were opened and fit |
 | Dev server | article page in the Browser pane | one `<h1>`, `<html lang="pt-BR">`, `og:type=article`, `og:title` set, byline `September 25th, 2026`; blog index shows the PT/EN/ES language badge on the cards |
 
 Not verified: search engine indexing and social network previews of the deployed site (nothing was deployed).
@@ -737,7 +739,7 @@ Every task maintains this exact checklist during execution:
   - [x] **VISUAL**: Inspect the article heading and the card language label at mobile and desktop widths in light and dark mode: borders, margins, padding, spacing and typography.
   - [x] **EVIDENCE**: Record curl output, status codes and modified files.
   - [x] **IMPROVE**: Apply UI improvements or justify absence.
-  <!-- specsfy:evidence {"task": "T014", "refs": ["US-001", "US-002", "US-003", "FR-001", "FR-002", "FR-003", "FR-004", "FR-007", "AC-001", "AC-002", "AC-003", "AC-006"], "files": ["apps/web/app/composables/use-content-seo.ts", "apps/web/app/components/layout/LayoutContentPage.vue", "apps/web/app/pages/blog/index.vue", "apps/web/app/pages/docs/[...slug].vue", "apps/web/app/utils/breadcrumb.ts", "apps/web/app/composables/use-breadcrumb.ts", "apps/web/app/utils/date.ts"], "commands": [{"run": "cd apps/web && bun run typecheck", "exit": 0}, {"run": "cd apps/web && SITE_URL=https://nuxfire.com bun run build", "exit": 0}]} -->
+  <!-- specsfy:evidence {"task": "T014", "refs": ["US-001", "US-002", "US-003", "FR-001", "FR-002", "FR-003", "FR-004", "FR-007", "AC-001", "AC-002", "AC-003", "AC-006"], "files": ["apps/web/app/composables/use-content-seo.ts", "apps/web/app/components/layout/LayoutContentPage.vue", "apps/web/app/pages/blog/index.vue", "apps/web/app/pages/docs/[...slug].vue", "apps/web/app/utils/breadcrumb.ts", "apps/web/app/composables/use-breadcrumb.ts", "apps/web/app/utils/date.ts", "apps/web/app/utils/blog-locale.ts", "apps/web/app/utils/blog-locale.test.ts"], "commands": [{"run": "bunx vitest run apps/web/app/utils/blog-locale.test.ts", "exit": 0}, {"run": "cd apps/web && bun run typecheck", "exit": 0}, {"run": "cd apps/web && SITE_URL=https://nuxfire.com bun run build", "exit": 0}]} -->
 
 - [x] T015 [CODE] [US-003] Add the sitemap hook in apps/web/server/plugins/sitemap-blog.ts using the pure builder and verify the built sitemap — Refs: US-003, FR-004, FR-005, NFR-001, AC-004 — Depends: T012, T013
   - [x] **PREP**: Confirm the RED tests and how the sitemap module runs its hooks.
@@ -836,7 +838,7 @@ Every task maintains this exact checklist during execution:
 - **DEC-001**: Fix the shared layout with one composable and a pure builder rather than patching each page — one code path covers blog, legal and docs; considered per-page `useSeoMeta` (drift-prone) and content-frontmatter-only `seo` (does not cover JSON-LD or hreflang).
 - **DEC-002**: `lang` is required with no default — a wrong language is an SEO defect that cannot be inferred from the file; considered defaulting to Portuguese (silent, wrong for new English posts).
 - **DEC-003**: Translations are declared explicitly in `translations` on every member of the cluster, not discovered by a shared key — the head and the sitemap hook can then be built from a single entry without a query, and reciprocity is machine-checked; considered `translationKey` (needs a collection query in `onUrl`, which receives one entry only).
-- **DEC-004**: The blog index is not filtered by locale; each card shows the post language — filtering would leave English and Spanish readers with one post each.
+- **DEC-004**: The blog index shows each post once, in the language of the active locale (`postsForLocale`, `apps/web/app/utils/blog-locale.ts`): the version in that language, else English (the default language), else the first version, so no post is dropped and posts without a translation stay visible with their language label. First decision was to list every version; it showed the three Git posts as three cards, ignoring the language the visitor chose, and the site already works per locale for the docs (`use-docs-locale.ts`). Search still covers every post.
 - **DEC-005**: Date-only values are normalized to `T00:00:00Z` for machine-readable output because Google requires a timezone and the source has no time; authors may supply a full ISO datetime to be exact.
 - **DEC-006**: Structured-data images are 16:9 only — the covers are composed at 16:9 and cropping to 1:1 or 4:3 would cut their text; Google marks multiple ratios as recommended, not required (R-005).
 - **DEC-007**: Social images are PNG 1200x675 derived from the SVG sources with `sharp` and committed; runtime OG generation stays disabled (needs a native renderer on Workers) — build-time output is deterministic on one platform and adds no runtime cost.
@@ -848,6 +850,7 @@ Every task maintains this exact checklist during execution:
 - **DEC-014**: The gate treats a `<meta http-equiv="refresh">` stub (the redirect pages of the route rules) as exempt from page rules, lets hreflang siblings share a title (the same page in another language), and parses quoted attribute values that contain `>` — all three were false positives found by the first audit of the real build, not relaxations of a real defect.
 - **DEC-015**: The docs breadcrumb links a segment only when the content navigation has a page at that path (`page !== false`) — folder sections such as `/docs/saas-starter-kit/features` have no page; they used to return a soft 200 "not found" page, and became 404 links that failed the prerender once FR-007/AC-006 made missing content a real 404.
 - **DEC-016**: The blog byline date is parsed with `parseISO` — `new Date("2026-09-25")` is midnight UTC and rendered as the 24th west of Greenwich (and differently on server and client), contradicting the front matter and `datePublished`.
+- **DEC-017**: Every post exists in every configured language — the blog index follows the active locale (DEC-004), so the seven original posts, written only in Portuguese, showed the same Portuguese card in `/blog`, `/pt-br/blog` and `/es/blog` while the Git post changed language. They were translated to English and Spanish (14 files, per-language covers, `translations` on all 24), and the gate now rejects any post whose `translations` does not list every language (`post-translations-complete`). The specialist states the rule, the slug and cover conventions, and a locale-switch check as validation.
 - **DEC-010**: The CLI validator (`bun run fireskill validate`) is the authoritative spec linter; the standalone `validate_spec.mjs` has headings that no longer match the template and is reported, not modified.
 
 ### 18. Definition of Done

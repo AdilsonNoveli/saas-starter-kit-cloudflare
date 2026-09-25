@@ -275,10 +275,32 @@ describe("source lint of post frontmatter (AC-005)", () => {
     expect(rules(lintPosts(posts, lintCtx))).toContain("post-ogimage-exists");
   });
 
-  // SPECSFY: US-004 FR-006 FR-008 AC-005
-  it("accepts a post without translations and without ogImage", () => {
+  // SPECSFY: US-004 FR-006 FR-008 US-003 FR-004 AC-005
+  it("rejects a post that has no translations: the site follows the language of the visitor", () => {
     const alone = post("solo", "pt-br", { translations: undefined, ogImage: undefined });
-    expect(lintPosts([alone], lintCtx)).toEqual([]);
+    const found = lintPosts([alone], lintCtx).filter((v) => v.rule === "post-translations-complete");
+    expect(found).toHaveLength(1);
+    expect(found[0].where).toBe(alone.file);
+    expect(found[0].message).toContain("en, pt-br, es");
+  });
+
+  // SPECSFY: US-004 FR-006 FR-008 US-003 FR-004 AC-005
+  it("rejects a cluster that lacks a configured language and names the missing one", () => {
+    const pair = { en: CLUSTER.en, "pt-br": CLUSTER["pt-br"] };
+    const posts = [
+      post(CLUSTER.en, "en", { translations: pair }),
+      post(CLUSTER["pt-br"], "pt-br", { translations: pair }),
+    ];
+    const found = lintPosts(posts, lintCtx).filter((v) => v.rule === "post-translations-complete");
+    expect(found).toHaveLength(2);
+    expect(found[0].message).toContain("es");
+  });
+
+  // SPECSFY: US-004 FR-006 FR-008 AC-005
+  it("accepts a post without ogImage when its cluster is complete", () => {
+    const posts = cleanPosts();
+    posts.forEach((entry) => delete entry.frontmatter.ogImage);
+    expect(lintPosts(posts, lintCtx)).toEqual([]);
   });
 });
 
@@ -681,6 +703,7 @@ function frontmatter(slug: string, lang: string, extra = ""): string {
     "translations:",
     `  en: ${CLUSTER.en}`,
     `  pt-br: ${CLUSTER["pt-br"]}`,
+    `  es: ${CLUSTER.es}`,
     ...(extra ? [extra] : []),
     "---",
     "",
@@ -695,23 +718,25 @@ interface Site {
   output: string;
 }
 
-/** A consistent two-post site (en + pt-br) on disk, ready for the CLI. */
+/** A consistent three-post site (en, pt-br, es) on disk, ready for the CLI. */
 function buildSite(mutate: (site: Site) => void = () => {}): Site {
   const root = mkdtempSync(join(tmpdir(), "check-seo-"));
   roots.push(root);
   const site: Site = { content: join(root, "content"), publicDir: join(root, "public"), output: join(root, "output") };
   write(join(site.content, `${CLUSTER.en}.md`), frontmatter(CLUSTER.en, "en"));
   write(join(site.content, `${CLUSTER["pt-br"]}.md`), frontmatter(CLUSTER["pt-br"], "pt-br"));
+  write(join(site.content, `${CLUSTER.es}.md`), frontmatter(CLUSTER.es, "es"));
   write(join(site.publicDir, "images/blog/git.png"), png(1200, 675));
   write(join(site.output, "images/blog/git.png"), png(1200, 675));
   write(join(site.output, "images/og/default.png"), png(1200, 675));
   const alternates = [
     { hreflang: "en-US", href: postUrl(CLUSTER.en) },
     { hreflang: "pt-BR", href: postUrl(CLUSTER["pt-br"]) },
+    { hreflang: "es-ES", href: postUrl(CLUSTER.es) },
     { hreflang: "x-default", href: postUrl(CLUSTER.en) },
   ];
-  const langs = { en: ["en-US", "en_US"], "pt-br": ["pt-BR", "pt_BR"] } as const;
-  for (const lang of ["en", "pt-br"] as const) {
+  const langs = { en: ["en-US", "en_US"], "pt-br": ["pt-BR", "pt_BR"], es: ["es-ES", "es_ES"] } as const;
+  for (const lang of ["en", "pt-br", "es"] as const) {
     write(
       join(site.output, "blog", CLUSTER[lang], "index.html"),
       html(
@@ -730,7 +755,7 @@ function buildSite(mutate: (site: Site) => void = () => {}): Site {
   write(
     join(site.output, "__sitemap__/en-US.xml"),
     sitemapXml(
-      (["en", "pt-br"] as const).map((lang) => ({
+      (["en", "pt-br", "es"] as const).map((lang) => ({
         loc: postUrl(CLUSTER[lang]),
         lastmod: "2026-09-25T00:00:00Z",
         alternates,

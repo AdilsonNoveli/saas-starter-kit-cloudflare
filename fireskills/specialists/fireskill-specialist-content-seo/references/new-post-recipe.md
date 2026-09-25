@@ -6,9 +6,10 @@ supersedes this document.
 
 ## Steps
 
-1. **Pick the languages and the slugs.** One file per language, named for its language
-   (`git-branching-…` for English, `git-branches-…` for Portuguese, `git-ramas-…` for Spanish).
-   A slug is a URL: it never changes after publication.
+1. **Pick the slugs.** Always three files, one per configured language (`en`, `pt-br`, `es`),
+   each named for its language (`git-branching-…`, `git-branches-…`, `git-ramas-…`). A slug is a
+   URL: it never changes after publication, and a translation must not reuse another file's slug
+   (`vibe-coding-ia-…` in Portuguese and `vibe-coding-con-ia-…` in Spanish).
 2. **Write the English source first**, then translate. Verify every command in a scratch
    repository and every vendor claim in the vendor documentation (see `$fireskill-specialist-technical-research`).
 3. **Frontmatter** in each file. This is the complete contract; nothing is defaulted:
@@ -34,17 +35,21 @@ translations:
 
    - Use `authorType: "Person"` when `author` is a person (default `Organization`).
    - Add `updated: "YYYY-MM-DD"` when you materially change a published post.
-   - Omit `translations` for a post that exists in one language only.
-4. **Cover**: copy `apps/web/public/images/blog/git-branching-stage-production.svg` as a starting
-   point (800x450, 16:9), change the text, then generate the PNG and open it:
+   - `translations` is never omitted and never partial: the gate rejects a post that does not
+     list all three languages (`post-translations-complete`).
+4. **Covers**: copy `apps/web/public/images/blog/git-branching-stage-production.svg` as a starting
+   point (800x450, 16:9), change the text, then generate the PNG and open it. When the image has
+   words, make one per language (`<name>.svg`, `<name>-en.svg`, `<name>-es.svg`) and point each
+   post's `image`/`ogImage` at its own; a cover without words may be shared:
 
 ```bash
 bun run generate:og
 ```
 
 5. **Body**: start at `##` (the `<h1>` is the title). Keep code blocks and AI-agent prompts
-   identical across languages; translate prose. Portuguese uses "você", Spanish docs-style
-   manuals use "usted".
+   identical across languages; translate prose, code comments and sample user-facing strings.
+   Links to the home carry the post's locale prefix (`/#pricing`, `/pt-br#pricing`,
+   `/es#pricing`). Portuguese uses "você", Spanish docs-style manuals use "usted".
 6. **Validate**:
 
 ```bash

@@ -9,6 +9,10 @@ tags: ["Cloudflare Queues", "Background Jobs", "DLQ", "Assíncrono"]
 image: "/images/blog/cloudflare-queues-background-jobs.svg"
 lang: pt-br
 ogImage: "/images/blog/cloudflare-queues-background-jobs.png"
+translations:
+  en: async-queues-background-jobs-serverless
+  pt-br: filas-assincronas-jobs-segundo-plano-serverless
+  es: colas-asincronas-jobs-segundo-plano-serverless
 ---
 
 No desenvolvimento de aplicações web modernas, nada degrada mais a experiência do usuário do que telas travadas esperando operações demoradas.
@@ -78,4 +82,4 @@ O Nuxfire inclui um **CRON Worker** nativo configurado em `apps/functions`, disp
 
 Construa sistemas distribuídos profissionais sem surpresas operacionais.
 
-[**Acesse o monorepo do Nuxfire agora mesmo com entrega imediata e suporte no Grupo VIP →**](/#pricing)
+[**Acesse o monorepo do Nuxfire agora mesmo com entrega imediata e suporte no Grupo VIP →**](/pt-br#pricing)

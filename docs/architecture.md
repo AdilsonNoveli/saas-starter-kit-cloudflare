@@ -5,7 +5,7 @@
 
 | Type | Quantity |
 | --- | --- |
-| Code | 422 |
+| Code | 424 |
 | Tests | 18 |
 
 ## Diagrams

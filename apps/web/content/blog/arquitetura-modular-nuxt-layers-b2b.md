@@ -9,6 +9,10 @@ tags: ["Nuxt Layers", "Arquitetura Modular", "B2B SaaS", "Clean Code"]
 image: "/images/blog/nuxt-layers-modular-b2b.svg"
 lang: pt-br
 ogImage: "/images/blog/nuxt-layers-modular-b2b.png"
+translations:
+  en: modular-architecture-nuxt-layers-b2b
+  pt-br: arquitetura-modular-nuxt-layers-b2b
+  es: arquitectura-modular-nuxt-layers-b2b
 ---
 
 Conforme um produto SaaS cresce, a complexidade do código tende a explodir. Componentes de checkout misturam-se com regras de autenticação, telas de administração dividem diretórios com telas de usuários comuns e uma alteração no modelo de banco quebra três telas diferentes sem aviso prévio.
@@ -88,4 +92,4 @@ O script de build inspeciona esse arquivo e monta a composição final em `apps/
 
 Pronto para transformar sua produtividade e construir com a arquitetura correta desde o início?
 
-[**Garanta acesso imediato ao código-fonte do Nuxfire e ao Grupo VIP →**](/#pricing)
+[**Garanta acesso imediato ao código-fonte do Nuxfire e ao Grupo VIP →**](/pt-br#pricing)

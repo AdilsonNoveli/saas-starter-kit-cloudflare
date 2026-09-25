@@ -9,6 +9,10 @@ tags: ["Cursor", "Claude Code", "v0", "Vibe Coding", "TypeScript"]
 image: "/images/blog/vibe-coding-ai-cursor-claude.svg"
 lang: pt-br
 ogImage: "/images/blog/vibe-coding-ai-cursor-claude.png"
+translations:
+  en: vibe-coding-ai-cursor-claude-code-saas
+  pt-br: vibe-coding-ia-cursor-claude-code-saas
+  es: vibe-coding-con-ia-cursor-claude-code-saas
 ---
 
 O termo **"Vibe Coding"** tornou-se a maior tendência de desenvolvimento de software em 2026. Desenvolvedores experientes e fundadores técnicos usam assistentes inteligentes como **Cursor**, **Claude Code** e **v0** para escrever código em velocidades nunca antes imaginadas.
@@ -84,4 +88,4 @@ Ao combinar a velocidade da IA gerativa com uma base arquitetural sólida de ní
 
 Chega de lutar contra alucinações da IA. Comece seu projeto sobre uma base profissional e testada.
 
-[**Garanta seu acesso imediato ao código-fonte do Nuxfire e entre no Grupo VIP →**](/#pricing)
+[**Garanta seu acesso imediato ao código-fonte do Nuxfire e entre no Grupo VIP →**](/pt-br#pricing)

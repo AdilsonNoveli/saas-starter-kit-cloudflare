@@ -89,6 +89,15 @@ export function lintPosts(posts: PostFile[], ctx: LintContext): Violation[] {
       }
     }
 
+    // The site follows the language of the visitor (the blog index shows one card per post in
+    // the active locale), so a post that exists in one language only leaves the other locales
+    // reading it in a language they did not choose.
+    const declared = fm.translations !== null && typeof fm.translations === "object" ? (fm.translations as Record<string, unknown>) : {};
+    const missing = ctx.langs.filter((lang) => !isText(declared[lang]));
+    if (missing.length > 0) {
+      add("post-translations-complete", `translations must list a version in every language; missing: ${missing.join(", ")}`);
+    }
+
     const translations = fm.translations;
     if (translations !== undefined && translations !== null && typeof translations === "object") {
       const own = translations as Record<string, unknown>;

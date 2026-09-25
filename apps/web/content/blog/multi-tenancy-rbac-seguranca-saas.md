@@ -9,6 +9,10 @@ tags: ["Multi-Tenancy", "RBAC", "PostgreSQL", "Drizzle ORM", "Segurança"]
 image: "/images/blog/multi-tenancy-rbac-postgresql.svg"
 lang: pt-br
 ogImage: "/images/blog/multi-tenancy-rbac-postgresql.png"
+translations:
+  en: multi-tenancy-rbac-saas-security
+  pt-br: multi-tenancy-rbac-seguranca-saas
+  es: multi-tenancy-rbac-seguridad-saas
 ---
 
 O maior divisor de águas entre um projeto amador e um produto de software corporativo pronto para vendas B2B é a segurança do **multi-tenancy** e do **RBAC (Role-Based Access Control)**.
@@ -100,4 +104,4 @@ Para clientes B2B exigentes, o Nuxfire já inclui uma tabela dedicada de **Audit
 
 Construa seu SaaS sobre uma fundação que atende aos mais altos padrões de segurança corporativa desde o primeiro commit.
 
-[**Adquira sua licença do Nuxfire e garanta acesso imediato ao código e ao Grupo VIP →**](/#pricing)
+[**Adquira sua licença do Nuxfire e garanta acesso imediato ao código e ao Grupo VIP →**](/pt-br#pricing)

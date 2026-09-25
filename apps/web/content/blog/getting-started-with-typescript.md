@@ -9,6 +9,10 @@ image: "/images/blog/typescript-end-to-end-typesafety.svg"
 lang: pt-br
 authorType: "Person"
 ogImage: "/images/blog/typescript-end-to-end-typesafety.png"
+translations:
+  en: typescript-nuxt-4-getting-started-guide
+  pt-br: getting-started-with-typescript
+  es: primeros-pasos-typescript-nuxt-4
 ---
 
 O **TypeScript** tornou-se um requisito indispensável no desenvolvimento moderno de software, especialmente na construção de aplicações SaaS críticas onde erros em tempo de execução custam clientes e reputação.
@@ -84,4 +88,4 @@ Ao desenvolver com Cursor, GitHub Copilot ou Claude Code, as definições de tip
 
 Adotar TypeScript desde o dia zero no seu SaaS economiza semanas de depuração e viabiliza um crescimento sustentável da base de código. 
 
-Se você quer pular a configuração manual de TypeScript, tRPC, Drizzle e Nuxt Layers e começar diretamente com uma arquitetura de nível enterprise pronta para produção, conheça o [Nuxfire](/#pricing) e garanta acesso imediato ao código-fonte completo.
+Se você quer pular a configuração manual de TypeScript, tRPC, Drizzle e Nuxt Layers e começar diretamente com uma arquitetura de nível enterprise pronta para produção, conheça o [Nuxfire](/pt-br#pricing) e garanta acesso imediato ao código-fonte completo.

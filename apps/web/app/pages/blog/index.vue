@@ -51,7 +51,7 @@
                 >
                   {{ post.category || $t("blog.defaultCategory") }}
                 </UBadge>
-                <!-- Posts are written in one language each; the label says which. -->
+                <!-- A post shown in another language than the site's says so. -->
                 <UBadge
                   color="neutral"
                   variant="subtle"
@@ -122,7 +122,7 @@ definePageMeta({
   layout: "page",
   auth: false,
 });
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 
 // The visible subtitle is the description: one text, no second copy to drift.
@@ -143,7 +143,10 @@ useSchemaOrg([
 const languageName = (lang: string): string =>
   CONTENT_LOCALES.find((locale) => locale.code === lang)?.name ?? lang;
 
-const { data: posts } = await useAsyncData("blog-list", () =>
+const { data: allPosts } = await useAsyncData("blog-list", () =>
   queryCollection("blog").order("date", "DESC").all(),
 );
+
+// One card per post, in the language the visitor is browsing in (see postsForLocale).
+const posts = computed(() => postsForLocale(allPosts.value ?? [], locale.value));
 </script>

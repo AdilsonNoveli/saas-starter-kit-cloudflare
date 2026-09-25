@@ -85,3 +85,22 @@ export type StripePlanCurrency = (typeof STRIPE_PLAN_CURRENCIES)[number];
 export const PLAN_BILLING_INTERVALS = ["month", "year"] as const;
 
 export type PlanBillingInterval = (typeof PLAN_BILLING_INTERVALS)[number];
+
+/**
+ * Where a buyer lands after paying for a plan, decided per plan in the admin:
+ * a team of their own (they become its Owner), or an existing team the platform
+ * owner picked (`Plan.buyerTeamId`). `Plan.buyerTeamMode` is a plain text column
+ * like every other status-like field here, so this is the write-side allow-list.
+ */
+export const PlanBuyerTeamMode = {
+  NEW_TEAM: "NEW_TEAM",
+  EXISTING_TEAM: "EXISTING_TEAM",
+} as const;
+
+export type PlanBuyerTeamMode =
+  (typeof PlanBuyerTeamMode)[keyof typeof PlanBuyerTeamMode];
+
+export const PLAN_BUYER_TEAM_MODES = [
+  PlanBuyerTeamMode.NEW_TEAM,
+  PlanBuyerTeamMode.EXISTING_TEAM,
+] as const;

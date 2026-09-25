@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import type { H3Event } from "h3";
 import { count, desc, eq } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 // See the note in billing.ts: layers reach the Composition Root's tRPC
 // primitives and server utils by explicit import, never by Nitro's merge.
@@ -14,12 +15,19 @@ import { plans, teams } from "@nuxfire/functions/schema";
 import {
   PaymentProvider,
   PLAN_BILLING_INTERVALS,
+  PLAN_BUYER_TEAM_MODES,
+  PlanBuyerTeamMode,
   STRIPE_PLAN_CURRENCIES,
 } from "../../shared/types/enums";
 import {
   STRIPE_CANCEL_CONFIG_KV_KEY,
   createStripeCancelConfiguration,
 } from "../utils/stripe-portal";
+import {
+  mergeBuyerTeam,
+  resolveBuyerTeam,
+  type BuyerTeamSetting,
+} from "../utils/plan-buyer-team";
 import {
   formatPlanPrice,
   planCatalogNeedsSync,
@@ -78,6 +86,12 @@ const planFieldsSchema = z.object({
   // floor is 1 and "no limit" is expressed by the null, not by a number.
   maxSeats: z.number().int().positive().nullable().optional(),
   limits: z.record(z.string(), z.unknown()).nullable().optional(),
+  // Where a buyer lands after paying: a team of their own, or the existing team
+  // in `buyerTeamId`. Whether the team is required (and real) depends on the
+  // *merged* mode, so it is judged in `resolveBuyerTeamSetting`, not here — the
+  // same reason `amount`/`currency` are not refined on this schema.
+  buyerTeamMode: z.enum(PLAN_BUYER_TEAM_MODES).optional(),
+  buyerTeamId: z.string().trim().max(100).nullable().optional(),
 });
 
 type PlanRow = typeof plans.$inferSelect;
@@ -191,6 +205,42 @@ async function resolvePlanPricing(
 }
 
 /**
+ * Judges the buyer-team setting that a create or update leads to, and returns
+ * the two columns to store. The pure consistency rules live in
+ * `utils/plan-buyer-team.ts`; what is checked here is the one thing only the
+ * database can answer: the chosen team exists and is not suspended, so a plan
+ * is never saved pointing at a destination nobody can join.
+ */
+async function resolveBuyerTeamSetting(setting: BuyerTeamSetting) {
+  const resolved = resolveBuyerTeam(setting);
+  if (!resolved.ok) {
+    throw new TRPCError({ code: "BAD_REQUEST", message: resolved.reason });
+  }
+
+  const { buyerTeamId } = resolved.value;
+  if (buyerTeamId) {
+    const team = await useDB().query.teams.findFirst({
+      where: eq(teams.id, buyerTeamId),
+      columns: { status: true },
+    });
+    if (!team) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "The team the buyer will join does not exist",
+      });
+    }
+    if (team.status !== "ACTIVE") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "The team the buyer will join is suspended",
+      });
+    }
+  }
+
+  return resolved.value;
+}
+
+/**
  * Plan administration for the platform owner. Plans used to exist only as a
  * hardcoded seed script; this router is what replaces it, which is why
  * `archivePlan` is a soft delete: `Team.planId` and `Subscription.planId` are
@@ -226,11 +276,14 @@ export const adminPlansRouter = router({
         })
         .default({ includeArchived: false }),
     )
-    .query(({ input }) =>
+    .query(({ input }) => {
+      // A second read of Team, aliased: the first join (`teams.planId`) counts
+      // the teams ON the plan, this one names the team the plan sends buyers TO.
+      const buyerTeam = alias(teams, "buyerTeam");
       // One grouped join instead of a count query per plan. `count(teams.id)`
       // over the joined column (not `count()` over the row) is what makes a
       // plan nobody uses come back as 0 rather than 1.
-      useDB()
+      return useDB()
         .select({
           id: plans.id,
           name: plans.name,
@@ -244,21 +297,30 @@ export const adminPlansRouter = router({
           currency: plans.currency,
           maxSeats: plans.maxSeats,
           limits: plans.limits,
+          buyerTeamMode: plans.buyerTeamMode,
+          buyerTeamId: plans.buyerTeamId,
+          buyerTeamName: buyerTeam.name,
           isArchived: plans.isArchived,
           createdAt: plans.createdAt,
           teamCount: count(teams.id),
         })
         .from(plans)
         .leftJoin(teams, eq(teams.planId, plans.id))
+        .leftJoin(buyerTeam, eq(buyerTeam.id, plans.buyerTeamId))
         .where(input.includeArchived ? undefined : eq(plans.isArchived, false))
-        .groupBy(plans.id)
-        .orderBy(desc(plans.createdAt)),
-    ),
+        .groupBy(plans.id, buyerTeam.id)
+        .orderBy(desc(plans.createdAt));
+    }),
 
   createPlan: platformAdminProcedure
     .input(planFieldsSchema)
     .mutation(async ({ ctx, input }) => {
-      const { amount, currency, ...fields } = input;
+      const { amount, currency, buyerTeamMode, buyerTeamId, ...fields } = input;
+
+      const buyerTeam = await resolveBuyerTeamSetting({
+        mode: buyerTeamMode ?? PlanBuyerTeamMode.NEW_TEAM,
+        teamId: buyerTeamId ?? null,
+      });
 
       const pricing = await resolvePlanPricing(
         ctx.event,
@@ -282,7 +344,7 @@ export const adminPlansRouter = router({
 
       const [plan] = await useDB()
         .insert(plans)
-        .values({ ...fields, ...pricing })
+        .values({ ...fields, ...pricing, ...buyerTeam })
         .returning();
 
       if (!plan) {
@@ -329,7 +391,17 @@ export const adminPlansRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Plan not found" });
       }
 
-      const { amount, currency, ...fields } = changes;
+      const { amount, currency, buyerTeamMode, buyerTeamId, ...fields } =
+        changes;
+
+      // Only judged when the edit touches the setting: renaming a plan whose
+      // target team was since deleted must not fail on a field nobody changed.
+      const buyerTeam =
+        buyerTeamMode !== undefined || buyerTeamId !== undefined
+          ? await resolveBuyerTeamSetting(
+              mergeBuyerTeam(existing, { buyerTeamMode, buyerTeamId }),
+            )
+          : {};
 
       const pricing = await resolvePlanPricing(
         ctx.event,
@@ -361,7 +433,7 @@ export const adminPlansRouter = router({
 
       const [plan] = await useDB()
         .update(plans)
-        .set({ ...fields, ...pricing })
+        .set({ ...fields, ...pricing, ...buyerTeam })
         .where(eq(plans.id, id))
         .returning();
 

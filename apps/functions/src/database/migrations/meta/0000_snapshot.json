@@ -681,6 +681,19 @@
           "primaryKey": false,
           "notNull": false
         },
+        "buyerTeamMode": {
+          "name": "buyerTeamMode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'NEW_TEAM'"
+        },
+        "buyerTeamId": {
+          "name": "buyerTeamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "isArchived": {
           "name": "isArchived",
           "type": "boolean",
@@ -704,7 +717,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "Plan_buyerTeamId_Team_id_fk": {
+          "name": "Plan_buyerTeamId_Team_id_fk",
+          "tableFrom": "Plan",
+          "tableTo": "Team",
+          "columnsFrom": [
+            "buyerTeamId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

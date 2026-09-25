@@ -50,6 +50,7 @@
 import type { DropdownMenuItem, TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/table-core";
 import type { RouterOutput } from "~~/server/trpc/routers";
+import { PlanBuyerTeamMode } from "@nuxfire/layer-billing/shared/types/enums";
 
 definePageMeta({
   layout: "admin",
@@ -65,6 +66,21 @@ const UDropdownMenu = resolveComponent("UDropdownMenu");
 
 const notification = useNotification();
 const client = useTrpcClient();
+const { t } = useI18n();
+
+/**
+ * What the plan does with a buyer, in words. An existing-team plan whose team
+ * no longer resolves (deleted since) says so, because whoever consumes the plan
+ * refuses to provision without a destination.
+ */
+function buyerTeamLabel(plan: Plan): string {
+  if (plan.buyerTeamMode !== PlanBuyerTeamMode.EXISTING_TEAM) {
+    return t("billing.admin.plans.buyerTeam.newTeam");
+  }
+  return plan.buyerTeamName
+    ? t("billing.admin.plans.buyerTeam.joins", { team: plan.buyerTeamName })
+    : t("billing.admin.plans.buyerTeam.teamRemoved");
+}
 
 // Unlike the status dropdown on Companies, this one refetches: `listPlans`
 // filters archived rows in SQL, so asking for them is a different query, not a
@@ -205,6 +221,11 @@ const columns: TableColumn<Plan>[] = [
     accessorKey: "maxSeats",
     header: "Seats",
     cell: ({ row }) => row.original.maxSeats ?? "Unlimited",
+  },
+  {
+    id: "buyerTeam",
+    header: () => t("billing.admin.plans.buyerTeam.column"),
+    cell: ({ row }) => buyerTeamLabel(row.original),
   },
   {
     id: "teams",

@@ -97,6 +97,8 @@ CREATE TABLE "Plan" (
 	"currency" text,
 	"maxSeats" integer,
 	"limits" jsonb,
+	"buyerTeamMode" text DEFAULT 'NEW_TEAM' NOT NULL,
+	"buyerTeamId" text,
 	"isArchived" boolean DEFAULT false NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
@@ -217,6 +219,7 @@ CREATE TABLE "Team" (
 ALTER TABLE "DeadLetterRecord" ADD CONSTRAINT "DeadLetterRecord_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Job" ADD CONSTRAINT "Job_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "PlatformAdmin" ADD CONSTRAINT "PlatformAdmin_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Plan" ADD CONSTRAINT "Plan_buyerTeamId_Team_id_fk" FOREIGN KEY ("buyerTeamId") REFERENCES "public"."Team"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_planId_Plan_id_fk" FOREIGN KEY ("planId") REFERENCES "public"."Plan"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "KanbanBoard" ADD CONSTRAINT "KanbanBoard_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

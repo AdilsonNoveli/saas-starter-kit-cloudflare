@@ -6,7 +6,7 @@ import { join, relative, resolve } from "node:path";
 
 const args = process.argv.slice(2);
 const project = resolve(args.includes("--project") ? args[args.indexOf("--project") + 1] : process.cwd());
-const ignored = new Set([".git", "node_modules", "vendor", "_docs", "fireskills", ".nuxt", ".output", ".sst", ".data", "dist", "build", ".next", ".astro", "coverage", ".turbo"]);
+const ignored = new Set([".git", ".claude", "node_modules", "vendor", "_docs", "fireskills", ".nuxt", ".output", ".sst", ".data", "dist", "build", ".next", ".astro", "coverage", ".turbo"]);
 const textExtensions = new Set([".astro", ".css", ".go", ".html", ".js", ".jsx", ".json", ".md", ".mjs", ".php", ".py", ".rb", ".rs", ".sql", ".svelte", ".toml", ".ts", ".tsx", ".vue", ".yaml", ".yml"]);
 const groups = {
   instructions: [], manifests: [], configuration: [], application: [], routes: [],

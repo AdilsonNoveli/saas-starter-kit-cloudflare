@@ -26,6 +26,17 @@ export default defineNuxtConfig({
       // them buys nothing and this is a relocation, not a redesign.
     },
   ],
+  // The layer's own text lives in `i18n/locales/`. Without this block the
+  // module never reads those files (only the Composition Root's own are
+  // loaded), and every key the layer asks for renders as the raw key. Same
+  // codes and file names as `apps/app/nuxt.config.ts`, which they merge into.
+  i18n: {
+    locales: [
+      { code: "en", language: "en-US", file: "en.json" },
+      { code: "pt-br", language: "pt-BR", file: "pt-BR.json" },
+      { code: "es", language: "es-ES", file: "es.json" },
+    ],
+  },
   // `srcDir: "app"` used to be here, explicit, only because this layer had no
   // `app/` directory while it was backend-only and Nuxt 4 silently falls back
   // to the layer ROOT in that case (dragging `server/**` into the CLIENT

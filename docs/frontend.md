@@ -3,9 +3,9 @@
 <!-- specsfy:documentator:start -->
 ## Observed Surfaces
 
-- Components, pages, or views: 141.
+- Components, pages, or views: 143.
 - Tailwind: detected.
-- CSS tokens: --reka-dropdown-menu-trigger-width, --ui-primary, --vis-crosshair-line-stroke-color, --vis-crosshair-circle-stroke-color, --ui-bg, --vis-axis-grid-color, --ui-border, --vis-axis-tick-color, --vis-axis-tick-label-color, --ui-text-dimmed, --vis-tooltip-background-color, --vis-tooltip-border-color, --vis-tooltip-text-color, --ui-text-highlighted, ---, --ui-text, --ui-, --color-flame, --ui-success, --background, --shiny-text, --shiny-dot, --color-brand, --color-flame-700, --color-brand-hover, --color-flame-600, --color-brand-secondary, --color-fire-500, --color-brand-light, --color-fire-50, --color-flame-500, --color-flame-800, --gradient-angle, --gradient-angle-offset, --gradient-shine, --gradient-brand, --ui-warning, --muted, --color-, --font-sans, --font-mono, --color-flame-50, --color-flame-100, --color-flame-200, --color-flame-300, --color-flame-400, --color-flame-900, --color-flame-950, --color-fire-100, --color-fire-200, --color-fire-300, --color-fire-400, --color-fire-600, --color-fire-700, --color-fire-800, --color-fire-900, --color-fire-950, --color-night-50, --color-night-100, --color-night-200, --color-night-300, --color-night-400, --color-night-500, --color-night-600, --color-night-700, --color-night-800, --color-night-900, --color-night-950, --radius-lg, --ui-radius, --ui-bg-muted, --ui-bg-elevated, --ui-bg-accented, --ui-border-muted, --ui-border-accented, --ui-text-muted.
+- CSS tokens: --reka-dropdown-menu-trigger-width, --ui-primary, --vis-crosshair-line-stroke-color, --vis-crosshair-circle-stroke-color, --ui-bg, --vis-axis-grid-color, --ui-border, --vis-axis-tick-color, --vis-axis-tick-label-color, --ui-text-dimmed, --vis-tooltip-background-color, --vis-tooltip-border-color, --vis-tooltip-text-color, --ui-text-highlighted, ---, --ui-text, --ui-, --color-flame, --ui-success, --background, --shiny-text, --shiny-dot, --color-brand, --color-flame-700, --color-brand-hover, --color-flame-600, --color-brand-secondary, --color-fire-500, --color-brand-light, --color-fire-50, --color-flame-500, --color-flame-800, --gradient-angle, --gradient-angle-offset, --gradient-shine, --gradient-brand, --ui-warning, --muted, --duration, --gap, --color-, --font-sans, --font-mono, --color-flame-50, --color-flame-100, --color-flame-200, --color-flame-300, --color-flame-400, --color-flame-900, --color-flame-950, --color-fire-100, --color-fire-200, --color-fire-300, --color-fire-400, --color-fire-600, --color-fire-700, --color-fire-800, --color-fire-900, --color-fire-950, --color-night-50, --color-night-100, --color-night-200, --color-night-300, --color-night-400, --color-night-500, --color-night-600, --color-night-700, --color-night-800, --color-night-900, --color-night-950, --radius-lg, --ui-radius, --ui-bg-muted, --ui-bg-elevated, --ui-bg-accented, --ui-border-muted, --ui-border-accented, --ui-text-muted.
 
 | File |
 | --- |
@@ -94,6 +94,8 @@
 | apps\web\app\components\loader\LoaderSpin.vue |
 | apps\web\app\components\navigation\NavigationBar.vue |
 | apps\web\app\components\search\Search.vue |
+| apps\web\app\components\testimonial\TestimonialCard.vue |
+| apps\web\app\components\testimonial\TestimonialRow.vue |
 | apps\web\app\error.vue |
 | apps\web\app\layouts\default.vue |
 | apps\web\app\layouts\docs.vue |

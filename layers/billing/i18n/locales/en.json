@@ -1,3 +1,33 @@
 {
-  "billing": {}
+  "billing": {
+    "admin": {
+      "plans": {
+        "buyerTeam": {
+          "label": "After the purchase",
+          "help": "Where the buyer lands once they have paid for this plan.",
+          "modes": {
+            "NEW_TEAM": {
+              "label": "A new team of their own",
+              "description": "The buyer becomes its Owner."
+            },
+            "EXISTING_TEAM": {
+              "label": "An existing team",
+              "description": "The buyer joins the team you choose."
+            }
+          },
+          "team": {
+            "label": "Team the buyer joins",
+            "placeholder": "Search teams by name",
+            "empty": "No team matches",
+            "required": "Choose the team the buyer will join.",
+            "loadFailed": "Could not load teams"
+          },
+          "column": "Buyer lands in",
+          "newTeam": "A new team per buyer",
+          "joins": "Joins {team}",
+          "teamRemoved": "Team removed, choose another"
+        }
+      }
+    }
+  }
 }

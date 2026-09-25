@@ -1,3 +1,33 @@
 {
-  "billing": {}
+  "billing": {
+    "admin": {
+      "plans": {
+        "buyerTeam": {
+          "label": "Depois da compra",
+          "help": "Onde o comprador entra depois de pagar por este plano.",
+          "modes": {
+            "NEW_TEAM": {
+              "label": "Um time novo, só dele",
+              "description": "O comprador vira o dono desse time."
+            },
+            "EXISTING_TEAM": {
+              "label": "Um time que já existe",
+              "description": "O comprador entra no time que você escolher."
+            }
+          },
+          "team": {
+            "label": "Time em que o comprador entra",
+            "placeholder": "Buscar time pelo nome",
+            "empty": "Nenhum time encontrado",
+            "required": "Escolha o time em que o comprador entra.",
+            "loadFailed": "Não foi possível carregar os times"
+          },
+          "column": "O comprador entra em",
+          "newTeam": "Um time novo por comprador",
+          "joins": "Entra em {team}",
+          "teamRemoved": "Time removido, escolha outro"
+        }
+      }
+    }
+  }
 }

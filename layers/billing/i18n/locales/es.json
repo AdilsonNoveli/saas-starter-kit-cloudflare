@@ -1,3 +1,33 @@
 {
-  "billing": {}
+  "billing": {
+    "admin": {
+      "plans": {
+        "buyerTeam": {
+          "label": "Después de la compra",
+          "help": "Dónde entra el comprador después de pagar este plan.",
+          "modes": {
+            "NEW_TEAM": {
+              "label": "Un equipo nuevo, solo suyo",
+              "description": "El comprador pasa a ser su propietario."
+            },
+            "EXISTING_TEAM": {
+              "label": "Un equipo que ya existe",
+              "description": "El comprador entra en el equipo que elijas."
+            }
+          },
+          "team": {
+            "label": "Equipo en el que entra el comprador",
+            "placeholder": "Buscar equipo por nombre",
+            "empty": "Ningún equipo coincide",
+            "required": "Elige el equipo en el que entra el comprador.",
+            "loadFailed": "No se pudieron cargar los equipos"
+          },
+          "column": "El comprador entra en",
+          "newTeam": "Un equipo nuevo por comprador",
+          "joins": "Entra en {team}",
+          "teamRemoved": "Equipo eliminado, elige otro"
+        }
+      }
+    }
+  }
 }

@@ -6,6 +6,7 @@ import {
   timestamp,
   jsonb,
   primaryKey,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
@@ -107,6 +108,25 @@ export const plans = pgTable("Plan", {
   // Open-ended bag for future quotas (storage, jobs, API calls). A jsonb
   // column means adding the next limit is a code change, not a migration.
   limits: jsonb("limits"),
+  // Where a buyer lands after paying, chosen per plan in the admin:
+  // "NEW_TEAM" (a team of their own, they become its Owner) or "EXISTING_TEAM"
+  // (they join `buyerTeamId`). Text with a default rather than a pgEnum, like
+  // Subscription.status: the set of destinations is the kind of value that
+  // gains members. The default keeps every plan that existed before this
+  // column behaving as "a team per buyer".
+  buyerTeamMode: text("buyerTeamMode").notNull().default("NEW_TEAM"),
+  // Only meaningful for "EXISTING_TEAM". `set null` rather than the default
+  // `no action`: deleting that team must not be blocked by a plan pointing at
+  // it, and a plan left without a destination is refused by whoever consumes
+  // it, not silently pointed somewhere else.
+  //
+  // The `AnyPgColumn` annotation is required, not decoration: `Team.planId`
+  // already points back at `Plan`, so this makes the two tables reference each
+  // other directly, and without an explicit return type TypeScript cannot infer
+  // either of them ("implicitly has type any ... in its own initializer").
+  buyerTeamId: text("buyerTeamId").references((): AnyPgColumn => teams.id, {
+    onDelete: "set null",
+  }),
   // Plans are archived, never deleted: Team.planId and Subscription.planId are
   // real foreign keys, so a physical delete would break rows that still point
   // here.

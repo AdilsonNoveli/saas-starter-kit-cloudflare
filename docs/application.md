@@ -176,6 +176,8 @@ Inventory: maps each observed file to its surface.
 | Components | apps/web/app/components/loader/LoaderSpin.vue | — |
 | Components | apps/web/app/components/navigation/NavigationBar.vue | — |
 | Components | apps/web/app/components/search/Search.vue | SearchProps |
+| Components | apps/web/app/components/testimonial/TestimonialCard.vue | — |
+| Components | apps/web/app/components/testimonial/TestimonialRow.vue | Testimonial |
 | Pages | apps/web/app/composables/use-breadcrumb.ts | useBreadcrumb |
 | Pages | apps/web/app/composables/use-collapsed-map.ts | useCollapsedMap |
 | Pages | apps/web/app/composables/use-content-navigation.ts | DocsNavBadge, DocsNavigationItem, findNavItemByPath |
@@ -257,6 +259,4 @@ Inventory: maps each observed file to its surface.
 | Routes and APIs | layers/admin/server/trpc/admin-queue.ts | CRON_JOB_ID, readJobId |
 | Routes and APIs | layers/admin/server/trpc/admin-teams.ts | setTeamStatus |
 | Routes and APIs | layers/admin/server/trpc/router.ts | — |
-| Other sources | layers/admin/server/utils/platform-admin.ts | findActivePlatformAdmin, rather, isActivePlatformAdmin, isValidPlatformTotp |
-| Other sources | layers/admin/server/utils/platform-mfa-session.ts | PLATFORM_MFA_COOKIE_NAME, PLATFORM_MFA_MAX_AGE_SECONDS, PlatformMfaSessionData, sessionConfig, getPlatformMfaSession, startPlatformMfaSession |
 <!-- specsfy:documentator:end -->

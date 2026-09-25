@@ -22,7 +22,7 @@ Persistence map of the system.
 | PlatformAdmin | SQL Table | id:text, userId:text, mfaSecret:text, mfaEnabledAt:timestamp, created_at:timestamp, revokedAt:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
 | Benefit | SQL Table | id:text, name:text, data:jsonb, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
 | BenefitsOnPlan | SQL Table | planId:text, benefitId:text, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
-| Plan | SQL Table | id:text, name:text, description:text, tier:text, price:text, period:text, provider:text, providerPriceId:text, providerProductId:text, unitAmount:integer, currency:text, maxSeats:integer, limits:jsonb, isArchived:boolean, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
+| Plan | SQL Table | id:text, name:text, description:text, tier:text, price:text, period:text, provider:text, providerPriceId:text, providerProductId:text, unitAmount:integer, currency:text, maxSeats:integer, limits:jsonb, buyerTeamMode:text, buyerTeamId:text, isArchived:boolean, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
 | Subscription | SQL Table | id:text, teamId:text, status:text, provider:text, providerSubscriptionId:text, planId:text, currentPeriodStart:timestamp, currentPeriodEnd:timestamp, cancelAtPeriodEnd:boolean, providerMetadata:jsonb, customerEmail:text, lastPaymentDate:timestamp, nextPaymentDate:timestamp, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
 | KanbanBoard | SQL Table | id:text, teamId:text, name:text, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
 | KanbanCard | SQL Table | id:text, columnId:text, title:text, description:text, position:integer, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
@@ -49,7 +49,7 @@ Technical details: `fireskill-specialist-drizzle`.
 
 ### Relations and Rules Not Expressed in Schema Columns
 
-- Foreign keys in database (15, all in `0000_init.sql`): `MfaRecoveryCode.userId` → `User` (`ON DELETE CASCADE`); `Team.planId` → `Plan`; `Subscription` → `Team` and `Plan`; `Job`, `DeadLetterRecord`, and `KanbanBoard` → `Team`; `KanbanColumn` → `KanbanBoard`; `KanbanCard` → `KanbanColumn`; `Permission` → `Role`; `TeamMembership.roleId` → `Role`; `TeamInvite` → `Team`, `Role`, and `User` (`invitedById`); `PlatformAdmin` → `User`.
+- Foreign keys in database (16, all in `0000_init.sql`): `Plan.buyerTeamId` → `Team` (`ON DELETE SET NULL`); `MfaRecoveryCode.userId` → `User` (`ON DELETE CASCADE`); `Team.planId` → `Plan`; `Subscription` → `Team` and `Plan`; `Job`, `DeadLetterRecord`, and `KanbanBoard` → `Team`; `KanbanColumn` → `KanbanBoard`; `KanbanCard` → `KanbanColumn`; `Permission` → `Role`; `TeamMembership.roleId` → `Role`; `TeamInvite` → `Team`, `Role`, and `User` (`invitedById`); `PlatformAdmin` → `User`.
 - Column only, without FK: `TeamMembership.teamId` and `userId`, `Role.teamId`, `BenefitsOnPlan.planId` and `benefitId`, `Log.jobId`, `AuditLog.actorUserId` (deliberate: log persists after user deletion), and `Notification.userId` (Drizzle `relations()` only, to avoid circular import).
 - `PlatformAdmin.role` (enum `platform_role`: `SUPER_ADMIN`, `SUPPORT`) does not appear in detected list above: scanner ignores enum columns.
 - Three deliberate schema cycles (core↔teams, teams↔billing, core↔notifications) work solely because all cross-file references reside inside callbacks.
@@ -58,6 +58,7 @@ Technical details: `fireskill-specialist-drizzle`.
 - `MfaRecoveryCode`: single-use recovery codes, one set per `(userId, scope)` where `scope` is `user` (backs `User.mfaSecret`) or `platform` (backs `PlatformAdmin.mfaSecret`). Only an HMAC-SHA256 of the code is stored (keyed with the factor's own encryption key, bound to scope and user); `usedAt` is set atomically on redemption. Unique on `(userId, scope, codeHash)`; regenerating or disabling MFA deletes the whole set. Set/replace logic: `apps/app/server/utils/mfa-recovery.ts`; manual reset: `apps/functions/src/database/reset-mfa.ts`.
 - `mfaSecret` (on `User` and `PlatformAdmin`) is always encrypted (AES-GCM) and never exposed in client sessions.
 - Plans are database rows created in `/admin/plans`; only the **Free** plan and system roles are seeded (idempotent seed on each deploy).
+- `Plan.buyerTeamMode` (`NEW_TEAM` default, or `EXISTING_TEAM`) and `Plan.buyerTeamId` record, per plan, where a buyer lands after paying: a team of their own (as Owner) or the existing team named by `buyerTeamId` (required, and only meaningful, for `EXISTING_TEAM`). Set in `/admin/plans`; stored only: nothing provisions a buyer yet (checkout spec).
 
 ### Retention and Backup
 

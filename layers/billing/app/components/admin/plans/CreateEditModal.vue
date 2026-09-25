@@ -155,6 +155,42 @@
               />
             </UFormField>
 
+            <!-- Where the buyer lands after paying -->
+            <div class="space-y-4 pt-4 border-t border-default">
+              <UFormField
+                :label="t('billing.admin.plans.buyerTeam.label')"
+                name="buyerTeamMode"
+                :help="t('billing.admin.plans.buyerTeam.help')"
+              >
+                <URadioGroup
+                  v-model="state.buyerTeamMode"
+                  :items="buyerTeamModeItems"
+                />
+              </UFormField>
+
+              <UFormField
+                v-if="isExistingTeamMode"
+                :label="t('billing.admin.plans.buyerTeam.team.label')"
+                name="buyerTeamId"
+                required
+              >
+                <USelectMenu
+                  v-model="state.buyerTeamId"
+                  v-model:search-term="teamSearch"
+                  :items="teamItems"
+                  value-key="value"
+                  ignore-filter
+                  :loading="teamsLoading"
+                  :placeholder="t('billing.admin.plans.buyerTeam.team.placeholder')"
+                  class="w-full"
+                >
+                  <template #empty>
+                    {{ t("billing.admin.plans.buyerTeam.team.empty") }}
+                  </template>
+                </USelectMenu>
+              </UFormField>
+            </div>
+
             <!-- Features & limits -->
             <div class="space-y-3 pt-4 border-t border-default">
               <div class="flex items-center justify-between">
@@ -252,6 +288,8 @@ import type { RouterOutput } from "~~/server/trpc/routers";
 import {
   PaymentProvider,
   PLAN_BILLING_INTERVALS,
+  PLAN_BUYER_TEAM_MODES,
+  PlanBuyerTeamMode,
   STRIPE_PLAN_CURRENCIES,
 } from "@nuxfire/layer-billing/shared/types/enums";
 
@@ -301,6 +339,7 @@ const emit = defineEmits<{ success: [] }>();
 
 const notification = useNotification();
 const client = useTrpcClient();
+const { t } = useI18n();
 
 const isEdit = computed(() => Boolean(props.plan));
 const title = computed(() =>
@@ -359,8 +398,19 @@ const schema = z
           (typeof value === "number" && Number.isInteger(value) && value > 0),
         "Leave empty for unlimited, or enter a whole number above zero",
       ),
+    buyerTeamMode: z.enum(PLAN_BUYER_TEAM_MODES),
+    // Unset is `undefined`, like `provider` above.
+    buyerTeamId: z.string().optional(),
   })
   .superRefine((data, ctx) => {
+    if (data.buyerTeamMode === PlanBuyerTeamMode.EXISTING_TEAM && !data.buyerTeamId) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["buyerTeamId"],
+        message: t("billing.admin.plans.buyerTeam.team.required"),
+      });
+    }
+
     if (data.provider === PaymentProvider.STRIPE) {
       if (typeof data.amount !== "number" || data.amount <= 0) {
         ctx.addIssue({
@@ -394,11 +444,86 @@ const state = reactive<Schema>({
   amount: "",
   currency: undefined,
   maxSeats: "",
+  buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM,
+  buyerTeamId: undefined,
 });
 
 const isStripeProvider = computed(
   () => state.provider === PaymentProvider.STRIPE,
 );
+
+const isExistingTeamMode = computed(
+  () => state.buyerTeamMode === PlanBuyerTeamMode.EXISTING_TEAM,
+);
+
+const buyerTeamModeItems = computed(() =>
+  PLAN_BUYER_TEAM_MODES.map((mode) => ({
+    value: mode,
+    label: t(`billing.admin.plans.buyerTeam.modes.${mode}.label`),
+    description: t(`billing.admin.plans.buyerTeam.modes.${mode}.description`),
+  })),
+);
+
+interface TeamItem {
+  value: string;
+  label: string;
+  description: string;
+}
+
+// Teams come from the server as the admin types (the platform can hold far
+// more than any list worth loading up front). The team already chosen is kept
+// in the list even when the current search does not return it, or the select
+// would lose its label while the value is still set.
+const teamItems = ref<TeamItem[]>([]);
+const teamSearch = ref("");
+const teamsLoading = ref(false);
+let teamSearchTimer: ReturnType<typeof setTimeout> | undefined;
+
+async function loadTeams(search: string) {
+  teamsLoading.value = true;
+  try {
+    const found = await client.admin.teams.listTeams.query({
+      search: search || undefined,
+      status: "ACTIVE",
+      limit: 20,
+    });
+    const items = found.map((team) => ({
+      value: team.id,
+      label: team.name,
+      description: team.slug,
+    }));
+    const selected = teamItems.value.find(
+      (item) =>
+        item.value === state.buyerTeamId &&
+        !items.some((found) => found.value === item.value),
+    );
+    teamItems.value = selected ? [selected, ...items] : items;
+  } catch (error) {
+    notification.error(
+      t("billing.admin.plans.buyerTeam.team.loadFailed"),
+      getErrorMessage(error),
+    );
+  } finally {
+    teamsLoading.value = false;
+  }
+}
+
+watch(teamSearch, (term) => {
+  clearTimeout(teamSearchTimer);
+  teamSearchTimer = setTimeout(() => {
+    if (open.value && isExistingTeamMode.value) loadTeams(term.trim());
+  }, 250);
+});
+
+watch(
+  () => open.value && isExistingTeamMode.value,
+  (needsTeams) => {
+    if (needsTeams) loadTeams("");
+  },
+  { immediate: true },
+);
+
+onBeforeUnmount(() => clearTimeout(teamSearchTimer));
 
 // The preview needs a live number as amount/currency change, unlike the
 // saved `price` string which only reflects what the last submit resolved to.
@@ -431,6 +556,21 @@ function reset() {
   state.amount = plan?.unitAmount != null ? plan.unitAmount / 100 : "";
   state.currency = STRIPE_PLAN_CURRENCIES.find((c) => c === plan?.currency);
   state.maxSeats = plan?.maxSeats ?? "";
+  state.buyerTeamMode =
+    PLAN_BUYER_TEAM_MODES.find((mode) => mode === plan?.buyerTeamMode) ??
+    PlanBuyerTeamMode.NEW_TEAM;
+  state.buyerTeamId = plan?.buyerTeamId ?? undefined;
+  teamSearch.value = "";
+  teamItems.value =
+    plan?.buyerTeamId && plan.buyerTeamName
+      ? [
+          {
+            value: plan.buyerTeamId,
+            label: plan.buyerTeamName,
+            description: "",
+          },
+        ]
+      : [];
 
   const limits = plan?.limits as Record<string, unknown> | null;
   if (limits && Array.isArray(limits.features)) {
@@ -483,7 +623,24 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   const stripeManaged = data.provider === PaymentProvider.STRIPE;
   const existingLimits = (props.plan?.limits as Record<string, unknown> | null) ?? {};
 
+  // A team of their own carries no target team, whatever the select last held.
+  const buyerTeam = {
+    buyerTeamMode: data.buyerTeamMode,
+    buyerTeamId:
+      data.buyerTeamMode === PlanBuyerTeamMode.EXISTING_TEAM
+        ? (data.buyerTeamId ?? null)
+        : null,
+  };
+  // Sent on create, and on edit only when it changed: saving a new name for a
+  // plan whose team was suspended since must not be refused over a setting the
+  // admin did not touch.
+  const buyerTeamChanged =
+    !props.plan ||
+    buyerTeam.buyerTeamMode !== props.plan.buyerTeamMode ||
+    buyerTeam.buyerTeamId !== props.plan.buyerTeamId;
+
   const fields = {
+    ...(buyerTeamChanged ? buyerTeam : {}),
     name: data.name,
     description: data.description,
     tier: data.tier,

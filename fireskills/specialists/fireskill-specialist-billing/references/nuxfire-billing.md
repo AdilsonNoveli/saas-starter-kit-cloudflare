@@ -27,7 +27,8 @@ Every statement cites its evidence file. Code supersedes this document.
 
 ## 4. Data and Permissions
 
-- Tables (`layers/billing/server/database/schema.ts`): `Plan` (`tier`, `price`, `period`, `provider`, `providerPriceId`, `providerProductId`, `unitAmount`, `currency`, `maxSeats`, `limits`, `isArchived`), `Subscription` (`teamId`, `status`, `provider`, `providerSubscriptionId`, `planId`, periods, `cancelAtPeriodEnd`, payment dates), `Benefit`, `BenefitsOnPlan`. Migrations: `apps/functions/src/database/migrations/`.
+- Tables (`layers/billing/server/database/schema.ts`): `Plan` (`tier`, `price`, `period`, `provider`, `providerPriceId`, `providerProductId`, `unitAmount`, `currency`, `maxSeats`, `limits`, `buyerTeamMode`, `buyerTeamId`, `isArchived`), `Subscription` (`teamId`, `status`, `provider`, `providerSubscriptionId`, `planId`, periods, `cancelAtPeriodEnd`, payment dates), `Benefit`, `BenefitsOnPlan`. Migrations: `apps/functions/src/database/migrations/`.
+- Where a buyer lands after paying is a per-plan setting: `Plan.buyerTeamMode` (`PlanBuyerTeamMode`: `NEW_TEAM`, the default, or `EXISTING_TEAM`) and `Plan.buyerTeamId` (FK to `Team`, `ON DELETE SET NULL`, the `AnyPgColumn` annotation on it is required because `Team.planId` points back). Edited in `/admin/plans` (`CreateEditModal.vue`, team picked with `admin.teams.listTeams`); `utils/plan-buyer-team.ts` keeps mode and team consistent and `resolveBuyerTeamSetting` in `server/trpc/admin-plans.ts` refuses a team that does not exist or is suspended. **Stored only**: nothing reads it to provision a buyer yet.
 - Enums `SubscriptionStatus` (`ACTIVE`, `PAUSED`, `CANCELED`, `PAST_DUE`, `UNPAID`, `INCOMPLETE`, `TRIALING`) and `PaymentProvider` (`PADDLE`, `STRIPE`, `LEMONSQUEEZY`, `MANUAL`): `shared/types/enums.ts`.
 - UI permission: `teams:billing:view` (manifest string from `teams`; function in `layers/billing/shared/utils/abilities.ts`).
 - Existing tests: `event-ledger.test.ts`, `subscription-repository.test.ts`, `status-map.test.ts`, `abilities.test.ts`. None touch the database.
@@ -35,6 +36,7 @@ Every statement cites its evidence file. Code supersedes this document.
 ## 5. What Does NOT Exist
 
 - Invoice history and download, plan switching with proration, seat limit warnings, internal coupon system (only Paddle.js `discountCode`), plan change/cancellation notification emails. Logged in backlog under `specs/inbox/`.
+- Anything that consumes `Plan.buyerTeamMode`: no code creates a team or membership for a buyer, no purchase updates `Team.planId` (seat limits read `Team.planId`, so a paying team keeps the Free limits), and there is no checkout for a visitor without an account or team. Pending the checkout spec.
 - LemonSqueezy or `MANUAL` implementations (exist only in the enum).
 - Webhook handler for `invoice.paid`; Stripe checkout outside `subscription` mode.
 - Integration tests for tRPC billing routes or webhooks.

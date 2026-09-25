@@ -1,4 +1,5 @@
 import { assertRasterImage, toIsoDateTime } from "../apps/web/app/utils/seo/content-seo";
+import { attributes, decode, tagPattern } from "./html-scan";
 
 // The rules behind `bun run check:seo`. Pure: they receive already-read data (parsed
 // frontmatter, HTML strings, sitemap XML) and return violations, so every rule is
@@ -7,6 +8,12 @@ import { assertRasterImage, toIsoDateTime } from "../apps/web/app/utils/seo/cont
 // Sources for each rule: specs/*/0001-content-seo-metadata (section 2, research notes).
 
 export interface Violation {
+  /**
+   * The exact thing the violation is about (a literal text, an image path). An allowance with a
+   * `match` compares it for equality when it is present, so that one text that contains another
+   * does not use up the other text's entry.
+   */
+  subject?: string;
   /** Stable rule identifier, printed and asserted by tests. */
   rule: string;
   /** File (source lint) or page URL (build audit). */
@@ -158,21 +165,6 @@ export interface HeadInfo {
   redirect: boolean;
 }
 
-const ENTITIES: Record<string, string> = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'" };
-const decode = (text: string): string => text.replace(/&(amp|lt|gt|quot|#39);/g, (entity) => ENTITIES[entity] ?? entity);
-
-/** The inside of a tag: a quoted attribute value may contain `>` (for example `specs/<state>`). */
-const TAG_BODY = String.raw`(?:[^>"']|"[^"]*"|'[^']*')*`;
-const tagPattern = (name: string): RegExp => new RegExp(String.raw`<${name}\b${TAG_BODY}>`, "gi");
-
-function attributes(tag: string): Record<string, string> {
-  const found: Record<string, string> = {};
-  for (const match of tag.matchAll(/([a-zA-Z][a-zA-Z0-9:-]*)\s*=\s*"([^"]*)"/g)) {
-    found[match[1].toLowerCase()] = decode(match[2]);
-  }
-  return found;
-}
-
 export function parseHead(html: string): HeadInfo {
   const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const meta = new Map<string, string[]>();
@@ -252,6 +244,12 @@ export interface AuditContext {
   expectedImage: { width: number; height: number };
   /** Looks a root-relative path up in the build output. */
   image: (publicPath: string) => ImageInfo;
+  /** Titles that mean "nobody wrote this": a title that starts with one of them is a violation. */
+  placeholderTitles?: readonly string[];
+  /** The content of robots.txt when the build has it (Nuxt renders it at runtime, so usually it has not). */
+  robotsTxt?: string;
+  /** True only when the claim ledger proves that real, attributable reviews exist. */
+  provenReviews?: boolean;
 }
 
 export interface PageHtml {
@@ -262,8 +260,6 @@ export interface PageHtml {
 
 const POST_URL = /^\/blog\/[^/]+$/;
 const ABSOLUTE = /^https?:\/\//i;
-/** The sitemap protocol's W3C Datetime: a date, or a datetime with a timezone. */
-const SITEMAP_LASTMOD = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2}))?$/;
 const ISO_WITH_TIMEZONE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/;
 const HREFLANG_CODE = /^(x-default|[a-z]{2,3}(-[A-Za-z]{2,4})?)$/;
 
@@ -319,8 +315,25 @@ export function auditPage(page: PageHtml, ctx: AuditContext): Violation[] {
   const violations: Violation[] = [];
   const add = (rule: string, message: string): number => violations.push({ rule, where: page.url, message });
   const head = parseHead(page.html);
+  // A redirect stub is a 200 page: Bing asks for a 301 for a permanent move (guideline 7) and
+  // Cloudflare answers a real redirect from `_redirects`, so a meta refresh has no place.
+  if (head.redirect) {
+    add("no-meta-refresh", "the page is only a <meta http-equiv=refresh>: answer a 301 or 308 from apps/web/public/_redirects instead");
+    return violations;
+  }
   if (isNoindex(head)) return violations;
   const first = (key: string): string | undefined => head.meta.get(key)?.[0];
+
+  // Structured data that cannot be honest (Google structured-data policies; Bing guideline 14).
+  for (const node of jsonLdNodes(head.jsonLd)) {
+    if (hasType(node, "FAQPage")) {
+      add("jsonld-no-faq", "FAQPage markup: Google stopped showing FAQ rich results on 2026-05-07, so it describes nothing a search engine will use");
+    }
+    const rated = node.aggregateRating !== undefined || node.review !== undefined || hasType(node, "Review") || hasType(node, "AggregateRating");
+    if (rated && !ctx.provenReviews) {
+      add("jsonld-no-unproven-rating", "aggregateRating or review markup without proof that real reviews exist (the claim ledger must prove them)");
+    }
+  }
 
   // Title
   if (!head.title) {
@@ -330,6 +343,8 @@ export function auditPage(page: PageHtml, ctx: AuditContext): Violation[] {
       (fallback) => head.title === fallback || head.title === `${fallback} | ${ctx.siteName}`,
     );
     if (isFallback) add("title-not-fallback", `"${head.title}" is the site fallback: the page did not set a title`);
+    const placeholder = (ctx.placeholderTitles ?? []).find((word) => head.title!.toLowerCase().startsWith(word.toLowerCase()));
+    if (placeholder) add("title-not-placeholder", `"${head.title}" starts with the placeholder "${placeholder}": write the title of this page`);
     const segments = head.title.split(" | ").map((segment) => segment.trim());
     if (new Set(segments).size !== segments.length) {
       add("title-no-repeated-segment", `"${head.title}" repeats a segment`);
@@ -490,13 +505,41 @@ export function auditSite(pages: PageHtml[], sitemap: SitemapUrl[], ctx: AuditCo
 
   // Sitemap
   const entries = new Map(sitemap.map((entry) => [trimSlash(entry.loc), entry]));
+  const pathOf = (loc: string): string => {
+    try {
+      return new URL(loc).pathname;
+    } catch {
+      return loc;
+    }
+  };
   for (const entry of sitemap) {
     const target = byAbsolute.get(trimSlash(entry.loc));
     if (!target) {
       violations.push({ rule: "sitemap-target-exists", where: entry.loc, message: "the sitemap lists a URL that is not a page of the build" });
     } else if (isNoindex(target.head)) {
       violations.push({ rule: "sitemap-noindex", where: entry.loc, message: "the sitemap lists a page that asks not to be indexed or only redirects" });
+    } else {
+      const canonical = target.head.links.find((link) => link.rel === "canonical")?.href;
+      if (canonical && trimSlash(canonical) !== trimSlash(entry.loc)) {
+        violations.push({ rule: "sitemap-canonical", where: pathOf(entry.loc), message: `the sitemap lists ${entry.loc} but the page declares the canonical ${canonical}: Bing asks for canonical URLs only` });
+      }
     }
+    if (entry.lastmod !== undefined && !ISO_WITH_TIMEZONE.test(entry.lastmod)) {
+      violations.push({ rule: "sitemap-lastmod-datetime", where: pathOf(entry.loc), message: `lastmod is "${entry.lastmod}": Bing asks for ISO 8601 with date, time and timezone (2026-09-25T10:00:00Z)` });
+    }
+  }
+  if (ctx.robotsTxt !== undefined) {
+    const host = new URL(ctx.siteUrl).host;
+    const lines = ctx.robotsTxt.split(/\r?\n/).map((line) => line.trim());
+    const listed = lines.some((line) => {
+      const url = /^sitemap\s*:\s*(\S+)/i.exec(line)?.[1];
+      try {
+        return url !== undefined && new URL(url).host === host;
+      } catch {
+        return false;
+      }
+    });
+    if (!listed) violations.push({ rule: "robots-sitemap", where: "/robots.txt", message: `robots.txt lists no Sitemap of ${host}` });
   }
   for (const { page, head } of parsed) {
     if (!isPostUrl(page.url)) continue;
@@ -505,8 +548,8 @@ export function auditSite(pages: PageHtml[], sitemap: SitemapUrl[], ctx: AuditCo
       violations.push({ rule: "sitemap-post-listed", where: page.url, message: "the post is not in the sitemap" });
       continue;
     }
-    if (!entry.lastmod || !SITEMAP_LASTMOD.test(entry.lastmod)) {
-      violations.push({ rule: "sitemap-lastmod", where: page.url, message: `lastmod is ${entry.lastmod ? `"${entry.lastmod}"` : "missing"}: a W3C Datetime (YYYY-MM-DD or ISO 8601 with a timezone) is required` });
+    if (!entry.lastmod) {
+      violations.push({ rule: "sitemap-lastmod", where: page.url, message: "the post has no lastmod in the sitemap" });
     }
     const pair = (link: { hreflang: string; href: string }): string => `${link.hreflang}|${trimSlash(link.href)}`;
     const inHead = new Set(hreflangLinksOf(head).map(pair));

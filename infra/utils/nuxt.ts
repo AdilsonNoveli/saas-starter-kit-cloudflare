@@ -16,6 +16,7 @@ export async function deployWorker(
     root,
     domain,
     aliases = [],
+    htmlHandling,
     app,
     vars = {},
     link: extraLink = [],
@@ -29,6 +30,14 @@ export async function deployWorker(
      * alias, so the app must emit absolute canonical URLs for `domain`.
      */
     aliases?: string[];
+    /**
+     * How Workers Static Assets treats the trailing slash of HTML pages. The
+     * default (`auto-trailing-slash`) serves a prerendered `foo/index.html` at
+     * `/foo/` and answers `/foo` with a 307, which contradicts a canonical URL
+     * without the slash: a search engine is told, temporarily, to go to a URL
+     * whose canonical points back. See SPEC-0002 research/redirect-spike.md.
+     */
+    htmlHandling?: "auto-trailing-slash" | "force-trailing-slash" | "drop-trailing-slash" | "none";
     app?: boolean;
     vars?: Record<string, Input<string> | undefined>;
     link?: Link.Linkable[];
@@ -82,6 +91,7 @@ export async function deployWorker(
       compatibility: COMPATIBILITY,
       assets: {
         directory: path.resolve(outputDir, "public"),
+        ...(htmlHandling ? { htmlHandling } : {}),
       },
       link,
       environment,

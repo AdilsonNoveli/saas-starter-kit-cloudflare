@@ -1,0 +1,19 @@
+# Claim ledger: every factual claim, testimonial and time-limited offer that a human reads in a
+# marketing text (apps/web/i18n/locales/*.json, namespace `landing`) has a record here, and a
+# machine checks that the record still holds: `bun run check:copy`.
+#
+# Evidence kinds:
+#   repo-count      files (globs) + pattern (regex) + equals: the pattern occurs exactly `equals` times
+#   repo-file       path (+ optional contains regex): the file exists (and contains it)
+#   url             url + retrieved (YYYY-MM-DD): a primary source that says it
+#   owner-statement by + on (YYYY-MM-DD): the owner states it and answers for it
+#
+# `notClaims` lists a key whose number is not a claim (a version, a year) with the reason.
+# `testimonials` holds a record per testimonial: the person exists, used the product, gave
+# consent, has their own photo, and where it came from (16 CFR 465.2).
+# `offers` holds the dated limit that backs an urgency phrase (Directive 2005/29/EC Annex I(7)).
+schema: 1
+claims: []
+notClaims: []
+testimonials: []
+offers: []

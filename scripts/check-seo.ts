@@ -4,12 +4,21 @@
 //  2. Build audit: every prerendered page, and the sitemaps, under apps/web/.output/public.
 //     Run it after `nuxt build`; without a build only the source lint runs, and it says so.
 //
+// `bun run check:seo -- --live <origin> [--sitemap-origin <origin>] [--redirects <file>]` audits
+// the HTTP layer of a running site instead (status codes, redirects, compression, cache): see
+// scripts/seo-live.ts. It is read-only and it only runs when asked.
+//
+// Known exceptions live in scripts/seo-config.json as dated, owned allowances (allowances.ts).
+//
 // Exit code 0 when clean, 1 on any violation (each printed with its rule and location).
 // The rules are pure and unit-tested in seo-rules.ts; this file only reads and reports.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { CONTENT_LANGS } from "../apps/web/i18n/supported-locales";
+import { applyAllowances, missingOwners, type Allowance } from "./allowances";
 import { pngSize } from "./og-images";
+import { parseRedirects } from "./redirects";
+import { auditLive, parseOrigin } from "./seo-live";
 import {
   auditPage,
   auditSite,
@@ -31,6 +40,37 @@ function option(name: string): string | undefined {
   return index === -1 ? undefined : process.argv[index + 1];
 }
 
+// ---------------------------------------------------------------------------------
+// Live mode: `--live <origin>`
+// ---------------------------------------------------------------------------------
+
+if (process.argv.includes("--live")) {
+  const given = option("live");
+  if (given === undefined || given.startsWith("--")) {
+    console.error("✗ --live needs an origin, for example: bun run check:seo -- --live https://nuxfire.com");
+    process.exit(1);
+  }
+  try {
+    const origin = parseOrigin(given!);
+    const redirectsFile = option("redirects") ?? join(root, "apps/web/public/_redirects");
+    const legacy = existsSync(redirectsFile)
+      ? parseRedirects(readFileSync(redirectsFile, "utf8")).entries.map((entry) => ({ from: entry.from, to: entry.to.startsWith("/") ? entry.to : undefined }))
+      : [];
+    const { violations, checked } = await auditLive({ origin, sitemapOrigin: option("sitemap-origin"), legacy });
+    console.log(`${checked} sitemap URL(s) and ${legacy.length} legacy URL(s) audited live at ${origin}`);
+    if (violations.length > 0) {
+      for (const violation of violations) console.error(`✗ [${violation.rule}] ${violation.where}\n    ${violation.message}`);
+      console.error(`\n${violations.length} violation(s) of ${new Set(violations.map((v) => v.rule)).size} rule(s).`);
+      process.exit(1);
+    }
+    console.log("✓ check:seo --live passed");
+    process.exit(0);
+  } catch (error) {
+    console.error(`✗ ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  }
+}
+
 const contentDir = option("content") ?? join(root, "apps/web/content/blog");
 const publicDir = option("public") ?? join(root, "apps/web/public");
 const outputDir = option("output") ?? join(root, "apps/web/.output/public");
@@ -49,6 +89,15 @@ const HOMES = ["/", "/pt-br", "/es"];
 
 const violations: Violation[] = [];
 const notes: string[] = [];
+
+interface SeoConfig {
+  placeholderTitles: string[];
+  allow: Allowance[];
+}
+const seoConfigFile = option("config") ?? join(root, "scripts/seo-config.json");
+const seoConfig: SeoConfig = existsSync(seoConfigFile)
+  ? (JSON.parse(readFileSync(seoConfigFile, "utf8")) as SeoConfig)
+  : { placeholderTitles: [], allow: [] };
 
 // ---------------------------------------------------------------------------------
 // 1. Source lint
@@ -127,6 +176,10 @@ if (!existsSync(outputDir)) {
     fallbackDescriptions: FALLBACK_DESCRIPTIONS,
     fallbackDescriptionAllowed: HOMES,
     expectedImage: EXPECTED_IMAGE,
+    placeholderTitles: seoConfig.placeholderTitles,
+    // Nuxt renders robots.txt at runtime; when a build does have the file it is audited here,
+    // otherwise `--live` audits the real answer.
+    robotsTxt: existsSync(join(outputDir, "robots.txt")) ? readFileSync(join(outputDir, "robots.txt"), "utf8") : undefined,
     image: (publicPath): ImageInfo => {
       const file = join(outputDir, publicPath);
       if (!existsSync(file) || !statSync(file).isFile()) return { exists: false };
@@ -145,6 +198,8 @@ if (!existsSync(outputDir)) {
 // ---------------------------------------------------------------------------------
 
 for (const note of notes) console.log(`! ${note}`);
+const { remaining, problems } = applyAllowances(violations, seoConfig.allow);
+violations.splice(0, violations.length, ...remaining, ...problems, ...missingOwners(seoConfig.allow, root));
 if (violations.length > 0) {
   for (const violation of violations) {
     console.error(`✗ [${violation.rule}] ${violation.where}\n    ${violation.message}`);

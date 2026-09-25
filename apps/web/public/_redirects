@@ -1,0 +1,14 @@
+# Permanent redirects for URLs that moved. Cloudflare Workers Static Assets answers these
+# itself, before an asset is served (https://developers.cloudflare.com/workers/static-assets/redirects/).
+# Every rule says its status: without one Cloudflare answers 302, and Bing accepts 302 only for
+# a change shorter than two days (Bing Webmaster Guidelines, section 7).
+/docs/pro /docs/saas-starter-kit 301
+/docs/nuxfire /docs/saas-starter-kit 301
+/docs/production /docs/saas-starter-kit 301
+/pt-br/license /license 301
+/pt-br/privacy-policy /privacy-policy 301
+/pt-br/terms-of-service /terms-of-service 301
+/es/license /license 301
+/es/privacy-policy /privacy-policy 301
+/es/terms-of-service /terms-of-service 301
+/sitemap.xml /sitemap_index.xml 301

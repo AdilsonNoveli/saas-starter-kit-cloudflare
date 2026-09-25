@@ -106,3 +106,60 @@ describe("the commands and the rules are registered (AC-008)", () => {
     expect(read("AGENTS.md")).toContain("check:seo");
   });
 });
+
+// ---------------------------------------------------------------------------------
+// SPEC-0002: routing text, package scripts and the docs in three languages (AC-011)
+// ---------------------------------------------------------------------------------
+
+describe("the routing of pages and text to the new specialists is written down (AC-011)", () => {
+  // SPECSFY: US-006 FR-003 FR-008 FR-012 NFR-007 AC-011
+  it("makes AGENTS.md route every human-readable text to the copy specialist and name the gates", () => {
+    const agents = read("AGENTS.md");
+    expect(agents).toContain("fireskill-specialist-copywriting");
+    expect(agents).toMatch(/human-readable/i);
+    expect(agents).toContain("check:copy");
+    expect(agents).toContain("check:perf");
+  });
+
+  // SPECSFY: US-006 FR-003 FR-008 FR-012 NFR-007 AC-011
+  it("states the rules in the project rules", () => {
+    const rules = read(".fireskills/RULES.md");
+    expect(rules).toContain("fireskill-specialist-copywriting");
+    expect(rules).toContain("fireskill-specialist-web-performance");
+    expect(rules).toContain("fireskill-specialist-seo");
+    expect(rules).toContain("CLAIMS.yml");
+    expect(rules).toMatch(/human-readable/i);
+  });
+
+  // SPECSFY: US-006 FR-003 FR-008 FR-012 NFR-007 AC-011
+  it("routes text, page-weight and search work in the routing table of fireskills/SKILL.md", () => {
+    const skill = read("fireskills/SKILL.md");
+    const row = (name: string): string => skill.split(/\r?\n/).find((line) => line.includes(name) && line.startsWith("|")) ?? "";
+    expect(row("fireskill-specialist-copywriting")).toMatch(/locales|packages\/emails|human-readable/i);
+    expect(row("fireskill-specialist-web-performance")).toMatch(/perf-budgets|routeRules|bundle|hydration/i);
+    expect(row("fireskill-specialist-seo")).toMatch(/robots|_redirects|sitemap|structured/i);
+    expect(skill).toContain("bun run check:perf");
+    expect(skill).toContain("bun run check:copy");
+  });
+});
+
+describe("the docs in three languages describe the three specialists (AC-011)", () => {
+  const stacks = [
+    { lang: "en", file: "apps/web/content/docs/2.fireskills/4.specialists/1.nuxfire-stack.md" },
+    { lang: "pt-br", file: "apps/web/content/pt-br/docs/2.fireskills/4.specialists/1.nuxfire-stack.md" },
+    { lang: "es", file: "apps/web/content/es/docs/2.fireskills/4.specialists/1.nuxfire-stack.md" },
+  ];
+  const names = ["fireskill-specialist-web-performance", "fireskill-specialist-seo", "fireskill-specialist-copywriting"];
+
+  // SPECSFY: US-006 FR-012 NFR-007 AC-011
+  it.each(stacks)("the $lang stack page has a numbered section for each specialist", ({ file }) => {
+    const page = read(file);
+    for (const name of names) expect(page, name).toMatch(new RegExp("^## \\d+\\. `" + name + "`", "m"));
+  });
+
+  // SPECSFY: US-006 FR-012 NFR-007 AC-011
+  it.each(stacks)("the $lang stack page names the gates and the claim ledger", ({ file }) => {
+    const page = read(file);
+    for (const word of ["check:perf", "check:copy", "CLAIMS.yml", "IndexNow"]) expect(page, word).toContain(word);
+  });
+});

@@ -18,6 +18,10 @@ await deployWorker("Web", {
   root: "apps/web",
   domain: webDomain,
   aliases: webAliases,
+  // The site declares canonical URLs without a trailing slash (apps/web/nuxt.config.ts,
+  // @nuxtjs/i18n baseUrl). Dropping the slash makes those URLs answer 200 directly.
+  // Verified locally with `wrangler dev` and `bun run check:seo -- --live` (SPEC-0002 T039).
+  htmlHandling: "drop-trailing-slash",
   link: [contentDatabase],
   vars: {
     NUXT_PUBLIC_APP_URL: appUrl.properties.value,

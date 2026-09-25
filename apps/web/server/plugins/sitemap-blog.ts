@@ -1,7 +1,7 @@
 import { queryCollection } from "@nuxt/content/server";
 import { getSiteConfig } from "#site-config/server/composables/getSiteConfig";
 import { DEFAULT_OG_IMAGE } from "../../site";
-import { blogPostFromEntry, sitemapEntryFor, type SeoContext } from "../../app/utils/seo/content-seo";
+import { blogPostFromEntry, lastmodWithTime, sitemapEntryFor, type SeoContext } from "../../app/utils/seo/content-seo";
 
 // Gives every blog post its real `lastmod` and hreflang cluster in the sitemap, taken from
 // the same builders that write the page head, so the two can never disagree (Google treats
@@ -12,6 +12,11 @@ import { blogPostFromEntry, sitemapEntryFor, type SeoContext } from "../../app/u
 // runs with the full server context. The hook fires for the prerendered sitemaps at build
 // time and for any sitemap generated at runtime.
 export default defineNitroPlugin((nitroApp) => {
+  // The module drops the time of a midnight-UTC lastmod; Bing asks for date and time.
+  nitroApp.hooks.hook("sitemap:output", (ctx) => {
+    ctx.sitemap = lastmodWithTime(ctx.sitemap);
+  });
+
   nitroApp.hooks.hook("sitemap:resolved", async ({ urls, event }) => {
     const site = getSiteConfig(event);
     const context: SeoContext = {

@@ -1,0 +1,27 @@
+{
+  "placeholderTitles": [
+    "Demo SaaS",
+    "SaaS Demo",
+    "SaaS de demostración"
+  ],
+  "allow": [
+    {
+      "rule": "title-not-placeholder",
+      "where": "/",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "title-not-placeholder",
+      "where": "/pt-br",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "title-not-placeholder",
+      "where": "/es",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    }
+  ]
+}

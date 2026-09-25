@@ -1,0 +1,3218 @@
+{
+  "schema": 1,
+  "allow": [
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryCodes.vue",
+      "match": "Recovery codes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryCodes.vue",
+      "match": "Copy",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryCodes.vue",
+      "match": "Download",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryCodes.vue",
+      "match": "Each code works once. Store them somewhere safe, like a password manager. They won't be shown again, and anyone holding one can get into your account.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Recovery codes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Generate new codes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryPanel.vue",
+      "match": "I've saved these codes somewhere safe",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Done",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Six-digit code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Generate codes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "I've saved these codes somewhere safe",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "Done",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "Generate code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "QR code for your authenticator app",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "Recovery code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "ABCD-EFGH-JKMN",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "Use recovery code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "Six-digit code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "Can't scan it? Type this",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "into your app instead.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/account/MfaSetupModal.vue",
+      "match": "Keep it secret — anyone holding it can generate your codes.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardActivity.vue",
+      "match": "Recent Activity",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardActivity.vue",
+      "match": "No recent member or invite activity yet.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardChart.client.vue",
+      "match": "Member Growth",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardChart.client.vue",
+      "match": "Illustrative data",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardChart.server.vue",
+      "match": "Member Growth",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/[[team]]/dashboard.vue",
+      "match": "Dashboard",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/[[team]]/dashboard.vue",
+      "match": "Notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings.vue",
+      "match": "Account Settings",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/appearance.vue",
+      "match": "Theme",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/appearance.vue",
+      "match": "Choose how Nuxfire looks on this device.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/appearance.vue",
+      "match": "Language",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/appearance.vue",
+      "match": "Choose the language used across Nuxfire.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/index.vue",
+      "match": "Profile",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/index.vue",
+      "match": "This is how you appear across the app.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/index.vue",
+      "match": "Avatar",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/index.vue",
+      "match": "JPG, GIF or PNG. 2MB max.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/index.vue",
+      "match": "Name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/index.vue",
+      "match": "John Doe",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/index.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/index.vue",
+      "match": "Save Profile",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "We'll email you a verification code to confirm the change.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Change Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Two-Factor Authentication",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Disable 2FA",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Enable 2FA",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Sessions",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Sign out of every other browser or device currently signed in to your account.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Sign out other sessions",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Disable two-factor authentication",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "You will only need your password to log in again. You can re-enable it any time.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Disable",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Danger Zone",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Permanently delete your account, credentials and profile. This cannot be undone.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Delete Account",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "This permanently deletes your credentials, every active session, and your profile. Teams you don't own are unaffected; if you are the sole owner of a team with other members, remove them or transfer ownership first.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/account-settings/security.vue",
+      "match": "Permanently Delete",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthAgreement.vue",
+      "match": "By continuing, you agree to our",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthAgreement.vue",
+      "match": "Terms of Service",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthAgreement.vue",
+      "match": "and",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthAgreement.vue",
+      "match": "Privacy Policy",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthIcon.vue",
+      "match": "Nuxfire",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthLayout.vue",
+      "match": "Nuxfire",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthLayout.vue",
+      "match": "Nuxfire Enterprise Security",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthSocialLogin.vue",
+      "match": "GitHub",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthSocialLogin.vue",
+      "match": "Google",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Success",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Error",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Account Email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "name@company.com",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Verification Code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Enter the one-time code sent to your email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "New Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Must be at least 8 characters",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Enter new password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Confirm New Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Confirm new password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Didn't receive the code?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Resend",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Remember your password?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Sign in",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Authentication Failed",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Verification code sent",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Verification Code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Enter the one-time code sent to your inbox",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "name@company.com",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Enter password (optional for code sign-in)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Or continue with",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Forgot password?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Didn't receive a code?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Resend",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Return to email sign in",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Don't have an account?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Create account",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Registration Error",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Confirmation Sent",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Verification Code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Enter the one-time code sent to your email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Work Email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "name@company.com",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Must be at least 8 characters",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Create a strong password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Confirm Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Confirm your password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Or register with",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Already have an account?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Sign in",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "David Kim",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "Lisa Thompson",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "James Wilson",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "Sarah Johnson",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "Michael Chen",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "MFA Elevated (30m)",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "Acme Cloud Inc.",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "acme-cloud",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "PRO TIER",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "Globex Labs",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "globex-labs",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "ENTERPRISE",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "Initech Dev",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "initech-dev",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "FREE TIER",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "useDB().select({ memberCount: count() }).groupBy()",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "AuditLog: append-only",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingDatabaseArchitecture.vue",
+      "match": "20 PostgreSQL Tables • Drizzle ORM",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingFolderStructure.vue",
+      "match": "nuxfire — Bun Monorepo",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingFolderStructure.vue",
+      "match": "Nuxt 4 + SST v4",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingPricing.vue",
+      "match": "Monorepo Enterprise",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/landing/LandingUseCases.vue",
+      "match": "$ bun run deploy",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/layout/LayoutFooter.vue",
+      "match": "Nuxfire",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/components/navigation/NavigationBar.vue",
+      "match": "Nuxfire",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/pages/docs/[...slug].vue",
+      "match": "content",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/pages/docs/[...slug].vue",
+      "match": ".md",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/AdminDataTable.vue",
+      "match": "Display",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/AdminDataTable.vue",
+      "match": "of",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/AdminDataTable.vue",
+      "match": "row(s) selected.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/ReactivateModal.vue",
+      "match": "Members regain access to this company immediately.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/ReactivateModal.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/ReactivateModal.vue",
+      "match": "Reactivate",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/SuspendModal.vue",
+      "match": "Members lose access to this company immediately. You can reactivate it at any time.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/SuspendModal.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/SuspendModal.vue",
+      "match": "Suspend",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "Replay this message?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "The message goes back to the job queue and is processed again from the start.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "Replay",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "Company:",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/layouts/admin.vue",
+      "match": "Nuxfire",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/layouts/admin.vue",
+      "match": "Admin",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/audit-log.vue",
+      "match": "Audit Log",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/audit-log.vue",
+      "match": "Refresh",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Back",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Reactivate",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Suspend",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Company",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Subscription",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Status",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "This company has no members.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "No subscription on record.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/index.vue",
+      "match": "Companies",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/index.vue",
+      "match": "Filter status",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/index.vue",
+      "match": "Refresh",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/index.vue",
+      "match": "Overview",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/index.vue",
+      "match": "Manage companies",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/index.vue",
+      "match": "Recent Companies",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/index.vue",
+      "match": "No companies yet.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Queue",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Refresh",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Cron logs",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "The 20 most recent platform cron runs.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Dead letter queue",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Messages that exhausted every retry. Replaying sends one back to the job queue.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Pro",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Tier",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "PRO",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Description",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Everything a growing team needs",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Provider",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Select a provider",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Period",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Select a period",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Amount",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Currency",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Select a currency",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Price",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Provider price ID",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "price_...",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Max seats",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Unlimited",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Add feature",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Feature name (e.g. WhatsApp numbers, Storage)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Value (e.g. 5, Unlimited, true)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Remove feature",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Stripe Price:",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "— changing the amount, currency or period creates a new Price and archives this one.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Features & Limits",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Extra fields and quotas displayed in the comparison table.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "No custom features added. Click \"Add feature\" to configure extra fields for this plan.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/admin/plans/CreateEditModal.vue",
+      "match": "Preview",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingComparisonTable.vue",
+      "match": "No plans available for the selected billing cycle.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingComparisonTable.vue",
+      "match": "Features & Limits",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingComparisonTable.vue",
+      "match": "Current",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingComparisonTable.vue",
+      "match": "No specific features listed for these plans.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingPeriodToggle.vue",
+      "match": "Billing cycle",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingPortalActions.vue",
+      "match": "Manage Billing",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingPortalActions.vue",
+      "match": "Cancel Subscription",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Refresh",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Settings",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Billing",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Your plan, add-ons, payment methods, and invoices.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Try again",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Plans",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Compare plans and manage your subscription.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/admin/plans/index.vue",
+      "match": "Plans",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/admin/plans/index.vue",
+      "match": "Show archived",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/admin/plans/index.vue",
+      "match": "Setup Stripe portal",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/admin/plans/index.vue",
+      "match": "New plan",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Search cards...",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Column name...",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Save column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Add column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Search",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "column(s)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "card(s)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "(filtrando)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "New column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoardCreateModal.vue",
+      "match": "New board",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoardCreateModal.vue",
+      "match": "Name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoardCreateModal.vue",
+      "match": "Board name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoardCreateModal.vue",
+      "match": "Create",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanCard.vue",
+      "match": "Delete card",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumn.vue",
+      "match": "Add card...",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumn.vue",
+      "match": "Add card",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumn.vue",
+      "match": "card(s)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumn.vue",
+      "match": "Nenhum card",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Save",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Edit column name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Edit column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Delete column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/[boardId].vue",
+      "match": "All boards",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/index.vue",
+      "match": "Kanban",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/index.vue",
+      "match": "Board options",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/index.vue",
+      "match": "New board",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/index.vue",
+      "match": "Abrir board",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/components/NotificationsSlideover.vue",
+      "match": "Notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/components/NotificationsSlideover.vue",
+      "match": "No notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/account-settings/notifications.vue",
+      "match": "Receive notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/account-settings/notifications.vue",
+      "match": "Want to receive notifications?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Live notification demo",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "This Starter Kit ships a full real-time notification pipeline: a database row plus a WebSocket push over Cloudflare Durable Objects. Pick a team member below and send them a notification — it lands instantly in their bell, in the top bar of the team dashboard, with no page refresh.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Choose a team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Member",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Choose a member",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Title",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Welcome aboard!",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Message",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Your team just hit 10 members 🎉",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Send notification",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamCreateModal.vue",
+      "match": "Create Team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamCreateModal.vue",
+      "match": "Team Name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamCreateModal.vue",
+      "match": "Enter team name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamCreateModal.vue",
+      "match": "Slug",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamCreateModal.vue",
+      "match": "Enter team slug",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamCreateModal.vue",
+      "match": "Create",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamInvitesListItem.vue",
+      "match": "Invited by",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamSwitcher.vue",
+      "match": "Team Settings",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamSwitcher.vue",
+      "match": "Select a Team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamSwitcher.vue",
+      "match": "Create new team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamSwitcher.vue",
+      "match": "No teams yet",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamSwitcher.vue",
+      "match": "Create your first team to get started",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/components/TeamSwitcher.vue",
+      "match": "Create New Team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings.vue",
+      "match": "Settings",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/index.vue",
+      "match": "General",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/index.vue",
+      "match": "These informations will be displayed publicly.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/index.vue",
+      "match": "Save changes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/index.vue",
+      "match": "Team Avatar",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/index.vue",
+      "match": "Team Name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "Email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "Enter an email to invite",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "Role",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "Invite People",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "Invite",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "No team members yet",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "Invite people to join your team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "No pending invites",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/members.vue",
+      "match": "Invite team members to collaborate",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/security.vue",
+      "match": "Delete Team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/security.vue",
+      "match": "Once you delete a team, there is no going back. Please be certain.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/security.vue",
+      "match": "Delete this team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/security.vue",
+      "match": "Are you sure you want to delete this team? This action is irreversible.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/security.vue",
+      "match": "No",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/[[team]]/settings/security.vue",
+      "match": "Yes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/invite/[[id]].vue",
+      "match": "Invite not found",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/invite/[[id]].vue",
+      "match": "The invite doesn't exist or has expired.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/invite/[[id]].vue",
+      "match": "Team Invite",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/invite/[[id]].vue",
+      "match": "Invited by",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/invite/[[id]].vue",
+      "match": "You've been invited to join this team as a",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/invite/[[id]].vue",
+      "match": "Decline",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/invite/[[id]].vue",
+      "match": "Accept",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/teams/app/pages/select-team.vue",
+      "match": "Teams",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.architecture.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.architecture.translationRest",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.seniorPersona.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.b2b.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.b2b.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.b2b.examples.2",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.b2b.examples.3",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.realtime.superpower",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.ai.superpower",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.micro.superpower",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.enterprise.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.enterprise.examples.1",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.enterprise.examples.2",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.items.api.superpower",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.banner.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.banner.descriptionCost",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.banner.environments.stage.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.useCases.banner.environments.prod.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.metrics.timeValue",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.metrics.missingValue",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.searchPlaceholder",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.features.adminAccounts.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.features.realtimeNotifications.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.features.contentSearch.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.features.infraServerless.name",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.features.infraServerless.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.comparison.features.infraPooling.name",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.testimonials.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.testimonials.items.item2.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.testimonials.items.item3.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.testimonials.items.item5.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.testimonials.items.item7.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.testimonials.items.item8.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.avatars.validated",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.databaseArchitecture.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.databaseArchitecture.metrics.tables.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.databaseArchitecture.metrics.hyperdrive.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.databaseArchitecture.metrics.kvAuth.value",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.databaseArchitecture.adminConsole.features.2.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.databaseArchitecture.summaryCallout.tail",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.faqs.items.item1.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.faqs.items.item3.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.faqs.items.item4.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.faqs.items.item6.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.faqs.items.item7.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.pricing.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.pricing.earlyBirdNote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.pricing.neverMonthly",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.pricing.guarantee.projects",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.pricing.guarantee.github",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.pricing.features.auth.text",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.pricing.features.database.text",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.pricing.features.storage.text",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.showcase.features.membersArea.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.showcase.features.membersArea.point1",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.showcase.features.membersArea.point2",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "en:landing.showcase.features.engineering.desc",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.architecture.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.seniorPersona.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.items.b2b.examples.2",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.items.b2b.examples.3",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.items.realtime.superpower",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.items.enterprise.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.items.enterprise.prompt",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.items.enterprise.examples.1",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.items.enterprise.examples.2",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.items.api.superpower",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.banner.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.banner.descriptionLead",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.banner.descriptionCost",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.banner.environments.stage.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.useCases.banner.environments.prod.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.badge",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.metrics.timeValue",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.metrics.missingValue",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.searchPlaceholder",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.columns.scratch",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.status.missing",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.features.teamsInvites.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.features.realtimeNotifications.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.features.contentSearch.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.comparison.features.infraServerless.name",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.testimonials.items.item2.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.testimonials.items.item3.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.testimonials.items.item5.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.testimonials.items.item8.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.avatars.validated",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.databaseArchitecture.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.databaseArchitecture.metrics.tables.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.databaseArchitecture.metrics.hyperdrive.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.databaseArchitecture.metrics.kvAuth.value",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.databaseArchitecture.adminConsole.features.4.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.databaseArchitecture.tableDictionaryTitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.databaseArchitecture.tablesList.teamInvite.role",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.databaseArchitecture.summaryCallout.tail",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.faqs.items.item1.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.faqs.items.item3.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.faqs.items.item6.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.faqs.items.item7.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.pricing.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.pricing.earlyBirdNote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.pricing.neverMonthly",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.pricing.guarantee.refund",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.pricing.guarantee.projects",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.pricing.guarantee.github",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.showcase.features.membersArea.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.showcase.features.engineering.desc",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "pt-br:landing.showcase.cta",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.architecture.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.seniorPersona.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.items.b2b.examples.3",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.items.enterprise.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.items.enterprise.prompt",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.items.enterprise.examples.1",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.items.enterprise.examples.2",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.banner.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.banner.descriptionCost",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.useCases.banner.environments.stage.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.comparison.subtitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.comparison.metrics.timeValue",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.comparison.metrics.missingValue",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.comparison.searchPlaceholder",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.comparison.features.teamsInvites.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.comparison.features.realtimeNotifications.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.comparison.features.contentSearch.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.comparison.features.infraServerless.name",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.testimonials.items.item3.quote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.avatars.validated",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.databaseArchitecture.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.databaseArchitecture.metrics.kvAuth.value",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.databaseArchitecture.adminConsole.features.2.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.databaseArchitecture.adminConsole.features.4.description",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.databaseArchitecture.tableDictionaryTitle",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.databaseArchitecture.tablesList.teamInvite.role",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.databaseArchitecture.summaryCallout.tail",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.faqs.items.item1.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.faqs.items.item4.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.faqs.items.item7.answer",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.pricing.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.pricing.earlyBirdNote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.pricing.neverMonthly",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.pricing.guarantee.refund",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.pricing.guarantee.projects",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.pricing.guarantee.github",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.showcase.features.membersArea.title",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.showcase.features.engineering.desc",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "claim-unproven",
+      "where": "es:landing.showcase.cta",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "urgency-unproven",
+      "where": "en:landing.pricing.earlyBirdNote",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item1",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item2",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item3",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item4",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item5",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item6",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item7",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item8",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "/static/N4aA96n.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "/static/AVQ0V28X.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "/static/VUMBKh1U.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "/static/xZ4wg2Xj.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingAvatars.vue",
+      "match": "/static/FJkauyEa.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingTestimonials.vue",
+      "match": "/static/xZ4wg2Xj.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingTestimonials.vue",
+      "match": "/static/FJkauyEa.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingTestimonials.vue",
+      "match": "/static/KtCFjlD4.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingTestimonials.vue",
+      "match": "/static/N4aA96n.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingTestimonials.vue",
+      "match": "/static/AVQ0V28X.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingTestimonials.vue",
+      "match": "/static/VUMBKh1U.jpeg",
+      "removedBy": "BACKLOG-landing-refactor",
+      "since": "2026-09-25"
+    }
+  ]
+}

@@ -88,15 +88,21 @@ export default defineNuxtConfig({
     prerender: {
       routes: ["/", ...docsRoutes(), ...blogRoutes()],
       crawlLinks: true,
+      // The legacy URLs are answered by `public/_redirects` (301). A prerendered page for
+      // them would be an empty page or a meta refresh stub, which is not a redirect.
+      ignore: [
+        /^\/docs\/(?:pro|nuxfire|production)\/?$/,
+        /^\/(?:pt-br|es)\/(?:license|privacy-policy|terms-of-service)\/?$/,
+      ],
     },
   },
   routeRules: {
-    "/docs/pro": { redirect: { to: "/docs/saas-starter-kit", statusCode: 302 } },
-    "/docs/nuxfire": { redirect: { to: "/docs/saas-starter-kit", statusCode: 302 } },
-    "/docs/production": { redirect: { to: "/docs/saas-starter-kit", statusCode: 301 } },
+    // Moved URLs are redirected by apps/web/public/_redirects with a 301 (Cloudflare answers it
+    // before an asset is served). A `redirect` route rule here would prerender a meta refresh
+    // page, which is a 200, not a redirect (SPEC-0002 FR-007).
     // The legal pages are English-only and have no localized routes (`i18n: false`, see
-    // pages/license.vue). Their /pt-br/... and /es/... URLs used to serve an empty page that
-    // was indexed and listed in the sitemap, so they now redirect to the real page.
+    // pages/license.vue): their /pt-br/... and /es/... URLs used to serve an empty page that
+    // was indexed and listed in the sitemap, and `_redirects` now sends them to the real page.
     // /signup only redirects the visitor to the app: it must not be indexed nor listed in the
     // sitemap (the robots module removes noindex routes from it).
     ...Object.fromEntries(
@@ -104,14 +110,6 @@ export default defineNuxtConfig({
         locale.code === "en" ? "/signup" : `/${locale.code}/signup`,
         { robots: false },
       ]),
-    ),
-    ...Object.fromEntries(
-      ["license", "privacy-policy", "terms-of-service"].flatMap((page) =>
-        CONTENT_LOCALES.filter((locale) => locale.code !== "en").map((locale) => [
-          `/${locale.code}/${page}`,
-          { redirect: { to: `/${page}`, statusCode: 301 } },
-        ]),
-      ),
     ),
   },
   runtimeConfig: {

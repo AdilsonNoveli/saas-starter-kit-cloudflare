@@ -8,6 +8,7 @@ import {
   buildPageSeo,
   contentNotFound,
   hreflangLinks,
+  lastmodWithTime,
   ogLocale,
   OG_IMAGE_SIZE,
   sitemapEntryFor,
@@ -440,5 +441,25 @@ describe("missing docs pages (AC-006)", () => {
   // SPECSFY: US-001 FR-001 FR-007 NFR-001 AC-006
   it("does not require a body unless asked to", () => {
     expect(contentNotFound({ title: "x" }, { path: "/docs/x" })).toBeNull();
+  });
+});
+
+describe("sitemap lastmod with a time (SPEC-0002 DEC-011)", () => {
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  it("adds midnight UTC to a date-only lastmod, the meaning DEC-005 gives a date without a time", () => {
+    const xml = "<urlset><url><loc>https://a/x</loc><lastmod>2026-09-25</lastmod></url></urlset>";
+    expect(lastmodWithTime(xml)).toBe("<urlset><url><loc>https://a/x</loc><lastmod>2026-09-25T00:00:00Z</lastmod></url></urlset>");
+  });
+
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  it("leaves a lastmod that already has a time, and a url without lastmod, unchanged", () => {
+    const xml = "<urlset><url><loc>https://a/x</loc><lastmod>2026-09-25T10:00:00-03:00</lastmod></url><url><loc>https://a/y</loc></url></urlset>";
+    expect(lastmodWithTime(xml)).toBe(xml);
+  });
+
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  it("rewrites every date-only lastmod of a sitemap", () => {
+    const xml = "<lastmod>2026-09-15</lastmod><lastmod>2026-09-25</lastmod>";
+    expect(lastmodWithTime(xml)).toBe("<lastmod>2026-09-15T00:00:00Z</lastmod><lastmod>2026-09-25T00:00:00Z</lastmod>");
   });
 });

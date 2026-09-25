@@ -170,3 +170,41 @@ describe("every specialist has the structure agents rely on (AC-008)", () => {
     expect(files).toContain("new-post-recipe.md");
   });
 });
+
+// ---------------------------------------------------------------------------------
+// SPEC-0002: the three specialists of performance, search and copy (AC-011, T022)
+// ---------------------------------------------------------------------------------
+
+const THREE = [
+  { name: "fireskill-specialist-web-performance", tags: ["performance", "web-vitals", "budgets"], files: ["apps/web/nuxt.config.ts"] },
+  { name: "fireskill-specialist-seo", tags: ["seo", "sitemap", "structured-data"], files: ["apps/web/nuxt.config.ts"] },
+  { name: "fireskill-specialist-copywriting", tags: ["copy", "microcopy", "claims"], files: ["apps/web/i18n/locales/en.json"] },
+] as const;
+
+describe("the specialists of performance, search and copy are registered (AC-011)", () => {
+  // SPECSFY: US-006 FR-001 FR-003 FR-008 FR-012 NFR-007 AC-011
+  it.each(THREE)("registers $name in catalog.json with tags and what it detects", ({ name, tags, files }) => {
+    const entry = catalog.skills.find((skill) => skill.name === name);
+    expect(entry, `${name} is not in catalog.json`).toBeDefined();
+    expect(entry?.description.length).toBeGreaterThan(60);
+    expect(entry?.tags).toEqual(expect.arrayContaining([...tags]));
+    for (const file of files) expect(entry?.detect.files).toContain(file);
+  });
+
+  // SPECSFY: US-006 FR-001 FR-003 FR-008 FR-012 NFR-007 AC-011
+  it.each(THREE)("routes to $name from fireskills/SKILL.md", ({ name }) => {
+    expect(read("fireskills/SKILL.md")).toContain(name);
+  });
+
+  // SPECSFY: US-006 FR-001 FR-003 FR-008 FR-012 NFR-007 AC-011
+  it("places the three among the Nuxfire stack specialists of the README", () => {
+    const readme = read("fireskills/README.md");
+    const stack = readme.slice(readme.indexOf("### Nuxfire Stack"), readme.indexOf("### Engineering"));
+    for (const { name } of THREE) expect(stack, name).toContain(name);
+  });
+
+  // SPECSFY: US-006 FR-001 FR-003 FR-008 FR-012 NFR-007 AC-011
+  it("counts 38 specialists", () => {
+    expect(catalog.skills.length).toBe(38);
+  });
+});

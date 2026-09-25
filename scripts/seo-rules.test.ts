@@ -565,12 +565,14 @@ describe("pages that must not be indexed (AC-005)", () => {
   });
 
   // SPECSFY: US-004 FR-008 US-001 FR-001 AC-005
+  // SPEC-0002 FR-004: the stub is exempt from the content rules (title, h1, image) but it is
+  // itself reported as `no-meta-refresh`.
   it("exempts a meta refresh redirect stub from the content rules", () => {
     const stub: PageHtml = {
       url: "/docs/pro",
       html: '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/docs/saas-starter-kit"></head></html>',
     };
-    expect(auditPage(stub, auditCtx)).toEqual([]);
+    expect(auditPage(stub, auditCtx).map((v) => v.rule)).toEqual(["no-meta-refresh"]);
     expect(auditSite([...clusterPages(), stub], cleanSitemap(), auditCtx)).toEqual([]);
   });
 
@@ -622,12 +624,16 @@ describe("build audit of the whole site (AC-005)", () => {
     expect(rules(auditSite(pages, cleanSitemap(), auditCtx))).not.toContain("title-unique");
   });
 
-  // SPECSFY: US-004 FR-008 US-003 FR-005 AC-005
-  it("accepts a date-only lastmod and rejects one that is not a W3C Datetime", () => {
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  // SPEC-0002 DEC-011 supersedes the date-only acceptance of SPEC-0001 DEC-013: Bing asks for
+  // a date and a time in the sitemap lastmod.
+  it("requires a lastmod with date, time and timezone", () => {
     const withLastmod = (lastmod: string) => cleanSitemap().map((entry) => ({ ...entry, lastmod }));
-    expect(rules(auditSite(clusterPages(), withLastmod("2026-09-25"), auditCtx))).not.toContain("sitemap-lastmod");
-    expect(rules(auditSite(clusterPages(), withLastmod("25/09/2026"), auditCtx))).toContain("sitemap-lastmod");
-    expect(rules(auditSite(clusterPages(), withLastmod("2026-09-25T10:00"), auditCtx))).toContain("sitemap-lastmod");
+    expect(rules(auditSite(clusterPages(), withLastmod("2026-09-25T00:00:00Z"), auditCtx))).not.toContain("sitemap-lastmod-datetime");
+    expect(rules(auditSite(clusterPages(), withLastmod("2026-09-25T10:00:00-03:00"), auditCtx))).not.toContain("sitemap-lastmod-datetime");
+    expect(rules(auditSite(clusterPages(), withLastmod("2026-09-25"), auditCtx))).toContain("sitemap-lastmod-datetime");
+    expect(rules(auditSite(clusterPages(), withLastmod("25/09/2026"), auditCtx))).toContain("sitemap-lastmod-datetime");
+    expect(rules(auditSite(clusterPages(), withLastmod("2026-09-25T10:00"), auditCtx))).toContain("sitemap-lastmod-datetime");
   });
 
   // SPECSFY: US-004 FR-008 US-003 FR-004 AC-005
@@ -782,6 +788,9 @@ function run(site: Site, extra: string[] = []) {
     quote(site.publicDir),
     "--output",
     quote(site.output),
+    // the repository's own allowances must not leak into a fixture site
+    "--config",
+    quote(join(site.publicDir, "no-such-seo-config.json")),
     ...extra.map(quote),
   ].join(" ");
   const result = spawnSync(command, { encoding: "utf8", shell: true });
@@ -937,5 +946,97 @@ describe("the gate needs no dependency (NFR-002)", () => {
     };
     const all = Object.keys({ ...manifest.dependencies, ...manifest.devDependencies });
     expect(all.filter((name) => /yaml/i.test(name))).toEqual([]);
+  });
+});
+
+
+// ---------------------------------------------------------------------------------
+// SPEC-0002: search rules on the built output (AC-004, T006-T008)
+// ---------------------------------------------------------------------------------
+
+describe("sitemap freshness and robots (AC-004)", () => {
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  it("checks the lastmod of every sitemap URL, not only of the posts", () => {
+    const docs = page({}, "/docs/x");
+    const sitemap = [...cleanSitemap(), { loc: `${SITE}/docs/x`, lastmod: "2026-09-25", alternatives: [] }];
+    const found = auditSite([...clusterPages(), docs], sitemap, auditCtx);
+    expect(found.filter((v) => v.rule === "sitemap-lastmod-datetime").map((v) => v.where)).toContain("/docs/x");
+  });
+
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  it("keeps sitemap-lastmod for a post that has none", () => {
+    const sitemap = cleanSitemap().map((entry) => ({ ...entry, lastmod: undefined }));
+    expect(rules(auditSite(clusterPages(), sitemap, auditCtx))).toContain("sitemap-lastmod");
+  });
+
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  it("requires robots.txt to list a sitemap of the site when robots.txt is given", () => {
+    const without = { ...auditCtx, robotsTxt: "User-agent: *\nDisallow:\n" };
+    expect(rules(auditSite(clusterPages(), cleanSitemap(), without))).toContain("robots-sitemap");
+    const other = { ...auditCtx, robotsTxt: "Sitemap: https://elsewhere.com/sitemap.xml\n" };
+    expect(rules(auditSite(clusterPages(), cleanSitemap(), other))).toContain("robots-sitemap");
+    const good = { ...auditCtx, robotsTxt: `User-agent: *\nSitemap: ${SITE}/sitemap_index.xml\n` };
+    expect(rules(auditSite(clusterPages(), cleanSitemap(), good))).not.toContain("robots-sitemap");
+    expect(rules(auditSite(clusterPages(), cleanSitemap(), auditCtx))).not.toContain("robots-sitemap");
+  });
+});
+
+describe("redirect stubs, canonical sitemap URLs and placeholder titles (AC-004)", () => {
+  const stub = (url: string): PageHtml => ({
+    url,
+    html: '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/docs"></head></html>',
+  });
+
+  // SPECSFY: US-002 FR-004 FR-007 NFR-001 AC-004
+  it("rejects a page that is only a meta refresh", () => {
+    const found = auditPage(stub("/docs/pro"), auditCtx);
+    expect(rules(found)).toEqual(["no-meta-refresh"]);
+    expect(found[0].where).toBe("/docs/pro");
+  });
+
+  // SPECSFY: US-002 FR-004 FR-007 NFR-001 AC-004
+  it("rejects a sitemap URL whose page declares another canonical", () => {
+    const pages = clusterPages();
+    pages[0] = { ...pages[0], html: pages[0].html.replace(`<link rel="canonical" href="${postUrl(CLUSTER.en)}">`, `<link rel="canonical" href="${SITE}/blog/other">`) };
+    expect(rules(auditSite(pages, cleanSitemap(), auditCtx))).toContain("sitemap-canonical");
+    expect(rules(auditSite(clusterPages(), cleanSitemap(), auditCtx))).not.toContain("sitemap-canonical");
+  });
+
+  // SPECSFY: US-002 FR-004 FR-007 NFR-001 AC-004
+  it("rejects a title that matches a configured placeholder", () => {
+    const ctx = { ...auditCtx, placeholderTitles: ["Demo SaaS"] };
+    const found = auditPage(page({ title: "Demo SaaS | Nuxfire" }), ctx);
+    expect(rules(found)).toContain("title-not-placeholder");
+    expect(rules(auditPage(page({ title: "Git for Your First Release | Nuxfire" }), ctx))).not.toContain("title-not-placeholder");
+    expect(rules(auditPage(page({ title: "Demo SaaS | Nuxfire" }), auditCtx))).not.toContain("title-not-placeholder");
+  });
+});
+
+describe("structured data that cannot be honest (AC-004)", () => {
+  const withLd = (node: unknown): PageHtml =>
+    page({ jsonLd: { "@context": "https://schema.org", "@graph": [blogPosting(), node] } });
+
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  it("rejects FAQPage markup: Google stopped showing FAQ rich results on 2026-05-07", () => {
+    const found = auditPage(withLd({ "@type": "FAQPage", mainEntity: [] }), auditCtx);
+    expect(rules(found)).toContain("jsonld-no-faq");
+    const array = auditPage(withLd({ "@type": ["WebPage", "FAQPage"] }), auditCtx);
+    expect(rules(array)).toContain("jsonld-no-faq");
+  });
+
+  // SPECSFY: US-002 US-004 FR-004 FR-009 NFR-001 AC-004
+  it("rejects a rating or a review unless the ledger proves reviews exist", () => {
+    const rated = withLd({ "@type": "SoftwareApplication", name: "Nuxfire", aggregateRating: { "@type": "AggregateRating", ratingValue: 5 } });
+    expect(rules(auditPage(rated, auditCtx))).toContain("jsonld-no-unproven-rating");
+    const reviewed = withLd({ "@type": "Product", name: "Nuxfire", review: [{ "@type": "Review" }] });
+    expect(rules(auditPage(reviewed, auditCtx))).toContain("jsonld-no-unproven-rating");
+    expect(rules(auditPage(rated, { ...auditCtx, provenReviews: true }))).not.toContain("jsonld-no-unproven-rating");
+  });
+
+  // SPECSFY: US-002 FR-004 NFR-001 AC-004
+  it("does not flag a page whose JSON-LD is only an article and a breadcrumb", () => {
+    const ok = auditPage(withLd({ "@type": "BreadcrumbList", itemListElement: [] }), auditCtx);
+    expect(rules(ok)).not.toContain("jsonld-no-faq");
+    expect(rules(ok)).not.toContain("jsonld-no-unproven-rating");
   });
 });

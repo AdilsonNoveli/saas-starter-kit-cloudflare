@@ -309,6 +309,15 @@ export function hreflangLinks(post: BlogPostInput, ctx: SeoContext): AlternateLi
   return links;
 }
 
+/**
+ * The sitemap module writes a midnight-UTC lastmod as a bare date (`2026-09-25`), dropping the
+ * time. Bing asks for ISO 8601 with date and time (Bing Webmaster blog, 2025-07-31), so a
+ * date-only value gets the meaning DEC-005 already gives a date without a time: midnight UTC.
+ */
+export function lastmodWithTime(sitemapXml: string): string {
+  return sitemapXml.replace(/<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/g, "<lastmod>$1T00:00:00Z</lastmod>");
+}
+
 /** `lastmod` and alternatives of a post for the sitemap (`updated`, else `date`). */
 export function sitemapEntryFor(
   post: BlogPostInput,

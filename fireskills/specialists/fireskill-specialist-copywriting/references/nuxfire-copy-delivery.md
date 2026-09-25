@@ -42,7 +42,8 @@ Where the text of the products lives, what the gate checks, and the state of the
   is not done.
 - **No structured review of the transactional emails** for voice or language: they are React
   templates that were not audited by the gate (it scans `.vue`).
-- **No raw copywriting material in the repository**: the owner's local folder was removed from
-  the machine and never committed; the pattern library was built without it
-  (`references/pattern-library.md` explains the consequence).
+- **No raw copywriting material in the repository**: the owner's local folder `docs/copywiter/`
+  is untracked and is never committed; the pattern library was distilled from it (all 37 files read
+  on 2026-09-25) and passes the originality check, so the folder can be deleted once the library
+  is committed (`references/pattern-library.md` explains what was kept and what was left out).
 - **No test of any copy on real visitors**: no A/B or preference test has been run.

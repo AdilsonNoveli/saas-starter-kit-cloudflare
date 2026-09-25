@@ -17,8 +17,8 @@ of this codebase. Never work from memory: work through the framework.
 ## Core Working Rules
 
 - **Every human-readable text in the apps** (interface labels and buttons, empty states, errors and
-  permission messages, landing and pricing copy, blog voice, transactional emails, notifications, legal
-  text, testimonials and any claim about the product) passes through
+  permission messages, landing and pricing copy, blog voice, transactional emails, notifications, docs, legal
+  text, testimonials and any claim about the product; not the names of menus, tools and features) passes through
   `fireskill-specialist-copywriting`; no number, comparison, guarantee, deadline or testimonial is
   written without a record in `.fireskills/CLAIMS.yml`. Page weight belongs to
   `fireskill-specialist-web-performance` and what search engines require to `fireskill-specialist-seo`.

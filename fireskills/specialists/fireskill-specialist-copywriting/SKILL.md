@@ -7,10 +7,21 @@ description: The pass that every text a human reads in a Nuxfire product goes th
 
 Copy is engineering here: it has an audience, a brief, a source for every claim, a review, and a
 gate. The rule of the repository (`AGENTS.md`) is that **text written for a human to read in the
-apps passes through this specialist**. What counts as such text is decided in SPEC-0002 DEC-014,
-which the owner has not yet confirmed (Q-02): interface strings, marketing pages, blog posts,
-legal text, transactional emails, notifications and messages shown to users are covered; docs are
-covered for voice and clarity only; code comments, logs and developer-only console output are not.
+apps passes through this specialist**. Scope, confirmed by the owner on 2026-09-25 (SPEC-0002 DEC-014):
+everything that reaches the user as text, whether it teaches, notifies or sells: interface strings,
+marketing pages, blog posts, docs, legal text, transactional emails, notifications, errors, empty states.
+**Outside the pass**: names of menus, tools and features, product and proper names, commands and code
+identifiers (they stay short, consistent and conventional; they still live in the locale files), and
+code comments, logs and developer-only console output.
+
+Good copy improves communication in all three registers, but the goal differs, and the techniques
+must not leak from one to the other:
+
+| Register | Where | Goal | Not allowed |
+| --- | --- | --- | --- |
+| Persuade | landing, pricing, blog headlines, invitations | move a reader who has not decided, with proof | any claim without a ledger record |
+| Teach or guide | docs, onboarding, empty states, errors, tooltips | the reader understands and completes the task | hooks, curiosity gaps, urgency: here clarity is the whole job |
+| Notify | emails, toasts, notifications | say who did what, and what to do next | marketing claims, pressure, vague alarms |
 
 ## When to Use
 

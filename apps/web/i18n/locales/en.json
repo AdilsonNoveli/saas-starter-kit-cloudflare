@@ -129,7 +129,7 @@
       "seniorPersona": {
         "badge": "Fireskills Engine • Your Senior Engineer",
         "title": "A Multi-Skilled Senior Engineer Ready to Work Inside Your IDE",
-        "description": "Fireskills is Nuxfire's robust, fail-safe builder. Powered by 35 verified domain specialists, it acts as a tireless Senior Software Engineer: transforming raw ideas into normative BDD contracts, requiring automated tests that fail before coding (TDD), and implementing features across Nuxt 4, SST, Drizzle, and Cloudflare with zero hallucinations and architectural rigor.",
+        "description": "Fireskills is Nuxfire's robust, fail-safe builder. Powered by 38 verified domain specialists, it acts as a tireless Senior Software Engineer: transforming raw ideas into normative BDD contracts, requiring automated tests that fail before coding (TDD), and implementing features across Nuxt 4, SST, Drizzle, and Cloudflare with zero hallucinations and architectural rigor.",
         "cta": "Explore the 6 steps below and be surprised by how simple and fast it is:"
       },
       "items": {
@@ -187,11 +187,11 @@
         },
         "enterprise": {
           "category": "Step 05 • Specialists",
-          "title": "Implementation by 35 Specialists",
+          "title": "Implementation by 38 Specialists",
           "description": "Domain specialists in Nuxt 4, SST, Drizzle, tRPC, and Cloudflare write surgical code until all automated tests turn green.",
           "prompt": "Use $fireskill-07-implement to code task 1 with the Drizzle and tRPC specialists.",
           "examples": {
-            "1": "35 Specialists",
+            "1": "38 Specialists",
             "2": "100% Type-Safe",
             "3": "Phases 1..3",
             "4": "Green Tests"

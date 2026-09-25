@@ -133,9 +133,9 @@ Three specialists an agent must load, and gates that make the rules mechanical, 
 
 #### Open Questions
 
-- **Q-01** (blocks T049, T050): may the owner's material be redistributed or adapted, and may the raw files stay out of the delivered repository (ignored by git), with the two committed files removed from the tree? First question asked to the owner.
-- **Q-02** (blocks T051): confirm the scope of "text a human reads in the apps" (DEC-014).
-- **Q-03** (blocks T051): markets and jurisdictions whose consumer rules apply (this spec read US, EU and Brazil).
+- **Q-01** (blocks T049, T050): may the owner's material be redistributed or adapted, and may the raw files stay out of the delivered repository (ignored by git), with the two committed files removed from the tree? **Answered 2026-09-25**: the material is local only, it does not go into git, and the two committed files are removed (done in commit 6096621); the owner deleted the folder from the machine, and asked not to add it to `.gitignore`.
+- **Q-02** (blocks T051): confirm the scope of "text a human reads in the apps" (DEC-014). **Not answered**: DEC-014 was applied as the default and is reported to the owner as an assumption.
+- **Q-03** (blocks T051): markets and jurisdictions whose consumer rules apply (this spec read US, EU and Brazil). **Not answered**: the three markets were applied as the default and are reported as an assumption.
 - **Q-04** (blocks SPEC-0003, not this spec): are the testimonials and the "40+ devs" statement real, and what is the evidence?
 - **Q-05** (blocks T041): explicit authorization to deploy the redirect and trailing-slash fix to production and to run the live audit and, later, IndexNow submissions.
 - **Q-06** (blocks SPEC-0003): the single conversion action and the primary audience of the landing.
@@ -653,25 +653,25 @@ apps/web/public/_redirects
 
 | Requirement | BDD Scenario | Level | Test File/Command | Evidence |
 | --- | --- | --- | --- | --- |
-| FR-001 | AC-011 | Integration | scripts/specialists-catalog.test.ts | Pending |
-| FR-002 | AC-001, AC-002, AC-003 | Unit | scripts/perf-rules.test.ts | Pending |
-| FR-003 | AC-011 | Integration | scripts/specialists-catalog.test.ts | Pending |
-| FR-004 | AC-004 | Unit | scripts/seo-rules.test.ts | Pending |
-| FR-005 | AC-005 | Integration | scripts/seo-live.test.ts | Pending |
-| FR-006 | AC-006 | Unit | scripts/indexnow.test.ts | Pending |
-| FR-007 | AC-004, AC-005 | Integration | scripts/redirects.test.ts, scripts/seo-live.test.ts | Pending |
-| FR-008 | AC-011 | Integration | scripts/content-docs-drift.test.ts | Pending |
-| FR-009 | AC-007, AC-009 | Unit | scripts/copy-rules.test.ts | Pending |
-| FR-010 | AC-007, AC-008, AC-009 | Unit | scripts/copy-rules.test.ts | Pending |
-| FR-011 | AC-010 | Unit | scripts/copy-patterns.test.ts | Pending |
-| FR-012 | AC-011 | Integration | scripts/content-docs-drift.test.ts | Pending |
-| NFR-001 | AC-001, AC-004, AC-007 | Unit | bun run test | Pending |
-| NFR-002 | AC-003, AC-008 | Unit | scripts/perf-rules.test.ts, scripts/copy-rules.test.ts | Pending |
-| NFR-003 | AC-005, AC-006 | Integration | scripts/seo-live.test.ts, scripts/indexnow.test.ts | Pending |
-| NFR-004 | AC-011 | Integration | scripts/gates-dependencies.test.ts | Pending |
-| NFR-005 | AC-010 | Unit | scripts/copy-patterns.test.ts | Pending |
-| NFR-006 | AC-011 | Integration | scripts/specialist-evidence.test.ts | Pending |
-| NFR-007 | AC-011 | Integration | scripts/content-docs-drift.test.ts | Pending |
+| FR-001 | AC-011 | Integration | scripts/specialists-catalog.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-002 | AC-001, AC-002, AC-003 | Unit | scripts/perf-rules.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-003 | AC-011 | Integration | scripts/specialists-catalog.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-004 | AC-004 | Unit | scripts/seo-rules.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-005 | AC-005 | Integration | scripts/seo-live.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-006 | AC-006 | Unit | scripts/indexnow.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-007 | AC-004, AC-005 | Integration | scripts/redirects.test.ts, scripts/seo-live.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-008 | AC-011 | Integration | scripts/content-docs-drift.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-009 | AC-007, AC-009 | Unit | scripts/copy-rules.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-010 | AC-007, AC-008, AC-009 | Unit | scripts/copy-rules.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-011 | AC-010 | Unit | scripts/copy-patterns.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| FR-012 | AC-011 | Integration | scripts/content-docs-drift.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| NFR-001 | AC-001, AC-004, AC-007 | Unit | bun run test | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| NFR-002 | AC-003, AC-008 | Unit | scripts/perf-rules.test.ts, scripts/copy-rules.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| NFR-003 | AC-005, AC-006 | Integration | scripts/seo-live.test.ts, scripts/indexnow.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| NFR-004 | AC-011 | Integration | scripts/gates-dependencies.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| NFR-005 | AC-010 | Unit | scripts/copy-patterns.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| NFR-006 | AC-011 | Integration | scripts/specialist-evidence.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
+| NFR-007 | AC-011 | Integration | scripts/content-docs-drift.test.ts | GREEN 2026-09-25 (`bun run test`, 553 passed) |
 
 ### 13. Validations
 
@@ -691,7 +691,7 @@ apps/web/public/_redirects
 
 - **Result**: Pending
 - **Command**: `node fireskills/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/draft/0002-web-performance-search-copy-specialists/spec.md .`
-- **Findings**: Pending.
+- **Findings**: Traceability OK, 37 of 37 IDs covered in 32 test files (2026-09-25). Gates on a fresh build with `SITE_URL=https://nuxfire.com`: `check:seo`, `check:perf`, `check:copy` and `check:i18n` exit 0; `check:seo --live` against a local `wrangler dev` with `drop-trailing-slash` audited 97 sitemap URLs and 10 legacy URLs, exit 0; typechecks of `apps/web`, `apps/app` and `apps/app` server exit 0; `bun run test` 553 passed, 1 skipped. The gate stays Pending: T041 (production deploy and live audit, which needs Q-05) is open, and Q-02 and Q-03 were not answered.
 
 ### 14. Tasks
 
@@ -711,335 +711,342 @@ Every task maintains this exact checklist during execution:
 
 #### Phase 1 — RED TDD Informed by BDD
 
-- [ ] T001 [TEST] [TDD] [US-001] Derive from AC-001 failing Vitest cases for the extraction of brotli bytes and request counts of a page and the evaluation of route budgets in `scripts/perf-rules.test.ts` — Refs: US-001, FR-002, NFR-001, AC-001 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T001 [TEST] [TDD] [US-001] Derive from AC-001 failing Vitest cases for the extraction of brotli bytes and request counts of a page and the evaluation of route budgets in `scripts/perf-rules.test.ts` — Refs: US-001, FR-002, NFR-001, AC-001 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T002 [TEST] [TDD] [US-001] Derive from AC-002 failing Vitest cases for the image rules `img-dimensions`, `img-lcp-lazy` and `img-max-bytes` in `scripts/perf-rules.test.ts` — Refs: US-001, FR-002, NFR-001, AC-002 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T002 [TEST] [TDD] [US-001] Derive from AC-002 failing Vitest cases for the image rules `img-dimensions`, `img-lcp-lazy` and `img-max-bytes` in `scripts/perf-rules.test.ts` — Refs: US-001, FR-002, NFR-001, AC-002 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T003 [TEST] [TDD] [US-001] Derive from AC-002 failing Vitest cases for `third-party-origin` and `js-none` in `scripts/perf-rules.test.ts` — Refs: US-001, FR-002, NFR-001, AC-002 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T003 [TEST] [TDD] [US-001] Derive from AC-002 failing Vitest cases for `third-party-origin` and `js-none` in `scripts/perf-rules.test.ts` — Refs: US-001, FR-002, NFR-001, AC-002 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T004 [TEST] [TDD] [US-007] Derive from AC-003 failing Vitest cases for the baseline ratchet (`baseline-regression`, `baseline-stale`, `baseline-owner`) of the performance budgets in `scripts/perf-rules.test.ts` — Refs: US-007, FR-002, NFR-002, AC-003 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T004 [TEST] [TDD] [US-007] Derive from AC-003 failing Vitest cases for the baseline ratchet (`baseline-regression`, `baseline-stale`, `baseline-owner`) of the performance budgets in `scripts/perf-rules.test.ts` — Refs: US-007, FR-002, NFR-002, AC-003 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T005 [TEST] [TDD] Derive from AC-001 and AC-003 failing Vitest cases for the `check:perf` command line (exit codes, output format, missing build output) in `scripts/perf-rules.test.ts` — Refs: US-001, US-007, FR-002, NFR-001, NFR-002, AC-001, AC-003 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T005 [TEST] [TDD] Derive from AC-001 and AC-003 failing Vitest cases for the `check:perf` command line (exit codes, output format, missing build output) in `scripts/perf-rules.test.ts` — Refs: US-001, US-007, FR-002, NFR-001, NFR-002, AC-001, AC-003 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T006 [TEST] [TDD] [US-002] Derive from AC-004 failing Vitest cases for `sitemap-lastmod-datetime` and `robots-sitemap` in `scripts/seo-rules.test.ts` — Refs: US-002, FR-004, NFR-001, AC-004 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T006 [TEST] [TDD] [US-002] Derive from AC-004 failing Vitest cases for `sitemap-lastmod-datetime` and `robots-sitemap` in `scripts/seo-rules.test.ts` — Refs: US-002, FR-004, NFR-001, AC-004 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T007 [TEST] [TDD] [US-002] Derive from AC-004 failing Vitest cases for `no-meta-refresh`, `sitemap-canonical` and `title-not-placeholder` in `scripts/seo-rules.test.ts` — Refs: US-002, FR-004, FR-007, NFR-001, AC-004 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T007 [TEST] [TDD] [US-002] Derive from AC-004 failing Vitest cases for `no-meta-refresh`, `sitemap-canonical` and `title-not-placeholder` in `scripts/seo-rules.test.ts` — Refs: US-002, FR-004, FR-007, NFR-001, AC-004 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T008 [TEST] [TDD] Derive from AC-004 failing Vitest cases for `jsonld-no-faq` and `jsonld-no-unproven-rating` in `scripts/seo-rules.test.ts` — Refs: US-002, US-004, FR-004, FR-009, NFR-001, AC-004 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T008 [TEST] [TDD] Derive from AC-004 failing Vitest cases for `jsonld-no-faq` and `jsonld-no-unproven-rating` in `scripts/seo-rules.test.ts` — Refs: US-002, US-004, FR-004, FR-009, NFR-001, AC-004 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T009 [TEST] [TDD] [US-002] Derive from AC-005 failing Vitest cases for `live-status`, `live-redirect-chain` and `live-legacy-redirect` against a local `Bun.serve` fixture in `scripts/seo-live.test.ts` — Refs: US-002, FR-005, FR-007, NFR-003, AC-005 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T009 [TEST] [TDD] [US-002] Derive from AC-005 failing Vitest cases for `live-status`, `live-redirect-chain` and `live-legacy-redirect` against a local `Bun.serve` fixture in `scripts/seo-live.test.ts` — Refs: US-002, FR-005, FR-007, NFR-003, AC-005 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T010 [TEST] [TDD] [US-002] Derive from AC-005 failing Vitest cases for `live-robots`, `live-compression`, `live-immutable-cache` and `live-noindex-listed` in `scripts/seo-live.test.ts` — Refs: US-002, FR-005, NFR-003, AC-005 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T010 [TEST] [TDD] [US-002] Derive from AC-005 failing Vitest cases for `live-robots`, `live-compression`, `live-immutable-cache` and `live-noindex-listed` in `scripts/seo-live.test.ts` — Refs: US-002, FR-005, NFR-003, AC-005 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T011 [TEST] [TDD] [US-002] Derive from AC-005 and AC-006 failing Vitest cases for the read-only guarantees (only GET and HEAD, only the given origin, no run without an origin) in `scripts/seo-live.test.ts` — Refs: US-002, FR-005, FR-006, NFR-003, AC-005, AC-006 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T011 [TEST] [TDD] [US-002] Derive from AC-005 and AC-006 failing Vitest cases for the read-only guarantees (only GET and HEAD, only the given origin, no run without an origin) in `scripts/seo-live.test.ts` — Refs: US-002, FR-005, FR-006, NFR-003, AC-005, AC-006 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T012 [TEST] [TDD] [US-002] Derive from AC-006 failing Vitest cases for the IndexNow key validation and payload building in `scripts/indexnow.test.ts` — Refs: US-002, FR-006, NFR-003, AC-006 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T012 [TEST] [TDD] [US-002] Derive from AC-006 failing Vitest cases for the IndexNow key validation and payload building in `scripts/indexnow.test.ts` — Refs: US-002, FR-006, NFR-003, AC-006 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T013 [TEST] [TDD] [US-002] Derive from AC-006 failing Vitest cases for the dry-run default and the refusal to send without `--submit` and `--origin` in `scripts/indexnow.test.ts` — Refs: US-002, FR-006, NFR-003, AC-006 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T013 [TEST] [TDD] [US-002] Derive from AC-006 failing Vitest cases for the dry-run default and the refusal to send without `--submit` and `--origin` in `scripts/indexnow.test.ts` — Refs: US-002, FR-006, NFR-003, AC-006 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T014 [TEST] [TDD] [US-004] Derive from AC-007 failing Vitest cases for the validation of the claim ledger schema in `scripts/copy-rules.test.ts` — Refs: US-004, FR-009, NFR-001, NFR-002, AC-007 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T014 [TEST] [TDD] [US-004] Derive from AC-007 failing Vitest cases for the validation of the claim ledger schema in `scripts/copy-rules.test.ts` — Refs: US-004, FR-009, NFR-001, NFR-002, AC-007 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T015 [TEST] [TDD] [US-004] Derive from AC-007 failing Vitest cases for the verifiers `repo-count`, `repo-file`, `url` with a retrieved date and `owner-statement` in `scripts/copy-rules.test.ts` — Refs: US-004, FR-009, NFR-001, AC-007 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T015 [TEST] [TDD] [US-004] Derive from AC-007 failing Vitest cases for the verifiers `repo-count`, `repo-file`, `url` with a retrieved date and `owner-statement` in `scripts/copy-rules.test.ts` — Refs: US-004, FR-009, NFR-001, AC-007 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T016 [TEST] [TDD] Derive from AC-007 failing Vitest cases for the detection of numeric and superlative claims in the marketing namespaces against the ledger in `scripts/copy-rules.test.ts` — Refs: US-003, US-004, FR-009, FR-010, NFR-001, AC-007 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T016 [TEST] [TDD] Derive from AC-007 failing Vitest cases for the detection of numeric and superlative claims in the marketing namespaces against the ledger in `scripts/copy-rules.test.ts` — Refs: US-003, US-004, FR-009, FR-010, NFR-001, AC-007 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T017 [TEST] [TDD] Derive from AC-008 failing Vitest cases for the literal-text scanner of `.vue` templates and its baseline ratchet in `scripts/copy-rules.test.ts` — Refs: US-003, US-007, FR-010, NFR-002, AC-008 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T017 [TEST] [TDD] Derive from AC-008 failing Vitest cases for the literal-text scanner of `.vue` templates and its baseline ratchet in `scripts/copy-rules.test.ts` — Refs: US-003, US-007, FR-010, NFR-002, AC-008 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T018 [TEST] [TDD] Derive from AC-009 failing Vitest cases for `urgency-unproven`, `testimonial-unverified` and `testimonial-shared-image` in `scripts/copy-rules.test.ts` — Refs: US-003, US-004, FR-009, FR-010, AC-009 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T018 [TEST] [TDD] Derive from AC-009 failing Vitest cases for `urgency-unproven`, `testimonial-unverified` and `testimonial-shared-image` in `scripts/copy-rules.test.ts` — Refs: US-003, US-004, FR-009, FR-010, AC-009 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T019 [TEST] [TDD] [US-005] Derive from AC-010 failing Vitest cases for the structure and classification of the pattern library in `scripts/copy-patterns.test.ts` — Refs: US-005, FR-011, NFR-005, AC-010 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T019 [TEST] [TDD] [US-005] Derive from AC-010 failing Vitest cases for the structure and classification of the pattern library in `scripts/copy-patterns.test.ts` — Refs: US-005, FR-011, NFR-005, AC-010 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T020 [TEST] [TDD] [US-005] Derive from AC-010 failing Vitest cases for the 8-word overlap detector against the raw material, with an explicit skip when it is absent, in `scripts/copy-patterns.test.ts` — Refs: US-005, FR-011, NFR-005, AC-010 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T020 [TEST] [TDD] [US-005] Derive from AC-010 failing Vitest cases for the 8-word overlap detector against the raw material, with an explicit skip when it is absent, in `scripts/copy-patterns.test.ts` — Refs: US-005, FR-011, NFR-005, AC-010 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T021 [TEST] [TDD] [US-005] Derive from AC-010 failing Vitest cases for the language coverage of the examples and the absence of class C examples in `scripts/copy-patterns.test.ts` — Refs: US-005, FR-011, NFR-005, AC-010 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T021 [TEST] [TDD] [US-005] Derive from AC-010 failing Vitest cases for the language coverage of the examples and the absence of class C examples in `scripts/copy-patterns.test.ts` — Refs: US-005, FR-011, NFR-005, AC-010 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T022 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases for the registration of the three specialists (catalog, routing table, README, count 38) in `scripts/specialists-catalog.test.ts` — Refs: US-006, FR-001, FR-003, FR-008, FR-012, NFR-007, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T022 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases for the registration of the three specialists (catalog, routing table, README, count 38) in `scripts/specialists-catalog.test.ts` — Refs: US-006, FR-001, FR-003, FR-008, FR-012, NFR-007, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T023 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases for the required structure of the three specialists (sections, `agents/openai.yaml`, references, "What does NOT exist") in `scripts/specialist-evidence.test.ts` — Refs: US-006, FR-001, FR-003, FR-008, NFR-006, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T023 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases for the required structure of the three specialists (sections, `agents/openai.yaml`, references, "What does NOT exist") in `scripts/specialist-evidence.test.ts` — Refs: US-006, FR-001, FR-003, FR-008, NFR-006, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T024 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases for the routing text of `AGENTS.md`, `fireskills/SKILL.md` and `.fireskills/RULES.md` and for the package scripts in `scripts/content-docs-drift.test.ts` — Refs: US-006, FR-003, FR-008, FR-012, NFR-007, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T024 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases for the routing text of `AGENTS.md`, `fireskills/SKILL.md` and `.fireskills/RULES.md` and for the package scripts in `scripts/content-docs-drift.test.ts` — Refs: US-006, FR-003, FR-008, FR-012, NFR-007, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T025 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases for the docs mirrors in en, pt-br and es and the count of specialists in the locale files in `scripts/content-docs-drift.test.ts` — Refs: US-006, FR-012, NFR-007, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T025 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases for the docs mirrors in en, pt-br and es and the count of specialists in the locale files in `scripts/content-docs-drift.test.ts` — Refs: US-006, FR-012, NFR-007, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T026 [TEST] [TDD] [US-001] Derive from AC-011 failing Vitest cases that check every performance fact of the specialist against the installed packages (the `noScripts` route rule and the lazy hydration strategies exist in the installed Nuxt) in `scripts/specialist-evidence.test.ts` — Refs: US-001, FR-001, NFR-006, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T026 [TEST] [TDD] [US-001] Derive from AC-011 failing Vitest cases that check every performance fact of the specialist against the installed packages (the `noScripts` route rule and the lazy hydration strategies exist in the installed Nuxt) in `scripts/specialist-evidence.test.ts` — Refs: US-001, FR-001, NFR-006, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T027 [TEST] [TDD] [US-002] Derive from AC-004 and AC-005 failing Vitest cases for the parsing and validation of `apps/web/public/_redirects` (only 301 or 308, no duplicate source, every legacy path of `nuxt.config.ts` present) in `scripts/redirects.test.ts` — Refs: US-002, FR-007, NFR-001, AC-004, AC-005 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T027 [TEST] [TDD] [US-002] Derive from AC-004 and AC-005 failing Vitest cases for the parsing and validation of `apps/web/public/_redirects` (only 301 or 308, no duplicate source, every legacy path of `nuxt.config.ts` present) in `scripts/redirects.test.ts` — Refs: US-002, FR-007, NFR-001, AC-004, AC-005 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T028 [TEST] [TDD] Derive from AC-011 failing Vitest cases that no gate script imports a package other than Node or Bun built-ins and the already declared tooling, and that nothing under `apps/` imports from `scripts/`, in `scripts/gates-dependencies.test.ts` — Refs: US-001, US-002, US-003, NFR-004, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T028 [TEST] [TDD] Derive from AC-011 failing Vitest cases that no gate script imports a package other than Node or Bun built-ins and the already declared tooling, and that nothing under `apps/` imports from `scripts/`, in `scripts/gates-dependencies.test.ts` — Refs: US-001, US-002, US-003, NFR-004, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T029 [TEST] [TDD] Derive from AC-011 failing Vitest cases that every tooling package used by the gates is an exact-version root `devDependency` and that the gate scripts are registered in `package.json`, in `scripts/gates-dependencies.test.ts` — Refs: US-001, US-002, US-003, FR-012, NFR-004, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T029 [TEST] [TDD] Derive from AC-011 failing Vitest cases that every tooling package used by the gates is an exact-version root `devDependency` and that the gate scripts are registered in `package.json`, in `scripts/gates-dependencies.test.ts` — Refs: US-001, US-002, US-003, FR-012, NFR-004, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T030 [TEST] [TDD] Derive from AC-011 failing Vitest cases that the built `apps/web/.output` output contains no code of the gates, in `scripts/gates-dependencies.test.ts` — Refs: US-001, US-002, NFR-004, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T030 [TEST] [TDD] Derive from AC-011 failing Vitest cases that the built `apps/web/.output` output contains no code of the gates, in `scripts/gates-dependencies.test.ts` — Refs: US-001, US-002, NFR-004, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T031 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases that every fact table of the three specialists has the columns Source, Read and Mode, in `scripts/specialist-evidence.test.ts` — Refs: US-006, FR-001, FR-003, FR-008, FR-012, NFR-006, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T031 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases that every fact table of the three specialists has the columns Source, Read and Mode, in `scripts/specialist-evidence.test.ts` — Refs: US-006, FR-001, FR-003, FR-008, FR-012, NFR-006, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
-- [ ] T032 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases that a finished reference has no row with mode SUM and that every URL in a fact table appears in the research index, in `scripts/specialist-evidence.test.ts` — Refs: US-006, FR-001, FR-003, FR-008, NFR-006, AC-011 — Depends: none
-  - [ ] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
-  - [ ] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
-  - [ ] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
-  - [ ] **VISUAL**: Not applicable: test implementation with no visual output.
-  - [ ] **EVIDENCE**: Record the test command and the failure trace in section 11.
-  - [ ] **IMPROVE**: Review coverage and record the lesson learned.
+- [x] T032 [TEST] [TDD] [US-006] Derive from AC-011 failing Vitest cases that a finished reference has no row with mode SUM and that every URL in a fact table appears in the research index, in `scripts/specialist-evidence.test.ts` — Refs: US-006, FR-001, FR-003, FR-008, NFR-006, AC-011 — Depends: none
+  - [x] **PREP**: Read the Gherkin of the referenced AC and confirm the rule, the IDs and the test level; load `$fireskill-specialist-typescript` and `$fireskill-specialist-content-seo`.
+  - [x] **EXECUTE**: Author the cases with a unique `SPECSFY:` comment marker each, without `.feature` files.
+  - [x] **VERIFY**: Observe a valid RED failure caused by the missing behaviour, not by a syntax error.
+  - [x] **VISUAL**: Not applicable: test implementation with no visual output.
+  - [x] **EVIDENCE**: Record the test command and the failure trace in section 11.
+  - [x] **IMPROVE**: Review coverage and record the lesson learned.
 
 #### Phase 2 — Performance track (US-001, US-007)
 
 **Goal**: budgets and rules on the built output, measured facts for the specialist.
 **Independent Test**: `bun run check:perf` on the current build.
 
-- [ ] T033 [CODE] Implement the pure performance rules (metrics extraction, budgets, image and origin rules, `js-none`, baseline ratchet) in `scripts/perf-rules.ts` — Refs: US-001, US-007, FR-002, NFR-001, NFR-002, AC-001, AC-002, AC-003 — Depends: T001, T002, T003, T004, T005
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T033 [CODE] Implement the pure performance rules (metrics extraction, budgets, image and origin rules, `js-none`, baseline ratchet) in `scripts/perf-rules.ts` — Refs: US-001, US-007, FR-002, NFR-001, NFR-002, AC-001, AC-002, AC-003 — Depends: T001, T002, T003, T004, T005
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T033", "refs": ["US-001", "US-007", "FR-002", "NFR-001", "NFR-002", "AC-001", "AC-002", "AC-003"], "files": ["scripts/perf-rules.ts"], "commands": [{"run": "bunx vitest run scripts/perf-rules.test.ts", "exit": 0}, {"run": "bun run test", "exit": 0}]} -->
 
-- [ ] T034 [CODE] Implement the `check:perf` command, register it in `package.json` and generate the first baseline (M1-M3 values, each with `removedBy`) in `scripts/check-perf.ts` and `perf-budgets.json` — Refs: US-001, US-007, FR-002, FR-012, NFR-001, NFR-002, AC-001, AC-003 — Depends: T033, T001, T002, T003, T004, T005
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T034 [CODE] Implement the `check:perf` command, register it in `package.json` and generate the first baseline (M1-M3 values, each with `removedBy`) in `scripts/check-perf.ts` and `perf-budgets.json` — Refs: US-001, US-007, FR-002, FR-012, NFR-001, NFR-002, AC-001, AC-003 — Depends: T033, T001, T002, T003, T004, T005
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T034", "refs": ["US-001", "US-007", "FR-002", "FR-012", "NFR-001", "NFR-002", "AC-001", "AC-003"], "files": ["scripts/check-perf.ts", "perf-budgets.json", "package.json"], "commands": [{"run": "bunx vitest run scripts/perf-rules.test.ts", "exit": 0}, {"run": "bun run check:perf", "exit": 0}]} -->
 
 #### Phase 3 — Search track (US-002)
 
 **Goal**: search rules on the output and on a live origin, IndexNow, and the fix of D4 and D5.
 **Independent Test**: `bun run check:seo -- --live <origin>`.
 
-- [ ] T035 [CODE] Implement the new static search rules (`sitemap-lastmod-datetime`, `no-meta-refresh`, `sitemap-canonical`, `title-not-placeholder`, `jsonld-no-faq`, `jsonld-no-unproven-rating`, `robots-sitemap`) in `scripts/seo-rules.ts` and `scripts/seo-config.json` — Refs: US-002, US-004, FR-004, FR-007, NFR-001, AC-004 — Depends: T006, T007, T008
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T035 [CODE] Implement the new static search rules (`sitemap-lastmod-datetime`, `no-meta-refresh`, `sitemap-canonical`, `title-not-placeholder`, `jsonld-no-faq`, `jsonld-no-unproven-rating`, `robots-sitemap`) in `scripts/seo-rules.ts` and `scripts/seo-config.json` — Refs: US-002, US-004, FR-004, FR-007, NFR-001, AC-004 — Depends: T006, T007, T008
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T035", "refs": ["US-002", "US-004", "FR-004", "FR-007", "NFR-001", "AC-004"], "files": ["scripts/seo-rules.ts", "scripts/seo-config.json"], "commands": [{"run": "bunx vitest run scripts/seo-rules.test.ts", "exit": 0}, {"run": "bun run check:seo", "exit": 0}]} -->
 
-- [ ] T036 [CODE] [US-002] Make the sitemap `lastmod` of posts carry date and time in `apps/web/server/plugins/sitemap-blog.ts` and `apps/web/app/utils/seo/content-seo.ts` — Refs: US-002, FR-004, NFR-001, AC-004 — Depends: T006, T007, T008, T035
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T036 [CODE] [US-002] Make the sitemap `lastmod` of posts carry date and time in `apps/web/server/plugins/sitemap-blog.ts` and `apps/web/app/utils/seo/content-seo.ts` — Refs: US-002, FR-004, NFR-001, AC-004 — Depends: T006, T007, T008, T035
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T036", "refs": ["US-002", "FR-004", "NFR-001", "AC-004"], "files": ["apps/web/server/plugins/sitemap-blog.ts", "apps/web/app/utils/seo/content-seo.ts"], "commands": [{"run": "bunx vitest run apps/web/app/utils/seo/content-seo.test.ts", "exit": 0}, {"run": "bun run check:seo", "exit": 0}]} -->
 
-- [ ] T037 [CODE] [US-002] Implement the live HTTP audit and the `--live` option of `check:seo` in `scripts/seo-live.ts` and `scripts/check-seo.ts` — Refs: US-002, FR-005, FR-007, NFR-003, AC-005, AC-006 — Depends: T009, T010, T011
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T037 [CODE] [US-002] Implement the live HTTP audit and the `--live` option of `check:seo` in `scripts/seo-live.ts` and `scripts/check-seo.ts` — Refs: US-002, FR-005, FR-007, NFR-003, AC-005, AC-006 — Depends: T009, T010, T011
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T037", "refs": ["US-002", "FR-005", "FR-007", "NFR-003", "AC-005", "AC-006"], "files": ["scripts/seo-live.ts", "scripts/check-seo.ts"], "commands": [{"run": "bunx vitest run scripts/seo-live.test.ts", "exit": 0}, {"run": "bun run check:seo -- --live http://127.0.0.1:8787 --sitemap-origin https://nuxfire.com", "exit": 0}]} -->
 
-- [ ] T038 [CODE] [US-002] Implement the IndexNow script with dry run by default and register `indexnow` in `package.json` in `scripts/indexnow.ts` — Refs: US-002, FR-006, NFR-003, AC-006 — Depends: T011, T012, T013
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T038 [CODE] [US-002] Implement the IndexNow script with dry run by default and register `indexnow` in `package.json` in `scripts/indexnow.ts` — Refs: US-002, FR-006, NFR-003, AC-006 — Depends: T011, T012, T013
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T038", "refs": ["US-002", "FR-006", "NFR-003", "AC-006"], "files": ["scripts/indexnow.ts", "package.json"], "commands": [{"run": "bunx vitest run scripts/indexnow.test.ts", "exit": 0}]} -->
 
-- [ ] T039 [OPS] Run the redirect and trailing-slash spike locally with `wrangler dev` for `auto-trailing-slash` and `drop-trailing-slash`, with and without a `_redirects` file, audited by `check:seo --live`, and record the result in `specs/draft/0002-web-performance-search-copy-specialists/research/redirect-spike.md` — Refs: US-002, FR-005, FR-007, AC-005 — Depends: T037
-  - [ ] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
-  - [ ] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
-  - [ ] **VERIFY**: Compare the result with the expected outcome and record any difference.
-  - [ ] **VISUAL**: Not applicable: operational step with no visual output.
-  - [ ] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
-  - [ ] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
+- [x] T039 [OPS] Run the redirect and trailing-slash spike locally with `wrangler dev` for `auto-trailing-slash` and `drop-trailing-slash`, with and without a `_redirects` file, audited by `check:seo --live`, and record the result in `specs/draft/0002-web-performance-search-copy-specialists/research/redirect-spike.md` — Refs: US-002, FR-005, FR-007, AC-005 — Depends: T037
+  - [x] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
+  - [x] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
+  - [x] **VERIFY**: Compare the result with the expected outcome and record any difference.
+  - [x] **VISUAL**: Not applicable: operational step with no visual output.
+  - [x] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
+  - [x] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
 
-- [ ] T040 [CODE] [US-002] Apply the mechanism chosen by the spike: `apps/web/public/_redirects` and, if chosen, `assets.htmlHandling` in `infra/utils/nuxt.ts`, and remove the meta-refresh stubs of `apps/web/nuxt.config.ts` route rules — Refs: US-002, FR-004, FR-007, AC-004, AC-005 — Depends: T007, T009, T027, T039
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T040 [CODE] [US-002] Apply the mechanism chosen by the spike: `apps/web/public/_redirects` and, if chosen, `assets.htmlHandling` in `infra/utils/nuxt.ts`, and remove the meta-refresh stubs of `apps/web/nuxt.config.ts` route rules — Refs: US-002, FR-004, FR-007, AC-004, AC-005 — Depends: T007, T009, T027, T039
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T040", "refs": ["US-002", "FR-004", "FR-007", "AC-004", "AC-005"], "files": ["apps/web/public/_redirects", "infra/utils/nuxt.ts", "infra/web.ts", "apps/web/nuxt.config.ts"], "commands": [{"run": "bunx vitest run scripts/redirects.test.ts", "exit": 0}, {"run": "bun run check:seo -- --live http://127.0.0.1:8787 --sitemap-origin https://nuxfire.com", "exit": 0}]} -->
 
 - [ ] T041 [OPS] After the owner's authorization (Q-05), deploy the change and run `check:seo --live https://nuxfire.com`, recording the before and after in `specs/draft/0002-web-performance-search-copy-specialists/research/live-audit.md` — Refs: US-002, FR-005, FR-007, AC-005 — Depends: T040
   - [ ] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
@@ -1054,124 +1061,127 @@ Every task maintains this exact checklist during execution:
 **Goal**: claims proven, no new ungoverned text, original patterns.
 **Independent Test**: `bun run check:copy`.
 
-- [ ] T042 [CODE] Implement the pure copy rules (ledger schema and verifiers, claim detection, literal scanner and ratchet, urgency and testimonial rules) in `scripts/copy-rules.ts` — Refs: US-003, US-004, US-007, FR-009, FR-010, NFR-001, NFR-002, AC-007, AC-008, AC-009 — Depends: T014, T015, T016, T017, T018
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T042 [CODE] Implement the pure copy rules (ledger schema and verifiers, claim detection, literal scanner and ratchet, urgency and testimonial rules) in `scripts/copy-rules.ts` — Refs: US-003, US-004, US-007, FR-009, FR-010, NFR-001, NFR-002, AC-007, AC-008, AC-009 — Depends: T014, T015, T016, T017, T018
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T042", "refs": ["US-003", "US-004", "US-007", "FR-009", "FR-010", "NFR-001", "NFR-002", "AC-007", "AC-008", "AC-009"], "files": ["scripts/copy-rules.ts"], "commands": [{"run": "bunx vitest run scripts/copy-rules.test.ts scripts/copy-patterns.test.ts", "exit": 0}, {"run": "bun run test", "exit": 0}]} -->
 
-- [ ] T043 [CODE] Implement the `check:copy` command, register it in `package.json`, create the initial ledger and generate the literal baseline (each entry `removedBy`) in `scripts/check-copy.ts`, `.fireskills/CLAIMS.yml` and `scripts/copy-baseline.json` — Refs: US-003, US-004, US-007, FR-009, FR-010, FR-012, NFR-001, NFR-002, AC-007, AC-008, AC-009 — Depends: T042, T014, T015, T016, T017, T018
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T043 [CODE] Implement the `check:copy` command, register it in `package.json`, create the initial ledger and generate the literal baseline (each entry `removedBy`) in `scripts/check-copy.ts`, `.fireskills/CLAIMS.yml` and `scripts/copy-baseline.json` — Refs: US-003, US-004, US-007, FR-009, FR-010, FR-012, NFR-001, NFR-002, AC-007, AC-008, AC-009 — Depends: T042, T014, T015, T016, T017, T018
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T043", "refs": ["US-003", "US-004", "US-007", "FR-009", "FR-010", "FR-012", "NFR-001", "NFR-002", "AC-007", "AC-008", "AC-009"], "files": ["scripts/check-copy.ts", ".fireskills/CLAIMS.yml", "scripts/copy-baseline.json"], "commands": [{"run": "bunx vitest run scripts/copy-rules.test.ts", "exit": 0}, {"run": "bun run check:copy", "exit": 0}]} -->
 
-- [ ] T044 [OPS] Run the lab measurement protocol (Lighthouse or a Chromium with paint timing) on the home built locally and on production, and record LCP, CLS and an INP proxy with the method and its limits in `specs/draft/0002-web-performance-search-copy-specialists/research/lab-measurements.md` — Refs: US-001, FR-001, NFR-006 — Depends: T034
-  - [ ] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
-  - [ ] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
-  - [ ] **VERIFY**: Compare the result with the expected outcome and record any difference.
-  - [ ] **VISUAL**: Not applicable: operational step with no visual output.
-  - [ ] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
-  - [ ] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
+- [x] T044 [OPS] Run the lab measurement protocol (Lighthouse or a Chromium with paint timing) on the home built locally and on production, and record LCP, CLS and an INP proxy with the method and its limits in `specs/draft/0002-web-performance-search-copy-specialists/research/lab-measurements.md` — Refs: US-001, FR-001, NFR-006 — Depends: T034
+  - [x] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
+  - [x] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
+  - [x] **VERIFY**: Compare the result with the expected outcome and record any difference.
+  - [x] **VISUAL**: Not applicable: operational step with no visual output.
+  - [x] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
+  - [x] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
 
-- [ ] T045 [OPS] Run the zero-JavaScript spike: `routeRules` `noScripts` on a scratch route, measure bytes before and after, list what stops working (color mode, locale switcher, header menu, search) and record it in `specs/draft/0002-web-performance-search-copy-specialists/research/zero-js-spike.md` — Refs: US-001, FR-001, FR-002 — Depends: T034
-  - [ ] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
-  - [ ] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
-  - [ ] **VERIFY**: Compare the result with the expected outcome and record any difference.
-  - [ ] **VISUAL**: Not applicable: operational step with no visual output.
-  - [ ] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
-  - [ ] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
+- [x] T045 [OPS] Run the zero-JavaScript spike: `routeRules` `noScripts` on a scratch route, measure bytes before and after, list what stops working (color mode, locale switcher, header menu, search) and record it in `specs/draft/0002-web-performance-search-copy-specialists/research/zero-js-spike.md` — Refs: US-001, FR-001, FR-002 — Depends: T034
+  - [x] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
+  - [x] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
+  - [x] **VERIFY**: Compare the result with the expected outcome and record any difference.
+  - [x] **VISUAL**: Not applicable: operational step with no visual output.
+  - [x] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
+  - [x] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
 
-- [ ] T046 [DOC] Author `fireskill-specialist-web-performance` (`SKILL.md`, `agents/openai.yaml`, references) after re-reading the web.dev and Astro sources RAW, in `fireskills/specialists/fireskill-specialist-web-performance/SKILL.md` — Refs: US-001, US-006, FR-001, NFR-006 — Depends: T034, T044, T045
-  - [ ] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
-  - [ ] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
-  - [ ] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
-  - [ ] **VISUAL**: Not applicable: documentation with no visual output.
-  - [ ] **EVIDENCE**: Record the sources read, the commands and the modified files.
-  - [ ] **IMPROVE**: Record what a reviewer agent found in a separate pass.
+- [x] T046 [DOC] Author `fireskill-specialist-web-performance` (`SKILL.md`, `agents/openai.yaml`, references) after re-reading the web.dev and Astro sources RAW, in `fireskills/specialists/fireskill-specialist-web-performance/SKILL.md` — Refs: US-001, US-006, FR-001, NFR-006 — Depends: T034, T044, T045
+  - [x] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
+  - [x] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
+  - [x] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
+  - [x] **VISUAL**: Not applicable: documentation with no visual output.
+  - [x] **EVIDENCE**: Record the sources read, the commands and the modified files.
+  - [x] **IMPROVE**: Record what a reviewer agent found in a separate pass.
 
-- [ ] T047 [DOC] Re-read RAW the Google, Bing and schema.org sources listed as not yet read (redirects, canonicalization, sitemaps, robots, Product, Organization, WebSite, BreadcrumbList) and update `specs/draft/0002-web-performance-search-copy-specialists/research/google-search.md` and `research/schema-org.md` — Refs: FR-003, NFR-006 — Depends: none
-  - [ ] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
-  - [ ] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
-  - [ ] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
-  - [ ] **VISUAL**: Not applicable: documentation with no visual output.
-  - [ ] **EVIDENCE**: Record the sources read, the commands and the modified files.
-  - [ ] **IMPROVE**: Record what a reviewer agent found in a separate pass.
+- [x] T047 [DOC] Re-read RAW the Google, Bing and schema.org sources listed as not yet read (redirects, canonicalization, sitemaps, robots, Product, Organization, WebSite, BreadcrumbList) and update `specs/draft/0002-web-performance-search-copy-specialists/research/google-search.md` and `research/schema-org.md` — Refs: FR-003, NFR-006 — Depends: none
+  - [x] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
+  - [x] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
+  - [x] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
+  - [x] **VISUAL**: Not applicable: documentation with no visual output.
+  - [x] **EVIDENCE**: Record the sources read, the commands and the modified files.
+  - [x] **IMPROVE**: Record what a reviewer agent found in a separate pass.
 
-- [ ] T048 [DOC] Author `fireskill-specialist-seo` (`SKILL.md`, `agents/openai.yaml`, references) in `fireskills/specialists/fireskill-specialist-seo/SKILL.md` — Refs: US-002, US-006, FR-003, NFR-006 — Depends: T035, T037, T038, T040, T047
-  - [ ] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
-  - [ ] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
-  - [ ] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
-  - [ ] **VISUAL**: Not applicable: documentation with no visual output.
-  - [ ] **EVIDENCE**: Record the sources read, the commands and the modified files.
-  - [ ] **IMPROVE**: Record what a reviewer agent found in a separate pass.
+- [x] T048 [DOC] Author `fireskill-specialist-seo` (`SKILL.md`, `agents/openai.yaml`, references) in `fireskills/specialists/fireskill-specialist-seo/SKILL.md` — Refs: US-002, US-006, FR-003, NFR-006 — Depends: T035, T037, T038, T040, T047
+  - [x] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
+  - [x] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
+  - [x] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
+  - [x] **VISUAL**: Not applicable: documentation with no visual output.
+  - [x] **EVIDENCE**: Record the sources read, the commands and the modified files.
+  - [x] **IMPROVE**: Record what a reviewer agent found in a separate pass.
 
-- [ ] T049 [OPS] Record the owner's answers to Q-01, Q-02 and Q-03 as decisions and, once Q-01 is confirmed, ignore `docs/copywiter/` in git and remove the two committed files from the tree in `specs/draft/0002-web-performance-search-copy-specialists/spec.md` — Refs: FR-008, FR-011, NFR-005 — Depends: none
-  - [ ] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
-  - [ ] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
-  - [ ] **VERIFY**: Compare the result with the expected outcome and record any difference.
-  - [ ] **VISUAL**: Not applicable: operational step with no visual output.
-  - [ ] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
-  - [ ] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
+- [x] T049 [OPS] Record the owner's answers to Q-01, Q-02 and Q-03 as decisions and, once Q-01 is confirmed, ignore `docs/copywiter/` in git and remove the two committed files from the tree in `specs/draft/0002-web-performance-search-copy-specialists/spec.md` — Refs: FR-008, FR-011, NFR-005 — Depends: none
+  - [x] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
+  - [x] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
+  - [x] **VERIFY**: Compare the result with the expected outcome and record any difference.
+  - [x] **VISUAL**: Not applicable: operational step with no visual output.
+  - [x] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
+  - [x] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
 
-- [ ] T050 [DOC] Distil the pattern library (classes A, B, C; original structures; examples in en, pt-br and es) from the raw material in `fireskills/specialists/fireskill-specialist-copywriting/references/pattern-library.md` — Refs: US-005, FR-011, NFR-005 — Depends: T049, T019, T020, T021
-  - [ ] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
-  - [ ] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
-  - [ ] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
-  - [ ] **VISUAL**: Not applicable: documentation with no visual output.
-  - [ ] **EVIDENCE**: Record the sources read, the commands and the modified files.
-  - [ ] **IMPROVE**: Record what a reviewer agent found in a separate pass.
+- [x] T050 [DOC] Distil the pattern library (classes A, B, C; original structures; examples in en, pt-br and es) from the raw material in `fireskills/specialists/fireskill-specialist-copywriting/references/pattern-library.md` — Refs: US-005, FR-011, NFR-005 — Depends: T049, T019, T020, T021
+  - [x] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
+  - [x] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
+  - [x] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
+  - [x] **VISUAL**: Not applicable: documentation with no visual output.
+  - [x] **EVIDENCE**: Record the sources read, the commands and the modified files.
+  - [x] **IMPROVE**: Record what a reviewer agent found in a separate pass.
 
-- [ ] T051 [DOC] Author `fireskill-specialist-copywriting` (`SKILL.md`, `agents/openai.yaml`, workflow, messaging, headlines, application text, claims and compliance, localisation references) after re-reading RAW the copy, compliance and application-text sources in `fireskills/specialists/fireskill-specialist-copywriting/SKILL.md` — Refs: US-003, US-004, US-006, FR-008, NFR-006 — Depends: T043, T049
-  - [ ] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
-  - [ ] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
-  - [ ] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
-  - [ ] **VISUAL**: Not applicable: documentation with no visual output.
-  - [ ] **EVIDENCE**: Record the sources read, the commands and the modified files.
-  - [ ] **IMPROVE**: Record what a reviewer agent found in a separate pass.
+- [x] T051 [DOC] Author `fireskill-specialist-copywriting` (`SKILL.md`, `agents/openai.yaml`, workflow, messaging, headlines, application text, claims and compliance, localisation references) after re-reading RAW the copy, compliance and application-text sources in `fireskills/specialists/fireskill-specialist-copywriting/SKILL.md` — Refs: US-003, US-004, US-006, FR-008, NFR-006 — Depends: T043, T049
+  - [x] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
+  - [x] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
+  - [x] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
+  - [x] **VISUAL**: Not applicable: documentation with no visual output.
+  - [x] **EVIDENCE**: Record the sources read, the commands and the modified files.
+  - [x] **IMPROVE**: Record what a reviewer agent found in a separate pass.
 
 #### Phase 5 — Governance (US-006)
 
 **Goal**: routing, registration, docs and counts.
 **Independent Test**: catalog and drift tests, `bun run check:i18n`.
 
-- [ ] T052 [CODE] [US-006] Register the three specialists and the routing rules in `fireskills/specialists/catalog.json`, `fireskills/SKILL.md`, `fireskills/README.md`, `AGENTS.md` and `.fireskills/RULES.md` — Refs: US-006, FR-001, FR-003, FR-008, FR-012, NFR-006, NFR-007, AC-011 — Depends: T022, T023, T024, T031, T032
-  - [ ] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
-  - [ ] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
-  - [ ] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
-  - [ ] **VISUAL**: Not applicable: non-visual code with no user interface.
-  - [ ] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
-  - [ ] **IMPROVE**: Document refactoring or justify its absence.
+- [x] T052 [CODE] [US-006] Register the three specialists and the routing rules in `fireskills/specialists/catalog.json`, `fireskills/SKILL.md`, `fireskills/README.md`, `AGENTS.md` and `.fireskills/RULES.md` — Refs: US-006, FR-001, FR-003, FR-008, FR-012, NFR-006, NFR-007, AC-011 — Depends: T022, T023, T024, T031, T032
+  - [x] **PREP**: Confirm the RED tests fail for the declared reason and the dependencies are complete; read `.fireskills/RULES.md` and load `$fireskill-specialist-typescript`.
+  - [x] **EXECUTE**: Implement the minimal passing code at the declared path, pure functions first and a thin command line.
+  - [x] **VERIFY**: Run the targeted suite and the full `bun run test` for regressions.
+  - [x] **VISUAL**: Not applicable: non-visual code with no user interface.
+  - [x] **EVIDENCE**: Record the GREEN output and the modified files in the evidence comment and in sections 11-13.
+  - [x] **IMPROVE**: Document refactoring or justify its absence.
+  <!-- specsfy:evidence {"task": "T052", "refs": ["US-006", "FR-001", "FR-003", "FR-008", "FR-012", "NFR-006", "NFR-007", "AC-011"], "files": ["fireskills/specialists/catalog.json", "fireskills/SKILL.md", "fireskills/README.md", "AGENTS.md", ".fireskills/RULES.md"], "commands": [{"run": "bunx vitest run scripts/specialists-catalog.test.ts scripts/content-docs-drift.test.ts", "exit": 0}]} -->
 
-- [ ] T053 [DOC] Document the three specialists in the docs in three languages and update the specialist counts in `apps/web/content/docs/2.fireskills/4.specialists/0.overview.md` and its pt-br and es mirrors and locale files — Refs: US-006, FR-012, NFR-007 — Depends: T052, T025
-  - [ ] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
-  - [ ] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
-  - [ ] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
-  - [ ] **VISUAL**: Not applicable: documentation with no visual output.
-  - [ ] **EVIDENCE**: Record the sources read, the commands and the modified files.
-  - [ ] **IMPROVE**: Record what a reviewer agent found in a separate pass.
+- [x] T053 [DOC] Document the three specialists in the docs in three languages and update the specialist counts in `apps/web/content/docs/2.fireskills/4.specialists/0.overview.md` and its pt-br and es mirrors and locale files — Refs: US-006, FR-012, NFR-007 — Depends: T052, T025
+  - [x] **PREP**: Read the research files and, for every source to be encoded as a rule, re-read the page RAW and record the reading mode.
+  - [x] **EXECUTE**: Write the document at the declared path from verified facts only; label decisions as decisions.
+  - [x] **VERIFY**: Run the specialist and drift tests and `bun run check:i18n` where a mirror exists.
+  - [x] **VISUAL**: Not applicable: documentation with no visual output.
+  - [x] **EVIDENCE**: Record the sources read, the commands and the modified files.
+  - [x] **IMPROVE**: Record what a reviewer agent found in a separate pass.
 
-- [ ] T054 [OPS] Run the Fireskills documentator, the context monitor and `bun run check:i18n`, resolving every pending flag, in `docs/README.md` and `.fireskills/PACKAGES.md` — Refs: US-006, FR-012, NFR-007 — Depends: T053
-  - [ ] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
-  - [ ] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
-  - [ ] **VERIFY**: Compare the result with the expected outcome and record any difference.
-  - [ ] **VISUAL**: Not applicable: operational step with no visual output.
-  - [ ] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
-  - [ ] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
+- [x] T054 [OPS] Run the Fireskills documentator, the context monitor and `bun run check:i18n`, resolving every pending flag, in `docs/README.md` and `.fireskills/PACKAGES.md` — Refs: US-006, FR-012, NFR-007 — Depends: T053
+  - [x] **PREP**: Confirm the prerequisites, the authorization when the step is outward-facing, and that the environment is the intended one.
+  - [x] **EXECUTE**: Run the procedure exactly as written and keep the raw output.
+  - [x] **VERIFY**: Compare the result with the expected outcome and record any difference.
+  - [x] **VISUAL**: Not applicable: operational step with no visual output.
+  - [x] **EVIDENCE**: Record the commands, outputs, dates and the files produced.
+  - [x] **IMPROVE**: Record what the step taught and whether a rule or a test must change.
 
 #### Final Quality Phase
 
-- [ ] T055 [TEST] Execute the full regression, a fresh build with `SITE_URL`, `check:perf`, `check:seo`, `check:copy`, the typecheck and the traceability, confirming with `--json` that each ID is covered by the test files declared in section 12 and not by another spec, in `scripts/specialists-catalog.test.ts` — Refs: US-001, US-002, US-003, US-004, US-005, US-006, US-007, FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, NFR-001, NFR-002, NFR-003, NFR-004, NFR-005, NFR-006, NFR-007, AC-001, AC-002, AC-003, AC-004, AC-005, AC-006, AC-007, AC-008, AC-009, AC-010, AC-011 — Depends: T034, T036, T040, T043, T046, T048, T050, T051, T054
-  - [ ] **PREP**: Identify the suites, builds and gates to run.
-  - [ ] **EXECUTE**: Run the complete regression and every gate on a fresh build.
-  - [ ] **VERIFY**: Confirm zero failures and a clean output from every gate.
-  - [ ] **VISUAL**: Not applicable: verification with no visual output.
-  - [ ] **EVIDENCE**: Record final counts and commands.
-  - [ ] **IMPROVE**: Document retrospective notes.
+- [x] T055 [TEST] Execute the full regression, a fresh build with `SITE_URL`, `check:perf`, `check:seo`, `check:copy`, the typecheck and the traceability, confirming with `--json` that each ID is covered by the test files declared in section 12 and not by another spec, in `scripts/specialists-catalog.test.ts` — Refs: US-001, US-002, US-003, US-004, US-005, US-006, US-007, FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, NFR-001, NFR-002, NFR-003, NFR-004, NFR-005, NFR-006, NFR-007, AC-001, AC-002, AC-003, AC-004, AC-005, AC-006, AC-007, AC-008, AC-009, AC-010, AC-011 — Depends: T034, T036, T040, T043, T046, T048, T050, T051, T054
+  - [x] **PREP**: Identify the suites, builds and gates to run.
+  - [x] **EXECUTE**: Run the complete regression and every gate on a fresh build.
+  - [x] **VERIFY**: Confirm zero failures and a clean output from every gate.
+  - [x] **VISUAL**: Not applicable: verification with no visual output.
+  - [x] **EVIDENCE**: Record final counts and commands.
+  - [x] **IMPROVE**: Document retrospective notes.
 
 
 ### 15. Execution Order
@@ -1226,6 +1236,11 @@ Every task maintains this exact checklist during execution:
 - **DEC-014**: "Text a human reads" means interface strings, marketing pages, blog posts, legal text, transactional emails, notifications and error messages shown to users; documentation prose is covered for voice and clarity only, not for conversion; code comments, logs and developer-only console messages are excluded — to be confirmed by the owner (Q-02).
 - **DEC-015**: Marketing copy is localised by transcreation (the message is rebuilt for the market), interface text by faithful translation.
 - **DEC-016**: The copy gate has no inline ignore comment; the only exception mechanism is the dated, owned baseline.
+- **DEC-017**: The raw copy material no longer exists on the machine (the owner deleted it), so the pattern library was written from the trigger and component names recorded in `research/copywiter-material-analysis.md`, the primary sources of `research/raw-reads.md` and the compliance rules, not distilled from the files; it has 24 patterns (12 class A, 7 class B, 5 class C) and says so in its own text; the originality test is skipped when the folder is absent. Supersedes the extraction method of T050.
+- **DEC-018**: Owners of baselines and allowances are `BACKLOG-landing-refactor`, `BACKLOG-app-ui-copy` and `BACKLOG-web-image-dimensions` (files `specs/backlog/000n-*.md`), because the follow-up specs do not exist yet; `ownerExists` checks that the file is there. Added rule ids: `testimonial-unregistered-image`, `claim-text-mismatch`. The sitemap `lastmod` time is written by the `sitemap:output` hook.
+- **DEC-019**: Two builds of the same source are not byte-identical (hashes, and the icons that Nuxt Icon could not fetch from Iconify within 1,500 ms at prerender time: up to 6 % of the home HTML), so a baseline may be exceeded by `regressionTolerancePct` (0.1) before it is a regression; this refines DEC-009 (bytes are deterministic only up to build noise) and DEC-008. The icon nondeterminism itself is a finding, handed to a follow-up task, not fixed here.
+- **DEC-020**: `noScripts` on a route removes the whole shell's JavaScript (language switch, color mode, menus) and leaves two inline scripts, so no page is declared `js: none` yet; DEC-004 stands with the condition recorded in `research/zero-js-spike.md`.
+- **DEC-021**: The landing text that states "38 specialists" is not covered by a ledger record: the same locale keys also carry other unproven claims (for example "zero hallucinations"), and a ledger record covers a whole key, so covering them would hide those. They stay baselined until the landing is rewritten (`BACKLOG-landing-refactor`).
 
 ### 18. Definition of Done
 

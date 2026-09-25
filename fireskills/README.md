@@ -87,6 +87,9 @@ Specialists are technical context skills equipping agents with deep expertise in
 | `fireskill-specialist-pinia` | Pinia: stores, SSR hydration, composables |
 | `fireskill-specialist-billing` | Stripe and Paddle: checkout, webhooks, subscriptions, plans |
 | `fireskill-specialist-content-seo` | Blog and docs content, translations and SEO: frontmatter contract, metadata builders, hreflang and sitemap, `check:seo` |
+| `fireskill-specialist-web-performance` | Browser delivery: zero-JS routes, lazy hydration, images, fonts, Core Web Vitals, budgets, `check:perf` |
+| `fireskill-specialist-seo` | Google and Bing requirements: status codes, redirects, canonical, sitemap, structured data, IndexNow, `check:seo --live` |
+| `fireskill-specialist-copywriting` | Every human-readable text: research, messaging, application text, claim ledger, localisation, `check:copy` |
 
 ### Engineering (Stack-Agnostic)
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Web Performance"
+  short_description: "Astro-level page weight: zero-JS pages, lazy hydration, images, budgets and check:perf"
+  default_prompt: "Use $fireskill-specialist-web-performance to guide this task with measured budgets and the check:perf gate."

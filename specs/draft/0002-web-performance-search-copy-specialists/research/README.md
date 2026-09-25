@@ -25,7 +25,11 @@ never as reproduced pages (licences differ; nothing here is a copy of a source).
 | `compliance-claims.md` | 16 CFR 465, EU Directive 2005/29/EC Annex I(7), Brazilian CDC arts. 36-38 |
 | `nuxt-cloudflare-capabilities.md` | What Nuxt 4.5.2, Nitro, `@nuxt/image` and Cloudflare Static Assets can do (CODE, CMD, docs) |
 | `baseline-measurements.md` | Measured state of the Nuxfire home, the live site headers and the Astro reference |
-| `copywiter-material-analysis.md` | Structure, volume and risk classes of `docs/copywiter/` (37 files) |
+| `copywiter-material-analysis.md` | Structure, volume and risk classes of `docs/copywiter/` (37 files; the folder is no longer on the machine) |
+| `raw-reads.md` | Pages re-read RAW while writing the references (Google, Bing, IndexNow, Cloudflare, Astro, schema.org, NN/g, WCAG, Copyblogger, Copyhackers); supersedes the SUM rows |
+| `redirect-spike.md` | Trailing-slash and redirect behaviour reproduced on a local Worker, and the final live audit |
+| `lab-measurements.md` | Lighthouse protocol and results for the home page, a blog post and the Astro docs page |
+| `zero-js-spike.md` | `noScripts` on `/` and `/blog/**`: bytes, LCP, and what stops working |
 
 Sources that could **not** be read: the Bing help pages through the fetch tool (returned an empty
 shell; solved by reading them in a browser), CXL through the fetch tool (HTTP 403; solved the same

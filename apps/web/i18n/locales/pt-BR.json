@@ -129,7 +129,7 @@
       "seniorPersona": {
         "badge": "Fireskills Engine • Seu Engenheiro Sênior",
         "title": "Um Engenheiro Sênior multi-habilidoso pronto para codificar dentro da sua IDE",
-        "description": "O Fireskills é o construtor anti-falhas do Nuxfire. Composto por 35 especialistas técnicos verificados, ele opera como um Engenheiro Sênior incansável: transforma ideias brutas em contratos BDD normativos, exige testes automatizados que falham antes do código (TDD) e implementa features em Nuxt 4, SST, Drizzle e Cloudflare com zero alucinações e total robustez arquitetural.",
+        "description": "O Fireskills é o construtor anti-falhas do Nuxfire. Composto por 38 especialistas técnicos verificados, ele opera como um Engenheiro Sênior incansável: transforma ideias brutas em contratos BDD normativos, exige testes automatizados que falham antes do código (TDD) e implementa features em Nuxt 4, SST, Drizzle e Cloudflare com zero alucinações e total robustez arquitetural.",
         "cta": "Veja os 6 passos abaixo e surpreenda-se com a facilidade e velocidade:"
       },
       "items": {
@@ -187,11 +187,11 @@
         },
         "enterprise": {
           "category": "Passo 05 • Especialistas",
-          "title": "Construção com 35 Especialistas",
+          "title": "Construção com 38 Especialistas",
           "description": "Especialistas de domínio em Nuxt 4, SST, Drizzle, tRPC e Cloudflare escrevem o código cirurgicamente até que todos os testes passem (Green).",
           "prompt": "Use $fireskill-07-implement para codificar a tarefa 1 com os especialistas de Drizzle e tRPC.",
           "examples": {
-            "1": "35 Especialistas",
+            "1": "38 Especialistas",
             "2": "100% Type-Safe",
             "3": "Fases 1..3",
             "4": "Testes no Verde"

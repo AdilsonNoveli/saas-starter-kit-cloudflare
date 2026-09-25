@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Copywriting"
+  short_description: "Every human-readable text: research, messaging, proven claims, localisation and check:copy"
+  default_prompt: "Use $fireskill-specialist-copywriting to guide this task with verified copy standards, the claim ledger and the check:copy gate."

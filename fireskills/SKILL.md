@@ -50,6 +50,9 @@ Load **before** writing code in each area:
 | stores | `fireskill-specialist-pinia` |
 | `layers/billing`, Stripe, Paddle, webhooks, plans, subscriptions | `fireskill-specialist-billing` |
 | `apps/web/content/**`, blog posts, docs pages, translations, page metadata, sitemap, `apps/web/public/images/**` | `fireskill-specialist-content-seo` |
+| every text a human reads: `apps/*/i18n/locales/**`, `.vue` template text, `packages/emails/templates/**`, pricing, testimonials, claims | `fireskill-specialist-copywriting` |
+| `perf-budgets.json`, `routeRules` (`noScripts`), hydration, images, fonts, third-party scripts, bundle size, Core Web Vitals | `fireskill-specialist-web-performance` |
+| `robots`, `apps/web/public/_redirects`, sitemap, canonical, structured data, `assets.htmlHandling`, IndexNow | `fireskill-specialist-seo` |
 | Workers, bindings, queues, cron, Durable Objects | `fireskill-specialist-cloudflare-workers` |
 | `infra/`, secrets, stages, deployment | `fireskill-specialist-sst` |
 
@@ -77,6 +80,10 @@ Stack-agnostic engineering specialists (security, accessibility, performance, ob
 | Typecheck | `bun run typecheck` in `apps/app` **and** `bunx vue-tsc --noEmit -p server/tsconfig.json` |
 | i18n completeness | `bun run check:i18n` |
 | SEO gate (frontmatter lint always; page audit after a build) | `SITE_URL=https://<domain> bun run --cwd apps/web build`, then `bun run check:seo` |
+| Page weight gate (after a build) | `bun run check:perf` |
+| Copy gate: claims, testimonials, urgency, literal text | `bun run check:copy` |
+| Live SEO audit of a running server | `bun run check:seo -- --live <origin> [--sitemap-origin <origin>]` |
+| IndexNow (dry run by default; `--submit` needs authorization) | `bun run indexnow -- --origin https://<domain>` |
 | Social images (SVG covers to 1200x675 PNG) | `bun run generate:og` |
 | Specs: progress, state transitions, effort, milestones | `bun run fireskill progress`, `transition <id> <state>`, `effort <id> <1-10> --reason "…"`, `milestones sync` |
 | Deterministic spec linter | `bun run fireskill validate <id> [--strict]` |

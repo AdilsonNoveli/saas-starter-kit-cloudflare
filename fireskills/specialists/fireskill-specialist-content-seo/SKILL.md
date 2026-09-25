@@ -12,6 +12,8 @@ description: Write, translate and review Nuxfire blog posts, docs pages and thei
 - Trigger when changing what a page tells search engines and social networks: title,
   description, `<h1>`, canonical, Open Graph, Twitter, JSON-LD, `<html lang>`, hreflang, sitemap.
 - Trigger when adding or renaming a locale (`apps/web/i18n/supported-locales.ts`).
+- Search-engine mechanics that are not about authoring (redirects, `_redirects`, `assets.htmlHandling`,
+  sitemap and `lastmod` rules, IndexNow, structured-data selection) live in `$fireskill-specialist-seo`.
 - Do not trigger for visual work on the layout (`$fireskill-specialist-nuxt-ui`), for the
   landing copy stored in `apps/web/i18n/locales/*.json` beyond the keys of `blog.*`, or for
   the infrastructure of the `Web` Worker (`$fireskill-specialist-sst`).
@@ -114,6 +116,9 @@ description: Write, translate and review Nuxfire blog posts, docs pages and thei
 
 - `$fireskill-specialist-nuxt` — pages, composables, Nitro plugins.
 - `$fireskill-specialist-nuxt-ui` — blog card and article layout components.
+- `$fireskill-specialist-seo` — what Google and Bing require of any page (status codes, redirects,
+  canonical, sitemap, structured data, IndexNow); this specialist keeps how posts and docs are authored.
+- `$fireskill-specialist-copywriting` — the words of titles, descriptions and post copy.
 - `$fireskill-specialist-technical-research` — sourcing claims.
 - `$fireskill-specialist-web-accessibility` — headings and landmarks.
 - `$fireskill-specialist-delivery-engineering` — deploying the `Web` Worker after content changes.

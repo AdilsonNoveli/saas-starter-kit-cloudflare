@@ -25,7 +25,7 @@ Base provided by the Nuxfire starter kit (Nuxt 4 + Cloudflare Workers + SST). Ad
 | In-app and real-time notifications (WebSocket/Durable Object) | `layers/notifications`, `apps/functions/src/websockets.js` |
 | Queued jobs with DLQ and hourly cron (cron only writes a row to `Log`) | `infra/jobs.ts`, `infra/cron.ts`, `apps/functions/src/` |
 | Transactional email (React Email; only Resend is active) | `packages/emails`, `apps/functions/src/emails.ts` |
-| Public website, blog (posts in `en`/`pt-br`/`es` with validated frontmatter, one index card per post in the active locale, per-post SEO, sitemap `lastmod`/hreflang), docs, and legal pages (Nuxt Content v3), audited by `bun run check:seo` | `apps/web`, `scripts/check-seo.ts` |
+| Public website, blog (posts in `en`/`pt-br`/`es` with validated frontmatter, one index card per post in the active locale, per-post SEO, sitemap `lastmod`/hreflang), docs, and legal pages (Nuxt Content v3), audited by `bun run check:seo`, weighed by `bun run check:perf` and its text checked by `bun run check:copy` | `apps/web`, `scripts/check-seo.ts`, `scripts/check-perf.ts`, `scripts/check-copy.ts` |
 | Kanban (toggleable feature layer in `config.ts`) | `layers/kanban` |
 
 ## Boundaries and Non-Goals

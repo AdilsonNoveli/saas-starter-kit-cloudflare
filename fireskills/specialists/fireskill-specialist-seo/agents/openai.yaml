@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - SEO"
+  short_description: "Google and Bing requirements: status codes, canonical, sitemap, structured data, IndexNow"
+  default_prompt: "Use $fireskill-specialist-seo to guide this task with verified search engine requirements and the check:seo gate."

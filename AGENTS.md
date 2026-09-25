@@ -1,7 +1,7 @@
 # Nuxfire — Agent Instructions
 
 Development in this repository is governed by **Fireskills** (`fireskills/`):
-a specification-driven workflow and 35 technical specialists with verified knowledge
+a specification-driven workflow and 38 technical specialists with verified knowledge
 of this codebase. Never work from memory: work through the framework.
 
 ## Always Start Here
@@ -16,6 +16,12 @@ of this codebase. Never work from memory: work through the framework.
 
 ## Core Working Rules
 
+- **Every human-readable text in the apps** (interface labels and buttons, empty states, errors and
+  permission messages, landing and pricing copy, blog voice, transactional emails, notifications, legal
+  text, testimonials and any claim about the product) passes through
+  `fireskill-specialist-copywriting`; no number, comparison, guarantee, deadline or testimonial is
+  written without a record in `.fireskills/CLAIMS.yml`. Page weight belongs to
+  `fireskill-specialist-web-performance` and what search engines require to `fireskill-specialist-seo`.
 - Behavioral changes (features, business rules, data schemas, views): strictly follow workflow in
   `fireskills/skills/`. Trivial fixes: may proceed directly, provided `.fireskills/RULES.md` has been read
   and the relevant specialist is loaded.
@@ -24,7 +30,9 @@ of this codebase. Never work from memory: work through the framework.
 - No deployments, destructive data operations, or irreversible actions without explicit user authorization.
 - Never declare work "done" without running full validation: `bun run test`, typechecks
   (`apps/app` and `bunx vue-tsc --noEmit -p server/tsconfig.json`), and checks specified by the specialist.
-  For content and page metadata (`apps/web`), also `bun run check:seo` against a fresh `nuxt build`.
+  For content and page metadata (`apps/web`), also `bun run check:seo` against a fresh `nuxt build`;
+  for anything that changes what a public page weighs, `bun run check:perf`; for any text a human
+  reads, `bun run check:copy` and `bun run check:i18n`.
 
 <!-- specsfy:framework:start -->
 ## Fireskills Framework

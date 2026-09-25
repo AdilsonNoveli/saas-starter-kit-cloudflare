@@ -5,8 +5,8 @@
 
 | Type | Quantity |
 | --- | --- |
-| Code | 424 |
-| Tests | 18 |
+| Code | 441 |
+| Tests | 26 |
 
 ## Diagrams
 

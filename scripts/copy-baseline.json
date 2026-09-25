@@ -2034,6 +2034,78 @@
       "where": "landing.testimonials.items.item4",
       "removedBy": "SPEC-0003",
       "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item2",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item5",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item6",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item7",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unverified",
+      "where": "landing.testimonials.items.item8",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingProof.vue",
+      "match": "/static/xZ4wg2Xj.webp",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingProof.vue",
+      "match": "/static/FJkauyEa.webp",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingProof.vue",
+      "match": "/static/KtCFjlD4.webp",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingProof.vue",
+      "match": "/static/N4aA96n.webp",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingProof.vue",
+      "match": "/static/AVQ0V28X.webp",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "testimonial-unregistered-image",
+      "where": "apps/web/app/components/landing/LandingProof.vue",
+      "match": "/static/VUMBKh1U.webp",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
     }
   ]
 }

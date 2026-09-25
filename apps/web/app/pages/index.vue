@@ -2,11 +2,12 @@
   <div>
     <LandingHero />
     <LandingProblem />
-    <LandingOutcomes />
-    <LandingMethod />
-    <LandingAudience />
-    <LandingProof />
-    <LandingOffer />
+    <!-- Below the first screen: hydrated when they scroll into view, so the first load pays only for the hero -->
+    <LazyLandingOutcomes hydrate-on-visible />
+    <LazyLandingMethod hydrate-on-visible />
+    <LazyLandingAudience hydrate-on-visible />
+    <LazyLandingProof hydrate-on-visible />
+    <LazyLandingOffer hydrate-on-visible />
   </div>
 </template>
 

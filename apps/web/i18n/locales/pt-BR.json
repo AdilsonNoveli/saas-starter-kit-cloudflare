@@ -100,6 +100,7 @@
     "seoTitle": "Kit para criar seu SaaS em Nuxt na Cloudflare",
     "seoDescription": "Comece seu SaaS com login, times, cobrança, painel de admin e deploy já prontos. Kit em Nuxt para Cloudflare, com um método para a sua IA construir o resto.",
     "hero": {
+      "badge": "Nuxt, Cloudflare e Stripe",
       "title": "Comece seu SaaS com login, cobrança e deploy já prontos.",
       "subtitle": "O Nuxfire é um kit em Nuxt para Cloudflare com times, permissões, pagamentos, painel de admin e um método para a sua IA construir o resto por especificação e teste.",
       "cta": "Quero o Nuxfire",
@@ -109,7 +110,17 @@
     },
     "problem": {
       "title": "Sua ideia está clara. O que atrasa é o resto.",
-      "body": "Login, times, permissões, cobrança, e-mails, filas, painel de admin e deploy. Cada peça toma tempo, e pedir para a IA fazer tudo isso desde o começo costuma dar um desenho diferente a cada vez."
+      "body": "Login, times, permissões, cobrança, e-mails, filas, painel de admin e deploy. Cada peça toma tempo, e pedir para a IA fazer tudo isso desde o começo costuma dar um desenho diferente a cada vez.",
+      "pieces": {
+        "auth": "Login",
+        "teams": "Times",
+        "permissions": "Permissões",
+        "billing": "Cobrança",
+        "emails": "E-mails",
+        "queues": "Filas",
+        "admin": "Painel de admin",
+        "deploy": "Deploy"
+      }
     },
     "outcomes": {
       "title": "O que você recebe",
@@ -139,7 +150,8 @@
           "title": "Deploy",
           "text": "Um comando publica o app na sua conta da Cloudflare."
         }
-      }
+      },
+      "eyebrow": "No kit"
     },
     "method": {
       "title": "Um método para a IA seguir, em vez de tentativa e erro",
@@ -158,14 +170,16 @@
           "title": "Publique",
           "text": "Os testes passam, a documentação é atualizada e o deploy sai com um comando."
         }
-      }
+      },
+      "eyebrow": "Método"
     },
     "audience": {
       "title": "Para quem é",
       "forTitle": "É para você se",
       "forText": "Você constrói SaaS com ajuda de IA, como Cursor e Claude Code, e quer partir de uma base pronta em vez de montar cada peça.",
       "notTitle": "Talvez não seja para você se",
-      "notText": "Você procura uma ferramenta sem código: aqui você edita TypeScript. Ou não pretende publicar na Cloudflare."
+      "notText": "Você procura uma ferramenta sem código: aqui você edita TypeScript. Ou não pretende publicar na Cloudflare.",
+      "eyebrow": "Para quem"
     },
     "testimonials": {
       "title": "Quem já usou",
@@ -176,6 +190,11 @@
           "role": "Dev Full-Stack · Comunidade Discord",
           "quote": "Configurar autenticação multi-tenant e webhooks da Stripe levava semanas. Com o Nuxfire, coloquei o faturamento e a gestão de equipes no ar em um único fim de semana..."
         },
+        "item2": {
+          "name": "Marcus Vance",
+          "role": "Líder de Plataforma · Testador GitHub",
+          "quote": "A arquitetura de Workers com Hyperdrive Postgres é absurdamente rápida. Zero cold start na borda global e o pipeline SST funcionou perfeitamente de primeira..."
+        },
         "item3": {
           "name": "Elena Rostova",
           "role": "Fundadora de SaaS · Acesso Antecipado",
@@ -185,8 +204,29 @@
           "name": "Liam O'Connor",
           "role": "Arquiteto Backend · Discord",
           "quote": "Eu tinha dúvidas sobre rodar Nuxt 4 e Drizzle na borda, mas a arquitetura é genial. Separação limpa entre Web, App e Auth Workers sem nenhuma complexidade inútil..."
+        },
+        "item5": {
+          "name": "Sofia Mendes",
+          "role": "Engenheira Cloud · Testadora GitHub",
+          "quote": "Os WebSockets com Durable Objects e filas assíncronas nativas foram o diferencial. Substituímos nosso antigo Redis BullMQ e reduzimos a conta de servidor a zero..."
+        },
+        "item6": {
+          "name": "Daniel Zhao",
+          "role": "Criador Indie · Early Adopter",
+          "quote": "Os componentes do Nuxt UI v4 com docs em D1 e portal Stripe tornaram o lançamento do nosso B2B muito simples. Uma base de código feita por engenheiros seniores..."
+        },
+        "item7": {
+          "name": "Kavita Patel",
+          "role": "Desenvolvedora Nuxt · Comunidade Discord",
+          "quote": "A tipagem ponta a ponta entre Drizzle ORM e tRPC é impecável. Refatorar o banco não gera bugs ocultos em runtime. Facilmente o melhor starter kit Nuxt do mercado..."
+        },
+        "item8": {
+          "name": "Jordan Blake",
+          "role": "Engenheiro de Produto · Acesso Antecipado",
+          "quote": "Pare de perder tempo criando autenticação e permissões do zero. Migramos nosso MVP para o Nuxfire e ativamos as primeiras assinaturas pagas 48h depois. Vale ouro..."
         }
-      }
+      },
+      "eyebrow": "Depoimentos"
     },
     "offer": {
       "title": "Comece hoje",
@@ -214,7 +254,8 @@
       "talkTitle": "Prefere conversar antes?",
       "talkText": "Combine uma conversa pelo WhatsApp de suporte e tire suas dúvidas antes de comprar.",
       "talkCta": "Chamar no WhatsApp",
-      "talkMessage": "Olá! Quero conversar sobre o Nuxfire."
+      "talkMessage": "Olá! Quero conversar sobre o Nuxfire.",
+      "eyebrow": "Oferta"
     },
     "faq": {
       "title": "Perguntas de quem vai comprar",

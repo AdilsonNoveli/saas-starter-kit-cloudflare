@@ -34,6 +34,46 @@ claims:
       on: "2026-09-25"
     verifiedAt: "2026-09-25"
     owner: "Owner of Nuxfire"
+  - id: testimonial-item2-quote
+    keys:
+      - landing.testimonials.items.item2.quote
+    statement: "A user quoted on the page said the deployment worked on the first try with zero cold starts"
+    evidence:
+      kind: owner-statement
+      by: "Owner of Nuxfire (the quote is real, kept as given)"
+      on: "2026-09-25"
+    verifiedAt: "2026-09-25"
+    owner: "Owner of Nuxfire"
+  - id: testimonial-item5-quote
+    keys:
+      - landing.testimonials.items.item5.quote
+    statement: "A user quoted on the page said the kit let them cut server bills to zero"
+    evidence:
+      kind: owner-statement
+      by: "Owner of Nuxfire (the quote is real, kept as given)"
+      on: "2026-09-25"
+    verifiedAt: "2026-09-25"
+    owner: "Owner of Nuxfire"
+  - id: testimonial-item7-quote
+    keys:
+      - landing.testimonials.items.item7.quote
+    statement: "A user quoted on the page called the type safety immaculate and the kit the best Nuxt starter"
+    evidence:
+      kind: owner-statement
+      by: "Owner of Nuxfire (the quote is real, kept as given)"
+      on: "2026-09-25"
+    verifiedAt: "2026-09-25"
+    owner: "Owner of Nuxfire"
+  - id: testimonial-item8-quote
+    keys:
+      - landing.testimonials.items.item8.quote
+    statement: "A user quoted on the page said they shipped paid subscriptions 48 hours after migrating"
+    evidence:
+      kind: owner-statement
+      by: "Owner of Nuxfire (the quote is real, kept as given)"
+      on: "2026-09-25"
+    verifiedAt: "2026-09-25"
+    owner: "Owner of Nuxfire"
 notClaims: []
 testimonials: []
 offers: []

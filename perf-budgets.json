@@ -37,9 +37,9 @@
     {
       "route": "/",
       "metric": "js",
-      "limit": 259386,
+      "limit": 261789,
       "kind": "baseline",
-      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25 after the refactor; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25; raised from 259386 by 2403 bytes when the owner asked for the testimonial marquee back, DEC-014; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
       "removedBy": "SPEC-0003",
       "since": "2026-09-25"
     },
@@ -78,9 +78,9 @@
     {
       "route": "/pt-br",
       "metric": "js",
-      "limit": 259386,
+      "limit": 261789,
       "kind": "baseline",
-      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25 after the refactor; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25; raised from 259386 by 2403 bytes when the owner asked for the testimonial marquee back, DEC-014; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
       "removedBy": "SPEC-0003",
       "since": "2026-09-25"
     },
@@ -119,9 +119,9 @@
     {
       "route": "/es",
       "metric": "js",
-      "limit": 259386,
+      "limit": 261789,
       "kind": "baseline",
-      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25 after the refactor; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25; raised from 259386 by 2403 bytes when the owner asked for the testimonial marquee back, DEC-014; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
       "removedBy": "SPEC-0003",
       "since": "2026-09-25"
     },

@@ -102,7 +102,7 @@ describe("what the owner ruled out is not on the page (FR-013, FR-014, FR-015)",
 
 describe("the page is short and the depth is elsewhere (FR-010, NFR-003)", () => {
   const index = readFileSync(join(WEB, "app/pages/index.vue"), "utf8");
-  const used = [...index.matchAll(/<(Landing[A-Za-z]+)/g)].map((match) => match[1]);
+  const used = [...index.matchAll(/<(?:Lazy)?(Landing[A-Za-z]+)/g)].map((match) => match[1]);
 
   // SPECSFY: US-005 FR-010 NFR-003 AC-005
   it("uses at most seven landing sections", () => {
@@ -111,7 +111,7 @@ describe("the page is short and the depth is elsewhere (FR-010, NFR-003)", () =>
   });
 
   // SPECSFY: US-005 FR-010 NFR-003 AC-005
-  it("no longer has the technical blocks, the badges, the marquee or the old pricing card", () => {
+  it("no longer has the technical blocks, the badges or the old pricing card", () => {
     for (const name of [
       "LandingUseCases",
       "LandingArchitecture",
@@ -125,7 +125,7 @@ describe("the page is short and the depth is elsewhere (FR-010, NFR-003)", () =>
     ]) {
       expect(existsSync(join(WEB, "app/components/landing", `${name}.vue`)), name).toBe(false);
     }
-    expect(existsSync(join(WEB, "app/components/testimonial/TestimonialRow.vue"))).toBe(false);
+    // The testimonial cards and their marquee stay: the owner asked for them back (SPEC-0003 DEC-014).
     expect(existsSync(join(WEB, "app/components/pricing/PricingCard.vue"))).toBe(false);
   });
 

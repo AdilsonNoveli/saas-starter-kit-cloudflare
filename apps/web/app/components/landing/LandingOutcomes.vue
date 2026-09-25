@@ -14,24 +14,28 @@ const outcomes = [
 </script>
 
 <template>
-  <section aria-labelledby="landing-outcomes" class="container mx-auto max-w-3xl px-4 md:px-8 py-16 md:py-24">
-    <h2 id="landing-outcomes" class="text-pretty text-3xl sm:text-4xl font-extrabold tracking-tight text-highlighted">
-      {{ t("landing.outcomes.title") }}
-    </h2>
-    <ul class="mt-12 space-y-10 list-none p-0">
-      <li v-for="item in outcomes" :key="item.key" class="flex gap-5">
-        <UIcon :name="item.icon" class="mt-1 size-6 shrink-0 text-primary" aria-hidden="true" />
-        <div>
-          <h3 class="text-xl font-bold text-highlighted">
-            {{ t(`landing.outcomes.items.${item.key}.title`) }}
-          </h3>
-          <p class="mt-2 text-base leading-relaxed text-muted">
-            {{ t(`landing.outcomes.items.${item.key}.text`) }}
-          </p>
-          <NuxtLink :to="item.href" class="mt-2 inline-block text-sm font-medium text-primary hover:underline">
-            {{ t("landing.outcomes.linkLabel") }}
-          </NuxtLink>
-        </div>
+  <section aria-labelledby="landing-outcomes" class="container mx-auto max-w-6xl px-4 md:px-8 py-20 md:py-28">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="text-sm font-semibold uppercase tracking-widest text-primary">{{ t("landing.outcomes.eyebrow") }}</p>
+      <h2 id="landing-outcomes" class="mt-3 text-pretty text-4xl sm:text-5xl font-extrabold tracking-tight text-highlighted">
+        {{ t("landing.outcomes.title") }}
+      </h2>
+    </div>
+    <ul class="mt-16 grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 list-none p-0">
+      <li v-for="item in outcomes" :key="item.key">
+        <span class="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <UIcon :name="item.icon" class="size-6" aria-hidden="true" />
+        </span>
+        <h3 class="mt-5 text-xl font-bold text-highlighted">
+          {{ t(`landing.outcomes.items.${item.key}.title`) }}
+        </h3>
+        <p class="mt-2 text-base leading-relaxed text-muted">
+          {{ t(`landing.outcomes.items.${item.key}.text`) }}
+        </p>
+        <NuxtLink :to="item.href" class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+          {{ t("landing.outcomes.linkLabel") }}
+          <UIcon name="i-lucide-arrow-right" class="size-4" aria-hidden="true" />
+        </NuxtLink>
       </li>
     </ul>
   </section>

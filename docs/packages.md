@@ -10,6 +10,7 @@
 | Third-party | production | unenv | 2.0.0-rc.24 | Purpose not described in local metadata. | unjs/unenv | — |
 | Third-party | development | @tsconfig/node22 | ^22 | A base TSConfig for working with Node 22. | https://github.com/tsconfig/bases | https://github.com/tsconfig/bases |
 | Third-party | development | prettier | ^3.4.2 | Prettier is an opinionated code formatter | prettier/prettier | — |
+| Third-party | development | sharp | 0.35.4 | High performance Node.js image processing, the fastest module to resize JPEG, PNG, WebP, GIF, AVIF and TIFF images | https://github.com/lovell/sharp | https://github.com/lovell/sharp |
 | Third-party | development | typescript | ^5 | TypeScript is a language for application scale JavaScript development | https://github.com/microsoft/TypeScript | https://github.com/microsoft/TypeScript |
 | Third-party | development | vitest | ^5.0.0 | Next generation testing framework powered by Vite | https://github.com/vitest-dev/vitest | https://github.com/vitest-dev/vitest |
 | Third-party | production | @nuxfire/tokens | workspace:* | Purpose not described in local metadata. |  | — |

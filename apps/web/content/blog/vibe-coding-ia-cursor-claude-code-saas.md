@@ -7,6 +7,8 @@ category: "Desenvolvimento com IA"
 readTime: "8 min"
 tags: ["Cursor", "Claude Code", "v0", "Vibe Coding", "TypeScript"]
 image: "/images/blog/vibe-coding-ai-cursor-claude.svg"
+lang: pt-br
+ogImage: "/images/blog/vibe-coding-ai-cursor-claude.png"
 ---
 
 O termo **"Vibe Coding"** tornou-se a maior tendência de desenvolvimento de software em 2026. Desenvolvedores experientes e fundadores técnicos usam assistentes inteligentes como **Cursor**, **Claude Code** e **v0** para escrever código em velocidades nunca antes imaginadas.

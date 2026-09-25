@@ -7,6 +7,8 @@ category: "Segurança & Banco de Dados"
 readTime: "9 min"
 tags: ["Multi-Tenancy", "RBAC", "PostgreSQL", "Drizzle ORM", "Segurança"]
 image: "/images/blog/multi-tenancy-rbac-postgresql.svg"
+lang: pt-br
+ogImage: "/images/blog/multi-tenancy-rbac-postgresql.png"
 ---
 
 O maior divisor de águas entre um projeto amador e um produto de software corporativo pronto para vendas B2B é a segurança do **multi-tenancy** e do **RBAC (Role-Based Access Control)**.

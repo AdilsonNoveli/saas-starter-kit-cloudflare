@@ -1,7 +1,7 @@
 # Nuxfire — Agent Instructions
 
 Development in this repository is governed by **Fireskills** (`fireskills/`):
-a specification-driven workflow and 34 technical specialists with verified knowledge
+a specification-driven workflow and 35 technical specialists with verified knowledge
 of this codebase. Never work from memory: work through the framework.
 
 ## Always Start Here
@@ -24,6 +24,7 @@ of this codebase. Never work from memory: work through the framework.
 - No deployments, destructive data operations, or irreversible actions without explicit user authorization.
 - Never declare work "done" without running full validation: `bun run test`, typechecks
   (`apps/app` and `bunx vue-tsc --noEmit -p server/tsconfig.json`), and checks specified by the specialist.
+  For content and page metadata (`apps/web`), also `bun run check:seo` against a fresh `nuxt build`.
 
 <!-- specsfy:framework:start -->
 ## Fireskills Framework

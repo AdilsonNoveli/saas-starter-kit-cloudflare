@@ -86,6 +86,7 @@ Specialists are technical context skills equipping agents with deep expertise in
 | `fireskill-specialist-nuxt-authorization` | RBAC: defineAbility, abilityProcedure, Can component |
 | `fireskill-specialist-pinia` | Pinia: stores, SSR hydration, composables |
 | `fireskill-specialist-billing` | Stripe and Paddle: checkout, webhooks, subscriptions, plans |
+| `fireskill-specialist-content-seo` | Blog and docs content, translations and SEO: frontmatter contract, metadata builders, hreflang and sitemap, `check:seo` |
 
 ### Engineering (Stack-Agnostic)
 

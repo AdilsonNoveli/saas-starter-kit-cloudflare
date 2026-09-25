@@ -49,6 +49,7 @@ Load **before** writing code in each area:
 | login, sessions, cookies, `apps/functions/src/auth.ts` | `fireskill-specialist-openauth` |
 | stores | `fireskill-specialist-pinia` |
 | `layers/billing`, Stripe, Paddle, webhooks, plans, subscriptions | `fireskill-specialist-billing` |
+| `apps/web/content/**`, blog posts, docs pages, translations, page metadata, sitemap, `apps/web/public/images/**` | `fireskill-specialist-content-seo` |
 | Workers, bindings, queues, cron, Durable Objects | `fireskill-specialist-cloudflare-workers` |
 | `infra/`, secrets, stages, deployment | `fireskill-specialist-sst` |
 
@@ -75,6 +76,8 @@ Stack-agnostic engineering specialists (security, accessibility, performance, ob
 | Automated tests | `bun run test` |
 | Typecheck | `bun run typecheck` in `apps/app` **and** `bunx vue-tsc --noEmit -p server/tsconfig.json` |
 | i18n completeness | `bun run check:i18n` |
+| SEO gate (frontmatter lint always; page audit after a build) | `SITE_URL=https://<domain> bun run --cwd apps/web build`, then `bun run check:seo` |
+| Social images (SVG covers to 1200x675 PNG) | `bun run generate:og` |
 | Specs: progress, state transitions, effort, milestones | `bun run fireskill progress`, `transition <id> <state>`, `effort <id> <1-10> --reason "…"`, `milestones sync` |
 | Deterministic spec linter | `bun run fireskill validate <id> [--strict]` |
 | Lessons learned | `bun run fireskill lesson add/list/status/prune` |

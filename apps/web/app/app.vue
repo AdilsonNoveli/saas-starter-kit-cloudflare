@@ -26,12 +26,22 @@ provide("navigation", navigation);
 // tracking it when the locale changes.
 const localeHead = useLocaleHead({ seo: true });
 
+// A blog post is written in one language that does not depend on the visitor's locale, so
+// its page emits `lang`, `og:locale` and the hreflang cluster itself (use-content-seo.ts).
+// Both sets of tags would otherwise be present and contradict each other.
+const ownsLocaleHead = useState("seo:owns-locale-head", () => false);
+
 useHead(() => ({
-  htmlAttrs: localeHead.value.htmlAttrs,
+  htmlAttrs: ownsLocaleHead.value
+    ? { dir: localeHead.value.htmlAttrs?.dir }
+    : localeHead.value.htmlAttrs,
   link: [
     { href: "/svg/nuxfire.svg", rel: "icon", type: "image/svg+xml" },
     ...(localeHead.value.link ?? []),
   ],
-  meta: localeHead.value.meta ?? [],
+  meta: ownsLocaleHead.value ? [] : (localeHead.value.meta ?? []),
 }));
+
+// Every page carries a social image unless it sets its own (Open Graph requires one).
+useDefaultSocialMeta();
 </script>

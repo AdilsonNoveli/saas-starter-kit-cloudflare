@@ -42,14 +42,27 @@
           <div class="space-y-4">
             <!-- Top Metadata: Category & Reading Time -->
             <div class="flex items-center justify-between gap-2 text-xs">
-              <UBadge
-                color="primary"
-                variant="subtle"
-                size="sm"
-                class="font-semibold uppercase tracking-wider text-[11px]"
-              >
-                {{ post.category || $t("blog.defaultCategory") }}
-              </UBadge>
+              <div class="flex items-center gap-1.5">
+                <UBadge
+                  color="primary"
+                  variant="subtle"
+                  size="sm"
+                  class="font-semibold uppercase tracking-wider text-[11px]"
+                >
+                  {{ post.category || $t("blog.defaultCategory") }}
+                </UBadge>
+                <!-- Posts are written in one language each; the label says which. -->
+                <UBadge
+                  color="neutral"
+                  variant="subtle"
+                  size="sm"
+                  class="font-mono font-semibold uppercase text-[11px]"
+                  :title="$t('blog.postLanguage', { language: languageName(post.lang) })"
+                  :aria-label="$t('blog.postLanguage', { language: languageName(post.lang) })"
+                >
+                  {{ post.lang.split("-")[0] }}
+                </UBadge>
+              </div>
               <span v-if="post.readTime" class="text-muted flex items-center gap-1 font-medium">
                 <UIcon name="i-lucide-clock" class="w-3.5 h-3.5 text-muted" />
                 {{ post.readTime }}
@@ -103,14 +116,32 @@
 </template>
 
 <script setup lang="ts">
+import { CONTENT_LOCALES } from "~~/i18n/supported-locales";
+
 definePageMeta({
   layout: "page",
   auth: false,
 });
 const { t } = useI18n();
-useSeoMeta({
-  title: () => t("blog.seoTitle"),
+const route = useRoute();
+
+// The visible subtitle is the description: one text, no second copy to drift.
+usePageSeo({
+  path: route.path,
+  title: t("blog.seoTitle"),
+  description: t("blog.subtitle"),
+  kind: "blog-index",
 });
+useSchemaOrg([
+  defineWebPage({
+    "@type": "CollectionPage",
+    name: t("blog.title"),
+    description: t("blog.subtitle"),
+  }),
+]);
+
+const languageName = (lang: string): string =>
+  CONTENT_LOCALES.find((locale) => locale.code === lang)?.name ?? lang;
 
 const { data: posts } = await useAsyncData("blog-list", () =>
   queryCollection("blog").order("date", "DESC").all(),

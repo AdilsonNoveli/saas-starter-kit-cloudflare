@@ -7,6 +7,8 @@ category: "Tempo Real & WebSockets"
 readTime: "6 min"
 tags: ["WebSockets", "Durable Objects", "Cloudflare", "Tempo Real"]
 image: "/images/blog/websockets-durable-objects.svg"
+lang: pt-br
+ogImage: "/images/blog/websockets-durable-objects.png"
 ---
 
 Construir funcionalidades em tempo real (como notificações instantâneas, cursores colaborativos ou dashboards ao vivo) sempre foi um dos maiores pesadelos em arquiteturas serverless.

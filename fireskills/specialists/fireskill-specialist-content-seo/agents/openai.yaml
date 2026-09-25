@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Content SEO"
+  short_description: "Blog and docs authoring, translations and SEO in Nuxfire"
+  default_prompt: "Use $fireskill-specialist-content-seo to guide this task with verified content, translation and SEO standards."

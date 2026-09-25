@@ -7,6 +7,8 @@ category: "Engenharia de Software"
 readTime: "8 min"
 tags: ["Nuxt Layers", "Arquitetura Modular", "B2B SaaS", "Clean Code"]
 image: "/images/blog/nuxt-layers-modular-b2b.svg"
+lang: pt-br
+ogImage: "/images/blog/nuxt-layers-modular-b2b.png"
 ---
 
 Conforme um produto SaaS cresce, a complexidade do código tende a explodir. Componentes de checkout misturam-se com regras de autenticação, telas de administração dividem diretórios com telas de usuários comuns e uma alteração no modelo de banco quebra três telas diferentes sem aviso prévio.

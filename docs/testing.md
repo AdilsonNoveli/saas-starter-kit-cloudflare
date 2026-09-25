@@ -3,9 +3,9 @@
 <!-- specsfy:documentator:start -->
 ## Summary
 
-- Test files: 14.
+- Test files: 18.
 - Runner: Vitest.
-- Scripts: doctor: bun scripts/doctor.ts; deploy: bun scripts/deploy.ts; format: prettier -w .; test: vitest run; check:i18n: bun scripts/check-i18n-completeness.ts && bun scripts/check-docs-translations.ts; fireskill: bun fireskills/cli/src/main.ts; web: sst shell -- bun scripts/dev.ts web; web-remote: sst shell -- bun scripts/dev.ts web remote; app: sst shell -- bun scripts/dev.ts app; app-remote: sst shell -- bun scripts/dev.ts app remote.
+- Scripts: doctor: bun scripts/doctor.ts; deploy: bun scripts/deploy.ts; format: prettier -w .; test: vitest run; check:i18n: bun scripts/check-i18n-completeness.ts && bun scripts/check-docs-translations.ts; check:seo: bun scripts/check-seo.ts; generate:og: bun scripts/generate-og-images.ts; fireskill: bun fireskills/cli/src/main.ts; web: sst shell -- bun scripts/dev.ts web; web-remote: sst shell -- bun scripts/dev.ts web remote; app: sst shell -- bun scripts/dev.ts app; app-remote: sst shell -- bun scripts/dev.ts app remote.
 
 | File |
 | --- |
@@ -20,7 +20,11 @@
 | packages\tokens\theme-color.test.ts |
 | scripts\app-identity.test.ts |
 | scripts\branding.test.ts |
+| scripts\content-docs-drift.test.ts |
 | scripts\durable-objects.test.ts |
 | scripts\no-explicit-any.test.ts |
 | scripts\notification-rules.test.ts |
+| scripts\og-images.test.ts |
+| scripts\seo-rules.test.ts |
+| scripts\specialists-catalog.test.ts |
 <!-- specsfy:documentator:end -->

@@ -184,9 +184,10 @@ Inventory: maps each observed file to its surface.
 | Components | apps/web/app/components/search/Search.vue | SearchProps |
 | Components | apps/web/app/components/testimonial/TestimonialCard.vue | — |
 | Components | apps/web/app/components/testimonial/TestimonialRow.vue | Testimonial |
-| Pages | apps/web/app/composables/use-breadcrumb.ts | BreadcrumbItem, useBreadcrumb |
+| Pages | apps/web/app/composables/use-breadcrumb.ts | useBreadcrumb |
 | Pages | apps/web/app/composables/use-collapsed-map.ts | useCollapsedMap |
 | Pages | apps/web/app/composables/use-content-navigation.ts | DocsNavBadge, DocsNavigationItem, findNavItemByPath |
+| Pages | apps/web/app/composables/use-content-seo.ts | useSeoContext, useDefaultSocialMeta, useArticleSeo, usePageSeo |
 | Pages | apps/web/app/composables/use-docs-locale.ts | docsCollectionFor, queryDocsPage, queryDocsNavigation |
 | Pages | apps/web/app/composables/use-notification.ts | useNotification |
 | Pages | apps/web/app/composables/use-page.ts | — |
@@ -202,12 +203,20 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/web/app/pages/privacy-policy.vue | — |
 | Pages | apps/web/app/pages/signup.vue | — |
 | Pages | apps/web/app/pages/terms-of-service.vue | — |
+| Pages | apps/web/app/utils/breadcrumb.test.ts | — |
+| Pages | apps/web/app/utils/breadcrumb.ts | BreadcrumbNavItem, BreadcrumbItem, breadcrumbFromNavigation |
+| Pages | apps/web/app/utils/date.test.ts | — |
 | Pages | apps/web/app/utils/date.ts | — |
+| Pages | apps/web/app/utils/seo/content-seo.test.ts | — |
+| Pages | apps/web/app/utils/seo/content-seo.ts | OG_IMAGE_SIZE, BLOG_BASE, SeoContext, BlogPostInput, AlternateLink, SocialImage, SeoMeta, BlogPostingSchema |
 | Pages | apps/web/app/utils/title-case.ts | toTitleCase |
 | Other sources | apps/web/content.config.ts | — |
 | Other sources | apps/web/i18n/i18n.config.ts | — |
+| Other sources | apps/web/i18n/supported-locales.ts | CONTENT_LOCALES, CONTENT_LANGS |
 | Other sources | apps/web/nuxt.config.ts | docsRoutes, walk, blogRoutes |
 | Other sources | apps/web/public/crisp.js | — |
+| Other sources | apps/web/server/plugins/sitemap-blog.ts | to |
+| Other sources | apps/web/site.ts | SITE_URL, DEFAULT_OG_IMAGE |
 | Other sources | apps/web/sst-env.d.ts | — |
 | Other sources | apps/web/tailwind.config.ts | — |
 | Other sources | config.ts | — |
@@ -250,13 +259,4 @@ Inventory: maps each observed file to its surface.
 | Routes and APIs | layers/admin/server/trpc/admin-queue.ts | CRON_JOB_ID, readJobId |
 | Routes and APIs | layers/admin/server/trpc/admin-teams.ts | setTeamStatus |
 | Routes and APIs | layers/admin/server/trpc/router.ts | — |
-| Other sources | layers/admin/server/utils/platform-admin.ts | findActivePlatformAdmin, rather, isActivePlatformAdmin, isValidPlatformTotp |
-| Other sources | layers/admin/server/utils/platform-mfa-session.ts | PLATFORM_MFA_COOKIE_NAME, PLATFORM_MFA_MAX_AGE_SECONDS, PlatformMfaSessionData, sessionConfig, getPlatformMfaSession, startPlatformMfaSession |
-| Other sources | layers/admin/sst-env.d.ts | — |
-| Components | layers/billing/app/components/admin/plans/CreateEditModal.vue | CustomFeature, toProviderOption, addFeature, removeFeature, reset, onSubmit |
-| Components | layers/billing/app/components/billing/BillingComparisonTable.vue | PlanItem, Props, StoredFeature, getPlanFeatureValue |
-| Components | layers/billing/app/components/billing/BillingPeriodToggle.vue | PeriodOption |
-| Components | layers/billing/app/components/billing/BillingPortalActions.vue | PortalLinksObj, Props |
-| Components | layers/billing/app/components/billing/BillingTrialBanner.vue | Props, formatDate |
-| Components | layers/billing/app/components/pricing/PricingCard.vue | PricingFeature, Props |
 <!-- specsfy:documentator:end -->

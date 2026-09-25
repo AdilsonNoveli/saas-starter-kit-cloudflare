@@ -93,20 +93,31 @@
 </template>
 
 <script setup lang="ts">
+import { contentNotFound } from "~/utils/seo/content-seo";
+
 const page = await usePage();
 const {
-  docs: { name },
+  docs: { name, description },
 } = useAppConfig();
 
 const localePath = useLocalePath();
 const breadcrumbLinks = await useBreadcrumb();
 
-useSeoMeta({
+const route = useRoute();
+
+// The page renders its own "not found" state, but the response must say 404 as well:
+// status 200 on a page with nothing in it is a soft 404 that search engines index.
+if (contentNotFound(page.value, { path: route.path, requireBody: true })) {
+  const event = useRequestEvent();
+  if (event) setResponseStatus(event, 404);
+}
+
+usePageSeo({
+  path: route.path,
   title: `${page.value?.title ?? "404"} - ${name}`,
-  ogTitle: page.value?.title,
-  description: page.value?.description,
-  ogDescription: page.value?.description,
-  twitterCard: "summary_large_image",
+  socialTitle: page.value?.title ?? "404",
+  description: page.value?.description || description,
+  kind: "docs",
 });
 
 definePageMeta({

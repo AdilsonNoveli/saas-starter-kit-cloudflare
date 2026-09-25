@@ -1,5 +1,6 @@
 ---
 title: License
+description: "The Nuxfire license agreement: the scope of the license, permitted uses, restrictions, enforcement, and liability and governing law."
 ---
 
 Thank you for your interest in nuxfire. Please review the license terms below to understand the permitted uses of this product. If you have any questions or need clarification, feel free to reach out at [hi@nuxfire.com](mailto:hi@nuxfire.com).

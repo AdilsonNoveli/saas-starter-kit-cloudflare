@@ -1,5 +1,6 @@
 ---
 title: Privacy Policy
+description: "How Nuxfire collects, uses, retains, transfers, discloses and protects your personal data, and how you can have it deleted."
 ---
 
 Last updated: January 16, 2026

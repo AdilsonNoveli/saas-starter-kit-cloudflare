@@ -5,8 +5,8 @@
 
 | Type | Quantity |
 | --- | --- |
-| Code | 405 |
-| Tests | 14 |
+| Code | 422 |
+| Tests | 18 |
 
 ## Diagrams
 

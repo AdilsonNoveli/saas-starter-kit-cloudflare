@@ -1,5 +1,6 @@
 ---
 title: Terms and Conditions
+description: "The terms and conditions that govern your use of the Nuxfire website and its services."
 ---
 
 **Effective Date:** January 16, 2026

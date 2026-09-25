@@ -2,6 +2,8 @@ import { readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { generatePaths } from "../../scripts/generate-paths";
+import { CONTENT_LOCALES } from "./i18n/supported-locales";
+import { SITE_URL } from "./site";
 
 // Regenerates constants/paths.json (the docs "project structure" tree, see
 // generate-paths.ts) from the real repo tree every time this config loads —
@@ -57,11 +59,6 @@ function blogRoutes(): string[] {
   return routes;
 }
 
-// Set per stage at build time by infra/web.ts (from the branding domain); a local build
-// outside the deploy gets localhost. Feeds both @nuxtjs/seo's `site.url` and i18n's
-// `baseUrl` below, so every absolute URL the site emits points at the same origin.
-const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -97,13 +94,25 @@ export default defineNuxtConfig({
     "/docs/pro": { redirect: { to: "/docs/saas-starter-kit", statusCode: 302 } },
     "/docs/nuxfire": { redirect: { to: "/docs/saas-starter-kit", statusCode: 302 } },
     "/docs/production": { redirect: { to: "/docs/saas-starter-kit", statusCode: 301 } },
-  },
-  app: {
-    head: {
-      // No charset/viewport here — Nuxt already sets these exact defaults;
-      // repeating them just trips nuxt-seo-utils's "repeats a default" check.
-      title: "Nuxfire Docs | Nuxfire",
-    },
+    // The legal pages are English-only and have no localized routes (`i18n: false`, see
+    // pages/license.vue). Their /pt-br/... and /es/... URLs used to serve an empty page that
+    // was indexed and listed in the sitemap, so they now redirect to the real page.
+    // /signup only redirects the visitor to the app: it must not be indexed nor listed in the
+    // sitemap (the robots module removes noindex routes from it).
+    ...Object.fromEntries(
+      CONTENT_LOCALES.map((locale) => [
+        locale.code === "en" ? "/signup" : `/${locale.code}/signup`,
+        { robots: false },
+      ]),
+    ),
+    ...Object.fromEntries(
+      ["license", "privacy-policy", "terms-of-service"].flatMap((page) =>
+        CONTENT_LOCALES.filter((locale) => locale.code !== "en").map((locale) => [
+          `/${locale.code}/${page}`,
+          { redirect: { to: `/${page}`, statusCode: 301 } },
+        ]),
+      ),
+    ),
   },
   runtimeConfig: {
     public: {
@@ -118,7 +127,7 @@ export default defineNuxtConfig({
     autoImportPath: "~/assets/icons",
   },
   site: {
-    url: siteUrl,
+    url: SITE_URL,
     name: "Nuxfire",
   },
 
@@ -147,24 +156,12 @@ export default defineNuxtConfig({
     // (`href="/"`), which resolve to whichever hostname served the page: the
     // production `www.` alias (infra/dns.ts → webAliases) would canonicalize to
     // itself instead of the apex.
-    baseUrl: siteUrl,
+    baseUrl: SITE_URL,
     defaultLocale: "en",
     strategy: "prefix_except_default",
-    locales: [
-      { name: "English (US)", code: "en", language: "en-US", file: "en.json" },
-      {
-        name: "Português (Brasil)",
-        // Lowercase on purpose: `code` drives the URL prefix
-        // (prefix_except_default -> /pt-br/...), and Nuxt Link Checker's
-        // no-uppercase-chars rule flags any uppercase in a URL path. `language`
-        // stays properly-cased "pt-BR" since that's the BCP-47 tag used for
-        // hreflang/SEO, a separate field from `code`.
-        code: "pt-br",
-        language: "pt-BR",
-        file: "pt-BR.json",
-      },
-      { name: "Español", code: "es", language: "es-ES", file: "es.json" },
-    ],
+    // Single source: i18n/supported-locales.ts (also read by content.config.ts and the
+    // SEO builders), so a locale is never renamed in one place and forgotten in another.
+    locales: CONTENT_LOCALES.map(({ code, language, name, file }) => ({ code, language, name, file })),
     experimental: { typedOptionsAndMessages: "default" },
   },
   typescript: {

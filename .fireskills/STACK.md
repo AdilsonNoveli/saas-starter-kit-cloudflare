@@ -37,3 +37,4 @@ Technical details for each item live in the corresponding specialist (`fireskill
 - **Email**: React Email; Resend active. Mailgun, SES, SparkPost, and SMTP exist in the mailer fork (`packages/emails/mailer`), disabled in `config.ts` and commented out in `apps/functions/src/emails.ts`.
 - **React** exists solely in `packages/emails`; product UI is Vue.
 - **Testing**: Vitest; no Playwright or Cypress.
+- **Content SEO**: page metadata of `apps/web` comes from pure builders (`apps/web/app/utils/seo/content-seo.ts`) applied through `nuxt-seo-utils`/`nuxt-schema-org`; social images are PNGs rendered at build time from SVG covers with `sharp` (an exact root `devDependency`, scripts only, never bundled into the Worker) and audited by `bun run check:seo`. See `fireskill-specialist-content-seo`. Not `nuxt-og-image` (disabled).

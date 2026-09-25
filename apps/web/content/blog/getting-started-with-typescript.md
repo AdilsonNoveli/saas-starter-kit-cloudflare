@@ -6,6 +6,9 @@ author: "Adilson Noveli"
 category: "TypeScript"
 readTime: "5 min"
 image: "/images/blog/typescript-end-to-end-typesafety.svg"
+lang: pt-br
+authorType: "Person"
+ogImage: "/images/blog/typescript-end-to-end-typesafety.png"
 ---
 
 O **TypeScript** tornou-se um requisito indispensável no desenvolvimento moderno de software, especialmente na construção de aplicações SaaS críticas onde erros em tempo de execução custam clientes e reputação.

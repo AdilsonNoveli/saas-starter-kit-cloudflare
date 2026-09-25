@@ -2,7 +2,7 @@
 /** Validates material evidence of completed tasks under opt-in contract. */
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { resolve, relative } from "node:path";
+import { resolve, relative, isAbsolute } from "node:path";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 
@@ -74,7 +74,7 @@ if (!spec || !root || !existsSync(spec) || !existsSync(root)) {
         } else {
           for (const file of item.files) {
             const candidate = resolve(rootPath, String(file));
-            if (typeof file !== "string" || (!candidate.startsWith(`${rootPath}/`) && candidate !== rootPath) || !existsSync(candidate)) {
+            if (typeof file !== "string" || (relative(rootPath, candidate).startsWith("..") || isAbsolute(relative(rootPath, candidate))) || !existsSync(candidate)) {
               taskErrors.push(`non-existent or unsafe file: ${file}`);
             }
           }

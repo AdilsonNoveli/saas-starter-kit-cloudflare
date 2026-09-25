@@ -25,6 +25,5 @@ const {
 } = useAppConfig();
 useSeoMeta({
   description: description,
-  twitterCard: "summary_large_image",
 });
 </script>

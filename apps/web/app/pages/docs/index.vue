@@ -97,12 +97,11 @@ const docsConfig = useAppConfig().docs;
 // hardcoded here.
 const page = await usePage();
 
-useSeoMeta({
+usePageSeo({
+  path: useRoute().path,
   title: docsConfig.name,
-  ogTitle: docsConfig.name,
-  description: docsConfig.description,
-  ogDescription: docsConfig.description,
-  twitterCard: "summary_large_image",
+  description: page.value?.description || docsConfig.description,
+  kind: "docs",
 });
 
 const { t, locale } = useI18n();

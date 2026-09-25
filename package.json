@@ -7,6 +7,8 @@
     "format": "prettier -w .",
     "test": "vitest run",
     "check:i18n": "bun scripts/check-i18n-completeness.ts && bun scripts/check-docs-translations.ts",
+    "check:seo": "bun scripts/check-seo.ts",
+    "generate:og": "bun scripts/generate-og-images.ts",
     "fireskill": "bun fireskills/cli/src/main.ts",
     "web": "sst shell -- bun scripts/dev.ts web",
     "web-remote": "sst shell -- bun scripts/dev.ts web remote",
@@ -21,6 +23,7 @@
   "devDependencies": {
     "@tsconfig/node22": "^22",
     "prettier": "^3.4.2",
+    "sharp": "0.35.4",
     "typescript": "^5",
     "vitest": "^5.0.0"
   },

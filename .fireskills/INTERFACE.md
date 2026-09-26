@@ -26,6 +26,9 @@ Register each created or modified screen.
 | Screen or Route | File | Used Vue Components | Data and Actions | States |
 | --- | --- | --- | --- | --- |
 | Home `/`, `/pt-br`, `/es` | `apps/web/app/pages/index.vue` | the seven landing sections | Offer from `apps/web/app/utils/offer.ts`; checkout address from `runtimeConfig.public.checkoutUrl`; support by WhatsApp link | Offer button disabled with a visible text while no checkout address is set |
+| Buy `/buy/[planId]` (SPEC-0004) | `apps/app/app/pages/buy/[planId].vue` | `UCard`, `UForm`, `UFormField`, `UInput`, `UButton`, `UAlert`, `UIcon` | `checkout.getPlanSummary` (plan name/price), `checkout.startBuyerCheckout` (e-mail only; provider derived server-side from `Plan.provider`, never chosen client-side) | Loading (spinner), plan not found (`UAlert`), form + submit error (`UAlert`); public page (`auth: false`) |
+| Claim `/claim/[id]` (SPEC-0004) | `apps/app/app/pages/claim/[id].vue` | `UCard`, `UForm`, `UFormField`, `UInput`, `UButton`, `UAlert`, `UIcon` | `checkout.getPendingPurchase`, `checkout.claimPurchase` (NEW_TEAM: name+slug form with auto-suggest, mirrors `TeamCreateModal`; EXISTING_TEAM: one-click join) | Loading, not found/not confirmed, expired, rejected, already claimed, and the two claim forms; protected page (no `auth: false`, DEC-002 of SPEC-0004) |
+| Admin Pending purchases `/admin/pending-purchases` (SPEC-0004) | `layers/billing/app/pages/admin/pending-purchases/index.vue` | `UDashboardPanel`, `UDashboardNavbar`, `AdminDataTable`, `UBadge`, `USelect` | `admin.pendingPurchases.listPendingPurchases`, filtered by status | Loading, empty (`AdminDataTable` default), populated; read-only (no edit/delete, nothing to change from this screen) |
 
 ## Composition Rules
 

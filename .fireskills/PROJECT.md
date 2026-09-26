@@ -21,7 +21,7 @@ Base provided by the Nuxfire starter kit (Nuxt 4 + Cloudflare Workers + SST). Ad
 | Identity and session: OpenAuth (password, email code, GitHub, Google), optional TOTP MFA, login rate limiting | `apps/functions/src/auth.ts`, `apps/login`, `apps/app/server/utils/auth.ts` |
 | Teams, invitations (expire in 30 days), seats per plan, RBAC `Owner`/`Admin`/`Member`, team suspension | `layers/teams` |
 | Platform console (`/admin`, MFA + elevated 30-minute session): companies, plans, queue/DLQ with replay, audit log, global notifications | `layers/admin`, `layers/billing`, `layers/notifications` |
-| Billing: database-driven plans (each plan sets where a buyer lands after paying: a team of their own as Owner, or an existing team chosen in `/admin/plans`), Stripe and Paddle checkout, webhooks with KV idempotency ledger | `layers/billing` |
+| Billing: database-driven plans (each plan sets where a buyer lands after paying: a team of their own as Owner, or an existing team chosen in `/admin/plans`), Stripe and Paddle checkout, webhooks with KV idempotency ledger. A buyer without a team pays at `/buy/[planId]` (e-mail only), then claims access at `/claim/[id]` after creating an account, which creates the team/membership and activates the plan (`PendingPurchase`, `/admin/pending-purchases`) | `layers/billing` |
 | In-app and real-time notifications (WebSocket/Durable Object) | `layers/notifications`, `apps/functions/src/websockets.js` |
 | Queued jobs with DLQ and hourly cron (cron only writes a row to `Log`) | `infra/jobs.ts`, `infra/cron.ts`, `apps/functions/src/` |
 | Transactional email (React Email; only Resend is active) | `packages/emails`, `apps/functions/src/emails.ts` |
@@ -40,8 +40,8 @@ What the starter does not do or does not have yet (absence verified in code):
 - Analytics: documentation page is "coming soon".
 - The offer on the home page (`LandingOffer.vue`) reads one static configuration (`apps/web/app/utils/offer.ts`); it does not read `Plan` records from the database and has no checkout yet (`runtimeConfig.public.checkoutUrl` is empty).
 - Team dashboard chart is illustrative (random walk), not real data.
-- The plan's buyer destination (`Plan.buyerTeamMode`, `Plan.buyerTeamId`) is stored and editable only: no checkout or webhook creates a team or membership for a buyer yet, and a purchase does not update `Team.planId`.
-- i18n: `apps/app` only extracted the `welcome` key, and `layers/billing` the buyer-destination text of the plan form and table (its locale files are declared in the layer's `nuxt.config.ts`); the rest of the interface is fixed in English.
+- The plan's buyer destination (`Plan.buyerTeamMode`, `Plan.buyerTeamId`) now provisions a real buyer, via `/buy/[planId]` and `/claim/[id]` (SPEC-0004): a first purchase for a destination with no paid plan yet. Re-purchase/upgrade of a team that already has an active paid plan is still out of scope, and a rejected or expired claim has no automatic refund — both are visible in `/admin/pending-purchases` for manual follow-up.
+- i18n: `apps/app` only extracted the `welcome` key, and `layers/billing` the buyer-destination text of the plan form/table plus the Buy, Claim, and Pending-purchases screens (its locale files are declared in the layer's `nuxt.config.ts`); the rest of the interface is fixed in English.
 
 ## Technical Context
 

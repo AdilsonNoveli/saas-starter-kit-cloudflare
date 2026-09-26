@@ -8,6 +8,7 @@ Persistence map of the system.
 | Source | Technology/form | Evidence |
 | --- | --- | --- |
 | Structure | Schema/migration | `apps/functions/src/database/migrations/0000_init.sql` |
+| Structure | Schema/migration | `apps/functions/src/database/migrations/0001_pending_purchase.sql` |
 
 ## Detected Structures
 
@@ -34,6 +35,7 @@ Persistence map of the system.
 | TeamMembership | SQL Table | id:text, teamId:text, userId:text, roleId:text, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
 | Team | SQL Table | id:text, name:text, slug:text, description:text, logo:text, status:text, planId:text, stripeCustomerId:text, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
 | MfaRecoveryCode | SQL Table | id:text, userId:text, scope:text, codeHash:text, usedAt:timestamp, created_at:timestamp | Not detected | `apps/functions/src/database/migrations/0000_init.sql` |
+| PendingPurchase | SQL Table | id:text, email:text, planId:text, provider:text, providerCheckoutId:text, providerCustomerId:text, providerSubscriptionId:text, status:text, failureReason:text, claimEmailSentAt:timestamp, claimedAt:timestamp, claimedByUserId:text, resultTeamId:text, expiresAt:timestamp, created_at:timestamp, updated_at:timestamp | Not detected | `apps/functions/src/database/migrations/0001_pending_purchase.sql` |
 <!-- specsfy:database:end -->
 
 ## Decisions, Ownership, and Retention
@@ -49,7 +51,7 @@ Technical details: `fireskill-specialist-drizzle`.
 
 ### Relations and Rules Not Expressed in Schema Columns
 
-- Foreign keys in database (16, all in `0000_init.sql`): `Plan.buyerTeamId` → `Team` (`ON DELETE SET NULL`); `MfaRecoveryCode.userId` → `User` (`ON DELETE CASCADE`); `Team.planId` → `Plan`; `Subscription` → `Team` and `Plan`; `Job`, `DeadLetterRecord`, and `KanbanBoard` → `Team`; `KanbanColumn` → `KanbanBoard`; `KanbanCard` → `KanbanColumn`; `Permission` → `Role`; `TeamMembership.roleId` → `Role`; `TeamInvite` → `Team`, `Role`, and `User` (`invitedById`); `PlatformAdmin` → `User`.
+- Foreign keys in database (16 in `0000_init.sql`, 3 more in `0001_pending_purchase.sql`): `Plan.buyerTeamId` → `Team` (`ON DELETE SET NULL`); `MfaRecoveryCode.userId` → `User` (`ON DELETE CASCADE`); `Team.planId` → `Plan`; `Subscription` → `Team` and `Plan`; `Job`, `DeadLetterRecord`, and `KanbanBoard` → `Team`; `KanbanColumn` → `KanbanBoard`; `KanbanCard` → `KanbanColumn`; `Permission` → `Role`; `TeamMembership.roleId` → `Role`; `TeamInvite` → `Team`, `Role`, and `User` (`invitedById`); `PlatformAdmin` → `User`; `PendingPurchase.planId` → `Plan`, `PendingPurchase.claimedByUserId` → `User`, `PendingPurchase.resultTeamId` → `Team` (`ON DELETE SET NULL`).
 - Column only, without FK: `TeamMembership.teamId` and `userId`, `Role.teamId`, `BenefitsOnPlan.planId` and `benefitId`, `Log.jobId`, `AuditLog.actorUserId` (deliberate: log persists after user deletion), and `Notification.userId` (Drizzle `relations()` only, to avoid circular import).
 - `PlatformAdmin.role` (enum `platform_role`: `SUPER_ADMIN`, `SUPPORT`) does not appear in detected list above: scanner ignores enum columns.
 - Three deliberate schema cycles (core↔teams, teams↔billing, core↔notifications) work solely because all cross-file references reside inside callbacks.
@@ -58,7 +60,8 @@ Technical details: `fireskill-specialist-drizzle`.
 - `MfaRecoveryCode`: single-use recovery codes, one set per `(userId, scope)` where `scope` is `user` (backs `User.mfaSecret`) or `platform` (backs `PlatformAdmin.mfaSecret`). Only an HMAC-SHA256 of the code is stored (keyed with the factor's own encryption key, bound to scope and user); `usedAt` is set atomically on redemption. Unique on `(userId, scope, codeHash)`; regenerating or disabling MFA deletes the whole set. Set/replace logic: `apps/app/server/utils/mfa-recovery.ts`; manual reset: `apps/functions/src/database/reset-mfa.ts`.
 - `mfaSecret` (on `User` and `PlatformAdmin`) is always encrypted (AES-GCM) and never exposed in client sessions.
 - Plans are database rows created in `/admin/plans`; only the **Free** plan and system roles are seeded (idempotent seed on each deploy).
-- `Plan.buyerTeamMode` (`NEW_TEAM` default, or `EXISTING_TEAM`) and `Plan.buyerTeamId` record, per plan, where a buyer lands after paying: a team of their own (as Owner) or the existing team named by `buyerTeamId` (required, and only meaningful, for `EXISTING_TEAM`). Set in `/admin/plans`; stored only: nothing provisions a buyer yet (checkout spec).
+- `Plan.buyerTeamMode` (`NEW_TEAM` default, or `EXISTING_TEAM`) and `Plan.buyerTeamId` record, per plan, where a buyer lands after paying: a team of their own (as Owner) or the existing team named by `buyerTeamId` (required, and only meaningful, for `EXISTING_TEAM`). Set in `/admin/plans`.
+- `PendingPurchase` (SPEC-0004): a buyer with no team pays before creating an account; this row holds the checkout until an authenticated claim resolves `Plan.buyerTeamMode` into a real team/membership. `providerCheckoutId` is unique (Stripe Checkout Session id, or `paddle:<id>` for Paddle, which has no server-created session); `providerSubscriptionId`/`providerCustomerId` stay null until the provider confirms the subscription. `status` (`PENDING` | `CLAIMED` | `EXPIRED` | `REJECTED`) is text, like every other status-like column in this schema. `claimedByUserId` → `User`, `resultTeamId` → `Team` (`ON DELETE SET NULL`, like `Plan.buyerTeamId`). Expiry (30 days) is computed lazily on read (`getPendingPurchase`), not swept by a cron job. Indexed on `email` and `status`.
 
 ### Retention and Backup
 

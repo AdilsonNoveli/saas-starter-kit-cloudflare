@@ -3,7 +3,7 @@
 | Metadata | Value |
 | --- | --- |
 | ID | BACKLOG-0007 |
-| Status | Refining |
+| Status | Promoted |
 | Product | Nuxfire (starter kit) — billing genérico de times (`layers/billing`) |
 | Epic | Billing: destino do comprador (`Plan.buyerTeamMode`/`buyerTeamId`) |
 | Feature | Checkout sem time prévio: comprador paga, depois cria/entra na conta |
@@ -11,7 +11,7 @@
 | Priority | Unprioritized |
 | Milestones | |
 | Created at | 2026-09-25 |
-| Promoted spec | None |
+| Promoted spec | `specs/draft/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md` |
 
 ## Original Idea
 

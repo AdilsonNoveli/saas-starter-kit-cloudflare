@@ -135,6 +135,14 @@ export const plans = pgTable("Plan", {
   // real foreign keys, so a physical delete would break rows that still point
   // here.
   isArchived: boolean("isArchived").notNull().default(false),
+  // Whether this is the plan advertised on apps/web's landing page Buy CTA.
+  // At most one plan holds this at a time — the admin toggles it in
+  // /admin/plans, and setting it on one plan clears every other plan's flag
+  // in the same transaction (admin-plans.ts). apps/web reads this live
+  // (via a Cloudflare service binding to apps/app, layers/billing/server/api/public/offer.get.ts)
+  // instead of a deploy-time env var, so changing the offer never needs a
+  // redeploy of the landing page.
+  isPublicOffer: boolean("isPublicOffer").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .default(sql`now()`),

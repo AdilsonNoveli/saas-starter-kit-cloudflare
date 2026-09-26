@@ -26,6 +26,17 @@
           "newTeam": "Um time novo por comprador",
           "joins": "Entra em {team}",
           "teamRemoved": "Time removido, escolha outro"
+        },
+        "publicOffer": {
+          "label": "Mostrar na landing page",
+          "help": "O botão de compra da landing page aponta para o plano marcado aqui. Ativar em um plano desativa automaticamente nos demais.",
+          "badge": "Na landing page",
+          "menuHide": "Remover da landing page",
+          "notifyOnTitle": "Agora exibido na landing page",
+          "notifyOnBody": "{plan} agora é o botão de compra da landing page.",
+          "notifyOffTitle": "Removido da landing page",
+          "notifyOffBody": "{plan} não aparece mais na landing page.",
+          "notifyErrorTitle": "Falha ao atualizar a oferta da landing page"
         }
       },
       "pendingPurchases": {

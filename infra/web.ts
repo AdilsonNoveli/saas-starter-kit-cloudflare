@@ -1,5 +1,5 @@
 import { webUrl, appUrl, webDomain, webAliases } from "./dns";
-import { secret } from "./secret";
+import { app } from "./app";
 import { deployWorker } from "./utils/nuxt";
 
 /**
@@ -23,16 +23,17 @@ await deployWorker("Web", {
   // @nuxtjs/i18n baseUrl). Dropping the slash makes those URLs answer 200 directly.
   // Verified locally with `wrangler dev` and `bun run check:seo -- --live` (SPEC-0002 T039).
   htmlHandling: "drop-trailing-slash",
-  link: [contentDatabase],
+  // Lets this Worker reach apps/app over a zero-hop service binding
+  // (env.AppWorker) instead of a public fetch — same reasoning as
+  // infra/app.ts's own `link: [auth]`. Used by apps/web/server/api/offer.get.ts
+  // to read the admin's chosen public-offer Plan (SPEC-0004 follow-up) live,
+  // with no env var and no redeploy needed when the admin changes it.
+  link: [contentDatabase, app],
   vars: {
     NUXT_PUBLIC_APP_URL: appUrl.properties.value,
     // read directly in nuxt.config.ts at build time (not a runtimeConfig
     // entry) since @nuxtjs/seo's `site.url` is evaluated at build time
     SITE_URL: webUrl.properties.value,
-    // The Buy CTA's target (apps/app's `/buy/<planId>`, SPEC-0004). Empty
-    // until the admin sets CHECKOUT_URL (infra/secret.ts) — the landing page
-    // renders its "coming soon" state instead (apps/web/app/composables/use-offer.ts).
-    NUXT_PUBLIC_CHECKOUT_URL: secret.CheckoutUrl.value,
   },
 });
 

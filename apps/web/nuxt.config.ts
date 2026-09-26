@@ -115,10 +115,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       appUrl: "",
-      // Full URL of the Buy CTA's destination — apps/app's `/buy/<planId>` page (SPEC-0004),
-      // for the Plan the admin configured for this offer. Empty until that Plan exists;
-      // set via NUXT_PUBLIC_CHECKOUT_URL once its id is known.
-      checkoutUrl: "",
     },
   },
   fonts: {

@@ -11,7 +11,6 @@ const OFFER: Offer = {
   launchPrice: 97,
   launchLimit: 100,
   updateMonths: 12,
-  checkoutUrl: "",
   support: { whatsapp: "5511940204449" },
 };
 
@@ -30,11 +29,9 @@ describe("the offer configuration (FR-002)", () => {
   });
 
   // SPECSFY: US-001 FR-002 FR-013 AC-001
-  it("rejects a currency that is not a three-letter code, a support number that is not digits, and a checkout address that is not https", () => {
+  it("rejects a currency that is not a three-letter code, and a support number that is not digits", () => {
     expect(validateOffer({ ...OFFER, currency: "R$" as never }).join(" ")).toContain("currency");
     expect(validateOffer({ ...OFFER, support: { whatsapp: "+55 11 94020-4449" } }).join(" ")).toContain("whatsapp");
-    expect(validateOffer({ ...OFFER, checkoutUrl: "http://pay.example.com" }).join(" ")).toContain("checkoutUrl");
-    expect(validateOffer({ ...OFFER, checkoutUrl: "https://buy.stripe.com/abc" })).toEqual([]);
   });
 });
 

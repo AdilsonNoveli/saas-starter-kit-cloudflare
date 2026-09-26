@@ -121,6 +121,33 @@ async function setArchived(plan: Plan, archived: boolean) {
 }
 
 /**
+ * One-click toggle for the landing page's Buy CTA target. Turning it on for
+ * one plan turns it off for every other plan (admin-plans.ts's updatePlan,
+ * inside one transaction) — the table refetches afterward so that becomes
+ * visible immediately rather than only on the next manual refresh.
+ */
+async function setPublicOffer(plan: Plan, isPublicOffer: boolean) {
+  try {
+    await client.admin.plans.updatePlan.mutate({ id: plan.id, isPublicOffer });
+
+    notification.success(
+      isPublicOffer
+        ? t("billing.admin.plans.publicOffer.notifyOnTitle")
+        : t("billing.admin.plans.publicOffer.notifyOffTitle"),
+      isPublicOffer
+        ? t("billing.admin.plans.publicOffer.notifyOnBody", { plan: plan.name })
+        : t("billing.admin.plans.publicOffer.notifyOffBody", { plan: plan.name }),
+    );
+    await refresh();
+  } catch (error) {
+    notification.error(
+      t("billing.admin.plans.publicOffer.notifyErrorTitle"),
+      error instanceof Error ? error.message : "Something went wrong",
+    );
+  }
+}
+
+/**
  * Reprovisions the Stripe portal configuration the tenant "Cancel
  * Subscription" link reads. Idempotent and destroys no data, so it is a plain
  * button rather than a confirmation step.
@@ -146,6 +173,17 @@ function getRowItems(row: Row<Plan>): DropdownMenuItem[] {
       icon: "i-lucide-pencil",
       onSelect: () => edit(plan),
     },
+    plan.isPublicOffer
+      ? {
+          label: t("billing.admin.plans.publicOffer.menuHide"),
+          icon: "i-lucide-eye-off",
+          onSelect: () => setPublicOffer(plan, false),
+        }
+      : {
+          label: t("billing.admin.plans.publicOffer.label"),
+          icon: "i-lucide-eye",
+          onSelect: () => setPublicOffer(plan, true),
+        },
     { type: "separator" },
     plan.isArchived
       ? {
@@ -239,14 +277,23 @@ const columns: TableColumn<Plan>[] = [
     id: "status",
     header: "Status",
     cell: ({ row }) =>
-      h(
-        UBadge,
-        {
-          variant: "subtle",
-          color: row.original.isArchived ? "neutral" : "success",
-        },
-        () => (row.original.isArchived ? "Archived" : "Active"),
-      ),
+      h("div", { class: "flex flex-wrap gap-1" }, [
+        h(
+          UBadge,
+          {
+            variant: "subtle",
+            color: row.original.isArchived ? "neutral" : "success",
+          },
+          () => (row.original.isArchived ? "Archived" : "Active"),
+        ),
+        row.original.isPublicOffer
+          ? h(
+              UBadge,
+              { variant: "subtle", color: "primary" },
+              () => t("billing.admin.plans.publicOffer.badge"),
+            )
+          : null,
+      ]),
   },
   {
     id: "actions",

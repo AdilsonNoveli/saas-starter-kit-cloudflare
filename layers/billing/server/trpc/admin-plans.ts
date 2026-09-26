@@ -28,6 +28,7 @@ import {
   resolveBuyerTeam,
   type BuyerTeamSetting,
 } from "../utils/plan-buyer-team";
+import { clearPublicOffer } from "../utils/plans";
 import {
   formatPlanPrice,
   planCatalogNeedsSync,
@@ -92,6 +93,10 @@ const planFieldsSchema = z.object({
   // same reason `amount`/`currency` are not refined on this schema.
   buyerTeamMode: z.enum(PLAN_BUYER_TEAM_MODES).optional(),
   buyerTeamId: z.string().trim().max(100).nullable().optional(),
+  // Shown on apps/web's landing page Buy CTA. At most one plan holds this at
+  // a time — setting it true here clears every other plan's flag in the same
+  // transaction (see createPlan/updatePlan below).
+  isPublicOffer: z.boolean().optional(),
 });
 
 type PlanRow = typeof plans.$inferSelect;
@@ -301,6 +306,7 @@ export const adminPlansRouter = router({
           buyerTeamId: plans.buyerTeamId,
           buyerTeamName: buyerTeam.name,
           isArchived: plans.isArchived,
+          isPublicOffer: plans.isPublicOffer,
           createdAt: plans.createdAt,
           teamCount: count(teams.id),
         })
@@ -342,10 +348,17 @@ export const adminPlansRouter = router({
         },
       );
 
-      const [plan] = await useDB()
-        .insert(plans)
-        .values({ ...fields, ...pricing, ...buyerTeam })
-        .returning();
+      const plan = await useDB().transaction(async (tx) => {
+        // Must happen before the insert, in the same transaction: a plan
+        // that fails to insert must not have already cleared the previous
+        // holder's flag.
+        if (fields.isPublicOffer) await clearPublicOffer(tx);
+        const [inserted] = await tx
+          .insert(plans)
+          .values({ ...fields, ...pricing, ...buyerTeam })
+          .returning();
+        return inserted;
+      });
 
       if (!plan) {
         throw new TRPCError({
@@ -431,11 +444,17 @@ export const adminPlansRouter = router({
         },
       );
 
-      const [plan] = await useDB()
-        .update(plans)
-        .set({ ...fields, ...pricing, ...buyerTeam })
-        .where(eq(plans.id, id))
-        .returning();
+      const plan = await useDB().transaction(async (tx) => {
+        // Same reasoning as createPlan: clear the previous holder first, in
+        // the same transaction as this plan's own update.
+        if (fields.isPublicOffer) await clearPublicOffer(tx);
+        const [updated] = await tx
+          .update(plans)
+          .set({ ...fields, ...pricing, ...buyerTeam })
+          .where(eq(plans.id, id))
+          .returning();
+        return updated;
+      });
 
       if (!plan) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Plan not found" });

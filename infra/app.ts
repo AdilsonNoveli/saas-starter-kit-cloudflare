@@ -4,7 +4,11 @@ import { deployWorker } from "./utils/nuxt";
 import { adminSecret, auth, clientID } from "./auth";
 import { wsTicketSecret } from "./websockets";
 
-await deployWorker("App", {
+// Exported so infra/web.ts can link this same Worker resource and reach it
+// over a service binding (env.AppWorker) instead of a public fetch — same
+// reasoning as this file's own `link: [auth]` below, applied in the other
+// direction (apps/web -> apps/app instead of apps/app -> apps/functions/auth).
+export const app = await deployWorker("App", {
   root: "apps/app",
   domain: appDomain,
   app: true,

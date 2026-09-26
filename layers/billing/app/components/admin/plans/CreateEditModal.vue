@@ -155,6 +155,17 @@
               />
             </UFormField>
 
+            <!-- Whether this plan is the landing page's Buy CTA -->
+            <div class="pt-4 border-t border-default">
+              <UFormField name="isPublicOffer">
+                <UCheckbox
+                  v-model="state.isPublicOffer"
+                  :label="t('billing.admin.plans.publicOffer.label')"
+                  :help="t('billing.admin.plans.publicOffer.help')"
+                />
+              </UFormField>
+            </div>
+
             <!-- Where the buyer lands after paying -->
             <div class="space-y-4 pt-4 border-t border-default">
               <UFormField
@@ -401,6 +412,7 @@ const schema = z
     buyerTeamMode: z.enum(PLAN_BUYER_TEAM_MODES),
     // Unset is `undefined`, like `provider` above.
     buyerTeamId: z.string().optional(),
+    isPublicOffer: z.boolean(),
   })
   .superRefine((data, ctx) => {
     if (data.buyerTeamMode === PlanBuyerTeamMode.EXISTING_TEAM && !data.buyerTeamId) {
@@ -446,6 +458,7 @@ const state = reactive<Schema>({
   maxSeats: "",
   buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM,
   buyerTeamId: undefined,
+  isPublicOffer: false,
 });
 
 const isStripeProvider = computed(
@@ -560,6 +573,7 @@ function reset() {
     PLAN_BUYER_TEAM_MODES.find((mode) => mode === plan?.buyerTeamMode) ??
     PlanBuyerTeamMode.NEW_TEAM;
   state.buyerTeamId = plan?.buyerTeamId ?? undefined;
+  state.isPublicOffer = plan?.isPublicOffer ?? false;
   teamSearch.value = "";
   teamItems.value =
     plan?.buyerTeamId && plan.buyerTeamName
@@ -655,6 +669,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       stripeManaged && typeof data.amount === "number" ? data.amount : null,
     currency: stripeManaged ? (data.currency ?? null) : null,
     maxSeats: typeof data.maxSeats === "number" ? data.maxSeats : null,
+    isPublicOffer: data.isPublicOffer,
     limits: {
       ...existingLimits,
       features: features.value.filter((f) => Boolean(f.name.trim())),

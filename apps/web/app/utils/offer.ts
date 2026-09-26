@@ -12,8 +12,6 @@ export interface Offer {
   launchLimit: number;
   /** Months of updates included in the price. */
   updateMonths: number;
-  /** https address of the checkout, or an empty string while there is none. */
-  checkoutUrl: string;
   support: {
     /** International number, digits only, for example `5511940204449`. */
     whatsapp: string;
@@ -27,7 +25,6 @@ export const OFFER: Offer = {
   launchPrice: 97,
   launchLimit: 100,
   updateMonths: 12,
-  checkoutUrl: "",
   support: { whatsapp: "5511940204449" },
 };
 
@@ -39,7 +36,6 @@ export function validateOffer(offer: Offer): string[] {
   if (!(offer.launchPrice > 0) || !(offer.launchPrice < offer.regularPrice)) problems.push("launchPrice must be above 0 and below regularPrice");
   if (!Number.isInteger(offer.launchLimit) || offer.launchLimit < 1) problems.push("launchLimit must be a whole number of 1 or more");
   if (!Number.isInteger(offer.updateMonths) || offer.updateMonths < 1) problems.push("updateMonths must be a whole number of 1 or more");
-  if (offer.checkoutUrl !== "" && !/^https:\/\/\S+$/.test(offer.checkoutUrl)) problems.push("checkoutUrl must be empty or an https address");
   if (!/^\d{10,15}$/.test(offer.support.whatsapp)) problems.push("support.whatsapp must be 10 to 15 digits, with the country code and no signs");
   return problems;
 }

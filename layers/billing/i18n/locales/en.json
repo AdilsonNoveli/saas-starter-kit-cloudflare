@@ -26,6 +26,17 @@
           "newTeam": "A new team per buyer",
           "joins": "Joins {team}",
           "teamRemoved": "Team removed, choose another"
+        },
+        "publicOffer": {
+          "label": "Show on landing page",
+          "help": "The landing page's Buy button links to whichever plan has this on. Turning it on here turns it off on every other plan.",
+          "badge": "On landing page",
+          "menuHide": "Remove from landing page",
+          "notifyOnTitle": "Now shown on the landing page",
+          "notifyOnBody": "{plan} is now the landing page's Buy CTA.",
+          "notifyOffTitle": "Removed from the landing page",
+          "notifyOffBody": "{plan} no longer appears on the landing page.",
+          "notifyErrorTitle": "Failed to update the landing page offer"
         }
       },
       "pendingPurchases": {

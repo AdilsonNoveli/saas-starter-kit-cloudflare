@@ -12,6 +12,10 @@ const LAUNCH_OPEN = true;
 
 const INTL: Record<string, string> = { en: "en-US", "pt-br": "pt-BR", es: "es-ES" };
 
+interface PublicOfferPlan {
+  id: string;
+}
+
 export function useOffer() {
   const { locale } = useI18n();
   const config = useRuntimeConfig();
@@ -19,7 +23,21 @@ export function useOffer() {
   const intl = computed(() => INTL[locale.value] ?? "en-US");
   const price = (amount: number): string => formatPrice(amount, OFFER.currency, intl.value);
 
-  const checkoutUrl = computed(() => (config.public.checkoutUrl as string | undefined) || OFFER.checkoutUrl);
+  // The Plan the admin flagged `isPublicOffer` in /admin/plans, read live
+  // through this app's own /api/offer route (server/api/offer.get.ts), which
+  // in turn reaches apps/app over a Cloudflare service binding — no env var,
+  // no redeploy when the admin changes which plan is for sale. `key` dedupes
+  // this fetch across every component that calls useOffer() on the same page.
+  const { data: publicOffer } = useFetch<PublicOfferPlan | null>("/api/offer", {
+    key: "public-offer",
+    default: () => null,
+  });
+
+  const checkoutUrl = computed(() =>
+    publicOffer.value && config.public.appUrl
+      ? `${config.public.appUrl}/buy/${publicOffer.value.id}`
+      : "",
+  );
   const params = computed(() => ({
     launch: price(OFFER.launchPrice),
     regular: price(OFFER.regularPrice),

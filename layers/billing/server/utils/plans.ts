@@ -1,6 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { plans } from "@nuxfire/functions/schema";
 import { FREE_PLAN } from "@nuxfire/functions/database/seed-data";
+import { formatPlanPrice } from "./stripe-catalog";
 
 export { FREE_PLAN };
 
@@ -32,6 +33,58 @@ export async function ensureFreePlan() {
   }
 
   return existingFreePlan;
+}
+
+export interface PublicOfferPlan {
+  id: string;
+  name: string;
+  description: string;
+  priceLabel: string;
+  period: string;
+}
+
+/**
+ * The plan advertised on apps/web's landing page Buy CTA, or `null` while the
+ * admin has not designated one (or it was archived without a replacement
+ * being set). Read live by `server/api/public/offer.get.ts` — no caller
+ * needs to already know a `planId`, unlike `checkout.getPlanSummary`.
+ */
+export async function getPublicOfferPlan(): Promise<PublicOfferPlan | null> {
+  const plan = await useDB().query.plans.findFirst({
+    where: and(eq(plans.isPublicOffer, true), eq(plans.isArchived, false)),
+  });
+  if (!plan) return null;
+
+  return {
+    id: plan.id,
+    name: plan.name,
+    description: plan.description,
+    priceLabel:
+      plan.unitAmount !== null && plan.currency
+        ? formatPlanPrice(plan.unitAmount, plan.currency)
+        : plan.price,
+    period: plan.period,
+  };
+}
+
+/**
+ * The single write path for enforcing "`isPublicOffer` is true on at most one
+ * plan" (admin-plans.ts's create/update mutations) — the same way a "default
+ * payment method" or "primary address" is usually kept unique: a
+ * low-frequency, admin-driven write, not a hot path that needs a partial
+ * unique index. Always call this inside the same transaction as, and right
+ * before, the plan's own insert/update that sets `isPublicOffer: true` — the
+ * final state only depends on that later write, so clearing every row first
+ * (including the one about to be re-set) is simpler than excluding it and no
+ * less correct within one transaction.
+ */
+export async function clearPublicOffer(
+  tx: Pick<ReturnType<typeof useDB>, "update">,
+): Promise<void> {
+  await tx
+    .update(plans)
+    .set({ isPublicOffer: false })
+    .where(eq(plans.isPublicOffer, true));
 }
 
 export async function addPlan(planDetails: {

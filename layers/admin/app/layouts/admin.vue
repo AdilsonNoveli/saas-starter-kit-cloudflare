@@ -150,6 +150,12 @@ const links = computed<NavigationMenuItem[]>(() => [
     onSelect: closeSidebar,
   },
   {
+    label: "Pending purchases",
+    icon: "i-lucide-hourglass",
+    to: "/admin/pending-purchases",
+    onSelect: closeSidebar,
+  },
+  {
     label: "Queue",
     icon: "i-lucide-loader",
     to: "/admin/queue",

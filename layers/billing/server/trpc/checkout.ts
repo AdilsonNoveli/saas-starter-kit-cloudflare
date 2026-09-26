@@ -26,6 +26,7 @@ import {
   describeBuyerDestination,
   validateBuyerCheckoutPlan,
 } from "../utils/billing/buyer-provisioning";
+import { formatPlanPrice } from "../utils/stripe-catalog";
 import { PaymentProvider, PlanBuyerTeamMode } from "../../shared/types/enums";
 
 /**
@@ -34,12 +35,35 @@ import { PaymentProvider, PlanBuyerTeamMode } from "../../shared/types/enums";
  * purpose — this is the only billing entry point a signed-out visitor calls.
  */
 export const checkoutRouter = router({
+  // Public, read-only, and deliberately minimal: only what the Buy page
+  // needs to render before the visitor commits to paying (section 10). Not
+  // itself a distinct FR — supporting data for US-001's screen.
+  getPlanSummary: publicProcedure
+    .input(z.object({ planId: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const plan = await useDB().query.plans.findFirst({
+        where: eq(plans.id, input.planId),
+      });
+      if (!plan || plan.isArchived) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Plan not found" });
+      }
+      return {
+        id: plan.id,
+        name: plan.name,
+        description: plan.description,
+        priceLabel:
+          plan.unitAmount !== null && plan.currency
+            ? formatPlanPrice(plan.unitAmount, plan.currency)
+            : plan.price,
+        period: plan.period,
+      };
+    }),
+
   startBuyerCheckout: publicProcedure
     .input(
       z.object({
         planId: z.string().min(1),
         email: z.string().email(),
-        provider: z.enum([PaymentProvider.STRIPE, PaymentProvider.PADDLE]),
         // Only meaningful for Stripe, which redirects back to it; Paddle's
         // checkout happens in-page via Paddle.js and never navigates away.
         redirectUrl: z.string().min(1).optional(),
@@ -63,22 +87,26 @@ export const checkoutRouter = router({
         const message =
           validation.reason === "plan_archived"
             ? "This plan is no longer available"
-            : validation.reason === "no_price"
+            : validation.reason === "no_price" || validation.reason === "no_provider"
               ? "This plan has no price configured"
               : "This plan's destination is not available";
         throw new TRPCError({ code: "BAD_REQUEST", message });
       }
 
-      // validateBuyerCheckoutPlan already confirmed this is non-null (its
-      // "no_price" branch); re-read into a local so TypeScript narrows it too.
+      // validateBuyerCheckoutPlan already confirmed these are non-null (its
+      // "no_price"/"no_provider" branches); re-read into locals so
+      // TypeScript narrows them too. The plan dictates its own provider —
+      // never a caller-supplied choice, since a plan is configured for
+      // exactly one.
       const providerPriceId = plan.providerPriceId;
-      if (!providerPriceId) {
+      const provider = plan.provider;
+      if (!providerPriceId || !provider) {
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Plan price missing" });
       }
 
       const pendingPurchaseId = cuid();
 
-      if (input.provider === PaymentProvider.STRIPE) {
+      if (provider === PaymentProvider.STRIPE) {
         const stripe = createStripeClient(event);
         const customer = await stripe.customers.create({
           email: input.email,

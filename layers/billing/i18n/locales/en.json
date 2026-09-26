@@ -27,7 +27,62 @@
           "joins": "Joins {team}",
           "teamRemoved": "Team removed, choose another"
         }
+      },
+      "pendingPurchases": {
+        "title": "Pending purchases",
+        "searchPlaceholder": "Filter by e-mail...",
+        "statusFilter": "Status",
+        "allStatuses": "All statuses",
+        "status": {
+          "PENDING": "Pending",
+          "CLAIMED": "Claimed",
+          "EXPIRED": "Expired",
+          "REJECTED": "Rejected"
+        },
+        "columns": {
+          "email": "E-mail",
+          "plan": "Plan",
+          "provider": "Provider",
+          "status": "Status",
+          "reason": "Reason",
+          "createdAt": "Created"
+        }
       }
+    },
+    "buy": {
+      "notFound": {
+        "title": "Plan not found",
+        "description": "This plan is no longer available."
+      },
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Continue to payment",
+      "genericError": "Something went wrong. Please try again."
+    },
+    "claim": {
+      "title": "Your {plan} purchase is confirmed",
+      "destination": "You'll land in {destination}.",
+      "notFound": {
+        "title": "Link not found",
+        "description": "This link doesn't exist or has expired."
+      },
+      "expired": {
+        "title": "This link has expired",
+        "description": "Claim links are valid for 30 days after purchase. Contact support for help."
+      },
+      "rejected": {
+        "title": "This purchase couldn't be completed",
+        "description": "Please contact support for help."
+      },
+      "alreadyClaimed": {
+        "title": "Already set up",
+        "description": "This purchase has already been claimed."
+      },
+      "teamNameLabel": "Team name",
+      "teamSlugLabel": "Team slug",
+      "createTeam": "Create my team",
+      "joinTeam": "Join team",
+      "genericError": "Something went wrong. Please try again."
     }
   }
 }

@@ -21,13 +21,17 @@ import { adminNotificationsRouter as notifications } from "@nuxfire/layer-notifi
 // purpose: it must stay mounted at `admin.plans`, which is the path the client
 // already calls.
 import { adminPlansRouter as plans } from "@nuxfire/layer-billing/server/trpc/router";
+// Read-only PendingPurchase visibility (SPEC-0004 US-003) — same reasoning as
+// `plans` above: billing-domain, merely admin-gated, mounted here so the
+// client calls `admin.pendingPurchases.listPendingPurchases`.
+import { adminBillingRouter as pendingPurchases } from "@nuxfire/layer-billing/server/trpc/router";
 import queue from "./admin-queue";
 import teams from "./admin-teams";
 
 // Everything platform-scoped lives under `admin.*`, never mixed into the
 // tenant routers next to it: the namespace is what makes "is this procedure
 // behind platformAdminProcedure?" answerable by looking at the path alone.
-const adminRouter = router({ teams, plans, queue, auditLog, notifications });
+const adminRouter = router({ teams, plans, pendingPurchases, queue, auditLog, notifications });
 
 /**
  * This layer's contribution to `appRouter`, keyed by the top-level name each

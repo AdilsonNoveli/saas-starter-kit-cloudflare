@@ -12,6 +12,7 @@ import type { PendingPurchaseRow } from "./pending-purchase-repository";
 export type CheckoutStartRejectionReason =
   | "plan_archived"
   | "no_price"
+  | "no_provider"
   | "destination_missing"
   | "destination_suspended";
 
@@ -25,14 +26,21 @@ export type CheckoutStartValidation =
  * plan or destination already known to be dead is worse than refusing
  * upfront. Re-run again at claim time (`provisionBuyerTeam`) rather than
  * trusted from here, since the destination can change in between.
+ *
+ * `Plan.provider` is a single nullable column, not a pair of provider flags:
+ * a plan is configured for exactly one provider (Stripe or Paddle), so
+ * `startBuyerCheckout` derives which one to use from the plan itself rather
+ * than trusting a caller-supplied choice.
  */
 export async function validateBuyerCheckoutPlan(plan: {
   isArchived: boolean;
+  provider: string | null;
   providerPriceId: string | null;
   buyerTeamMode: string;
   buyerTeamId: string | null;
 }): Promise<CheckoutStartValidation> {
   if (plan.isArchived) return { ok: false, reason: "plan_archived" };
+  if (!plan.provider) return { ok: false, reason: "no_provider" };
   if (!plan.providerPriceId) return { ok: false, reason: "no_price" };
 
   if (plan.buyerTeamMode === PlanBuyerTeamMode.EXISTING_TEAM) {

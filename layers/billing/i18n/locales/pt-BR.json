@@ -27,7 +27,62 @@
           "joins": "Entra em {team}",
           "teamRemoved": "Time removido, escolha outro"
         }
+      },
+      "pendingPurchases": {
+        "title": "Compras pendentes",
+        "searchPlaceholder": "Filtrar por e-mail...",
+        "statusFilter": "Status",
+        "allStatuses": "Todos os status",
+        "status": {
+          "PENDING": "Pendente",
+          "CLAIMED": "Resgatada",
+          "EXPIRED": "Expirada",
+          "REJECTED": "Recusada"
+        },
+        "columns": {
+          "email": "E-mail",
+          "plan": "Plano",
+          "provider": "Provedor",
+          "status": "Status",
+          "reason": "Motivo",
+          "createdAt": "Criada em"
+        }
       }
+    },
+    "buy": {
+      "notFound": {
+        "title": "Plano não encontrado",
+        "description": "Este plano não está mais disponível."
+      },
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "voce@exemplo.com",
+      "submit": "Continuar para o pagamento",
+      "genericError": "Algo deu errado. Tente novamente."
+    },
+    "claim": {
+      "title": "Sua compra do plano {plan} foi confirmada",
+      "destination": "Você vai entrar em {destination}.",
+      "notFound": {
+        "title": "Link não encontrado",
+        "description": "Este link não existe ou expirou."
+      },
+      "expired": {
+        "title": "Este link expirou",
+        "description": "Os links de resgate valem por 30 dias após a compra. Fale com o suporte para ajuda."
+      },
+      "rejected": {
+        "title": "Não foi possível concluir esta compra",
+        "description": "Fale com o suporte para ajuda."
+      },
+      "alreadyClaimed": {
+        "title": "Já configurado",
+        "description": "Esta compra já foi resgatada."
+      },
+      "teamNameLabel": "Nome do time",
+      "teamSlugLabel": "Slug do time",
+      "createTeam": "Criar meu time",
+      "joinTeam": "Entrar no time",
+      "genericError": "Algo deu errado. Tente novamente."
     }
   }
 }

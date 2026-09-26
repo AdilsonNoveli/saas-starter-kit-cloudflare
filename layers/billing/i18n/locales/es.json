@@ -27,7 +27,62 @@
           "joins": "Entra en {team}",
           "teamRemoved": "Equipo eliminado, elige otro"
         }
+      },
+      "pendingPurchases": {
+        "title": "Compras pendientes",
+        "searchPlaceholder": "Filtrar por correo...",
+        "statusFilter": "Estado",
+        "allStatuses": "Todos los estados",
+        "status": {
+          "PENDING": "Pendiente",
+          "CLAIMED": "Reclamada",
+          "EXPIRED": "Vencida",
+          "REJECTED": "Rechazada"
+        },
+        "columns": {
+          "email": "Correo",
+          "plan": "Plan",
+          "provider": "Proveedor",
+          "status": "Estado",
+          "reason": "Motivo",
+          "createdAt": "Creada"
+        }
       }
+    },
+    "buy": {
+      "notFound": {
+        "title": "Plan no encontrado",
+        "description": "Este plan ya no está disponible."
+      },
+      "emailLabel": "Correo",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "submit": "Continuar al pago",
+      "genericError": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "claim": {
+      "title": "Tu compra del plan {plan} está confirmada",
+      "destination": "Entrarás en {destination}.",
+      "notFound": {
+        "title": "Enlace no encontrado",
+        "description": "Este enlace no existe o venció."
+      },
+      "expired": {
+        "title": "Este enlace venció",
+        "description": "Los enlaces de reclamo valen 30 días después de la compra. Contacta al soporte para ayuda."
+      },
+      "rejected": {
+        "title": "No se pudo completar esta compra",
+        "description": "Contacta al soporte para ayuda."
+      },
+      "alreadyClaimed": {
+        "title": "Ya configurado",
+        "description": "Esta compra ya fue reclamada."
+      },
+      "teamNameLabel": "Nombre del equipo",
+      "teamSlugLabel": "Slug del equipo",
+      "createTeam": "Crear mi equipo",
+      "joinTeam": "Unirme al equipo",
+      "genericError": "Algo salió mal. Inténtalo de nuevo."
     }
   }
 }

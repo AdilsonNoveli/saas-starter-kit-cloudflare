@@ -46,3 +46,7 @@ export const routers = {
  * no change at all, because it was always a package specifier.)
  */
 export { adminPlansRouter } from "./admin-plans";
+// Same reasoning as adminPlansRouter above: read-only PendingPurchase
+// visibility (SPEC-0004 US-003) is billing-domain logic that happens to be
+// admin-gated, mounted at `admin.pendingPurchases` by layers/admin.
+export { adminBillingRouter } from "./admin-billing";

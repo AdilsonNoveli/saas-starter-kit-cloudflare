@@ -266,6 +266,7 @@ describe("validateBuyerCheckoutPlan", () => {
     const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
     const result = await validateBuyerCheckoutPlan({
       isArchived: true,
+      provider: "STRIPE",
       providerPriceId: "price_1",
       buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM,
       buyerTeamId: null,
@@ -280,6 +281,7 @@ describe("validateBuyerCheckoutPlan", () => {
     const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
     const result = await validateBuyerCheckoutPlan({
       isArchived: false,
+      provider: "STRIPE",
       providerPriceId: "price_1",
       buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM,
       buyerTeamId: "team_gone",
@@ -296,6 +298,7 @@ describe("validateBuyerCheckoutPlan", () => {
     const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
     const result = await validateBuyerCheckoutPlan({
       isArchived: false,
+      provider: "STRIPE",
       providerPriceId: "price_1",
       buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM,
       buyerTeamId: "team_1",
@@ -307,6 +310,7 @@ describe("validateBuyerCheckoutPlan", () => {
     const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
     const result = await validateBuyerCheckoutPlan({
       isArchived: false,
+      provider: "STRIPE",
       providerPriceId: "price_1",
       buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM,
       buyerTeamId: null,
@@ -323,6 +327,7 @@ describe("validateBuyerCheckoutPlan", () => {
     const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
     const result = await validateBuyerCheckoutPlan({
       isArchived: false,
+      provider: "STRIPE",
       providerPriceId: "price_1",
       buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM,
       buyerTeamId: "team_1",

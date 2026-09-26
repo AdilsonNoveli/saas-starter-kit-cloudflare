@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { pendingPurchases } from "../../database/schema";
 import { PendingPurchaseStatus } from "../../../shared/types/enums";
 import type { PaymentProvider } from "../../../shared/types/enums";
@@ -192,4 +192,47 @@ export async function claimPendingPurchase(
     )
     .returning();
   return row ?? null;
+}
+
+export interface AdminPendingPurchaseRow {
+  id: string;
+  email: string;
+  planName: string;
+  provider: string;
+  status: string;
+  failureReason: string | null;
+  createdAt: Date;
+  claimedAt: Date | null;
+  expiresAt: Date;
+}
+
+/**
+ * US-003: every pending purchase (all statuses), newest first, for the
+ * platform admin's read-only listing — the only place FR-011's "visible for
+ * investigation" requirement is met. Extracted from `admin-billing.ts` so it
+ * is testable the same way as every other DB-touching function here; that
+ * router file itself, like every tRPC router in this codebase, has no direct
+ * test.
+ */
+export async function listPendingPurchasesForAdmin(
+  status?: PendingPurchaseStatus,
+): Promise<AdminPendingPurchaseRow[]> {
+  const rows = await useDB().query.pendingPurchases.findMany({
+    where: status ? eq(pendingPurchases.status, status) : undefined,
+    orderBy: desc(pendingPurchases.createdAt),
+    with: { plan: { columns: { name: true } } },
+    limit: 200,
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    email: row.email,
+    planName: row.plan.name,
+    provider: row.provider,
+    status: row.status,
+    failureReason: row.failureReason,
+    createdAt: row.createdAt,
+    claimedAt: row.claimedAt,
+    expiresAt: row.expiresAt,
+  }));
 }

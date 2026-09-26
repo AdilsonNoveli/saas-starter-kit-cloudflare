@@ -255,3 +255,63 @@ describe("createPendingPurchase", () => {
     expect(days).toBeLessThan(30.1);
   });
 });
+
+describe("listPendingPurchasesForAdmin", () => {
+  const mockFindMany = vi.fn();
+
+  beforeEach(() => {
+    mockFindMany.mockReset();
+    vi.stubGlobal("useDB", () => ({
+      query: { pendingPurchases: { findMany: mockFindMany } },
+    }));
+  });
+
+  it("SPECSFY: AC-009 lists an EXPIRED purchase for the admin", async () => {
+    mockFindMany.mockResolvedValue([
+      { ...basePurchase, status: PendingPurchaseStatus.EXPIRED, plan: { name: "Starter" } },
+    ]);
+
+    const { listPendingPurchasesForAdmin } = await import("./pending-purchase-repository");
+    const rows = await listPendingPurchasesForAdmin();
+
+    expect(rows).toEqual([
+      expect.objectContaining({ id: "pp_1", status: PendingPurchaseStatus.EXPIRED, planName: "Starter" }),
+    ]);
+  });
+
+  it("SPECSFY: AC-023 filters by status", async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    const { listPendingPurchasesForAdmin } = await import("./pending-purchase-repository");
+    await listPendingPurchasesForAdmin(PendingPurchaseStatus.REJECTED);
+
+    expect(mockFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.anything() }),
+    );
+  });
+
+  it("does not filter when no status is given", async () => {
+    mockFindMany.mockResolvedValue([]);
+
+    const { listPendingPurchasesForAdmin } = await import("./pending-purchase-repository");
+    await listPendingPurchasesForAdmin();
+
+    expect(mockFindMany).toHaveBeenCalledWith(expect.objectContaining({ where: undefined }));
+  });
+
+  it("SPECSFY: AC-024 surfaces the recorded failure reason", async () => {
+    mockFindMany.mockResolvedValue([
+      {
+        ...basePurchase,
+        status: PendingPurchaseStatus.REJECTED,
+        failureReason: "Destination team no longer exists",
+        plan: { name: "Support Seat" },
+      },
+    ]);
+
+    const { listPendingPurchasesForAdmin } = await import("./pending-purchase-repository");
+    const rows = await listPendingPurchasesForAdmin();
+
+    expect(rows[0]?.failureReason).toBe("Destination team no longer exists");
+  });
+});

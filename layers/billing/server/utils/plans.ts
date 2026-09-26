@@ -86,30 +86,3 @@ export async function clearPublicOffer(
     .set({ isPublicOffer: false })
     .where(eq(plans.isPublicOffer, true));
 }
-
-export async function addPlan(planDetails: {
-  name: string;
-  description: string;
-  tier: string;
-  period: string;
-  price: string;
-  provider: string;
-  providerPriceId?: string;
-}) {
-  try {
-    const newPlan = await useDB().insert(plans).values({
-      name: planDetails.name,
-      description: planDetails.description,
-      tier: planDetails.tier,
-      price: planDetails.price,
-      period: planDetails.period,
-      provider: planDetails.provider,
-      providerPriceId: planDetails.providerPriceId,
-    });
-    console.log(`Created plan: ${planDetails.name}`);
-    return newPlan;
-  } catch (error) {
-    console.error(`Error adding plan ${planDetails.name}:`, error);
-    throw error;
-  }
-}

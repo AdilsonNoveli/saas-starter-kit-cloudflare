@@ -444,13 +444,6 @@
     },
     {
       "rule": "literal-text",
-      "where": "apps/login/app/components/AuthIcon.vue",
-      "match": "Nuxfire",
-      "removedBy": "BACKLOG-app-ui-copy",
-      "since": "2026-09-25"
-    },
-    {
-      "rule": "literal-text",
       "where": "apps/login/app/components/AuthLayout.vue",
       "match": "Nuxfire",
       "removedBy": "BACKLOG-app-ui-copy",

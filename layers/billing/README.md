@@ -60,7 +60,7 @@ and the generated sidebar navigation all read the same `activeLayerNames` set.
 | `server/utils/stripe/subscription-sync.ts` | the canonical handler behind every Stripe subscription event                        |
 | `server/utils/billing/event-ledger.ts` | shared Stripe/Paddle webhook idempotency ledger in KV (+ its test)                      |
 | `server/utils/billing/subscription-repository.ts` | the single `upsertSubscription()` write path for both providers (+ its test)  |
-| `server/utils/plans.ts`                | `ensureFreePlan()`/`addPlan()` — the reactive Free-plan safety net                       |
+| `server/utils/plans.ts`                | `ensureFreePlan()` — the reactive Free-plan safety net; `getPublicOfferPlan()`/`clearPublicOffer()` — the landing page's public-offer flag |
 | `shared/types/enums.ts`                | `SubscriptionStatus`, `PaymentProvider`, `STRIPE_PLAN_CURRENCIES`, `PLAN_BILLING_INTERVALS` |
 | `shared/utils/abilities.ts`            | `billingGetBillingInfo` (+ its test)                                                    |
 

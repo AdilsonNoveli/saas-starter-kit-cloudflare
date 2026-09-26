@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { signPaddleTeam, verifyPaddleTeam } from "./paddle-team-signature";
+import {
+  signPaddleTeam,
+  verifyPaddleTeam,
+  signPaddlePendingPurchase,
+  verifyPaddlePendingPurchase,
+} from "./paddle-team-signature";
 
 const SECRET = "test-webhook-secret-with-enough-length";
 
@@ -30,5 +35,36 @@ describe("paddle team signature", () => {
   it("fails closed when the secret is not configured", async () => {
     await expect(signPaddleTeam("", "team_a")).rejects.toThrow();
     expect(await verifyPaddleTeam("", "team_a", "aa")).toBe(false);
+  });
+});
+
+describe("paddle pending-purchase signature", () => {
+  it("SPECSFY: AC-011 accepts a signature made for the same pending purchase and secret", async () => {
+    const signature = await signPaddlePendingPurchase(SECRET, "pp_a");
+    expect(await verifyPaddlePendingPurchase(SECRET, "pp_a", signature)).toBe(true);
+  });
+
+  it("SPECSFY: AC-011 rejects a signature reused for a different pending purchase", async () => {
+    const signature = await signPaddlePendingPurchase(SECRET, "pp_a");
+    expect(await verifyPaddlePendingPurchase(SECRET, "pp_b", signature)).toBe(false);
+  });
+
+  it("SPECSFY: AC-011 rejects a tampered signature", async () => {
+    const signature = await signPaddlePendingPurchase(SECRET, "pp_a");
+    const tampered = `${signature.slice(0, -1)}${signature.endsWith("0") ? "1" : "0"}`;
+    expect(await verifyPaddlePendingPurchase(SECRET, "pp_a", tampered)).toBe(false);
+  });
+
+  it("SPECSFY: AC-011 keeps the two domains separate: a team signature never verifies as a pending-purchase signature", async () => {
+    const teamSignature = await signPaddleTeam(SECRET, "same_id");
+    expect(await verifyPaddlePendingPurchase(SECRET, "same_id", teamSignature)).toBe(false);
+
+    const purchaseSignature = await signPaddlePendingPurchase(SECRET, "same_id");
+    expect(await verifyPaddleTeam(SECRET, "same_id", purchaseSignature)).toBe(false);
+  });
+
+  it("fails closed when the secret is not configured", async () => {
+    await expect(signPaddlePendingPurchase("", "pp_a")).rejects.toThrow();
+    expect(await verifyPaddlePendingPurchase("", "pp_a", "aa")).toBe(false);
   });
 });

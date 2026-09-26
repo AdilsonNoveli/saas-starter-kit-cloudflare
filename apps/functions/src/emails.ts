@@ -92,6 +92,7 @@ const templates: {
   Welcome: Emails.Welcome,
   VerificationCode: Emails.VerificationCode,
   Invitation: Emails.Invitation,
+  PurchaseClaim: Emails.PurchaseClaim,
 };
 
 export type { SendEmailType, EmailsWorker } from "./emails-types";

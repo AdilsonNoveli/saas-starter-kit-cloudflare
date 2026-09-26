@@ -866,7 +866,7 @@ Mandatory checklist per task in exact order: `PREP`, `EXECUTE`, `VERIFY`, `VISUA
   - [ ] **EVIDENCE**: Record the RED failure trace.
   - [ ] **IMPROVE**: Note the atomic-transition shape this drives (see T026).
 
-- [ ] T007 [TEST] [TDD] Derive from AC-007 a failing Vitest case (webhook redelivery does not duplicate) in layers/billing/server/api/webhooks/stripe.test.ts — Refs: FR-004, FR-012, NFR-002, AC-007 — Depends: none
+- [ ] T007 [TEST] [TDD] Derive from AC-007 a failing Vitest case (webhook redelivery does not duplicate) in layers/billing/server/utils/billing/stripe-webhook-dispatch.test.ts — Refs: FR-004, FR-012, NFR-002, AC-007 — Depends: none
   - [ ] **PREP**: Read AC-007's Gherkin; confirm the ledger fixture from `event-ledger.test.ts` is reusable.
   - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
   - [ ] **VERIFY**: Observe RED.
@@ -874,7 +874,7 @@ Mandatory checklist per task in exact order: `PREP`, `EXECUTE`, `VERIFY`, `VISUA
   - [ ] **EVIDENCE**: Record the RED failure trace.
   - [ ] **IMPROVE**: Confirm the test asserts exactly one claim e-mail send, not merely one DB row.
 
-- [ ] T008 [TEST] [TDD] Derive from AC-008 a failing Vitest case (delayed payment method does not claim early) in layers/billing/server/api/webhooks/stripe.test.ts — Refs: FR-004, AC-008 — Depends: none
+- [ ] T008 [TEST] [TDD] Derive from AC-008 a failing Vitest case (delayed payment method does not claim early) in layers/billing/server/utils/billing/stripe-webhook-dispatch.test.ts — Refs: FR-004, AC-008 — Depends: none
   - [ ] **PREP**: Read AC-008's Gherkin (both scenarios: `unpaid` then `async_payment_succeeded`).
   - [ ] **EXECUTE**: Author both cases with unique `SPECSFY:` markers.
   - [ ] **VERIFY**: Observe RED.
@@ -1059,14 +1059,14 @@ Mandatory checklist per task in exact order: `PREP`, `EXECUTE`, `VERIFY`, `VISUA
   - [ ] **IMPROVE**: Confirm the existing `team_id` branch's behavior is unchanged (diff review).
   <!-- specsfy:evidence {"task":"T029","refs":["FR-001","FR-003","FR-004","FR-012","NFR-001","AC-002","AC-007","AC-011"],"files":["layers/billing/server/api/webhooks/paddle.post.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/api/webhooks/paddle.test.ts","exit":0}]} -->
 
-- [ ] T030 [CODE] [US-001] Add the pending-purchase branch and claim-e-mail trigger in layers/billing/server/api/webhooks/stripe.post.ts — Refs: FR-004, FR-012, AC-001, AC-007, AC-008 — Depends: T001, T007, T008
+- [ ] T030 [CODE] [US-001] Add the pending-purchase branch and claim-e-mail trigger in layers/billing/server/utils/billing/stripe-webhook-dispatch.ts (extracted from stripe.post.ts, which stays a thin defineEventHandler wrapper) — Refs: FR-004, FR-012, AC-001, AC-007, AC-008 — Depends: T001, T007, T008
   - [ ] **PREP**: Confirm RED T007/T008.
   - [ ] **EXECUTE**: In `dispatch()`, branch on `customer.metadata.pending_purchase_id` to call `recordConfirmedSubscription` instead of `syncStripeSubscription`, sending the claim e-mail only on first confirmation.
-  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/api/webhooks/stripe.test.ts` — GREEN.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/utils/billing/stripe-webhook-dispatch.test.ts` — GREEN.
   - [ ] **VISUAL**: Not applicable — webhook handler only.
   - [ ] **EVIDENCE**: Record the passing test command output.
   - [ ] **IMPROVE**: Confirm the existing `customer.subscription.*`/`checkout.session.*` branches for a team-upgrade checkout are unchanged.
-  <!-- specsfy:evidence {"task":"T030","refs":["FR-004","FR-012","AC-001","AC-007","AC-008"],"files":["layers/billing/server/api/webhooks/stripe.post.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/api/webhooks/stripe.test.ts","exit":0}]} -->
+  <!-- specsfy:evidence {"task":"T030","refs":["FR-004","FR-012","AC-001","AC-007","AC-008"],"files":["layers/billing/server/api/webhooks/stripe.post.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/utils/billing/stripe-webhook-dispatch.test.ts","exit":0}]} -->
 
 - [ ] T031 [CODE] [US-001] Add signPaddlePendingPurchase/verifyPaddlePendingPurchase in layers/billing/server/utils/billing/paddle-team-signature.ts — Refs: FR-001, FR-003, NFR-001, AC-011 — Depends: T011, T001, T002
   - [ ] **PREP**: Confirm RED T011.
@@ -1107,11 +1107,11 @@ Mandatory checklist per task in exact order: `PREP`, `EXECUTE`, `VERIFY`, `VISUA
 - [ ] T035 [CODE] [US-001] Implement the PurchaseClaim e-mail template in packages/emails/templates/PurchaseClaim.tsx — Refs: FR-004, AC-001, AC-007, AC-008 — Depends: T001, T007, T008
   - [ ] **PREP**: Confirm RED T007/T008; read `Invitation.tsx` for the existing React Email conventions.
   - [ ] **EXECUTE**: Implement the template (plan name, destination summary, claim link).
-  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/api/webhooks/stripe.test.ts` — the claim-e-mail assertions in T007/T008 GREEN.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/utils/billing/stripe-webhook-dispatch.test.ts` — the claim-e-mail assertions in T007/T008 GREEN.
   - [ ] **VISUAL**: Borders, spacing, margins, padding, and typography reviewed in the e-mail client preview during T030's verification (transactional e-mail markup, not a `.vue` screen).
   - [ ] **EVIDENCE**: Record the file created and its use from T030.
   - [ ] **IMPROVE**: Confirm the template's copy passes through `fireskill-specialist-copywriting` per `AGENTS.md`'s text rule.
-  <!-- specsfy:evidence {"task":"T035","refs":["FR-004","AC-001","AC-007","AC-008"],"files":["packages/emails/templates/PurchaseClaim.tsx"],"commands":[{"run":"bunx vitest run layers/billing/server/api/webhooks/stripe.test.ts","exit":0}]} -->
+  <!-- specsfy:evidence {"task":"T035","refs":["FR-004","AC-001","AC-007","AC-008"],"files":["packages/emails/templates/PurchaseClaim.tsx"],"commands":[{"run":"bunx vitest run layers/billing/server/utils/billing/stripe-webhook-dispatch.test.ts","exit":0}]} -->
 
 #### Interface Phase
 

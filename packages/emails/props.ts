@@ -32,8 +32,16 @@ export interface InviteEmailProps {
   inviteLink: string;
 }
 
+export interface PurchaseClaimEmailProps {
+  planName: string;
+  /** "a new team of your own" or the destination team's name, already worded for display. */
+  destinationSummary: string;
+  claimLink: string;
+}
+
 export interface EmailProps {
   Welcome: WelcomeProps;
   VerificationCode: VerificationEmailProps;
   Invitation: InviteEmailProps;
+  PurchaseClaim: PurchaseClaimEmailProps;
 }

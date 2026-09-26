@@ -100,6 +100,29 @@ async function provisionNewTeam(
   });
 }
 
+/**
+ * Human-readable destination for a claim e-mail / claim-page summary
+ * (FR-004, `checkout.getPendingPurchase`): "a new team of your own" for
+ * `NEW_TEAM`, or the destination team's own name for `EXISTING_TEAM`.
+ */
+export async function describeBuyerDestination(plan: {
+  // `string`, not `PlanBuyerTeamMode`: `Plan.buyerTeamMode` is a plain text
+  // column (like every other status-like field in this schema), so callers
+  // reading a row straight from the database hand this whatever string is
+  // stored, not the narrowed write-side type.
+  buyerTeamMode: string;
+  buyerTeamId: string | null;
+}): Promise<string> {
+  if (plan.buyerTeamMode === PlanBuyerTeamMode.NEW_TEAM) {
+    return "a new team of your own";
+  }
+  if (!plan.buyerTeamId) return "a team that no longer exists";
+  const team = await useDB().query.teams.findFirst({
+    where: eq(teams.id, plan.buyerTeamId),
+  });
+  return team ? team.name : "a team that no longer exists";
+}
+
 async function provisionExistingTeam(
   input: ProvisionBuyerTeamInput,
 ): Promise<ProvisionResult> {

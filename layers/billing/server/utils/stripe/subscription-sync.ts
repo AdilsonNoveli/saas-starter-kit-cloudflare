@@ -42,6 +42,34 @@ export async function syncStripeSubscription(
     return { ok: false, reason: "Customer has no team_id in metadata" };
   }
 
+  return syncStripeSubscriptionForTeam(stripe, subscriptionId, teamId);
+}
+
+/**
+ * The team-scoped half of `syncStripeSubscription` (SPEC-0004 FR-009):
+ * extracted so a buyer-provisioning claim, which resolves `teamId` from the
+ * just-created team rather than from `customer.metadata.team_id`, can reuse
+ * the exact same write path instead of a second copy of it. Re-fetches the
+ * subscription itself rather than accepting it as a parameter, for the same
+ * reason the wrapper above always re-fetches: shaped by this SDK's pinned API
+ * version, not by whatever the caller happened to have on hand.
+ */
+export async function syncStripeSubscriptionForTeam(
+  stripe: Stripe,
+  subscriptionId: string,
+  teamId: string,
+): Promise<SubscriptionSyncOutcome> {
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+  const customerId =
+    typeof subscription.customer === "string"
+      ? subscription.customer
+      : subscription.customer.id;
+  const customer = await stripe.customers.retrieve(customerId);
+  if (customer.deleted) {
+    return { ok: false, reason: "Customer was deleted" };
+  }
+
   // Self-healing backfill for a team whose checkout predates the
   // `stripeCustomerId` column (or one created outside createStripeCheckoutSession):
   // without this, createStripeCheckoutSession's customer-reuse check would find

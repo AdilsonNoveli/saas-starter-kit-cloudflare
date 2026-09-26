@@ -1,37 +1,18 @@
 import type Stripe from "stripe";
+import { sender } from "@nuxfire/functions/sender";
 import { createStripeClient } from "../../utils/stripe";
-import { syncStripeSubscription } from "../../utils/stripe/subscription-sync";
 import {
   markEventProcessed,
   wasEventProcessed,
 } from "../../utils/billing/event-ledger";
+import { dispatch } from "../../utils/billing/stripe-webhook-dispatch";
 
 /**
  * Deliberately thin: verify → dedupe → dispatch. All the actual state
- * resolution (which team, which plan, what changed) lives in
- * `syncStripeSubscription`, shared by every event type below instead of
- * duplicated per case.
- *
- * Event coverage, and why each one is here:
- * - `customer.subscription.*` (created/updated/deleted): the primary signal
- *   for every state change a subscription goes through, `deleted` included —
- *   without it, a subscription that reaches the end of its
- *   `cancel_at_period_end` window, or is canceled immediately via the API,
- *   never tells this app it ended, and the team keeps looking ACTIVE forever.
- * - `checkout.session.completed` / `.async_payment_succeeded`: required by
- *   Stripe's own integration guidance for delayed-notification payment
- *   methods (boleto, SEPA debit — relevant here since checkout accepts
- *   dynamic payment methods, not just cards). `completed` fires the instant
- *   the session finishes, but the payment can still be `unpaid` at that
- *   moment for those methods, so fulfillment is gated on `payment_status`.
- * - `invoice.payment_failed`: the subscription's own status usually follows
- *   a failed charge into `past_due` too, but this is the earlier, dedicated
- *   signal for it — reacting on the subscription event alone means waiting
- *   on whichever event Stripe happens to deliver first.
- * - `invoice.paid` is deliberately not handled separately: on renewal, Stripe
- *   also fires `customer.subscription.updated` (the period advances), which
- *   already re-reads `latest_invoice` and captures `lastPaymentDate` — a
- *   second handler for the same fact would be a second place to keep in sync.
+ * resolution (which team, which plan, what changed — including SPEC-0004's
+ * pending-purchase fork) lives in `stripe-webhook-dispatch.ts`, tested on its
+ * own since this file's `defineEventHandler` needs Nitro's auto-imports at
+ * module-eval time, which a plain Vitest run never provides.
  */
 export default defineEventHandler(async (event) => {
   await assertNotRateLimited(event, "webhook:stripe", {
@@ -71,8 +52,11 @@ export default defineEventHandler(async (event) => {
     return { status: "success", deduped: true };
   }
 
+  const sendEmail = sender(event.context?.cloudflare?.env?.Emails);
+  const origin = getRequestURL(event).origin;
+
   try {
-    const outcome = await dispatch(stripe, stripeEvent);
+    const outcome = await dispatch(stripe, stripeEvent, sendEmail, origin);
     if (!outcome.ok) {
       console.error(`Stripe webhook ${stripeEvent.type}: ${outcome.reason}`);
       return { status: "error", message: outcome.reason };
@@ -91,57 +75,3 @@ export default defineEventHandler(async (event) => {
     });
   }
 });
-
-async function dispatch(
-  stripe: Stripe,
-  stripeEvent: Stripe.Event,
-): Promise<{ ok: true } | { ok: false; reason: string }> {
-  switch (stripeEvent.type) {
-    case "customer.subscription.created":
-    case "customer.subscription.updated":
-    case "customer.subscription.deleted": {
-      const subscription = stripeEvent.data.object as Stripe.Subscription;
-      return syncStripeSubscription(stripe, subscription.id);
-    }
-
-    case "checkout.session.completed":
-    case "checkout.session.async_payment_succeeded": {
-      const session = stripeEvent.data.object as Stripe.Checkout.Session;
-      if (session.payment_status === "unpaid") {
-        // Not a failure — a delayed payment method's session completing
-        // before the money has actually moved. `async_payment_succeeded`
-        // (or the subscription's own event once it activates) is what
-        // finishes this.
-        return { ok: true };
-      }
-      if (!session.subscription) {
-        // This app's only Checkout mode is "subscription" (see
-        // server/trpc/routers/stripe.ts), so every real session has one —
-        // this only guards a session type this handler doesn't expect.
-        return { ok: false, reason: "Checkout session has no subscription" };
-      }
-      const subscriptionId =
-        typeof session.subscription === "string"
-          ? session.subscription
-          : session.subscription.id;
-      return syncStripeSubscription(stripe, subscriptionId);
-    }
-
-    case "invoice.payment_failed": {
-      const invoice = stripeEvent.data.object as Stripe.Invoice;
-      if (!invoice.subscription) {
-        // A one-off invoice not tied to a subscription — nothing here to
-        // reconcile against.
-        return { ok: true };
-      }
-      const subscriptionId =
-        typeof invoice.subscription === "string"
-          ? invoice.subscription
-          : invoice.subscription.id;
-      return syncStripeSubscription(stripe, subscriptionId);
-    }
-
-    default:
-      return { ok: true };
-  }
-}

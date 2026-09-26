@@ -5,13 +5,13 @@
 | Format | Specsfy/2.0 |
 | ID | SPEC-0004 |
 | Slug | 0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode |
-| Status | Draft |
+| Status | Defined |
 | Effort | 6 |
 | Effort updated at | 2026-09-26 |
 | Effort rationale | New checkout entry point (no existing team), a new persisted entity (pending purchase), a new claim journey with two Vue pages, and edits to both provider webhook handlers; comparable in size to the two-provider webhook work already in `layers/billing`. |
 | ClickUp Task | |
 | Milestones | |
-| Definition Gate | Pending |
+| Definition Gate | Passed |
 | Plan Gate | Pending |
 | Delivery Gate | Pending |
 | Evidence Contract | 1 |
@@ -62,7 +62,7 @@ This spec's research is entirely internal (live repository code, read directly),
 
 #### Stored research artifacts
 
-- `specs/draft/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/research/internal-evidence.md`: provenance notes for R-001–R-005, pinning the exact repository files/behaviors each finding rests on as of 2026-09-26. No external (non-repository) artifacts were consulted.
+- `specs/defined/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/research/internal-evidence.md`: provenance notes for R-001–R-005, pinning the exact repository files/behaviors each finding rests on as of 2026-09-26. No external (non-repository) artifacts were consulted.
 
 #### Resolved Questions
 
@@ -608,7 +608,7 @@ See section 10 (full nine-area breakdown, `Human Interface: Yes`).
 #### File Structure
 
 ```text
-specs/draft/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/
+specs/defined/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/
   spec.md
 layers/billing/
   server/database/schema.ts                        (edit: pendingPurchases table)
@@ -736,6 +736,7 @@ No changes to `Plan`, `Team`, `TeamMembership`, or `Subscription` shapes — thi
 - Stripe (`stripe ^17.5.0`, pinned API version, existing `createStripeClient`): `customers.create`, `checkout.sessions.create` (mode `subscription`, no team-scoped customer reuse since none exists yet). No new package.
 - Paddle (`@paddle/paddle-node-sdk`, `@paddle/paddle-js`, existing `usePayments` composable): browser checkout with `customData` carrying `pending_purchase_id`/`purchase_sig` instead of `team_id`/`team_sig`. No new package.
 - Both already configured (`config.ts`, `infra/secret.ts`); no new credentials.
+- Failure mode: neither call gets custom timeout/retry wrapping, matching the existing `createStripeCheckoutSession` precedent (`layers/billing/server/trpc/stripe.ts`), which relies on the SDK's own defaults and lets a failure surface as a plain error. A failed `startBuyerCheckout` call returns `INTERNAL_SERVER_ERROR` and creates no `PendingPurchase` row (see Errors and Edge Cases); the buyer's only recovery path is retrying the Buy page, same as the existing upgrade checkout offers today.
 
 ### 11. TDD Strategy
 
@@ -785,20 +786,27 @@ No changes to `Plan`, `Team`, `TeamMembership`, or `Subscription` shapes — thi
 
 #### Act I Gate — Definition
 
-- **Result**: Pending
-- **Command**: `node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/draft/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md`
-- **Findings**: Pending — run by `$fireskill-04-validate`.
+- **Result**: READY (structural: `VALID DRAFT`; research: `PASSED`; semantic review below has no `P1 Open` finding).
+- **Command**: `node fireskills/skills/fireskill-04-validate/scripts/validate_spec.mjs specs/defined/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md` (2026-09-26: `RESULT: VALID DRAFT`); `node fireskills/skills/fireskill-03-specify/scripts/load_research.mjs specs/defined/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md` (2026-09-26: `Research: PASSED`).
+- **Findings** (review lenses — `references/review-lenses.md`):
+
+- **FIND-SEC-001** [P1] [Resolved] Could a claimant defeat the e-mail-match check by registering with someone else's unverified e-mail — Refs: FR-005 — Evidence: apps/functions/src/auth.ts — Effect: would let an attacker claim a stranger's purchase by typing their e-mail — Suggestion: none required, already mitigated: every OpenAuth provider verifies e-mail ownership before issuing a session (password signup sends and verifies a code, code login is itself the verification, GitHub/Google emails are provider-verified), so FR-005 matches against a proven mailbox, not a claimed string.
+- **FIND-SEC-002** [P3] [Resolved] Could a logged-out visitor see purchase/destination details by opening a claim link, the way invite links show details before login — Refs: FR-005 — Evidence: apps/app/app/middleware/0.auth.global.ts — Effect: would leak plan/team information pre-authentication — Suggestion: none required, already mitigated: DEC-002 makes the claim page a normal protected page with no auth bypass, so the existing global middleware redirects before any data loads.
+- **FIND-ARCH-001** [P2] [Resolved] Extracting a team-scoped sync function out of the existing Stripe sync must not change behavior on the existing team-upgrade webhook path — Refs: FR-009 — Evidence: layers/billing/server/utils/stripe/subscription-sync.ts — Effect: a careless refactor could regress the already-working upgrade flow — Suggestion: add characterization tests for the current behavior before refactoring, already reflected in the task ordering (schema, then repository, then provisioning, then sync extraction, ahead of new behavior).
+- **FIND-SEC-003** [P2] [Accepted] A confirmed EXISTING_TEAM purchase whose destination becomes invalid before claim has already taken the buyer's money with no automatic refund — Refs: FR-008 — Evidence: specs/backlog/0007-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode.md — Effect: buyer paid, got no access, needs manual follow-up via the admin listing — Suggestion: a future spec could add refund or cancellation triggered by rejection; out of scope here by the user's own recorded decision (that same backlog file, "Recompra/upgrade... fora de escopo", "sem reembolso automático").
+
+No `P1 Open` finding. Gate is `READY`.
 
 #### Act II Gate — Plan
 
 - **Result**: Pending
-- **Command**: `node fireskills/skills/fireskill-05-tasks/scripts/validate_tasks.mjs specs/draft/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md`
+- **Command**: `node fireskills/skills/fireskill-05-tasks/scripts/validate_tasks.mjs specs/defined/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md`
 - **Findings**: Pending.
 
 #### Act III Gate — Delivery
 
 - **Result**: Pending
-- **Command**: `node fireskills/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/draft/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md .`
+- **Command**: `node fireskills/skills/fireskill-06-tdd-bdd/scripts/check_traceability.mjs specs/defined/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md .`
 - **Findings**: Pending.
 
 ### 14. Tasks
@@ -853,3 +861,6 @@ To be produced by `$fireskill-05-tasks` from sections 6–10 above, following th
 - [ ] All requirements have verified test evidence.
 - [ ] All tasks in section 14 are completed.
 - [ ] All static checks and automated test suites pass (`bun run test`, `apps/app` typecheck, `bunx vue-tsc --noEmit -p server/tsconfig.json`, `bun run check:i18n`, `bun run check:copy`).
+- [ ] `.fireskills/DATABASE.md` updated with the new `PendingPurchase` table (this spec changes persistence, per `fireskill-04-validate`'s point 9).
+- [ ] `.fireskills/INTERFACE.md` updated with the Buy, Claim, and Pending-purchases screens (new human interface, section 10).
+- [ ] `.fireskills/PROJECT.md` "Boundaries and Non-Goals" line "Anything that consumes `Plan.buyerTeamMode`..." (currently in `fireskills/specialists/fireskill-specialist-billing/references/nuxfire-billing.md:39` and `PROJECT.md`) revised to reflect that a purchase now provisions a team, via `$fireskill-documentator`.

@@ -260,3 +260,73 @@ describe("provisionBuyerTeam", () => {
     expect(fakeDb.insertMembership).not.toHaveBeenCalled();
   });
 });
+
+describe("validateBuyerCheckoutPlan", () => {
+  it("SPECSFY: AC-012 rejects an archived plan", async () => {
+    const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
+    const result = await validateBuyerCheckoutPlan({
+      isArchived: true,
+      providerPriceId: "price_1",
+      buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM,
+      buyerTeamId: null,
+    });
+    expect(result).toEqual({ ok: false, reason: "plan_archived" });
+  });
+
+  it("SPECSFY: AC-003 rejects an EXISTING_TEAM plan whose destination was deleted", async () => {
+    vi.stubGlobal("useDB", () => ({
+      query: { teams: { findFirst: vi.fn().mockResolvedValue(undefined) } },
+    }));
+    const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
+    const result = await validateBuyerCheckoutPlan({
+      isArchived: false,
+      providerPriceId: "price_1",
+      buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM,
+      buyerTeamId: "team_gone",
+    });
+    expect(result).toEqual({ ok: false, reason: "destination_missing" });
+  });
+
+  it("SPECSFY: AC-013 rejects an EXISTING_TEAM plan whose destination is suspended", async () => {
+    vi.stubGlobal("useDB", () => ({
+      query: {
+        teams: { findFirst: vi.fn().mockResolvedValue({ id: "team_1", status: "SUSPENDED" }) },
+      },
+    }));
+    const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
+    const result = await validateBuyerCheckoutPlan({
+      isArchived: false,
+      providerPriceId: "price_1",
+      buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM,
+      buyerTeamId: "team_1",
+    });
+    expect(result).toEqual({ ok: false, reason: "destination_suspended" });
+  });
+
+  it("accepts a NEW_TEAM plan with a configured price", async () => {
+    const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
+    const result = await validateBuyerCheckoutPlan({
+      isArchived: false,
+      providerPriceId: "price_1",
+      buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM,
+      buyerTeamId: null,
+    });
+    expect(result).toEqual({ ok: true });
+  });
+
+  it("accepts an EXISTING_TEAM plan whose destination is ACTIVE", async () => {
+    vi.stubGlobal("useDB", () => ({
+      query: {
+        teams: { findFirst: vi.fn().mockResolvedValue({ id: "team_1", status: "ACTIVE" }) },
+      },
+    }));
+    const { validateBuyerCheckoutPlan } = await import("./buyer-provisioning");
+    const result = await validateBuyerCheckoutPlan({
+      isArchived: false,
+      providerPriceId: "price_1",
+      buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM,
+      buyerTeamId: "team_1",
+    });
+    expect(result).toEqual({ ok: true });
+  });
+});

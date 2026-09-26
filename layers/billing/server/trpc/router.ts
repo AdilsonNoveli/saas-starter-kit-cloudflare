@@ -1,6 +1,7 @@
 import type { AnyRouter } from "@trpc/server";
 import { billingRouter } from "./billing";
 import { stripeRouter } from "./stripe";
+import { checkoutRouter } from "./checkout";
 
 /**
  * This layer's contribution to `appRouter`, keyed by the top-level name each
@@ -23,6 +24,7 @@ import { stripeRouter } from "./stripe";
 export const routers = {
   billing: billingRouter,
   stripe: stripeRouter,
+  checkout: checkoutRouter,
 } satisfies Record<string, AnyRouter>;
 
 /**

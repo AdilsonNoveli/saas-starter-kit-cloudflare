@@ -9,6 +9,44 @@ import { PlanBuyerTeamMode } from "../../../shared/types/enums";
 import { claimPendingPurchase } from "./pending-purchase-repository";
 import type { PendingPurchaseRow } from "./pending-purchase-repository";
 
+export type CheckoutStartRejectionReason =
+  | "plan_archived"
+  | "no_price"
+  | "destination_missing"
+  | "destination_suspended";
+
+export type CheckoutStartValidation =
+  | { ok: true }
+  | { ok: false; reason: CheckoutStartRejectionReason };
+
+/**
+ * FR-002: refuses a checkout before any provider is involved, for the same
+ * reasons `provisionExistingTeam` refuses a claim — taking a payment for a
+ * plan or destination already known to be dead is worse than refusing
+ * upfront. Re-run again at claim time (`provisionBuyerTeam`) rather than
+ * trusted from here, since the destination can change in between.
+ */
+export async function validateBuyerCheckoutPlan(plan: {
+  isArchived: boolean;
+  providerPriceId: string | null;
+  buyerTeamMode: string;
+  buyerTeamId: string | null;
+}): Promise<CheckoutStartValidation> {
+  if (plan.isArchived) return { ok: false, reason: "plan_archived" };
+  if (!plan.providerPriceId) return { ok: false, reason: "no_price" };
+
+  if (plan.buyerTeamMode === PlanBuyerTeamMode.EXISTING_TEAM) {
+    if (!plan.buyerTeamId) return { ok: false, reason: "destination_missing" };
+    const destination = await useDB().query.teams.findFirst({
+      where: eq(teams.id, plan.buyerTeamId),
+    });
+    if (!destination) return { ok: false, reason: "destination_missing" };
+    if (destination.status !== "ACTIVE") return { ok: false, reason: "destination_suspended" };
+  }
+
+  return { ok: true };
+}
+
 export interface ProvisionBuyerTeamInput {
   pendingPurchase: PendingPurchaseRow;
   plan: {

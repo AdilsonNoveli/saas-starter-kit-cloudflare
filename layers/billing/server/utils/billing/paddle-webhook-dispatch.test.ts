@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { EventName, type Paddle } from "@paddle/paddle-node-sdk";
-import type { SendEmail } from "./paddle-webhook-dispatch";
+import type { PaddleSendEmail } from "./paddle-webhook-dispatch";
 
 const mockUpsertSubscription = vi.fn();
 vi.mock("./subscription-repository", () => ({
@@ -48,7 +48,7 @@ const mockPlansFindFirst = vi.fn();
 const mockPendingPurchaseFindFirst = vi.fn();
 
 describe("paddle webhook dispatch", () => {
-  let sendEmail: SendEmail;
+  let sendEmail: PaddleSendEmail;
 
   beforeEach(() => {
     mockUpsertSubscription.mockReset();
@@ -62,7 +62,7 @@ describe("paddle webhook dispatch", () => {
       email: "buyer@example.com",
       plan: { id: "plan_1", name: "Starter" },
     });
-    sendEmail = vi.fn().mockResolvedValue(true) as unknown as SendEmail;
+    sendEmail = vi.fn().mockResolvedValue(true) as unknown as PaddleSendEmail;
     vi.stubGlobal("useDB", () => ({
       query: {
         plans: { findFirst: mockPlansFindFirst },
@@ -73,7 +73,7 @@ describe("paddle webhook dispatch", () => {
 
   it("regression: an existing team_id customer is written through upsertSubscription unchanged", async () => {
     const paddle = fakePaddle();
-    const { dispatch } = await import("./paddle-webhook-dispatch");
+    const { dispatchPaddleWebhook: dispatch } = await import("./paddle-webhook-dispatch");
 
     const outcome = await dispatch(
       paddle,
@@ -93,7 +93,7 @@ describe("paddle webhook dispatch", () => {
   it("SPECSFY: AC-002 confirms a pending-purchase customer and sends the claim e-mail once", async () => {
     mockRecordConfirmedSubscription.mockResolvedValue({ firstConfirmation: true });
     const paddle = fakePaddle();
-    const { dispatch } = await import("./paddle-webhook-dispatch");
+    const { dispatchPaddleWebhook: dispatch } = await import("./paddle-webhook-dispatch");
 
     const outcome = await dispatch(
       paddle,
@@ -120,7 +120,7 @@ describe("paddle webhook dispatch", () => {
   it("SPECSFY: AC-007 does not resend the claim e-mail on redelivery", async () => {
     mockRecordConfirmedSubscription.mockResolvedValue({ firstConfirmation: false });
     const paddle = fakePaddle();
-    const { dispatch } = await import("./paddle-webhook-dispatch");
+    const { dispatchPaddleWebhook: dispatch } = await import("./paddle-webhook-dispatch");
 
     const outcome = await dispatch(
       paddle,
@@ -142,7 +142,7 @@ describe("paddle webhook dispatch", () => {
   it("SPECSFY: AC-011 rejects a pending-purchase event with an invalid signature", async () => {
     mockVerifyPaddlePendingPurchase.mockResolvedValue(false);
     const paddle = fakePaddle();
-    const { dispatch } = await import("./paddle-webhook-dispatch");
+    const { dispatchPaddleWebhook: dispatch } = await import("./paddle-webhook-dispatch");
 
     const outcome = await dispatch(
       paddle,
@@ -163,7 +163,7 @@ describe("paddle webhook dispatch", () => {
 
   it("does not confirm a pending-purchase subscription that is not yet active", async () => {
     const paddle = fakePaddle();
-    const { dispatch } = await import("./paddle-webhook-dispatch");
+    const { dispatchPaddleWebhook: dispatch } = await import("./paddle-webhook-dispatch");
 
     const outcome = await dispatch(
       paddle,

@@ -4,7 +4,7 @@ import {
   markEventProcessed,
   wasEventProcessed,
 } from "../../utils/billing/event-ledger";
-import { dispatch } from "../../utils/billing/paddle-webhook-dispatch";
+import { dispatchPaddleWebhook } from "../../utils/billing/paddle-webhook-dispatch";
 
 /**
  * Deliberately thin: verify → dedupe → dispatch. All the actual state
@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
   const origin = getRequestURL(event).origin;
 
   try {
-    const outcome = await dispatch(paddle, eventData, secretKey, sendEmail, origin);
+    const outcome = await dispatchPaddleWebhook(paddle, eventData, secretKey, sendEmail, origin);
     if (!outcome.ok) {
       console.error(`Paddle webhook ${eventData.eventType}: ${outcome.reason}`);
       return { status: "error", message: outcome.reason };

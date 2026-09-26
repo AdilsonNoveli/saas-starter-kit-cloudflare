@@ -16,8 +16,8 @@ import { describeBuyerDestination } from "./buyer-provisioning";
 // `defineEventHandler(...)` needs Nitro's auto-imports at module-eval time,
 // which a plain Vitest run never provides.
 
-export type SendEmail = ReturnType<typeof sender>;
-export type DispatchOutcome = { ok: true } | { ok: false; reason: string };
+export type PaddleSendEmail = ReturnType<typeof sender>;
+export type PaddleDispatchOutcome = { ok: true } | { ok: false; reason: string };
 
 export function mapPaddleStatus(paddleStatus: string): SubscriptionStatus {
   const statusMap: Record<string, SubscriptionStatus> = {
@@ -100,13 +100,13 @@ export async function resolvePaddleSubscriptionInput(
   };
 }
 
-export async function dispatch(
+export async function dispatchPaddleWebhook(
   paddle: Paddle,
   eventData: Awaited<ReturnType<Paddle["webhooks"]["unmarshal"]>>,
   secretKey: string,
-  sendEmail: SendEmail,
+  sendEmail: PaddleSendEmail,
   origin: string,
-): Promise<DispatchOutcome> {
+): Promise<PaddleDispatchOutcome> {
   switch (eventData.eventType) {
     case EventName.SubscriptionCreated:
     case EventName.SubscriptionUpdated:
@@ -167,9 +167,9 @@ async function resolvePendingPurchaseConfirmation(
   pendingPurchaseId: string,
   purchaseSignature: string,
   secretKey: string,
-  sendEmail: SendEmail,
+  sendEmail: PaddleSendEmail,
   origin: string,
-): Promise<DispatchOutcome> {
+): Promise<PaddleDispatchOutcome> {
   if (!(await verifyPaddlePendingPurchase(secretKey, pendingPurchaseId, purchaseSignature))) {
     return { ok: false, reason: "Invalid purchase signature" };
   }

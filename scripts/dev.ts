@@ -23,6 +23,7 @@ const proc = Bun.spawn(
       NUXT_PUBLIC_AUTH_CLIENT_ID: Resource.AppAuthClientID.value,
       NUXT_PUBLIC_AUTH_URL: Resource.AuthUrl.value,
       NUXT_PUBLIC_APP_URL: Resource.AppUrl.value,
+      NUXT_PUBLIC_CHECKOUT_URL: Resource.CHECKOUT_URL.value,
       ...(flags.websockets
         ? { NUXT_PUBLIC_WEBSOCKETS_ENDPOINT: Resource.WebsocketsUrl.value }
         : {}),

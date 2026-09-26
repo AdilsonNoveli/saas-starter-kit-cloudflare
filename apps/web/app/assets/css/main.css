@@ -16,6 +16,10 @@
   --color-brand-hover: var(--color-flame-600);
   --color-brand-secondary: var(--color-fire-500);
   --color-brand-light: var(--color-fire-50);
+
+  /* Buy CTA — dedicated brand green, not the generic `--ui-success` state color */
+  --color-cta: var(--color-mint-500);
+  --color-cta-foreground: var(--color-mint-950);
 }
 
 .dark {
@@ -118,13 +122,14 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Variante verde do shiny-button (Nuxt / Emerald brand) */
+/* Variante verde do shiny-button — cor de marca da CTA de compra (--color-cta) */
 .shiny-button.shiny-button-green,
 .shiny-button-green {
-  --gradient-shine: color-mix(in oklab, var(--ui-success) 70%, white);
-  --gradient-brand: var(--ui-success);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ui-success) 35%, transparent);
-  color: white;
+  --shiny-text: var(--color-cta-foreground);
+  --gradient-shine: color-mix(in oklab, var(--color-cta) 70%, white);
+  --gradient-brand: var(--color-cta);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-cta) 35%, transparent);
+  color: var(--color-cta-foreground);
 }
 /* Pseudo-elemento ::before - Grade de pontos animada */
 .shiny-button::before {

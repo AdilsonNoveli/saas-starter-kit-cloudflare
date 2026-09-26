@@ -63,6 +63,17 @@ if (flags.paddle) {
   secretList.PaddleClientToken = new sst.Secret("PADDLE_CLIENT_TOKEN", "");
 }
 
+// The Buy CTA's destination on apps/web's landing page (SPEC-0004): the full
+// URL of apps/app's `/buy/<planId>` page for whichever Plan the admin
+// configured as the public offer. Public by design (becomes
+// NUXT_PUBLIC_CHECKOUT_URL, see infra/web.ts) but still per-stage and
+// manually set, like PaddleClientToken above — there is no Plan row at
+// deploy time to derive it from, only one the admin creates afterwards in
+// /admin/plans. Defaults to "" so a stage that has not set it yet still
+// deploys; the landing page shows a "coming soon" state instead of the CTA
+// until it does (apps/web/app/composables/use-offer.ts).
+secretList.CheckoutUrl = new sst.Secret("CHECKOUT_URL", "");
+
 // Platform admin console (apps/app/server/utils/platform-*.ts). Both are
 // operator-managed rather than generated per stage, because they outlive any
 // single deploy: the encryption key in particular guards TOTP seeds already

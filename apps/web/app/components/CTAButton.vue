@@ -7,7 +7,7 @@
       'group inline-flex items-center justify-center font-bold uppercase tracking-wider select-none cursor-pointer',
       isShiny
         ? (color === 'green' ? 'shiny-button shiny-button-green' : 'shiny-button')
-        : (color === 'green' ? 'bg-success hover:bg-success/90 text-white duration-200 active:scale-95 shadow-sm' : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white duration-200 active:scale-95 shadow-sm'),
+        : (color === 'green' ? 'bg-[var(--color-cta)] hover:bg-[var(--color-cta)]/90 text-[var(--color-cta-foreground)] duration-200 active:scale-95 shadow-sm' : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white duration-200 active:scale-95 shadow-sm'),
       sizeClasses,
       radiusClasses,
       widthClasses,

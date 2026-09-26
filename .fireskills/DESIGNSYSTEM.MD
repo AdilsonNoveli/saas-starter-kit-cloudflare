@@ -4,7 +4,7 @@
 
 ## Single Source of Truth
 
-- `packages/tokens/theme.css`: fonts, palettes (`flame`, `fire`, `night`), border radius (`--ui-radius`), and the surface, text, and border mapping for light and dark modes (`--ui-*`, `.dark` block).
+- `packages/tokens/theme.css`: fonts, palettes (`flame`, `fire`, `night`, and `mint` — the Buy CTA's fixed brand green, only shades 500/950, not wired into `ui.colors`), border radius (`--ui-radius`), and the surface, text, and border mapping for light and dark modes (`--ui-*`, `.dark` block).
 - `packages/tokens/index.ts`: `sharedUiConfig` (the `ui` block of each `app.config.ts`, including `colors`: `primary` → `flame`, `secondary` → `fire`, `neutral` → `night`) and `enterpriseTableUi` (the `:ui` prop of `UTable`). The rationale for each override is documented in the file's comments.
 - `packages/tokens/index.ts` also exports `themeColor` (the color for `<meta name="theme-color">`, which does not accept CSS variables); `theme-color.test.ts` fails if it diverges from `--ui-bg` in `theme.css`.
 - `apps/app`, `apps/web`, and `apps/login` import, in this order, `tailwindcss`, `@nuxt/ui`, and `@nuxfire/tokens/theme.css` in their `main.css`. `theme.css` comes last to override Nuxt UI defaults.

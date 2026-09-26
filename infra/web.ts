@@ -1,4 +1,5 @@
 import { webUrl, appUrl, webDomain, webAliases } from "./dns";
+import { secret } from "./secret";
 import { deployWorker } from "./utils/nuxt";
 
 /**
@@ -28,6 +29,10 @@ await deployWorker("Web", {
     // read directly in nuxt.config.ts at build time (not a runtimeConfig
     // entry) since @nuxtjs/seo's `site.url` is evaluated at build time
     SITE_URL: webUrl.properties.value,
+    // The Buy CTA's target (apps/app's `/buy/<planId>`, SPEC-0004). Empty
+    // until the admin sets CHECKOUT_URL (infra/secret.ts) — the landing page
+    // renders its "coming soon" state instead (apps/web/app/composables/use-offer.ts).
+    NUXT_PUBLIC_CHECKOUT_URL: secret.CheckoutUrl.value,
   },
 });
 

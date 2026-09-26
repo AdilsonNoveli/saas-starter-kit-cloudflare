@@ -59,6 +59,17 @@
   --color-fire-950: #431e08;
 
   /*
+   * Buy CTA accent — a fixed brand green for purchase buttons, distinct from
+   * the generic `success` semantic (Tailwind green, used for confirmations
+   * and success states everywhere). Only the two shades this button actually
+   * needs: the fill and its own foreground text (kept as a fixed pair rather
+   * than adapting to `--ui-text-*` per theme, matching the brand's exact
+   * color choice in both light and dark mode).
+   */
+  --color-mint-500: #04d46c;
+  --color-mint-950: #041c12;
+
+  /*
    * Neutral surface scale — cold true-gray, byte-identical to the pedped
    * admin reference's own `gray-*` scale (the "enterprise, estilo Linear"
    * target). Used for every app's page/card/text neutrals; the flame/fire

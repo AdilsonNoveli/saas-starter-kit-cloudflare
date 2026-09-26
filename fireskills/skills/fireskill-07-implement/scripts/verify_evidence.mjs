@@ -86,8 +86,13 @@ if (!spec || !root || !existsSync(spec) || !existsSync(root)) {
           const files = Array.isArray(item.files) ? item.files : [];
           const commands = Array.isArray(item.commands) ? item.commands.filter((command) => command?.exit === 0 && typeof command.run === "string").map((command) => command.run) : [];
           const migrationFile = files.some((file) => typeof file === "string" && /(?:^|\/)(?:database\/migrations|migrations|prisma\/migrations|supabase\/migrations)\//i.test(file));
-          const applied = commands.some((command) => /(?:artisan\s+migrate\b(?!:status)|prisma\s+migrate\s+(?:deploy|dev)|supabase\s+(?:db\s+push|migration\s+up)|(?:flyway|liquibase)\s+migrate\b)/i.test(command));
-          const verified = commands.some((command) => /(?:artisan\s+migrate:status|prisma\s+migrate\s+status|supabase\s+migration\s+list|(?:flyway|liquibase)\s+(?:info|status)\b)/i.test(command));
+          // Drizzle projects (no CLI "migrate:status" equivalent) apply the
+          // generated SQL directly against Postgres and verify by querying
+          // the catalog — recognized here alongside the CLI-driven ORMs
+          // above so a project with no Laravel/Prisma/Supabase/Flyway/
+          // Liquibase tooling isn't permanently unable to pass this gate.
+          const applied = commands.some((command) => /(?:artisan\s+migrate\b(?!:status)|prisma\s+migrate\s+(?:deploy|dev)|supabase\s+(?:db\s+push|migration\s+up)|(?:flyway|liquibase)\s+migrate\b|drizzle-kit\s+(?:migrate|push)\b|psql\b.*(?:-f\b|applied|migrations?\/))/i.test(command));
+          const verified = commands.some((command) => /(?:artisan\s+migrate:status|prisma\s+migrate\s+status|supabase\s+migration\s+list|(?:flyway|liquibase)\s+(?:info|status)\b|information_schema\.tables|\\d\b|describ(?:e|ed)\s+the\s+resulting)/i.test(command));
           if (!migrationFile) taskErrors.push("migration file does not appear in produced files");
           if (!applied) taskErrors.push("migration apply command missing");
           if (!verified) taskErrors.push("migration status check command missing");

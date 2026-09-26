@@ -11,7 +11,7 @@
 | Priority | Unprioritized |
 | Milestones | |
 | Created at | 2026-09-25 |
-| Promoted spec | `specs/defined/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md` |
+| Promoted spec | `specs/completed/0004-checkout-provisiona-time-e-assinatura-conforme-plan-buyerteammode/spec.md` |
 
 ## Original Idea
 

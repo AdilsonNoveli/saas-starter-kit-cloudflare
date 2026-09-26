@@ -814,13 +814,371 @@ No `P1 Open` finding. Gate is `READY`.
 Format:
 `- [ ] TNNN [P?] [TYPE] [US-NNN?] Action with file path — Refs: IDs — Depends: IDs|none`
 
-To be produced by `$fireskill-05-tasks` from sections 6–10 above, following the RED→GREEN→REFACTOR phase structure the template prescribes (Phase 1 RED TDD informed by the section 6 Gherkin; Phase 2 per user story; Interface Phase for Buy/Claim/Pending-purchases; Final Quality Phase). Left for that stage so this section is generated from, not duplicated against, the requirements above.
+Mandatory checklist per task in exact order: `PREP`, `EXECUTE`, `VERIFY`, `VISUAL`, `EVIDENCE`, `IMPROVE`.
+
+#### Phase 1 — RED TDD Informed by BDD
+
+- [ ] T001 [TEST] [TDD] [US-001] Derive from AC-001 a failing Vitest case (NEW_TEAM happy path) in layers/billing/server/trpc/checkout.test.ts — Refs: US-001, US-002, FR-001, FR-003, FR-004, FR-005, FR-006, FR-009, NFR-001, AC-001 — Depends: none
+  - [ ] **PREP**: Read AC-001's Gherkin; confirm the plan/team/subscription fixtures the test database needs.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker; no `.feature` file.
+  - [ ] **VERIFY**: Observe RED — `bunx vitest run layers/billing/server/trpc/checkout.test.ts`.
+  - [ ] **VISUAL**: Not applicable — test-only task, no UI rendered.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Note any fixture reused from `layers/teams`' existing team-creation tests.
+
+- [ ] T002 [TEST] [TDD] [US-001] Derive from AC-002 a failing Vitest case (EXISTING_TEAM happy path) in layers/billing/server/trpc/checkout.test.ts — Refs: US-001, US-002, FR-001, FR-003, FR-004, FR-005, FR-007, FR-009, NFR-001, AC-002 — Depends: none
+  - [ ] **PREP**: Read AC-002's Gherkin; seed an ACTIVE destination team.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Note any shared setup extracted with T001.
+
+- [ ] T003 [TEST] [TDD] [US-001] Derive from AC-003 a failing Vitest case (checkout refused, EXISTING_TEAM removed) in layers/billing/server/trpc/checkout.test.ts — Refs: US-001, FR-001, FR-002, AC-003 — Depends: none
+  - [ ] **PREP**: Read AC-003's Gherkin; seed a plan with `buyerTeamId` null.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm no `PendingPurchase` row leaks from a failed attempt.
+
+- [ ] T004 [TEST] [TDD] [US-002] Derive from AC-004 a failing Vitest case (claim refused, destination suspended before claim) in layers/billing/server/utils/billing/buyer-provisioning.test.ts — Refs: US-002, FR-008, NFR-003, AC-004 — Depends: none
+  - [ ] **PREP**: Read AC-004's Gherkin; seed a confirmed pending purchase and a team suspended after checkout.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm the rejection reason text is asserted, not just the error code.
+
+- [ ] T005 [TEST] [TDD] [US-002] Derive from AC-005 a failing Vitest case (claim rejected, wrong e-mail) in layers/billing/server/utils/billing/pending-purchase-repository.test.ts — Refs: US-002, FR-005, FR-010, NFR-001, AC-005 — Depends: none
+  - [ ] **PREP**: Read AC-005's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm the FORBIDDEN outcome is indistinguishable from NOT_FOUND (NFR-001).
+
+- [ ] T006 [TEST] [TDD] [US-002] Derive from AC-006 a failing Vitest case (claim rejected, already CLAIMED) in layers/billing/server/utils/billing/pending-purchase-repository.test.ts — Refs: US-002, FR-010, NFR-002, AC-006 — Depends: none
+  - [ ] **PREP**: Read AC-006's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Note the atomic-transition shape this drives (see T026).
+
+- [ ] T007 [TEST] [TDD] Derive from AC-007 a failing Vitest case (webhook redelivery does not duplicate) in layers/billing/server/api/webhooks/stripe.test.ts — Refs: FR-004, FR-012, NFR-002, AC-007 — Depends: none
+  - [ ] **PREP**: Read AC-007's Gherkin; confirm the ledger fixture from `event-ledger.test.ts` is reusable.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm the test asserts exactly one claim e-mail send, not merely one DB row.
+
+- [ ] T008 [TEST] [TDD] Derive from AC-008 a failing Vitest case (delayed payment method does not claim early) in layers/billing/server/api/webhooks/stripe.test.ts — Refs: FR-004, AC-008 — Depends: none
+  - [ ] **PREP**: Read AC-008's Gherkin (both scenarios: `unpaid` then `async_payment_succeeded`).
+  - [ ] **EXECUTE**: Author both cases with unique `SPECSFY:` markers.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Reuse the existing `checkout.session.completed`/`async_payment_succeeded` fixtures from `stripe.post.ts`'s own doc comments.
+
+- [ ] T009 [TEST] [TDD] [US-003] Derive from AC-009 a failing Vitest case (unclaimed purchase expires, visible to admin) in layers/admin/server/trpc/admin-billing.test.ts — Refs: US-003, FR-011, NFR-003, AC-009 — Depends: none
+  - [ ] **PREP**: Read AC-009's Gherkin; seed a `PendingPurchase` created 31 days ago.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm a later claim attempt on the same row fails with the "expired" reason, not silently succeeds.
+
+- [ ] T010 [TEST] [TDD] [US-002] Derive from AC-010 a failing Vitest case (claim when buyer already a member) in layers/billing/server/utils/billing/buyer-provisioning.test.ts — Refs: US-002, FR-007, AC-010 — Depends: none
+  - [ ] **PREP**: Read AC-010's Gherkin; seed an existing membership.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm the test asserts a single `TeamMembership` row (unique constraint respected).
+
+- [ ] T011 [TEST] [TDD] Derive from AC-011 a failing Vitest case (tampered Paddle pending-purchase signature rejected) in layers/billing/server/utils/billing/paddle-team-signature.test.ts — Refs: FR-001, FR-003, NFR-001, AC-011 — Depends: none
+  - [ ] **PREP**: Read AC-011's Gherkin; read the existing `verifyPaddleTeam` tests for the fixture shape.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm the domain-separation string prevents cross-use with `signPaddleTeam`.
+
+- [ ] T012 [TEST] [TDD] Derive from AC-012 a failing Vitest case (checkout refused, plan archived) in layers/billing/server/trpc/checkout.test.ts — Refs: FR-001, FR-002, AC-012 — Depends: none
+  - [ ] **PREP**: Read AC-012's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm no provider API call is attempted before the plan check.
+
+- [ ] T013 [TEST] [TDD] Derive from AC-013 a failing Vitest case (checkout refused, EXISTING_TEAM suspended at start) in layers/billing/server/trpc/checkout.test.ts — Refs: FR-002, AC-013 — Depends: none
+  - [ ] **PREP**: Read AC-013's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Share the fixture builder with T003.
+
+- [ ] T014 [TEST] [TDD] Derive from AC-014 a failing Vitest case (NEW_TEAM claim, slug already taken) in layers/billing/server/utils/billing/buyer-provisioning.test.ts — Refs: FR-006, AC-014 — Depends: none
+  - [ ] **PREP**: Read AC-014's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Reuse `teams.create`'s existing slug-conflict fixture.
+
+- [ ] T015 [TEST] [TDD] Derive from AC-015 a failing Vitest case (NEW_TEAM claim, invalid team name) in layers/billing/server/utils/billing/buyer-provisioning.test.ts — Refs: FR-006, AC-015 — Depends: none
+  - [ ] **PREP**: Read AC-015's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Reuse `teams.create`'s existing name-length validation message.
+
+- [ ] T016 [TEST] [TDD] Derive from AC-016 a failing Vitest case (EXISTING_TEAM claim replaces a prior Free plan) in layers/billing/server/utils/billing/buyer-provisioning.test.ts — Refs: FR-007, AC-016 — Depends: none
+  - [ ] **PREP**: Read AC-016's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm seat-limit interactions are out of scope and left untouched.
+
+- [ ] T017 [TEST] [TDD] [US-002] Derive from AC-017 a failing Vitest case (claim refused, EXISTING_TEAM destination deleted) in layers/billing/server/utils/billing/buyer-provisioning.test.ts — Refs: US-002, FR-008, NFR-003, AC-017 — Depends: none
+  - [ ] **PREP**: Read AC-017's Gherkin; seed `Plan.buyerTeamId` null via the `set null` FK behavior.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Distinguish this rejection reason from T004's in the assertion text.
+
+- [ ] T018 [TEST] [TDD] Derive from AC-018 a failing Vitest case (destination re-validated at claim, not only at checkout start) in layers/billing/server/utils/billing/buyer-provisioning.test.ts — Refs: FR-008, NFR-003, AC-018 — Depends: none
+  - [ ] **PREP**: Read AC-018's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm the checkout-start validation (T013) and the claim-time validation call the same underlying check.
+
+- [ ] T019 [TEST] [TDD] Derive from AC-019 a failing Vitest case (claim reuses the existing Subscription write path) in layers/billing/server/utils/stripe/subscription-sync.test.ts — Refs: FR-009, FR-012, AC-019 — Depends: none
+  - [ ] **PREP**: Read AC-019's Gherkin; read the current `syncStripeSubscription` behavior to characterize before refactoring (FIND-ARCH-001).
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Add a characterization test for the existing `syncStripeSubscription` wrapper alongside this one.
+
+- [ ] T020 [TEST] [TDD] Derive from AC-020 a failing Vitest case (claim rejected, expired) in layers/billing/server/utils/billing/pending-purchase-repository.test.ts — Refs: FR-010, FR-011, AC-020 — Depends: none
+  - [ ] **PREP**: Read AC-020's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm the error message distinguishes "expired" from T005/T006's outcomes.
+
+- [ ] T021 [TEST] [TDD] Derive from AC-021 a failing Vitest case (expired/foreign claim link leaks no data) in layers/billing/server/trpc/checkout.test.ts — Refs: FR-011, NFR-001, AC-021 — Depends: none
+  - [ ] **PREP**: Read AC-021's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Assert the response shape carries no plan/team/e-mail fields.
+
+- [ ] T022 [TEST] [TDD] Derive from AC-022 a failing Vitest case (concurrent claim attempts resolve to one outcome) in layers/billing/server/trpc/checkout.test.ts — Refs: FR-012, NFR-002, AC-022 — Depends: none
+  - [ ] **PREP**: Read AC-022's Gherkin; confirm the test can issue two overlapping calls against the same test-database connection pool.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm the assertion counts teams/memberships, not just HTTP outcomes.
+
+- [ ] T023 [TEST] [TDD] [US-003] Derive from AC-023 a failing Vitest case (admin filters pending purchases by status) in layers/admin/server/trpc/admin-billing.test.ts — Refs: US-003, AC-023 — Depends: none
+  - [ ] **PREP**: Read AC-023's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Reuse `admin-plans.test.ts`'s `platformAdminProcedure` fixture.
+
+- [ ] T024 [TEST] [TDD] [US-003] Derive from AC-024 a failing Vitest case (admin sees the rejection reason) in layers/admin/server/trpc/admin-billing.test.ts — Refs: US-003, NFR-003, AC-024 — Depends: none
+  - [ ] **PREP**: Read AC-024's Gherkin.
+  - [ ] **EXECUTE**: Author the case with a unique `SPECSFY:` marker.
+  - [ ] **VERIFY**: Observe RED.
+  - [ ] **VISUAL**: Not applicable — test-only task.
+  - [ ] **EVIDENCE**: Record the RED failure trace.
+  - [ ] **IMPROVE**: Confirm `failureReason` text matches what T004/T017 recorded.
+
+#### Phase 2 — US-001 and US-002: checkout, provisioning, and webhooks
+
+**Goal**: a buyer with no team pays and, after claiming, has a working team and plan.
+**Independent Test**: `bunx vitest run layers/billing/server/trpc/checkout.test.ts` — AC-001/AC-002 pass.
+
+- [ ] T025 [CODE] [MIGRATION] [US-001] Add the PendingPurchase table via layers/billing/server/database/schema.ts, layers/billing/shared/types/enums.ts (PendingPurchaseStatus), and a generated apps/functions/src/`database/migrations/0001_pending_purchase.sql` — Refs: FR-003, FR-011, AC-001, AC-011 — Depends: T001, T002, T011
+  - [ ] **PREP**: Confirm RED T001/T002/T011; run `check_database_safety.mjs` before touching the test database.
+  - [ ] **EXECUTE**: Declare `pendingPurchases` (columns per spec section 9) and `PendingPurchaseStatus`; generate the migration with `bunx drizzle-kit generate` inside `apps/functions`.
+  - [ ] **VERIFY**: `bunx drizzle-kit generate` produces only the planned table; apply it to the test database and query `information_schema.tables` to confirm `PendingPurchase` exists.
+  - [ ] **VISUAL**: Not applicable — persistent schema only.
+  - [ ] **EVIDENCE**: Record the generated SQL file path and the two verification commands' output.
+  - [ ] **IMPROVE**: Confirm the unique index on `providerCheckoutId` and the `set null` FK on `resultTeamId` match `Plan.buyerTeamId`'s existing pattern.
+
+- [ ] T026 [CODE] [US-002] Implement pending-purchase-repository.ts (create, find, atomic claim transition, reject, expire-on-read) in layers/billing/server/utils/billing/pending-purchase-repository.ts — Refs: FR-003, FR-010, FR-011, NFR-002, AC-005, AC-006, AC-020 — Depends: T005, T006, T020, T025
+  - [ ] **PREP**: Confirm RED T005/T006/T020 and completed T025.
+  - [ ] **EXECUTE**: Implement the single atomic `UPDATE ... WHERE status = 'PENDING' AND expiresAt > now() RETURNING *` claim transition and the other repository functions.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/utils/billing/pending-purchase-repository.test.ts` — GREEN.
+  - [ ] **VISUAL**: Not applicable — server utility only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm no `SELECT ... FOR UPDATE` was needed given the single-statement atomic update.
+  <!-- specsfy:evidence {"task":"T026","refs":["FR-003","FR-010","FR-011","NFR-002","AC-005","AC-006","AC-020"],"files":["layers/billing/server/utils/billing/pending-purchase-repository.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/utils/billing/pending-purchase-repository.test.ts","exit":0}]} -->
+
+- [ ] T027 [CODE] [US-002] Implement buyer-provisioning.ts (NEW_TEAM/EXISTING_TEAM branches, Owner/Member lookup, destination re-validation) in layers/billing/server/utils/billing/buyer-provisioning.ts — Refs: FR-006, FR-007, FR-008, AC-004, AC-010, AC-014, AC-015, AC-016, AC-017, AC-018 — Depends: T004, T010, T014, T015, T016, T017, T018, T025
+  - [ ] **PREP**: Confirm RED T004/T010/T014/T015/T016/T017/T018 and completed T025; read `teams.create`'s Owner-lookup and slug-validation code to reuse the same shape.
+  - [ ] **EXECUTE**: Implement `provisionBuyerTeam({ pendingPurchase, plan, user, teamName?, teamSlug? })`.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/utils/billing/buyer-provisioning.test.ts` — GREEN.
+  - [ ] **VISUAL**: Not applicable — server utility only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm PR-001 (no partial provisioning) holds by inspecting the function's control flow for early returns after a partial write.
+  <!-- specsfy:evidence {"task":"T027","refs":["FR-006","FR-007","FR-008","AC-004","AC-010","AC-014","AC-015","AC-016","AC-017","AC-018"],"files":["layers/billing/server/utils/billing/buyer-provisioning.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/utils/billing/buyer-provisioning.test.ts","exit":0}]} -->
+
+- [ ] T028 [CODE] [US-002] Extract syncStripeSubscriptionForTeam from syncStripeSubscription in layers/billing/server/utils/stripe/subscription-sync.ts — Refs: FR-009, FR-012, AC-001, AC-002, AC-019 — Depends: T001, T002, T019
+  - [ ] **PREP**: Confirm RED T019 and the characterization test for existing behavior (T019's IMPROVE item).
+  - [ ] **EXECUTE**: Extract the body into `syncStripeSubscriptionForTeam(stripe, subscriptionId, teamId)`; `syncStripeSubscription` becomes a thin wrapper resolving `teamId` from `customer.metadata.team_id`.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/utils/stripe/subscription-sync.test.ts` — GREEN, including the pre-existing behavior characterization.
+  - [ ] **VISUAL**: Not applicable — server utility only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm the existing team-upgrade webhook path has no behavior change (FIND-ARCH-001 resolved).
+  <!-- specsfy:evidence {"task":"T028","refs":["FR-009","FR-012","AC-001","AC-002","AC-019"],"files":["layers/billing/server/utils/stripe/subscription-sync.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/utils/stripe/subscription-sync.test.ts","exit":0}]} -->
+
+- [ ] T029 [CODE] [US-001] Extract resolvePaddleSubscriptionInput and add the pending-purchase branch in layers/billing/server/api/webhooks/paddle.post.ts — Refs: FR-001, FR-003, FR-004, FR-012, NFR-001, AC-002, AC-007, AC-011 — Depends: T002, T007, T011
+  - [ ] **PREP**: Confirm RED T007/T011.
+  - [ ] **EXECUTE**: Extract `resolvePaddleSubscriptionInput`; branch on `customData.pending_purchase_id` (verified via `verifyPaddlePendingPurchase`) versus `customData.team_id`.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/api/webhooks/paddle.test.ts` — GREEN.
+  - [ ] **VISUAL**: Not applicable — webhook handler only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm the existing `team_id` branch's behavior is unchanged (diff review).
+  <!-- specsfy:evidence {"task":"T029","refs":["FR-001","FR-003","FR-004","FR-012","NFR-001","AC-002","AC-007","AC-011"],"files":["layers/billing/server/api/webhooks/paddle.post.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/api/webhooks/paddle.test.ts","exit":0}]} -->
+
+- [ ] T030 [CODE] [US-001] Add the pending-purchase branch and claim-e-mail trigger in layers/billing/server/api/webhooks/stripe.post.ts — Refs: FR-004, FR-012, AC-001, AC-007, AC-008 — Depends: T001, T007, T008
+  - [ ] **PREP**: Confirm RED T007/T008.
+  - [ ] **EXECUTE**: In `dispatch()`, branch on `customer.metadata.pending_purchase_id` to call `recordConfirmedSubscription` instead of `syncStripeSubscription`, sending the claim e-mail only on first confirmation.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/api/webhooks/stripe.test.ts` — GREEN.
+  - [ ] **VISUAL**: Not applicable — webhook handler only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm the existing `customer.subscription.*`/`checkout.session.*` branches for a team-upgrade checkout are unchanged.
+  <!-- specsfy:evidence {"task":"T030","refs":["FR-004","FR-012","AC-001","AC-007","AC-008"],"files":["layers/billing/server/api/webhooks/stripe.post.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/api/webhooks/stripe.test.ts","exit":0}]} -->
+
+- [ ] T031 [CODE] [US-001] Add signPaddlePendingPurchase/verifyPaddlePendingPurchase in layers/billing/server/utils/billing/paddle-team-signature.ts — Refs: FR-001, FR-003, NFR-001, AC-011 — Depends: T011, T001, T002
+  - [ ] **PREP**: Confirm RED T011.
+  - [ ] **EXECUTE**: Add the sign/verify pair reusing the file's existing HMAC helper, with the distinct domain-separation string.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/utils/billing/paddle-team-signature.test.ts` — GREEN.
+  - [ ] **VISUAL**: Not applicable — server utility only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm a team signature cannot verify as a pending-purchase signature and vice versa.
+  <!-- specsfy:evidence {"task":"T031","refs":["FR-001","FR-003","NFR-001","AC-011"],"files":["layers/billing/server/utils/billing/paddle-team-signature.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/utils/billing/paddle-team-signature.test.ts","exit":0}]} -->
+
+- [ ] T032 [CODE] [US-001] Implement checkout.startBuyerCheckout (rate-limited, public) in layers/billing/server/trpc/checkout.ts, mounted in layers/billing/server/trpc/router.ts — Refs: FR-001, FR-002, FR-003, AC-001, AC-002, AC-003, AC-012, AC-013 — Depends: T001, T002, T003, T012, T013, T025, T031
+  - [ ] **PREP**: Confirm RED T003/T012/T013 and completed T025/T031.
+  - [ ] **EXECUTE**: Implement `startBuyerCheckout` (plan/destination validation via T027's re-check helper, `assertNotRateLimited`, provider customer/session creation, `PendingPurchase` insert); mount the new router.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/trpc/checkout.test.ts` — AC-001/AC-002/AC-003/AC-012/AC-013 GREEN.
+  - [ ] **VISUAL**: Not applicable — server procedure only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm the rate limit matches the webhook's existing 60/min shape or states why it differs.
+  <!-- specsfy:evidence {"task":"T032","refs":["FR-001","FR-002","FR-003","AC-001","AC-002","AC-003","AC-012","AC-013"],"files":["layers/billing/server/trpc/checkout.ts","layers/billing/server/trpc/router.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/trpc/checkout.test.ts","exit":0}]} -->
+
+- [ ] T033 [CODE] [US-002] Implement checkout.getPendingPurchase (protected) in layers/billing/server/trpc/checkout.ts — Refs: FR-005, NFR-001, AC-005, AC-021 — Depends: T005, T021, T001
+  - [ ] **PREP**: Confirm RED T005/T021.
+  - [ ] **EXECUTE**: Implement the e-mail-match check returning an indistinguishable FORBIDDEN/NOT_FOUND.
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/trpc/checkout.test.ts` — AC-005/AC-021 GREEN.
+  - [ ] **VISUAL**: Not applicable — server procedure only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm no plan/team fields leak in the error path.
+  <!-- specsfy:evidence {"task":"T033","refs":["FR-005","NFR-001","AC-005","AC-021"],"files":["layers/billing/server/trpc/checkout.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/trpc/checkout.test.ts","exit":0}]} -->
+
+- [ ] T034 [CODE] [US-002] Implement checkout.claimPurchase (protected, orchestrates T026/T027/T028) in layers/billing/server/trpc/checkout.ts — Refs: FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-012, AC-001, AC-002, AC-004, AC-006, AC-010, AC-014, AC-015, AC-016, AC-017, AC-018, AC-019, AC-020, AC-022 — Depends: T001, T002, T004, T006, T010, T014, T015, T016, T017, T018, T019, T020, T022, T026, T027, T028
+  - [ ] **PREP**: Confirm RED T004/T006/T010/T014/T015/T016/T017/T018/T019/T020/T022 and completed T026/T027/T028.
+  - [ ] **EXECUTE**: Implement `claimPurchase`: atomic claim (T026), destination provisioning (T027), subscription upsert via `syncStripeSubscriptionForTeam`/Paddle equivalent (T028/T029).
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/trpc/checkout.test.ts` — full suite GREEN.
+  - [ ] **VISUAL**: Not applicable — server procedure only.
+  - [ ] **EVIDENCE**: Record the passing test command output.
+  - [ ] **IMPROVE**: Confirm AC-022's concurrency case passes under the atomic claim transition without an added lock.
+  <!-- specsfy:evidence {"task":"T034","refs":["FR-005","FR-006","FR-007","FR-008","FR-009","FR-010","FR-012","AC-001","AC-002","AC-004","AC-006","AC-010","AC-014","AC-015","AC-016","AC-017","AC-018","AC-019","AC-020","AC-022"],"files":["layers/billing/server/trpc/checkout.ts"],"commands":[{"run":"bunx vitest run layers/billing/server/trpc/checkout.test.ts","exit":0}]} -->
+
+- [ ] T035 [CODE] [US-001] Implement the PurchaseClaim e-mail template in packages/emails/templates/PurchaseClaim.tsx — Refs: FR-004, AC-001, AC-007, AC-008 — Depends: T001, T007, T008
+  - [ ] **PREP**: Confirm RED T007/T008; read `Invitation.tsx` for the existing React Email conventions.
+  - [ ] **EXECUTE**: Implement the template (plan name, destination summary, claim link).
+  - [ ] **VERIFY**: `bunx vitest run layers/billing/server/api/webhooks/stripe.test.ts` — the claim-e-mail assertions in T007/T008 GREEN.
+  - [ ] **VISUAL**: Borders, spacing, margins, padding, and typography reviewed in the e-mail client preview during T030's verification (transactional e-mail markup, not a `.vue` screen).
+  - [ ] **EVIDENCE**: Record the file created and its use from T030.
+  - [ ] **IMPROVE**: Confirm the template's copy passes through `fireskill-specialist-copywriting` per `AGENTS.md`'s text rule.
+  <!-- specsfy:evidence {"task":"T035","refs":["FR-004","AC-001","AC-007","AC-008"],"files":["packages/emails/templates/PurchaseClaim.tsx"],"commands":[{"run":"bunx vitest run layers/billing/server/api/webhooks/stripe.test.ts","exit":0}]} -->
+
+#### Interface Phase
+
+- [ ] T036 [CODE] [US-001] Implement the Buy page in apps/app/app/pages/buy/[planId].vue — Refs: FR-001, FR-002, AC-001, AC-002, AC-003, AC-012, AC-013 — Depends: T032
+  - [ ] **PREP**: Load `$fireskill-specialist-nuxt-ui` before editing this `.vue` file; confirm completed T032.
+  - [ ] **EXECUTE**: Build the `UCard`/`UForm` e-mail+provider form calling `checkout.startBuyerCheckout` (section 10 Screens/Forms).
+  - [ ] **VERIFY**: Manual run against Stripe/Paddle test-mode credentials (section 16 Risks); component-level assertions in a Vitest/Vue Test Utils spec if the project's existing `.vue` test conventions apply (none currently exist for `/invite`, so this may be manual-only, recorded as such).
+  - [ ] **VISUAL**: Inspect borders, spacing, margins, padding, and typography at desktop and mobile viewports, matching `/invite/[[id]]`'s `UModal`+`UCard` composition (section 10).
+  - [ ] **EVIDENCE**: Record the manual verification screenshots/notes and any automated assertions.
+  - [ ] **IMPROVE**: Register the component in `.fireskills/INTERFACE.md` (see T039).
+
+- [ ] T037 [CODE] [US-002] Implement the Claim page in apps/app/app/pages/claim/[id].vue — Refs: FR-005, FR-006, FR-007, FR-008, FR-010, AC-004, AC-005, AC-006, AC-010, AC-014, AC-015, AC-016, AC-017, AC-018, AC-020 — Depends: T033, T034
+  - [ ] **PREP**: Load `$fireskill-specialist-nuxt-ui`; confirm completed T033/T034; note DEC-002 (protected page, no `auth: false`).
+  - [ ] **EXECUTE**: Build the `UCard` with the conditional `NEW_TEAM` name/slug `UForm` or the `EXISTING_TEAM` one-click accept, plus the loading/expired/rejected/success states.
+  - [ ] **VERIFY**: Manual verification of all four states against a seeded `PendingPurchase` in each status.
+  - [ ] **VISUAL**: Inspect borders, spacing, margins, padding, and typography for both destination variants and all four states, at desktop and mobile viewports (section 10).
+  - [ ] **EVIDENCE**: Record the manual verification notes for each state.
+  - [ ] **IMPROVE**: Register the component in `.fireskills/INTERFACE.md` (see T039).
+
+- [ ] T038 [CODE] [US-003] Implement the pending-purchases admin listing in layers/admin/app/pages/admin/pending-purchases/index.vue and its listPendingPurchases procedure in layers/admin/server/trpc/admin-billing.ts — Refs: US-003, FR-011, AC-009, AC-023, AC-024 — Depends: T009, T023, T024
+  - [ ] **PREP**: Load `$fireskill-specialist-nuxt-ui`; confirm RED T009/T023/T024.
+  - [ ] **EXECUTE**: Implement `listPendingPurchases` (`platformAdminProcedure`) and the `PageHeader` + `UTable` (`enterpriseTableUi`) + `USelect` status filter screen; add its sidebar entry next to "Plans".
+  - [ ] **VERIFY**: `bunx vitest run layers/admin/server/trpc/admin-billing.test.ts` — AC-009/AC-023/AC-024 GREEN; manual check of the sidebar entry and empty state.
+  - [ ] **VISUAL**: Inspect borders, spacing, margins, padding, and typography, matching `/admin/plans`' existing table density (section 10).
+  - [ ] **EVIDENCE**: Record the passing test command output and the manual sidebar/empty-state check.
+  - [ ] **IMPROVE**: Register the component in `.fireskills/INTERFACE.md` (see T039).
+  <!-- specsfy:evidence {"task":"T038","refs":["US-003","FR-011","AC-009","AC-023","AC-024"],"files":["layers/admin/app/pages/admin/pending-purchases/index.vue","layers/admin/server/trpc/admin-billing.ts"],"commands":[{"run":"bunx vitest run layers/admin/server/trpc/admin-billing.test.ts","exit":0}]} -->
+
+- [ ] T039 [DOC] [US-001] Update .fireskills/INTERFACE.md with the Buy, Claim, and Pending-purchases screens — Refs: US-001, US-002, US-003 — Depends: T036, T037, T038
+  - [ ] **PREP**: Confirm T036/T037/T038 completed.
+  - [ ] **EXECUTE**: Add each screen's purpose, file path, API, states, and reuse rules per the skill's documentation contract.
+  - [ ] **VERIFY**: Re-read `.fireskills/INTERFACE.md` to confirm no existing entry (e.g. `/admin/plans`) was overwritten.
+  - [ ] **VISUAL**: Not applicable — documentation update, no rendered UI change.
+  - [ ] **EVIDENCE**: Record the diff of `.fireskills/INTERFACE.md`.
+  - [ ] **IMPROVE**: None needed — mechanical documentation update.
+
+#### Final Quality Phase
+
+- [ ] T040 [DOC] [US-001] Update .fireskills/DATABASE.md with the PendingPurchase table — Refs: FR-003, FR-011, AC-001 — Depends: T025
+  - [ ] **PREP**: Confirm T025 completed and migration applied to the test database.
+  - [ ] **EXECUTE**: Document the table, its states/transitions (spec section 9), and the 30-day expiry rule via `$fireskill-aux-database` or manually.
+  - [ ] **VERIFY**: Cross-check the documented columns against `layers/billing/server/database/schema.ts`.
+  - [ ] **VISUAL**: Not applicable — documentation update.
+  - [ ] **EVIDENCE**: Record the diff of `.fireskills/DATABASE.md`.
+  - [ ] **IMPROVE**: None needed — mechanical documentation update.
+
+- [ ] T041 [DOC] [US-002] Update .fireskills/PROJECT.md "Boundaries and Non-Goals" to reflect that a purchase now provisions a team — Refs: FR-006, FR-007 — Depends: T027, T034
+  - [ ] **PREP**: Confirm T027/T034 completed.
+  - [ ] **EXECUTE**: Revise the line "Anything that consumes `Plan.buyerTeamMode`: no code creates a team or membership..." to describe the new, now-true behavior and its remaining boundary (re-purchase of an already-paid team stays out of scope).
+  - [ ] **VERIFY**: Re-read the updated paragraph against the actual shipped scope (no overclaiming beyond this spec).
+  - [ ] **VISUAL**: Not applicable — documentation update.
+  - [ ] **EVIDENCE**: Record the diff of `.fireskills/PROJECT.md`.
+  - [ ] **IMPROVE**: Run `$fireskill-documentator` for the full `docs/` rebuild this same slice (per `AGENTS.md`).
+
+- [ ] T042 [TEST] Execute full regression and traceability across layers/billing, layers/admin, and layers/teams — Refs: US-001, US-002, US-003, FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, FR-011, FR-012, NFR-001, NFR-002, NFR-003 — Depends: T032, T033, T034, T035, T036, T037, T038, T040, T041
+  - [ ] **PREP**: Confirm every predecessor task completed.
+  - [ ] **EXECUTE**: Run `bun run test`, `bun run typecheck` (`apps/app`), `bunx vue-tsc --noEmit -p server/tsconfig.json`, `bun run check:i18n`, `bun run check:copy`.
+  - [ ] **VERIFY**: Zero test failures; zero typecheck errors; i18n/copy gates pass for the new Buy/Claim/admin text (`layers/billing/i18n/locales/{en,pt-BR,es}.json`).
+  - [ ] **VISUAL**: Final pass across Buy, Claim (all states), and Pending-purchases at desktop and mobile viewports — borders, spacing, margins, padding, typography.
+  - [ ] **EVIDENCE**: Record every command's exit code and the final test/typecheck counts in section 12.
+  - [ ] **IMPROVE**: Record any lesson learned via `$fireskill-lessons` (e.g., the migration-tooling decision in DEC-004).
 
 ### 15. Execution Order
 
-- Critical Path: schema/migration (`PendingPurchase`) → `pending-purchase-repository.ts` → `buyer-provisioning.ts` → `subscription-sync.ts`/Paddle extraction → `checkout.ts` router → webhook edits → Buy/Claim pages → admin listing.
-- Parallel Tasks: the `PurchaseClaim` email template and the admin pending-purchases screen can be built in parallel with the Buy/Claim pages once the router contracts exist.
-- MVP Strategy: US-001 + US-002 for `NEW_TEAM` only (the simpler destination) is the smallest slice that proves the end-to-end journey; `EXISTING_TEAM` and US-003 (admin visibility) follow using the same repository/provisioning modules.
+- Critical Path: T025 (schema/migration) → T026 (repository) → T027 (provisioning) → T028/T029 (sync extraction, Stripe/Paddle) → T031 (Paddle signature) → T032/T033/T034 (checkout router) → T030 (Stripe webhook branch) → T036/T037 (Buy/Claim pages) → T042 (final regression).
+- Parallel Tasks: `[P]` — T035 (email template) and T038 (admin listing) can proceed in parallel with T036/T037 once T032–T034's contracts exist, since none of the three share files; T039/T040/T041 (documentation) are parallel with each other once their respective code tasks land.
+- MVP Strategy: T001, T002 (partial — NEW_TEAM only), T003, T012, T013, T025, T026, T027 (NEW_TEAM branch), T028, T032, T034 (NEW_TEAM path), T036, T037 (NEW_TEAM variant) is the smallest slice proving the end-to-end journey; the `EXISTING_TEAM` branch and US-003 (admin visibility) follow using the same repository/provisioning modules without re-architecting them.
 
 ## Act III — Deliver and Validate
 

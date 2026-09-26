@@ -104,3 +104,26 @@ export const PLAN_BUYER_TEAM_MODES = [
   PlanBuyerTeamMode.NEW_TEAM,
   PlanBuyerTeamMode.EXISTING_TEAM,
 ] as const;
+
+/**
+ * Lifecycle of a `PendingPurchase` (SPEC-0004): a buyer paid before having an
+ * account, so provisioning waits for an authenticated claim. `PENDING` until
+ * claimed, expired, or its `EXISTING_TEAM` destination stops being valid;
+ * every other state is terminal.
+ */
+export const PendingPurchaseStatus = {
+  PENDING: "PENDING",
+  CLAIMED: "CLAIMED",
+  EXPIRED: "EXPIRED",
+  REJECTED: "REJECTED",
+} as const;
+
+export type PendingPurchaseStatus =
+  (typeof PendingPurchaseStatus)[keyof typeof PendingPurchaseStatus];
+
+export const PENDING_PURCHASE_STATUSES = [
+  PendingPurchaseStatus.PENDING,
+  PendingPurchaseStatus.CLAIMED,
+  PendingPurchaseStatus.EXPIRED,
+  PendingPurchaseStatus.REJECTED,
+] as const;

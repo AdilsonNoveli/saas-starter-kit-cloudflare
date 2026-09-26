@@ -6,6 +6,7 @@ import {
   timestamp,
   jsonb,
   primaryKey,
+  index,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
@@ -30,6 +31,9 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // schema import in this repo is a package specifier now, core-schema.ts and the
 // barrel included; see nuxfire-layers.md.)
 import { teams } from "@nuxfire/layer-teams/server/database/schema";
+// `User` lives in core-schema.ts, which never imports this layer, so this is
+// a plain one-way import — no cycle to guard against, unlike `teams` above.
+import { users } from "@nuxfire/functions/database/core-schema";
 
 export const benefits = pgTable("Benefit", {
   id: text("id").primaryKey().notNull(),
@@ -182,5 +186,84 @@ export const subscriptionRelations = relations(subscriptions, ({ one }) => ({
   plan: one(plans, {
     fields: [subscriptions.planId],
     references: [plans.id],
+  }),
+}));
+
+// A buyer with no team yet (or not yet a member of `Plan.buyerTeamId`) pays
+// before creating an account (SPEC-0004): this row is what the checkout
+// webhook has to hold onto until an authenticated claim can resolve
+// `Plan.buyerTeamMode` into a real team/membership and hand the row's
+// `providerSubscriptionId` to the existing `upsertSubscription` write path.
+export const pendingPurchases = pgTable(
+  "PendingPurchase",
+  {
+    id: text("id")
+      .$default(() => cuid())
+      .primaryKey()
+      .notNull(),
+    email: text("email").notNull(),
+    planId: text("planId")
+      .notNull()
+      .references(() => plans.id),
+    provider: text("provider").notNull(),
+    // Stripe Checkout Session id, or the Paddle checkout's transaction id —
+    // set at checkout start, before either provider has confirmed a
+    // subscription. Unique so a client retry after a network error reuses the
+    // same row instead of leaving an orphaned duplicate.
+    providerCheckoutId: text("providerCheckoutId").notNull().unique(),
+    // Both null until the provider confirms the subscription; a delayed
+    // payment method (Stripe boleto/SEPA) can leave a checkout "completed"
+    // with no confirmed subscription yet.
+    providerCustomerId: text("providerCustomerId"),
+    providerSubscriptionId: text("providerSubscriptionId"),
+    // "PENDING" | "CLAIMED" | "EXPIRED" | "REJECTED" — plain text with a
+    // default, like every other status-like column in this schema, not a
+    // pgEnum.
+    status: text("status").notNull().default("PENDING"),
+    // Set only when status becomes "REJECTED" (an EXISTING_TEAM destination
+    // that stopped being valid before claim).
+    failureReason: text("failureReason"),
+    // Guards against sending the claim e-mail twice when the provider
+    // redelivers the confirmation event.
+    claimEmailSentAt: timestamp("claimEmailSentAt", { withTimezone: true }),
+    claimedAt: timestamp("claimedAt", { withTimezone: true }),
+    claimedByUserId: text("claimedByUserId").references(() => users.id),
+    // `set null`, like `Plan.buyerTeamId`: deleting the resulting team must
+    // never be blocked by a purchase record that only exists for audit.
+    resultTeamId: text("resultTeamId").references(
+      (): AnyPgColumn => teams.id,
+      { onDelete: "set null" },
+    ),
+    expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now()`)
+      .$onUpdate(() => new Date()),
+  },
+  (table) => [
+    // Claim looks a row up by id, but re-derives identity by e-mail
+    // (comparing against the authenticated session) on every claim/admin
+    // read — worth an index once purchase volume grows past a handful.
+    index("PendingPurchase_email_idx").on(table.email),
+    // The admin listing (`listPendingPurchases`) filters by status.
+    index("PendingPurchase_status_idx").on(table.status),
+  ],
+);
+
+export const pendingPurchaseRelations = relations(pendingPurchases, ({ one }) => ({
+  plan: one(plans, {
+    fields: [pendingPurchases.planId],
+    references: [plans.id],
+  }),
+  claimedBy: one(users, {
+    fields: [pendingPurchases.claimedByUserId],
+    references: [users.id],
+  }),
+  resultTeam: one(teams, {
+    fields: [pendingPurchases.resultTeamId],
+    references: [teams.id],
   }),
 }));

@@ -1,4 +1,5 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import { layers } from "../../../../../config";
 import { router } from "../trpc";
 import account from "./account";
 import pub from "./public";
@@ -8,28 +9,65 @@ import pub from "./public";
 // here: both flow through `activeLayerNames` in nuxt.config.ts, so neither
 // needs a hand-written import in this file.
 import { layerRouters } from "./.composition/layer-routers";
+// Billing-domain, admin-*gated* routers (SPEC-0005): folded into `admin.*`
+// here, not inside `@nuxfire/layer-admin`, because `admin` is a base layer
+// (config.ts's `layers.core`, always active) and must never import a feature
+// layer. The Composition Root is the one place allowed to know about every
+// layer, so it is where two layers' routers get combined under one namespace.
+import { adminPlansRouter, adminBillingRouter } from "@nuxfire/layer-billing/server/trpc/router";
+// `admin.teams` also needs replacing outright, not merging (SPEC-0005): its
+// base version (`@nuxfire/layer-admin`) and its billing-aware version both
+// define `listTeams`/`getTeamDetail` under the same key, so `mergeRouters`
+// would collide on those two procedure paths. Building the whole `admin`
+// router explicitly below, key by key, avoids that ambiguity entirely.
+import { buildAdminTeamsRouterWithBilling } from "./admin-teams-billing";
+
+// `admin.plans.*`/`admin.pendingPurchases.*`/the billing-aware `admin.teams.*`
+// only exist when billing is active. `queue`/`auditLog`/`notifications` are
+// reused unchanged from `@nuxfire/layer-admin/server/trpc/router` either way
+// — they never touched billing.
+function buildAdminRouterWithBilling() {
+  return router({
+    teams: buildAdminTeamsRouterWithBilling(),
+    queue: layerRouters.admin.queue,
+    auditLog: layerRouters.admin.auditLog,
+    notifications: layerRouters.admin.notifications,
+    plans: adminPlansRouter,
+    pendingPurchases: adminBillingRouter,
+  });
+}
+// The TYPE always includes billing's admin surface, even though the runtime
+// value below only does when `layers.features.billing` is true — `cond ?
+// mergeRouters(...) : layerRouters.admin` does not let TypeScript narrow out
+// the untaken branch here (a ternary over two structurally different,
+// generic-heavy router types, unlike a plain literal ternary), so the
+// inferred type collapses to the *narrower* of the two, silently dropping
+// `admin.plans`/`admin.pendingPurchases` from every client `.vue` file
+// (found via `bun run typecheck` in apps/app, not assumed — see git history
+// for the exact error before this annotation). This file already imports
+// `@nuxfire/layer-billing` directly, so a fork that genuinely removes billing
+// must edit this file's imports anyway; flipping only the config flag here
+// degrades to a runtime "no procedure found" on `admin.plans.*` rather than a
+// compile error, which is an accepted, documented gap for that unlikely
+// half-removed state.
+const adminRouter: ReturnType<typeof buildAdminRouterWithBilling> = layers
+  .features.billing
+  ? buildAdminRouterWithBilling()
+  : (layerRouters.admin as ReturnType<typeof buildAdminRouterWithBilling>);
 
 export const appRouter = router({
   account,
   public: pub,
   // `teams` and `invites` arrive through here (@nuxfire/layer-teams), since
-  // Fase 3 passo 2a so do `billing` and `stripe` (@nuxfire/layer-billing),
-  // since passo 3 so does `notifications` (@nuxfire/layer-notifications), and
-  // since passo 4 so does `admin` (@nuxfire/layer-admin) — each layer's
-  // `routers` map mounts them under those exact top-level keys. The
-  // client-facing API shape is unchanged; only where the modules live is.
-  //
-  // `admin` used to be the one hand-written exception on this list
-  // (`import admin from "./admin"`), because its aggregator still lived in this
-  // package. It does not any more, so it flows through the generated
-  // composition like every other layer — core and feature layers really are one
-  // mechanism now, with no remaining special case.
-  //
-  // `admin.plans` and `admin.notifications` are still NOT top-level keys: they
-  // live in @nuxfire/layer-billing and @nuxfire/layer-notifications as named
-  // exports OUTSIDE those layers' `routers` maps, and
-  // @nuxfire/layer-admin's own router.ts mounts them under `admin`.
+  // Fase 3 passo 2a so does `stripe` (@nuxfire/layer-billing), since passo 3
+  // so does `notifications` (@nuxfire/layer-notifications), and since passo 4
+  // so does `admin` (@nuxfire/layer-admin) — each layer's `routers` map mounts
+  // them under those exact top-level keys. The client-facing API shape is
+  // unchanged; only where the modules live is.
   ...layerRouters,
+  // Overrides the `admin` key from the spread above with the version that may
+  // carry billing's sub-routers (see `adminRouter` above).
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

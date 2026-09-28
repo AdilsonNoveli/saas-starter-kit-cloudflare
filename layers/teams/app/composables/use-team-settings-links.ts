@@ -1,19 +1,14 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
-// The only cross-layer composable this file uses. The other three ability
-// wrappers below are this layer's own and come from Nuxt's auto-import;
-// `useGetBillingInfoAbility` lives in layers/billing (it wraps that layer's
-// `billingGetBillingInfo`), so it is imported explicitly by package subpath —
-// same shape as the `@nuxfire/layer-billing/shared/utils/abilities` import that
-// passo 2a introduced.
-import { useGetBillingInfoAbility } from "@nuxfire/layer-billing/app/composables/use-ability";
+import type { LayerTeamSettingsTab } from "@nuxfire/manifest";
 
 /**
  * The ability-gated list of team settings sections (General/Members/Security
- * /Billing), shared between the sidebar's "Settings" trigger (`layouts/
- * dashboard.vue`) and the settings toolbar (`pages/[[team]]/settings.vue`) —
- * both need the exact same set of visible tabs for the same team, so this is
- * the single source of truth for it instead of two independently-maintained
- * copies of the same ability checks.
+ * plus whatever tabs active feature layers contribute), shared between the
+ * sidebar's "Settings" trigger (`layouts/dashboard.vue`) and the settings
+ * toolbar (`pages/[[team]]/settings.vue`) — both need the exact same set of
+ * visible tabs for the same team, so this is the single source of truth for
+ * it instead of two independently-maintained copies of the same ability
+ * checks.
  */
 export function useTeamSettingsLinks(teamID: Ref<string>) {
   const currentTeam = useCurrentTeam();
@@ -21,7 +16,29 @@ export function useTeamSettingsLinks(teamID: Ref<string>) {
 
   const { data: showMembers } = useListMembersAndInvitesAbility(teamID);
   const { data: showSecurity } = useDeleteTeamAbility(teamID);
-  const { data: showBilling } = useGetBillingInfoAbility(teamID);
+
+  const contributedTabs = useLayerTeamSettingsTabs();
+  const contributedTabVisibility = contributedTabs.map((tab) => ({
+    tab,
+    // One `useAsyncData` per contributed tab, same pattern as the two calls
+    // above — the number of tabs is small (one per feature layer that opts
+    // in) and static for the lifetime of the component.
+    visible: useAsyncData(
+      `team-settings-tab-${tab.permission}`,
+      () => allows(teamsHasPermission, teamID.value, tab.permission),
+      { watch: [teamID] },
+    ).data,
+  }));
+
+  const toContributedItem = ({
+    tab,
+  }: {
+    tab: LayerTeamSettingsTab;
+  }): NavigationMenuItem => ({
+    label: tab.label,
+    icon: tab.icon,
+    to: `${baseRoute.value}${tab.to}`,
+  });
 
   return computed<NavigationMenuItem[]>(() => [
     {
@@ -51,14 +68,9 @@ export function useTeamSettingsLinks(teamID: Ref<string>) {
           },
         ]
       : []),
-    ...(showBilling.value
-      ? [
-          {
-            label: "Billing",
-            icon: "i-lucide-credit-card",
-            to: `${baseRoute.value}/settings/billing`,
-          },
-        ]
-      : []),
+    ...contributedTabVisibility
+      .filter(({ visible }) => visible.value)
+      .sort((a, b) => a.tab.order - b.tab.order)
+      .map(toContributedItem),
   ]);
 }

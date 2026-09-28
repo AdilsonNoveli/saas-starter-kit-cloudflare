@@ -1,5 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { isInviteAcceptable } from "./team-seats";
+import { hasSeatAvailable, isInviteAcceptable } from "./team-seats";
+
+// SPECSFY: AC-003, AC-004, AC-012
+describe("hasSeatAvailable", () => {
+  it("is unlimited when maxSeats is null (no plan, or a plan with no cap)", () => {
+    expect(hasSeatAvailable(null, 0)).toBe(true);
+    expect(hasSeatAvailable(null, 1000)).toBe(true);
+  });
+
+  it("allows one more below the cap", () => {
+    expect(hasSeatAvailable(3, 2)).toBe(true);
+  });
+
+  it("blocks at and above the cap", () => {
+    expect(hasSeatAvailable(3, 3)).toBe(false);
+    expect(hasSeatAvailable(3, 4)).toBe(false);
+  });
+});
 
 describe("isInviteAcceptable", () => {
   it("rejects anything that isn't PENDING, regardless of expiry", () => {

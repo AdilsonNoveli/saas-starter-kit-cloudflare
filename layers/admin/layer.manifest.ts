@@ -10,24 +10,26 @@ export default defineLayerManifest({
   // Documentational only — nothing validates `extends` order automatically
   // (see nuxfire-layers.md, Fase 1.4).
   //
-  // These two are real import edges, not guesses: `server/trpc/router.ts` here
-  // imports `adminPlansRouter` from `@nuxfire/layer-billing/server/trpc/router`
-  // and `adminNotificationsRouter` from
-  // `@nuxfire/layer-notifications/server/trpc/router`. Those two routers are
-  // billing-/notifications-domain logic that is merely admin-*gated*, so they
-  // live in their own layers and are mounted here, under `admin.plans` and
-  // `admin.notifications` — the paths the client already calls. That is why
-  // `admin` is the LAST extraction of Fase 3: it is an aggregation layer, not a
-  // leaf, and extracting it earlier would have meant rewriting those imports
-  // twice.
+  // `server/trpc/router.ts` imports `adminNotificationsRouter` from
+  // `@nuxfire/layer-notifications/server/trpc/router` — notifications-domain
+  // logic that is merely admin-*gated*, mounted here under
+  // `admin.notifications`, the path the client already calls.
   //
-  // `teams` is deliberately NOT listed, and that is what the code says.
-  // `server/trpc/admin-teams.ts` queries `teams`/`teamMemberships`/`plans`/
-  // `subscriptions` through the `@nuxfire/functions/schema` aggregator barrel,
-  // never through `@nuxfire/layer-teams` directly — same reasoning the
-  // notifications manifest spells out: `requires` documents the import
-  // direction, and no file in this layer imports that package.
-  requires: ["billing", "notifications"],
+  // `billing` is deliberately NOT listed any more (SPEC-0005): this layer is
+  // base (`config.ts`'s `layers.core`) and must never import a feature layer.
+  // `admin.plans`/`admin.pendingPurchases` (from billing) and the billing-aware
+  // `admin.teams` (plan/subscription columns) are now assembled by the
+  // Composition Root (`apps/app/server/trpc/routers/admin-teams-billing.ts`
+  // and `routers/index.ts`), which replaces this layer's base `teams` router
+  // and adds those two keys only when `layers.features.billing` is true — no
+  // file in `layers/admin` imports `@nuxfire/layer-billing` any more, enforced
+  // by `scripts/layer-dependency-direction.test.ts`.
+  //
+  // `teams` is deliberately NOT listed either: `server/trpc/admin-teams.ts`
+  // queries `teams`/`teamMemberships`/`jobs` through the
+  // `@nuxfire/functions/schema` aggregator barrel, never through
+  // `@nuxfire/layer-teams` directly.
+  requires: ["notifications"],
 
   // `navigation` is deliberately absent. This layer's sidebar is its own —
   // `app/layouts/admin.vue` builds the `/admin/*` menu inline — and the tenant

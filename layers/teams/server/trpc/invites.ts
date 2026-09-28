@@ -14,6 +14,7 @@ import { teamInvites, teamMemberships, teams } from "@nuxfire/functions/schema";
 import {
   countPendingInvites,
   countTeamMembers,
+  hasSeatAvailable,
   isInviteAcceptable,
 } from "../utils/team-seats";
 import {
@@ -42,9 +43,6 @@ export const invitesRouter = router({
             memberships: {
               where: eq(teamMemberships.userId, user.id),
             },
-            plan: {
-              columns: { maxSeats: true },
-            },
           },
         });
 
@@ -65,13 +63,21 @@ export const invitesRouter = router({
         // Deliberately only about *new* invites: a team already over its limit
         // (because the plan changed under it) keeps every member it has —
         // nothing here removes anyone.
-        if (team.plan.maxSeats !== null) {
+        //
+        // `team.maxSeats` (not `team.plan.maxSeats`): denormalized onto Team
+        // by billing whenever it sets a plan (SPEC-0005) — this base layer has
+        // no relation to `Plan` to query through. `null` means unlimited,
+        // whether because the plan has no seat cap or because there is no
+        // plan at all (billing disabled, or none assigned yet) — the same
+        // outcome either way. The two counts are only worth fetching when
+        // there is a cap to check against.
+        if (team.maxSeats !== null) {
           const [members, pendingInvites] = await Promise.all([
             countTeamMembers(team.id),
             countPendingInvites(team.id),
           ]);
 
-          if (members + pendingInvites >= team.plan.maxSeats) {
+          if (!hasSeatAvailable(team.maxSeats, members + pendingInvites)) {
             throw new TRPCError({
               code: "FORBIDDEN",
               message:
@@ -131,7 +137,7 @@ export const invitesRouter = router({
         where: eq(teamInvites.id, input.inviteId),
         with: {
           team: {
-            with: { plan: { columns: { maxSeats: true } } },
+            columns: { maxSeats: true },
           },
         },
       });
@@ -175,10 +181,13 @@ export const invitesRouter = router({
       // in the same instant can still both pass. Closing that fully needs row
       // locking on the team; the window is milliseconds and the failure mode
       // is one seat over, so it is deliberately not paid for here.
-      const maxSeats = invite.team.plan.maxSeats;
+      //
+      // `invite.team.maxSeats` (not `.plan.maxSeats`): see the identical note
+      // in `sendInvite` above (SPEC-0005).
+      const maxSeats = invite.team.maxSeats;
       if (maxSeats !== null) {
         const members = await countTeamMembers(invite.teamId);
-        if (members >= maxSeats) {
+        if (!hasSeatAvailable(maxSeats, members)) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message:

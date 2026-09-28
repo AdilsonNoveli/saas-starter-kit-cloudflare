@@ -237,6 +237,7 @@ export const checkoutRouter = router({
           id: plan.id,
           buyerTeamMode: plan.buyerTeamMode as PlanBuyerTeamMode,
           buyerTeamId: plan.buyerTeamId,
+          maxSeats: plan.maxSeats,
         },
         userId: user.id,
         teamName: input.teamName,

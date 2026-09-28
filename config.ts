@@ -34,15 +34,42 @@ export const layers = {
   // layer needs no hand-written import anywhere; adding its name here is all.
   // With `admin` (Fase 3 passo 4, the last extraction) this list is complete:
   // apps/app holds no domain logic any more, only the Composition Root.
-  core: ["teams", "billing", "notifications", "admin"] as string[],
+  core: ["teams", "notifications", "admin"] as string[],
 
   // Feature layers — toggleable per build/deploy. `false` drops the layer's
-  // pages, components and Nuxt config from the bundle entirely; it does NOT
-  // drop its tables from the database schema (see section 4 of the plan —
-  // orphan data is intentional, "disabled" means "out of the UI", not "erased").
+  // pages, components and Nuxt config from the bundle, AND its migration
+  // history from the next deploy: each feature layer owns its own migration
+  // history (`layers/<name>/drizzle.config.ts`, `layers/<name>/migrations/`),
+  // separate from the base history in `apps/functions/src/database/
+  // migrations/`, applied by its own `drizzle-kit migrate` in
+  // `infra/utils/nuxt.ts`, gated on the flag here — a layer that was never
+  // turned on never reaches the database, not even as an empty table. This
+  // is a per-deploy toggle, not a runtime schema diff: flipping an
+  // already-deployed layer off does not generate a DROP for its tables
+  // (nothing diffs the two histories against each other); their data is
+  // simply no longer migrated or seeded. See apps/functions/src/database/
+  // MIGRATIONS.md for the split and its bootstrap procedure.
+  //
+  // `billing` moved here from `core` in SPEC-0005: `Team.planId` is nullable
+  // and `layers/teams` no longer imports `@nuxfire/layer-billing` (a base
+  // layer must never import a feature layer — enforced by
+  // scripts/layer-dependency-direction.test.ts), so billing can now be
+  // turned off without breaking team creation or invites.
+  //
+  // `as const`, not `satisfies Record<string, boolean>`: a plain object
+  // literal widens `true`/`false` properties to `boolean`, which is exactly
+  // what breaks `apps/app/server/trpc/routers/index.ts`'s
+  // `layers.features.billing ? mergeRouters(...) : layerRouters.admin` —
+  // TypeScript cannot narrow a runtime `boolean` at the type level, so the
+  // client-facing `admin.plans`/`admin.pendingPurchases` types silently
+  // disappeared (caught by `bun run typecheck` in apps/app, not assumed).
+  // `as const` keeps each flag's literal type, so flipping one here is a
+  // compile-time signal for every file that assumed it — exactly what should
+  // happen when a fork actually turns billing off.
   features: {
     kanban: true,
-  } satisfies Record<string, boolean>,
+    billing: true,
+  } as const,
 };
 
 // enable/disable features/3rd-party integrations

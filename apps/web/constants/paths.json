@@ -1384,7 +1384,6 @@
   "layers/billing/app/components/pricing/",
   "layers/billing/app/components/pricing/PricingCard.vue",
   "layers/billing/app/composables/",
-  "layers/billing/app/composables/use-ability.ts",
   "layers/billing/app/composables/use-payments.ts",
   "layers/billing/app/pages/",
   "layers/billing/app/pages/[[team]]/",

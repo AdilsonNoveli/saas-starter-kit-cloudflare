@@ -22,6 +22,25 @@ export interface LayerNavigation {
   sidebar?: LayerNavigationItem[];
 }
 
+/**
+ * A tab a layer injects into the per-team settings page
+ * (`layers/teams/app/pages/[[team]]/settings.vue`). Unlike the sidebar, a
+ * settings tab is visibility-gated per team/user, so it carries the
+ * permission string to check — the generic `teamsHasPermission` ability
+ * (`layers/teams/shared/utils/abilities.ts`) checks it without either side
+ * importing the other (SPEC-0005: base layers never import a feature layer).
+ */
+export interface LayerTeamSettingsTab {
+  label: string;
+  icon: string;
+  /** Route suffix appended to the team's settings base route, e.g. `/settings/billing`. */
+  to: string;
+  /** Permission string gating visibility, e.g. `teams:billing:view`. */
+  permission: string;
+  /** Sort key across all layers; lower comes first. */
+  order: number;
+}
+
 export interface LayerManifest {
   /** Layer id — matches the `layers/<name>/` folder and the `@nuxfire/layer-<name>` package. */
   name: string;
@@ -34,6 +53,7 @@ export interface LayerManifest {
    */
   requires?: string[];
   navigation?: LayerNavigation;
+  teamSettingsTabs?: LayerTeamSettingsTab[];
   /** Permission strings this layer adds to the RBAC catalogue, `layer:resource:action`. */
   permissions?: string[];
 }

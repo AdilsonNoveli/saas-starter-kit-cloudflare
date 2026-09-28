@@ -135,7 +135,7 @@ describe("provisionBuyerTeam", () => {
     const { provisionBuyerTeam } = await import("./buyer-provisioning");
     const result = await provisionBuyerTeam({
       pendingPurchase: basePendingPurchase,
-      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM, buyerTeamId: null },
+      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM, buyerTeamId: null, maxSeats: null },
       userId: "user_1",
       teamName: "A",
       teamSlug: "a",
@@ -150,7 +150,7 @@ describe("provisionBuyerTeam", () => {
     const { provisionBuyerTeam } = await import("./buyer-provisioning");
     const result = await provisionBuyerTeam({
       pendingPurchase: basePendingPurchase,
-      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM, buyerTeamId: null },
+      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM, buyerTeamId: null, maxSeats: null },
       userId: "user_1",
       teamName: "Acme",
       teamSlug: "acme",
@@ -171,7 +171,7 @@ describe("provisionBuyerTeam", () => {
     const { provisionBuyerTeam } = await import("./buyer-provisioning");
     const result = await provisionBuyerTeam({
       pendingPurchase: basePendingPurchase,
-      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM, buyerTeamId: null },
+      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.NEW_TEAM, buyerTeamId: null, maxSeats: null },
       userId: "user_1",
       teamName: "Acme",
       teamSlug: "acme",
@@ -186,7 +186,7 @@ describe("provisionBuyerTeam", () => {
     const { provisionBuyerTeam } = await import("./buyer-provisioning");
     const result = await provisionBuyerTeam({
       pendingPurchase: basePendingPurchase,
-      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: "team_1" },
+      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: "team_1", maxSeats: null },
       userId: "user_1",
     });
     expect(result).toEqual({ ok: false, reason: "destination_suspended" });
@@ -200,7 +200,7 @@ describe("provisionBuyerTeam", () => {
     const { provisionBuyerTeam } = await import("./buyer-provisioning");
     const result = await provisionBuyerTeam({
       pendingPurchase: basePendingPurchase,
-      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: null },
+      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: null, maxSeats: null },
       userId: "user_1",
     });
     expect(result).toEqual({ ok: false, reason: "destination_missing" });
@@ -216,7 +216,7 @@ describe("provisionBuyerTeam", () => {
     const { provisionBuyerTeam } = await import("./buyer-provisioning");
     const result = await provisionBuyerTeam({
       pendingPurchase: basePendingPurchase,
-      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: "team_1" },
+      plan: { id: "plan_1", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: "team_1", maxSeats: null },
       userId: "user_1",
     });
     expect(result).toEqual({ ok: false, reason: "destination_suspended" });
@@ -234,7 +234,7 @@ describe("provisionBuyerTeam", () => {
     const { provisionBuyerTeam } = await import("./buyer-provisioning");
     const result = await provisionBuyerTeam({
       pendingPurchase: basePendingPurchase,
-      plan: { id: "plan_support", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: "team_1" },
+      plan: { id: "plan_support", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: "team_1", maxSeats: null },
       userId: "user_1",
     });
     expect(result).toEqual({ ok: true, teamId: "team_1", teamSlug: "client-co" });
@@ -253,7 +253,7 @@ describe("provisionBuyerTeam", () => {
     const { provisionBuyerTeam } = await import("./buyer-provisioning");
     const result = await provisionBuyerTeam({
       pendingPurchase: basePendingPurchase,
-      plan: { id: "plan_support", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: "team_1" },
+      plan: { id: "plan_support", buyerTeamMode: PlanBuyerTeamMode.EXISTING_TEAM, buyerTeamId: "team_1", maxSeats: null },
       userId: "user_1",
     });
     expect(result).toEqual({ ok: true, teamId: "team_1", teamSlug: "client-co" });

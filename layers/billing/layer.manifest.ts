@@ -1,4 +1,5 @@
 import { defineLayerManifest } from "@nuxfire/manifest";
+import { PERMISSIONS } from "@nuxfire/layer-teams/shared/utils/permissions";
 
 export default defineLayerManifest({
   name: "billing",
@@ -8,17 +9,31 @@ export default defineLayerManifest({
   version: "1.0.0",
 
   // Documentational only — nothing validates `extends` order automatically
-  // (see nuxfire-layers.md, Fase 1.4). `teams` is listed because
-  // `Subscription.teamId` is a real FK to `Team` and this layer imports
-  // `@nuxfire/layer-teams/server/database/schema` directly. The reverse edge
-  // exists too at the schema level (`Team.planId` -> `Plan`), but it is not
-  // listed as a `requires` on the teams manifest: `requires` documents layer
-  // dependency direction, and billing is the dependent of the two.
+  // (see nuxfire-layers.md, Fase 1.4). `teams` is listed because this layer
+  // imports `@nuxfire/layer-teams/server/database/schema` directly (schema
+  // relations, see nuxfire-drizzle.md) and `shared/utils/permissions` (below).
+  // The reverse edge (`teams` reaching into `billing`) no longer exists as of
+  // SPEC-0005 — a base layer must never import a feature layer.
   requires: ["teams"],
 
-  // `navigation` is deliberately absent: billing is reached from the team
-  // settings pages and from /admin, never from a top-level sidebar item. (This
-  // layer's frontend is still in apps/app — it moves in Fase 3 passo 2b.)
+  // `navigation` (top-level sidebar) is deliberately absent: billing is
+  // reached from the team settings pages and from /admin, never from a
+  // top-level sidebar item.
+  //
+  // `teamSettingsTabs` is how billing reaches the team settings page instead
+  // (SPEC-0005): `layers/teams/app/composables/use-team-settings-links.ts`
+  // reads this generically from every active layer's manifest and checks
+  // `permission` via the generic `teamsHasPermission` ability — teams never
+  // imports billing's own `useGetBillingInfoAbility` (removed).
+  teamSettingsTabs: [
+    {
+      label: "Billing",
+      icon: "i-lucide-credit-card",
+      to: "/settings/billing",
+      permission: PERMISSIONS.TEAMS.BILLING.VIEW,
+      order: 30,
+    },
+  ],
 
   // Empty on purpose, not an oversight. The one RBAC gate on this domain is
   // `teams:billing:view`, which is already declared by the teams manifest and

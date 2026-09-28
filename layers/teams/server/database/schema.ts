@@ -2,6 +2,7 @@ import {
   pgTable,
   text,
   boolean,
+  integer,
   timestamp,
   primaryKey,
   unique,
@@ -23,21 +24,6 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // binding at module top level; keep every cross-file reference inside a
 // callback or the cycle turns into a TDZ crash at import time.
 import { jobs, users } from "@nuxfire/functions/database/core-schema";
-// `Plan` and `Subscription` moved to layers/billing in Fase 3 passo 2a, which
-// turns the `Team` <-> billing references below into a SECOND cycle of exactly
-// the same shape — this time between two peer layers, not between a layer and
-// the aggregator package: `Team.planId` and `teamRelations` point at `Plan`/
-// `Subscription` here, while `Subscription.teamId` and `subscriptionRelations`
-// point back at `Team` there. The same rule keeps it safe, and the same rule is
-// the only thing keeping it safe: every reference to `plans`/`subscriptions`
-// below sits inside a `.references(() => ...)` or a `relations()` callback body.
-// `@nuxfire/layer-billing` is a declared dependency of this layer for this one
-// import (and this layer is a declared dependency of billing for the mirror
-// import) — a workspace dependency cycle that Bun resolves as plain symlinks.
-import {
-  plans,
-  subscriptions,
-} from "@nuxfire/layer-billing/server/database/schema";
 
 export const teams = pgTable("Team", {
   id: text("id")
@@ -55,9 +41,21 @@ export const teams = pgTable("Team", {
   // existing team has to come out of the migration ACTIVE, or the suspension
   // check would read null and lock out tenants that were never suspended.
   status: text("status").notNull().default("ACTIVE"),
-  planId: text("planId")
-    .notNull()
-    .references(() => plans.id),
+  // No `.references()` (SPEC-0005): a real FK would force this base layer to
+  // import `@nuxfire/layer-billing` to reference `plans.id`, which is exactly
+  // the dependency direction this schema no longer allows — same reasoning
+  // already applied to `Notification.userId` (see nuxfire-drizzle.md, "column
+  // only, without FK"). The query-time relation lives in billing's own
+  // schema.ts instead (`teamBillingRelations`), which is allowed to import
+  // this layer. Nullable: a team with billing disabled, or not yet on any
+  // plan, has none.
+  planId: text("planId"),
+  // Denormalized from the team's current plan (SPEC-0005) so that seat-limit
+  // enforcement here never has to look up `Plan` — billing writes this
+  // alongside `planId` whenever it changes a team's plan
+  // (`buyer-provisioning.ts`). `null` = unlimited, same meaning as a plan
+  // whose own `maxSeats` is null.
+  maxSeats: integer("maxSeats"),
   // Set on the team's first Stripe Checkout attempt, reused on every one
   // after. Without it, createStripeCheckoutSession had no way to look up a
   // team's customer, so it created a brand-new Stripe Customer object on
@@ -73,16 +71,15 @@ export const teams = pgTable("Team", {
     .$onUpdate(() => new Date()),
 });
 
-export const teamRelations = relations(teams, ({ one, many }) => ({
-  // The plan a team is on. `planId` is a notNull foreign key, so this is
-  // always present — it is what seat limits and quotas are read from.
-  plan: one(plans, {
-    fields: [teams.planId],
-    references: [plans.id],
-  }),
+// `plan`/`subscriptions` relations moved to billing's own schema.ts
+// (`teamBillingRelations`, SPEC-0005): this base layer no longer imports
+// `plans`/`subscriptions` from billing, for either a FK or a query relation.
+// Drizzle merges relation entries per table by name across every `relations()`
+// call found in the schema, regardless of which file declares them, so
+// `db.query.teams.findFirst({ with: { plan: ... } })` still works unchanged.
+export const teamRelations = relations(teams, ({ many }) => ({
   memberships: many(teamMemberships),
   roles: many(roles),
-  subscriptions: many(subscriptions),
   jobs: many(jobs),
 }));
 

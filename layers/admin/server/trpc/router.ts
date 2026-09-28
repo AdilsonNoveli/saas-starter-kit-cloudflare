@@ -10,28 +10,28 @@ import auditLog from "./admin-audit-log";
 //
 // This import needed ZERO changes when this file moved out of
 // `apps/app/server/trpc/routers/admin/index.ts`: it was already a package
-// specifier, already portable. Same for `plans` below. That was the point of
-// leaving those two mount points pointing at the layers that own the logic, and
-// the reason `admin` was extracted last.
+// specifier, already portable.
 import { adminNotificationsRouter as notifications } from "@nuxfire/layer-notifications/server/trpc/router";
-// Plan/Benefit CRUD and the Stripe product/price catalog sync moved to
-// @nuxfire/layer-billing in Fase 3 passo 2a — billing-domain logic that is
-// merely admin-*gated*, not admin-domain logic. It is imported here rather than
-// spread into `appRouter` with the rest of that layer's `routers` map on
-// purpose: it must stay mounted at `admin.plans`, which is the path the client
-// already calls.
-import { adminPlansRouter as plans } from "@nuxfire/layer-billing/server/trpc/router";
-// Read-only PendingPurchase visibility (SPEC-0004 US-003) — same reasoning as
-// `plans` above: billing-domain, merely admin-gated, mounted here so the
-// client calls `admin.pendingPurchases.listPendingPurchases`.
-import { adminBillingRouter as pendingPurchases } from "@nuxfire/layer-billing/server/trpc/router";
 import queue from "./admin-queue";
 import teams from "./admin-teams";
 
 // Everything platform-scoped lives under `admin.*`, never mixed into the
 // tenant routers next to it: the namespace is what makes "is this procedure
 // behind platformAdminProcedure?" answerable by looking at the path alone.
-const adminRouter = router({ teams, plans, pendingPurchases, queue, auditLog, notifications });
+//
+// Plan/Benefit CRUD, the Stripe catalog sync (`admin.plans`) and read-only
+// PendingPurchase visibility (`admin.pendingPurchases`) are billing-domain
+// logic that is merely admin-*gated*. `teams` above is the base version:
+// `listTeams`/`getTeamDetail` return `planName`/`planTier`/`subscription` as
+// null placeholders, never querying `Plan`/`Subscription`. All three used to
+// be imported directly here from `@nuxfire/layer-billing` — a base layer
+// (`admin`, always active) importing a feature layer, which SPEC-0005
+// forbids. The Composition Root (`apps/app/server/trpc/routers/index.ts`,
+// `admin-teams-billing.ts`) replaces `teams` with a billing-aware version and
+// adds `plans`/`pendingPurchases`, conditionally on `layers.features.billing`
+// — the client-facing paths never change and this file never needs to know
+// billing exists.
+const adminRouter = router({ teams, queue, auditLog, notifications });
 
 /**
  * This layer's contribution to `appRouter`, keyed by the top-level name each

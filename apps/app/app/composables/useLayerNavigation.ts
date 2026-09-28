@@ -1,4 +1,4 @@
-import type { LayerNavigationItem } from "@nuxfire/manifest";
+import type { LayerNavigationItem, LayerTeamSettingsTab } from "@nuxfire/manifest";
 import { layerManifests } from "./.composition/layer-navigation";
 
 /**
@@ -18,5 +18,19 @@ export function useLayerNavigation() {
       .flatMap((manifest) => manifest.navigation?.sidebar ?? [])
       .slice()
       .sort((a, b) => a.order - b.order),
+  );
+}
+
+/**
+ * Team-settings tabs declared by the active Nuxt layers (SPEC-0005). Lives
+ * here, next to `useLayerNavigation`, rather than as an explicit import from
+ * `layers/teams` into `.composition/layer-navigation.ts`: this file sits in
+ * `apps/app`, which Nuxt auto-imports for every extended layer, so
+ * `useTeamSettingsLinks` (owned by `layers/teams`, a base layer) consumes it
+ * without importing anything from the feature layer that contributed a tab.
+ */
+export function useLayerTeamSettingsTabs() {
+  return layerManifests.flatMap(
+    (manifest): LayerTeamSettingsTab[] => manifest.teamSettingsTabs ?? [],
   );
 }

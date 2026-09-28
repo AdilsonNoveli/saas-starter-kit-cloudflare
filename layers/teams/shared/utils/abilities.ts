@@ -86,3 +86,18 @@ export const teamsDeleteInvite = defineAbility(
 // `layers/billing/shared/utils/abilities.ts` as `billingGetBillingInfo`. The
 // permission string itself stays here — it is teams-owned, declared by this
 // layer's manifest and already written into live `Permission` rows.
+
+/**
+ * Generic, permission-string-parameterised ability (SPEC-0005). What lets
+ * `useTeamSettingsLinks` show a feature layer's contributed settings tab
+ * (`LayerManifest.teamSettingsTabs`, e.g. billing's) without importing that
+ * layer: the tab carries its own permission string, and this one ability —
+ * already teams-owned, since `hasTeamPermission` is private to this file —
+ * checks it generically. A layer-specific ability wrapper (like the old
+ * `teamsGetBillingInfo`/`billingGetBillingInfo`) is unnecessary for this case
+ * and would need one new export per feature that wants a tab.
+ */
+export const teamsHasPermission = defineAbility(
+  (user: User | null, teamId: string, permission: string) =>
+    hasTeamPermission(user, teamId, permission),
+);

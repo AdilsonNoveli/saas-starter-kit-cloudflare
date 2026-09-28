@@ -11,16 +11,16 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
-// `Team` lives in the teams layer. `Subscription` below holds a foreign key to
-// it, and `Team.planId`/`teamRelations` in that same file hold references back
-// to `Plan`/`Subscription` here — a real, deliberate two-file cycle, the second
-// one in this schema (core-schema.ts <-> layers/teams was the first, Fase 3
-// passo 1a). It is safe for exactly the same reason: every reference crossing
-// the boundary sits inside a Drizzle callback — `.references(() => teams.id)`
-// and `relations(t, ({ one }) => ...)` — so neither module dereferences the
-// other's exports while it is still evaluating. Nothing below may read an
-// imported binding at module top level, or the cycle turns into a TDZ crash at
-// import time.
+// `Team` lives in the teams layer (base). This import is one-way: `Subscription`
+// below holds a real foreign key to `teams.id`, and `teamBillingRelations`
+// (bottom of this file) declares the reverse query relation
+// (`db.query.teams.findFirst({ with: { subscriptions: ... } })`) from this side
+// too — `teams`' own schema.ts does not import this layer at all (SPEC-0005: a
+// base layer must never import a feature layer). Before SPEC-0005 this was a
+// real two-file cycle (`Team.planId`/`teamRelations` held the reverse
+// references); Drizzle merges relation entries per table by name across every
+// `relations()` call it finds, regardless of which file declares them, so
+// splitting the declaration here changed nothing about how a query resolves.
 //
 // Package specifier, not a relative path: this is a layer importing a peer
 // layer, exactly like layers/kanban's own `Team` FK does, so
@@ -196,6 +196,17 @@ export const subscriptionRelations = relations(subscriptions, ({ one }) => ({
     references: [plans.id],
   }),
 }));
+
+// No `teams`-side relation back to `subscriptions`/`plan` (SPEC-0005):
+// Drizzle's relational query builder merges relation entries per table
+// across every `relations()` call it finds at RUNTIME, but its TypeScript
+// inference does not — a second `relations(teams, ...)` call in this file
+// silently dropped `teamRelations`' own `memberships`/`roles`/`jobs` from the
+// inferred type of every `db.query.teams.findFirst()` call in the app (found
+// via `bunx vue-tsc --noEmit -p server/tsconfig.json`, not assumed). Querying
+// from `subscriptions` (the relation above already covers it) instead of
+// nesting through `teams` avoids needing a team-side declaration at all — see
+// `getBillingInfo` in `server/trpc/billing.ts`.
 
 // A buyer with no team yet (or not yet a member of `Plan.buyerTeamId`) pays
 // before creating an account (SPEC-0004): this row is what the checkout

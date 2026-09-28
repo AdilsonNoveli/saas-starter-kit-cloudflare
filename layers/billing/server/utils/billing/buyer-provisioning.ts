@@ -61,6 +61,10 @@ export interface ProvisionBuyerTeamInput {
     id: string;
     buyerTeamMode: PlanBuyerTeamMode;
     buyerTeamId: string | null;
+    // Denormalized onto `Team.maxSeats` alongside `planId` below (SPEC-0005):
+    // `layers/teams` has no relation to `Plan` any more, so seat-limit
+    // enforcement there reads this column directly instead of joining.
+    maxSeats: number | null;
   };
   userId: string;
   teamName?: string;
@@ -123,6 +127,7 @@ async function provisionNewTeam(
         name,
         slug,
         planId: input.plan.id,
+        maxSeats: input.plan.maxSeats,
         stripeCustomerId: input.pendingPurchase.providerCustomerId,
       })
       .returning();
@@ -202,7 +207,10 @@ async function provisionExistingTeam(
       });
     }
 
-    await tx.update(teams).set({ planId: input.plan.id }).where(eq(teams.id, teamId));
+    await tx
+      .update(teams)
+      .set({ planId: input.plan.id, maxSeats: input.plan.maxSeats })
+      .where(eq(teams.id, teamId));
 
     const claimed = await claimPendingPurchase(
       tx,

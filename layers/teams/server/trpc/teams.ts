@@ -12,11 +12,6 @@ import {
   router,
 } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";
-// `Plan` is billing's table, so its reactive free-plan safety net moved with it
-// in Fase 3 passo 2a — this is now a peer-layer import, not a Composition Root
-// one. `teams.create` still needs it: a brand-new tenant is inserted with
-// `planId` pointing at the Free plan.
-import { ensureFreePlan } from "@nuxfire/layer-billing/server/utils/plans";
 import {
   teamInvites,
   teamMemberships,
@@ -188,21 +183,20 @@ export const teamsRouter = router({
           message: "Owner role could not be found or created",
         });
       }
-      const freePlan = await ensureFreePlan();
-      if (!freePlan) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Free plan could not be found or created",
-        });
-      }
-
+      // No `planId` (SPEC-0005): this base layer no longer reaches into
+      // billing to assign a default plan — a team is created plan-less
+      // (`planId`/`maxSeats` both null, meaning unlimited) whether billing is
+      // active or not. If billing is active, it is billing's own job to
+      // attach a plan later (checkout, or an admin assigning one) —
+      // `buyer-provisioning.ts` already writes `planId`/`maxSeats` directly
+      // into `Team` for the checkout flow, which is the allowed direction
+      // (feature → base).
       const [team] = await useDB()
         .insert(teams)
         .values({
           name: input.name,
           slug: input.slug,
           description: input.description,
-          planId: freePlan.id,
         })
         .returning();
 

@@ -9,7 +9,7 @@ import { z } from "zod";
 // explicit imports), and the same pattern layers/teams' routers use.
 import { protectedProcedure, router } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";
-import { teamMemberships, teams } from "@nuxfire/functions/schema";
+import { teamMemberships, teams, subscriptions } from "@nuxfire/functions/schema";
 import { signPaddleTeam } from "../utils/billing/paddle-team-signature";
 import { createStripeClient } from "../utils/stripe";
 import { STRIPE_CANCEL_CONFIG_KV_KEY } from "../utils/stripe-portal";
@@ -62,27 +62,6 @@ export const billingRouter = router({
           memberships: {
             where: eq(teamMemberships.userId, user.id),
           },
-          subscriptions: {
-            // Explicit ordering, and only the row that actually governs
-            // billing today. Without an ORDER BY, Postgres returns these in
-            // arbitrary order, so "first" and "last" were both non-
-            // deterministic — the same team could get different answers on
-            // consecutive requests once it had more than one subscription row
-            // (plan change, provider switch, cancelled history).
-            orderBy: (subscription, { desc }) => [desc(subscription.createdAt)],
-            limit: 1,
-            with: {
-              plan: {
-                with: {
-                  benefits: {
-                    with: {
-                      benefit: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
         },
       });
 
@@ -112,12 +91,34 @@ export const billingRouter = router({
         },
       });
 
+      // Queried directly off `subscriptions` (not nested through
+      // `teams.findFirst({ with: { subscriptions } })`, SPEC-0005): `teams`
+      // declares no relation to `Plan`/`Subscription` any more (a base layer
+      // must never import a feature layer to build one), and
+      // `subscriptionRelations` in billing's own schema.ts already relates
+      // `subscriptions` back to both `team` and `plan`, so this needs no
+      // relation declared on the `teams` side at all.
+      //
       // One subscription drives both values. They used to be read from
       // opposite ends of the same unordered list — `[0]` for the plan and
       // `[length - 1]` for everything else — so a team with more than one
       // subscription row could see the name of one plan next to the renewal
       // date, status and portal links of a different one.
-      const currentSubscription = team.subscriptions?.[0];
+      const currentSubscription = await useDB().query.subscriptions.findFirst({
+        where: eq(subscriptions.teamId, team.id),
+        orderBy: (subscription, { desc }) => [desc(subscription.createdAt)],
+        with: {
+          plan: {
+            with: {
+              benefits: {
+                with: {
+                  benefit: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
       const currentPlan =
         currentSubscription?.plan ||

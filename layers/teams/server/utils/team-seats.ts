@@ -59,3 +59,19 @@ export function isInviteAcceptable(invite: {
   if (invite.status !== "PENDING") return false;
   return invite.expiresAt === null || invite.expiresAt.getTime() > Date.now();
 }
+
+/**
+ * Whether a team with `maxSeats` room can take one more occupant (a member or
+ * a pending invite counted as `used`). `maxSeats == null` means unlimited —
+ * true whether it comes from a plan with no seat cap or from a team with no
+ * plan at all (SPEC-0005: `Team.maxSeats` is denormalized by billing, absent
+ * when billing is disabled or no plan was ever assigned). Extracted as a pure
+ * function so `invites.ts`'s two call sites (send and accept) share one rule
+ * instead of two copies of the same `!== null` check.
+ */
+export function hasSeatAvailable(
+  maxSeats: number | null,
+  used: number,
+): boolean {
+  return maxSeats === null || used < maxSeats;
+}

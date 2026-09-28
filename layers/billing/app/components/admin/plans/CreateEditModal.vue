@@ -28,54 +28,66 @@
         <fieldset :disabled="loading" class="contents">
           <div class="space-y-4">
             <div class="grid gap-4 sm:grid-cols-2">
-              <UFormField label="Name" name="name" required>
-                <UInput v-model="state.name" class="w-full" placeholder="Pro" />
+              <UFormField :label="t('billing.admin.plans.form.name.label')" name="name" required>
+                <UInput
+                  v-model="state.name"
+                  class="w-full"
+                  :placeholder="t('billing.admin.plans.form.name.placeholder')"
+                />
               </UFormField>
 
               <UFormField
-                label="Tier"
+                :label="t('billing.admin.plans.form.tier.label')"
                 name="tier"
                 required
-                help="Free-form, e.g. FREE or PRO."
+                :help="t('billing.admin.plans.form.tier.help')"
               >
-                <UInput v-model="state.tier" class="w-full" placeholder="PRO" />
+                <UInput
+                  v-model="state.tier"
+                  class="w-full"
+                  :placeholder="t('billing.admin.plans.form.tier.placeholder')"
+                />
               </UFormField>
             </div>
 
-            <UFormField label="Description" name="description" required>
+            <UFormField
+              :label="t('billing.admin.plans.form.description.label')"
+              name="description"
+              required
+            >
               <UTextarea
                 v-model="state.description"
                 class="w-full"
                 :rows="2"
-                placeholder="Everything a growing team needs"
+                :placeholder="t('billing.admin.plans.form.description.placeholder')"
               />
             </UFormField>
 
             <div class="grid gap-4 sm:grid-cols-2">
               <UFormField
-                label="Provider"
+                :label="t('billing.admin.plans.form.provider.label')"
                 name="provider"
-                help="Leave empty for a free plan."
+                :help="t('billing.admin.plans.form.provider.help')"
               >
                 <USelect
                   v-model="state.provider"
                   :items="providerOptions"
                   class="w-full"
-                  placeholder="Select a provider"
+                  :placeholder="t('billing.admin.plans.form.provider.placeholder')"
                 />
               </UFormField>
 
               <UFormField
-                label="Period"
+                :label="t('billing.admin.plans.form.period.label')"
                 name="period"
                 required
-                help="Billing interval for the toggle on the billing page."
+                :help="t('billing.admin.plans.form.period.help')"
               >
                 <USelect
                   v-model="state.period"
                   :items="periodOptions"
                   class="w-full"
-                  placeholder="Select a period"
+                  :placeholder="t('billing.admin.plans.form.period.placeholder')"
                 />
               </UFormField>
             </div>
@@ -89,10 +101,10 @@
           -->
             <div v-if="isStripeProvider" class="grid gap-4 sm:grid-cols-2">
               <UFormField
-                label="Amount"
+                :label="t('billing.admin.plans.form.amount.label')"
                 name="amount"
                 required
-                help="Charged in the currency selected, e.g. 179.90."
+                :help="t('billing.admin.plans.form.amount.help')"
               >
                 <UInput
                   v-model.number="state.amount"
@@ -100,16 +112,16 @@
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="179.00"
+                  :placeholder="t('billing.admin.plans.form.amount.placeholder')"
                 />
               </UFormField>
 
-              <UFormField label="Currency" name="currency" required>
+              <UFormField :label="t('billing.admin.plans.form.currency.label')" name="currency" required>
                 <USelect
                   v-model="state.currency"
                   :items="currencyOptions"
                   class="w-full"
-                  placeholder="Select a currency"
+                  :placeholder="t('billing.admin.plans.form.currency.placeholder')"
                 />
               </UFormField>
 
@@ -117,41 +129,41 @@
                 v-if="props.plan?.providerPriceId"
                 class="text-xs text-muted sm:col-span-2"
               >
-                Stripe Price: <code>{{ props.plan.providerPriceId }}</code>
-                — changing the amount, currency or period creates a new Price
-                and archives this one.
+                {{ t('billing.admin.plans.form.stripePriceLabel') }}
+                <code>{{ props.plan.providerPriceId }}</code>
+                {{ t('billing.admin.plans.form.stripePriceNote') }}
               </p>
             </div>
 
             <div v-else class="grid gap-4 sm:grid-cols-2">
-              <UFormField label="Price" name="price" required>
+              <UFormField :label="t('billing.admin.plans.form.price.label')" name="price" required>
                 <UInput
                   v-model="state.price"
                   class="w-full"
-                  placeholder="$29"
+                  :placeholder="t('billing.admin.plans.form.price.placeholder')"
                 />
               </UFormField>
 
-              <UFormField label="Provider price ID" name="providerPriceId">
+              <UFormField :label="t('billing.admin.plans.form.providerPriceId.label')" name="providerPriceId">
                 <UInput
                   v-model="state.providerPriceId"
                   class="w-full"
-                  placeholder="price_..."
+                  :placeholder="t('billing.admin.plans.form.providerPriceId.placeholder')"
                 />
               </UFormField>
             </div>
 
             <UFormField
-              label="Max seats"
+              :label="t('billing.admin.plans.form.maxSeats.label')"
               name="maxSeats"
-              help="Leave empty for unlimited."
+              :help="t('billing.admin.plans.form.maxSeats.help')"
             >
               <UInput
                 v-model.number="state.maxSeats"
                 class="w-full"
                 type="number"
                 min="1"
-                placeholder="Unlimited"
+                :placeholder="t('billing.admin.plans.form.maxSeats.placeholder')"
               />
             </UFormField>
 
@@ -207,10 +219,10 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h4 class="text-sm font-semibold text-highlighted">
-                    Features & Limits
+                    {{ t('billing.admin.plans.form.features.heading') }}
                   </h4>
                   <p class="text-xs text-muted">
-                    Extra fields and quotas displayed in the comparison table.
+                    {{ t('billing.admin.plans.form.features.subheading') }}
                   </p>
                 </div>
                 <UButton
@@ -218,7 +230,7 @@
                   color="primary"
                   variant="subtle"
                   icon="i-lucide-plus"
-                  label="Add feature"
+                  :label="t('billing.admin.plans.form.features.add')"
                   type="button"
                   @click="addFeature"
                 />
@@ -232,13 +244,13 @@
                 >
                   <UInput
                     v-model="feat.name"
-                    placeholder="Feature name (e.g. WhatsApp numbers, Storage)"
+                    :placeholder="t('billing.admin.plans.form.features.namePlaceholder')"
                     class="flex-1"
                     size="sm"
                   />
                   <UInput
                     v-model="feat.value"
-                    placeholder="Value (e.g. 5, Unlimited, true)"
+                    :placeholder="t('billing.admin.plans.form.features.valuePlaceholder')"
                     class="w-36 sm:w-44"
                     size="sm"
                   />
@@ -248,21 +260,21 @@
                     variant="ghost"
                     size="xs"
                     type="button"
-                    title="Remove feature"
+                    :title="t('billing.admin.plans.form.features.remove')"
                     @click="removeFeature(idx)"
                   />
                 </div>
               </div>
               <p v-else class="text-xs text-muted italic">
-                No custom features added. Click "Add feature" to configure extra fields for this plan.
+                {{ t('billing.admin.plans.form.features.empty') }}
               </p>
             </div>
           </div>
 
           <div class="space-y-2">
-            <p class="text-sm font-medium text-muted">Preview</p>
+            <p class="text-sm font-medium text-muted">{{ t('billing.admin.plans.form.preview.label') }}</p>
             <PricingCard
-              :name="state.name || 'Plan name'"
+              :name="state.name || t('billing.admin.plans.form.preview.defaultName')"
               :price="previewPrice"
               :period="state.period"
               :description="state.description"
@@ -273,14 +285,14 @@
 
         <div class="flex justify-end gap-2 lg:col-span-2">
           <UButton
-            label="Cancel"
+            :label="t('billing.admin.plans.form.actions.cancel')"
             color="neutral"
             variant="subtle"
             :disabled="loading"
             @click="open = false"
           />
           <UButton
-            :label="isEdit ? 'Save changes' : 'Create plan'"
+            :label="isEdit ? t('billing.admin.plans.form.actions.save') : t('billing.admin.plans.form.actions.create')"
             color="primary"
             variant="solid"
             type="submit"
@@ -354,12 +366,14 @@ const { t } = useI18n();
 
 const isEdit = computed(() => Boolean(props.plan));
 const title = computed(() =>
-  props.plan ? `Edit ${props.plan.name}` : "New plan",
+  props.plan
+    ? t("billing.admin.plans.form.editTitle", { name: props.plan.name })
+    : t("billing.admin.plans.form.createTitle"),
 );
 const description = computed(() =>
   props.plan
-    ? "Changes apply to every team already on this plan."
-    : "Create a plan tenants can subscribe to.",
+    ? t("billing.admin.plans.form.editDescription")
+    : t("billing.admin.plans.form.createDescription"),
 );
 
 // Dynamic extra features & limits state
@@ -382,14 +396,16 @@ function removeFeature(index: number) {
 // only conditionally on `provider`, which is why that check lives in
 // `superRefine` instead of on the fields themselves — same reason the server
 // schema keeps it out of `planFieldsSchema` proper.
+const requiredMessage = t("billing.admin.plans.form.validation.required");
+
 const schema = z
   .object({
-    name: z.string().trim().min(1, "Required").max(100),
-    description: z.string().trim().min(1, "Required").max(500),
-    tier: z.string().trim().min(1, "Required").max(50),
+    name: z.string().trim().min(1, requiredMessage).max(100),
+    description: z.string().trim().min(1, requiredMessage).max(500),
+    tier: z.string().trim().min(1, requiredMessage).max(50),
     price: z.string().trim().max(50),
     period: z.enum(PLAN_BILLING_INTERVALS, {
-      message: "Required",
+      message: requiredMessage,
     }),
     // Unset is `undefined`, matching both the nullable column and how USelect
     // represents an empty selection.
@@ -407,7 +423,7 @@ const schema = z
         (value) =>
           value === "" ||
           (typeof value === "number" && Number.isInteger(value) && value > 0),
-        "Leave empty for unlimited, or enter a whole number above zero",
+        t("billing.admin.plans.form.validation.maxSeatsInvalid"),
       ),
     buyerTeamMode: z.enum(PLAN_BUYER_TEAM_MODES),
     // Unset is `undefined`, like `provider` above.
@@ -428,18 +444,18 @@ const schema = z
         ctx.addIssue({
           code: "custom",
           path: ["amount"],
-          message: "Required for a Stripe-managed plan",
+          message: t("billing.admin.plans.form.validation.stripeAmountRequired"),
         });
       }
       if (!data.currency) {
         ctx.addIssue({
           code: "custom",
           path: ["currency"],
-          message: "Required for a Stripe-managed plan",
+          message: t("billing.admin.plans.form.validation.stripeCurrencyRequired"),
         });
       }
     } else if (!data.price.trim()) {
-      ctx.addIssue({ code: "custom", path: ["price"], message: "Required" });
+      ctx.addIssue({ code: "custom", path: ["price"], message: requiredMessage });
     }
   });
 
@@ -614,18 +630,24 @@ const previewFeatures = computed(() => {
     {
       text:
         typeof state.maxSeats === "number"
-          ? `Up to ${state.maxSeats} seats`
-          : "Unlimited seats",
+          ? t("billing.admin.plans.form.preview.seatsUpTo", { count: state.maxSeats })
+          : t("billing.admin.plans.form.preview.seatsUnlimited"),
       included: true,
     },
-    { text: `${state.tier || "Custom"} tier`, included: true },
+    {
+      text: t("billing.admin.plans.form.preview.tier", {
+        tier: state.tier || t("billing.admin.plans.form.preview.tierDefault"),
+      }),
+      included: true,
+    },
   ];
 
+  const included = t("billing.admin.plans.form.preview.included");
   const extra = features.value
     .filter((f) => f.name.trim() && f.value !== "false")
     .slice(0, 3)
     .map((f) => ({
-      text: `${f.name}: ${f.value === "true" ? "Included" : f.value}`,
+      text: `${f.name}: ${f.value === "true" ? included : f.value}`,
       included: true,
     }));
 
@@ -687,15 +709,19 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     open.value = false;
     notification.success(
-      plan ? "Plan updated" : "Plan created",
-      `${fields.name} was saved.`,
+      plan
+        ? t("billing.admin.plans.form.notify.updatedTitle")
+        : t("billing.admin.plans.form.notify.createdTitle"),
+      t("billing.admin.plans.form.notify.savedBody", { name: fields.name }),
     );
     // The caller owns the data, so it owns the refetch.
     emit("success");
   } catch (error) {
     notification.error(
-      props.plan ? "Failed to update plan" : "Failed to create plan",
-      error instanceof Error ? error.message : "Something went wrong",
+      props.plan
+        ? t("billing.admin.plans.form.notify.updateFailedTitle")
+        : t("billing.admin.plans.form.notify.createFailedTitle"),
+      getErrorMessage(error, t("billing.admin.plans.form.notify.genericError")),
     );
   } finally {
     loading.value = false;

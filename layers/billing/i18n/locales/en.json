@@ -2,6 +2,80 @@
   "billing": {
     "admin": {
       "plans": {
+        "form": {
+          "createTitle": "New plan",
+          "createDescription": "Create a plan tenants can subscribe to.",
+          "editTitle": "Edit {name}",
+          "editDescription": "Changes apply to every team already on this plan.",
+          "name": { "label": "Name", "placeholder": "Pro" },
+          "tier": {
+            "label": "Tier",
+            "help": "Free-form, e.g. FREE or PRO.",
+            "placeholder": "PRO"
+          },
+          "description": {
+            "label": "Description",
+            "placeholder": "Everything a growing team needs"
+          },
+          "provider": {
+            "label": "Provider",
+            "help": "Leave empty for a free plan.",
+            "placeholder": "Select a provider"
+          },
+          "period": {
+            "label": "Period",
+            "help": "Billing interval for the toggle on the billing page.",
+            "placeholder": "Select a period"
+          },
+          "amount": {
+            "label": "Amount",
+            "help": "Charged in the currency selected, e.g. 179.90.",
+            "placeholder": "179.00"
+          },
+          "currency": { "label": "Currency", "placeholder": "Select a currency" },
+          "stripePriceLabel": "Stripe Price:",
+          "stripePriceNote": "— changing the amount, currency or period creates a new Price and archives this one.",
+          "price": { "label": "Price", "placeholder": "$29" },
+          "providerPriceId": { "label": "Provider price ID", "placeholder": "price_..." },
+          "maxSeats": {
+            "label": "Max seats",
+            "help": "Leave empty for unlimited.",
+            "placeholder": "Unlimited"
+          },
+          "features": {
+            "heading": "Features & Limits",
+            "subheading": "Extra fields and quotas displayed in the comparison table.",
+            "add": "Add feature",
+            "namePlaceholder": "Feature name (e.g. WhatsApp numbers, Storage)",
+            "valuePlaceholder": "Value (e.g. 5, Unlimited, true)",
+            "remove": "Remove feature",
+            "empty": "No custom features added. Click \"Add feature\" to configure extra fields for this plan."
+          },
+          "preview": {
+            "label": "Preview",
+            "defaultName": "Plan name",
+            "seatsUpTo": "Up to {count} seats",
+            "seatsUnlimited": "Unlimited seats",
+            "tier": "{tier} tier",
+            "tierDefault": "Custom",
+            "included": "Included"
+          },
+          "actions": { "cancel": "Cancel", "save": "Save changes", "create": "Create plan" },
+          "validation": {
+            "required": "Required",
+            "stripeAmountRequired": "Required for a Stripe-managed plan",
+            "stripeCurrencyRequired": "Required for a Stripe-managed plan",
+            "maxSeatsInvalid": "Leave empty for unlimited, or enter a whole number above zero"
+          },
+          "notify": {
+            "updatedTitle": "Plan updated",
+            "createdTitle": "Plan created",
+            "savedBody": "{name} was saved.",
+            "updateFailedTitle": "Failed to update plan",
+            "createFailedTitle": "Failed to create plan",
+            "genericError": "Something went wrong"
+          }
+        },
         "buyerTeam": {
           "label": "After the purchase",
           "help": "Where the buyer lands once they have paid for this plan.",

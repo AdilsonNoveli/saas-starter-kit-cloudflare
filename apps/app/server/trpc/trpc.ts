@@ -9,7 +9,33 @@ import type { Context } from "~~/server/trpc/context";
 // the Nuxt client program.
 type AnyAbility = Parameters<typeof coreAllows>[0];
 
-const t = initTRPC.context<Context>().create();
+const t = initTRPC.context<Context>().create({
+  // Without this, an unhandled exception (a DB constraint violation, a
+  // missing column) reaches the client as `error.message` verbatim — for a
+  // Drizzle/postgres failure that includes the full SQL statement and every
+  // bound parameter value, which can hold PII. `error.cause` is the original
+  // thrown value (see @trpc/server's `getTRPCErrorFromUnknown`); it — and,
+  // for a `DrizzleQueryError`, the real driver error one level deeper in
+  // `cause.cause` — is logged for operators, serialized per the Workers
+  // logging rule (raw `Error` objects serialize to `{}`), while the client
+  // gets a message that names nothing internal. A `TRPCError` a procedure
+  // throws on purpose (`BAD_REQUEST`, `FORBIDDEN`, ...) is untouched: its
+  // message is already meant for the person using the form.
+  errorFormatter({ shape, error }) {
+    if (error.code !== "INTERNAL_SERVER_ERROR") return shape;
+
+    const cause = error.cause;
+    const rootCause =
+      cause instanceof Error && cause.cause instanceof Error ? cause.cause : cause;
+    console.error("trpc: unhandled procedure error", {
+      message: rootCause instanceof Error ? rootCause.message : error.message,
+      name: rootCause instanceof Error ? rootCause.name : error.name,
+      stack: rootCause instanceof Error ? rootCause.stack : error.stack,
+    });
+
+    return { ...shape, message: "Something went wrong. Please try again." };
+  },
+});
 
 export const publicProcedure = t.procedure.use(async (opts) => {
   return opts.next({
@@ -145,3 +171,7 @@ export const platformAdminProcedure = protectedProcedure.use(async (opts) => {
 
 export const router = t.router;
 export const middleware = t.middleware;
+// Used by routers/index.ts (Composition Root) to fold billing's admin-facing
+// sub-routers into `admin.*` conditionally on `layers.features.billing`
+// (SPEC-0005) — without `@nuxfire/layer-admin` importing a feature layer.
+export const mergeRouters = t.mergeRouters;

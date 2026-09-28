@@ -2,6 +2,80 @@
   "billing": {
     "admin": {
       "plans": {
+        "form": {
+          "createTitle": "Nuevo plan",
+          "createDescription": "Crea un plan al que los clientes puedan suscribirse.",
+          "editTitle": "Editar {name}",
+          "editDescription": "Los cambios se aplican a todos los equipos que ya están en este plan.",
+          "name": { "label": "Nombre", "placeholder": "Pro" },
+          "tier": {
+            "label": "Nivel",
+            "help": "Texto libre, ej.: FREE o PRO.",
+            "placeholder": "PRO"
+          },
+          "description": {
+            "label": "Descripción",
+            "placeholder": "Todo lo que necesita un equipo en crecimiento"
+          },
+          "provider": {
+            "label": "Proveedor",
+            "help": "Déjalo vacío para un plan gratuito.",
+            "placeholder": "Selecciona un proveedor"
+          },
+          "period": {
+            "label": "Período",
+            "help": "Intervalo de facturación del interruptor en la página de facturación.",
+            "placeholder": "Selecciona un período"
+          },
+          "amount": {
+            "label": "Importe",
+            "help": "Se cobra en la moneda seleccionada, ej.: 179.90.",
+            "placeholder": "179.00"
+          },
+          "currency": { "label": "Moneda", "placeholder": "Selecciona una moneda" },
+          "stripePriceLabel": "Precio en Stripe:",
+          "stripePriceNote": "— cambiar el importe, la moneda o el período crea un nuevo Precio y archiva este.",
+          "price": { "label": "Precio", "placeholder": "$29" },
+          "providerPriceId": { "label": "ID de precio del proveedor", "placeholder": "price_..." },
+          "maxSeats": {
+            "label": "Asientos máximos",
+            "help": "Déjalo vacío para ilimitado.",
+            "placeholder": "Ilimitado"
+          },
+          "features": {
+            "heading": "Funciones y límites",
+            "subheading": "Campos extra y cuotas que se muestran en la tabla comparativa.",
+            "add": "Agregar función",
+            "namePlaceholder": "Nombre de la función (ej.: números de WhatsApp, almacenamiento)",
+            "valuePlaceholder": "Valor (ej.: 5, Ilimitado, true)",
+            "remove": "Quitar función",
+            "empty": "No se agregaron funciones personalizadas. Haz clic en \"Agregar función\" para configurar campos extra de este plan."
+          },
+          "preview": {
+            "label": "Vista previa",
+            "defaultName": "Nombre del plan",
+            "seatsUpTo": "Hasta {count} asientos",
+            "seatsUnlimited": "Asientos ilimitados",
+            "tier": "Nivel {tier}",
+            "tierDefault": "Personalizado",
+            "included": "Incluido"
+          },
+          "actions": { "cancel": "Cancelar", "save": "Guardar cambios", "create": "Crear plan" },
+          "validation": {
+            "required": "Obligatorio",
+            "stripeAmountRequired": "Obligatorio para un plan gestionado por Stripe",
+            "stripeCurrencyRequired": "Obligatorio para un plan gestionado por Stripe",
+            "maxSeatsInvalid": "Déjalo vacío para ilimitado, o ingresa un número entero mayor que cero"
+          },
+          "notify": {
+            "updatedTitle": "Plan actualizado",
+            "createdTitle": "Plan creado",
+            "savedBody": "{name} se guardó.",
+            "updateFailedTitle": "Error al actualizar el plan",
+            "createFailedTitle": "Error al crear el plan",
+            "genericError": "Algo salió mal"
+          }
+        },
         "buyerTeam": {
           "label": "Después de la compra",
           "help": "Dónde entra el comprador después de pagar este plan.",

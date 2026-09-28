@@ -34,7 +34,7 @@ description: Create, register, activate, and compose Nuxt Layers in the Nuxfire 
 - Layer without `app/` directory specifies `srcDir: "app"`.
 - Global middleware does not support cross-layer ordering; order-critical middleware resides in Composition Root. Layer plugins declare `dependsOn`.
 - Database schemas: add manual line in barrel via package specifier; never relative paths.
-- Deactivating a layer does not drop database tables.
+- Migration history is per-layer, never shared (SPEC-0006): a feature layer that owns tables gets its own `drizzle.config.ts`/`migrations/`, generated and applied from that layer's own directory. A feature never turned on never has its migration run — its tables never exist, not even empty. Deactivating an *already-active* feature does not retroactively drop its tables (that stays a separate, reviewed, destructive operation). See `$fireskill-specialist-drizzle`, `references/new-table-recipe.md`.
 - No independent infrastructure per layer (Durable Objects, queues, crons); share provisioned resources.
 - Multilingual i18n support across all 3 languages with matching keys (`bun run check:i18n`).
 - Never edit `.composition/*` files manually.
@@ -50,6 +50,8 @@ description: Create, register, activate, and compose Nuxt Layers in the Nuxfire 
 - Using relative imports from `layers/` inside `apps/functions`.
 - Moving domain logic back into `apps/app`.
 - Creating empty convenience layers lacking coherent domain models.
+- Generating a feature layer's migration from `apps/functions/` instead of the layer's own directory, or editing `apps/functions/drizzle.config.ts` to "add" a feature's schema — that config only ever globs `layers.core`.
+- Editing `infra/utils/nuxt.ts` to add a per-feature migration branch — its deploy loop already discovers any `layers.features` entry with a `migrations/` folder automatically.
 
 ## Validation
 

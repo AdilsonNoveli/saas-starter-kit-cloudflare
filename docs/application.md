@@ -12,13 +12,13 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/app/app/app.config.ts | — |
 | Pages | apps/app/app/app.vue | — |
 | Pages | apps/app/app/assets/css/main.css | — |
-| Components | apps/app/app/components/ConfirmDialog.vue | settle |
 | Components | apps/app/app/components/account/AccountUserDropdown.vue | — |
 | Components | apps/app/app/components/account/MfaRecoveryCodes.vue | download |
 | Components | apps/app/app/components/account/MfaRecoveryPanel.vue | loadRemaining, onSubmit |
 | Components | apps/app/app/components/account/MfaSetupModal.vue | startSetup, onSubmit, finishEnrolment, onRecoverySubmit, notifyFailure |
 | Components | apps/app/app/components/avatar/AvatarUploader.vue | triggerUpload, onFileChange |
 | Components | apps/app/app/components/background/BackgroundDots.vue | — |
+| Components | apps/app/app/components/ConfirmDialog.vue | settle |
 | Components | apps/app/app/components/layout/LayoutContentPage.vue | — |
 | Components | apps/app/app/components/layout/LayoutSection.vue | — |
 | Components | apps/app/app/components/loader/LoaderSpin.vue | — |
@@ -31,20 +31,20 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/app/app/composables/use-dashboard.ts | — |
 | Pages | apps/app/app/composables/use-notification.ts | ConfirmDialogOptions, ConfirmDialogRequest, useConfirmDialogState, useNotification |
 | Pages | apps/app/app/composables/use-trpc-client.ts | — |
-| Pages | apps/app/app/composables/useLayerNavigation.ts | useLayerNavigation |
+| Pages | apps/app/app/composables/useLayerNavigation.ts | useLayerNavigation, useLayerTeamSettingsTabs |
 | Pages | apps/app/app/error.vue | — |
 | Pages | apps/app/app/layouts/dashboard.vue | — |
 | Pages | apps/app/app/layouts/page.vue | — |
 | Pages | apps/app/app/middleware/0.auth.global.ts | — |
 | Pages | apps/app/app/middleware/1.teams.global.ts | — |
-| Pages | apps/app/app/pages/[...path].vue | — |
-| Pages | apps/app/app/pages/[[team]]/dashboard.vue | — |
 | Pages | apps/app/app/pages/account-settings/appearance.vue | — |
 | Pages | apps/app/app/pages/account-settings/index.vue | handleAvatarUpload, handleAvatarRemove, saveProfile, resetProfileForm |
 | Pages | apps/app/app/pages/account-settings/security.vue | of, goToChangePassword, onMfaEnrolled, onDisableMfa, onSignOutOthers, onDeleteAccount |
 | Pages | apps/app/app/pages/account-settings.vue | — |
 | Pages | apps/app/app/pages/buy/[planId].vue | startCheckout |
 | Pages | apps/app/app/pages/claim/[id].vue | onNameInput, claim |
+| Pages | apps/app/app/pages/[...path].vue | — |
+| Pages | apps/app/app/pages/[[team]]/dashboard.vue | — |
 | Pages | apps/app/app/plugins/authorization-resolver.ts | — |
 | Pages | apps/app/app/plugins/websockets.client.ts | — |
 | Pages | apps/app/app/utils/auth.ts | in |
@@ -75,7 +75,8 @@ Inventory: maps each observed file to its surface.
 | Routes and APIs | apps/app/server/trpc/context.ts | createContext |
 | Routes and APIs | apps/app/server/trpc/routers/.composition/layer-routers.ts | — |
 | Routes and APIs | apps/app/server/trpc/routers/account.ts | — |
-| Routes and APIs | apps/app/server/trpc/routers/index.ts | — |
+| Routes and APIs | apps/app/server/trpc/routers/admin-teams-billing.ts | buildAdminTeamsRouterWithBilling |
+| Routes and APIs | apps/app/server/trpc/routers/index.ts | buildAdminRouterWithBilling |
 | Routes and APIs | apps/app/server/trpc/routers/public.ts | — |
 | Routes and APIs | apps/app/server/trpc/trpc.ts | is, allow, deny, auth |
 | Pages | apps/app/server/utils/audit-log.ts | AuditLogEntry, recordAuditLog |
@@ -117,7 +118,6 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/login/app/app.config.ts | — |
 | Pages | apps/login/app/app.vue | — |
 | Components | apps/login/app/components/AuthAgreement.vue | — |
-| Components | apps/login/app/components/AuthIcon.vue | — |
 | Components | apps/login/app/components/AuthLayout.vue | — |
 | Components | apps/login/app/components/AuthSocialLogin.vue | handleSocialSignIn |
 | Pages | apps/login/app/composables/useNotification.ts | useNotification |
@@ -131,9 +131,7 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/web/app/app.config.ts | — |
 | Pages | apps/web/app/app.vue | — |
 | Pages | apps/web/app/assets/css/main.css | — |
-| Components | apps/web/app/components/CTAButton.vue | Props |
 | Components | apps/web/app/components/background/BackgroundDots.vue | — |
-| Components | apps/web/app/components/color-mode/ColorModeDropdown.vue | — |
 | Components | apps/web/app/components/color-mode/ColorModeSwitch.vue | — |
 | Components | apps/web/app/components/content/Center.vue | — |
 | Components | apps/web/app/components/content/CodeCopy.vue | handleCopy |
@@ -162,6 +160,7 @@ Inventory: maps each observed file to its surface.
 | Components | apps/web/app/components/content/ProseThead.vue | — |
 | Components | apps/web/app/components/content/ProseTr.vue | — |
 | Components | apps/web/app/components/content/ProseUl.vue | — |
+| Components | apps/web/app/components/CTAButton.vue | Props |
 | Components | apps/web/app/components/folder-tree/FolderTree.global.vue | — |
 | Components | apps/web/app/components/folder-tree/FolderTreeItem.vue | FolderTreeNode, FolderTreeItemProps, toggleExpand, getFileIcon |
 | Components | apps/web/app/components/landing/LandingAudience.vue | — |
@@ -171,7 +170,6 @@ Inventory: maps each observed file to its surface.
 | Components | apps/web/app/components/landing/LandingOutcomes.vue | — |
 | Components | apps/web/app/components/landing/LandingProblem.vue | — |
 | Components | apps/web/app/components/landing/LandingProof.vue | — |
-| Components | apps/web/app/components/layout/LayoutBanner.vue | — |
 | Components | apps/web/app/components/layout/LayoutContentPage.vue | isBlogPost |
 | Components | apps/web/app/components/layout/LayoutFooter.vue | — |
 | Components | apps/web/app/components/layout/LayoutSection.vue | — |
@@ -186,15 +184,15 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/web/app/composables/use-content-seo.ts | useSeoContext, useDefaultSocialMeta, useArticleSeo, usePageSeo |
 | Pages | apps/web/app/composables/use-docs-locale.ts | docsCollectionFor, queryDocsPage, queryDocsNavigation |
 | Pages | apps/web/app/composables/use-notification.ts | useNotification |
-| Pages | apps/web/app/composables/use-offer.ts | LAUNCH_OPEN, INTL, useOffer |
+| Pages | apps/web/app/composables/use-offer.ts | LAUNCH_OPEN, INTL, PublicOfferPlan, useOffer |
 | Pages | apps/web/app/composables/use-page.ts | — |
 | Pages | apps/web/app/composables/use-scrollspy.ts | useScrollspy |
 | Pages | apps/web/app/error.vue | — |
 | Pages | apps/web/app/layouts/default.vue | — |
 | Pages | apps/web/app/layouts/docs.vue | — |
 | Pages | apps/web/app/layouts/page.vue | — |
-| Pages | apps/web/app/pages/blog/[...slug].vue | — |
 | Pages | apps/web/app/pages/blog/index.vue | — |
+| Pages | apps/web/app/pages/blog/[...slug].vue | — |
 | Pages | apps/web/app/pages/index.vue | — |
 | Pages | apps/web/app/pages/license.vue | — |
 | Pages | apps/web/app/pages/privacy-policy.vue | — |
@@ -217,6 +215,7 @@ Inventory: maps each observed file to its surface.
 | Other sources | apps/web/i18n/supported-locales.ts | CONTENT_LOCALES, CONTENT_LANGS |
 | Other sources | apps/web/nuxt.config.ts | docsRoutes, walk, blogRoutes |
 | Other sources | apps/web/public/crisp.js | — |
+| Routes and APIs | apps/web/server/api/offer.get.ts | PublicOfferPlan |
 | Other sources | apps/web/server/plugins/sitemap-blog.ts | to |
 | Other sources | apps/web/site.ts | SITE_URL, DEFAULT_OG_IMAGE |
 | Other sources | apps/web/sst-env.d.ts | — |
@@ -245,8 +244,8 @@ Inventory: maps each observed file to its surface.
 | Pages | layers/admin/app/layouts/admin.vue | onMfaVerified |
 | Pages | layers/admin/app/middleware/admin.ts | — |
 | Pages | layers/admin/app/pages/admin/audit-log.vue | UAvatar, UBadge, UButton, UTooltip, describeMetadata, sortableHeader |
-| Pages | layers/admin/app/pages/admin/companies/[id].vue | — |
 | Pages | layers/admin/app/pages/admin/companies/index.vue | UAvatar, UBadge, UButton, UCheckbox, UDropdownMenu, getRowItems, sortableHeader |
+| Pages | layers/admin/app/pages/admin/companies/[id].vue | — |
 | Pages | layers/admin/app/pages/admin/index.vue | UBadge, formatDate |
 | Pages | layers/admin/app/pages/admin/queue/index.vue | UBadge, UButton, UCheckbox, UDropdownMenu, UTooltip, refreshAll, JOB_STATUSES, describeMessage |
 | Other sources | layers/admin/layer.manifest.ts | — |
@@ -259,4 +258,5 @@ Inventory: maps each observed file to its surface.
 | Other sources | layers/admin/server/database/schema.ts | — |
 | Routes and APIs | layers/admin/server/trpc/admin-audit-log.ts | — |
 | Routes and APIs | layers/admin/server/trpc/admin-queue.ts | CRON_JOB_ID, readJobId |
+| Routes and APIs | layers/admin/server/trpc/admin-teams.ts | AdminTeamSubscription, setTeamStatus |
 <!-- specsfy:documentator:end -->

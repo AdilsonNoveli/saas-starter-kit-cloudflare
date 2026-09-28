@@ -143,9 +143,21 @@ Authentication providers only activate if credentials exist: the `Auth` Worker a
    resolves a new version, update patch keys accordingly (Bun matches exact versions
    and silently skips unkeyed patches).
 10. **Deployments run migrations and seeds** for the `App` (`infra/utils/nuxt.ts`):
-    `bunx drizzle-kit migrate` and `bun run src/database/seed/index.ts` run directly
-    against Postgres using `Database*` secrets. The workstation executing deployments
-    must have network reachability to the database host (IPv6/IPv4).
+    one `bun run scripts/run-migrations.mjs` `command.local.Command` for the base
+    history (`apps/functions`), then one more per **active** feature layer with a
+    `migrations/` folder (`config.ts`'s `layers.features`, e.g. `kanban`,
+    `billing`), each its own command chained via `dependsOn` — base first, then
+    features in `Object.entries` order — before `bun run src/database/seed/index.ts`
+    (SPEC-0006, 2026-09-28; see `$fireskill-specialist-drizzle` and
+    `apps/functions/src/database/MIGRATIONS.md`). **Never `bunx drizzle-kit
+    migrate`**: its interactive spinner CLI crashes with a bare `exit status 1`
+    and no further output when `command.local.Command` spawns it (no TTY) —
+    reproduced on a real deploy, twice, at the identical point, even against an
+    already-correctly-migrated database. `run-migrations.mjs` calls
+    `drizzle-orm`'s own `migrate()` directly (same engine, no spinner) and
+    surfaces the real Postgres error on failure. All of them run directly
+    against Postgres using `Database*` secrets. The workstation executing
+    deployments must have network reachability to the database host (IPv6/IPv4).
 11. **Nothing locally executed substitutes for `sst deploy`** when `apps/functions`
     imports from `layers/` (see `$fireskill-specialist-drizzle`): require a live deployment
     or `bunx esbuild <handler> --bundle --platform=node` for each `handler:` in `infra/*.ts`.

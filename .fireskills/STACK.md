@@ -31,6 +31,7 @@ Technical details for each item live in the corresponding specialist (`fireskill
 
 - **Runtime**: Cloudflare Workers via SST, no `wrangler.toml`, no Docker, no Linux server.
 - **Database**: PostgreSQL via Hyperdrive with Drizzle (see `.fireskills/DATABASE.md`). Not `hubDatabase()` nor Prisma.
+- **Migrations (SPEC-0006)**: three independent Drizzle Kit histories, not one. `drizzle-kit` is a `devDependency` of `apps/functions` (base, `layers.core`) **and** of every feature layer that owns tables (`layers/kanban`, `layers/billing`), each with its own `drizzle.config.ts`, `migrations/` folder, and tracking table (`drizzle.__drizzle_migrations[_<layer>]`). Applied by separate `drizzle-kit migrate` invocations in `infra/utils/nuxt.ts`, gated on `config.ts`'s `layers.features` — a feature turned off never runs its migration, so its tables never reach that database. See `apps/functions/src/database/MIGRATIONS.md` and `fireskill-specialist-drizzle`.
 - **Authentication**: OpenAuth.js in dedicated Worker (`PasswordProvider` + `CodeProvider`, plus GitHub and Google when credentials exist). Not NextAuth/Lucia/Clerk.
 - **Authorization**: `nuxt-authorization` (Bouncer style, `defineAbility`); not CASL.
 - **KV and cache**: NuxtHub's `hubKV()`/`hubCache()`.

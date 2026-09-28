@@ -91,3 +91,7 @@
 | npm | development | @types/nodemailer | ^8.0.1 | TypeScript definitions for nodemailer | https://github.com/DefinitelyTyped/DefinitelyTyped |
 | npm | peer | @aws-sdk/client-sesv2 | ^3.997.0 | AWS SDK for JavaScript Sesv2 Client for Node.js, Browser and React Native | https://github.com/aws/aws-sdk-js-v3 |
 <!-- specsfy:documentator:end -->
+
+## Provenance Notes
+
+- **SPEC-0006 (2026-09-28):** `layers/kanban/package.json` and `layers/billing/package.json` each gained `drizzle-kit ^0.31.10` as a direct `devDependency` (own `drizzle.config.ts`, own migration history — see `.fireskills/STACK.md`). No new distinct row above: same package/version already inventoried for `apps/functions`, workspace-deduplicated by `$fireskill-documentator`. `bun install` run; `bun.lock` updated.

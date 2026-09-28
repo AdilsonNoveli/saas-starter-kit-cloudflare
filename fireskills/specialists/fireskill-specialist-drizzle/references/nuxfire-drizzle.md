@@ -27,12 +27,32 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
 - Every consumer imports `@nuxfire/functions/schema` and sees a flattened module.
   Inside the app, `useDB()` and `tables` originate from `apps/app/server/utils/db.ts`
   (`export const tables = schema`; re-exports `sql, eq, ne, and, or, count`).
-- `drizzle.config.ts` reads `./src/database/core-schema.ts` **and**
-  `../../layers/*/server/database/schema.ts` (glob pattern); new layers enter
-  migrations automatically, but the **barrel file** requires an explicit import line.
-- Barrel imports are **unconditional**: disabling a feature layer in `config.ts`
-  strips pages and components from the client bundle, but **does not** drop tables
-  or client database types ("disabled" ≠ "dropped"; preserving orphan data is intentional).
+- `apps/functions/drizzle.config.ts` reads `./src/database/core-schema.ts`
+  **and only `layers.core`'s** `server/database/schema.ts` files (SPEC-0006,
+  2026-09-28) — this is the **base** migration history and it never sees a
+  feature layer's schema at all, active or not. Each feature layer that owns
+  tables (`layers/kanban`, `layers/billing`) has its **own**
+  `layers/<name>/drizzle.config.ts`, schema'd to that layer's
+  `server/database/schema.ts` alone, generating into its **own**
+  `layers/<name>/migrations/` with its **own** tracking table
+  (`drizzle.__drizzle_migrations_<name>`, via that config's
+  `migrations: {table, schema}`) — three fully independent histories, not
+  one gated array. `config.ts`'s `layers.features` gates **which of these
+  histories are applied at deploy time** (`infra/utils/nuxt.ts`), not what
+  a single `drizzle-kit generate` includes. New layers still enter runtime
+  automatically once listed in `config.ts`; the **barrel file** (`schema.ts`)
+  still requires its own explicit `export *` line, unrelated to any of this.
+- The **barrel file**'s imports stay **unconditional** on purpose — it only
+  feeds the runtime typed client, at no query cost, since a disabled layer's
+  tRPC router is never mounted (`scripts/compose-layers.ts`) **and** its
+  migration history is never applied (`infra/utils/nuxt.ts` skips it). A
+  feature turned off in `config.ts` never runs a migration for its
+  history at all — its tables never exist in that installation's database,
+  not even empty; this replaced the earlier (2026-09-27) design where a
+  disabled feature's tables stayed forever in the shared base history once
+  created. See `apps/functions/src/database/MIGRATIONS.md` for the one-time
+  split technique ("snapshot surgery") and the bootstrap procedure required
+  for any environment that already had tables in the old shared history.
 - **Package specifier, never a relative path**, in the barrel and `core-schema.ts`:
   `export * from "@nuxfire/layer-kanban/server/database/schema";`.
   Relative paths (`../../../../layers/...`) pass `tsc`, `vitest`, `drizzle-kit`,
@@ -91,14 +111,45 @@ a column attribute was unintentionally altered.
 
 ## 5. Migrations
 
-- Consolidated baseline at `apps/functions/src/database/migrations/0000_init.sql`
-  (2026-09-16); `meta/_journal.json` contains one entry.
-- **Generate** (from `apps/functions`), providing credentials via environment variables:
-  `DATABASE_HOST=… DATABASE_PORT=5432 DATABASE_USER=… DATABASE_PASSWORD=… DATABASE_NAME=… bunx drizzle-kit generate`
-  (`generate-migrations` script in `package.json`). **Inspect generated SQL**: drizzle-kit
-  cannot distinguish renames from drop + add operations.
-- **Apply**: runs automatically on every `App` deployment — `drizzle-kit migrate`
-  inside a `command.local.Command` (`infra/utils/nuxt.ts`), using `Database*` secrets.
+- **Three independent histories** (SPEC-0006, 2026-09-28), each with its own
+  config, folder, and tracking table:
+
+  | History | Config | Folder | Tracking table |
+  |---|---|---|---|
+  | Base (`layers.core`) | `apps/functions/drizzle.config.ts` | `apps/functions/src/database/migrations/` | `drizzle.__drizzle_migrations` |
+  | Kanban | `layers/kanban/drizzle.config.ts` | `layers/kanban/migrations/` | `drizzle.__drizzle_migrations_kanban` |
+  | Billing | `layers/billing/drizzle.config.ts` | `layers/billing/migrations/` | `drizzle.__drizzle_migrations_billing` |
+
+  Base baseline consolidated at `0000_init.sql` (2026-09-16, then again on
+  2026-09-28 — see `MIGRATIONS.md`'s "base consolidation" note — to contain
+  `layers.core` tables only, deleting and regenerating from scratch rather
+  than narrowing in place, safe only because this is a SaaS kit forked fresh
+  by third parties, not a single app with data that can't be reset). Each
+  feature history has its own fresh initial migration,
+  named after the layer rather than drizzle-kit's default `init`
+  (`layers/kanban/migrations/0000_kanban.sql`,
+  `layers/billing/migrations/0000_billing.sql`) so a flat listing shows which
+  history a file belongs to at a glance — the filename only locates the file
+  on disk (`meta/_journal.json`'s `tag`), never affects the applied-migration
+  hash (`sha256` of file content). Generated from that layer's schema alone;
+  a feature table can FK a base table by name (`"Team"`) but never the
+  reverse (enforced by `scripts/layer-dependency-direction.test.ts`).
+- **Generate** (from the owning directory — `apps/functions`, or
+  `layers/kanban`/`layers/billing`), providing credentials via environment
+  variables: `DATABASE_HOST=… DATABASE_PORT=5432 DATABASE_USER=… DATABASE_PASSWORD=… DATABASE_NAME=… bunx drizzle-kit generate`
+  (`generate-migrations` script in each `package.json`). **Inspect generated
+  SQL**: drizzle-kit cannot distinguish renames from drop + add operations.
+- **Apply**: runs automatically on every `App` deployment, base first, then
+  each **active** feature's history in turn, before the seed step — via
+  `scripts/run-migrations.mjs <folder> <table> <schema>`, each its own
+  `command.local.Command` chained via `dependsOn` (`infra/utils/nuxt.ts`),
+  using `Database*` secrets. **Never `bunx drizzle-kit migrate`**: its
+  interactive spinner CLI crashes with a bare `exit status 1` when spawned
+  without a TTY, exactly how `command.local.Command` runs it (reproduced on
+  a real deploy). `run-migrations.mjs` calls `drizzle-orm`'s own `migrate()`
+  directly — same engine, no spinner, and reports the real Postgres error on
+  failure. A feature that is `false` in `config.ts`, or has no
+  `migrations/` folder yet, is skipped entirely — no command runs for it.
   Never run manual migrations on shared staging databases.
 - **No down-migrations.** Rollback follows expand/contract patterns
   (`apps/functions/src/database/MIGRATIONS.md`): additive changes remain in place;
@@ -107,6 +158,15 @@ a column attribute was unintentionally altered.
   Production issues are remediated by rolling forward.
 - Any environment that applied previous migration history (`0000`–`0009`) requires
   its `public`/`drizzle` schemas reset prior to the next `migrate` run.
+- Any environment with data predating the SPEC-0006 split (kanban/billing
+  tables already created by the old shared base history) needs a one-time
+  bootstrap — `scripts/print-migration-bootstrap.mjs <migrationsFolder>
+  <table>` prints (never executes) the `INSERT`s that mark each feature's
+  initial migration (`0000_kanban.sql`/`0000_billing.sql`) already-applied
+  in its new tracking table, matching drizzle-orm's own hash/timestamp
+  algorithm exactly. Apply by hand before
+  that environment's next deploy. A brand-new environment needs no
+  bootstrap: all three histories just run fresh, in order.
 - Create automated database snapshots prior to any migration altering populated columns.
 
 ## 6. Seed Data and Manual Utility Scripts

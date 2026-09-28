@@ -25,13 +25,13 @@ description: Model and modify schemas, relations, migrations, and seeds with Dri
 - Source schemas are `core-schema.ts` (platform/non-domain) + per-layer `schema.ts`; `apps/functions/src/database/schema.ts` is an aggregate **barrel** importing each layer **exclusively by package specifier** (`@nuxfire/layer-<x>/…`), never relative paths.
 - Inside a domain layer, import tables directly from their **owning file**, never from the aggregator barrel `@nuxfire/functions/schema`.
 - Inter-file foreign key references must live **strictly inside callbacks** (`.references(() => t.id)`, `relations(t, ({ one }) => …)`); never evaluate imported table bindings at top-level module scope (prevents TDZ).
-- There are exactly three deliberate schema dependency cycles (core<->teams, teams<->billing, core<->notifications). Do not introduce a fourth without necessity; `notifications` uses `relations()` without physical FK constraint.
+- There are exactly two deliberate schema dependency cycles (core<->teams, core<->notifications). `teams<->billing` used to be the third; SPEC-0005 broke it one-directional (billing->teams only — `Team.planId` has no FK/relation back to `Plan`, since a base layer must never import a feature layer). Do not introduce a fourth cycle without necessity; `notifications` uses `relations()` without physical FK constraint.
 - Never rename existing columns or "normalize" existing `camelCase`/`snake_case` column identifiers: triggers destructive data migrations.
 - State fields that expand over time use `text` with default value, not `pgEnum`.
 - Tenant-scoped tables include `teamId` and all queries filter by it.
-- Migrations: generate inside `apps/functions` with `DATABASE_*` credentials in environment; apply **exclusively** during deployment (`drizzle-kit migrate` in `infra/utils/nuxt.ts`). No automated rollbacks: use expand/contract patterns.
+- Migrations (SPEC-0006): three independent histories — base (`apps/functions`, `layers.core` only) plus one per feature layer that owns tables (`layers/kanban`, `layers/billing`), each its own `drizzle.config.ts`/`migrations/`/tracking table. Generate (`drizzle-kit generate`, interactive, human-run only) inside the owning directory with `DATABASE_*` credentials in environment; apply **exclusively** during deployment via `scripts/run-migrations.mjs` (never `bunx drizzle-kit migrate` — its spinner CLI crashes without a TTY, which is how `command.local.Command` always runs it), one per history, base first then each active feature (`infra/utils/nuxt.ts`). No automated rollbacks: use expand/contract patterns.
 - Deployment seed is idempotent and creates only Free tier plans and system roles; admin assignment is explicit (`grant-platform-admin.ts`), never automatic.
-- Deactivating a layer in `config.ts` preserves existing database tables.
+- A feature that is `false` in `config.ts` **never runs its migration history at all** — its tables never exist in that installation's database (SPEC-0006). This is a deploy-time skip, not a schema diff: flipping an already-active feature off does not retroactively drop its tables — nothing diffs the independent histories against each other; the tables simply stop being migrated or seeded.
 - Moving `pgTable` definitions between files produces zero migration diffs; if a diff appears, schema was unintentionally mutated.
 - PostgreSQL error code `23505` indicates unique key constraint violation.
 
@@ -41,8 +41,9 @@ description: Model and modify schemas, relations, migrations, and seeds with Dri
 - Importing `@nuxfire/functions/schema` from inside a layer schema (circular loop through aggregator).
 - Accessing `teams`, `users`, or `plans` at top-level module scope across cyclic dependencies.
 - Adding physical foreign key constraints to complete the `notifications` cycle.
-- Editing `0000_init.sql` or `meta/*` by hand; applying manual ad-hoc migrations on shared stages.
+- Editing `0000_init.sql` or `meta/*` by hand; applying manual ad-hoc migrations on shared stages. Two documented exceptions, both empirically verified before/after, never repeated without the same rigor — see `apps/functions/src/database/MIGRATIONS.md`: (1) the one-time "snapshot surgery" that created the SPEC-0006 split (hand-removing table entries from a `meta/*_snapshot.json` with **zero** new SQL); (2) the full base consolidation (delete + regenerate `0000_init.sql` from scratch), safe **only** when the environment can be reset — this project is a SaaS kit forked fresh by third parties, not a single app with data that must survive.
 - Dropping a column/table and removing consumer code in the **same deployment**.
+- Using `bunx drizzle-kit migrate` (its CLI) anywhere in the deploy pipeline (`infra/utils/nuxt.ts`, or any `command.local.Command`): its spinner UI crashes without a TTY, reproduced on a real deploy. Use `scripts/run-migrations.mjs` there instead — `drizzle-kit migrate`'s CLI is fine for a human running it interactively at a real terminal, never for an automated, non-TTY pipeline.
 - Attaching admin creation or hardcoded passwords to deploy seeds.
 - Caching Drizzle or postgres.js clients in module-level global variables.
 - Deleting `User` rows without clearing both `AuthKV` session keys.

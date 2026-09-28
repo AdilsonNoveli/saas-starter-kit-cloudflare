@@ -5,12 +5,21 @@
 
 | File |
 | --- |
-| apps/functions/src/database/MIGRATIONS.md |
-| apps/functions/src/database/migrations/0000_init.sql |
-| apps/functions/src/database/migrations/0001_pending_purchase.sql |
-| apps/functions/src/database/migrations/meta/0000_snapshot.json |
-| apps/functions/src/database/migrations/meta/0001_snapshot.json |
-| apps/functions/src/database/migrations/meta/_journal.json |
+| apps\functions\src\database\migrations\0000_init.sql |
+| apps\functions\src\database\migrations\meta\0000_snapshot.json |
+| apps\functions\src\database\migrations\meta\_journal.json |
+| apps\functions\src\database\MIGRATIONS.md |
+| layers\billing\migrations\0000_billing.sql |
+| layers\billing\migrations\meta\0000_snapshot.json |
+| layers\billing\migrations\meta\_journal.json |
+| layers\kanban\migrations\0000_kanban.sql |
+| layers\kanban\migrations\meta\0000_snapshot.json |
+| layers\kanban\migrations\meta\_journal.json |
+| scripts\print-migration-bootstrap.mjs |
+| scripts\print-migration-bootstrap.test.ts |
+| scripts\run-migrations.mjs |
+| specs\review\0005-desacoplar-billing-da-base-team-sem-plan-obrigatorio-e-migrations-por-base-feature\spec.md |
+| specs\review\0006-migrations-base-feature-historicos-independentes\spec.md |
 | No confirmed structure beyond listed sources. |
 
 ```mermaid

@@ -5,8 +5,11 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
 ## 1. Architecture Model
 
 - Business domains reside in `layers/<name>/` (`layers/*` workspace), package
-  `@nuxfire/layer-<name>`. Existing today: **core** `teams`, `billing`,
-  `notifications`, `admin`; **feature** `kanban` (`config.ts`).
+  `@nuxfire/layer-<name>`. Existing today: **core** `teams`, `notifications`,
+  `admin`; **feature** `kanban`, `billing` (`config.ts`). `billing` moved from
+  core to feature in SPEC-0005, once `layers/teams` stopped importing it (a
+  base layer must never import a feature layer, enforced by
+  `scripts/layer-dependency-direction.test.ts`).
 - `apps/app` is the **Composition Root**: application shell (dashboard, account),
   tRPC composition, `nuxt.config.ts`, and core infrastructure
   (`server/utils/{db,auth,audit-log,mfa-crypto,rate-limit,ws-ticket,user-mfa*}.ts`,
@@ -20,8 +23,8 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
 
 ```ts
 export const layers = {
-  core: ["teams", "billing", "notifications", "admin"] as string[],
-  features: { kanban: true } satisfies Record<string, boolean>,
+  core: ["teams", "notifications", "admin"] as string[],
+  features: { kanban: true, billing: true } as const,
 };
 ```
 
@@ -142,8 +145,22 @@ it must be a literal string matching the directory name.
 - Per-layer infrastructure (Durable Objects, queues, crons) is **out of scope**: layers
   consume shared infrastructure (Postgres/Hyperdrive, KV, R2). Manifests omit
   `infrastructure` fields.
-- Disabling a feature layer **does not drop tables** or strip Drizzle client types:
-  "disabled" = omitted from UI.
+- Disabling a feature layer does **not** strip its Drizzle client types (barrel imports
+  stay unconditional, at no cost — its tRPC router is never mounted, so nothing queries
+  those tables). A feature layer that owns tables (`kanban`, `billing`) also owns its
+  **own** independent migration history (`layers/<name>/drizzle.config.ts`,
+  `layers/<name>/migrations/`, own tracking table) — separate from the base history,
+  which only ever sees `layers.core` (SPEC-0006, 2026-09-28, replacing the 2026-09-27
+  design where a feature's tables lived in the shared base history and were merely
+  excluded from its *next* migration). `config.ts`'s `layers.features` gates whether
+  that history's migration (`scripts/run-migrations.mjs`, never `drizzle-kit migrate`'s
+  own CLI — see `fireskill-specialist-drizzle`) runs at deploy time at all
+  (`infra/utils/nuxt.ts`) — "disabled" = omitted from UI **and** its migration never
+  applied, so a feature never turned on never has tables in that database, not even
+  empty. Flipping an already-active feature off does **not** retroactively drop its
+  tables (nothing diffs the independent histories against each other); its data is
+  simply no longer migrated or seeded going forward. See `fireskill-specialist-drizzle`
+  and `apps/functions/src/database/MIGRATIONS.md`.
 
 ## 7. Navigation, Permissions, and Localization
 

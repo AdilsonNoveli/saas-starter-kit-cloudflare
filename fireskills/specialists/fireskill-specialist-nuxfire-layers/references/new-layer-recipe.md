@@ -22,7 +22,23 @@ the code supersedes this document.
 5. **Database Schema** (if tables exist) — `server/database/schema.ts`; add import line to barrel
    `apps/functions/src/database/schema.ts` via **package specifier**; add
    `@nuxfire/layer-<name>: workspace:*` to `apps/functions/package.json`; run `bun install`.
-   See `$fireskill-specialist-drizzle`.
+   **If this is a feature layer (step 10: `layers.features`), it also needs its
+   own, completely independent migration history — not a line added
+   anywhere shared.** Create `layers/<name>/drizzle.config.ts` (copy
+   `layers/kanban/drizzle.config.ts`, set `migrations.table:
+   "__drizzle_migrations_<name>"`), add `drizzle-kit` devDependency +
+   `generate-migrations` script to `layers/<name>/package.json`, then
+   generate the first migration **from `layers/<name>/`** — never from
+   `apps/functions/`, and never by editing `apps/functions/drizzle.config.ts`
+   to "add" the new layer's schema; that file only ever globs `layers.core`.
+   `infra/utils/nuxt.ts`'s deploy loop discovers the new `migrations/` folder
+   automatically once `layers.features.<name>` is `true` — no code change
+   there. Full recipe, exact naming convention, and the two documented
+   exceptions for hand-editing an already-applied migration:
+   `$fireskill-specialist-drizzle`, `references/new-table-recipe.md`
+   ("Adding a New Feature Layer That Owns Tables"). A **core** layer
+   (`layers.core`) needs none of this — its schema folds into the base's
+   next generated migration automatically.
 6. **tRPC Routing** (if endpoints exist) — `server/trpc/router.ts` exporting
    `routers = { <key>: <router> } satisfies Record<string, AnyRouter>`. See `$fireskill-specialist-trpc`.
 7. **Frontend Views** — `app/pages/[[team]]/<name>/…`, components named `<Name>*.vue`
@@ -33,7 +49,9 @@ the code supersedes this document.
 9. **Test Suites** — `vitest.config.ts` and `vitest.setup.ts` (replicated from `kanban`);
    no configuration needed in the root aggregator.
 10. **Enable Layer** — `config.ts`: `layers.core` (always active) or `layers.features`
-    (`<name>: true`, toggleable).
+    (`<name>: true`, toggleable). Decide this **before** step 5's database
+    schema setup — it determines whether the layer gets its own migration
+    history at all.
 11. Run `bun install` so Bun creates workspace symlinks.
 
 ## Verification (Never Rely Solely on "typecheck passed")
@@ -65,3 +83,5 @@ the code supersedes this document.
 | `Could not resolve …/layers/…` during deploy | Relative path used in schema barrel file |
 | Unexpected post-login redirect | Global middleware moved from `apps/app` into a layer |
 | `bun install` reports cyclic dependencies | Informational only: `teams` ⇄ `billing` is an expected workspace cycle |
+| New feature layer's tables never appear in the base migration, even active | Correct — a feature layer's tables live only in its own `layers/<name>/migrations/`, never the base's; generate from `layers/<name>/`, not `apps/functions/` |
+| `drizzle-kit migrate` (its CLI) exits 1 with no output during `sst deploy` | Never call it directly in the deploy pipeline — its spinner UI crashes without a TTY. Use `scripts/run-migrations.mjs`; see `$fireskill-specialist-sst` |

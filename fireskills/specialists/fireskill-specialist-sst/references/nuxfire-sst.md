@@ -145,7 +145,8 @@ Authentication providers only activate if credentials exist: the `Auth` Worker a
 10. **Deployments run migrations and seeds** for the `App` (`infra/utils/nuxt.ts`):
     one `bun run scripts/run-migrations.mjs` `command.local.Command` for the base
     history (`apps/functions`), then one more for every `layers.core` layer with
-    its own `migrations/` folder (unconditional — `admin`, `notifications`),
+    its own `migrations/` folder (unconditional — `admin`, `notifications`,
+    `teams`),
     then one more per **active** `layers.features` layer with a `migrations/`
     folder (gated, e.g. `kanban`, `billing`), each its own command chained via
     `dependsOn` — base first, then core histories, then active feature

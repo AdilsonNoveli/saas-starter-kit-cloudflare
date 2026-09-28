@@ -6,6 +6,7 @@ import {
   timestamp,
   primaryKey,
   unique,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
@@ -13,17 +14,16 @@ import { createId as cuid } from "@paralleldrive/cuid2";
 // barrel re-exports this very file, so importing it from here would loop
 // through the aggregator. Layers only ever depend on the core tables directly.
 //
-// This import and `core-schema`'s own `import { teams } from
-// "@nuxfire/layer-teams/server/database/schema"` form a real, deliberate
-// two-file cycle: `Job`/`DeadLetterRecord` stay in core and hold FKs to
-// `Team`, while `TeamMembership`/`TeamInvite` live here and hold FKs to
-// `User`. It is safe because Drizzle takes *callbacks* everywhere a table
-// crosses the boundary — `.references(() => users.id)` and
-// `relations(t, ({ one }) => ...)` — so neither module dereferences the other's
-// exports while it is still evaluating. Nothing below may read an imported
-// binding at module top level; keep every cross-file reference inside a
-// callback or the cycle turns into a TDZ crash at import time.
-import { jobs, users } from "@nuxfire/functions/database/core-schema";
+// `Job`/`DeadLetterRecord` moved into this file (SPEC-0006, teams migration
+// split, 2026-09-28) — they used to live in core-schema.ts and hold FKs back
+// to `Team`, which was the second half of a bidirectional cycle with this
+// file's own `TeamInvite.invitedById` → `User`. Now only `users` crosses the
+// boundary (teams → base, one-directional), which is what let this layer get
+// its own `drizzle.config.ts`. `core-schema.ts` still imports `jobs` back
+// from here, but only for `logRelations`, a relation with no physical FK
+// (same shape as its existing `notifications` import) — not a cycle a
+// migration needs to order.
+import { users, logs } from "@nuxfire/functions/database/core-schema";
 
 export const teams = pgTable("Team", {
   id: text("id")
@@ -223,3 +223,72 @@ export const permissionsRelations = relations(permissions, ({ one }) => ({
     references: [roles.id],
   }),
 }));
+
+// Moved from apps/functions/src/database/core-schema.ts (SPEC-0006, teams
+// migration split, 2026-09-28) — see the comment at the top of this file.
+// Async-job-processing infrastructure, but always tenant-scoped (`teamId`
+// required on both), which is what made it belong here rather than in base.
+export const jobs = pgTable("Job", {
+  id: text("id")
+    .$default(() => cuid())
+    .primaryKey()
+    .notNull(),
+  message: text("message").notNull(),
+  status: text("status").notNull().default("pending"), // pending, processing, completed, failed
+  teamId: text("teamId")
+    .notNull()
+    .references(() => teams.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`)
+    .$onUpdate(() => new Date()),
+});
+
+export const jobRelations = relations(jobs, ({ one, many }) => ({
+  team: one(teams, {
+    fields: [jobs.teamId],
+    references: [teams.id],
+  }),
+  logs: many(logs),
+}));
+
+// What lands in the JobDLQ after JobQueue exhausts its retries. Written only
+// by apps/functions/src/dlq-consumer.ts, read only by the platform-admin
+// queue module (layers/admin/server/trpc/admin-queue.ts) — the point is
+// operator visibility for messages that would otherwise exist nowhere but
+// the Cloudflare dashboard.
+export const deadLetterRecords = pgTable("DeadLetterRecord", {
+  id: text("id")
+    .$default(() => cuid())
+    .primaryKey()
+    .notNull(),
+  // The original Job object the queue delivered, kept whole: this is exactly
+  // what `admin.queue.replayDeadLetter` sends back to JobQueue, so it has to
+  // match the shape jobs-consumer.ts expects.
+  message: jsonb("message").notNull(),
+  error: text("error").notNull(),
+  // Nullable: the team comes from the message itself, and the table still has
+  // to accept a malformed message with no resolvable team rather than losing
+  // the record entirely.
+  teamId: text("teamId").references(() => teams.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`now()`),
+  // null = never replayed. Set once and never cleared — the trace that a
+  // message was already reprocessed is worth more than a reusable row (same
+  // soft-state pattern as `revokedAt`/`isArchived` above).
+  replayedAt: timestamp("replayedAt", { withTimezone: true }),
+});
+
+export const deadLetterRecordRelations = relations(
+  deadLetterRecords,
+  ({ one }) => ({
+    team: one(teams, {
+      fields: [deadLetterRecords.teamId],
+      references: [teams.id],
+    }),
+  }),
+);

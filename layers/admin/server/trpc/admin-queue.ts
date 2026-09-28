@@ -6,11 +6,12 @@ import { z } from "zod";
 import { platformAdminProcedure, router } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";
 import { recordAuditLog } from "~~/server/utils/audit-log";
-// `Job`, `Log` and `DeadLetterRecord` stay in apps/functions core-schema and
-// did NOT move with this router: they are generic async-job-processing
+// `Job` and `DeadLetterRecord` live in layers/teams (SPEC-0006, teams
+// migration split, 2026-09-28) and `Log` in apps/functions core-schema — none
+// of the three moved with this router: they are generic async-job-processing
 // infrastructure, written by src/jobs-consumer.ts and src/dlq-consumer.ts, not
-// admin-domain data. This module only reads them — same reasoning that kept
-// them in core through every prior extraction.
+// admin-domain data. This module only reads them, via the barrel, which is
+// why the import below is unaffected by where each table actually lives.
 import {
   deadLetterRecords,
   jobs,

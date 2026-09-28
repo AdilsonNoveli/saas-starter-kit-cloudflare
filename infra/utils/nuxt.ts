@@ -171,13 +171,11 @@ export async function deployWorker(
       );
     };
 
-    // Core layers with their own history (today: admin, notifications) run
-    // unconditionally, right after the base — `layers.core` has no on/off
-    // flag, unlike `layers.features` below. `teams` has no `drizzle.config.ts`
-    // of its own (a real, bidirectional FK cycle with core-schema.ts keeps
-    // it folded into the base history — see apps/functions/drizzle.config.ts),
-    // so `applyLayerMigrations` is a no-op for it: nothing to find, nothing
-    // created.
+    // Core layers with their own history (today: admin, notifications,
+    // teams) run unconditionally, right after the base — `layers.core` has
+    // no on/off flag, unlike `layers.features` below. See
+    // apps/functions/drizzle.config.ts for how a core layer opts into its
+    // own history (owning a `drizzle.config.ts`) versus folding into base.
     for (const layerName of layers.core) applyLayerMigrations(layerName);
 
     // Feature layers with their own history (kanban, billing) run only when

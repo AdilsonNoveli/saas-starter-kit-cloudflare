@@ -4,33 +4,32 @@ import {
   pgTable,
   text,
   timestamp,
-  jsonb,
   index,
   unique,
 } from "drizzle-orm/pg-core";
 import { sql, relations } from "drizzle-orm";
 import { createId as cuid } from "@paralleldrive/cuid2";
-// `Team` and the rest of the multi-tenancy/RBAC tables live in the teams layer
-// (Fase 3, passo 1a). `Job` and `DeadLetterRecord` below still hold foreign
-// keys to `Team`, which is why this file imports back out of a layer — and the
-// teams layer imports `User`/`Job` from here in turn. That two-file cycle is
-// deliberate and safe: every reference
-// crossing the boundary sits inside a Drizzle callback
-// (`.references(() => teams.id)`, `relations(t, ({ one }) => ...)`), so neither
-// module reads the other's exports while it is still evaluating. Never
-// dereference `teams` at this file's top level.
+// `Team` and the rest of the multi-tenancy/RBAC tables live in the teams
+// layer (Fase 3, passo 1a). `Job` and `DeadLetterRecord` moved there too
+// (SPEC-0006, teams migration split, 2026-09-28) — they were the last thing
+// forcing a bidirectional FK cycle between this file and layers/teams
+// (`Job.teamId`/`DeadLetterRecord.teamId` → `Team`), which is what kept
+// `teams` folded into the base migration history. All that is left of that
+// cycle now is `logRelations` below, a Drizzle relation with no physical FK
+// (`Log.jobId` has no `.references()`), imported the exact same way
+// `usersRelations` already imports `notifications` two imports down: a
+// relation-only pointer from base into a `layers.core` layer, not a new
+// pattern. `TeamInvite.invitedById` → `User` is now the only physical FK
+// left between the two files, one-directional (teams → base), which is what
+// let `layers/teams` finally get its own `drizzle.config.ts`.
 //
 // Package specifier, NOT relative — a relative `../../../../layers/teams/...`
 // resolves fine under tsc/vitest/drizzle-kit/plain esbuild, but fails SST's own
 // Cloudflare Worker bundler at actual deploy time ("Could not resolve
 // ../../../../layers/teams/server/database/schema"), since cron.ts/
 // jobs-consumer.ts/dlq-consumer.ts import this file and are bundled by SST
-// directly, not by Nitro/Vite. A workspace-dependency cycle here (this package
-// gaining a dependency on a layer that already depends on it) is NOT the
-// problem it looks like — `layers/teams` <-> `layers/billing` already do this
-// today and `bun install` resolves it as plain symlinks with no complaint. See
-// nuxfire-layers.md for the full incident.
-import { teams } from "@nuxfire/layer-teams/server/database/schema";
+// directly, not by Nitro/Vite. See nuxfire-layers.md for the full incident.
+import { jobs } from "@nuxfire/layer-teams/server/database/schema";
 // `Notification` moved to layers/notifications (Fase 3, passo 3). This file
 // still needs it for `usersRelations` below (`notifications: many(...)`), while
 // that file needs `users` from here for `notificationRelations` — the THIRD
@@ -122,32 +121,10 @@ export const waitlistEmails = pgTable("WaitlistEmail", {
     .$onUpdate(() => new Date()),
 });
 
-export const jobs = pgTable("Job", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  message: text("message").notNull(),
-  status: text("status").notNull().default("pending"), // pending, processing, completed, failed
-  teamId: text("teamId")
-    .notNull()
-    .references(() => teams.id),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`)
-    .$onUpdate(() => new Date()),
-});
-
-export const jobRelations = relations(jobs, ({ one, many }) => ({
-  team: one(teams, {
-    fields: [jobs.teamId],
-    references: [teams.id],
-  }),
-  logs: many(logs),
-}));
+// `Job` and `DeadLetterRecord` moved to layers/teams/server/database/schema.ts
+// (SPEC-0006, teams migration split) — see the import at the top of this
+// file. They are still exported from `@nuxfire/functions/schema`, which
+// aggregates both.
 
 export const logs = pgTable("Log", {
   id: text("id")
@@ -181,39 +158,6 @@ export const logRelations = relations(logs, ({ one }) => ({
 // fourth schema cycle. They are still exported from `@nuxfire/functions/schema`,
 // which aggregates every file.
 
-// What lands in the JobDLQ after JobQueue exhausts its retries. Written only
-// by src/dlq-consumer.ts, read only by the platform-admin queue module — the
-// point is operator visibility for messages that would otherwise exist
-// nowhere but the Cloudflare dashboard.
-export const deadLetterRecords = pgTable("DeadLetterRecord", {
-  id: text("id")
-    .$default(() => cuid())
-    .primaryKey()
-    .notNull(),
-  // The original Job object the queue delivered, kept whole: this is exactly
-  // what `admin.queue.replayDeadLetter` sends back to JobQueue, so it has to
-  // match the shape jobs-consumer.ts expects.
-  message: jsonb("message").notNull(),
-  error: text("error").notNull(),
-  // Nullable: the team comes from the message itself, and the table still has
-  // to accept a malformed message with no resolvable team rather than losing
-  // the record entirely.
-  teamId: text("teamId").references(() => teams.id),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .default(sql`now()`),
-  // null = never replayed. Set once and never cleared — the trace that a
-  // message was already reprocessed is worth more than a reusable row (same
-  // soft-state pattern as `revokedAt`/`isArchived` above).
-  replayedAt: timestamp("replayedAt", { withTimezone: true }),
-});
-
-export const deadLetterRecordRelations = relations(
-  deadLetterRecords,
-  ({ one }) => ({
-    team: one(teams, {
-      fields: [deadLetterRecords.teamId],
-      references: [teams.id],
-    }),
-  }),
-);
+// `DeadLetterRecord` and `deadLetterRecordRelations` moved to
+// layers/teams/server/database/schema.ts alongside `Job` (SPEC-0006, teams
+// migration split). Still exported from `@nuxfire/functions/schema`.

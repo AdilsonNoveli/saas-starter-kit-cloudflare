@@ -147,28 +147,34 @@ it must be a literal string matching the directory name.
   `infrastructure` fields.
 - Disabling a feature layer does **not** strip its Drizzle client types (barrel imports
   stay unconditional, at no cost — its tRPC router is never mounted, so nothing queries
-  those tables). Most layers that own tables also own their **own** independent
+  those tables). Every layer that owns tables also owns its **own** independent
   migration history (`layers/<name>/drizzle.config.ts`, `layers/<name>/migrations/`,
-  own tracking table) — separate from the base history, which by default only ever
-  sees `core-schema.ts` (SPEC-0006, 2026-09-28, replacing the 2026-09-27 design where
-  a feature's tables lived in the shared base history and were merely excluded from
-  its *next* migration; extended the same day to two `layers.core` layers too —
-  `admin`, `notifications`). Whether a layer's history is independent or folded into
-  the base is decided per-layer, not by core-vs-feature: any layer whose FK
-  relationship to `core-schema.ts` is one-directional (or absent) can split cleanly —
-  today that's `admin`, `notifications`, `kanban`, `billing`. `teams` is the one
-  exception with its own schema: a real, bidirectional physical FK cycle with
-  `core-schema.ts` (`Job`/`DeadLetterRecord` → `Team`, `TeamInvite.invitedById` →
-  `User`) means no single cross-history migration ordering can satisfy both
-  directions, so it stays folded into the base — see `fireskill-specialist-drizzle`.
+  own tracking table) — separate from the base history, which now only ever
+  sees `core-schema.ts` (`User`, `MfaRecoveryCode`, `WaitlistEmail`, `Log`)
+  (SPEC-0006, 2026-09-28, replacing the 2026-09-27 design where a feature's
+  tables lived in the shared base history and were merely excluded from its
+  *next* migration; extended the same day to `admin`/`notifications`, then to
+  `teams`). Whether a layer's history is independent or folded into the base
+  is decided per-layer, not by core-vs-feature: any layer whose FK
+  relationship to `core-schema.ts` is one-directional (or absent) can split
+  cleanly — today that's every `layers.core`/`layers.features` entry:
+  `admin`, `notifications`, `teams`, `kanban`, `billing`. `teams` used to be
+  the one exception with its own schema: a real, bidirectional physical FK
+  cycle with `core-schema.ts` (`Job`/`DeadLetterRecord` → `Team`,
+  `TeamInvite.invitedById` → `User`) meant no single cross-history migration
+  ordering could satisfy both directions — fixed (2026-09-28) by moving
+  `Job`/`DeadLetterRecord` into `layers/teams/server/database/schema.ts`
+  itself, since they were always team-scoped concepts, leaving only the
+  one-directional `TeamInvite.invitedById` → `User` — see
+  `fireskill-specialist-drizzle`.
   For a **feature** layer specifically, `config.ts`'s `layers.features` additionally
   gates whether that history's migration (`scripts/run-migrations.mjs`, never
   `drizzle-kit migrate`'s own CLI — see `fireskill-specialist-drizzle`) runs at deploy
   time at all (`infra/utils/nuxt.ts`) — "disabled" = omitted from UI **and** its
   migration never applied, so a feature never turned on never has tables in that
   database, not even empty. A **core** layer with its own history (`admin`,
-  `notifications`) has no such flag: its migration always runs, only the history
-  itself is independent, for the same at-a-glance-clarity reason as feature layers.
+  `notifications`, `teams`) has no such flag: its migration always runs, only the
+  history itself is independent, for the same at-a-glance-clarity reason as feature layers.
   Flipping an already-active feature off does **not** retroactively drop its
   tables (nothing diffs the independent histories against each other); its data is
   simply no longer migrated or seeded going forward. See `fireskill-specialist-drizzle`

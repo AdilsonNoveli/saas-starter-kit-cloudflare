@@ -9,17 +9,17 @@ import { layers } from "../../config";
 // SPEC-0006: this migration history is BASE ONLY, and even within
 // `layers.core` it's not "every core layer" — only the ones that don't
 // self-manage their own migration history. A core or feature layer that
-// owns a `drizzle.config.ts` (kanban, billing, admin, notifications) applies
-// its own migrations independently (`layers/<name>/drizzle.config.ts`,
-// `layers/<name>/migrations/`), via its own `drizzle-kit migrate`
-// invocation (`infra/utils/nuxt.ts`) — gated on `layers.features.<name>`
-// for feature layers, always-on for core layers. `teams` is the one
-// `layers.core` entry that stays folded into the base: it has a real,
-// bidirectional physical FK cycle with `core-schema.ts` (`Job`/
-// `DeadLetterRecord` → `Team`, `TeamInvite.invitedById` → `User`), so it
-// cannot have an independent, one-directionally-ordered history without
-// first moving `Job`/`DeadLetterRecord` into `layers/teams` itself — not
-// done, out of scope. Before SPEC-0006, this file derived its `schema`
+// owns a `drizzle.config.ts` (kanban, billing, admin, notifications, teams)
+// applies its own migrations independently (`layers/<name>/drizzle.
+// config.ts`, `layers/<name>/migrations/`), via its own `drizzle-kit
+// migrate` invocation (`infra/utils/nuxt.ts`) — gated on
+// `layers.features.<name>` for feature layers, always-on for core layers.
+// `teams` got its own history same-day (2026-09-28): moving `Job`/
+// `DeadLetterRecord` into `layers/teams/server/database/schema.ts` (they
+// were the base's only physical FKs into `Team`) turned the previous
+// bidirectional cycle with `core-schema.ts` into a one-directional one
+// (`TeamInvite.invitedById` → `User`), the same shape every other core
+// layer already had. Before SPEC-0006, this file derived its `schema`
 // array from `layers.core` **and** active `layers.features`, so a feature's
 // tables lived in the SAME migration history as the base; splitting them
 // required a one-time snapshot surgery (removing their entries from `meta/

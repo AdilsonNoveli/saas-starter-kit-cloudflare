@@ -2,12 +2,12 @@
 
 Based on `layers/kanban/server/database/schema.ts` (a feature layer) and
 rules documented in `nuxfire-drizzle.md`. Since SPEC-0006 (2026-09-28,
-extended the same day to `admin`/`notifications`) there are **five
-independent migration histories** — base and one per layer that owns
-tables and has its own `drizzle.config.ts` — never a single shared one.
-Which layers get their own history is **not** simply "core vs. feature" —
-see "Can this layer's history be independent?" below, the decision that
-matters most.
+extended the same day to `admin`/`notifications`, then to `teams`) there
+are **six independent migration histories** — base and one per layer that
+owns tables and has its own `drizzle.config.ts` — never a single shared
+one. Which layers get their own history is **not** simply "core vs.
+feature" — see "Can this layer's history be independent?" below, the
+decision that matters most.
 
 ## New Table in an Existing Layer
 
@@ -57,17 +57,18 @@ layer's foreign keys against `core-schema.ts`:
 
 | FK shape against `core-schema.ts` | Can split? | Examples |
 | --- | --- | --- |
-| One-directional (layer → base only), or none at all | **Yes** | `admin` (`PlatformAdmin.userId` → `User`, one-directional), `notifications` (`Notification.userId` has no physical FK, relation only), `kanban`, `billing` (feature layers, FK → `Team`/`User`/`Plan` only) |
-| Bidirectional (base also FKs the layer) | **No** — not without a schema change first | `teams`: `core-schema.ts`'s `Job.teamId`/`DeadLetterRecord.teamId` → `Team`, **and** `teams`' own `TeamInvite.invitedById` → `User`. No single migration ordering across two independent histories can satisfy both directions. |
+| One-directional (layer → base only), or none at all | **Yes** | `admin` (`PlatformAdmin.userId` → `User`, one-directional), `notifications` (`Notification.userId` has no physical FK, relation only), `teams` (`TeamInvite.invitedById` → `User`, one-directional, since the 2026-09-28 split below), `kanban`, `billing` (feature layers, FK → `Team`/`User`/`Plan` only) |
+| Bidirectional (base also FKs the layer) | **No** — not without a schema change first | None today. `teams` used to be the example: `core-schema.ts`'s `Job.teamId`/`DeadLetterRecord.teamId` → `Team`, **and** `teams`' own `TeamInvite.invitedById` → `User`. No single migration ordering across two independent histories can satisfy both directions — fixed (SPEC-0006, 2026-09-28) by moving `Job`/`DeadLetterRecord` into `layers/teams/server/database/schema.ts`, since they were always team-scoped concepts (`teamId` required on both), not base-agnostic infrastructure. |
 
-If bidirectional, the layer stays folded into the base history — same
-mechanism `apps/functions/drizzle.config.ts` already uses for `teams`
-today (`existsSync(layers/<name>/drizzle.config.ts)` decides per
-`layers.core` entry whether base includes that layer's schema). The
-prerequisite to eventually split such a layer is moving whichever base
-tables create the reverse direction (for `teams`: `Job`/`DeadLetterRecord`)
-into the layer itself — a real schema change, not a migration-tooling
-exercise, and not something to do casually.
+If bidirectional, the layer stays folded into the base history until fixed
+— same mechanism `apps/functions/drizzle.config.ts` uses to decide, per
+`layers.core` entry (`existsSync(layers/<name>/drizzle.config.ts)`),
+whether base includes that layer's schema. The prerequisite to split such
+a layer is moving whichever base tables create the reverse direction into
+the layer itself — a real schema change, not a migration-tooling exercise,
+and not something to do casually. See the `teams` split (`MIGRATIONS.md`'s
+"teams split" note, 2026-09-28) for a worked example of doing this for
+real.
 
 **Before adding a new table to an existing layer, or a new layer, check
 this table for the layer in question — do not assume "core layers never
@@ -81,8 +82,8 @@ run it **from that history's own directory**:
 
 | Layer is in... | Has independent history? | Generate from | Config |
 | --- | --- | --- | --- |
-| `layers.core`, one-directional FK (or none) to base | Yes (`admin`, `notifications`) | `layers/<name>/` | `layers/<name>/drizzle.config.ts` |
-| `layers.core`, bidirectional FK with base | No (`teams`) | `apps/functions/` | `apps/functions/drizzle.config.ts` |
+| `layers.core`, one-directional FK (or none) to base | Yes (`admin`, `notifications`, `teams`) | `layers/<name>/` | `layers/<name>/drizzle.config.ts` |
+| `layers.core`, bidirectional FK with base | No (none today) | `apps/functions/` | `apps/functions/drizzle.config.ts` |
 | `layers.features`, owns tables | Yes (`kanban`, `billing`) | `layers/<name>/` | `layers/<name>/drizzle.config.ts` |
 
 Running `drizzle-kit generate` from the wrong directory either sees nothing
@@ -148,20 +149,25 @@ starting, ideally before the schema is even finalized):
    (no TTY — see `nuxfire-sst.md`, R-008/R-009), not just by running it
    interactively.
 
-## Adding a New Layer With a Bidirectional FK Cycle (rare — matches `teams` today)
+## Adding a New Layer With a Bidirectional FK Cycle (rare — no current example; `teams` was the example until its 2026-09-28 split)
 
 If the new layer's tables need base tables to FK *into them* (the reverse
 of the normal direction), it cannot get an independent history without
 first restructuring the schema. Options, in order of preference:
 
 1. **Move the base tables that create the reverse FK into the new layer
-   itself** (what would eventually make `teams` splittable: relocating
-   `Job`/`DeadLetterRecord`). Then the layer only has one-directional FKs
-   out to base, and can follow the recipe above.
-2. **Accept the layer stays folded into the base history** (`teams`' current
-   state) — no `drizzle.config.ts` of its own; `apps/functions/drizzle.config.ts`
-   includes it automatically via its `existsSync` filter. Document why,
-   same as this file does for `teams`.
+   itself** — this is exactly what made `teams` splittable: `Job`/
+   `DeadLetterRecord` used to live in `core-schema.ts` with a FK to `Team`;
+   moving them into `layers/teams/server/database/schema.ts` (they were
+   always team-scoped concepts, `teamId` required on both) collapsed the
+   cycle down to `TeamInvite.invitedById` → `User`, one-directional. Then
+   the layer only has one-directional FKs out to base, and can follow the
+   recipe above.
+2. **Accept the layer stays folded into the base history** until that
+   restructuring happens — no `drizzle.config.ts` of its own;
+   `apps/functions/drizzle.config.ts` includes it automatically via its
+   `existsSync` filter. Document why, the way `MIGRATIONS.md`'s "teams
+   split" note documents both the before and after for `teams`.
 
 Never invent a "run base first, then re-run part of base again after the
 layer" ordering hack to force independence anyway — that produces exactly
@@ -172,8 +178,8 @@ avoid.
 
 Generate from that layer's own directory (`cd layers/<name>`) if it has an
 independent history, or from `apps/functions/` if it's folded into the
-base (`teams`) — exactly as in "New Table in an Existing Layer" above. The
-new migration lands in that history's own `migrations/` folder as
+base — exactly as in "New Table in an Existing Layer" above. The new
+migration lands in that history's own `migrations/` folder as
 `0001_<something>.sql`, `0002_...`, etc. — never touches another history.
 
 ## Modifying Existing Columns or Tables

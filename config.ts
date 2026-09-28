@@ -40,10 +40,11 @@ export const layers = {
   // `apps/functions/src/database/migrations/` or in its own independent
   // `layers/<name>/migrations/` is decided per-layer, by the shape of its
   // foreign keys against `core-schema.ts` (SPEC-0006, 2026-09-28): a
-  // one-directional FK into base (or none) can split (`admin`,
-  // `notifications` do, exactly like the toggleable `kanban`/`billing`
-  // below); a bidirectional FK cycle with base cannot (`teams` — `Job`/
-  // `DeadLetterRecord` FK `Team`, `TeamInvite` FKs `User` back). See
+  // one-directional FK into base (or none) can split — every `layers.core`
+  // entry does today (`admin`, `notifications`, and `teams` since
+  // 2026-09-28, once `Job`/`DeadLetterRecord` moved into `layers/teams`
+  // itself and stopped forcing a bidirectional cycle), exactly like the
+  // toggleable `kanban`/`billing` below. See
   // apps/functions/src/database/MIGRATIONS.md and
   // fireskill-specialist-drizzle/references/new-table-recipe.md.
   core: ["teams", "notifications", "admin"] as string[],

@@ -71,6 +71,27 @@
 > feature, needs zero further edits there. Same reset procedure as above,
 > same reasoning (development database, no data that needed to survive).
 
+> **2026-09-28 (teams split):** the cycle that kept `teams` folded into the
+> base is broken. `Job` and `DeadLetterRecord` moved out of `core-schema.ts`
+> into `layers/teams/server/database/schema.ts` — both are always
+> tenant-scoped (`teamId` required on each), so they belonged there
+> semantically anyway, not just structurally. That was the base's only
+> physical FK into `Team`; the only cross-file reference remaining is
+> `TeamInvite.invitedById` → `User` (teams → base, one-directional, same
+> shape as `PlatformAdmin.userId` → `User`), so `layers/teams` now has its
+> own `drizzle.config.ts` and `migrations/0000_teams.sql` (7 tables: `Team`,
+> `TeamMembership`, `TeamInvite`, `Role`, `Permission`, `Job`,
+> `DeadLetterRecord`). `core-schema.ts`'s `logRelations` (`Log.jobId` → `Job`,
+> no physical FK) now imports `jobs` back from `layers/teams` — a
+> relation-only pointer, the same shape `usersRelations` already has into
+> `notifications`, not a new kind of cycle. Every consumer of `jobs`/
+> `deadLetterRecords` (`dlq-consumer.ts`, `jobs-consumer.ts`,
+> `admin-queue.ts`, `admin-teams.ts`, `admin-teams-billing.ts`) imports via
+> the schema barrel, so none needed an import-path change — verified by grep
+> before touching any file. The base's `0000_init.sql` was regenerated again
+> (4 tables now: `User`, `MfaRecoveryCode`, `WaitlistEmail`, `Log`). Same
+> reset procedure and reasoning as the two notes above.
+
 Migrations are **generated** with Drizzle Kit (`drizzle-kit generate`, an
 author-time command always run interactively by a human) from `schema.ts`,
 but **applied** against Postgres by `scripts/run-migrations.mjs`, never by
@@ -122,34 +143,33 @@ these command strings as fixed, reproduce it locally under this same double
 
 ## Base and layer histories
 
-There are now **five** independent migration histories, each with its own
-`drizzle-kit` config and its own tracking table in the `drizzle` schema —
-not just base vs. feature; two `layers.core` layers have their own history
-too:
+There are now **six** independent migration histories, each with its own
+`drizzle-kit` config and its own tracking table in the `drizzle` schema:
 
 | History | Config | Migrations | Tracking table | Scope |
 | --- | --- | --- | --- | --- |
-| Base | `apps/functions/drizzle.config.ts` | `apps/functions/src/database/migrations/` | `drizzle.__drizzle_migrations` | `core-schema.ts` + `layers/teams` only (always applied) |
+| Base | `apps/functions/drizzle.config.ts` | `apps/functions/src/database/migrations/` | `drizzle.__drizzle_migrations` | `core-schema.ts` only — `User`, `MfaRecoveryCode`, `WaitlistEmail`, `Log` (always applied) |
+| Teams | `layers/teams/drizzle.config.ts` | `layers/teams/migrations/` | `drizzle.__drizzle_migrations_teams` | `layers/teams/server/database/schema.ts` only (core, always applied) |
 | Admin | `layers/admin/drizzle.config.ts` | `layers/admin/migrations/` | `drizzle.__drizzle_migrations_admin` | `layers/admin/server/database/schema.ts` only (core, always applied) |
 | Notifications | `layers/notifications/drizzle.config.ts` | `layers/notifications/migrations/` | `drizzle.__drizzle_migrations_notifications` | `layers/notifications/server/database/schema.ts` only (core, always applied) |
 | Kanban | `layers/kanban/drizzle.config.ts` | `layers/kanban/migrations/` | `drizzle.__drizzle_migrations_kanban` | `layers/kanban/server/database/schema.ts` only (feature, gated) |
 | Billing | `layers/billing/drizzle.config.ts` | `layers/billing/migrations/` | `drizzle.__drizzle_migrations_billing` | `layers/billing/server/database/schema.ts` only (feature, gated) |
 
-**Why `teams` stays folded into the base, unlike `admin`/`notifications`:**
-`admin` and `notifications` each have a one-directional FK into the base
-only (`PlatformAdmin.userId` → `User`; `Notification.userId` has no
-physical FK at all, only a Drizzle relation) — same shape as
-kanban/billing, safe to split. `teams` has a **real, bidirectional**
-physical FK cycle with `core-schema.ts`: `Job.teamId`/
-`DeadLetterRecord.teamId` → `Team` (base needs teams' table to exist), and
-`TeamInvite.invitedById` → `User` (teams needs base's table to exist). No
-single migration ordering across two independent histories can satisfy
-both directions, so `teams` has no `drizzle.config.ts` of its own — its
-tables are created by the base's own migration, same as before. Splitting
-it would first require moving `Job`/`DeadLetterRecord` out of
-`core-schema.ts` and into `layers/teams` itself (they're team-scoped
-concepts anyway) to make the dependency one-directional — not done, a
-deliberate, separate piece of work if it ever happens.
+**Why `teams` was the last layer to split:** `admin` and `notifications`
+each had a one-directional FK into the base only (`PlatformAdmin.userId` →
+`User`; `Notification.userId` has no physical FK at all, only a Drizzle
+relation) — same shape as kanban/billing, safe to split immediately.
+`teams` used to have a **real, bidirectional** physical FK cycle with
+`core-schema.ts`: `Job.teamId`/`DeadLetterRecord.teamId` → `Team` (base
+needed teams' table to exist), and `TeamInvite.invitedById` → `User` (teams
+needed base's table to exist). No single migration ordering across two
+independent histories can satisfy both directions at once. The fix (see the
+"teams split" note above): move `Job`/`DeadLetterRecord` out of
+`core-schema.ts` into `layers/teams` itself — they were always team-scoped
+concepts (`teamId` required on both), never truly base-agnostic
+infrastructure — which collapses the cycle down to the one-directional
+`TeamInvite.invitedById` → `User`, the same shape every other split layer
+already had.
 
 A layer's tables can FK into base tables by name (e.g. `Team`) — never the
 reverse, since a base layer must never import a feature layer (enforced by
@@ -242,10 +262,11 @@ DATABASE_HOST=... DATABASE_PORT=5432 DATABASE_USER=... DATABASE_PASSWORD=... DAT
   bunx drizzle-kit generate
 ```
 
-A feature layer (same pattern, from that layer's own directory):
+A layer with its own history — core or feature — (same pattern, from that
+layer's own directory):
 
 ```bash
-cd layers/kanban   # or layers/billing
+cd layers/teams   # or layers/admin, layers/notifications, layers/kanban, layers/billing
 DATABASE_HOST=... DATABASE_PORT=5432 DATABASE_USER=... DATABASE_PASSWORD=... DATABASE_NAME=... \
   bunx drizzle-kit generate
 ```

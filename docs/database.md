@@ -21,6 +21,9 @@
 | layers\notifications\migrations\0000_notifications.sql |
 | layers\notifications\migrations\meta\0000_snapshot.json |
 | layers\notifications\migrations\meta\_journal.json |
+| layers\teams\migrations\0000_teams.sql |
+| layers\teams\migrations\meta\0000_snapshot.json |
+| layers\teams\migrations\meta\_journal.json |
 | scripts\print-migration-bootstrap.mjs |
 | scripts\print-migration-bootstrap.test.ts |
 | scripts\run-migrations.mjs |

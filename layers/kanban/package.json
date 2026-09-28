@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "generate-migrations": "drizzle-kit generate"
+  },
   "exports": {
     ".": "./nuxt.config.ts",
     "./manifest": "./layer.manifest.ts",
@@ -23,6 +26,7 @@
   },
   "devDependencies": {
     "@types/sortablejs": "^1.15.8",
+    "drizzle-kit": "^0.31.10",
     "nuxt": "^4.5.2",
     "nuxt-authorization": "^0.3.5",
     "vitest": "^5.0.0"

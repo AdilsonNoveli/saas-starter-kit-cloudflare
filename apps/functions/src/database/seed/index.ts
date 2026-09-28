@@ -16,6 +16,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../schema";
 import { FREE_PLAN, SYSTEM_ROLES } from "./data";
+import { layers } from "../../../../../config";
 
 async function main() {
   const sql = postgres({
@@ -30,15 +31,22 @@ async function main() {
   const db = drizzle(sql, { schema });
 
   try {
-    const [existingPlan] = await db
-      .select({ id: schema.plans.id })
-      .from(schema.plans)
-      .where(eq(schema.plans.tier, "FREE"));
-    if (existingPlan) {
-      console.log("seed: free plan already exists, skipping");
+    // SPEC-0005: `Plan` is not in the database at all when billing is
+    // disabled (`apps/functions/drizzle.config.ts` excludes its schema from
+    // the generated migration), so seeding a row into it would fail.
+    if (!layers.features.billing) {
+      console.log("seed: billing disabled, skipping free plan");
     } else {
-      await db.insert(schema.plans).values(FREE_PLAN);
-      console.log("seed: created free plan");
+      const [existingPlan] = await db
+        .select({ id: schema.plans.id })
+        .from(schema.plans)
+        .where(eq(schema.plans.tier, "FREE"));
+      if (existingPlan) {
+        console.log("seed: free plan already exists, skipping");
+      } else {
+        await db.insert(schema.plans).values(FREE_PLAN);
+        console.log("seed: created free plan");
+      }
     }
 
     const [existingRole] = await db

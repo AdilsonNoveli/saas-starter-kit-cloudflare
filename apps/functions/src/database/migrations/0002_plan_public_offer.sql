@@ -1,1 +1,0 @@
-ALTER TABLE "Plan" ADD COLUMN "isPublicOffer" boolean DEFAULT false NOT NULL;

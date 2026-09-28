@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1789556325839,
+      "when": 1790616568111,
       "tag": "0000_init",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1790382832492,
-      "tag": "0001_pending_purchase",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1790417544174,
-      "tag": "0002_plan_public_offer",
       "breakpoints": true
     }
   ]

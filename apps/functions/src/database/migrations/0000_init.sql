@@ -28,6 +28,16 @@ CREATE TABLE "Log" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "MfaRecoveryCode" (
+	"id" text PRIMARY KEY NOT NULL,
+	"userId" text NOT NULL,
+	"scope" text NOT NULL,
+	"codeHash" text NOT NULL,
+	"usedAt" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "MfaRecoveryCode_userId_scope_codeHash_unique" UNIQUE("userId","scope","codeHash")
+);
+--> statement-breakpoint
 CREATE TABLE "User" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text,
@@ -43,120 +53,6 @@ CREATE TABLE "WaitlistEmail" (
 	"email" text NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "AuditLog" (
-	"id" text PRIMARY KEY NOT NULL,
-	"actorUserId" text NOT NULL,
-	"action" text NOT NULL,
-	"targetType" text NOT NULL,
-	"targetId" text,
-	"metadata" jsonb,
-	"ip" text,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "PlatformAdmin" (
-	"id" text PRIMARY KEY NOT NULL,
-	"userId" text NOT NULL,
-	"role" "platform_role" NOT NULL,
-	"mfaSecret" text,
-	"mfaEnabledAt" timestamp with time zone,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"revokedAt" timestamp with time zone,
-	CONSTRAINT "PlatformAdmin_userId_unique" UNIQUE("userId")
-);
---> statement-breakpoint
-CREATE TABLE "Benefit" (
-	"id" text PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
-	"data" jsonb,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "BenefitsOnPlan" (
-	"planId" text NOT NULL,
-	"benefitId" text NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "BenefitsOnPlan_planId_benefitId_pk" PRIMARY KEY("planId","benefitId")
-);
---> statement-breakpoint
-CREATE TABLE "Plan" (
-	"id" text PRIMARY KEY NOT NULL,
-	"name" text NOT NULL,
-	"description" text NOT NULL,
-	"tier" text DEFAULT 'FREE' NOT NULL,
-	"price" text NOT NULL,
-	"period" text NOT NULL,
-	"provider" text,
-	"providerPriceId" text,
-	"providerProductId" text,
-	"unitAmount" integer,
-	"currency" text,
-	"maxSeats" integer,
-	"limits" jsonb,
-	"buyerTeamMode" text DEFAULT 'NEW_TEAM' NOT NULL,
-	"buyerTeamId" text,
-	"isArchived" boolean DEFAULT false NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "Subscription" (
-	"id" text PRIMARY KEY NOT NULL,
-	"teamId" text NOT NULL,
-	"status" text DEFAULT 'ACTIVE' NOT NULL,
-	"provider" text NOT NULL,
-	"providerSubscriptionId" text NOT NULL,
-	"planId" text NOT NULL,
-	"currentPeriodStart" timestamp with time zone,
-	"currentPeriodEnd" timestamp with time zone,
-	"cancelAtPeriodEnd" boolean DEFAULT false NOT NULL,
-	"providerMetadata" jsonb,
-	"customerEmail" text,
-	"lastPaymentDate" timestamp with time zone,
-	"nextPaymentDate" timestamp with time zone,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "KanbanBoard" (
-	"id" text PRIMARY KEY NOT NULL,
-	"teamId" text NOT NULL,
-	"name" text NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "KanbanCard" (
-	"id" text PRIMARY KEY NOT NULL,
-	"columnId" text NOT NULL,
-	"title" text NOT NULL,
-	"description" text,
-	"position" integer DEFAULT 0 NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "KanbanColumn" (
-	"id" text PRIMARY KEY NOT NULL,
-	"boardId" text NOT NULL,
-	"name" text NOT NULL,
-	"position" integer DEFAULT 0 NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "Notification" (
-	"id" text PRIMARY KEY NOT NULL,
-	"title" text NOT NULL,
-	"message" text NOT NULL,
-	"userId" text NOT NULL,
-	"data" jsonb,
-	"read" boolean DEFAULT false NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "Permission" (
@@ -210,36 +106,52 @@ CREATE TABLE "Team" (
 	"description" text,
 	"logo" text,
 	"status" text DEFAULT 'ACTIVE' NOT NULL,
-	"planId" text NOT NULL,
+	"planId" text,
+	"maxSeats" integer,
 	"stripeCustomerId" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "Notification" (
+	"id" text PRIMARY KEY NOT NULL,
+	"title" text NOT NULL,
+	"message" text NOT NULL,
+	"userId" text NOT NULL,
+	"data" jsonb,
+	"read" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "AuditLog" (
+	"id" text PRIMARY KEY NOT NULL,
+	"actorUserId" text NOT NULL,
+	"action" text NOT NULL,
+	"targetType" text NOT NULL,
+	"targetId" text,
+	"metadata" jsonb,
+	"ip" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "PlatformAdmin" (
+	"id" text PRIMARY KEY NOT NULL,
+	"userId" text NOT NULL,
+	"role" "platform_role" NOT NULL,
+	"mfaSecret" text,
+	"mfaEnabledAt" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"revokedAt" timestamp with time zone,
+	CONSTRAINT "PlatformAdmin_userId_unique" UNIQUE("userId")
+);
+--> statement-breakpoint
 ALTER TABLE "DeadLetterRecord" ADD CONSTRAINT "DeadLetterRecord_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Job" ADD CONSTRAINT "Job_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "PlatformAdmin" ADD CONSTRAINT "PlatformAdmin_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Plan" ADD CONSTRAINT "Plan_buyerTeamId_Team_id_fk" FOREIGN KEY ("buyerTeamId") REFERENCES "public"."Team"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_planId_Plan_id_fk" FOREIGN KEY ("planId") REFERENCES "public"."Plan"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "KanbanBoard" ADD CONSTRAINT "KanbanBoard_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "KanbanCard" ADD CONSTRAINT "KanbanCard_columnId_KanbanColumn_id_fk" FOREIGN KEY ("columnId") REFERENCES "public"."KanbanColumn"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "KanbanColumn" ADD CONSTRAINT "KanbanColumn_boardId_KanbanBoard_id_fk" FOREIGN KEY ("boardId") REFERENCES "public"."KanbanBoard"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "MfaRecoveryCode" ADD CONSTRAINT "MfaRecoveryCode_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Permission" ADD CONSTRAINT "Permission_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_invitedById_User_id_fk" FOREIGN KEY ("invitedById") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TeamMembership" ADD CONSTRAINT "TeamMembership_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Team" ADD CONSTRAINT "Team_planId_Plan_id_fk" FOREIGN KEY ("planId") REFERENCES "public"."Plan"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-CREATE TABLE "MfaRecoveryCode" (
-	"id" text PRIMARY KEY NOT NULL,
-	"userId" text NOT NULL,
-	"scope" text NOT NULL,
-	"codeHash" text NOT NULL,
-	"usedAt" timestamp with time zone,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "MfaRecoveryCode_userId_scope_codeHash_unique" UNIQUE("userId","scope","codeHash")
-);
---> statement-breakpoint
-ALTER TABLE "MfaRecoveryCode" ADD CONSTRAINT "MfaRecoveryCode_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "PlatformAdmin" ADD CONSTRAINT "PlatformAdmin_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "MfaRecoveryCode_userId_scope_idx" ON "MfaRecoveryCode" USING btree ("userId","scope");

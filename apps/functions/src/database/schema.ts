@@ -3,11 +3,18 @@
 // here; `apps/app/server/utils/db.ts` keeps importing this file unchanged.
 export * from "./core-schema";
 
-// Layer schemas. Unconditional on purpose — NOT gated by `layers.features` in
-// config.ts. Turning a feature layer off removes its pages/components from the
-// Nuxt bundle; it never removes its tables from the database or from the typed
-// Drizzle client. See nuxfire-drizzle.md ("orphan data"): disabling
-// means "out of the UI", not "erased".
+// Layer schemas. Unconditional on purpose for THIS file only — the runtime,
+// typed Drizzle client (apps/app/server/utils/db.ts) keeps every layer's
+// columns typed regardless of `layers.features` in config.ts, which costs
+// nothing: a disabled layer's tRPC router is never mounted
+// (scripts/compose-layers.ts), so no request path ever queries a table this
+// gives a type for. Do NOT read this as "a disabled layer's tables stay in
+// the database" — that used to be true but no longer is: migration
+// GENERATION is gated by `layers.features`, in `apps/functions/drizzle.config.ts`
+// (its own `schema` array is derived from the same `layers.core`/
+// `layers.features` config, filtered to layers that are active). Turning a
+// feature layer off and regenerating now diffs its tables as DROPs, the same
+// weight as any other destructive migration — see MIGRATIONS.md.
 //
 // Unlike the tRPC composition (server/trpc/routers/.composition/), this file is
 // hand-maintained: each new layer appends exactly one line here.

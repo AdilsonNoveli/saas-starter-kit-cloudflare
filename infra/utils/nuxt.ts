@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import { existsSync } from "node:fs";
 // Type-only: SST does not export its `Input`/`Link` types as globals. Erased at build time.
 import type { Input } from "../../.sst/platform/src/components/input";
 import type { Link } from "../../.sst/platform/src/components/link";
@@ -7,6 +8,7 @@ import { websockets } from "../websockets";
 import { jobsQueue } from "../jobs";
 import { database } from "../database";
 import { secret } from "../secret";
+import { layers } from "#nuxfire/config";
 import { COMPATIBILITY } from "./constants";
 import { build as buildPackage } from "./builder";
 
@@ -110,16 +112,75 @@ export async function deployWorker(
       DATABASE_PASSWORD: secret.DatabasePassword.value,
       DATABASE_NAME: secret.DatabaseName.value,
     };
-    const migrations = new command.local.Command(
+    // `run-migrations.mjs`, never `bunx drizzle-kit migrate`: verified (a real
+    // deploy failure, reproduced twice) that drizzle-kit's CLI spinner
+    // reliably crashes with a bare "exit status 1" and no further output when
+    // spawned without a TTY — exactly how command.local.Command runs it.
+    // `run-migrations.mjs` calls drizzle-orm's own `migrate()` directly (the
+    // same engine drizzle-kit's CLI wraps), with no interactive UI to crash,
+    // and prints the real Postgres error (schema/table/constraint/hint) on
+    // failure. `drizzle-kit generate` (author-time, always run interactively
+    // by a human) is unaffected and stays the tool for producing new
+    // migration files. See scripts/run-migrations.mjs and MIGRATIONS.md.
+    // Relative to `dir`, unquoted — both "apps/functions" and "layers/<name>"
+    // sit exactly two segments below the repo root, so "../../scripts/..."
+    // resolves correctly from either. NOT an absolute, quoted path: verified
+    // (reproduced the exact real-deploy failure locally, twice, via `cmd /c`)
+    // that Pulumi's command.local.Command wraps `create` in its own `cmd /c
+    // "..."` on Windows, and a quoted path nested inside that outer quoting
+    // breaks cmd.exe's argument parsing (`error: File not found
+    // ""C:\...\run-migrations.mjs""`, doubled quotes, exactly what a nested
+    // `cmd /c "cmd /c "..."..."` mis-parse produces) — even though the same
+    // quoted absolute path runs correctly under a single, unwrapped `cmd /c`.
+    // The path has no spaces, so no quoting is needed in the first place.
+    const runMigrationsScript = "../../scripts/run-migrations.mjs";
+    const baseMigrations = new command.local.Command(
       `${name}Migrations`,
       {
         dir: path.resolve("apps/functions"),
-        create: "bunx drizzle-kit migrate",
+        create: `bun run ${runMigrationsScript} ./src/database/migrations __drizzle_migrations drizzle`,
         triggers: [new Date().toString()],
         environment: databaseEnvironment,
       },
       { dependsOn: [worker] },
     );
+
+    // SPEC-0006: each active feature layer (`config.ts`'s `layers.features`)
+    // owns its own migration history — `layers/<name>/drizzle.config.ts`,
+    // `layers/<name>/migrations/` — separate from the base history above.
+    // Applied here, one migration run per active feature that actually has a
+    // `migrations/` folder (a feature layer can be frontend-only, or not have
+    // generated one yet — nothing to apply either way). A feature that is OFF
+    // is skipped entirely: its tables never reach this database, not even as
+    // an empty table — that is the whole point.
+    //
+    // Chained sequentially, base first, in `Object.entries` order: a
+    // feature's tables can FK into base tables (never the reverse — a base
+    // layer must never import a feature layer, enforced by
+    // scripts/layer-dependency-direction.test.ts), so the base migration
+    // must complete first. Order AMONG features doesn't matter today
+    // (verified: no feature layer references another — see SPEC-0006
+    // research), so declaration order is used for simplicity, not because
+    // it is required; a future feature that depends on another feature
+    // layer would need `requires` in its manifest reflected here too.
+    let lastMigrations: typeof baseMigrations = baseMigrations;
+    for (const [featureName, enabled] of Object.entries(layers.features)) {
+      if (!enabled) continue;
+      const featureRoot = path.resolve(`layers/${featureName}`);
+      if (!existsSync(path.resolve(featureRoot, "migrations"))) continue;
+      const migrationsTable = `__drizzle_migrations_${featureName}`;
+      lastMigrations = new command.local.Command(
+        `${name}Migrations${featureName[0].toUpperCase()}${featureName.slice(1)}`,
+        {
+          dir: featureRoot,
+          create: `bun run ${runMigrationsScript} ./migrations ${migrationsTable} drizzle`,
+          triggers: [new Date().toString()],
+          environment: databaseEnvironment,
+        },
+        { dependsOn: [lastMigrations] },
+      );
+    }
+
     // Guarantees the built-in team roles (Owner/Admin/Member) and the free
     // Plan exist after every deploy, fresh installs included — not just
     // reactively, the first time some request happens to need one (the
@@ -136,7 +197,7 @@ export async function deployWorker(
         triggers: [new Date().toString()],
         environment: databaseEnvironment,
       },
-      { dependsOn: [migrations] },
+      { dependsOn: [lastMigrations] },
     );
   }
 

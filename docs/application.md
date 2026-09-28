@@ -248,6 +248,7 @@ Inventory: maps each observed file to its surface.
 | Pages | layers/admin/app/pages/admin/companies/[id].vue | — |
 | Pages | layers/admin/app/pages/admin/index.vue | UBadge, formatDate |
 | Pages | layers/admin/app/pages/admin/queue/index.vue | UBadge, UButton, UCheckbox, UDropdownMenu, UTooltip, refreshAll, JOB_STATUSES, describeMessage |
+| Other sources | layers/admin/drizzle.config.ts | — |
 | Other sources | layers/admin/layer.manifest.ts | — |
 | Other sources | layers/admin/nuxt.config.ts | — |
 | Routes and APIs | layers/admin/server/api/admin/mfa/challenge.post.ts | — |
@@ -258,5 +259,4 @@ Inventory: maps each observed file to its surface.
 | Other sources | layers/admin/server/database/schema.ts | — |
 | Routes and APIs | layers/admin/server/trpc/admin-audit-log.ts | — |
 | Routes and APIs | layers/admin/server/trpc/admin-queue.ts | CRON_JOB_ID, readJobId |
-| Routes and APIs | layers/admin/server/trpc/admin-teams.ts | AdminTeamSubscription, setTeamStatus |
 <!-- specsfy:documentator:end -->

@@ -6,17 +6,23 @@ import { defineConfig } from "drizzle-kit";
 // relatively — see the comment there).
 import { layers } from "../../config";
 
-// SPEC-0006: this migration history is BASE ONLY — `layers.core` (always
-// active), never `layers.features`. A feature layer (kanban, billing) owns
-// its own independent migration history instead (`layers/<name>/drizzle.
-// config.ts`, `layers/<name>/migrations/`), generated from that layer's
-// schema alone and applied by its own `drizzle-kit migrate` invocation
-// (`infra/utils/nuxt.ts`), gated on `layers.features.<name>` — so a feature
-// that is off never reaches this database at all, not even as an empty
-// table. Before SPEC-0006, this file derived its `schema` array from
-// `layers.core` **and** active `layers.features`, so a feature's tables lived
-// in the SAME migration history as the base; splitting them required a
-// one-time snapshot surgery (removing their entries from `meta/
+// SPEC-0006: this migration history is BASE ONLY, and even within
+// `layers.core` it's not "every core layer" — only the ones that don't
+// self-manage their own migration history. A core or feature layer that
+// owns a `drizzle.config.ts` (kanban, billing, admin, notifications) applies
+// its own migrations independently (`layers/<name>/drizzle.config.ts`,
+// `layers/<name>/migrations/`), via its own `drizzle-kit migrate`
+// invocation (`infra/utils/nuxt.ts`) — gated on `layers.features.<name>`
+// for feature layers, always-on for core layers. `teams` is the one
+// `layers.core` entry that stays folded into the base: it has a real,
+// bidirectional physical FK cycle with `core-schema.ts` (`Job`/
+// `DeadLetterRecord` → `Team`, `TeamInvite.invitedById` → `User`), so it
+// cannot have an independent, one-directionally-ordered history without
+// first moving `Job`/`DeadLetterRecord` into `layers/teams` itself — not
+// done, out of scope. Before SPEC-0006, this file derived its `schema`
+// array from `layers.core` **and** active `layers.features`, so a feature's
+// tables lived in the SAME migration history as the base; splitting them
+// required a one-time snapshot surgery (removing their entries from `meta/
 // 0003_snapshot.json` by hand, no new `.sql` file) so this file narrowing to
 // base-only would not diff them as DROPs — see MIGRATIONS.md.
 //
@@ -30,12 +36,23 @@ import { layers } from "../../config";
 // in infra/utils/nuxt.ts) — the same directory this config file lives in.
 const here = process.cwd();
 
-// Not every core layer necessarily owns a database schema (same allowance
-// `scripts/compose-layers.ts` makes for a layer with no tRPC router) — only
-// glob in the ones that do.
+// A core layer folds into the base's own history only if it (a) owns a
+// database schema at all (same allowance `scripts/compose-layers.ts` makes
+// for a layer with no tRPC router) AND (b) has no `drizzle.config.ts` of its
+// own — that file's presence is the single source of truth for "this layer
+// self-manages its migrations," checked automatically so a future core
+// layer with its own history needs zero edits here.
 const coreLayerSchemas = layers.core
-  .map((name) => `../../layers/${name}/server/database/schema.ts`)
-  .filter((path) => existsSync(resolve(here, path)));
+  .map((name) => ({
+    name,
+    schema: `../../layers/${name}/server/database/schema.ts`,
+    ownConfig: `../../layers/${name}/drizzle.config.ts`,
+  }))
+  .filter(
+    ({ schema, ownConfig }) =>
+      existsSync(resolve(here, schema)) && !existsSync(resolve(here, ownConfig)),
+  )
+  .map(({ schema }) => schema);
 
 export default defineConfig({
   dialect: "postgresql",

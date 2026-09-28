@@ -144,11 +144,15 @@ Authentication providers only activate if credentials exist: the `Auth` Worker a
    and silently skips unkeyed patches).
 10. **Deployments run migrations and seeds** for the `App` (`infra/utils/nuxt.ts`):
     one `bun run scripts/run-migrations.mjs` `command.local.Command` for the base
-    history (`apps/functions`), then one more per **active** feature layer with a
-    `migrations/` folder (`config.ts`'s `layers.features`, e.g. `kanban`,
-    `billing`), each its own command chained via `dependsOn` — base first, then
-    features in `Object.entries` order — before `bun run src/database/seed/index.ts`
-    (SPEC-0006, 2026-09-28; see `$fireskill-specialist-drizzle` and
+    history (`apps/functions`), then one more for every `layers.core` layer with
+    its own `migrations/` folder (unconditional — `admin`, `notifications`),
+    then one more per **active** `layers.features` layer with a `migrations/`
+    folder (gated, e.g. `kanban`, `billing`), each its own command chained via
+    `dependsOn` — base first, then core histories, then active feature
+    histories, in `Object.entries`/array order — before
+    `bun run src/database/seed/index.ts` (SPEC-0006, 2026-09-28, extended the
+    same day to core layers with a splittable FK shape; see
+    `$fireskill-specialist-drizzle` and
     `apps/functions/src/database/MIGRATIONS.md`). **Never `bunx drizzle-kit
     migrate`**: its interactive spinner CLI crashes with a bare `exit status 1`
     and no further output when `command.local.Command` spawns it (no TTY) —

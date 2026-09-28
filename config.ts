@@ -34,6 +34,18 @@ export const layers = {
   // layer needs no hand-written import anywhere; adding its name here is all.
   // With `admin` (Fase 3 passo 4, the last extraction) this list is complete:
   // apps/app holds no domain logic any more, only the Composition Root.
+  //
+  // "Core" here means activation only — it does NOT mean "shares the base's
+  // migration history." Whether a core layer's tables live in the base's own
+  // `apps/functions/src/database/migrations/` or in its own independent
+  // `layers/<name>/migrations/` is decided per-layer, by the shape of its
+  // foreign keys against `core-schema.ts` (SPEC-0006, 2026-09-28): a
+  // one-directional FK into base (or none) can split (`admin`,
+  // `notifications` do, exactly like the toggleable `kanban`/`billing`
+  // below); a bidirectional FK cycle with base cannot (`teams` — `Job`/
+  // `DeadLetterRecord` FK `Team`, `TeamInvite` FKs `User` back). See
+  // apps/functions/src/database/MIGRATIONS.md and
+  // fireskill-specialist-drizzle/references/new-table-recipe.md.
   core: ["teams", "notifications", "admin"] as string[],
 
   // Feature layers — toggleable per build/deploy. `false` drops the layer's

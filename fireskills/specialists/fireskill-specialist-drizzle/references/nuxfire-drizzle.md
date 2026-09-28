@@ -28,18 +28,25 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
   Inside the app, `useDB()` and `tables` originate from `apps/app/server/utils/db.ts`
   (`export const tables = schema`; re-exports `sql, eq, ne, and, or, count`).
 - `apps/functions/drizzle.config.ts` reads `./src/database/core-schema.ts`
-  **and only `layers.core`'s** `server/database/schema.ts` files (SPEC-0006,
-  2026-09-28) — this is the **base** migration history and it never sees a
-  feature layer's schema at all, active or not. Each feature layer that owns
-  tables (`layers/kanban`, `layers/billing`) has its **own**
-  `layers/<name>/drizzle.config.ts`, schema'd to that layer's
+  **and only the `layers.core` layers that have no `drizzle.config.ts` of
+  their own** (checked via `existsSync`, today just `layers/teams`) — this
+  is the **base** migration history. Every other layer that owns tables —
+  `layers/admin`, `layers/notifications` (`layers.core`, always applied),
+  `layers/kanban`, `layers/billing` (`layers.features`, gated) — has its
+  **own** `layers/<name>/drizzle.config.ts`, schema'd to that layer's
   `server/database/schema.ts` alone, generating into its **own**
   `layers/<name>/migrations/` with its **own** tracking table
   (`drizzle.__drizzle_migrations_<name>`, via that config's
-  `migrations: {table, schema}`) — three fully independent histories, not
-  one gated array. `config.ts`'s `layers.features` gates **which of these
-  histories are applied at deploy time** (`infra/utils/nuxt.ts`), not what
-  a single `drizzle-kit generate` includes. New layers still enter runtime
+  `migrations: {table, schema}`) — **five** fully independent histories, not
+  one gated array. `teams` is the one core layer that stays folded into the
+  base: it has a real, bidirectional FK cycle with `core-schema.ts`
+  (`Job`/`DeadLetterRecord` → `Team`, `TeamInvite.invitedById` → `User`),
+  so no single ordering across independent histories can satisfy both
+  directions — splitting it would first require moving `Job`/
+  `DeadLetterRecord` out of `core-schema.ts` into `layers/teams` itself.
+  `config.ts`'s `layers.features` gates **which feature histories are
+  applied at deploy time** (`infra/utils/nuxt.ts`); core histories with
+  their own config apply unconditionally. New layers still enter runtime
   automatically once listed in `config.ts`; the **barrel file** (`schema.ts`)
   still requires its own explicit `export *` line, unrelated to any of this.
 - The **barrel file**'s imports stay **unconditional** on purpose — it only
@@ -111,39 +118,56 @@ a column attribute was unintentionally altered.
 
 ## 5. Migrations
 
-- **Three independent histories** (SPEC-0006, 2026-09-28), each with its own
-  config, folder, and tracking table:
+- **Five independent histories** (SPEC-0006, 2026-09-28, extended the same
+  day to `admin`/`notifications`), each with its own config, folder, and
+  tracking table:
 
-  | History | Config | Folder | Tracking table |
-  |---|---|---|---|
-  | Base (`layers.core`) | `apps/functions/drizzle.config.ts` | `apps/functions/src/database/migrations/` | `drizzle.__drizzle_migrations` |
-  | Kanban | `layers/kanban/drizzle.config.ts` | `layers/kanban/migrations/` | `drizzle.__drizzle_migrations_kanban` |
-  | Billing | `layers/billing/drizzle.config.ts` | `layers/billing/migrations/` | `drizzle.__drizzle_migrations_billing` |
+  | History | Config | Folder | Tracking table | Kind |
+  |---|---|---|---|---|
+  | Base | `apps/functions/drizzle.config.ts` | `apps/functions/src/database/migrations/` | `drizzle.__drizzle_migrations` | `core-schema.ts` + `layers/teams` (no config of its own — FK cycle) |
+  | Admin | `layers/admin/drizzle.config.ts` | `layers/admin/migrations/` | `drizzle.__drizzle_migrations_admin` | `layers.core`, always applied |
+  | Notifications | `layers/notifications/drizzle.config.ts` | `layers/notifications/migrations/` | `drizzle.__drizzle_migrations_notifications` | `layers.core`, always applied |
+  | Kanban | `layers/kanban/drizzle.config.ts` | `layers/kanban/migrations/` | `drizzle.__drizzle_migrations_kanban` | `layers.features`, gated |
+  | Billing | `layers/billing/drizzle.config.ts` | `layers/billing/migrations/` | `drizzle.__drizzle_migrations_billing` | `layers.features`, gated |
 
-  Base baseline consolidated at `0000_init.sql` (2026-09-16, then again on
-  2026-09-28 — see `MIGRATIONS.md`'s "base consolidation" note — to contain
-  `layers.core` tables only, deleting and regenerating from scratch rather
-  than narrowing in place, safe only because this is a SaaS kit forked fresh
-  by third parties, not a single app with data that can't be reset). Each
-  feature history has its own fresh initial migration,
-  named after the layer rather than drizzle-kit's default `init`
-  (`layers/kanban/migrations/0000_kanban.sql`,
-  `layers/billing/migrations/0000_billing.sql`) so a flat listing shows which
-  history a file belongs to at a glance — the filename only locates the file
-  on disk (`meta/_journal.json`'s `tag`), never affects the applied-migration
-  hash (`sha256` of file content). Generated from that layer's schema alone;
-  a feature table can FK a base table by name (`"Team"`) but never the
-  reverse (enforced by `scripts/layer-dependency-direction.test.ts`).
+  `apps/functions/drizzle.config.ts` decides base's own scope by checking
+  `existsSync(layers/<name>/drizzle.config.ts)` for each `layers.core`
+  entry — present means that layer self-manages, absent means it folds into
+  the base. `teams` is the one core layer without its own config: it has a
+  real, bidirectional FK cycle with `core-schema.ts` (`Job`/
+  `DeadLetterRecord` → `Team`, `TeamInvite.invitedById` → `User`) that no
+  single cross-history ordering can satisfy; `admin`/`notifications` have
+  only a one-directional FK into the base (or none at all, for
+  `notifications`), the same shape as `kanban`/`billing`, so they split
+  cleanly. Base baseline consolidated at `0000_init.sql` twice (2026-09-16;
+  narrowed to exclude kanban/billing on 2026-09-28; narrowed again the same
+  day to exclude admin/notifications too — see `MIGRATIONS.md`'s
+  consolidation notes — each time by deleting and regenerating from
+  scratch, safe only because this is a SaaS kit forked fresh by third
+  parties, not a single app with data that can't be reset). Every
+  non-base history has its own fresh initial migration, named after the
+  layer rather than drizzle-kit's default `init` (`0000_admin.sql`,
+  `0000_notifications.sql`, `0000_kanban.sql`, `0000_billing.sql`) so a flat
+  listing shows which history a file belongs to at a glance — the filename
+  only locates the file on disk (`meta/_journal.json`'s `tag`), never
+  affects the applied-migration hash (`sha256` of file content). Generated
+  from that layer's schema alone; a non-base table can FK a base table by
+  name (`"Team"`, `"User"`) but never the reverse (enforced by
+  `scripts/layer-dependency-direction.test.ts`).
 - **Generate** (from the owning directory — `apps/functions`, or
-  `layers/kanban`/`layers/billing`), providing credentials via environment
-  variables: `DATABASE_HOST=… DATABASE_PORT=5432 DATABASE_USER=… DATABASE_PASSWORD=… DATABASE_NAME=… bunx drizzle-kit generate`
+  `layers/admin`/`layers/notifications`/`layers/kanban`/`layers/billing`),
+  providing credentials via environment variables:
+  `DATABASE_HOST=… DATABASE_PORT=5432 DATABASE_USER=… DATABASE_PASSWORD=… DATABASE_NAME=… bunx drizzle-kit generate`
   (`generate-migrations` script in each `package.json`). **Inspect generated
   SQL**: drizzle-kit cannot distinguish renames from drop + add operations.
 - **Apply**: runs automatically on every `App` deployment, base first, then
-  each **active** feature's history in turn, before the seed step — via
-  `scripts/run-migrations.mjs <folder> <table> <schema>`, each its own
-  `command.local.Command` chained via `dependsOn` (`infra/utils/nuxt.ts`),
-  using `Database*` secrets. **Never `bunx drizzle-kit migrate`**: its
+  every `layers.core` layer with its own history (unconditionally), then
+  every **active** `layers.features` layer with its own history, before the
+  seed step — via `scripts/run-migrations.mjs <folder> <table> <schema>`,
+  each its own `command.local.Command` chained via `dependsOn`
+  (`infra/utils/nuxt.ts`), using `Database*` secrets. Adding a new layer
+  with its own history — core or feature — needs zero edits to that loop.
+  **Never `bunx drizzle-kit migrate`**: its
   interactive spinner CLI crashes with a bare `exit status 1` when spawned
   without a TTY, exactly how `command.local.Command` runs it (reproduced on
   a real deploy). `run-migrations.mjs` calls `drizzle-orm`'s own `migrate()`

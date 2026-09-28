@@ -145,40 +145,49 @@ export async function deployWorker(
       { dependsOn: [worker] },
     );
 
-    // SPEC-0006: each active feature layer (`config.ts`'s `layers.features`)
-    // owns its own migration history — `layers/<name>/drizzle.config.ts`,
-    // `layers/<name>/migrations/` — separate from the base history above.
-    // Applied here, one migration run per active feature that actually has a
-    // `migrations/` folder (a feature layer can be frontend-only, or not have
-    // generated one yet — nothing to apply either way). A feature that is OFF
-    // is skipped entirely: its tables never reach this database, not even as
-    // an empty table — that is the whole point.
-    //
-    // Chained sequentially, base first, in `Object.entries` order: a
-    // feature's tables can FK into base tables (never the reverse — a base
-    // layer must never import a feature layer, enforced by
+    // SPEC-0006 (+ its admin/notifications follow-up): any layer — core or
+    // feature — that owns a `layers/<name>/drizzle.config.ts` applies its
+    // migrations from its own independent history, chained after whatever
+    // ran before it. A layer's tables can FK into base tables (never the
+    // reverse — a base layer must never import a feature layer, enforced by
     // scripts/layer-dependency-direction.test.ts), so the base migration
-    // must complete first. Order AMONG features doesn't matter today
-    // (verified: no feature layer references another — see SPEC-0006
-    // research), so declaration order is used for simplicity, not because
-    // it is required; a future feature that depends on another feature
-    // layer would need `requires` in its manifest reflected here too.
+    // above always runs first. This one helper, and the `existsSync` check
+    // inside it, is the entire mechanism: adding a new layer with its own
+    // migration history — core or feature — needs zero edits here.
     let lastMigrations: typeof baseMigrations = baseMigrations;
-    for (const [featureName, enabled] of Object.entries(layers.features)) {
-      if (!enabled) continue;
-      const featureRoot = path.resolve(`layers/${featureName}`);
-      if (!existsSync(path.resolve(featureRoot, "migrations"))) continue;
-      const migrationsTable = `__drizzle_migrations_${featureName}`;
+    const applyLayerMigrations = (layerName: string) => {
+      const layerRoot = path.resolve(`layers/${layerName}`);
+      if (!existsSync(path.resolve(layerRoot, "migrations"))) return;
+      const migrationsTable = `__drizzle_migrations_${layerName}`;
       lastMigrations = new command.local.Command(
-        `${name}Migrations${featureName[0].toUpperCase()}${featureName.slice(1)}`,
+        `${name}Migrations${layerName[0].toUpperCase()}${layerName.slice(1)}`,
         {
-          dir: featureRoot,
+          dir: layerRoot,
           create: `bun run ${runMigrationsScript} ./migrations ${migrationsTable} drizzle`,
           triggers: [new Date().toString()],
           environment: databaseEnvironment,
         },
         { dependsOn: [lastMigrations] },
       );
+    };
+
+    // Core layers with their own history (today: admin, notifications) run
+    // unconditionally, right after the base — `layers.core` has no on/off
+    // flag, unlike `layers.features` below. `teams` has no `drizzle.config.ts`
+    // of its own (a real, bidirectional FK cycle with core-schema.ts keeps
+    // it folded into the base history — see apps/functions/drizzle.config.ts),
+    // so `applyLayerMigrations` is a no-op for it: nothing to find, nothing
+    // created.
+    for (const layerName of layers.core) applyLayerMigrations(layerName);
+
+    // Feature layers with their own history (kanban, billing) run only when
+    // active — declaration order, since no feature layer today depends on
+    // another (see SPEC-0006 research); a future one that does would need
+    // its manifest's `requires` reflected here too. A feature that is OFF
+    // is skipped entirely: its tables never reach this database, not even
+    // as an empty table — that is the whole point.
+    for (const [featureName, enabled] of Object.entries(layers.features)) {
+      if (enabled) applyLayerMigrations(featureName);
     }
 
     // Guarantees the built-in team roles (Owner/Admin/Member) and the free

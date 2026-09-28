@@ -2,7 +2,6 @@
 -- Supabase and most managed Postgres providers ship this extension already.
 CREATE EXTENSION IF NOT EXISTS postgis;
 --> statement-breakpoint
-CREATE TYPE "public"."platform_role" AS ENUM('SUPER_ADMIN', 'SUPPORT');--> statement-breakpoint
 CREATE TABLE "DeadLetterRecord" (
 	"id" text PRIMARY KEY NOT NULL,
 	"message" jsonb NOT NULL,
@@ -113,38 +112,6 @@ CREATE TABLE "Team" (
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "Notification" (
-	"id" text PRIMARY KEY NOT NULL,
-	"title" text NOT NULL,
-	"message" text NOT NULL,
-	"userId" text NOT NULL,
-	"data" jsonb,
-	"read" boolean DEFAULT false NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "AuditLog" (
-	"id" text PRIMARY KEY NOT NULL,
-	"actorUserId" text NOT NULL,
-	"action" text NOT NULL,
-	"targetType" text NOT NULL,
-	"targetId" text,
-	"metadata" jsonb,
-	"ip" text,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "PlatformAdmin" (
-	"id" text PRIMARY KEY NOT NULL,
-	"userId" text NOT NULL,
-	"role" "platform_role" NOT NULL,
-	"mfaSecret" text,
-	"mfaEnabledAt" timestamp with time zone,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"revokedAt" timestamp with time zone,
-	CONSTRAINT "PlatformAdmin_userId_unique" UNIQUE("userId")
-);
---> statement-breakpoint
 ALTER TABLE "DeadLetterRecord" ADD CONSTRAINT "DeadLetterRecord_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Job" ADD CONSTRAINT "Job_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "MfaRecoveryCode" ADD CONSTRAINT "MfaRecoveryCode_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -153,5 +120,4 @@ ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_teamId_Team_id_fk" FOREIGN K
 ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_invitedById_User_id_fk" FOREIGN KEY ("invitedById") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "TeamMembership" ADD CONSTRAINT "TeamMembership_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "PlatformAdmin" ADD CONSTRAINT "PlatformAdmin_userId_User_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "MfaRecoveryCode_userId_scope_idx" ON "MfaRecoveryCode" USING btree ("userId","scope");

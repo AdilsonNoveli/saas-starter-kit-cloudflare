@@ -94,4 +94,4 @@
 
 ## Provenance Notes
 
-- **SPEC-0006 (2026-09-28):** `layers/kanban/package.json` and `layers/billing/package.json` each gained `drizzle-kit ^0.31.10` as a direct `devDependency` (own `drizzle.config.ts`, own migration history — see `.fireskills/STACK.md`). No new distinct row above: same package/version already inventoried for `apps/functions`, workspace-deduplicated by `$fireskill-documentator`. `bun install` run; `bun.lock` updated.
+- **SPEC-0006 (2026-09-28):** `layers/kanban/package.json` and `layers/billing/package.json` each gained `drizzle-kit ^0.31.10` as a direct `devDependency` (own `drizzle.config.ts`, own migration history — see `.fireskills/STACK.md`). No new distinct row above: same package/version already inventoried for `apps/functions`, workspace-deduplicated by `$fireskill-documentator`. `bun install` run; `bun.lock` updated. **Extended the same day:** `layers/admin/package.json` and `layers/notifications/package.json` gained the identical `drizzle-kit` devDependency for the same reason — their own independent migration history, verified safe by their one-directional-or-no FK shape against `core-schema.ts`. Same dedup, same `bun install`.

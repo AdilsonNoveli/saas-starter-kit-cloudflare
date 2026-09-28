@@ -49,6 +49,28 @@
 > "already have data" paragraph below, which still applies to any fork that
 > reaches this point with real user data to protect).
 
+> **2026-09-28 (admin/notifications split):** the same reasoning extended to
+> two more `layers.core` layers. `admin` (`PlatformAdmin`, `AuditLog`) and
+> `notifications` (`Notification`) each have only a one-directional FK into
+> the base — the same shape as `kanban`/`billing` — verified by reading both
+> schemas directly before touching anything. `teams` does **not** get this
+> treatment: it has a real, bidirectional FK cycle with `core-schema.ts`
+> (`Job`/`DeadLetterRecord` → `Team`, `TeamInvite.invitedById` → `User`),
+> so no single ordering across independent histories can satisfy both
+> directions — it stays folded into the base until that cycle is broken
+> (moving `Job`/`DeadLetterRecord` into `layers/teams`), which is separate,
+> undone work. `apps/functions/drizzle.config.ts` now filters `layers.core`
+> automatically — any core layer with its own `drizzle.config.ts` is
+> excluded from the base's schema, so a future core layer that gains an
+> independent history needs no edit here. The base's `0000_init.sql` was
+> regenerated again (11 tables now — `PlatformAdmin`/`AuditLog`/
+> `Notification` moved out), and `infra/utils/nuxt.ts`'s migration loop was
+> generalized to also apply every `layers.core` layer's own history
+> (unconditionally, before the `layers.features` loop) instead of only
+> feature layers — a new layer with its own `migrations/` folder, core or
+> feature, needs zero further edits there. Same reset procedure as above,
+> same reasoning (development database, no data that needed to survive).
+
 Migrations are **generated** with Drizzle Kit (`drizzle-kit generate`, an
 author-time command always run interactively by a human) from `schema.ts`,
 but **applied** against Postgres by `scripts/run-migrations.mjs`, never by
@@ -80,10 +102,10 @@ If you ever need to run a migration by hand outside a deploy (e.g. to
 diagnose a failure), use the identical command `infra/utils/nuxt.ts` runs:
 
 ```bash
-cd apps/functions   # or layers/kanban, layers/billing
+cd apps/functions   # or layers/admin, layers/notifications, layers/kanban, layers/billing
 DATABASE_HOST=... DATABASE_PORT=5432 DATABASE_USER=... DATABASE_PASSWORD=... DATABASE_NAME=... \
   bun run ../../scripts/run-migrations.mjs ./src/database/migrations __drizzle_migrations drizzle
-  # (feature layer: ./migrations __drizzle_migrations_<name> drizzle)
+  # (any other layer: ./migrations __drizzle_migrations_<name> drizzle)
 ```
 
 **If you ever edit `infra/utils/nuxt.ts`'s `create` strings**: never wrap the
@@ -98,24 +120,48 @@ quoting, since the repo path has no spaces. Before reporting any change to
 these command strings as fixed, reproduce it locally under this same double
 `cmd /c "..."` wrap; do not rely on `tsc` alone.
 
-## Base vs. feature histories
+## Base and layer histories
 
-There are now three independent migration histories, each with its own
-`drizzle-kit` config and its own tracking table in the `drizzle` schema:
+There are now **five** independent migration histories, each with its own
+`drizzle-kit` config and its own tracking table in the `drizzle` schema —
+not just base vs. feature; two `layers.core` layers have their own history
+too:
 
 | History | Config | Migrations | Tracking table | Scope |
 | --- | --- | --- | --- | --- |
-| Base | `apps/functions/drizzle.config.ts` | `apps/functions/src/database/migrations/` | `drizzle.__drizzle_migrations` | `layers.core` schemas + `core-schema.ts` (always applied) |
-| Kanban | `layers/kanban/drizzle.config.ts` | `layers/kanban/migrations/` | `drizzle.__drizzle_migrations_kanban` | `layers/kanban/server/database/schema.ts` only |
-| Billing | `layers/billing/drizzle.config.ts` | `layers/billing/migrations/` | `drizzle.__drizzle_migrations_billing` | `layers/billing/server/database/schema.ts` only |
+| Base | `apps/functions/drizzle.config.ts` | `apps/functions/src/database/migrations/` | `drizzle.__drizzle_migrations` | `core-schema.ts` + `layers/teams` only (always applied) |
+| Admin | `layers/admin/drizzle.config.ts` | `layers/admin/migrations/` | `drizzle.__drizzle_migrations_admin` | `layers/admin/server/database/schema.ts` only (core, always applied) |
+| Notifications | `layers/notifications/drizzle.config.ts` | `layers/notifications/migrations/` | `drizzle.__drizzle_migrations_notifications` | `layers/notifications/server/database/schema.ts` only (core, always applied) |
+| Kanban | `layers/kanban/drizzle.config.ts` | `layers/kanban/migrations/` | `drizzle.__drizzle_migrations_kanban` | `layers/kanban/server/database/schema.ts` only (feature, gated) |
+| Billing | `layers/billing/drizzle.config.ts` | `layers/billing/migrations/` | `drizzle.__drizzle_migrations_billing` | `layers/billing/server/database/schema.ts` only (feature, gated) |
 
-A feature layer's tables can FK into base tables by name (e.g. `Team`) —
-never the reverse, since a base layer must never import a feature layer
-(enforced by `scripts/layer-dependency-direction.test.ts`, which also
-catches an indirect import through the schema barrel). `infra/utils/nuxt.ts`
-applies the base history first, then each active feature's history in turn,
-before running the seed step — so a feature's `CREATE TABLE ... REFERENCES
-"Team"` always runs after `"Team"` exists.
+**Why `teams` stays folded into the base, unlike `admin`/`notifications`:**
+`admin` and `notifications` each have a one-directional FK into the base
+only (`PlatformAdmin.userId` → `User`; `Notification.userId` has no
+physical FK at all, only a Drizzle relation) — same shape as
+kanban/billing, safe to split. `teams` has a **real, bidirectional**
+physical FK cycle with `core-schema.ts`: `Job.teamId`/
+`DeadLetterRecord.teamId` → `Team` (base needs teams' table to exist), and
+`TeamInvite.invitedById` → `User` (teams needs base's table to exist). No
+single migration ordering across two independent histories can satisfy
+both directions, so `teams` has no `drizzle.config.ts` of its own — its
+tables are created by the base's own migration, same as before. Splitting
+it would first require moving `Job`/`DeadLetterRecord` out of
+`core-schema.ts` and into `layers/teams` itself (they're team-scoped
+concepts anyway) to make the dependency one-directional — not done, a
+deliberate, separate piece of work if it ever happens.
+
+A layer's tables can FK into base tables by name (e.g. `Team`) — never the
+reverse, since a base layer must never import a feature layer (enforced by
+`scripts/layer-dependency-direction.test.ts`, which also catches an
+indirect import through the schema barrel). `infra/utils/nuxt.ts` applies
+the base history first, then every `layers.core` layer with its own
+history (unconditionally — core has no on/off flag), then every **active**
+`layers.features` layer with its own history, before running the seed step
+— so any layer's `CREATE TABLE ... REFERENCES "Team"`/`"User"` always runs
+after those tables exist. Adding a new layer with its own history — core or
+feature — needs zero edits to that file: the loop discovers any
+`layers/<name>/migrations/` folder automatically.
 
 **Why this split, not one shared history gated by `config.ts`:** the
 previous design generated the base's migrations from `layers.core` **and**
@@ -124,7 +170,12 @@ new migrations from referencing it — its tables, already created by past
 migrations, stayed in the database forever. It also meant a fork that never
 uses kanban still carried kanban's DDL in the one history everyone shares.
 With independent histories, a feature that was never turned on never runs
-its migrations at all, so its tables never exist.
+its migrations at all, so its tables never exist. `admin`/`notifications`
+followed the same reasoning even though they're never toggled off: one
+shared, ever-growing history is exactly the "confusing on day one" problem
+this whole split exists to avoid — a fork should see, from the first
+migration file in each folder, exactly which tables belong to which part
+of the system.
 
 **How the split was originally done (2026-09-28, superseded the same day —
 kept here because the technique is what a live production fork must use

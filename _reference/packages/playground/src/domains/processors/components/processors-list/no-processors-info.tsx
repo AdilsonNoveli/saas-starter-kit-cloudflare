@@ -1,0 +1,21 @@
+import { Button } from '@mastra/playground-ui/components/Button';
+import { EmptyState } from '@mastra/playground-ui/components/EmptyState';
+import { ExternalLinkIcon } from 'lucide-react';
+
+export const NoProcessorsInfo = () => (
+  <EmptyState
+    titleSlot="No Processors yet"
+    descriptionSlot="Configure processors. Add input or output processors to your agents to transform messages."
+    actionSlot={
+      <Button
+        variant="ghost"
+        render={<a href="https://mastra.ai/docs/agents/processors" target="_blank" rel="noopener noreferrer" />}
+
+        icon={<ExternalLinkIcon />}
+      >
+        Processors Documentation
+      </Button>
+    }
+    variant="fill"
+  />
+);

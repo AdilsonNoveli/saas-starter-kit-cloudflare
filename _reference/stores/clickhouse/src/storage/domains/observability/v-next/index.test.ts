@@ -1,0 +1,6585 @@
+/**
+ * Integration tests for the ClickHouse v-next observability storage domain.
+ *
+ * Mirrors the DuckDB observability test suite but adapted for v-next semantics:
+ * - Insert-only model (no span updates)
+ * - ReplacingMergeTree for tracing, append-only MergeTree for signals
+ * - Discovery via helper tables (discovery_values / discovery_pairs)
+ * - Label-key exclusion in grouped queries
+ *
+ * Requires a running ClickHouse instance. Use `docker compose up -d` in the
+ * clickhouse store directory, or set CLICKHOUSE_URL/CLICKHOUSE_USERNAME/CLICKHOUSE_PASSWORD.
+ */
+import { randomUUID } from 'node:crypto';
+import { createClient } from '@clickhouse/client';
+import { createObservabilityVNextTests } from '@internal/storage-test-utils';
+import { coreFeatures } from '@mastra/core/features';
+import { EntityType, SpanType } from '@mastra/core/observability';
+import {
+  parseTraceQueryRequest,
+  planTraceQuery,
+  TraceQueryExecutionError,
+  TraceQueryResourceLimitError,
+} from '@mastra/core/storage';
+import type { ObservabilityStorage } from '@mastra/core/storage';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  ALL_MIGRATIONS,
+  buildAllMvDDL,
+  buildAllTableDDL,
+  buildRetentionDDL,
+  buildRetentionEntries,
+  MV_DISCOVERY_PAIRS,
+  MV_DISCOVERY_VALUES,
+  MV_SCORE_EVENTS_CURRENT,
+  MV_TRACE_ROOTS_DELTA,
+  MV_SCORE_EVENTS_DELTA,
+  buildScoreEventsDeltaMvDDL,
+  parseTtlExpression,
+  SCORE_EVENT_COLUMN_NAMES,
+  TABLE_DELETION_REQUESTS,
+  TABLE_DISCOVERY_PAIRS,
+  TABLE_DISCOVERY_VALUES,
+  TABLE_FEEDBACK_EVENTS,
+  TABLE_FEEDBACK_EVENTS_DELTA,
+  TABLE_SCORE_EVENTS,
+  TABLE_SCORE_EVENTS_CURRENT,
+  TABLE_SCORE_EVENTS_CURRENT_BACKFILL,
+  TABLE_SCORE_EVENTS_DELTA,
+  TABLE_SPAN_EVENTS,
+  TABLE_TRACE_ROOTS,
+  TABLE_TRACE_ROOTS_DELTA,
+} from './ddl';
+import { feedbackRecordToRow, scoreRecordToRow, spanRecordToRow } from './helpers';
+import { isReplacingMergeTreeEngine } from './migration';
+import { backfillCurrentScores } from './score-current';
+import { compileClickHouseTraceQuery, runWithClickHouseTraceQueryTimeout } from './trace-query';
+import { ObservabilityStorageClickhouseVNext } from '.';
+
+vi.setConfig({ testTimeout: 60_000, hookTimeout: 60_000 });
+
+// Reuse a single ClickHouse storage instance across the shared suite. init()
+// is expensive (DDL + MVs + migrations) and running it per-test triggers
+// container crashes under ARM emulation. dangerouslyClearAll() truncates the
+// signal tables between tests, giving the same isolation as a fresh instance.
+let sharedSuiteStorage: ObservabilityStorageClickhouseVNext | undefined;
+
+createObservabilityVNextTests({
+  capabilities: {
+    label: 'ClickHouse vNext',
+    preferredStrategy: 'insert-only',
+    traceQuery: true,
+    traceQueryDiscovery: true,
+    threadQuery: true,
+    traceQuerySpanWriteModel: 'completion-only',
+  },
+  getStorage: async () => {
+    if (!sharedSuiteStorage) {
+      sharedSuiteStorage = new ObservabilityStorageClickhouseVNext({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      await sharedSuiteStorage.init();
+    }
+    return sharedSuiteStorage as unknown as ObservabilityStorage;
+  },
+  cleanup: async storage => {
+    await storage.dangerouslyClearAll();
+  },
+  // ClickHouse vNext serves discovery from refreshable materialized views.
+  // In production they refresh on a schedule; in tests we need to trigger the
+  // refresh by hand so discovery reads see writes from the same test.
+  refreshDiscovery: async () => {
+    const { MV_DISCOVERY_VALUES, MV_DISCOVERY_PAIRS } = await import('./ddl');
+    const client = createClient({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+    try {
+      await client.command({ query: `SYSTEM REFRESH VIEW ${MV_DISCOVERY_VALUES}` });
+      await client.command({ query: `SYSTEM WAIT VIEW ${MV_DISCOVERY_VALUES}` });
+      await client.command({ query: `SYSTEM REFRESH VIEW ${MV_DISCOVERY_PAIRS}` });
+      await client.command({ query: `SYSTEM WAIT VIEW ${MV_DISCOVERY_PAIRS}` });
+    } finally {
+      await client.close();
+    }
+  },
+  // ClickHouse vNext dedups signal-table inserts via ReplacingMergeTree
+  // background merges. In retry-idempotency tests we force the merge with
+  // OPTIMIZE ... FINAL so the read assertion sees the collapsed row.
+  flushPendingMerges: async () => {
+    const {
+      TABLE_LOG_EVENTS,
+      TABLE_METRIC_EVENTS,
+      TABLE_SCORE_EVENTS,
+      TABLE_SCORE_EVENTS_CURRENT,
+      TABLE_FEEDBACK_EVENTS,
+    } = await import('./ddl');
+    const client = createClient({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+    try {
+      for (const table of [
+        TABLE_LOG_EVENTS,
+        TABLE_METRIC_EVENTS,
+        TABLE_SCORE_EVENTS,
+        TABLE_SCORE_EVENTS_CURRENT,
+        TABLE_FEEDBACK_EVENTS,
+      ]) {
+        await client.command({ query: `OPTIMIZE TABLE ${table} FINAL` });
+      }
+    } finally {
+      await client.close();
+    }
+  },
+});
+
+describe('ObservabilityStorageClickhouseVNext', () => {
+  let storage: ObservabilityStorageClickhouseVNext;
+
+  beforeAll(async () => {
+    storage = new ObservabilityStorageClickhouseVNext({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+    await storage.init();
+  });
+
+  beforeEach(async () => {
+    await storage.dangerouslyClearAll();
+  });
+
+  afterAll(async () => {
+    await storage.dangerouslyClearAll();
+  });
+
+  // ==========================================================================
+  // Strategy
+  // ==========================================================================
+
+  it('cancels timed-out trace-query work without affecting the next query', async () => {
+    const client = createClient({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+
+    try {
+      await expect(
+        runWithClickHouseTraceQueryTimeout(
+          client,
+          { timeoutMs: 10 },
+          {
+            query: 'SELECT sleep(0.1)',
+            query_params: {},
+          },
+        ),
+      ).rejects.toBeInstanceOf(TraceQueryExecutionError);
+
+      const result = await client.query({ query: 'SELECT 1 AS value', format: 'JSONEachRow' });
+      expect(await result.json<{ value: number }>()).toEqual([{ value: 1 }]);
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('reports discovery memory exhaustion without returning partial rows', async () => {
+    const client = createClient({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+
+    try {
+      await expect(
+        runWithClickHouseTraceQueryTimeout(
+          client,
+          { timeoutMs: 5_000, memoryLimitBytes: 1 },
+          { query: 'SELECT number, count() FROM numbers(1000000) GROUP BY number', query_params: {} },
+        ),
+      ).rejects.toBeInstanceOf(TraceQueryResourceLimitError);
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('pushes candidate trace IDs into related-table reads', async () => {
+    const client = createClient({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+    const startedAt = new Date('2026-08-26T10:00:00.000Z');
+    const fixtureSize = 20_000;
+    const unrelatedSpans = Array.from({ length: fixtureSize }, (_, index) => ({
+      traceId: `irrelevant-${String(index).padStart(5, '0')}`,
+      spanId: `irrelevant-span-${index}`,
+      parentSpanId: 'irrelevant-root',
+      name: 'irrelevant child',
+      spanType: SpanType.AGENT_RUN,
+      isEvent: false,
+      startedAt,
+      endedAt: new Date(startedAt.getTime() + 500),
+    }));
+    const unrelatedScores = Array.from({ length: fixtureSize }, (_, index) => ({
+      id: `irrelevant-score-${index}`,
+      scoreId: `irrelevant-score-${index}`,
+      traceId: `irrelevant-${String(index).padStart(5, '0')}`,
+      scorerId: 'quality',
+      score: 0.5,
+      timestamp: startedAt,
+      createdAt: startedAt,
+      updatedAt: null,
+    }));
+
+    try {
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'candidate-trace',
+            spanId: 'candidate-root',
+            parentSpanId: null,
+            name: 'candidate root',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            startedAt,
+            endedAt: new Date(startedAt.getTime() + 1_000),
+          },
+          {
+            traceId: 'candidate-trace',
+            spanId: 'candidate-child',
+            parentSpanId: 'candidate-root',
+            name: 'candidate child',
+            spanType: SpanType.TOOL_CALL,
+            isEvent: false,
+            startedAt,
+            endedAt: new Date(startedAt.getTime() + 500),
+          },
+          ...unrelatedSpans,
+        ],
+      });
+      await storage.batchCreateScores({
+        scores: [
+          {
+            id: 'candidate-score',
+            scoreId: 'candidate-score',
+            traceId: 'candidate-trace',
+            scorerId: 'quality',
+            score: 0.5,
+            timestamp: startedAt,
+            createdAt: startedAt,
+            updatedAt: null,
+          },
+          ...unrelatedScores,
+        ],
+      });
+
+      const executeAndReadRows = async (
+        request: Record<string, unknown>,
+        expectedTable: string,
+        expectPrimaryKey = true,
+        expectedIndex?: string,
+      ) => {
+        const plan = planTraceQuery(
+          parseTraceQueryRequest({
+            timeRange: {
+              from: new Date(startedAt.getTime() - 1_000).toISOString(),
+              to: new Date(startedAt.getTime() + 2_000).toISOString(),
+            },
+            ...request,
+          }),
+        );
+        const compiled = compileClickHouseTraceQuery(plan);
+        const explainResult = await client.query({
+          query: `EXPLAIN indexes = 1 ${compiled.query}`,
+          query_params: compiled.query_params,
+          format: 'TabSeparatedRaw',
+        });
+        const explain = await explainResult.text();
+        expect(explain).toContain(expectedTable);
+        if (expectPrimaryKey) expect(explain).toContain('PrimaryKey');
+        if (expectedIndex) expect(explain).toContain(expectedIndex);
+
+        const queryId = `trace-query-perf-${randomUUID()}`;
+        await runWithClickHouseTraceQueryTimeout(client, { timeoutMs: 15_000 }, compiled, queryId);
+        await client.command({ query: 'SYSTEM FLUSH LOGS' });
+        const logResult = await client.query({
+          query: `SELECT read_rows AS readRows, read_bytes AS readBytes
+FROM system.query_log
+WHERE query_id = {queryId:String} AND type = 'QueryFinish'
+ORDER BY event_time_microseconds DESC
+LIMIT 1`,
+          query_params: { queryId },
+          format: 'JSONEachRow',
+        });
+        const [log] = await logResult.json<{ readRows: number; readBytes: number }>();
+        expect(Number(log?.readBytes)).toBeGreaterThan(0);
+        return Number(log?.readRows);
+      };
+
+      const spanReadRows = await executeAndReadRows(
+        {
+          where: {
+            spans: { some: { op: 'eq', left: { path: 'spanType' }, right: { literal: SpanType.TOOL_CALL } } },
+          },
+        },
+        TABLE_SPAN_EVENTS,
+      );
+      const scoreReadRows = await executeAndReadRows(
+        { where: { scores: { some: { op: 'lt', left: { path: 'score' }, right: { literal: 0.6 } } } } },
+        TABLE_SCORE_EVENTS_CURRENT,
+      );
+      const repeatedSpanReadRows = await executeAndReadRows(
+        {
+          where: {
+            op: 'and',
+            args: [
+              { spans: { some: { op: 'eq', left: { path: 'spanType' }, right: { literal: SpanType.TOOL_CALL } } } },
+              { spans: { none: { op: 'exists', path: 'error' } } },
+            ],
+          },
+        },
+        TABLE_SPAN_EVENTS,
+      );
+      const repeatedScoreReadRows = await executeAndReadRows(
+        {
+          where: {
+            op: 'and',
+            args: [
+              { scores: { some: { op: 'lt', left: { path: 'score' }, right: { literal: 0.6 } } } },
+              { scores: { some: { op: 'eq', left: { path: 'scorerId' }, right: { literal: 'quality' } } } },
+            ],
+          },
+        },
+        TABLE_SCORE_EVENTS_CURRENT,
+      );
+      const mixedReadRows = await executeAndReadRows(
+        {
+          where: {
+            op: 'and',
+            args: [
+              { spans: { some: { op: 'eq', left: { path: 'spanType' }, right: { literal: SpanType.TOOL_CALL } } } },
+              { scores: { some: { op: 'lt', left: { path: 'score' }, right: { literal: 0.6 } } } },
+            ],
+          },
+        },
+        TABLE_SPAN_EVENTS,
+      );
+      const groupedReadRows = await executeAndReadRows({ group: { by: ['threadId'] } }, TABLE_TRACE_ROOTS, false);
+
+      expect(spanReadRows).toBeLessThan(fixtureSize);
+      expect(repeatedSpanReadRows).toBeLessThan(fixtureSize);
+      // Score predicates read the compact current-state table rather than rewrite history.
+      expect(scoreReadRows).toBeLessThan(fixtureSize * 2 + 100);
+      expect(repeatedScoreReadRows).toBeLessThan(fixtureSize * 2 + 100);
+      expect(mixedReadRows).toBeLessThan(fixtureSize * 3);
+      expect(groupedReadRows).toBeLessThan(10);
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('reads root payloads only for traces in the requested time range', async () => {
+    const client = createClient({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+    const startedAt = new Date('2026-08-26T10:00:00.000Z');
+    const outsideRoots = 5_000;
+    const payload = 'x'.repeat(2_000);
+
+    try {
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'in-range-trace',
+            spanId: 'in-range-root',
+            parentSpanId: null,
+            name: 'in-range root',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            startedAt,
+            endedAt: new Date(startedAt.getTime() + 1_000),
+          },
+          ...Array.from({ length: outsideRoots }, (_, index) => ({
+            traceId: `outside-${index}`,
+            spanId: `outside-root-${index}`,
+            parentSpanId: null,
+            name: 'outside root',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            input: payload,
+            output: payload,
+            startedAt: new Date(startedAt.getTime() - (index + 1) * 60_000),
+            endedAt: new Date(startedAt.getTime() - (index + 1) * 60_000 + 1_000),
+          })),
+        ],
+      });
+
+      const plan = planTraceQuery(
+        parseTraceQueryRequest({
+          timeRange: {
+            from: new Date(startedAt.getTime() - 1_000).toISOString(),
+            to: new Date(startedAt.getTime() + 2_000).toISOString(),
+          },
+        }),
+      );
+      const queryId = `trace-query-range-${randomUUID()}`;
+      const rows = await runWithClickHouseTraceQueryTimeout(
+        client,
+        { timeoutMs: 15_000 },
+        compileClickHouseTraceQuery(plan),
+        queryId,
+      );
+      expect(rows.map(row => row.traceId)).toEqual(['in-range-trace']);
+
+      await client.command({ query: 'SYSTEM FLUSH LOGS' });
+      const logResult = await client.query({
+        query: `SELECT read_bytes AS readBytes
+FROM system.query_log
+WHERE query_id = {queryId:String} AND type = 'QueryFinish'
+ORDER BY event_time_microseconds DESC
+LIMIT 1`,
+        query_params: { queryId },
+        format: 'JSONEachRow',
+      });
+      const [log] = await logResult.json<{ readBytes: number }>();
+      // Deduping the whole table would read every outside root's input and output.
+      expect(Number(log?.readBytes)).toBeLessThan(outsideRoots * payload.length);
+    } finally {
+      await client.close();
+    }
+  });
+
+  it('does not resurrect a trace through a non-current root in the requested time range', async () => {
+    const root = {
+      traceId: 'multi-root-trace',
+      parentSpanId: null,
+      name: 'agent run',
+      spanType: SpanType.AGENT_RUN,
+      isEvent: false,
+    };
+    await storage.batchCreateSpans({
+      records: [
+        {
+          ...root,
+          spanId: 'root-a',
+          startedAt: new Date('2026-08-05T10:00:00.000Z'),
+          endedAt: new Date('2026-08-05T10:00:02.000Z'),
+        },
+        {
+          ...root,
+          spanId: 'root-a-old',
+          startedAt: new Date('2026-08-01T10:00:00.000Z'),
+          endedAt: new Date('2026-08-01T10:00:01.000Z'),
+        },
+      ],
+    });
+
+    const query = async (from: string, to: string) => {
+      const response = await storage.queryTraces(planTraceQuery(parseTraceQueryRequest({ timeRange: { from, to } })));
+      if (!('traces' in response)) throw new Error('Expected trace results');
+      return response.traces.map(trace => trace.traceId);
+    };
+
+    expect(await query('2026-08-01T00:00:00Z', '2026-08-02T00:00:00Z')).toEqual([]);
+    expect(await query('2026-08-05T00:00:00Z', '2026-08-06T00:00:00Z')).toEqual(['multi-root-trace']);
+  });
+
+  it('keeps ordinary current-score reads proportional to logical rows after merges', async () => {
+    const client = createClient({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+    const logicalRows = 5_000;
+    const versionsPerScore = 5;
+    const aggregateQuery = `
+      SELECT count() AS total, avg(score) AS average
+      FROM (SELECT * FROM ${TABLE_SCORE_EVENTS_CURRENT} FINAL)
+      WHERE scorerId = 'current-state-performance'
+    `;
+
+    const runAggregate = async (queryId: string) => {
+      const result = await client.query({ query: aggregateQuery, query_id: queryId, format: 'JSONEachRow' });
+      const [row] = await result.json<{ total: string | number; average: number }>();
+      await client.command({ query: 'SYSTEM FLUSH LOGS' });
+      const logResult = await client.query({
+        query: `SELECT read_rows AS readRows
+                FROM system.query_log
+                WHERE query_id = {queryId:String} AND type = 'QueryFinish'
+                ORDER BY event_time_microseconds DESC
+                LIMIT 1`,
+        query_params: { queryId },
+        format: 'JSONEachRow',
+      });
+      const [log] = await logResult.json<{ readRows: string | number }>();
+      return { total: Number(row?.total), average: Number(row?.average), readRows: Number(log?.readRows) };
+    };
+
+    try {
+      await client.command({
+        query: `INSERT INTO ${TABLE_SCORE_EVENTS} (timestamp, scoreId, writeVersion, scorerId, score)
+                SELECT
+                  now64(3, 'UTC') - toIntervalDay(${versionsPerScore} - version),
+                  concat('current-state-performance-', toString(id)),
+                  version + 1,
+                  'current-state-performance',
+                  toFloat64(version)
+                FROM (SELECT number AS id FROM numbers(${logicalRows})) AS ids
+                CROSS JOIN (SELECT number AS version FROM numbers(${versionsPerScore})) AS versions`,
+      });
+
+      const explainResult = await client.query({
+        query: `EXPLAIN indexes = 1 ${aggregateQuery}`,
+        format: 'TabSeparatedRaw',
+      });
+      const explain = await explainResult.text();
+      expect(explain).toContain(TABLE_SCORE_EVENTS_CURRENT);
+      expect(explain.replaceAll(TABLE_SCORE_EVENTS_CURRENT, '')).not.toContain(TABLE_SCORE_EVENTS);
+
+      const beforeMerge = await runAggregate(`current-state-before-${randomUUID()}`);
+      const beforePage = await storage.listScores({
+        filters: { scorerId: 'current-state-performance' },
+        pagination: { page: 0, perPage: 10 },
+      });
+      const beforeOlap = await storage.getScoreAggregate({ scorerId: 'current-state-performance', aggregation: 'avg' });
+
+      await client.command({ query: `OPTIMIZE TABLE ${TABLE_SCORE_EVENTS_CURRENT} FINAL` });
+
+      const afterMerge = await runAggregate(`current-state-after-${randomUUID()}`);
+      const afterPage = await storage.listScores({
+        filters: { scorerId: 'current-state-performance' },
+        pagination: { page: 0, perPage: 10 },
+      });
+      const afterOlap = await storage.getScoreAggregate({ scorerId: 'current-state-performance', aggregation: 'avg' });
+      const historyResult = await client.query({
+        query: `SELECT count() AS total FROM ${TABLE_SCORE_EVENTS} WHERE scorerId = 'current-state-performance'`,
+        format: 'JSONEachRow',
+      });
+      const [historyRow] = await historyResult.json<{ total: string | number }>();
+
+      expect(beforeMerge).toMatchObject({ total: logicalRows, average: versionsPerScore - 1 });
+      expect(afterMerge).toMatchObject({ total: logicalRows, average: versionsPerScore - 1 });
+      expect(afterMerge.readRows).toBeLessThanOrEqual(logicalRows);
+      expect(afterMerge.readRows).toBeLessThan(Number(historyRow?.total));
+      expect(beforePage.pagination.total).toBe(logicalRows);
+      expect(beforePage.scores).toHaveLength(10);
+      expect(beforePage.scores.every(score => score.score === versionsPerScore - 1)).toBe(true);
+      expect(afterPage).toEqual(beforePage);
+      expect(beforeOlap).toEqual({ value: versionsPerScore - 1 });
+      expect(afterOlap).toEqual(beforeOlap);
+    } finally {
+      await client.close();
+    }
+  });
+
+  // ClickHouse vNext is completion-only. The tied-version fixture models event-sourced
+  // replacement writes and intentionally remains covered by PostgreSQL and DuckDB only.
+
+  it('reports insert-only as preferred strategy', () => {
+    expect(storage.observabilityStrategy).toEqual({
+      preferred: 'insert-only',
+      supported: ['insert-only'],
+    });
+  });
+
+  describe('delta polling', () => {
+    async function withFallbackStorage<T>(
+      run: (
+        fallbackStorage: ObservabilityStorageClickhouseVNext,
+        client: ReturnType<typeof createClient>,
+      ) => Promise<T>,
+    ): Promise<T> {
+      let adminClient: ReturnType<typeof createClient> | null = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        clickhouse_settings: {
+          date_time_input_format: 'best_effort',
+          date_time_output_format: 'iso',
+          use_client_time_zone: 1,
+          output_format_json_quote_64bit_integers: 0,
+        },
+      });
+      const database = `fallback_delta_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      await adminClient.command({ query: `CREATE DATABASE ${database}` });
+
+      // A database in the URL overrides the explicit database option.
+      const fixtureUrl = new URL(process.env.CLICKHOUSE_URL || 'http://localhost:8123');
+      fixtureUrl.pathname = '/';
+      fixtureUrl.searchParams.delete('database');
+      let client: ReturnType<typeof createClient> | null = createClient({
+        url: fixtureUrl.toString(),
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        database,
+        clickhouse_settings: {
+          date_time_input_format: 'best_effort',
+          date_time_output_format: 'iso',
+          use_client_time_zone: 1,
+          output_format_json_quote_64bit_integers: 0,
+        },
+      });
+
+      let fallbackStorage: ObservabilityStorageClickhouseVNext | null = new ObservabilityStorageClickhouseVNext({
+        client,
+        deltaCursorStrategy: 'fallback',
+      });
+
+      try {
+        await fallbackStorage.init();
+        await fallbackStorage.dangerouslyClearAll();
+        return await run(fallbackStorage, client);
+      } finally {
+        if (fallbackStorage) {
+          await fallbackStorage.dangerouslyClearAll();
+        }
+        if (client) {
+          await client.close();
+        }
+        if (adminClient) {
+          await adminClient.command({ query: `DROP DATABASE IF EXISTS ${database} SYNC` });
+          await adminClient.close();
+        }
+      }
+    }
+
+    it('characterizes a delta index entry becoming visible before its trace root', async () => {
+      await withFallbackStorage(async (isolatedStorage, client) => {
+        const startedAt = new Date();
+        const timeRange = {
+          from: new Date(startedAt.getTime() - 1_000).toISOString(),
+          to: new Date(startedAt.getTime() + 60_000).toISOString(),
+        };
+        const poll = async (after?: string) => {
+          const result = await isolatedStorage.queryTraces(
+            planTraceQuery(parseTraceQueryRequest({ timeRange, mode: 'delta', after })),
+          );
+          if (!('delta' in result)) throw new Error('Expected delta response');
+          return result;
+        };
+        const bootstrap = await poll();
+        const root = spanRecordToRow({
+          traceId: 'visibility-gap',
+          spanId: 'visibility-gap-root',
+          parentSpanId: null,
+          name: 'delayed root visibility',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          startedAt,
+          endedAt: new Date(startedAt.getTime() + 1),
+        });
+
+        // Stage physical-table visibility explicitly: ClickHouse does not make
+        // a source insert and its materialized views atomic for concurrent readers.
+        await client.insert({
+          table: TABLE_TRACE_ROOTS_DELTA,
+          format: 'JSONEachRow',
+          values: [
+            {
+              cursorId: '1',
+              ingestedAt: startedAt.toISOString(),
+              startedAt: startedAt.toISOString(),
+              traceId: root.traceId,
+              dedupeKey: root.dedupeKey,
+            },
+          ],
+        });
+        const gap = await poll(bootstrap.deltaCursor);
+        expect(gap.traces).toEqual([]);
+        expect(gap.deltaCursor).not.toBe(bootstrap.deltaCursor);
+
+        // The same insert becomes visible in the root table without producing a
+        // second index entry. Isolate the fixture so no shared MV is detached.
+        await client.command({ query: `DETACH TABLE ${MV_TRACE_ROOTS_DELTA}` });
+        try {
+          await client.insert({ table: TABLE_TRACE_ROOTS, format: 'JSONEachRow', values: [root] });
+        } finally {
+          await client.command({ query: `ATTACH TABLE ${MV_TRACE_ROOTS_DELTA}` });
+        }
+        expect((await poll(gap.deltaCursor)).traces).toEqual([]);
+        // An older cursor still sees the row, but the advanced cursor cannot.
+        expect((await poll(bootstrap.deltaCursor)).traces.map(trace => trace.traceId)).toEqual(['visibility-gap']);
+        const reloaded = await isolatedStorage.queryTraces(
+          planTraceQuery(parseTraceQueryRequest({ timeRange, pagination: { page: 0, perPage: 10 } })),
+        );
+        expect('traces' in reloaded && reloaded.traces.map(trace => trace.traceId)).toEqual(['visibility-gap']);
+      });
+    });
+
+    it('characterizes concurrent trace inserts and delta polls with numbered-page reconciliation', async () => {
+      await withFallbackStorage(async isolatedStorage => {
+        const startedAt = new Date();
+        const timeRange = {
+          from: new Date(startedAt.getTime() - 1_000).toISOString(),
+          to: new Date(startedAt.getTime() + 60_000).toISOString(),
+        };
+        const poll = async (after?: string) => {
+          const result = await isolatedStorage.queryTraces(
+            planTraceQuery(parseTraceQueryRequest({ timeRange, mode: 'delta', after, limit: 3 })),
+          );
+          if (!('delta' in result)) throw new Error('Expected delta response');
+          return result;
+        };
+        let after = (await poll()).deltaCursor;
+        const expected = Array.from({ length: 12 }, (_, index) => `concurrent-${String(index).padStart(2, '0')}`);
+        const observed = new Set<string>();
+        const record = (result: Awaited<ReturnType<typeof poll>>) => {
+          expect(result.traces.length).toBeLessThanOrEqual(3);
+          expect(new Set(result.traces.map(trace => trace.traceId)).size).toBe(result.traces.length);
+          for (const trace of result.traces) {
+            expect(expected).toContain(trace.traceId);
+            observed.add(trace.traceId);
+          }
+          after = result.deltaCursor;
+        };
+        // Promise.all starts each poll before waiting for the insert acknowledgment.
+        // A missed trace is permitted: this test characterizes best-effort polling.
+        for (const traceId of expected) {
+          const [, result] = await Promise.all([
+            isolatedStorage.batchCreateSpans({
+              records: [
+                {
+                  traceId,
+                  spanId: `${traceId}-root`,
+                  parentSpanId: null,
+                  name: 'concurrent completed root',
+                  spanType: SpanType.AGENT_RUN,
+                  isEvent: false,
+                  startedAt,
+                  endedAt: new Date(startedAt.getTime() + 1),
+                },
+              ],
+            }),
+            poll(after),
+          ]);
+          record(result);
+        }
+        for (let batch = 0; batch <= expected.length; batch++) {
+          const result = await poll(after);
+          record(result);
+          if (!result.delta.hasMore) break;
+          expect(batch).toBeLessThan(expected.length);
+        }
+        const reloaded = await isolatedStorage.queryTraces(
+          planTraceQuery(parseTraceQueryRequest({ timeRange, pagination: { page: 0, perPage: 100 } })),
+        );
+        if (!('pagination' in reloaded)) throw new Error('Expected numbered-page response');
+        expect(reloaded.traces.map(trace => trace.traceId).sort()).toEqual(expected);
+        expect(reloaded.pagination.total).toBe(expected.length);
+        // Reload reconciles every acknowledged insert, including any polling gaps.
+        expect([...observed].every(traceId => reloaded.traces.some(trace => trace.traceId === traceId))).toBe(true);
+        expect(reloaded.deltaCursor).toBeTypeOf('string');
+        expect((await poll(reloaded.deltaCursor)).traces).toEqual([]);
+      });
+    });
+
+    it('advertises metrics, logs, delta polling, trace query discovery, and queries when enabled', () => {
+      expect(storage.getFeatures()).toEqual([
+        'metrics',
+        'logs',
+        'entity-type-discovery',
+        'entity-name-discovery',
+        'service-name-discovery',
+        'environment-discovery',
+        'tag-discovery',
+        'metric-discovery',
+        'delta-polling',
+        'trace-query',
+        'trace-query-root-duration',
+        'trace-query-discovery',
+        'thread-query',
+        'trace-query-tenant-scope',
+        'feedback',
+      ]);
+    });
+
+    it('continues advertising trace query discovery and queries when delta polling is disabled', () => {
+      coreFeatures.delete('observability-delta-polling');
+
+      try {
+        expect(storage.getFeatures()).toEqual([
+          'metrics',
+          'logs',
+          'entity-type-discovery',
+          'entity-name-discovery',
+          'service-name-discovery',
+          'environment-discovery',
+          'tag-discovery',
+          'metric-discovery',
+          'trace-query',
+          'trace-query-root-duration',
+          'trace-query-discovery',
+          'thread-query',
+          'trace-query-tenant-scope',
+          'feedback',
+        ]);
+      } finally {
+        coreFeatures.add('observability-delta-polling');
+      }
+    });
+
+    it('supports page deltaCursor and delta polling for logs', async () => {
+      await storage.batchCreateLogs({
+        logs: [
+          {
+            logId: 'delta-log-1',
+            timestamp: new Date('2026-05-03T00:00:00Z'),
+            level: 'info',
+            message: 'delta log 1',
+            data: null,
+            traceId: 'delta-log-trace',
+            metadata: null,
+          },
+        ],
+      });
+
+      const page = await waitForValue(
+        () => storage.listLogs({ filters: { traceId: 'delta-log-trace' } }),
+        result => result.logs.length === 1 && typeof result.deltaCursor === 'string',
+      );
+      expect(page.logs[0]!.logId).toBe('delta-log-1');
+
+      const bootstrap = await storage.listLogs({ mode: 'delta', filters: { traceId: 'delta-log-trace' } });
+      expect(bootstrap.logs).toEqual([]);
+      expect(bootstrap.deltaCursor).toBeTruthy();
+
+      await storage.batchCreateLogs({
+        logs: [
+          {
+            logId: 'delta-log-2',
+            timestamp: new Date('2026-05-03T00:00:01Z'),
+            level: 'info',
+            message: 'delta log 2',
+            data: null,
+            traceId: 'delta-log-trace',
+            metadata: null,
+          },
+        ],
+      });
+
+      const delta = await waitForValue(
+        () =>
+          storage.listLogs({
+            mode: 'delta',
+            after: bootstrap.deltaCursor!,
+            filters: { traceId: 'delta-log-trace' },
+          }),
+        result => result.logs.length === 1,
+      );
+      expect(delta.logs.map(log => log.logId)).toEqual(['delta-log-2']);
+      expect(delta.deltaCursor).toBeTruthy();
+    });
+
+    it('supports page deltaCursor and delta polling for metrics', async () => {
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'delta-metric-1',
+            timestamp: new Date('2026-05-04T00:00:00Z'),
+            name: 'delta_metric',
+            value: 1,
+            labels: {},
+          },
+        ],
+      });
+
+      const page = await waitForValue(
+        () => storage.listMetrics({ filters: { name: ['delta_metric'] } }),
+        result => result.metrics.length === 1 && typeof result.deltaCursor === 'string',
+      );
+      expect(page.metrics[0]!.metricId).toBe('delta-metric-1');
+
+      const bootstrap = await storage.listMetrics({ mode: 'delta', filters: { name: ['delta_metric'] } });
+      expect(bootstrap.metrics).toEqual([]);
+      expect(bootstrap.deltaCursor).toBeTruthy();
+
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'delta-metric-2',
+            timestamp: new Date('2026-05-04T00:00:01Z'),
+            name: 'delta_metric',
+            value: 2,
+            labels: {},
+          },
+        ],
+      });
+
+      const delta = await waitForValue(
+        () =>
+          storage.listMetrics({
+            mode: 'delta',
+            after: bootstrap.deltaCursor!,
+            filters: { name: ['delta_metric'] },
+          }),
+        result => result.metrics.length === 1,
+      );
+      expect(delta.metrics.map(metric => metric.metricId)).toEqual(['delta-metric-2']);
+      expect(delta.deltaCursor).toBeTruthy();
+    });
+
+    it('supports page deltaCursor and delta polling for scores', async () => {
+      await storage.createScore({
+        score: {
+          scoreId: 'delta-score-1',
+          timestamp: new Date('2026-05-05T00:00:00Z'),
+          traceId: 'delta-score-trace-1',
+          spanId: null,
+          scorerId: 'delta-scorer',
+          score: 0.1,
+          reason: null,
+          experimentId: null,
+          metadata: null,
+        },
+      });
+
+      const page = await waitForValue(
+        () => storage.listScores({ filters: { scorerId: 'delta-scorer' } as any }),
+        result => result.scores.length === 1 && typeof result.deltaCursor === 'string',
+      );
+      expect(page.scores[0]!.scoreId).toBe('delta-score-1');
+
+      const bootstrap = await storage.listScores({ mode: 'delta', filters: { scorerId: 'delta-scorer' } as any });
+      expect(bootstrap.scores).toEqual([]);
+      expect(bootstrap.deltaCursor).toBeTruthy();
+
+      await storage.createScore({
+        score: {
+          scoreId: 'delta-score-2',
+          timestamp: new Date('2026-05-05T00:00:01Z'),
+          traceId: 'delta-score-trace-2',
+          spanId: null,
+          scorerId: 'delta-scorer',
+          score: 0.2,
+          reason: null,
+          experimentId: null,
+          metadata: null,
+        },
+      });
+
+      const delta = await waitForValue(
+        () =>
+          storage.listScores({
+            mode: 'delta',
+            after: bootstrap.deltaCursor!,
+            filters: { scorerId: 'delta-scorer' } as any,
+          }),
+        result => result.scores.length === 1,
+      );
+      expect(delta.scores.map(score => score.scoreId)).toEqual(['delta-score-2']);
+      expect(delta.deltaCursor).toBeTruthy();
+    });
+
+    it('emits a retried score once across delta polls', async () => {
+      const filters = { scorerId: 'delta-retry-scorer' } as any;
+      const score = {
+        scoreId: 'delta-score-retry',
+        timestamp: new Date('2026-05-05T00:00:02Z'),
+        traceId: 'delta-score-retry-trace',
+        spanId: null,
+        scorerId: 'delta-retry-scorer',
+        score: 0.3,
+        reason: null,
+        experimentId: null,
+        metadata: null,
+      };
+
+      const bootstrap = await storage.listScores({ mode: 'delta', filters });
+      await storage.createScore({ score });
+
+      const first = await waitForValue(
+        () => storage.listScores({ mode: 'delta', after: bootstrap.deltaCursor!, filters }),
+        result => result.scores.length > 0,
+      );
+      expect(first.scores.map(s => s.scoreId)).toEqual(['delta-score-retry']);
+
+      // The consumer has already seen the score; a retry and a rewrite land
+      // afterwards. The rewrite moves the score to another trace, so the
+      // delta row's original traceId no longer matches the current row.
+      await storage.createScore({ score });
+      await storage.createScore({ score: { ...score, traceId: 'delta-score-retry-trace-2', score: 0.9 } });
+
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      try {
+        const deltaRows = await client.query({
+          query: `SELECT count() AS count FROM ${TABLE_SCORE_EVENTS_DELTA} WHERE scoreId = {scoreId:String}`,
+          query_params: { scoreId: score.scoreId },
+          format: 'JSONEachRow',
+        });
+        expect((await deltaRows.json<{ count: string | number }>()).map(row => Number(row.count))).toEqual([1]);
+      } finally {
+        await client.close();
+      }
+
+      const second = await storage.listScores({ mode: 'delta', after: first.deltaCursor!, filters });
+      expect(second.scores).toEqual([]);
+      expect(second.deltaCursor).toBe(first.deltaCursor);
+
+      const replay = await storage.listScores({ mode: 'delta', after: bootstrap.deltaCursor!, filters });
+      expect(replay.scores.map(s => [s.scoreId, s.traceId, s.score])).toEqual([
+        ['delta-score-retry', 'delta-score-retry-trace-2', 0.9],
+      ]);
+      const page = await storage.listScores({ filters });
+      expect(page.scores.map(s => [s.scoreId, s.traceId, s.score])).toEqual([
+        ['delta-score-retry', 'delta-score-retry-trace-2', 0.9],
+      ]);
+    });
+
+    it('collapses duplicate delta rows for one score within and across polls', async () => {
+      const filters = { scorerId: 'delta-dup-scorer' } as any;
+      const score = {
+        scoreId: 'delta-score-dup-rows',
+        timestamp: new Date('2026-05-05T00:00:04Z'),
+        traceId: 'delta-score-dup-trace',
+        spanId: null,
+        scorerId: 'delta-dup-scorer',
+        score: 0.4,
+        reason: null,
+        experimentId: null,
+        metadata: null,
+      };
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+
+      try {
+        const bootstrap = await storage.listScores({ mode: 'delta', filters });
+        await storage.createScore({ score });
+        await waitForValue(
+          () => storage.listScores({ mode: 'delta', after: bootstrap.deltaCursor!, filters }),
+          result => result.scores.length > 0,
+        );
+
+        // Model the delta rows a concurrent-insert race can leave behind by
+        // writing two extra rows for the same score straight into the delta table.
+        await client.command({
+          query: `INSERT INTO ${TABLE_SCORE_EVENTS_DELTA} (cursorId, ingestedAt, traceId, timestamp, scoreId)
+                  SELECT (SELECT max(cursorId) FROM ${TABLE_SCORE_EVENTS_DELTA}) + n, now64(9, 'UTC'), {traceId:String}, parseDateTime64BestEffort({timestamp:String}, 3, 'UTC'), {scoreId:String}
+                  FROM (SELECT arrayJoin([1, 2]) AS n)`,
+          query_params: { traceId: score.traceId, timestamp: score.timestamp.toISOString(), scoreId: score.scoreId },
+        });
+        const deltaRows = await client.query({
+          query: `SELECT count() AS count FROM ${TABLE_SCORE_EVENTS_DELTA} WHERE scoreId = {scoreId:String}`,
+          query_params: { scoreId: score.scoreId },
+          format: 'JSONEachRow',
+        });
+        expect((await deltaRows.json<{ count: string | number }>()).map(row => Number(row.count))).toEqual([3]);
+
+        const poll = await storage.listScores({ mode: 'delta', after: bootstrap.deltaCursor!, filters });
+        expect(poll.scores.map(s => s.scoreId)).toEqual(['delta-score-dup-rows']);
+        expect(poll.delta?.hasMore).toBe(false);
+
+        // The two higher-cursor duplicates must not resurface on the next poll either.
+        const next = await storage.listScores({ mode: 'delta', after: poll.deltaCursor!, filters });
+        expect(next.scores).toEqual([]);
+      } finally {
+        // Remove the hand-written rows so their cursorIds don't outrun the stream head for later tests.
+        await client.command({
+          query: `DELETE FROM ${TABLE_SCORE_EVENTS_DELTA} WHERE scoreId = {scoreId:String}`,
+          query_params: { scoreId: score.scoreId },
+        });
+        await client.close();
+      }
+    });
+
+    it('supports page deltaCursor and delta polling for feedback', async () => {
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'delta-feedback-1',
+          timestamp: new Date('2026-05-06T00:00:00Z'),
+          traceId: 'delta-feedback-trace',
+          spanId: null,
+          feedbackSource: 'user',
+          feedbackType: 'thumbs',
+          value: 1,
+          comment: null,
+          experimentId: null,
+          metadata: null,
+        },
+      });
+
+      const page = await waitForValue(
+        () => storage.listFeedback({ filters: { traceId: 'delta-feedback-trace' } }),
+        result => result.feedback.length === 1 && typeof result.deltaCursor === 'string',
+      );
+      expect(page.feedback[0]!.feedbackId).toBe('delta-feedback-1');
+
+      const bootstrap = await storage.listFeedback({ mode: 'delta', filters: { traceId: 'delta-feedback-trace' } });
+      expect(bootstrap.feedback).toEqual([]);
+      expect(bootstrap.deltaCursor).toBeTruthy();
+
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'delta-feedback-2',
+          timestamp: new Date('2026-05-06T00:00:01Z'),
+          traceId: 'delta-feedback-trace',
+          spanId: null,
+          feedbackSource: 'user',
+          feedbackType: 'thumbs',
+          value: 0,
+          comment: null,
+          experimentId: null,
+          metadata: null,
+        },
+      });
+
+      const delta = await waitForValue(
+        () =>
+          storage.listFeedback({
+            mode: 'delta',
+            after: bootstrap.deltaCursor!,
+            filters: { traceId: 'delta-feedback-trace' },
+          }),
+        result => result.feedback.length === 1,
+      );
+      expect(delta.feedback.map(feedback => feedback.feedbackId)).toEqual(['delta-feedback-2']);
+      expect(delta.deltaCursor).toBeTruthy();
+    });
+
+    it('uses serial-backed delta tables when generateSerialID is available at runtime', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const result = await client.query({
+        query: `
+          SELECT create_table_query
+          FROM system.tables
+          WHERE database = currentDatabase()
+            AND name = 'mastra_mv_log_events_delta'
+        `,
+        format: 'JSONEachRow',
+      });
+      const rows = (await result.json()) as Array<{ create_table_query?: string }>;
+      const ddl = rows[0]?.create_table_query ?? '';
+      await client.close();
+
+      expect(ddl).toContain(`generateSerialID('mastra_log_events_delta_cursor')`);
+      expect(ddl).toContain('AS cursorId');
+    });
+
+    it('builds serial-backed delta DDL when explicitly requested', () => {
+      const serialDdl = [...buildAllTableDDL(), ...buildAllMvDDL('serial')].join('\n');
+      const fallbackDdl = [...buildAllTableDDL(), ...buildAllMvDDL('fallback')].join('\n');
+
+      expect(serialDdl).toContain(`generateSerialID('mastra_log_events_delta_cursor')`);
+      expect(serialDdl).toContain(`generateSerialID('mastra_trace_roots_delta_cursor')`);
+      expect(fallbackDdl).toContain('farmFingerprint64(');
+      expect(fallbackDdl).not.toContain('generateSerialID(');
+    });
+
+    it('supports fallback-mode delta polling for traces when forced', async () => {
+      await withFallbackStorage(async fallbackStorage => {
+        await fallbackStorage.createSpan({
+          span: {
+            traceId: 'fallback-trace-1',
+            spanId: 'fallback-trace-root-1',
+            parentSpanId: null,
+            name: 'fallback-trace-root',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: EntityType.AGENT,
+            entityId: 'fallback-trace-agent',
+            entityName: 'fallback-trace-agent',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: 'fallback',
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-05-08T00:00:00Z'),
+            endedAt: new Date('2026-05-08T00:00:01Z'),
+          },
+        });
+
+        const page = await waitForValue(
+          () => fallbackStorage.listTraces({ filters: { entityName: 'fallback-trace-agent' } }),
+          result => result.spans.length === 1 && typeof result.deltaCursor === 'string',
+        );
+
+        await fallbackStorage.createSpan({
+          span: {
+            traceId: 'fallback-trace-2',
+            spanId: 'fallback-trace-root-2',
+            parentSpanId: null,
+            name: 'fallback-trace-root',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: EntityType.AGENT,
+            entityId: 'fallback-trace-agent',
+            entityName: 'fallback-trace-agent',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: 'fallback',
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-05-08T00:00:02Z'),
+            endedAt: new Date('2026-05-08T00:00:03Z'),
+          },
+        });
+
+        const delta = await waitForValue(
+          () =>
+            fallbackStorage.listTraces({
+              mode: 'delta',
+              after: page.deltaCursor!,
+              filters: { entityName: 'fallback-trace-agent' },
+            }),
+          result => result.spans.length === 1,
+        );
+        expect(delta.spans.map(span => span.traceId)).toEqual(['fallback-trace-2']);
+      });
+    });
+
+    it('supports fallback-mode delta polling for branches when forced', async () => {
+      await withFallbackStorage(async fallbackStorage => {
+        await fallbackStorage.batchCreateSpans({
+          records: [
+            {
+              traceId: 'fallback-branch-trace-1',
+              spanId: 'fallback-branch-root-1',
+              parentSpanId: null,
+              name: 'root',
+              spanType: SpanType.WORKFLOW_RUN,
+              isEvent: false,
+              entityType: EntityType.WORKFLOW_RUN,
+              entityId: 'fallback-wf',
+              entityName: 'fallback-wf',
+              userId: null,
+              organizationId: null,
+              resourceId: null,
+              runId: null,
+              sessionId: null,
+              threadId: null,
+              requestId: null,
+              environment: null,
+              source: null,
+              serviceName: null,
+              scope: null,
+              attributes: null,
+              metadata: null,
+              tags: null,
+              links: null,
+              input: null,
+              output: null,
+              error: null,
+              startedAt: new Date('2026-05-09T00:00:00Z'),
+              endedAt: new Date('2026-05-09T00:00:01Z'),
+            },
+            {
+              traceId: 'fallback-branch-trace-1',
+              spanId: 'fallback-branch-anchor-1',
+              parentSpanId: 'fallback-branch-root-1',
+              name: 'observer',
+              spanType: SpanType.AGENT_RUN,
+              isEvent: false,
+              entityType: EntityType.AGENT,
+              entityId: 'fallback-branch-agent',
+              entityName: 'fallback-branch-agent',
+              userId: null,
+              organizationId: null,
+              resourceId: null,
+              runId: null,
+              sessionId: null,
+              threadId: null,
+              requestId: null,
+              environment: null,
+              source: null,
+              serviceName: null,
+              scope: null,
+              attributes: null,
+              metadata: null,
+              tags: null,
+              links: null,
+              input: null,
+              output: null,
+              error: null,
+              startedAt: new Date('2026-05-09T00:00:00.500Z'),
+              endedAt: new Date('2026-05-09T00:00:00.800Z'),
+            },
+          ],
+        });
+
+        const page = await waitForValue(
+          () => fallbackStorage.listBranches({ filters: { entityName: 'fallback-branch-agent' } }),
+          result => result.branches.length === 1 && typeof result.deltaCursor === 'string',
+        );
+
+        await fallbackStorage.batchCreateSpans({
+          records: [
+            {
+              traceId: 'fallback-branch-trace-2',
+              spanId: 'fallback-branch-root-2',
+              parentSpanId: null,
+              name: 'root',
+              spanType: SpanType.WORKFLOW_RUN,
+              isEvent: false,
+              entityType: EntityType.WORKFLOW_RUN,
+              entityId: 'fallback-wf',
+              entityName: 'fallback-wf',
+              userId: null,
+              organizationId: null,
+              resourceId: null,
+              runId: null,
+              sessionId: null,
+              threadId: null,
+              requestId: null,
+              environment: null,
+              source: null,
+              serviceName: null,
+              scope: null,
+              attributes: null,
+              metadata: null,
+              tags: null,
+              links: null,
+              input: null,
+              output: null,
+              error: null,
+              startedAt: new Date('2026-05-09T00:00:02Z'),
+              endedAt: new Date('2026-05-09T00:00:03Z'),
+            },
+            {
+              traceId: 'fallback-branch-trace-2',
+              spanId: 'fallback-branch-anchor-2',
+              parentSpanId: 'fallback-branch-root-2',
+              name: 'observer',
+              spanType: SpanType.AGENT_RUN,
+              isEvent: false,
+              entityType: EntityType.AGENT,
+              entityId: 'fallback-branch-agent',
+              entityName: 'fallback-branch-agent',
+              userId: null,
+              organizationId: null,
+              resourceId: null,
+              runId: null,
+              sessionId: null,
+              threadId: null,
+              requestId: null,
+              environment: null,
+              source: null,
+              serviceName: null,
+              scope: null,
+              attributes: null,
+              metadata: null,
+              tags: null,
+              links: null,
+              input: null,
+              output: null,
+              error: null,
+              startedAt: new Date('2026-05-09T00:00:02.500Z'),
+              endedAt: new Date('2026-05-09T00:00:02.800Z'),
+            },
+          ],
+        });
+
+        const delta = await waitForValue(
+          () =>
+            fallbackStorage.listBranches({
+              mode: 'delta',
+              after: page.deltaCursor!,
+              filters: { entityName: 'fallback-branch-agent' },
+            }),
+          result => result.branches.length === 1,
+        );
+        expect(delta.branches.map(branch => branch.traceId)).toEqual(['fallback-branch-trace-2']);
+      });
+    });
+
+    it('supports fallback-mode delta polling for logs when forced', async () => {
+      await withFallbackStorage(async fallbackStorage => {
+        await fallbackStorage.batchCreateLogs({
+          logs: [
+            {
+              logId: 'fallback-log-1',
+              timestamp: new Date('2026-05-10T00:00:00Z'),
+              level: 'info',
+              message: 'fallback log 1',
+              data: null,
+              traceId: 'fallback-log-trace',
+              metadata: null,
+            },
+          ],
+        });
+
+        const page = await waitForValue(
+          () => fallbackStorage.listLogs({ filters: { traceId: 'fallback-log-trace' } }),
+          result => result.logs.length === 1 && typeof result.deltaCursor === 'string',
+        );
+
+        await fallbackStorage.batchCreateLogs({
+          logs: [
+            {
+              logId: 'fallback-log-2',
+              timestamp: new Date('2026-05-10T00:00:01Z'),
+              level: 'info',
+              message: 'fallback log 2',
+              data: null,
+              traceId: 'fallback-log-trace',
+              metadata: null,
+            },
+          ],
+        });
+
+        const delta = await waitForValue(
+          () =>
+            fallbackStorage.listLogs({
+              mode: 'delta',
+              after: page.deltaCursor!,
+              filters: { traceId: 'fallback-log-trace' },
+            }),
+          result => result.logs.length === 1,
+        );
+        expect(delta.logs.map(log => log.logId)).toEqual(['fallback-log-2']);
+      });
+    });
+
+    it('keeps using fallback mode after reinit on a Keeper-enabled server when fallback delta tables already exist', async () => {
+      const fallbackStorage = new ObservabilityStorageClickhouseVNext({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        deltaCursorStrategy: 'fallback',
+      });
+      await fallbackStorage.init();
+      await fallbackStorage.dangerouslyClearAll();
+
+      try {
+        await fallbackStorage.batchCreateLogs({
+          logs: [
+            {
+              logId: 'fallback-upgrade-log-1',
+              timestamp: new Date('2026-05-11T00:00:00Z'),
+              level: 'info',
+              message: 'fallback upgrade log 1',
+              data: null,
+              traceId: 'fallback-upgrade-trace',
+              metadata: null,
+            },
+          ],
+        });
+
+        const page = await waitForValue(
+          () => fallbackStorage.listLogs({ filters: { traceId: 'fallback-upgrade-trace' } }),
+          result => result.logs.length === 1 && typeof result.deltaCursor === 'string',
+        );
+
+        const defaultStorage = new ObservabilityStorageClickhouseVNext({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        await defaultStorage.init();
+
+        await defaultStorage.batchCreateLogs({
+          logs: [
+            {
+              logId: 'fallback-upgrade-log-2',
+              timestamp: new Date('2026-05-11T00:00:01Z'),
+              level: 'info',
+              message: 'fallback upgrade log 2',
+              data: null,
+              traceId: 'fallback-upgrade-trace',
+              metadata: null,
+            },
+          ],
+        });
+
+        const delta = await waitForValue(
+          () =>
+            defaultStorage.listLogs({
+              mode: 'delta',
+              after: page.deltaCursor!,
+              filters: { traceId: 'fallback-upgrade-trace' },
+            }),
+          result => result.logs.length === 1,
+        );
+        expect(delta.logs.map(log => log.logId)).toEqual(['fallback-upgrade-log-2']);
+      } finally {
+        await fallbackStorage.dangerouslyClearAll();
+      }
+    });
+  });
+
+  // ==========================================================================
+  // Span Events
+  // ==========================================================================
+
+  describe('span events', () => {
+    const now = new Date();
+
+    it('creates and reconstructs a completed span', async () => {
+      await storage.createSpan({
+        span: {
+          traceId: 'trace-1',
+          spanId: 'span-1',
+          parentSpanId: null,
+          name: 'agent-run',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: EntityType.AGENT,
+          entityId: 'agent-1',
+          entityName: 'myAgent',
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: 'test',
+          source: null,
+          serviceName: 'test-service',
+          scope: null,
+          attributes: { model: 'gpt-4' },
+          metadata: { foo: 'bar' },
+          tags: ['tag1', 'tag2'],
+          links: null,
+          input: { prompt: 'hello' },
+          output: { answer: 'world' },
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      const result = await storage.getSpan({ traceId: 'trace-1', spanId: 'span-1' });
+      expect(result).not.toBeNull();
+      const span = result!.span;
+      expect(span.name).toBe('agent-run');
+      expect(span.traceId).toBe('trace-1');
+      expect(span.spanId).toBe('span-1');
+      expect(span.spanType).toBe('agent_run');
+      expect(span.entityType).toBe('agent');
+      expect(span.entityName).toBe('myAgent');
+      expect(span.environment).toBe('test');
+      expect(span.serviceName).toBe('test-service');
+      expect(span.attributes).toEqual({ model: 'gpt-4' });
+      expect(span.metadata).toEqual({ foo: 'bar' });
+      expect(span.tags).toEqual(expect.arrayContaining(['tag1', 'tag2']));
+      expect(span.input).toEqual({ prompt: 'hello' });
+      expect(span.output).toEqual({ answer: 'world' });
+      expect(span.endedAt).toBeInstanceOf(Date);
+    });
+
+    it('does not support span updates (insert-only model)', async () => {
+      await expect(
+        storage.updateSpan({
+          traceId: 'trace-1',
+          spanId: 'span-1',
+          updates: {
+            output: { temp: 72 },
+            endedAt: new Date('2026-01-01T00:00:01Z'),
+          },
+        }),
+      ).rejects.toThrow('does not support updating spans');
+    });
+
+    it('batch deletes traces (eventual disappearance)', async () => {
+      await storage.createSpan({
+        span: {
+          traceId: 'trace-del',
+          spanId: 'span-del',
+          parentSpanId: null,
+          name: 'delete-me',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: now,
+          endedAt: new Date(now.getTime() + 1000),
+        },
+      });
+
+      // Verify it exists first
+      const before = await storage.getSpan({ traceId: 'trace-del', spanId: 'span-del' });
+      expect(before).not.toBeNull();
+
+      // Delete should succeed without throwing (design doc: verify successful execution)
+      await expect(storage.batchDeleteTraces({ traceIds: ['trace-del'] })).resolves.toBeUndefined();
+
+      // Design doc (shared.md:271): verify eventual disappearance semantics.
+      // ClickHouse lightweight deletes are immediately visible in practice,
+      // but the contract is eventual consistency — poll rather than assume.
+      const disappeared = await eventuallyNull(() => storage.getSpan({ traceId: 'trace-del', spanId: 'span-del' }), {
+        maxAttempts: 10,
+        intervalMs: 100,
+      });
+      expect(disappeared).toBe(true);
+
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      try {
+        const result = await client.query({
+          query: `SELECT signal, predicateType, predicateValues FROM ${TABLE_DELETION_REQUESTS} WHERE signal = 'traces' AND has(predicateValues, 'trace-del') ORDER BY requestedAt DESC LIMIT 1`,
+          format: 'JSONEachRow',
+        });
+        await expect(result.json()).resolves.toEqual([
+          {
+            signal: 'traces',
+            predicateType: 'traceIds',
+            predicateValues: ['trace-del'],
+          },
+        ]);
+      } finally {
+        await client.close();
+      }
+    });
+  });
+
+  // ==========================================================================
+  // Trace branches
+  // ==========================================================================
+
+  describe('branches', () => {
+    /**
+     * Wait until the materialized view has populated `mastra_trace_branches` with
+     * the expected number of rows. The MV is incremental but ClickHouse is
+     * eventually-consistent w.r.t. parts merging; in practice rows appear
+     * within a single insert flush, but the retry loop guards against CI flakes.
+     */
+    async function waitForBranches(expected: number, timeoutMs = 5000): Promise<number> {
+      const deadline = Date.now() + timeoutMs;
+      let last = -1;
+      while (Date.now() < deadline) {
+        const result = await storage.listBranches({ pagination: { perPage: 100 } });
+        last = result.branches.length;
+        if (last >= expected) return last;
+        await new Promise(r => setTimeout(r, 100));
+      }
+      return last;
+    }
+
+    it('surfaces nested branches that listTraces would miss', async () => {
+      // orderWorkflow → Observer (nested AGENT_RUN, twice) and a tool call.
+      // Plus a model_step which must NOT appear (sub-operation).
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'inv-trace-1',
+            spanId: 'root',
+            parentSpanId: null,
+            name: 'orderWorkflow',
+            spanType: SpanType.WORKFLOW_RUN,
+            isEvent: false,
+            entityType: EntityType.WORKFLOW_RUN,
+            entityId: 'wf-1',
+            entityName: 'orderWorkflow',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: [],
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-04-01T12:00:00Z'),
+            endedAt: new Date('2026-04-01T12:00:10Z'),
+          },
+          {
+            traceId: 'inv-trace-1',
+            spanId: 'observer-1',
+            parentSpanId: 'root',
+            name: 'Observer',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: EntityType.AGENT,
+            entityId: 'agent-observer',
+            entityName: 'Observer',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: [],
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-04-01T12:00:01Z'),
+            endedAt: new Date('2026-04-01T12:00:03Z'),
+          },
+          {
+            traceId: 'inv-trace-1',
+            spanId: 'observer-2',
+            parentSpanId: 'root',
+            name: 'Observer',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: EntityType.AGENT,
+            entityId: 'agent-observer',
+            entityName: 'Observer',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: [],
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-04-01T12:00:05Z'),
+            endedAt: new Date('2026-04-01T12:00:07Z'),
+          },
+          {
+            traceId: 'inv-trace-1',
+            spanId: 'search-1',
+            parentSpanId: 'observer-1',
+            name: 'web_search',
+            spanType: SpanType.TOOL_CALL,
+            isEvent: false,
+            entityType: EntityType.TOOL,
+            entityId: 'tool-web-search',
+            entityName: 'web_search',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: [],
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-04-01T12:00:02Z'),
+            endedAt: new Date('2026-04-01T12:00:02.500Z'),
+          },
+          {
+            traceId: 'inv-trace-1',
+            spanId: 'model-step-1',
+            parentSpanId: 'observer-1',
+            name: 'gpt-4-call',
+            spanType: SpanType.MODEL_STEP, // sub-operation: must NOT appear
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: 'gpt-4',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: [],
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-04-01T12:00:02.250Z'),
+            endedAt: new Date('2026-04-01T12:00:02.400Z'),
+          },
+        ],
+      });
+
+      // Should populate: 1 workflow_run + 2 agent_run + 1 tool_call = 4.
+      // The model_step is excluded by the MV WHERE clause.
+      const populated = await waitForBranches(4);
+      expect(populated).toBe(4);
+
+      // listTraces({ entityName: 'Observer' }) returns nothing since Observer
+      // is never the root span -- this is the gap listBranches closes.
+      const traces = await storage.listTraces({ filters: { entityName: 'Observer' } });
+      expect(traces.spans).toHaveLength(0);
+
+      const observerBranches = await storage.listBranches({
+        filters: { entityName: 'Observer' },
+      });
+      expect(observerBranches.branches).toHaveLength(2);
+      expect(observerBranches.branches.every(i => i.entityName === 'Observer')).toBe(true);
+    });
+
+    it('narrows by spanType and respects pagination', async () => {
+      const baseStartedAt = new Date('2026-04-02T10:00:00Z');
+      const records = Array.from({ length: 5 }, (_, i) => ({
+        traceId: `pag-trace-${i}`,
+        spanId: `tool-${i}`,
+        parentSpanId: null,
+        name: `tool-${i}`,
+        spanType: SpanType.TOOL_CALL,
+        isEvent: false,
+        entityType: EntityType.TOOL,
+        entityId: 'web_search',
+        entityName: 'web_search',
+        userId: null,
+        organizationId: null,
+        resourceId: null,
+        runId: null,
+        sessionId: null,
+        threadId: null,
+        requestId: null,
+        environment: null,
+        source: null,
+        serviceName: null,
+        scope: null,
+        attributes: null,
+        metadata: null,
+        tags: [],
+        links: null,
+        input: null,
+        output: null,
+        error: null,
+        startedAt: new Date(baseStartedAt.getTime() + i * 1000),
+        endedAt: new Date(baseStartedAt.getTime() + i * 1000 + 500),
+      }));
+      await storage.batchCreateSpans({ records });
+
+      await waitForBranches(5);
+
+      const onlyTools = await storage.listBranches({
+        filters: { spanType: SpanType.TOOL_CALL, entityName: 'web_search' },
+        pagination: { page: 0, perPage: 2 },
+      });
+      expect(onlyTools.branches).toHaveLength(2);
+      expect(onlyTools.pagination.total).toBe(5);
+      expect(onlyTools.pagination.hasMore).toBe(true);
+
+      const page2 = await storage.listBranches({
+        filters: { spanType: SpanType.TOOL_CALL, entityName: 'web_search' },
+        pagination: { page: 2, perPage: 2 },
+      });
+      expect(page2.branches).toHaveLength(1);
+      expect(page2.pagination.hasMore).toBe(false);
+    });
+  });
+
+  // ==========================================================================
+  // getSpans (batch by spanId)
+  // ==========================================================================
+
+  // ==========================================================================
+  // getBranch
+  //
+  // ClickHouse v-next implements both getStructure (via getTraceLight alias)
+  // and getSpans, so getBranch goes through the optimized two-step path in
+  // base.ts: structure walk → batch span fetch (no full-trace pull).
+  // ==========================================================================
+
+  // ==========================================================================
+  // Metrics + OLAP
+  // ==========================================================================
+
+  describe('metrics', () => {
+    beforeEach(async () => {
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'metric-test-1',
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            name: 'mastra_agent_duration_ms',
+            value: 100,
+            labels: { status: 'ok' },
+            provider: 'openai',
+            model: 'gpt-4o-mini',
+            estimatedCost: 0.1,
+            costUnit: 'usd',
+            tags: ['prod'],
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+          },
+          {
+            metricId: 'metric-test-2',
+            timestamp: new Date('2026-01-01T00:00:05Z'),
+            name: 'mastra_agent_duration_ms',
+            value: 200,
+            labels: { status: 'ok' },
+            provider: 'openai',
+            model: 'gpt-4o-mini',
+            estimatedCost: 0.2,
+            costUnit: 'usd',
+            tags: ['prod'],
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+          },
+          {
+            metricId: 'metric-test-3',
+            timestamp: new Date('2026-01-01T00:00:10Z'),
+            name: 'mastra_agent_duration_ms',
+            value: 500,
+            labels: { status: 'error' },
+            provider: 'anthropic',
+            model: 'claude-3-7-sonnet',
+            estimatedCost: 0.5,
+            costUnit: 'usd',
+            tags: ['prod'],
+            entityType: EntityType.AGENT,
+            entityName: 'codeAgent',
+          },
+          {
+            metricId: 'metric-test-4',
+            timestamp: new Date('2026-01-01T01:00:00Z'),
+            name: 'mastra_tool_calls_started',
+            value: 1,
+            labels: {},
+            tags: ['prod'],
+            entityType: EntityType.TOOL,
+            entityName: 'search',
+          },
+        ],
+      });
+    });
+
+    it('getMetricBreakdown excludes rows missing label keys (v-next design)', async () => {
+      // The beforeEach inserts 3 mastra_agent_duration_ms rows with 'status' label.
+      // Insert 2 more rows with a different label key ('foo-bar'), but NOT 'status'.
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'metric-test-5',
+            timestamp: new Date('2026-01-01T00:00:20Z'),
+            name: 'mastra_agent_duration_ms',
+            value: 300,
+            labels: { 'foo-bar': 'alpha' },
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+          },
+          {
+            metricId: 'metric-test-6',
+            timestamp: new Date('2026-01-01T00:00:25Z'),
+            name: 'mastra_agent_duration_ms',
+            value: 400,
+            labels: { 'foo-bar': 'beta' },
+            entityType: EntityType.AGENT,
+            entityName: 'codeAgent',
+          },
+        ],
+      });
+
+      // Group by 'foo-bar' — only the 2 rows with 'foo-bar' label should appear.
+      // The 3 original rows with 'status' label (but no 'foo-bar') are excluded.
+      const result = await storage.getMetricBreakdown({
+        name: ['mastra_agent_duration_ms'],
+        groupBy: ['foo-bar'],
+        aggregation: 'count',
+      });
+
+      const alpha = result.groups.find(group => group.dimensions['foo-bar'] === 'alpha');
+      const beta = result.groups.find(group => group.dimensions['foo-bar'] === 'beta');
+      const missing = result.groups.find(group => group.dimensions['foo-bar'] === null);
+
+      expect(alpha?.value).toBe(1);
+      expect(beta?.value).toBe(1);
+      // v-next design: rows missing the requested label key are excluded
+      expect(missing).toBeUndefined();
+    });
+
+    it('getMetricAggregate returns costUnit: null when costUnits are mixed', async () => {
+      // Add a metric with a different costUnit (the beforeEach already inserts 'usd' metrics)
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'metric-test-5',
+            timestamp: new Date('2026-01-01T00:00:15Z'),
+            name: 'mastra_agent_duration_ms',
+            value: 50,
+            labels: { status: 'ok' },
+            provider: 'openai',
+            model: 'gpt-4o-mini',
+            estimatedCost: 0.05,
+            costUnit: 'eur',
+            tags: ['prod'],
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+          },
+        ],
+      });
+
+      const result = await storage.getMetricAggregate({
+        name: ['mastra_agent_duration_ms'],
+        aggregation: 'sum',
+      });
+      // All metrics sum: 100 + 200 + 500 + 50 = 850
+      expect(result.value).toBe(850);
+      // costUnit should be null because we have both 'usd' and 'eur'
+      expect(result.costUnit).toBeNull();
+    });
+
+    it('getMetricBreakdown returns costUnit: null for mixed-unit groups', async () => {
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'metric-test-5',
+            timestamp: new Date('2026-01-01T00:00:15Z'),
+            name: 'mastra_agent_duration_ms',
+            value: 50,
+            labels: { status: 'ok' },
+            provider: 'openai',
+            model: 'gpt-4o-mini',
+            estimatedCost: 0.05,
+            costUnit: 'eur',
+            tags: ['prod'],
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+          },
+        ],
+      });
+
+      const result = await storage.getMetricBreakdown({
+        name: ['mastra_agent_duration_ms'],
+        groupBy: ['entityName'],
+        aggregation: 'sum',
+      });
+
+      const weather = result.groups.find(g => g.dimensions.entityName === 'weatherAgent');
+      expect(weather).toBeDefined();
+      // weatherAgent has both 'usd' and 'eur' → mixed → null
+      expect(weather!.costUnit).toBeNull();
+
+      const code = result.groups.find(g => g.dimensions.entityName === 'codeAgent');
+      expect(code).toBeDefined();
+      // codeAgent has only 'usd' → consistent → 'usd'
+      expect(code!.costUnit).toBe('usd');
+    });
+
+    it('getMetricPercentiles returns percentile series', async () => {
+      const result = await storage.getMetricPercentiles({
+        name: 'mastra_agent_duration_ms',
+        percentiles: [0.5, 0.99],
+        interval: '1h',
+      });
+      expect(result.series).toHaveLength(2);
+      const p50 = result.series.find(s => s.percentile === 0.5);
+      expect(p50).toBeDefined();
+    });
+  });
+
+  // ==========================================================================
+  // Filter Surface Coverage
+  // ==========================================================================
+
+  describe('filter surface coverage', () => {
+    describe('logs filters', () => {
+      beforeEach(async () => {
+        await storage.batchCreateLogs({
+          logs: [
+            {
+              logId: 'log-test-1',
+              timestamp: new Date('2026-01-01T00:00:00Z'),
+              level: 'info',
+              message: 'log-A',
+              data: null,
+              traceId: 'ft-trace-1',
+              spanId: 'ft-span-1',
+              entityType: EntityType.AGENT,
+              entityName: 'agentA',
+              parentEntityType: EntityType.WORKFLOW_RUN,
+              parentEntityName: 'wfA',
+              rootEntityType: EntityType.WORKFLOW_RUN,
+              rootEntityName: 'rootWfA',
+              userId: 'user-A',
+              organizationId: 'org-A',
+              sessionId: 'sess-A',
+              threadId: 'thread-A',
+              requestId: 'req-A',
+              environment: 'staging',
+              executionSource: 'cloud',
+              serviceName: 'svc-A',
+              experimentId: 'exp-A',
+              tags: ['alpha'],
+              metadata: null,
+            },
+            {
+              logId: 'log-test-2',
+              timestamp: new Date('2026-01-01T00:00:05Z'),
+              level: 'error',
+              message: 'log-B',
+              data: null,
+              traceId: 'ft-trace-2',
+              spanId: 'ft-span-2',
+              entityType: EntityType.TOOL,
+              entityName: 'toolB',
+              userId: 'user-B',
+              environment: 'production',
+              executionSource: 'local',
+              serviceName: 'svc-B',
+              tags: ['beta'],
+              metadata: null,
+            },
+          ],
+        });
+      });
+
+      it('filters by entityType', async () => {
+        const result = await storage.listLogs({ filters: { entityType: 'agent' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by entityName', async () => {
+        const result = await storage.listLogs({ filters: { entityName: 'toolB' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-B');
+      });
+
+      it('filters by parentEntityType', async () => {
+        const result = await storage.listLogs({ filters: { parentEntityType: 'workflow_run' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by rootEntityType and rootEntityName', async () => {
+        const result = await storage.listLogs({
+          filters: { rootEntityType: 'workflow_run', rootEntityName: 'rootWfA' },
+        });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by userId', async () => {
+        const result = await storage.listLogs({ filters: { userId: 'user-A' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by sessionId', async () => {
+        const result = await storage.listLogs({ filters: { sessionId: 'sess-A' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by threadId', async () => {
+        const result = await storage.listLogs({ filters: { threadId: 'thread-A' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by requestId', async () => {
+        const result = await storage.listLogs({ filters: { requestId: 'req-A' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by environment', async () => {
+        const result = await storage.listLogs({ filters: { environment: 'production' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-B');
+      });
+
+      it('filters by executionSource', async () => {
+        const result = await storage.listLogs({ filters: { executionSource: 'cloud' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('rejects deprecated source filter', async () => {
+        await expect(storage.listLogs({ filters: { source: 'cloud' } as any })).rejects.toThrow(
+          'Deprecated `source` filter is not supported for logs; use `executionSource` instead.',
+        );
+      });
+
+      it('filters by serviceName', async () => {
+        const result = await storage.listLogs({ filters: { serviceName: 'svc-A' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by traceId', async () => {
+        const result = await storage.listLogs({ filters: { traceId: 'ft-trace-1' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by spanId', async () => {
+        const result = await storage.listLogs({ filters: { spanId: 'ft-span-2' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-B');
+      });
+
+      it('filters by experimentId', async () => {
+        const result = await storage.listLogs({ filters: { experimentId: 'exp-A' } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-A');
+      });
+
+      it('filters by timestamp range', async () => {
+        const result = await storage.listLogs({
+          filters: {
+            timestamp: {
+              start: new Date('2026-01-01T00:00:03Z'),
+              end: new Date('2026-01-01T00:00:10Z'),
+            },
+          },
+        });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.message).toBe('log-B');
+      });
+
+      it('filters by array-form level', async () => {
+        const result = await storage.listLogs({ filters: { level: ['info', 'warn'] } });
+        expect(result.logs).toHaveLength(1);
+        expect(result.logs[0]!.level).toBe('info');
+      });
+    });
+
+    describe('metrics filters', () => {
+      beforeEach(async () => {
+        await storage.batchCreateMetrics({
+          metrics: [
+            {
+              metricId: 'metric-test-1',
+              timestamp: new Date('2026-01-01T00:00:00Z'),
+              name: 'ft_metric',
+              value: 100,
+              labels: {},
+              traceId: 'mt-trace-1',
+              spanId: 'mt-span-1',
+              entityType: EntityType.AGENT,
+              entityName: 'agentA',
+              parentEntityType: EntityType.WORKFLOW_RUN,
+              parentEntityName: 'wfA',
+              rootEntityType: EntityType.WORKFLOW_RUN,
+              rootEntityName: 'rootWfA',
+              userId: 'user-A',
+              organizationId: 'org-A',
+              sessionId: 'sess-A',
+              threadId: 'thread-A',
+              requestId: 'req-A',
+              environment: 'staging',
+              executionSource: 'cloud',
+              serviceName: 'svc-A',
+              experimentId: 'exp-A',
+              tags: ['alpha'],
+            },
+            {
+              metricId: 'metric-test-2',
+              timestamp: new Date('2026-01-01T00:00:05Z'),
+              name: 'ft_metric',
+              value: 200,
+              labels: {},
+              traceId: 'mt-trace-2',
+              spanId: 'mt-span-2',
+              entityType: EntityType.TOOL,
+              entityName: 'toolB',
+              userId: 'user-B',
+              environment: 'production',
+              executionSource: 'local',
+              serviceName: 'svc-B',
+              tags: ['beta'],
+            },
+          ],
+        });
+      });
+
+      it('filters by entityType', async () => {
+        const result = await storage.listMetrics({ filters: { name: ['ft_metric'], entityType: 'agent' } });
+        expect(result.metrics).toHaveLength(1);
+        expect(result.metrics[0]!.value).toBe(100);
+      });
+
+      it('filters by entityName', async () => {
+        const result = await storage.listMetrics({ filters: { name: ['ft_metric'], entityName: 'toolB' } });
+        expect(result.metrics).toHaveLength(1);
+        expect(result.metrics[0]!.value).toBe(200);
+      });
+
+      it('filters by userId', async () => {
+        const result = await storage.listMetrics({ filters: { name: ['ft_metric'], userId: 'user-A' } });
+        expect(result.metrics).toHaveLength(1);
+        expect(result.metrics[0]!.value).toBe(100);
+      });
+
+      it('filters by environment', async () => {
+        const result = await storage.listMetrics({ filters: { name: ['ft_metric'], environment: 'production' } });
+        expect(result.metrics).toHaveLength(1);
+        expect(result.metrics[0]!.value).toBe(200);
+      });
+
+      it('filters by executionSource', async () => {
+        const result = await storage.listMetrics({
+          filters: { name: ['ft_metric'], executionSource: 'cloud' },
+        });
+        expect(result.metrics).toHaveLength(1);
+        expect(result.metrics[0]!.value).toBe(100);
+      });
+
+      it('rejects deprecated source filter', async () => {
+        await expect(storage.listMetrics({ filters: { name: ['ft_metric'], source: 'cloud' } as any })).rejects.toThrow(
+          'Deprecated `source` filter is not supported for metrics; use `executionSource` instead.',
+        );
+      });
+
+      it('filters by traceId', async () => {
+        const result = await storage.listMetrics({ filters: { name: ['ft_metric'], traceId: 'mt-trace-1' } });
+        expect(result.metrics).toHaveLength(1);
+        expect(result.metrics[0]!.value).toBe(100);
+      });
+
+      it('filters by experimentId', async () => {
+        const result = await storage.listMetrics({ filters: { name: ['ft_metric'], experimentId: 'exp-A' } });
+        expect(result.metrics).toHaveLength(1);
+        expect(result.metrics[0]!.value).toBe(100);
+      });
+
+      it('filters by timestamp range', async () => {
+        const result = await storage.listMetrics({
+          filters: {
+            name: ['ft_metric'],
+            timestamp: {
+              start: new Date('2026-01-01T00:00:03Z'),
+              end: new Date('2026-01-01T00:00:10Z'),
+            },
+          },
+        });
+        expect(result.metrics).toHaveLength(1);
+        expect(result.metrics[0]!.value).toBe(200);
+      });
+    });
+
+    describe('scores filters', () => {
+      beforeEach(async () => {
+        await storage.createScore({
+          score: {
+            scoreId: 'score-test-1',
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            traceId: 'sf-trace-1',
+            spanId: 'sf-span-1',
+            scorerId: 'quality',
+            score: 0.8,
+            reason: null,
+            experimentId: 'exp-A',
+            organizationId: 'org-A',
+            metadata: null,
+          },
+        });
+        await storage.createScore({
+          score: {
+            scoreId: 'score-test-2',
+            timestamp: new Date('2026-01-01T00:00:05Z'),
+            traceId: 'sf-trace-2',
+            spanId: null,
+            scorerId: 'factuality',
+            score: 0.6,
+            reason: null,
+            experimentId: null,
+            organizationId: 'org-B',
+            metadata: null,
+          },
+        });
+      });
+
+      it('filters by organizationId', async () => {
+        const result = await storage.listScores({ filters: { organizationId: 'org-A' } });
+        expect(result.scores).toHaveLength(1);
+        expect(result.scores[0]!.traceId).toBe('sf-trace-1');
+      });
+
+      it('filters by experimentId', async () => {
+        const result = await storage.listScores({ filters: { experimentId: 'exp-A' } });
+        expect(result.scores).toHaveLength(1);
+        expect(result.scores[0]!.traceId).toBe('sf-trace-1');
+      });
+
+      it('filters by traceId', async () => {
+        const result = await storage.listScores({ filters: { traceId: 'sf-trace-2' } });
+        expect(result.scores).toHaveLength(1);
+        expect(result.scores[0]!.scorerId).toBe('factuality');
+      });
+
+      it('filters by spanId', async () => {
+        const result = await storage.listScores({ filters: { spanId: 'sf-span-1' } });
+        expect(result.scores).toHaveLength(1);
+        expect(result.scores[0]!.traceId).toBe('sf-trace-1');
+      });
+
+      it('filters by array-form scorerId', async () => {
+        const result = await storage.listScores({ filters: { scorerId: ['quality', 'other'] } });
+        expect(result.scores).toHaveLength(1);
+        expect(result.scores[0]!.traceId).toBe('sf-trace-1');
+      });
+
+      it('filters by timestamp range', async () => {
+        const result = await storage.listScores({
+          filters: {
+            timestamp: {
+              start: new Date('2026-01-01T00:00:03Z'),
+              end: new Date('2026-01-01T00:00:10Z'),
+            },
+          },
+        });
+        expect(result.scores).toHaveLength(1);
+        expect(result.scores[0]!.traceId).toBe('sf-trace-2');
+      });
+
+      it('rejects deprecated source filter', async () => {
+        await expect(storage.listScores({ filters: { source: 'manual' } as any })).rejects.toThrow(
+          'Deprecated `source` filter is not supported for scores; use `scoreSource or executionSource` instead.',
+        );
+      });
+
+      it('allocates increasing write versions across separate writes regardless of timestamp', async () => {
+        const score = {
+          scoreId: 'score-physical-supersession',
+          timestamp: new Date('2026-01-02T00:00:00Z'),
+          traceId: 'score-physical-trace',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.2,
+          reason: null,
+          metadata: null,
+        };
+        await storage.createScore({ score });
+        await storage.createScore({
+          score: {
+            ...score,
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            score: 0.8,
+          },
+        });
+
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        try {
+          const result = await client.query({
+            query: `SELECT score, toString(writeVersion) AS writeVersion FROM ${TABLE_SCORE_EVENTS} FINAL WHERE scoreId = {scoreId:String} ORDER BY writeVersion`,
+            query_params: { scoreId: score.scoreId },
+            format: 'JSONEachRow',
+          });
+          expect(await result.json<{ score: number; writeVersion: string }>()).toEqual([
+            { score: 0.2, writeVersion: '1' },
+            { score: 0.8, writeVersion: '2' },
+          ]);
+        } finally {
+          await client.close();
+        }
+      });
+
+      it('allocates increasing write versions for repeated score IDs within one batch', async () => {
+        const score = {
+          scoreId: 'score-batch-write-version',
+          timestamp: new Date('2026-01-02T00:00:00Z'),
+          traceId: 'score-batch-version-trace',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.2,
+          reason: null,
+          metadata: null,
+        };
+        await storage.batchCreateScores({
+          scores: [
+            score,
+            {
+              ...score,
+              timestamp: new Date('2026-01-01T00:00:00Z'),
+              traceId: 'score-batch-version-current-trace',
+              score: 0.8,
+            },
+          ],
+        });
+
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        try {
+          const result = await client.query({
+            query: `SELECT traceId, score, toString(writeVersion) AS writeVersion FROM ${TABLE_SCORE_EVENTS} FINAL WHERE scoreId = {scoreId:String} ORDER BY writeVersion`,
+            query_params: { scoreId: score.scoreId },
+            format: 'JSONEachRow',
+          });
+          expect(await result.json<{ traceId: string; score: number; writeVersion: string }>()).toEqual([
+            { traceId: 'score-batch-version-trace', score: 0.2, writeVersion: '1' },
+            { traceId: 'score-batch-version-current-trace', score: 0.8, writeVersion: '2' },
+          ]);
+        } finally {
+          await client.close();
+        }
+      });
+
+      it('backfills physically distinct equal-version legacy score rows independently of insertion order', async () => {
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        const first = scoreRecordToRow({
+          scoreId: 'score-equal-write-version',
+          timestamp: new Date('2026-01-01T00:00:00Z'),
+          traceId: 'trace-equal-a',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.2,
+          reason: null,
+          metadata: null,
+        });
+        const second = scoreRecordToRow({
+          scoreId: 'score-equal-write-version',
+          timestamp: new Date('2026-01-01T00:00:00Z'),
+          traceId: 'trace-equal-b',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.8,
+          reason: null,
+          metadata: null,
+        });
+
+        try {
+          await client.insert({ table: TABLE_SCORE_EVENTS, values: [first, second], format: 'JSONEachRow' });
+          await client.command({ query: `TRUNCATE TABLE ${TABLE_SCORE_EVENTS_CURRENT}` });
+          await backfillCurrentScores(client);
+          const forwardWinner = await storage.getScoreById('score-equal-write-version');
+
+          await storage.dangerouslyClearAll();
+          await client.insert({ table: TABLE_SCORE_EVENTS, values: [second, first], format: 'JSONEachRow' });
+          await client.command({ query: `TRUNCATE TABLE ${TABLE_SCORE_EVENTS_CURRENT}` });
+          await backfillCurrentScores(client);
+          const reverseWinner = await storage.getScoreById('score-equal-write-version');
+
+          expect(reverseWinner).toEqual(forwardWinner);
+          expect([0.2, 0.8]).toContain(forwardWinner?.score);
+        } finally {
+          await client.close();
+        }
+      });
+
+      it('uses engine last-insert semantics for exact-key legacy ties before and after merges', async () => {
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        const first = scoreRecordToRow({
+          scoreId: 'score-exact-key-write-version',
+          timestamp: new Date('2026-01-01T00:00:00Z'),
+          traceId: 'trace-exact-key',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.2,
+          reason: null,
+          metadata: null,
+        });
+        const second = { ...first, score: 0.8 };
+
+        try {
+          await client.insert({ table: TABLE_SCORE_EVENTS, values: [first, second], format: 'JSONEachRow' });
+          expect(await storage.getScoreById('score-exact-key-write-version')).toMatchObject({ score: 0.8 });
+          await client.command({ query: `OPTIMIZE TABLE ${TABLE_SCORE_EVENTS} FINAL` });
+          expect(await storage.getScoreById('score-exact-key-write-version')).toMatchObject({ score: 0.8 });
+
+          await storage.dangerouslyClearAll();
+          await client.insert({ table: TABLE_SCORE_EVENTS, values: [second, first], format: 'JSONEachRow' });
+          expect(await storage.getScoreById('score-exact-key-write-version')).toMatchObject({ score: 0.2 });
+          await client.command({ query: `OPTIMIZE TABLE ${TABLE_SCORE_EVENTS} FINAL` });
+          expect(await storage.getScoreById('score-exact-key-write-version')).toMatchObject({ score: 0.2 });
+        } finally {
+          await client.close();
+        }
+      });
+
+      it('keeps the same current score before and after physical merges', async () => {
+        const score = {
+          scoreId: 'score-current-across-merge',
+          timestamp: new Date('2026-01-01T00:00:00Z'),
+          traceId: 'score-merge-old-trace',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.2,
+          reason: null,
+          metadata: null,
+        };
+        await storage.createScore({ score });
+        await storage.createScore({
+          score: { ...score, traceId: 'score-merge-current-trace', score: 0.8 },
+        });
+
+        expect(await storage.getScoreById(score.scoreId)).toMatchObject({
+          traceId: 'score-merge-current-trace',
+          score: 0.8,
+        });
+
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        try {
+          await client.command({ query: `OPTIMIZE TABLE ${TABLE_SCORE_EVENTS} FINAL` });
+          expect(await storage.getScoreById(score.scoreId)).toMatchObject({
+            traceId: 'score-merge-current-trace',
+            score: 0.8,
+          });
+        } finally {
+          await client.close();
+        }
+      });
+
+      it('starts post-migration score replacements at version 1 above legacy version-0 rows', async () => {
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        const legacyScore = {
+          scoreId: 'score-legacy-write-version',
+          timestamp: new Date('2026-01-02T00:00:00Z'),
+          traceId: 'score-legacy-trace',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.2,
+          reason: null,
+          metadata: null,
+        };
+        try {
+          await client.insert({
+            table: TABLE_SCORE_EVENTS,
+            values: [scoreRecordToRow(legacyScore)],
+            format: 'JSONEachRow',
+          });
+          await storage.createScore({
+            score: {
+              ...legacyScore,
+              timestamp: new Date('2026-01-01T00:00:00Z'),
+              score: 0.8,
+            },
+          });
+
+          const result = await client.query({
+            query: `SELECT score, toString(writeVersion) AS writeVersion FROM ${TABLE_SCORE_EVENTS} FINAL WHERE scoreId = {scoreId:String} ORDER BY writeVersion`,
+            query_params: { scoreId: legacyScore.scoreId },
+            format: 'JSONEachRow',
+          });
+          expect(await result.json<{ score: number; writeVersion: string }>()).toEqual([
+            { score: 0.2, writeVersion: '0' },
+            { score: 0.8, writeVersion: '1' },
+          ]);
+        } finally {
+          await client.close();
+        }
+      });
+    });
+
+    describe('feedback filters', () => {
+      beforeEach(async () => {
+        await storage.createFeedback({
+          feedback: {
+            feedbackId: 'feedback-test-1',
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            traceId: 'ff-trace-1',
+            spanId: 'ff-span-1',
+            feedbackSource: 'user',
+            feedbackType: 'thumbs',
+            value: 1,
+            comment: null,
+            experimentId: 'exp-A',
+            userId: 'user-A',
+            sourceId: null,
+            organizationId: 'org-A',
+            metadata: null,
+          },
+        });
+        await storage.createFeedback({
+          feedback: {
+            feedbackId: 'feedback-test-2',
+            timestamp: new Date('2026-01-01T00:00:05Z'),
+            traceId: 'ff-trace-2',
+            spanId: null,
+            feedbackSource: 'reviewer',
+            feedbackType: 'rating',
+            value: 4,
+            comment: null,
+            experimentId: null,
+            userId: 'user-B',
+            sourceId: null,
+            organizationId: 'org-B',
+            metadata: null,
+          },
+        });
+      });
+
+      it('retains changed-timestamp feedback versions as distinct physical rows', async () => {
+        const feedback = {
+          feedbackId: 'feedback-physical-supersession',
+          timestamp: new Date('2026-01-02T00:00:00Z'),
+          traceId: 'feedback-physical-trace',
+          spanId: null,
+          feedbackSource: 'old-physical-source',
+          feedbackType: 'rating',
+          value: 1,
+          comment: null,
+          experimentId: null,
+          sourceId: null,
+          metadata: null,
+        };
+        await storage.createFeedback({ feedback });
+        await storage.createFeedback({
+          feedback: {
+            ...feedback,
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            feedbackSource: 'current-physical-source',
+          },
+        });
+
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        try {
+          const result = await client.query({
+            query: `SELECT feedbackSource, toString(writeVersion) AS writeVersion FROM ${TABLE_FEEDBACK_EVENTS} FINAL WHERE feedbackId = {feedbackId:String} ORDER BY timestamp`,
+            query_params: { feedbackId: feedback.feedbackId },
+            format: 'JSONEachRow',
+          });
+          expect(await result.json<{ feedbackSource: string; writeVersion: string }>()).toEqual([
+            { feedbackSource: 'current-physical-source', writeVersion: '2' },
+            { feedbackSource: 'old-physical-source', writeVersion: '1' },
+          ]);
+        } finally {
+          await client.close();
+        }
+      });
+
+      it('starts post-migration replacements at version 1 above legacy version-0 rows', async () => {
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        const legacyFeedback = {
+          feedbackId: 'feedback-legacy-write-version',
+          timestamp: new Date('2026-01-02T00:00:00Z'),
+          traceId: 'feedback-legacy-trace',
+          spanId: null,
+          feedbackSource: 'legacy-current-by-timestamp',
+          feedbackType: 'rating',
+          value: 1,
+          comment: null,
+          experimentId: null,
+          sourceId: null,
+          metadata: null,
+        };
+        try {
+          await client.insert({
+            table: TABLE_FEEDBACK_EVENTS,
+            values: [
+              feedbackRecordToRow({
+                ...legacyFeedback,
+                timestamp: new Date('2026-01-01T00:00:00Z'),
+                feedbackSource: 'legacy-older-by-timestamp',
+              }),
+              feedbackRecordToRow(legacyFeedback),
+            ],
+            format: 'JSONEachRow',
+          });
+          await storage.createFeedback({
+            feedback: {
+              ...legacyFeedback,
+              timestamp: new Date('2025-12-31T00:00:00Z'),
+              feedbackSource: 'post-migration-current',
+            },
+          });
+
+          const result = await client.query({
+            query: `SELECT feedbackSource, toString(writeVersion) AS writeVersion FROM ${TABLE_FEEDBACK_EVENTS} FINAL WHERE feedbackId = {feedbackId:String} ORDER BY writeVersion, timestamp`,
+            query_params: { feedbackId: legacyFeedback.feedbackId },
+            format: 'JSONEachRow',
+          });
+          expect(await result.json<{ feedbackSource: string; writeVersion: string }>()).toEqual([
+            { feedbackSource: 'legacy-older-by-timestamp', writeVersion: '0' },
+            { feedbackSource: 'legacy-current-by-timestamp', writeVersion: '0' },
+            { feedbackSource: 'post-migration-current', writeVersion: '1' },
+          ]);
+        } finally {
+          await client.close();
+        }
+      });
+
+      it('updates review status on the current accepted feedback write', async () => {
+        const feedback = {
+          feedbackId: 'feedback-review-current-version',
+          timestamp: new Date('2026-01-02T00:00:00Z'),
+          traceId: 'feedback-review-trace',
+          spanId: null,
+          feedbackSource: 'superseded-review-source',
+          feedbackType: 'rating',
+          value: 1,
+          comment: null,
+          experimentId: null,
+          sourceId: null,
+          metadata: null,
+        };
+        await storage.createFeedback({ feedback });
+        await storage.createFeedback({
+          feedback: {
+            ...feedback,
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            feedbackSource: 'current-review-source',
+          },
+        });
+
+        const updated = await storage.updateFeedbackReviewStatus({
+          feedbackId: feedback.feedbackId,
+          reviewStatus: 'reviewed',
+        });
+        expect(updated).toMatchObject({
+          feedbackSource: 'current-review-source',
+          reviewStatus: 'reviewed',
+        });
+
+        const client = createClient({
+          url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+          username: process.env.CLICKHOUSE_USERNAME || 'default',
+          password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        });
+        try {
+          const result = await client.query({
+            query: `SELECT feedbackSource, reviewStatus, toString(writeVersion) AS writeVersion FROM ${TABLE_FEEDBACK_EVENTS} FINAL WHERE feedbackId = {feedbackId:String} ORDER BY writeVersion DESC, timestamp DESC LIMIT 1`,
+            query_params: { feedbackId: feedback.feedbackId },
+            format: 'JSONEachRow',
+          });
+          expect(await result.json<{ feedbackSource: string; reviewStatus: string; writeVersion: string }>()).toEqual([
+            { feedbackSource: 'current-review-source', reviewStatus: 'reviewed', writeVersion: '3' },
+          ]);
+        } finally {
+          await client.close();
+        }
+      });
+
+      it('filters by organizationId', async () => {
+        const result = await storage.listFeedback({ filters: { organizationId: 'org-A' } });
+        expect(result.feedback).toHaveLength(1);
+        expect(result.feedback[0]!.traceId).toBe('ff-trace-1');
+      });
+
+      it('filters by experimentId', async () => {
+        const result = await storage.listFeedback({ filters: { experimentId: 'exp-A' } });
+        expect(result.feedback).toHaveLength(1);
+        expect(result.feedback[0]!.traceId).toBe('ff-trace-1');
+      });
+
+      it('filters by traceId', async () => {
+        const result = await storage.listFeedback({ filters: { traceId: 'ff-trace-2' } });
+        expect(result.feedback).toHaveLength(1);
+        expect(result.feedback[0]!.feedbackType).toBe('rating');
+      });
+
+      it('filters by spanId', async () => {
+        const result = await storage.listFeedback({ filters: { spanId: 'ff-span-1' } });
+        expect(result.feedback).toHaveLength(1);
+        expect(result.feedback[0]!.traceId).toBe('ff-trace-1');
+      });
+
+      it('filters by array-form feedbackType', async () => {
+        const result = await storage.listFeedback({ filters: { feedbackType: ['rating', 'other'] } });
+        expect(result.feedback).toHaveLength(1);
+        expect(result.feedback[0]!.traceId).toBe('ff-trace-2');
+      });
+
+      it('filters by timestamp range', async () => {
+        const result = await storage.listFeedback({
+          filters: {
+            timestamp: {
+              start: new Date('2026-01-01T00:00:03Z'),
+              end: new Date('2026-01-01T00:00:10Z'),
+            },
+          },
+        });
+        expect(result.feedback).toHaveLength(1);
+        expect(result.feedback[0]!.traceId).toBe('ff-trace-2');
+      });
+
+      it('rejects deprecated source filter', async () => {
+        await expect(storage.listFeedback({ filters: { source: 'user' } as any })).rejects.toThrow(
+          'Deprecated `source` filter is not supported for feedback; use `feedbackSource or executionSource` instead.',
+        );
+      });
+    });
+  });
+
+  // ==========================================================================
+  // Discovery
+  // ==========================================================================
+
+  describe('discovery', () => {
+    beforeEach(async () => {
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'metric-test-1',
+            timestamp: new Date(),
+            name: 'mastra_agent_duration_ms',
+            value: 100,
+            labels: { agent: 'weatherAgent', status: 'ok' },
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+            serviceName: 'metric-service',
+            environment: 'metric-env',
+            tags: ['metric-tag'],
+          },
+          {
+            metricId: 'metric-test-2',
+            timestamp: new Date(),
+            name: 'mastra_tool_calls_started',
+            value: 1,
+            labels: { tool: 'search' },
+            entityType: EntityType.TOOL,
+            entityName: 'metricTool',
+            serviceName: 'metric-service',
+            environment: 'metric-env',
+            tags: ['metric-tag'],
+          },
+        ],
+      });
+
+      await storage.batchCreateLogs({
+        logs: [
+          {
+            logId: 'log-test-1',
+            timestamp: new Date(),
+            level: 'info',
+            message: 'discovery-log',
+            data: null,
+            entityType: EntityType.INPUT_PROCESSOR,
+            entityName: 'logProcessor',
+            serviceName: 'log-service',
+            environment: 'log-env',
+            tags: ['log-tag'],
+            metadata: null,
+          },
+        ],
+      });
+
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'disc-trace',
+            spanId: 'disc-span',
+            parentSpanId: null,
+            name: 'test',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: EntityType.AGENT,
+            entityId: 'a-1',
+            entityName: 'weatherAgent',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: 'production',
+            source: null,
+            serviceName: 'my-service',
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: ['v1', 'experiment'],
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date(),
+            endedAt: new Date(Date.now() + 1000),
+          },
+        ],
+      });
+
+      // Trigger discovery refresh so helper tables are populated.
+      // In production, discovery MVs refresh automatically on a schedule.
+      // In tests, we trigger an immediate refresh after inserting data.
+      await triggerDiscoveryRefresh();
+
+      // Inject duplicate rows directly into the helper tables to model the
+      // intermediate state between an MV refresh and a `ReplacingMergeTree`
+      // background merge. The discovery read paths must dedupe these rows
+      // before returning them to callers — that's what the assertions below
+      // verify.
+      await injectDuplicateDiscoveryRows();
+    });
+
+    it('init() reconciles pre-existing MergeTree discovery tables to ReplacingMergeTree', async () => {
+      // Simulates an upgrade from an older deployment that created the
+      // discovery helper tables as MergeTree. init() should drop the MV
+      // and table, then recreate both with the current ReplacingMergeTree
+      // engine — preserving the discovery refresh behavior end-to-end.
+      const adminClient = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const database = `mig_discovery_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      await adminClient.command({ query: `CREATE DATABASE ${database}` });
+
+      const scopedClient = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        database,
+      });
+
+      try {
+        await scopedClient.command({
+          query: `CREATE TABLE ${TABLE_DISCOVERY_VALUES} (kind LowCardinality(String), key1 String, value String) ENGINE = MergeTree ORDER BY (kind, key1, value)`,
+        });
+        await scopedClient.command({
+          query: `CREATE TABLE ${TABLE_DISCOVERY_PAIRS} (kind LowCardinality(String), key1 String, key2 String, value String) ENGINE = MergeTree ORDER BY (kind, key1, key2, value)`,
+        });
+
+        // Seed refreshable MVs pointing at the legacy helper tables. This
+        // mirrors a real upgrade and proves the reconcile path drops the
+        // pre-existing MVs before recreating the tables — otherwise
+        // ClickHouse would refuse to drop a table that an MV still depends
+        // on, and the recreate would also fail with "view already exists".
+        await scopedClient.command({
+          query: `CREATE MATERIALIZED VIEW ${MV_DISCOVERY_VALUES} REFRESH EVERY 1 MINUTE TO ${TABLE_DISCOVERY_VALUES} AS SELECT CAST('' AS LowCardinality(String)) AS kind, '' AS key1, '' AS value WHERE 0`,
+        });
+        await scopedClient.command({
+          query: `CREATE MATERIALIZED VIEW ${MV_DISCOVERY_PAIRS} REFRESH EVERY 5 MINUTE TO ${TABLE_DISCOVERY_PAIRS} AS SELECT CAST('' AS LowCardinality(String)) AS kind, '' AS key1, '' AS key2, '' AS value WHERE 0`,
+        });
+
+        const before = (await (
+          await scopedClient.query({
+            query: `SELECT name, engine FROM system.tables WHERE database = currentDatabase() AND name IN ({tables:Array(String)}) ORDER BY name`,
+            query_params: { tables: [TABLE_DISCOVERY_VALUES, TABLE_DISCOVERY_PAIRS] },
+            format: 'JSONEachRow',
+          })
+        ).json()) as Array<{ name: string; engine: string }>;
+        expect(before.map(r => r.engine)).toEqual(['MergeTree', 'MergeTree']);
+
+        const beforeMvs = (await (
+          await scopedClient.query({
+            query: `SELECT name FROM system.tables WHERE database = currentDatabase() AND name IN ({mvs:Array(String)}) ORDER BY name`,
+            query_params: { mvs: [MV_DISCOVERY_VALUES, MV_DISCOVERY_PAIRS] },
+            format: 'JSONEachRow',
+          })
+        ).json()) as Array<{ name: string }>;
+        expect(beforeMvs.map(r => r.name).sort()).toEqual([MV_DISCOVERY_PAIRS, MV_DISCOVERY_VALUES].sort());
+
+        const migratedStorage = new ObservabilityStorageClickhouseVNext({ client: scopedClient });
+        try {
+          await migratedStorage.init();
+
+          const after = (await (
+            await scopedClient.query({
+              query: `SELECT name, engine FROM system.tables WHERE database = currentDatabase() AND name IN ({tables:Array(String)}) ORDER BY name`,
+              query_params: { tables: [TABLE_DISCOVERY_VALUES, TABLE_DISCOVERY_PAIRS] },
+              format: 'JSONEachRow',
+            })
+          ).json()) as Array<{ name: string; engine: string }>;
+          // Use the same predicate that reconcileDiscoveryTables() uses to
+          // decide whether a table is already migrated, so this assertion
+          // passes on ClickHouse Cloud / replicated clusters where the
+          // engine is transparently rewritten to SharedReplacingMergeTree
+          // or ReplicatedReplacingMergeTree.
+          expect(after.map(r => r.name)).toEqual([TABLE_DISCOVERY_PAIRS, TABLE_DISCOVERY_VALUES]);
+          for (const row of after) {
+            expect(
+              isReplacingMergeTreeEngine(row.engine),
+              `expected ${row.name} engine to satisfy isReplacingMergeTreeEngine but got '${row.engine}'`,
+            ).toBe(true);
+          }
+
+          const mvs = (await (
+            await scopedClient.query({
+              query: `SELECT name FROM system.tables WHERE database = currentDatabase() AND name IN ({mvs:Array(String)}) ORDER BY name`,
+              query_params: { mvs: [MV_DISCOVERY_VALUES, MV_DISCOVERY_PAIRS] },
+              format: 'JSONEachRow',
+            })
+          ).json()) as Array<{ name: string }>;
+          expect(mvs.map(r => r.name).sort()).toEqual([MV_DISCOVERY_PAIRS, MV_DISCOVERY_VALUES].sort());
+        } finally {
+          await migratedStorage.dangerouslyClearAll();
+        }
+      } finally {
+        await scopedClient.close();
+        await adminClient.command({ query: `DROP DATABASE IF EXISTS ${database} SYNC` });
+        await adminClient.close();
+      }
+    });
+
+    it('init() recreates legacy non-APPEND discovery MVs while keeping their target tables', async () => {
+      // Simulates an upgrade from a release whose discovery MVs refreshed
+      // without APPEND. Non-APPEND refreshes swap the target table
+      // atomically, which fails (error 36) when the target table is
+      // Replicated inside a non-Replicated database. init() should drop
+      // only the stale views and recreate them with the current APPEND
+      // definition — the helper tables (and their data) must survive.
+      const adminClient = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const database = `mig_append_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      await adminClient.command({ query: `CREATE DATABASE ${database}` });
+
+      const scopedClient = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        database,
+      });
+
+      try {
+        // Current ReplacingMergeTree helper tables — the engine reconcile
+        // path must leave these alone.
+        await scopedClient.command({
+          query: `CREATE TABLE ${TABLE_DISCOVERY_VALUES} (kind LowCardinality(String), key1 String, value String) ENGINE = ReplacingMergeTree ORDER BY (kind, key1, value)`,
+        });
+        await scopedClient.command({
+          query: `CREATE TABLE ${TABLE_DISCOVERY_PAIRS} (kind LowCardinality(String), key1 String, key2 String, value String) ENGINE = ReplacingMergeTree ORDER BY (kind, key1, key2, value)`,
+        });
+        // Legacy views without APPEND, as created by older releases. A
+        // non-APPEND refresh swaps the target table, so a refresh running
+        // while the test inserts or checks the marker row would replace the
+        // table under it. EMPTY skips the refresh at creation and STOP VIEW
+        // disables the scheduled ones.
+        await scopedClient.command({
+          query: `CREATE MATERIALIZED VIEW ${MV_DISCOVERY_VALUES} REFRESH EVERY 1 MINUTE TO ${TABLE_DISCOVERY_VALUES} EMPTY AS SELECT CAST('' AS LowCardinality(String)) AS kind, '' AS key1, '' AS value WHERE 0`,
+        });
+        await scopedClient.command({
+          query: `CREATE MATERIALIZED VIEW ${MV_DISCOVERY_PAIRS} REFRESH EVERY 5 MINUTE TO ${TABLE_DISCOVERY_PAIRS} EMPTY AS SELECT CAST('' AS LowCardinality(String)) AS kind, '' AS key1, '' AS key2, '' AS value WHERE 0`,
+        });
+        await scopedClient.command({ query: `SYSTEM STOP VIEW ${MV_DISCOVERY_VALUES}` });
+        await scopedClient.command({ query: `SYSTEM STOP VIEW ${MV_DISCOVERY_PAIRS}` });
+
+        // Marker row proving the table (and its data) survives init()'s view
+        // migration.
+        await scopedClient.command({
+          query: `INSERT INTO ${TABLE_DISCOVERY_VALUES} VALUES ('entityType', '', 'marker-survivor')`,
+        });
+
+        const migratedStorage = new ObservabilityStorageClickhouseVNext({ client: scopedClient });
+        try {
+          await migratedStorage.init();
+
+          // Both views must exist again with an APPEND refresh definition.
+          const mvs = (await (
+            await scopedClient.query({
+              query: `SELECT name, create_table_query FROM system.tables WHERE database = currentDatabase() AND name IN ({mvs:Array(String)}) ORDER BY name`,
+              query_params: { mvs: [MV_DISCOVERY_VALUES, MV_DISCOVERY_PAIRS] },
+              format: 'JSONEachRow',
+            })
+          ).json()) as Array<{ name: string; create_table_query: string }>;
+          expect(mvs.map(r => r.name).sort()).toEqual([MV_DISCOVERY_PAIRS, MV_DISCOVERY_VALUES].sort());
+          for (const row of mvs) {
+            expect(
+              /REFRESH EVERY \d+ MINUTE APPEND/i.test(row.create_table_query),
+              `expected ${row.name} to have an APPEND refresh definition but got: ${row.create_table_query.slice(0, 200)}`,
+            ).toBe(true);
+          }
+
+          // The helper table was not dropped: the marker row survives.
+          const markerRows = (await (
+            await scopedClient.query({
+              query: `SELECT value FROM ${TABLE_DISCOVERY_VALUES} WHERE value = 'marker-survivor'`,
+              format: 'JSONEachRow',
+            })
+          ).json()) as Array<{ value: string }>;
+          expect(markerRows).toHaveLength(1);
+        } finally {
+          await migratedStorage.dangerouslyClearAll();
+        }
+      } finally {
+        await scopedClient.close();
+        await adminClient.command({ query: `DROP DATABASE IF EXISTS ${database} SYNC` });
+        await adminClient.close();
+      }
+    });
+
+    it('warns and proceeds when replication is enabled with existing local tables', async () => {
+      const adminClient = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const database = `replication_guard_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      await adminClient.command({ query: `CREATE DATABASE ${database}` });
+
+      const scopedClient = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        database,
+      });
+
+      try {
+        const localStorage = new ObservabilityStorageClickhouseVNext({ client: scopedClient });
+        await localStorage.init();
+
+        const enginesBefore = (await (
+          await scopedClient.query({
+            query: `SELECT name, engine FROM system.tables WHERE database = currentDatabase() AND name = {name:String}`,
+            query_params: { name: TABLE_SPAN_EVENTS },
+            format: 'JSONEachRow',
+          })
+        ).json()) as Array<{ name: string; engine: string }>;
+        expect(enginesBefore).toHaveLength(1);
+
+        const replicatedStorage = new ObservabilityStorageClickhouseVNext({
+          client: scopedClient,
+          replication: {
+            zookeeperPath: `/clickhouse/tables/test/${database}/{table}`,
+            replicaName: 'replica1',
+          },
+        });
+        const warn = vi.fn();
+        replicatedStorage.__setLogger({ warn } as any);
+
+        await replicatedStorage.init();
+
+        expect(warn).toHaveBeenCalledOnce();
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('pre-existing observability table'));
+        expect(warn).toHaveBeenCalledWith(expect.stringMatching(/local engine '(?:Replacing)?MergeTree'/));
+
+        const enginesAfter = (await (
+          await scopedClient.query({
+            query: `SELECT name, engine FROM system.tables WHERE database = currentDatabase() AND name = {name:String}`,
+            query_params: { name: TABLE_SPAN_EVENTS },
+            format: 'JSONEachRow',
+          })
+        ).json()) as Array<{ name: string; engine: string }>;
+        expect(enginesAfter).toEqual(enginesBefore);
+      } finally {
+        await scopedClient.close();
+        await adminClient.command({ query: `DROP DATABASE IF EXISTS ${database} SYNC` });
+        await adminClient.close();
+      }
+    });
+
+    it('emits replicated engines for v-next signal tables when replication is enabled', async () => {
+      const adminClient = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const database = `replication_positive_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      await adminClient.command({ query: `CREATE DATABASE ${database}` });
+
+      const scopedClient = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+        database,
+      });
+
+      try {
+        // Cluster omitted so this runs against the single-node test container.
+        // The engine-rewrite path still applies — it produces ReplicatedMergeTree
+        // tables coordinated via the embedded Keeper.
+        const replicatedStorage = new ObservabilityStorageClickhouseVNext({
+          client: scopedClient,
+          replication: {
+            zookeeperPath: `/clickhouse/tables/test/${database}/{table}`,
+            replicaName: 'replica1',
+          },
+        });
+
+        await replicatedStorage.init();
+
+        const engines = (await (
+          await scopedClient.query({
+            query: `SELECT name, engine FROM system.tables WHERE database = currentDatabase() AND name LIKE 'mastra_%' AND name NOT LIKE 'mastra_mv_%' ORDER BY name`,
+            format: 'JSONEachRow',
+          })
+        ).json()) as Array<{ name: string; engine: string }>;
+
+        expect(engines.length).toBeGreaterThan(0);
+        for (const { name, engine } of engines) {
+          expect(
+            engine.startsWith('Replicated') || engine.startsWith('Shared'),
+            `expected replicated/shared engine for ${name}, got ${engine}`,
+          ).toBe(true);
+        }
+      } finally {
+        await scopedClient.close();
+        await adminClient.command({ query: `DROP DATABASE IF EXISTS ${database} SYNC` });
+        await adminClient.close();
+      }
+    });
+  });
+
+  // ==========================================================================
+  // Scores
+  // ==========================================================================
+
+  describe('scores', () => {
+    it('captures new score writes in the current-state table', async () => {
+      const scoreId = 'score-current-state-write';
+      await storage.createScore({
+        score: {
+          scoreId,
+          timestamp: new Date(),
+          traceId: 'trace-current-state-write',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.9,
+          reason: null,
+          metadata: null,
+        },
+      });
+
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      try {
+        const result = await client.query({
+          query: `SELECT scoreId, score, toString(writeVersion) AS writeVersion
+                  FROM ${TABLE_SCORE_EVENTS_CURRENT} FINAL
+                  WHERE scoreId = {scoreId:String}`,
+          query_params: { scoreId },
+          format: 'JSONEachRow',
+        });
+        expect(await result.json<{ scoreId: string; score: number; writeVersion: string }>()).toEqual([
+          { scoreId, score: 0.9, writeVersion: '1' },
+        ]);
+      } finally {
+        await client.close();
+      }
+    });
+
+    it('scoreSource round-trips through CH scoreSource column', async () => {
+      await storage.createScore({
+        score: {
+          scoreId: 'score-test-1',
+          timestamp: new Date(),
+          traceId: 'trace-score-src',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.9,
+          reason: null,
+          experimentId: null,
+          scoreSource: 'automated',
+          metadata: null,
+        },
+      });
+
+      const result = await storage.listScores({});
+      const match = result.scores.find(s => s.traceId === 'trace-score-src');
+      expect(match).toBeDefined();
+      expect(match!.scoreSource).toBe('automated');
+    });
+
+    it('filters scores by scoreSource', async () => {
+      await storage.createScore({
+        score: {
+          scoreId: 'score-test-1',
+          timestamp: new Date(),
+          traceId: 'trace-ss-1',
+          spanId: null,
+          scorerId: 'relevance',
+          score: 0.8,
+          reason: null,
+          experimentId: null,
+          scoreSource: 'automated',
+          metadata: null,
+        },
+      });
+      await storage.createScore({
+        score: {
+          scoreId: 'score-test-2',
+          timestamp: new Date(),
+          traceId: 'trace-ss-2',
+          spanId: null,
+          scorerId: 'relevance',
+          score: 0.7,
+          reason: null,
+          experimentId: null,
+          scoreSource: 'manual',
+          metadata: null,
+        },
+      });
+
+      const result = await storage.listScores({
+        filters: { scoreSource: 'automated' },
+      });
+      expect(result.scores).toHaveLength(1);
+      expect(result.scores[0]!.traceId).toBe('trace-ss-1');
+    });
+  });
+
+  // ==========================================================================
+  // Feedback
+  // ==========================================================================
+
+  describe('feedback', () => {
+    it('maps every public feedback column while keeping writeVersion internal', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+
+      try {
+        const result = await client.query({
+          query: 'SELECT name FROM system.columns WHERE database = currentDatabase() AND table = {table:String}',
+          query_params: { table: TABLE_FEEDBACK_EVENTS },
+          format: 'JSONEachRow',
+        });
+        const columns = await result.json<{ name: string }>();
+        const row = feedbackRecordToRow({
+          feedbackId: 'feedback-column-parity',
+          timestamp: new Date('2026-01-01T00:00:00Z'),
+          feedbackSource: 'user',
+          feedbackType: 'rating',
+          value: 0,
+        });
+
+        expect(row).not.toHaveProperty('writeVersion');
+        expect(Object.keys(row).sort()).toEqual(
+          columns
+            .map(column => column.name)
+            .filter(column => column !== 'writeVersion')
+            .sort(),
+        );
+      } finally {
+        await client.close();
+      }
+    });
+
+    it('feedbackUserId round-trips through CH userId column', async () => {
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'feedback-test-1',
+          timestamp: new Date(),
+          traceId: 'trace-fbu',
+          spanId: null,
+          feedbackSource: 'user',
+          feedbackType: 'thumbs',
+          value: 1,
+          comment: null,
+          experimentId: null,
+          feedbackUserId: 'reviewer-1',
+          sourceId: null,
+          metadata: null,
+        },
+      });
+
+      const result = await storage.listFeedback({});
+      const match = result.feedback.find(f => f.traceId === 'trace-fbu');
+      expect(match).toBeDefined();
+      expect(match!.feedbackUserId).toBe('reviewer-1');
+    });
+
+    it('filters feedback by feedbackUserId', async () => {
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'feedback-test-1',
+          timestamp: new Date(),
+          traceId: 'trace-fbu-f1',
+          spanId: null,
+          feedbackSource: 'user',
+          feedbackType: 'thumbs',
+          value: 1,
+          comment: null,
+          experimentId: null,
+          feedbackUserId: 'reviewer-1',
+          sourceId: null,
+          metadata: null,
+        },
+      });
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'feedback-test-2',
+          timestamp: new Date(),
+          traceId: 'trace-fbu-f2',
+          spanId: null,
+          feedbackSource: 'user',
+          feedbackType: 'thumbs',
+          value: 0,
+          comment: null,
+          experimentId: null,
+          feedbackUserId: 'reviewer-2',
+          sourceId: null,
+          metadata: null,
+        },
+      });
+
+      const result = await storage.listFeedback({
+        filters: { feedbackUserId: 'reviewer-1' },
+      });
+      expect(result.feedback).toHaveLength(1);
+      expect(result.feedback[0]!.traceId).toBe('trace-fbu-f1');
+    });
+
+    it('feedbackSource round-trips through CH feedbackSource column', async () => {
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'feedback-test-1',
+          timestamp: new Date(),
+          traceId: 'trace-fbs',
+          spanId: null,
+          feedbackSource: 'manual',
+          feedbackType: 'rating',
+          value: 5,
+          comment: null,
+          experimentId: null,
+          userId: null,
+          sourceId: null,
+          metadata: null,
+        },
+      });
+
+      const result = await storage.listFeedback({});
+      const match = result.feedback.find(f => f.traceId === 'trace-fbs');
+      expect(match).toBeDefined();
+      expect(match!.feedbackSource).toBe('manual');
+    });
+
+    it('filters feedback by feedbackSource', async () => {
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'feedback-test-1',
+          timestamp: new Date(),
+          traceId: 'trace-fbs-f1',
+          spanId: null,
+          feedbackSource: 'manual',
+          feedbackType: 'rating',
+          value: 5,
+          comment: null,
+          experimentId: null,
+          userId: null,
+          sourceId: null,
+          metadata: null,
+        },
+      });
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'feedback-test-2',
+          timestamp: new Date(),
+          traceId: 'trace-fbs-f2',
+          spanId: null,
+          feedbackSource: 'automated',
+          feedbackType: 'rating',
+          value: 3,
+          comment: null,
+          experimentId: null,
+          userId: null,
+          sourceId: null,
+          metadata: null,
+        },
+      });
+
+      const result = await storage.listFeedback({
+        filters: { feedbackSource: 'manual' },
+      });
+      expect(result.feedback).toHaveLength(1);
+      expect(result.feedback[0]!.traceId).toBe('trace-fbs-f1');
+    });
+
+    it('batch creates feedback with mixed value types', async () => {
+      await storage.batchCreateFeedback({
+        feedbacks: [
+          {
+            feedbackId: 'feedback-test-1',
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            traceId: 'batch-trace-1',
+            spanId: null,
+            feedbackSource: 'user',
+            feedbackType: 'thumbs',
+            value: 1,
+            comment: 'Helpful',
+            experimentId: null,
+            userId: 'user-1',
+            sourceId: 'source-1',
+            metadata: null,
+          },
+          {
+            feedbackId: 'feedback-test-2',
+            timestamp: new Date('2026-01-01T00:00:01Z'),
+            traceId: 'batch-trace-2',
+            spanId: 'span-2',
+            feedbackSource: 'reviewer',
+            feedbackType: 'rating',
+            value: 4,
+            comment: null,
+            experimentId: 'exp-1',
+            userId: 'user-2',
+            sourceId: 'source-2',
+            metadata: { category: 'quality' },
+          },
+          {
+            feedbackId: 'feedback-test-3',
+            timestamp: new Date('2026-01-01T00:00:02Z'),
+            traceId: 'batch-trace-3',
+            spanId: null,
+            feedbackSource: 'system',
+            feedbackType: 'flag',
+            value: 'needs-review',
+            comment: 'Escalated',
+            experimentId: null,
+            userId: null,
+            sourceId: 'source-3',
+            metadata: { severity: 'high' },
+          },
+        ],
+      });
+
+      const result = await storage.listFeedback({
+        orderBy: { field: 'timestamp', direction: 'ASC' },
+      });
+
+      expect(result.feedback).toHaveLength(3);
+      expect(result.feedback).toEqual([
+        expect.objectContaining({
+          traceId: 'batch-trace-1',
+          value: 1,
+          comment: 'Helpful',
+        }),
+        expect.objectContaining({
+          traceId: 'batch-trace-2',
+          value: 4,
+          comment: null,
+        }),
+        expect.objectContaining({
+          traceId: 'batch-trace-3',
+          value: 'needs-review',
+          comment: 'Escalated',
+        }),
+      ]);
+    });
+  });
+
+  // ==========================================================================
+  // Retry-Idempotency via dedupeKey
+  // ==========================================================================
+
+  describe('retry-idempotency via dedupeKey', () => {
+    it('duplicate span inserts produce one logical row in getTrace', async () => {
+      const span = {
+        traceId: 'dedup-trace',
+        spanId: 'dedup-span',
+        parentSpanId: null,
+        name: 'idempotent-span',
+        spanType: SpanType.AGENT_RUN,
+        isEvent: false,
+        entityType: EntityType.AGENT,
+        entityId: 'a-1',
+        entityName: 'myAgent',
+        userId: null,
+        organizationId: null,
+        resourceId: null,
+        runId: null,
+        sessionId: null,
+        threadId: null,
+        requestId: null,
+        environment: 'test',
+        source: null,
+        serviceName: null,
+        scope: null,
+        attributes: null,
+        metadata: null,
+        tags: null,
+        links: null,
+        input: null,
+        output: null,
+        error: null,
+        startedAt: new Date('2026-01-01T00:00:00Z'),
+        endedAt: new Date('2026-01-01T00:00:01Z'),
+      } as const;
+
+      // Insert same span twice (simulates retry)
+      await storage.createSpan({ span });
+      await storage.createSpan({ span });
+
+      // getTrace uses LIMIT 1 BY dedupeKey — should return exactly one span
+      const trace = await storage.getTrace({ traceId: 'dedup-trace' });
+      expect(trace).not.toBeNull();
+      expect(trace!.spans).toHaveLength(1);
+      expect(trace!.spans[0]!.spanId).toBe('dedup-span');
+    });
+
+    it('duplicate root span inserts produce one logical row in listTraces', async () => {
+      const span = {
+        traceId: 'dedup-root-trace',
+        spanId: 'dedup-root-span',
+        parentSpanId: null,
+        name: 'root-span',
+        spanType: SpanType.AGENT_RUN,
+        isEvent: false,
+        entityType: EntityType.AGENT,
+        entityId: 'a-1',
+        entityName: 'myAgent',
+        userId: null,
+        organizationId: null,
+        resourceId: null,
+        runId: null,
+        sessionId: null,
+        threadId: null,
+        requestId: null,
+        environment: 'test',
+        source: null,
+        serviceName: null,
+        scope: null,
+        attributes: null,
+        metadata: null,
+        tags: null,
+        links: null,
+        input: null,
+        output: null,
+        error: null,
+        startedAt: new Date('2026-01-01T00:00:00Z'),
+        endedAt: new Date('2026-01-01T00:00:01Z'),
+      } as const;
+
+      // Insert same root span twice
+      await storage.createSpan({ span });
+      await storage.createSpan({ span });
+
+      // listTraces uses LIMIT 1 BY dedupeKey on trace_roots — should show one trace
+      const result = await storage.listTraces({});
+      expect(result.spans).toHaveLength(1);
+      expect(result.spans[0]!.traceId).toBe('dedup-root-trace');
+    });
+  });
+
+  // ==========================================================================
+  // trace_roots MV Population
+  // ==========================================================================
+
+  describe('trace_roots materialized view', () => {
+    it('root spans (parentSpanId = null) appear in trace_roots via MV', async () => {
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'mv-trace',
+            spanId: 'root-span',
+            parentSpanId: null,
+            name: 'root',
+            spanType: SpanType.WORKFLOW_RUN,
+            isEvent: false,
+            entityType: EntityType.WORKFLOW_RUN,
+            entityId: 'wf-1',
+            entityName: 'myWorkflow',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: 'production',
+            source: null,
+            serviceName: 'svc',
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-01-01T00:00:00Z'),
+            endedAt: new Date('2026-01-01T00:00:02Z'),
+          },
+          {
+            traceId: 'mv-trace',
+            spanId: 'child-span',
+            parentSpanId: 'root-span',
+            name: 'child',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: EntityType.AGENT,
+            entityId: 'a-1',
+            entityName: 'myAgent',
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: 'production',
+            source: null,
+            serviceName: 'svc',
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-01-01T00:00:00Z'),
+            endedAt: new Date('2026-01-01T00:00:01Z'),
+          },
+        ],
+      });
+
+      // getRootSpan reads from trace_roots — only root span should appear
+      const root = await storage.getRootSpan({ traceId: 'mv-trace' });
+      expect(root).not.toBeNull();
+      expect(root!.span.spanId).toBe('root-span');
+      expect(root!.span.name).toBe('root');
+
+      // listTraces should show exactly 1 trace (the root span)
+      const traces = await storage.listTraces({});
+      expect(traces.spans).toHaveLength(1);
+      expect(traces.spans[0]!.traceId).toBe('mv-trace');
+      expect(traces.spans[0]!.spanId).toBe('root-span');
+    });
+
+    it('child spans do NOT appear in trace_roots', async () => {
+      await storage.createSpan({
+        span: {
+          traceId: 'child-only-trace',
+          spanId: 'child-only',
+          parentSpanId: 'nonexistent-parent',
+          name: 'orphan-child',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      // Child span exists in span_events
+      const span = await storage.getSpan({ traceId: 'child-only-trace', spanId: 'child-only' });
+      expect(span).not.toBeNull();
+
+      // But NOT in trace_roots — getRootSpan should return null
+      const root = await storage.getRootSpan({ traceId: 'child-only-trace' });
+      expect(root).toBeNull();
+
+      // listTraces reads from trace_roots — should be empty
+      const traces = await storage.listTraces({});
+      expect(traces.spans).toHaveLength(0);
+    });
+  });
+
+  // ==========================================================================
+  // Status Derivation
+  // ==========================================================================
+
+  describe('status derivation', () => {
+    it('derives ERROR status when root span has error', async () => {
+      await storage.createSpan({
+        span: {
+          traceId: 'error-trace',
+          spanId: 'error-root',
+          parentSpanId: null,
+          name: 'failed-run',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: EntityType.AGENT,
+          entityId: 'a-1',
+          entityName: 'myAgent',
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: { message: 'Something failed', stack: 'Error: ...' },
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      const traces = await storage.listTraces({});
+      expect(traces.spans).toHaveLength(1);
+      expect(traces.spans[0]!.status).toBe('error');
+    });
+
+    it('derives SUCCESS status when root span has no error', async () => {
+      await storage.createSpan({
+        span: {
+          traceId: 'success-trace',
+          spanId: 'success-root',
+          parentSpanId: null,
+          name: 'good-run',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: EntityType.AGENT,
+          entityId: 'a-1',
+          entityName: 'myAgent',
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      const traces = await storage.listTraces({});
+      expect(traces.spans).toHaveLength(1);
+      expect(traces.spans[0]!.status).toBe('success');
+    });
+
+    it('RUNNING status filter returns no rows (v-next stores only completed spans)', async () => {
+      await storage.createSpan({
+        span: {
+          traceId: 'running-trace',
+          spanId: 'running-root',
+          parentSpanId: null,
+          name: 'running-run',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      // Filtering by RUNNING status should return no rows — v-next never stores running traces
+      const result = await storage.listTraces({ filters: { status: 'running' as any } });
+      expect(result.spans).toHaveLength(0);
+    });
+
+    it('filters traces by ERROR status', async () => {
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'status-filter-ok',
+            spanId: 'ok-root',
+            parentSpanId: null,
+            name: 'ok-run',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: null,
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-01-01T00:00:00Z'),
+            endedAt: new Date('2026-01-01T00:00:01Z'),
+          },
+          {
+            traceId: 'status-filter-err',
+            spanId: 'err-root',
+            parentSpanId: null,
+            name: 'err-run',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: null,
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: { message: 'boom' },
+            startedAt: new Date('2026-01-01T00:00:00Z'),
+            endedAt: new Date('2026-01-01T00:00:01Z'),
+          },
+        ],
+      });
+
+      const errors = await storage.listTraces({ filters: { status: 'error' as any } });
+      expect(errors.spans).toHaveLength(1);
+      expect(errors.spans[0]!.traceId).toBe('status-filter-err');
+
+      const successes = await storage.listTraces({ filters: { status: 'success' as any } });
+      expect(successes.spans).toHaveLength(1);
+      expect(successes.spans[0]!.traceId).toBe('status-filter-ok');
+    });
+
+    it('hasChildError filter finds traces with errored child spans', async () => {
+      // Trace with error child
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'hce-trace',
+            spanId: 'hce-root',
+            parentSpanId: null,
+            name: 'root',
+            spanType: SpanType.WORKFLOW_RUN,
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: null,
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-01-01T00:00:00Z'),
+            endedAt: new Date('2026-01-01T00:00:02Z'),
+          },
+          {
+            traceId: 'hce-trace',
+            spanId: 'hce-child',
+            parentSpanId: 'hce-root',
+            name: 'child-with-error',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: null,
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: { message: 'child failed' },
+            startedAt: new Date('2026-01-01T00:00:00Z'),
+            endedAt: new Date('2026-01-01T00:00:01Z'),
+          },
+        ],
+      });
+
+      // Trace without error child
+      await storage.createSpan({
+        span: {
+          traceId: 'clean-trace',
+          spanId: 'clean-root',
+          parentSpanId: null,
+          name: 'clean-root',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      const withErrors = await storage.listTraces({ filters: { hasChildError: true } });
+      expect(withErrors.spans).toHaveLength(1);
+      expect(withErrors.spans[0]!.traceId).toBe('hce-trace');
+
+      const withoutErrors = await storage.listTraces({ filters: { hasChildError: false } });
+      expect(withoutErrors.spans).toHaveLength(1);
+      expect(withoutErrors.spans[0]!.traceId).toBe('clean-trace');
+    });
+
+    it('maps trace source filter to executionSource column', async () => {
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'trace-source-cloud',
+            spanId: 'root-cloud',
+            parentSpanId: null,
+            name: 'cloud-trace',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: null,
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: 'cloud',
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-01-01T00:00:00Z'),
+            endedAt: new Date('2026-01-01T00:00:01Z'),
+          },
+          {
+            traceId: 'trace-source-local',
+            spanId: 'root-local',
+            parentSpanId: null,
+            name: 'local-trace',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: null,
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: 'local',
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: null,
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-01-01T00:00:02Z'),
+            endedAt: new Date('2026-01-01T00:00:03Z'),
+          },
+        ],
+      });
+
+      const filtered = await storage.listTraces({ filters: { source: 'cloud' } });
+      expect(filtered.spans).toHaveLength(1);
+      expect(filtered.spans[0]!.traceId).toBe('trace-source-cloud');
+    });
+  });
+
+  // ==========================================================================
+  // metadataRaw vs metadataSearch Split
+  // ==========================================================================
+
+  describe('metadata split (metadataRaw vs metadataSearch)', () => {
+    it('reconstructs full metadata from metadataRaw on read', async () => {
+      const metadata = {
+        customKey: 'customValue',
+        nested: { deep: 'object' },
+        number: 42,
+        nullVal: null,
+        array: [1, 2, 3],
+      };
+
+      await storage.createSpan({
+        span: {
+          traceId: 'meta-trace',
+          spanId: 'meta-span',
+          parentSpanId: null,
+          name: 'meta-test',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      const result = await storage.getSpan({ traceId: 'meta-trace', spanId: 'meta-span' });
+      expect(result).not.toBeNull();
+      // Full metadata preserved via metadataRaw, including nested objects and non-string values
+      expect(result!.span.metadata).toEqual(metadata);
+    });
+
+    it('filters traces by top-level string metadata (metadataSearch)', async () => {
+      await storage.batchCreateSpans({
+        records: [
+          {
+            traceId: 'meta-filter-1',
+            spanId: 'mf1',
+            parentSpanId: null,
+            name: 'with-custom',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: null,
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: { customTag: 'alpha', nested: { deep: 'val' } },
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-01-01T00:00:00Z'),
+            endedAt: new Date('2026-01-01T00:00:01Z'),
+          },
+          {
+            traceId: 'meta-filter-2',
+            spanId: 'mf2',
+            parentSpanId: null,
+            name: 'without-custom',
+            spanType: SpanType.AGENT_RUN,
+            isEvent: false,
+            entityType: null,
+            entityId: null,
+            entityName: null,
+            userId: null,
+            organizationId: null,
+            resourceId: null,
+            runId: null,
+            sessionId: null,
+            threadId: null,
+            requestId: null,
+            environment: null,
+            source: null,
+            serviceName: null,
+            scope: null,
+            attributes: null,
+            metadata: { otherKey: 'beta' },
+            tags: null,
+            links: null,
+            input: null,
+            output: null,
+            error: null,
+            startedAt: new Date('2026-01-01T00:00:01Z'),
+            endedAt: new Date('2026-01-01T00:00:02Z'),
+          },
+        ],
+      });
+
+      // Filter by metadata key=value — only top-level string values are indexed in metadataSearch
+      const result = await storage.listTraces({ filters: { metadata: { customTag: 'alpha' } } });
+      expect(result.spans).toHaveLength(1);
+      expect(result.spans[0]!.traceId).toBe('meta-filter-1');
+    });
+
+    it('non-string metadata values are not searchable', async () => {
+      await storage.createSpan({
+        span: {
+          traceId: 'meta-nonstring',
+          spanId: 'mns1',
+          parentSpanId: null,
+          name: 'non-string-meta',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: { numericVal: 42, boolVal: true, searchable: 'yes' },
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      // Can find by string metadata
+      const found = await storage.listTraces({ filters: { metadata: { searchable: 'yes' } } });
+      expect(found.spans).toHaveLength(1);
+
+      // Cannot find by numeric metadata (not indexed in metadataSearch)
+      const notFound = await storage.listTraces({ filters: { metadata: { numericVal: '42' } } });
+      expect(notFound.spans).toHaveLength(0);
+    });
+
+    it('PROMOTED_KEYS are excluded from metadataSearch', async () => {
+      // If metadata contains a promoted key (e.g. entityType or executionSource), it should NOT be searchable
+      // via metadata filter — promoted keys live in typed columns instead
+      await storage.createSpan({
+        span: {
+          traceId: 'meta-promoted',
+          spanId: 'mp1',
+          parentSpanId: null,
+          name: 'promoted-key-test',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: EntityType.AGENT,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: { entityType: 'agent', executionSource: 'cloud', customKey: 'findme' },
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      // customKey IS in metadataSearch — should be found
+      const found = await storage.listTraces({ filters: { metadata: { customKey: 'findme' } } });
+      expect(found.spans).toHaveLength(1);
+
+      // entityType is a PROMOTED_KEY — should NOT be in metadataSearch, so metadata filter won't find it
+      const notFound = await storage.listTraces({ filters: { metadata: { entityType: 'agent' } } });
+      expect(notFound.spans).toHaveLength(0);
+
+      const sourceNotFound = await storage.listTraces({ filters: { metadata: { executionSource: 'cloud' } } });
+      expect(sourceNotFound.spans).toHaveLength(0);
+    });
+  });
+
+  // ==========================================================================
+  // Shared Normalization Rules
+  // ==========================================================================
+
+  describe('shared normalization rules', () => {
+    it('tags are trimmed, deduplicated, and empty/null values dropped', async () => {
+      await storage.createSpan({
+        span: {
+          traceId: 'norm-tags',
+          spanId: 'nt1',
+          parentSpanId: null,
+          name: 'tag-normalization',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: ['  alpha ', 'beta', 'alpha', '', '  beta  ', 'gamma'],
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      const result = await storage.getSpan({ traceId: 'norm-tags', spanId: 'nt1' });
+      expect(result).not.toBeNull();
+      const tags = result!.span.tags;
+      // Should be trimmed and deduplicated, empty strings dropped
+      expect(tags).toEqual(['alpha', 'beta', 'gamma']);
+    });
+
+    it('labels are trimmed and empty keys/values dropped', async () => {
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'metric-test-1',
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            name: 'norm_labels_metric',
+            value: 1,
+            labels: { '  key1  ': '  val1  ', '': 'empty-key', key2: '', goodKey: 'goodVal' },
+            entityType: null,
+          },
+        ],
+      });
+
+      const result = await storage.listMetrics({ filters: { name: ['norm_labels_metric'] } });
+      expect(result.metrics).toHaveLength(1);
+      const labels = result.metrics[0]!.labels;
+      // Trimmed keys/values; empty key and empty value dropped
+      expect(labels).toEqual({ key1: 'val1', goodKey: 'goodVal' });
+    });
+
+    it('event spans are stored with endedAt = startedAt (zero-duration)', async () => {
+      const startedAt = new Date('2026-01-01T00:00:00Z');
+
+      await storage.createSpan({
+        span: {
+          traceId: 'event-trace',
+          spanId: 'event-span',
+          parentSpanId: null,
+          name: 'my-event',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: true,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt,
+          endedAt: new Date('2026-01-01T12:00:00Z'), // should be overridden to startedAt
+        },
+      });
+
+      const result = await storage.getSpan({ traceId: 'event-trace', spanId: 'event-span' });
+      expect(result).not.toBeNull();
+      expect(result!.span.isEvent).toBe(true);
+      // For event spans, endedAt should equal startedAt regardless of what was passed in
+      expect(result!.span.startedAt.getTime()).toBe(startedAt.getTime());
+      expect(result!.span.endedAt?.getTime()).toBe(startedAt.getTime());
+    });
+
+    it('log executionSource round-trips through CH executionSource column', async () => {
+      await storage.batchCreateLogs({
+        logs: [
+          {
+            logId: 'log-test-1',
+            timestamp: new Date(),
+            level: 'info',
+            message: 'exec-source-test',
+            data: null,
+            executionSource: 'cloud',
+            metadata: null,
+          },
+        ],
+      });
+
+      const result = await storage.listLogs({});
+      expect(result.logs).toHaveLength(1);
+      expect(result.logs[0]!.executionSource).toBe('cloud');
+    });
+
+    it('metric executionSource round-trips through CH executionSource column', async () => {
+      await storage.batchCreateMetrics({
+        metrics: [
+          {
+            metricId: 'metric-test-1',
+            timestamp: new Date(),
+            name: 'exec_source_metric',
+            value: 1,
+            labels: {},
+            executionSource: 'ci',
+          },
+        ],
+      });
+
+      const result = await storage.listMetrics({ filters: { name: ['exec_source_metric'] } });
+      expect(result.metrics).toHaveLength(1);
+      expect(result.metrics[0]!.executionSource).toBe('ci');
+    });
+
+    it('createdAt equals startedAt and updatedAt is null', async () => {
+      const startedAt = new Date('2026-01-01T00:00:00Z');
+
+      await storage.createSpan({
+        span: {
+          traceId: 'ts-trace',
+          spanId: 'ts-span',
+          parentSpanId: null,
+          name: 'timestamp-test',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          attributes: null,
+          metadata: null,
+          tags: null,
+          links: null,
+          input: null,
+          output: null,
+          error: null,
+          startedAt,
+          endedAt: new Date('2026-01-01T00:00:01Z'),
+        },
+      });
+
+      const result = await storage.getSpan({ traceId: 'ts-trace', spanId: 'ts-span' });
+      expect(result).not.toBeNull();
+      expect(result!.span.createdAt.getTime()).toBe(startedAt.getTime());
+      expect(result!.span.updatedAt).toBeNull();
+    });
+  });
+
+  // ==========================================================================
+  // Scores — OLAP
+  // ==========================================================================
+
+  describe('scores OLAP', () => {
+    beforeEach(async () => {
+      await storage.batchCreateScores({
+        scores: [
+          {
+            scoreId: 'score-test-1',
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            traceId: 'olap-s-1',
+            spanId: null,
+            scorerId: 'quality',
+            score: 0.8,
+            reason: null,
+            experimentId: null,
+            scoreSource: 'automated',
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+            environment: 'production',
+            metadata: null,
+          },
+          {
+            scoreId: 'score-test-2',
+            timestamp: new Date('2026-01-01T00:00:05Z'),
+            traceId: 'olap-s-2',
+            spanId: null,
+            scorerId: 'quality',
+            score: 0.6,
+            reason: null,
+            experimentId: null,
+            scoreSource: 'automated',
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+            environment: 'production',
+            metadata: null,
+          },
+          {
+            scoreId: 'score-test-3',
+            timestamp: new Date('2026-01-01T00:00:10Z'),
+            traceId: 'olap-s-3',
+            spanId: null,
+            scorerId: 'quality',
+            score: 0.9,
+            reason: null,
+            experimentId: null,
+            scoreSource: 'automated',
+            entityType: EntityType.AGENT,
+            entityName: 'codeAgent',
+            environment: 'staging',
+            metadata: null,
+          },
+          {
+            scoreId: 'score-test-4',
+            timestamp: new Date('2026-01-01T01:00:00Z'),
+            traceId: 'olap-s-4',
+            spanId: null,
+            scorerId: 'factuality',
+            score: 0.5,
+            reason: null,
+            experimentId: null,
+            scoreSource: 'manual',
+            metadata: null,
+          },
+        ],
+      });
+    });
+
+    it('getScorePercentiles rejects out-of-range values', async () => {
+      await expect(
+        storage.getScorePercentiles({
+          scorerId: 'quality',
+          percentiles: [1.5],
+          interval: '1h',
+        }),
+      ).rejects.toThrow('Percentile value must be a finite number between 0 and 1');
+    });
+  });
+
+  // ==========================================================================
+  // Feedback — OLAP
+  // ==========================================================================
+
+  describe('feedback OLAP', () => {
+    beforeEach(async () => {
+      await storage.batchCreateFeedback({
+        feedbacks: [
+          {
+            feedbackId: 'feedback-test-1',
+            timestamp: new Date('2026-01-01T00:00:00Z'),
+            traceId: 'olap-f-1',
+            spanId: null,
+            feedbackType: 'thumbs',
+            feedbackSource: 'user',
+            value: 1,
+            comment: null,
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+            environment: 'production',
+            metadata: null,
+          },
+          {
+            feedbackId: 'feedback-test-2',
+            timestamp: new Date('2026-01-01T00:00:05Z'),
+            traceId: 'olap-f-2',
+            spanId: null,
+            feedbackType: 'thumbs',
+            feedbackSource: 'user',
+            value: 0,
+            comment: null,
+            entityType: EntityType.AGENT,
+            entityName: 'weatherAgent',
+            environment: 'production',
+            metadata: null,
+          },
+          {
+            feedbackId: 'feedback-test-3',
+            timestamp: new Date('2026-01-01T00:00:10Z'),
+            traceId: 'olap-f-3',
+            spanId: null,
+            feedbackType: 'thumbs',
+            feedbackSource: 'user',
+            value: 1,
+            comment: null,
+            entityType: EntityType.AGENT,
+            entityName: 'codeAgent',
+            environment: 'staging',
+            metadata: null,
+          },
+          {
+            feedbackId: 'feedback-test-4',
+            timestamp: new Date('2026-01-01T01:00:00Z'),
+            traceId: 'olap-f-4',
+            spanId: null,
+            feedbackType: 'rating',
+            feedbackSource: 'reviewer',
+            value: 4,
+            comment: null,
+            metadata: null,
+          },
+          {
+            feedbackId: 'feedback-test-5',
+            timestamp: new Date('2026-01-01T01:00:05Z'),
+            traceId: 'olap-f-5',
+            spanId: null,
+            feedbackType: 'flag',
+            feedbackSource: 'system',
+            value: 'needs-review',
+            comment: null,
+            metadata: null,
+          },
+        ],
+      });
+    });
+
+    it('getFeedbackAggregate excludes string-valued feedback from aggregation', async () => {
+      // The 'flag' feedback with value 'needs-review' should not appear in numeric aggregation
+      const result = await storage.getFeedbackAggregate({
+        feedbackType: 'flag',
+        aggregation: 'count',
+      });
+      // String-valued feedback has valueNumber = NULL, so it's excluded by the identity filter
+      expect(result.value).toBe(0);
+    });
+
+    it('getFeedbackPercentiles rejects out-of-range values', async () => {
+      await expect(
+        storage.getFeedbackPercentiles({
+          feedbackType: 'thumbs',
+          percentiles: [-0.1],
+          interval: '1h',
+        }),
+      ).rejects.toThrow('Percentile value must be a finite number between 0 and 1');
+    });
+  });
+
+  // ==========================================================================
+  // Broadened Context Fields — Round-trip
+  // ==========================================================================
+
+  describe('broadened context fields round-trip', () => {
+    it('score with full context fields round-trips', async () => {
+      await storage.createScore({
+        score: {
+          scoreId: 'score-test-1',
+          timestamp: new Date('2026-01-01T00:00:00Z'),
+          traceId: 'ctx-score-1',
+          spanId: 'ctx-span-1',
+          scorerId: 'quality',
+          score: 0.95,
+          reason: 'excellent',
+          experimentId: 'exp-1',
+          scoreSource: 'automated',
+          entityType: EntityType.AGENT,
+          entityId: 'a-1',
+          entityName: 'myAgent',
+          parentEntityType: EntityType.WORKFLOW_RUN,
+          parentEntityId: 'wf-1',
+          parentEntityName: 'myWorkflow',
+          rootEntityType: EntityType.WORKFLOW_RUN,
+          rootEntityId: 'root-1',
+          rootEntityName: 'rootWorkflow',
+          userId: 'user-1',
+          organizationId: 'org-1',
+          resourceId: 'res-1',
+          runId: 'run-1',
+          sessionId: 'sess-1',
+          threadId: 'thread-1',
+          requestId: 'req-1',
+          environment: 'production',
+          executionSource: 'cloud',
+          serviceName: 'my-service',
+          tags: ['tag1', 'tag2'],
+          metadata: { custom: 'data' },
+          scope: { tenant: 'acme' },
+        },
+      });
+
+      const result = await storage.listScores({});
+      expect(result.scores).toHaveLength(1);
+      const s = result.scores[0]!;
+      expect(s.traceId).toBe('ctx-score-1');
+      expect(s.spanId).toBe('ctx-span-1');
+      expect(s.scorerId).toBe('quality');
+      expect(s.score).toBe(0.95);
+      expect(s.reason).toBe('excellent');
+      expect(s.scoreSource).toBe('automated');
+      expect(s.entityType).toBe('agent');
+      expect(s.entityId).toBe('a-1');
+      expect(s.entityName).toBe('myAgent');
+      expect(s.parentEntityType).toBe('workflow_run');
+      expect(s.parentEntityId).toBe('wf-1');
+      expect(s.parentEntityName).toBe('myWorkflow');
+      expect(s.rootEntityType).toBe('workflow_run');
+      expect(s.rootEntityId).toBe('root-1');
+      expect(s.rootEntityName).toBe('rootWorkflow');
+      expect(s.userId).toBe('user-1');
+      expect(s.organizationId).toBe('org-1');
+      expect(s.resourceId).toBe('res-1');
+      expect(s.runId).toBe('run-1');
+      expect(s.sessionId).toBe('sess-1');
+      expect(s.threadId).toBe('thread-1');
+      expect(s.requestId).toBe('req-1');
+      expect(s.environment).toBe('production');
+      expect(s.executionSource).toBe('cloud');
+      expect(s.serviceName).toBe('my-service');
+      expect(s.tags).toEqual(expect.arrayContaining(['tag1', 'tag2']));
+      expect(s.metadata).toEqual({ custom: 'data' });
+      expect(s.scope).toEqual({ tenant: 'acme' });
+    });
+
+    it('feedback with full context fields round-trips', async () => {
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'feedback-test-1',
+          timestamp: new Date('2026-01-01T00:00:00Z'),
+          traceId: 'ctx-fb-1',
+          spanId: 'ctx-fb-span-1',
+          feedbackType: 'rating',
+          feedbackSource: 'manual',
+          feedbackUserId: 'reviewer-1',
+          value: 5,
+          comment: 'great job',
+          experimentId: 'exp-1',
+          entityType: EntityType.AGENT,
+          entityId: 'a-1',
+          entityName: 'myAgent',
+          parentEntityType: EntityType.WORKFLOW_RUN,
+          parentEntityId: 'wf-1',
+          parentEntityName: 'myWorkflow',
+          rootEntityType: EntityType.WORKFLOW_RUN,
+          rootEntityId: 'root-1',
+          rootEntityName: 'rootWorkflow',
+          userId: 'reviewer-1',
+          organizationId: 'org-1',
+          resourceId: 'res-1',
+          runId: 'run-1',
+          sessionId: 'sess-1',
+          threadId: 'thread-1',
+          requestId: 'req-1',
+          environment: 'production',
+          executionSource: 'cloud',
+          serviceName: 'my-service',
+          sourceId: 'src-1',
+          tags: ['feedback-tag'],
+          metadata: { category: 'quality' },
+          scope: { org: 'acme' },
+        },
+      });
+
+      const result = await storage.listFeedback({});
+      expect(result.feedback).toHaveLength(1);
+      const f = result.feedback[0]!;
+      expect(f.traceId).toBe('ctx-fb-1');
+      expect(f.spanId).toBe('ctx-fb-span-1');
+      expect(f.feedbackType).toBe('rating');
+      expect(f.feedbackSource).toBe('manual');
+      expect(f.feedbackUserId).toBe('reviewer-1');
+      expect(f.value).toBe(5);
+      expect(f.comment).toBe('great job');
+      expect(f.entityType).toBe('agent');
+      expect(f.entityId).toBe('a-1');
+      expect(f.entityName).toBe('myAgent');
+      expect(f.parentEntityType).toBe('workflow_run');
+      expect(f.parentEntityId).toBe('wf-1');
+      expect(f.parentEntityName).toBe('myWorkflow');
+      expect(f.rootEntityType).toBe('workflow_run');
+      expect(f.rootEntityId).toBe('root-1');
+      expect(f.rootEntityName).toBe('rootWorkflow');
+      expect(f.organizationId).toBe('org-1');
+      expect(f.resourceId).toBe('res-1');
+      expect(f.runId).toBe('run-1');
+      expect(f.sessionId).toBe('sess-1');
+      expect(f.threadId).toBe('thread-1');
+      expect(f.requestId).toBe('req-1');
+      expect(f.environment).toBe('production');
+      expect(f.executionSource).toBe('cloud');
+      expect(f.serviceName).toBe('my-service');
+      expect(f.sourceId).toBe('src-1');
+      expect(f.tags).toEqual(expect.arrayContaining(['feedback-tag']));
+      expect(f.metadata).toEqual({ category: 'quality' });
+      expect(f.scope).toEqual({ org: 'acme' });
+    });
+  });
+
+  // ==========================================================================
+  // Deletion requests
+  // ==========================================================================
+
+  describe('deletion requests', () => {
+    it('records score and feedback predicates before hiding rows', async () => {
+      const scoreDeltaBootstrap = await storage.listScores({ mode: 'delta' });
+      const feedbackDeltaBootstrap = await storage.listFeedback({ mode: 'delta' });
+
+      await storage.createScore({
+        score: {
+          scoreId: 'request-score-1',
+          timestamp: new Date('2026-09-01T12:00:00Z'),
+          traceId: 'request-trace-1',
+          spanId: null,
+          scorerId: 'request-scorer',
+          score: 0.9,
+          reason: null,
+          experimentId: null,
+          organizationId: 'org-1',
+          resourceId: 'resource-1',
+          metadata: null,
+        },
+      });
+      await storage.createFeedback({
+        feedback: {
+          feedbackId: 'request-feedback-1',
+          timestamp: new Date('2026-09-01T12:00:01Z'),
+          traceId: 'request-trace-1',
+          spanId: null,
+          feedbackSource: 'user',
+          feedbackType: 'rating',
+          value: 1,
+          comment: 'delete me',
+          experimentId: null,
+          organizationId: 'org-1',
+          resourceId: 'resource-1',
+          metadata: null,
+        },
+      });
+
+      await storage.deleteScores({
+        scoreIds: ['request-score-1'],
+        organizationId: 'org-1',
+        resourceId: 'resource-1',
+      });
+      await storage.deleteFeedback({
+        feedbackIds: ['request-feedback-1'],
+        organizationId: 'org-1',
+        resourceId: 'resource-1',
+      });
+
+      expect((await storage.listScores({})).scores).toEqual([]);
+      expect((await storage.listFeedback({})).feedback).toEqual([]);
+      expect(
+        (
+          await storage.listScores({
+            mode: 'delta',
+            after: scoreDeltaBootstrap.deltaCursor!,
+            filters: { scorerId: 'request-scorer' } as any,
+          })
+        ).scores,
+      ).toEqual([]);
+      expect(
+        (
+          await storage.listFeedback({
+            mode: 'delta',
+            after: feedbackDeltaBootstrap.deltaCursor!,
+            filters: { traceId: 'request-trace-1' },
+          })
+        ).feedback,
+      ).toEqual([]);
+      await expect(
+        storage.updateFeedbackReviewStatus({
+          feedbackId: 'request-feedback-1',
+          reviewStatus: 'reviewed',
+        }),
+      ).rejects.toThrow('Feedback record not found');
+      expect((await storage.listFeedback({})).feedback).toEqual([]);
+      expect(
+        (
+          await storage.listFeedback({
+            mode: 'delta',
+            after: feedbackDeltaBootstrap.deltaCursor!,
+            filters: { traceId: 'request-trace-1' },
+          })
+        ).feedback,
+      ).toEqual([]);
+
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      try {
+        const result = await client.query({
+          query: `SELECT signal, predicateType, predicateValues, organizationId, resourceId FROM ${TABLE_DELETION_REQUESTS} FINAL ORDER BY signal`,
+          format: 'JSONEachRow',
+        });
+        const rows = (await result.json()) as Array<{
+          signal: string;
+          predicateType: string;
+          predicateValues: string[];
+          organizationId: string;
+          resourceId: string;
+        }>;
+
+        expect(rows).toEqual([
+          {
+            signal: 'feedback',
+            predicateType: 'itemIds',
+            predicateValues: ['request-feedback-1'],
+            organizationId: 'org-1',
+            resourceId: 'resource-1',
+          },
+          {
+            signal: 'scores',
+            predicateType: 'itemIds',
+            predicateValues: ['request-score-1'],
+            organizationId: 'org-1',
+            resourceId: 'resource-1',
+          },
+        ]);
+
+        const requestTableResult = await client.query({
+          query: `SHOW CREATE TABLE ${TABLE_DELETION_REQUESTS}`,
+          format: 'TabSeparatedRaw',
+        });
+        const requestTableDDL = await requestTableResult.text();
+        expect(requestTableDDL).not.toContain('TTL requestedAt');
+        expect(requestTableDDL).not.toContain('deletedAt');
+
+        const deletedAtResult = await client.query({
+          query: `SELECT table FROM system.columns WHERE database = currentDatabase() AND table IN ({scoreTable:String}, {feedbackTable:String}) AND name = 'deletedAt'`,
+          query_params: { scoreTable: TABLE_SCORE_EVENTS, feedbackTable: TABLE_FEEDBACK_EVENTS },
+          format: 'JSONEachRow',
+        });
+        expect(await deletedAtResult.json()).toEqual([]);
+
+        for (const [table, field, id] of [
+          [TABLE_SCORE_EVENTS_DELTA, 'scoreId', 'request-score-1'],
+          [TABLE_FEEDBACK_EVENTS_DELTA, 'feedbackId', 'request-feedback-1'],
+        ] as const) {
+          const deltaResult = await client.query({
+            query: `SELECT count() AS count FROM ${table} WHERE ${field} = {id:String}`,
+            query_params: { id },
+            format: 'JSONEachRow',
+          });
+          const [deltaRow] = (await deltaResult.json()) as Array<{ count: string }>;
+          expect(Number(deltaRow?.count)).toBe(1);
+        }
+
+        await storage.deleteScores({
+          scoreIds: ['request-score-1'],
+          organizationId: 'org-1',
+          resourceId: 'resource-1',
+        });
+        await storage.deleteFeedback({
+          feedbackIds: ['request-feedback-1'],
+          organizationId: 'org-1',
+          resourceId: 'resource-1',
+        });
+        expect((await storage.listScores({})).scores).toEqual([]);
+        expect((await storage.listFeedback({})).feedback).toEqual([]);
+
+        // Each request is upserted once more when marked applied, so count
+        // distinct requests under FINAL rather than raw row versions.
+        const requestCountResult = await client.query({
+          query: `SELECT count() AS count FROM ${TABLE_DELETION_REQUESTS} FINAL`,
+          format: 'JSONEachRow',
+        });
+        const [requestCountRow] = (await requestCountResult.json()) as Array<{ count: string }>;
+        expect(Number(requestCountRow?.count)).toBe(4);
+      } finally {
+        await client.close();
+      }
+    });
+
+    it('keeps the predicateValues skip index through init and migration and guards lookups through it', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const listIndexes = async () => {
+        const result = await client.query({
+          query: `SELECT name, type, expr FROM system.data_skipping_indices WHERE database = currentDatabase() AND table = {table:String}`,
+          query_params: { table: TABLE_DELETION_REQUESTS },
+          format: 'JSONEachRow',
+        });
+        return (await result.json()) as Array<{ name: string; type: string; expr: string }>;
+      };
+
+      try {
+        // Fresh install: CREATE TABLE carries the index.
+        expect(await listIndexes()).toEqual([
+          { name: 'idx_predicateValues', type: 'bloom_filter', expr: 'predicateValues' },
+        ]);
+
+        // Existing deployment created before the index: init() must add it via ALL_MIGRATIONS
+        // and re-running init() must not issue the ALTER again.
+        await client.command({
+          query: `ALTER TABLE ${TABLE_DELETION_REQUESTS} DROP INDEX IF EXISTS idx_predicateValues`,
+        });
+        expect(await listIndexes()).toEqual([]);
+
+        const originalCommand = client.command.bind(client);
+        const commands: string[] = [];
+        const spy = vi.spyOn(client, 'command').mockImplementation(async args => {
+          commands.push((args as { query: string }).query);
+          return originalCommand(args);
+        });
+        try {
+          await new ObservabilityStorageClickhouseVNext({ client }).init();
+          expect(commands.filter(q => /^\s*ALTER\s+TABLE/i.test(q) && q.includes('idx_predicateValues'))).toEqual([
+            `ALTER TABLE ${TABLE_DELETION_REQUESTS} ADD INDEX IF NOT EXISTS idx_predicateValues predicateValues TYPE bloom_filter(0.01) GRANULARITY 2`,
+          ]);
+          commands.length = 0;
+          await new ObservabilityStorageClickhouseVNext({ client }).init();
+          expect(commands.filter(q => /^\s*ALTER\s+TABLE/i.test(q))).toEqual([]);
+        } finally {
+          spy.mockRestore();
+        }
+        expect(await listIndexes()).toEqual([
+          { name: 'idx_predicateValues', type: 'bloom_filter', expr: 'predicateValues' },
+        ]);
+
+        // Guard lookups through the indexed column stay correct: the deleted id is blocked,
+        // a sibling id in the same scope is not.
+        const feedback = (feedbackId: string) => ({
+          feedbackId,
+          timestamp: new Date('2026-09-01T12:00:01Z'),
+          traceId: 'index-trace-1',
+          spanId: null,
+          feedbackSource: 'user' as const,
+          feedbackType: 'rating' as const,
+          value: 1,
+          comment: null,
+          experimentId: null,
+          organizationId: 'org-1',
+          resourceId: 'resource-1',
+          metadata: null,
+        });
+        await storage.createFeedback({ feedback: feedback('index-feedback-deleted') });
+        await storage.createFeedback({ feedback: feedback('index-feedback-kept') });
+        await storage.deleteFeedback({
+          feedbackIds: ['index-feedback-deleted'],
+          organizationId: 'org-1',
+          resourceId: 'resource-1',
+        });
+
+        // The guard's query plan must select the skip index, not just tolerate it.
+        const explainResult = await client.query({
+          query: `EXPLAIN indexes = 1
+            SELECT 1 AS found FROM ${TABLE_DELETION_REQUESTS} FINAL
+            WHERE signal = 'feedback'
+              AND predicateType = 'itemIds'
+              AND has(predicateValues, {feedbackId:String})
+              AND lastAppliedAt > toDateTime64(0, 3)
+              AND (organizationId = '' OR organizationId = {organizationId:String})
+              AND (resourceId = '' OR resourceId = {resourceId:String})
+            LIMIT 1`,
+          query_params: { feedbackId: 'index-feedback-deleted', organizationId: 'org-1', resourceId: 'resource-1' },
+          format: 'TabSeparatedRaw',
+        });
+        expect(await explainResult.text()).toContain('Name: idx_predicateValues');
+
+        await expect(
+          storage.updateFeedbackReviewStatus({ feedbackId: 'index-feedback-deleted', reviewStatus: 'reviewed' }),
+        ).rejects.toThrow('Feedback record not found');
+        await expect(
+          storage.updateFeedbackReviewStatus({ feedbackId: 'index-feedback-kept', reviewStatus: 'reviewed' }),
+        ).resolves.toMatchObject({ feedbackId: 'index-feedback-kept', reviewStatus: 'reviewed' });
+        expect((await storage.listFeedback({})).feedback.map(f => f.feedbackId)).toEqual(['index-feedback-kept']);
+      } finally {
+        await client.close();
+      }
+    });
+
+    it('ignores unapplied requests after a failed delete and converges on retry', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const requestsFor = async (id: string) => {
+        const result = await client.query({
+          query: `SELECT signal, lastAppliedAt > toDateTime64(0, 3) AS applied
+                  FROM ${TABLE_DELETION_REQUESTS} FINAL
+                  WHERE has(predicateValues, {id:String}) ORDER BY requestedAt`,
+          query_params: { id },
+          format: 'JSONEachRow',
+        });
+        return (await result.json()) as Array<{ signal: string; applied: number }>;
+      };
+
+      try {
+        const flaky = new ObservabilityStorageClickhouseVNext({ client });
+        await flaky.init();
+        await flaky.createFeedback({
+          feedback: {
+            feedbackId: 'unapplied-feedback-1',
+            timestamp: new Date('2026-09-01T12:00:01Z'),
+            traceId: 'unapplied-trace-1',
+            spanId: null,
+            feedbackSource: 'user',
+            feedbackType: 'rating',
+            value: 1,
+            comment: 'still visible',
+            experimentId: null,
+            organizationId: 'org-1',
+            resourceId: 'resource-1',
+            metadata: null,
+          },
+        });
+
+        // Request insert succeeds, lightweight DELETE fails.
+        const originalCommand = client.command.bind(client);
+        const spy = vi.spyOn(client, 'command').mockImplementation(async args => {
+          const query = (args as { query: string }).query;
+          if (/^\s*DELETE FROM/i.test(query)) throw new Error('simulated delete failure');
+          return originalCommand(args);
+        });
+        try {
+          await expect(
+            flaky.deleteFeedback({
+              feedbackIds: ['unapplied-feedback-1'],
+              organizationId: 'org-1',
+              resourceId: 'resource-1',
+            }),
+          ).rejects.toThrow('simulated delete failure');
+        } finally {
+          spy.mockRestore();
+        }
+
+        expect(await requestsFor('unapplied-feedback-1')).toEqual([{ signal: 'feedback', applied: 0 }]);
+        expect((await flaky.listFeedback({})).feedback.map(f => f.feedbackId)).toEqual(['unapplied-feedback-1']);
+
+        // The failed request does not block the update up front. The update's
+        // post-write check finds it and retries the delete, which now succeeds.
+        await expect(
+          flaky.updateFeedbackReviewStatus({ feedbackId: 'unapplied-feedback-1', reviewStatus: 'reviewed' }),
+        ).rejects.toThrow('Feedback record not found');
+        expect((await flaky.listFeedback({})).feedback).toEqual([]);
+        expect((await requestsFor('unapplied-feedback-1')).map(r => r.applied)).toEqual([0, 1]);
+        await expect(
+          flaky.updateFeedbackReviewStatus({ feedbackId: 'unapplied-feedback-1', reviewStatus: 'reviewed' }),
+        ).rejects.toThrow('Feedback record not found');
+
+        // Scores and traces mark their requests applied too.
+        await flaky.deleteScores({ scoreIds: ['applied-score-1'], organizationId: 'org-1', resourceId: 'resource-1' });
+        await flaky.batchDeleteTraces({ traceIds: ['applied-trace-1'] });
+        expect(await requestsFor('applied-score-1')).toEqual([{ signal: 'scores', applied: 1 }]);
+        expect(await requestsFor('applied-trace-1')).toEqual([{ signal: 'traces', applied: 1 }]);
+      } finally {
+        await client.close();
+      }
+    });
+
+    it('does not recreate feedback when a review update lands between the delete and the applied mark', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const gate = () => {
+        let open!: () => void;
+        const opened = new Promise<void>(resolve => (open = resolve));
+        return { open, opened };
+      };
+      // Update pauses at its pre-write guard until the first DELETE has run;
+      // the delete pauses before its applied mark until the update has returned.
+      const updateGuard = gate();
+      const appliedMark = gate();
+      const originalQuery = client.query.bind(client);
+      const originalInsert = client.insert.bind(client);
+      let guardCalls = 0;
+      let appliedMarks = 0;
+      const querySpy = vi.spyOn(client, 'query').mockImplementation(async args => {
+        const query = (args as { query: string }).query;
+        if (query.includes('has(predicateValues') && guardCalls++ === 0) await updateGuard.opened;
+        return originalQuery(args);
+      });
+      const insertSpy = vi.spyOn(client, 'insert').mockImplementation(async args => {
+        const row = (args as { table: string; values: Array<{ lastAppliedAt?: string }> }).values[0];
+        if (
+          (args as { table: string }).table === TABLE_DELETION_REQUESTS &&
+          row?.lastAppliedAt !== '1970-01-01T00:00:00.000Z' &&
+          appliedMarks++ === 0
+        ) {
+          await appliedMark.opened;
+        }
+        return originalInsert(args);
+      });
+
+      try {
+        const racing = new ObservabilityStorageClickhouseVNext({ client });
+        await racing.init();
+        await racing.createFeedback({
+          feedback: {
+            feedbackId: 'race-feedback-1',
+            timestamp: new Date('2026-09-01T12:00:01Z'),
+            traceId: 'race-trace-1',
+            spanId: null,
+            feedbackSource: 'user',
+            feedbackType: 'rating',
+            value: 1,
+            comment: 'racing',
+            experimentId: null,
+            organizationId: 'org-1',
+            resourceId: 'resource-1',
+            metadata: null,
+          },
+        });
+
+        const update = racing.updateFeedbackReviewStatus({ feedbackId: 'race-feedback-1', reviewStatus: 'reviewed' });
+        await vi.waitFor(() => expect(guardCalls).toBe(1));
+        const deletion = racing.deleteFeedback({
+          feedbackIds: ['race-feedback-1'],
+          organizationId: 'org-1',
+          resourceId: 'resource-1',
+        });
+        await vi.waitFor(async () => {
+          const rows = (await originalQuery({
+            query: `SELECT count() AS c FROM ${TABLE_FEEDBACK_EVENTS} WHERE feedbackId = 'race-feedback-1'`,
+            format: 'JSONEachRow',
+          }).then(r => r.json())) as Array<{ c: number | string }>;
+          expect(Number(rows[0]?.c)).toBe(0);
+        });
+
+        updateGuard.open();
+        await expect(update).rejects.toThrow('Feedback record not found');
+        // The first request is still pending. The update's replacement row was
+        // written after the DELETE, so its post-write check re-ran the delete.
+        expect((await racing.listFeedback({})).feedback).toEqual([]);
+
+        appliedMark.open();
+        await deletion;
+        expect((await racing.listFeedback({})).feedback).toEqual([]);
+        await expect(
+          racing.updateFeedbackReviewStatus({ feedbackId: 'race-feedback-1', reviewStatus: 'reviewed' }),
+        ).rejects.toThrow('Feedback record not found');
+      } finally {
+        updateGuard.open();
+        appliedMark.open();
+        querySpy.mockRestore();
+        insertSpy.mockRestore();
+        await client.close();
+      }
+    });
+
+    it('publishes review updates through the delta cursor', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const feedback = {
+        feedbackId: 'delta-wiring-feedback-1',
+        timestamp: new Date('2026-09-01T12:00:03Z'),
+        traceId: 'delta-wiring-trace-1',
+        spanId: null,
+        feedbackSource: 'user',
+        feedbackType: 'rating',
+        value: 1,
+        comment: null,
+        experimentId: null,
+        organizationId: 'org-1',
+        resourceId: 'resource-1',
+        metadata: null,
+      } as const;
+      const publishedRows = async () => {
+        const result = await client.query({
+          query: `SELECT count() AS rows FROM ${TABLE_FEEDBACK_EVENTS_DELTA} WHERE feedbackId = {feedbackId:String}`,
+          query_params: { feedbackId: feedback.feedbackId },
+          format: 'JSONEachRow',
+        });
+        return Number(((await result.json()) as Array<{ rows: string }>)[0]?.rows);
+      };
+      const enabled = coreFeatures.has('observability-delta-polling');
+
+      try {
+        coreFeatures.add('observability-delta-polling');
+        const store = new ObservabilityStorageClickhouseVNext({ client });
+        await store.init();
+        await store.createFeedback({ feedback });
+        const cursor = (await store.listFeedback({ mode: 'delta' })).deltaCursor!;
+
+        await store.updateFeedbackReviewStatus({ feedbackId: feedback.feedbackId, reviewStatus: 'reviewed' });
+
+        expect((await store.listFeedback({ mode: 'delta', after: cursor })).feedback).toMatchObject([
+          { feedbackId: feedback.feedbackId, reviewStatus: 'reviewed' },
+        ]);
+        // The insert materialized view publishes the replacement row.
+        expect(await publishedRows()).toBe(2);
+      } finally {
+        if (enabled) coreFeatures.add('observability-delta-polling');
+        else coreFeatures.delete('observability-delta-polling');
+        await client.close();
+      }
+    });
+  });
+
+  // ==========================================================================
+  // Retention / TTL
+  // ==========================================================================
+
+  describe('retention / TTL', () => {
+    // --- Unit tests for buildRetentionDDL ---
+
+    it('buildRetentionDDL generates no statements when config is empty', () => {
+      expect(buildRetentionDDL({})).toEqual([]);
+    });
+
+    it('buildRetentionDDL generates tracing TTL for span_events, trace_roots, and trace_branches', () => {
+      const stmts = buildRetentionDDL({ tracing: 30 });
+      expect(stmts).toHaveLength(3);
+      expect(stmts[0]).toBe('ALTER TABLE mastra_span_events MODIFY TTL endedAt + INTERVAL 30 DAY');
+      expect(stmts[1]).toBe('ALTER TABLE mastra_trace_roots MODIFY TTL endedAt + INTERVAL 30 DAY');
+      expect(stmts[2]).toBe('ALTER TABLE mastra_trace_branches MODIFY TTL endedAt + INTERVAL 30 DAY');
+    });
+
+    it('buildRetentionDDL generates per-signal TTL statements', () => {
+      const stmts = buildRetentionDDL({ logs: 7, metrics: 14, scores: 90, feedback: 60 });
+      expect(stmts).toHaveLength(5);
+      expect(stmts).toContain('ALTER TABLE mastra_log_events MODIFY TTL timestamp + INTERVAL 7 DAY');
+      expect(stmts).toContain('ALTER TABLE mastra_metric_events MODIFY TTL timestamp + INTERVAL 14 DAY');
+      expect(stmts).toContain('ALTER TABLE mastra_score_events MODIFY TTL timestamp + INTERVAL 90 DAY');
+      expect(stmts).toContain('ALTER TABLE mastra_score_events_current MODIFY TTL timestamp + INTERVAL 90 DAY');
+      expect(stmts).toContain('ALTER TABLE mastra_feedback_events MODIFY TTL timestamp + INTERVAL 60 DAY');
+    });
+
+    it('buildRetentionDDL adds a deletion-request TTL when every signal is bounded', () => {
+      const stmts = buildRetentionDDL({ tracing: 30, logs: 7, metrics: 14, scores: 90, feedback: 60 });
+      expect(stmts).toContain('ALTER TABLE mastra_deletion_requests MODIFY TTL requestedAt + INTERVAL 120 DAY');
+    });
+
+    it('buildRetentionDDL skips zero, negative, and non-numeric values', () => {
+      const stmts = buildRetentionDDL({
+        tracing: 0,
+        logs: -5,
+        metrics: NaN,
+        scores: undefined,
+        feedback: 10,
+      } as any);
+      expect(stmts).toEqual(['ALTER TABLE mastra_feedback_events MODIFY TTL timestamp + INTERVAL 10 DAY']);
+    });
+
+    it('buildRetentionDDL floors fractional days', () => {
+      const stmts = buildRetentionDDL({ logs: 7.9 });
+      expect(stmts).toHaveLength(1);
+      expect(stmts[0]).toBe('ALTER TABLE mastra_log_events MODIFY TTL timestamp + INTERVAL 7 DAY');
+    });
+
+    // --- Unit tests for buildRetentionEntries ---
+
+    it('buildRetentionEntries returns structured entries whose sql matches buildRetentionDDL', () => {
+      const config = { tracing: 30, logs: 7, metrics: 14 };
+      const entries = buildRetentionEntries(config);
+      const ddl = buildRetentionDDL(config);
+      expect(entries).toHaveLength(ddl.length);
+      expect(entries.map(e => e.sql)).toEqual(ddl);
+      for (const entry of entries) {
+        expect(entry.sql).toContain(`ALTER TABLE ${entry.table}`);
+        expect(entry.sql).toContain(`${entry.column} + INTERVAL ${entry.days} DAY`);
+      }
+    });
+
+    // --- Unit tests for parseTtlExpression ---
+
+    it('parseTtlExpression parses normalized toIntervalDay form', () => {
+      expect(parseTtlExpression('TTL endedAt + toIntervalDay(30)')).toEqual({ column: 'endedAt', days: 30 });
+    });
+
+    it('parseTtlExpression parses INTERVAL N DAY form', () => {
+      expect(parseTtlExpression('TTL timestamp + INTERVAL 7 DAY')).toEqual({ column: 'timestamp', days: 7 });
+    });
+
+    it('parseTtlExpression extracts TTL from a full CREATE TABLE statement', () => {
+      const createTable = `CREATE TABLE mastra_span_events (...) ENGINE = ReplacingMergeTree PARTITION BY toDate(endedAt) ORDER BY (traceId) TTL endedAt + toIntervalDay(30) SETTINGS index_granularity = 8192`;
+      expect(parseTtlExpression(createTable)).toEqual({ column: 'endedAt', days: 30 });
+    });
+
+    it('parseTtlExpression handles backtick-quoted column identifiers', () => {
+      // ClickHouse's `system.tables.create_table_query` often wraps identifiers
+      // in backticks, e.g. `TTL `endedAt` + toIntervalDay(30)`.
+      expect(parseTtlExpression('TTL `endedAt` + toIntervalDay(30)')).toEqual({ column: 'endedAt', days: 30 });
+      expect(parseTtlExpression('TTL `timestamp` + INTERVAL 7 DAY')).toEqual({ column: 'timestamp', days: 7 });
+    });
+
+    it('parseTtlExpression returns null when no TTL clause is present', () => {
+      expect(parseTtlExpression('ORDER BY (traceId, endedAt)')).toBeNull();
+      expect(parseTtlExpression('')).toBeNull();
+    });
+
+    // --- Integration tests: retention defaults and configured TTLs ---
+
+    it('creates signal and deletion-request tables without TTL by default and retrofits configured retention', async () => {
+      const database = `mastra_retention_${Date.now()}`;
+      const connection = {
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      };
+      const adminClient = createClient(connection);
+      await adminClient.command({ query: `CREATE DATABASE ${database}` });
+      const client = createClient({ ...connection, database });
+
+      try {
+        const storageWithoutRetention = new ObservabilityStorageClickhouseVNext({ client });
+        await storageWithoutRetention.init();
+
+        for (const table of [
+          TABLE_SCORE_EVENTS,
+          TABLE_SCORE_EVENTS_CURRENT,
+          TABLE_FEEDBACK_EVENTS,
+          TABLE_DELETION_REQUESTS,
+        ]) {
+          const result = await client.query({ query: `SHOW CREATE TABLE ${table}`, format: 'TabSeparatedRaw' });
+          expect(await result.text(), `${table} should not have a default TTL`).not.toContain('TTL');
+        }
+
+        const storageWithRetention = new ObservabilityStorageClickhouseVNext({
+          client,
+          retention: { scores: 30, feedback: 45 },
+        });
+        await storageWithRetention.applyRetention();
+
+        const expectedTTLs: Record<string, string> = {
+          [TABLE_SCORE_EVENTS]: 'timestamp + toIntervalDay(30)',
+          [TABLE_SCORE_EVENTS_CURRENT]: 'timestamp + toIntervalDay(30)',
+          [TABLE_FEEDBACK_EVENTS]: 'timestamp + toIntervalDay(45)',
+        };
+        for (const table of [TABLE_SCORE_EVENTS, TABLE_SCORE_EVENTS_CURRENT, TABLE_FEEDBACK_EVENTS]) {
+          const result = await client.query({ query: `SHOW CREATE TABLE ${table}`, format: 'TabSeparatedRaw' });
+          expect(await result.text(), `${table} should use configured retention`).toContain(expectedTTLs[table]!);
+        }
+
+        const deletionRequestsResult = await client.query({
+          query: `SHOW CREATE TABLE ${TABLE_DELETION_REQUESTS}`,
+          format: 'TabSeparatedRaw',
+        });
+        expect(await deletionRequestsResult.text()).not.toContain('TTL requestedAt');
+      } finally {
+        await client.close();
+        await adminClient.command({ query: `DROP DATABASE IF EXISTS ${database}` });
+        await adminClient.close();
+      }
+    });
+
+    it('init applies retention TTL to tables', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+
+      const signalTables = [
+        'mastra_span_events',
+        'mastra_trace_roots',
+        'mastra_trace_branches',
+        'mastra_log_events',
+        'mastra_metric_events',
+        'mastra_score_events',
+        'mastra_score_events_current',
+        'mastra_feedback_events',
+        'mastra_deletion_requests',
+      ];
+
+      try {
+        // Create a fresh storage instance with retention config
+        const retentionStorage = new ObservabilityStorageClickhouseVNext({
+          client,
+          retention: { tracing: 30, logs: 7, metrics: 14, scores: 90, feedback: 60 },
+        });
+        await retentionStorage.init();
+
+        // Verify TTL was applied by checking SHOW CREATE TABLE output
+        const expectedTTLs: Record<string, string> = {
+          mastra_span_events: 'endedAt + toIntervalDay(30)',
+          mastra_trace_roots: 'endedAt + toIntervalDay(30)',
+          mastra_trace_branches: 'endedAt + toIntervalDay(30)',
+          mastra_log_events: 'timestamp + toIntervalDay(7)',
+          mastra_metric_events: 'timestamp + toIntervalDay(14)',
+          mastra_score_events: 'timestamp + toIntervalDay(90)',
+          mastra_score_events_current: 'timestamp + toIntervalDay(90)',
+          mastra_feedback_events: 'timestamp + toIntervalDay(60)',
+          mastra_deletion_requests: 'requestedAt + toIntervalDay(120)',
+        };
+
+        for (const name of signalTables) {
+          const result = await client.query({
+            query: `SHOW CREATE TABLE ${name}`,
+            format: 'TabSeparatedRaw',
+          });
+          const createDDL = await result.text();
+          expect(createDDL, `${name} should have TTL clause`).toContain('TTL');
+          expect(createDDL, `${name} should have correct TTL expression`).toContain(expectedTTLs[name]!);
+        }
+      } finally {
+        // Clean up: remove TTL from all signal tables so subsequent test runs
+        // start from a clean state. ALTER TABLE ... MODIFY TTL with persistent
+        // TTL can cause background mutations that interfere with other tests.
+        for (const table of signalTables) {
+          await client.command({ query: `ALTER TABLE ${table} REMOVE TTL` });
+        }
+        await client.close();
+      }
+    });
+  });
+
+  // ==========================================================================
+  // init() idempotence
+  //
+  // Regression coverage for the metadata-version churn that hung agent streams
+  // when ClickHouse observability was configured. On Replicated/Shared
+  // MergeTree, every ALTER bumps the table's metadata version even when the
+  // change is a no-op, so init() must skip ALTERs whose target is already in
+  // place to avoid replica catch-up races on every process boot.
+  // ==========================================================================
+
+  describe('init idempotence', () => {
+    // --- Unit tests for ALL_MIGRATIONS shape ---
+
+    it('defines score current-state storage with a stable scoreId key', () => {
+      const tableDdl = buildAllTableDDL().find(ddl =>
+        ddl.includes(`CREATE TABLE IF NOT EXISTS ${TABLE_SCORE_EVENTS_CURRENT}`),
+      );
+      expect(tableDdl).toContain('ENGINE = ReplacingMergeTree(writeVersion)');
+      expect(tableDdl).toContain('PARTITION BY cityHash64(scoreId) % 64');
+      expect(tableDdl).toContain('ORDER BY scoreId');
+
+      const mvDdl = buildAllMvDDL('fallback').find(ddl =>
+        ddl.includes(`CREATE MATERIALIZED VIEW IF NOT EXISTS ${MV_SCORE_EVENTS_CURRENT}`),
+      );
+      expect(mvDdl).toContain(`TO ${TABLE_SCORE_EVENTS_CURRENT}`);
+      expect(mvDdl).toContain(`FROM ${TABLE_SCORE_EVENTS}`);
+    });
+
+    it.each([
+      ['score', TABLE_SCORE_EVENTS],
+      ['feedback', TABLE_FEEDBACK_EVENTS],
+    ])('includes durable %s write versions in fresh and migrated schemas', (_signal, table) => {
+      const tableDdl = buildAllTableDDL().find(ddl => ddl.includes(`CREATE TABLE IF NOT EXISTS ${table}`));
+      expect(tableDdl).toContain('writeVersion       UInt64 DEFAULT 0');
+      expect(
+        ALL_MIGRATIONS.find(
+          migration => migration.kind === 'column' && migration.table === table && migration.name === 'writeVersion',
+        )?.sql,
+      ).toContain('ADD COLUMN IF NOT EXISTS writeVersion UInt64 DEFAULT 0');
+    });
+
+    it('mints one delta cursor per scoreId', () => {
+      for (const strategy of ['serial', 'fallback'] as const) {
+        const mvDdl = buildAllMvDDL(strategy).find(ddl =>
+          ddl.includes(`CREATE MATERIALIZED VIEW IF NOT EXISTS ${MV_SCORE_EVENTS_DELTA}`),
+        );
+        expect(mvDdl).toContain(`SELECT scoreId FROM ${TABLE_SCORE_EVENTS_DELTA}`);
+        expect(mvDdl).toContain(`WHERE scoreId IN (SELECT scoreId FROM ${TABLE_SCORE_EVENTS})`);
+        expect(mvDdl).toContain('LIMIT 1 BY scoreId');
+      }
+
+      const deltaTableDdl = buildAllTableDDL().find(ddl =>
+        ddl.includes(`CREATE TABLE IF NOT EXISTS ${TABLE_SCORE_EVENTS_DELTA}`),
+      );
+      expect(deltaTableDdl).toContain('INDEX idx_scoreId scoreId TYPE bloom_filter(0.01) GRANULARITY 1');
+      expect(
+        ALL_MIGRATIONS.find(
+          migration =>
+            migration.kind === 'index' &&
+            migration.table === TABLE_SCORE_EVENTS_DELTA &&
+            migration.name === 'idx_scoreId',
+        ),
+      ).toBeDefined();
+    });
+
+    it('upgrades a score delta view that predates per-scoreId deduplication in place', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const score = {
+        scoreId: 'legacy-delta-mv-score',
+        timestamp: new Date('2026-01-02T00:00:00Z'),
+        traceId: 'legacy-delta-mv-trace',
+        spanId: null,
+        scorerId: 'quality',
+        score: 0.4,
+        reason: null,
+        metadata: null,
+      };
+      const readMvDdl = async () => {
+        const result = await client.query({
+          query: `SELECT create_table_query FROM system.tables WHERE database = currentDatabase() AND name = {name:String}`,
+          query_params: { name: MV_SCORE_EVENTS_DELTA },
+          format: 'JSONEachRow',
+        });
+        return (await result.json<{ create_table_query: string }>())[0]?.create_table_query ?? '';
+      };
+
+      try {
+        const strategy = (await readMvDdl()).includes('generateSerialID(') ? 'serial' : 'fallback';
+        const legacyMvDdl = buildScoreEventsDeltaMvDDL(strategy)
+          .replace(/\n\s*WHERE scoreId NOT IN \([\s\S]*?\n\s*\)/, '')
+          .replace(/\n\s*LIMIT 1 BY scoreId/, '');
+        expect(legacyMvDdl).not.toContain('NOT IN');
+
+        await client.command({ query: `DROP VIEW IF EXISTS ${MV_SCORE_EVENTS_DELTA}` });
+        await client.command({ query: legacyMvDdl });
+        expect(await readMvDdl()).not.toContain('NOT IN');
+
+        // init() must alter the view in place: a drop-and-recreate would leave
+        // a window in which score writes get no delta row.
+        const countDropViews = async () => {
+          await client.command({ query: 'SYSTEM FLUSH LOGS' });
+          const result = await client.query({
+            query: `SELECT count() AS count FROM system.query_log
+                    WHERE type = 'QueryFinish' AND query ILIKE {pattern:String}`,
+            query_params: { pattern: `DROP VIEW%${MV_SCORE_EVENTS_DELTA}%` },
+            format: 'JSONEachRow',
+          });
+          return Number((await result.json<{ count: string | number }>())[0]?.count ?? 0);
+        };
+        const dropsBefore = await countDropViews();
+
+        const storage = new ObservabilityStorageClickhouseVNext({ client });
+        await storage.init();
+        expect(await readMvDdl()).toContain('NOT IN');
+        expect(await countDropViews()).toBe(dropsBefore);
+
+        await storage.createScore({ score });
+        await storage.createScore({ score });
+
+        const deltaResult = await client.query({
+          query: `SELECT count() AS count FROM ${TABLE_SCORE_EVENTS_DELTA} WHERE scoreId = {scoreId:String}`,
+          query_params: { scoreId: score.scoreId },
+          format: 'JSONEachRow',
+        });
+        expect((await deltaResult.json<{ count: string | number }>()).map(row => Number(row.count))).toEqual([1]);
+
+        // A missing view is created by the regular CREATE pass, nothing to alter.
+        await client.command({ query: `DROP VIEW IF EXISTS ${MV_SCORE_EVENTS_DELTA}` });
+        await storage.init();
+        expect(await readMvDdl()).toContain('NOT IN');
+      } finally {
+        await new ObservabilityStorageClickhouseVNext({ client }).init();
+        await client.close();
+      }
+    });
+
+    it('additively upgrades legacy score rows without losing source or delta data', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const score = {
+        scoreId: 'legacy-score-write-version-migration',
+        timestamp: new Date('2026-01-01T00:00:00Z'),
+        traceId: 'legacy-score-migration-trace',
+        spanId: null,
+        scorerId: 'quality',
+        score: 0.4,
+        reason: null,
+        metadata: null,
+      };
+
+      try {
+        await client.command({ query: `DROP VIEW IF EXISTS ${MV_SCORE_EVENTS_CURRENT}` });
+        await client.command({ query: `DROP TABLE IF EXISTS ${TABLE_SCORE_EVENTS_CURRENT}` });
+        await client.command({ query: `DROP TABLE IF EXISTS ${TABLE_SCORE_EVENTS_CURRENT_BACKFILL}` });
+        await client.command({ query: `ALTER TABLE ${TABLE_SCORE_EVENTS} DROP COLUMN IF EXISTS writeVersion` });
+        await client.insert({
+          table: TABLE_SCORE_EVENTS,
+          values: [scoreRecordToRow(score)],
+          format: 'JSONEachRow',
+        });
+
+        await new ObservabilityStorageClickhouseVNext({ client }).init();
+
+        const sourceResult = await client.query({
+          query: `SELECT scoreId, score, toString(writeVersion) AS writeVersion FROM ${TABLE_SCORE_EVENTS} FINAL WHERE scoreId = {scoreId:String}`,
+          query_params: { scoreId: score.scoreId },
+          format: 'JSONEachRow',
+        });
+        expect(await sourceResult.json<{ scoreId: string; score: number; writeVersion: string }>()).toEqual([
+          { scoreId: score.scoreId, score: 0.4, writeVersion: '0' },
+        ]);
+
+        const deltaResult = await client.query({
+          query: `SELECT scoreId FROM ${TABLE_SCORE_EVENTS_DELTA} WHERE scoreId = {scoreId:String}`,
+          query_params: { scoreId: score.scoreId },
+          format: 'JSONEachRow',
+        });
+        expect(await deltaResult.json<{ scoreId: string }>()).toEqual([{ scoreId: score.scoreId }]);
+
+        const currentResult = await client.query({
+          query: `SELECT scoreId, score, toString(writeVersion) AS writeVersion FROM ${TABLE_SCORE_EVENTS_CURRENT} FINAL WHERE scoreId = {scoreId:String}`,
+          query_params: { scoreId: score.scoreId },
+          format: 'JSONEachRow',
+        });
+        expect(await currentResult.json<{ scoreId: string; score: number; writeVersion: string }>()).toEqual([
+          { scoreId: score.scoreId, score: 0.4, writeVersion: '0' },
+        ]);
+
+        const markerResult = await client.query({
+          query: `SELECT marker FROM ${TABLE_SCORE_EVENTS_CURRENT_BACKFILL} FINAL`,
+          format: 'JSONEachRow',
+        });
+        expect(await markerResult.json<{ marker: string }>()).toEqual([{ marker: 'v1' }]);
+      } finally {
+        await new ObservabilityStorageClickhouseVNext({ client }).init();
+        await client.close();
+      }
+    });
+
+    it('resumes a partial current-score backfill and skips it after completion', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+      const scores = [
+        {
+          scoreId: 'partial-backfill-a',
+          timestamp: new Date('2026-01-01T01:00:00Z'),
+          traceId: 'partial-backfill-trace-a',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.2,
+          reason: null,
+          metadata: null,
+        },
+        {
+          scoreId: 'partial-backfill-b',
+          timestamp: new Date('2026-01-01T02:00:00Z'),
+          traceId: 'partial-backfill-trace-b',
+          spanId: null,
+          scorerId: 'quality',
+          score: 0.8,
+          reason: null,
+          metadata: null,
+        },
+      ];
+
+      try {
+        await client.command({ query: `DROP VIEW IF EXISTS ${MV_SCORE_EVENTS_CURRENT}` });
+        await client.command({ query: `TRUNCATE TABLE ${TABLE_SCORE_EVENTS_CURRENT}` });
+        await client.command({ query: `TRUNCATE TABLE ${TABLE_SCORE_EVENTS_CURRENT_BACKFILL}` });
+        await client.insert({
+          table: TABLE_SCORE_EVENTS,
+          values: scores.map((score, index) => ({ ...scoreRecordToRow(score), writeVersion: index + 1 })),
+          format: 'JSONEachRow',
+        });
+        const scoreColumns = SCORE_EVENT_COLUMN_NAMES.join(', ');
+        await client.command({
+          query: `INSERT INTO ${TABLE_SCORE_EVENTS_CURRENT} (${scoreColumns})
+                  SELECT ${scoreColumns} FROM ${TABLE_SCORE_EVENTS}
+                  WHERE scoreId = 'partial-backfill-a'`,
+        });
+
+        const first = new ObservabilityStorageClickhouseVNext({ client });
+        const initialCommand = client.command.bind(client);
+        const backfillCommands: Array<Parameters<typeof client.command>[0]> = [];
+        const backfillSpy = vi.spyOn(client, 'command').mockImplementation(async args => {
+          backfillCommands.push(args);
+          return initialCommand(args);
+        });
+        try {
+          await first.init();
+        } finally {
+          backfillSpy.mockRestore();
+        }
+        expect(backfillCommands).toContainEqual(
+          expect.objectContaining({
+            query: expect.stringContaining(`INSERT INTO ${TABLE_SCORE_EVENTS_CURRENT} (`),
+            clickhouse_settings: { max_bytes_ratio_before_external_sort: 0.5 },
+          }),
+        );
+
+        const currentResult = await client.query({
+          query: `SELECT scoreId, score FROM ${TABLE_SCORE_EVENTS_CURRENT} FINAL
+                  WHERE scoreId IN ('partial-backfill-a', 'partial-backfill-b')
+                  ORDER BY scoreId`,
+          format: 'JSONEachRow',
+        });
+        expect(await currentResult.json<{ scoreId: string; score: number }>()).toEqual([
+          { scoreId: 'partial-backfill-a', score: 0.2 },
+          { scoreId: 'partial-backfill-b', score: 0.8 },
+        ]);
+
+        const originalCommand = client.command.bind(client);
+        const commands: string[] = [];
+        const spy = vi.spyOn(client, 'command').mockImplementation(async args => {
+          commands.push((args as { query: string }).query);
+          return originalCommand(args);
+        });
+        try {
+          await new ObservabilityStorageClickhouseVNext({ client }).init();
+          expect(commands.some(query => query.includes(`INSERT INTO ${TABLE_SCORE_EVENTS_CURRENT} (`))).toBe(false);
+        } finally {
+          spy.mockRestore();
+        }
+      } finally {
+        await new ObservabilityStorageClickhouseVNext({ client }).init();
+        await client.close();
+      }
+    });
+
+    it('ALL_MIGRATIONS entries carry table + name consistent with their SQL', () => {
+      expect(ALL_MIGRATIONS.length).toBeGreaterThan(0);
+      for (const entry of ALL_MIGRATIONS) {
+        expect(entry.sql).toContain(`ALTER TABLE ${entry.table}`);
+        expect(entry.sql).toContain(entry.name);
+        if (entry.kind === 'column') {
+          expect(entry.sql).toContain('ADD COLUMN IF NOT EXISTS');
+        } else {
+          expect(entry.sql).toContain('ADD INDEX IF NOT EXISTS');
+        }
+      }
+    });
+
+    it('ALL_MIGRATIONS entry names are unique within (table, kind)', () => {
+      const seen = new Set<string>();
+      for (const entry of ALL_MIGRATIONS) {
+        const key = `${entry.kind}:${entry.table}:${entry.name}`;
+        expect(seen.has(key), `duplicate migration entry ${key}`).toBe(false);
+        seen.add(key);
+      }
+    });
+
+    // --- Integration tests: init() must not re-issue applied ALTERs ---
+
+    it('re-running init against a current schema emits zero ALTER statements', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+
+      try {
+        // First init brings the DB to the current schema.
+        const first = new ObservabilityStorageClickhouseVNext({ client });
+        await first.init();
+
+        // Wrap client.command so we can observe the second init's DDL traffic.
+        const originalCommand = client.command.bind(client);
+        const commands: string[] = [];
+        const spy = vi.spyOn(client, 'command').mockImplementation(async args => {
+          commands.push((args as { query: string }).query);
+          return originalCommand(args);
+        });
+
+        try {
+          const second = new ObservabilityStorageClickhouseVNext({ client });
+          await second.init();
+
+          const alters = commands.filter(q => /^\s*ALTER\s+TABLE/i.test(q));
+          expect(alters, `expected no ALTERs, got:\n${alters.join('\n')}`).toEqual([]);
+        } finally {
+          spy.mockRestore();
+        }
+      } finally {
+        await client.close();
+      }
+    });
+
+    it('changing retention only emits MODIFY TTL for tables whose value actually differs', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+
+      const signalTables = [
+        'mastra_span_events',
+        'mastra_trace_roots',
+        'mastra_trace_branches',
+        'mastra_log_events',
+        'mastra_metric_events',
+        'mastra_score_events',
+        'mastra_score_events_current',
+        'mastra_feedback_events',
+      ];
+
+      try {
+        // Establish baseline retention.
+        const first = new ObservabilityStorageClickhouseVNext({
+          client,
+          retention: { tracing: 30, logs: 7, metrics: 14 },
+        });
+        await first.init();
+
+        // Spy on the second init's DDL traffic.
+        const originalCommand = client.command.bind(client);
+        const commands: string[] = [];
+        const spy = vi.spyOn(client, 'command').mockImplementation(async args => {
+          commands.push((args as { query: string }).query);
+          return originalCommand(args);
+        });
+
+        try {
+          // Change only `logs`; leave tracing and metrics unchanged.
+          const second = new ObservabilityStorageClickhouseVNext({
+            client,
+            retention: { tracing: 30, logs: 21, metrics: 14 },
+          });
+          await second.init();
+
+          const ttlAlters = commands.filter(q => /MODIFY TTL/i.test(q));
+          expect(ttlAlters).toHaveLength(1);
+          expect(ttlAlters[0]).toContain('mastra_log_events');
+          expect(ttlAlters[0]).toContain('21 DAY');
+        } finally {
+          spy.mockRestore();
+        }
+      } finally {
+        // Clean up TTLs so other tests start from a clean state.
+        for (const table of signalTables) {
+          await client.command({ query: `ALTER TABLE ${table} REMOVE TTL` }).catch(() => {});
+        }
+        await client.close();
+      }
+    });
+
+    it('init still applies an ALTER for a column that was manually dropped', async () => {
+      const client = createClient({
+        url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+        username: process.env.CLICKHOUSE_USERNAME || 'default',
+        password: process.env.CLICKHOUSE_PASSWORD || 'password',
+      });
+
+      // writeVersion is additive: legacy feedback rows default to version 0
+      // until the first post-migration write supersedes them.
+      const target = ALL_MIGRATIONS.find(
+        m => m.kind === 'column' && m.table === TABLE_FEEDBACK_EVENTS && m.name === 'writeVersion',
+      );
+      expect(target).toBeDefined();
+
+      try {
+        await new ObservabilityStorageClickhouseVNext({ client }).init();
+        await client.command({
+          query: `ALTER TABLE ${target!.table} DROP COLUMN IF EXISTS ${target!.name}`,
+        });
+
+        const originalCommand = client.command.bind(client);
+        const commands: string[] = [];
+        const spy = vi.spyOn(client, 'command').mockImplementation(async args => {
+          commands.push((args as { query: string }).query);
+          return originalCommand(args);
+        });
+
+        try {
+          await new ObservabilityStorageClickhouseVNext({ client }).init();
+          const matched = commands.filter(q => q.includes(`ALTER TABLE ${target!.table}`) && q.includes(target!.name));
+          expect(matched).toHaveLength(1);
+        } finally {
+          spy.mockRestore();
+        }
+
+        // Verify column is back so subsequent tests see the expected schema.
+        const colResult = await client.query({
+          query: `SELECT name FROM system.columns WHERE database = currentDatabase() AND table = {table:String} AND name = {name:String}`,
+          query_params: { table: target!.table, name: target!.name },
+          format: 'JSONEachRow',
+        });
+        expect(((await colResult.json()) as unknown[]).length).toBe(1);
+      } finally {
+        await client.close();
+      }
+    });
+  });
+});
+
+describe('listTracesLight projection', () => {
+  let storage: ObservabilityStorageClickhouseVNext;
+
+  const bigInput = {
+    messages: [
+      { role: 'user', content: 'summarize this' },
+      { role: 'assistant', content: 'x'.repeat(50_000) },
+    ],
+  };
+
+  beforeAll(async () => {
+    storage = new ObservabilityStorageClickhouseVNext({
+      url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+      username: process.env.CLICKHOUSE_USERNAME || 'default',
+      password: process.env.CLICKHOUSE_PASSWORD || 'password',
+    });
+    await storage.init();
+  });
+
+  beforeEach(async () => {
+    await storage.dangerouslyClearAll();
+    await storage.batchCreateSpans({
+      records: [
+        {
+          traceId: 'light-trace-1',
+          spanId: 'light-span-1',
+          parentSpanId: null,
+          name: 'agent run',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          startedAt: new Date('2026-01-01T00:00:00Z'),
+          endedAt: new Date('2026-01-01T00:00:05Z'),
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          links: null,
+          metadata: { customer: 'acme' },
+          tags: [],
+          error: null,
+          attributes: { model: 'claude-sonnet-5' },
+          input: bigInput,
+          output: { text: 'y'.repeat(50_000) },
+        },
+      ],
+    });
+  });
+
+  afterAll(async () => {
+    await storage.dangerouslyClearAll();
+  });
+
+  it('omits the heavy blobs and carries a short inputPreview instead', async () => {
+    const { spans } = await storage.listTracesLight({ pagination: { page: 0, perPage: 10 } });
+
+    expect(spans).toHaveLength(1);
+    const row = spans[0]! as Record<string, unknown>;
+    expect(row.input).toBeUndefined();
+    expect(row.output).toBeUndefined();
+    expect(row.attributes).toBeUndefined();
+    expect(row.inputPreview).toBe('summarize this');
+    expect(row.status).toBe('success');
+    expect(row.metadata).toEqual({ customer: 'acme' });
+  });
+
+  it('computes status on light rows matching the full listTraces status', async () => {
+    await storage.batchCreateSpans({
+      records: [
+        {
+          traceId: 'light-trace-error',
+          spanId: 'light-span-error',
+          parentSpanId: null,
+          name: 'agent run',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          startedAt: new Date('2026-01-01T00:02:00Z'),
+          endedAt: new Date('2026-01-01T00:02:05Z'),
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          links: null,
+          metadata: null,
+          tags: [],
+          error: { message: 'boom' },
+          attributes: null,
+          input: null,
+          output: null,
+        },
+      ],
+    });
+
+    const { spans } = await storage.listTracesLight({ pagination: { page: 0, perPage: 10 } });
+
+    const statusByTraceId = Object.fromEntries(spans.map(s => [s.traceId, s.status]));
+    expect(statusByTraceId).toEqual({
+      'light-trace-1': 'success',
+      'light-trace-error': 'error',
+    });
+
+    const full = await storage.listTraces({ pagination: { page: 0, perPage: 10 } });
+    const fullStatusByTraceId = Object.fromEntries(full.spans.map(s => [s.traceId, s.status]));
+    expect(statusByTraceId).toEqual(fullStatusByTraceId);
+  });
+
+  it('returns a deltaCursor on page 0 so live-tail polling stays enabled', async () => {
+    const page = await storage.listTracesLight({ pagination: { page: 0, perPage: 10 } });
+
+    expect(page.deltaCursor).toBeDefined();
+  });
+
+  it('serves delta mode with the same lightweight projection', async () => {
+    const seed = await storage.listTracesLight({ mode: 'delta' });
+    expect(seed.spans).toEqual([]);
+    expect(seed.deltaCursor).toBeDefined();
+
+    await storage.batchCreateSpans({
+      records: [
+        {
+          traceId: 'light-trace-2',
+          spanId: 'light-span-2',
+          parentSpanId: null,
+          name: 'agent run',
+          spanType: SpanType.AGENT_RUN,
+          isEvent: false,
+          startedAt: new Date('2026-01-01T00:01:00Z'),
+          endedAt: new Date('2026-01-01T00:01:05Z'),
+          entityType: null,
+          entityId: null,
+          entityName: null,
+          userId: null,
+          organizationId: null,
+          resourceId: null,
+          runId: null,
+          sessionId: null,
+          threadId: null,
+          requestId: null,
+          environment: null,
+          source: null,
+          serviceName: null,
+          scope: null,
+          links: null,
+          metadata: { customer: 'acme' },
+          tags: [],
+          error: null,
+          attributes: null,
+          input: bigInput,
+          output: { text: 'z'.repeat(50_000) },
+        },
+      ],
+    });
+
+    const delta = await storage.listTracesLight({ mode: 'delta', after: seed.deltaCursor, limit: 100 });
+
+    expect(delta.spans.map(s => s.traceId)).toContain('light-trace-2');
+    const row = delta.spans.find(s => s.traceId === 'light-trace-2')! as Record<string, unknown>;
+    expect(row.input).toBeUndefined();
+    expect(row.output).toBeUndefined();
+    expect(row.inputPreview).toBe('summarize this');
+    expect(row.status).toBe('success');
+    expect(row.metadata).toEqual({ customer: 'acme' });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Test helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Trigger an immediate refresh of discovery materialized views.
+ * In production these refresh on a schedule; in tests we need to trigger manually.
+ * Uses a standalone client connection since the adapter's client is private.
+ */
+async function triggerDiscoveryRefresh(): Promise<void> {
+  const { createClient } = await import('@clickhouse/client');
+  const { MV_DISCOVERY_VALUES, MV_DISCOVERY_PAIRS } = await import('./ddl');
+
+  const client = createClient({
+    url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+    username: process.env.CLICKHOUSE_USERNAME || 'default',
+    password: process.env.CLICKHOUSE_PASSWORD || 'password',
+  });
+
+  try {
+    await client.command({ query: `SYSTEM REFRESH VIEW ${MV_DISCOVERY_VALUES}` });
+    await client.command({ query: `SYSTEM WAIT VIEW ${MV_DISCOVERY_VALUES}` });
+    await client.command({ query: `SYSTEM REFRESH VIEW ${MV_DISCOVERY_PAIRS}` });
+    await client.command({ query: `SYSTEM WAIT VIEW ${MV_DISCOVERY_PAIRS}` });
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Inserts a second copy of every row already in the discovery helper tables.
+ * This models the window between a refreshable MV firing and
+ * `ReplacingMergeTree` collapsing the duplicate parts: identical rows live
+ * in separate parts and a plain `SELECT` returns them all. The discovery
+ * read paths must compensate with their own `SELECT DISTINCT`.
+ *
+ * Also asserts the duplicates are present so a regression in the seeding
+ * step shows up here instead of as a confusing "tests passed for the
+ * wrong reason" later on.
+ */
+async function injectDuplicateDiscoveryRows(): Promise<void> {
+  const { createClient } = await import('@clickhouse/client');
+  const { TABLE_DISCOVERY_VALUES, TABLE_DISCOVERY_PAIRS } = await import('./ddl');
+
+  const client = createClient({
+    url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+    username: process.env.CLICKHOUSE_USERNAME || 'default',
+    password: process.env.CLICKHOUSE_PASSWORD || 'password',
+  });
+
+  try {
+    const tables: Array<{ table: string; keys: string }> = [
+      { table: TABLE_DISCOVERY_VALUES, keys: 'kind, key1, value' },
+      { table: TABLE_DISCOVERY_PAIRS, keys: 'kind, key1, key2, value' },
+    ];
+    for (const { table, keys } of tables) {
+      // Pause background merges around the duplicate-seed + check so a fast
+      // server can't collapse the inserted parts before the assertion runs.
+      // Without this, the test would intermittently observe rowsInParts ==
+      // distinctRows on hot servers and fail for reasons unrelated to the
+      // read-side DISTINCT behavior we're trying to exercise.
+      await client.command({ query: `SYSTEM STOP MERGES ${table}` });
+      try {
+        await client.command({ query: `INSERT INTO ${table} SELECT * FROM ${table}` });
+        const partsResult = await client.query({
+          query: `SELECT sum(rows) AS rowsInParts FROM system.parts WHERE database = currentDatabase() AND table = '${table}' AND active`,
+          format: 'JSONEachRow',
+        });
+        const rowsInParts = Number(((await partsResult.json()) as Array<{ rowsInParts: string }>)[0]?.rowsInParts ?? 0);
+        const distinctResult = await client.query({
+          query: `SELECT countDistinct(${keys}) AS distinctRows FROM ${table}`,
+          format: 'JSONEachRow',
+        });
+        const distinctRows = Number(
+          ((await distinctResult.json()) as Array<{ distinctRows: string }>)[0]?.distinctRows ?? 0,
+        );
+        expect(
+          rowsInParts,
+          `expected duplicates in ${table} but got rowsInParts=${rowsInParts}, distinctRows=${distinctRows}`,
+        ).toBeGreaterThan(distinctRows);
+      } finally {
+        await client.command({ query: `SYSTEM START MERGES ${table}` });
+      }
+    }
+  } finally {
+    await client.close();
+  }
+}
+
+async function waitForValue<T>(
+  fn: () => Promise<T>,
+  predicate: (value: T) => boolean,
+  opts: { timeoutMs?: number; intervalMs?: number } = {},
+): Promise<T> {
+  const timeoutMs = opts.timeoutMs ?? 5000;
+  const intervalMs = opts.intervalMs ?? 100;
+  const deadline = Date.now() + timeoutMs;
+
+  let lastValue: T | undefined;
+  while (Date.now() < deadline) {
+    lastValue = await fn();
+    if (predicate(lastValue)) {
+      return lastValue;
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+
+  throw new Error(`Timed out waiting for expected value. Last value: ${JSON.stringify(lastValue)}`);
+}
+
+/**
+ * Poll until a query returns null, modeling eventual-disappearance semantics.
+ * Design doc (shared.md:271): delete-path tests should verify eventual
+ * disappearance rather than immediate absence.
+ */
+async function eventuallyNull<T>(
+  fn: () => Promise<T | null>,
+  opts: { maxAttempts: number; intervalMs: number },
+): Promise<boolean> {
+  for (let i = 0; i < opts.maxAttempts; i++) {
+    const result = await fn();
+    if (result === null) return true;
+    await new Promise(resolve => setTimeout(resolve, opts.intervalMs));
+  }
+  return false;
+}

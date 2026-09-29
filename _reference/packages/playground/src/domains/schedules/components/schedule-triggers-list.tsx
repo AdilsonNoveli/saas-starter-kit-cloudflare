@@ -1,0 +1,167 @@
+import type { ScheduleTriggerResponse } from '@mastra/client-js';
+import { DataList, DataListSkeleton, useDataListKeyboard } from '@mastra/playground-ui/components/DataList';
+import { RelativeTimestamp } from '@mastra/playground-ui/components/RelativeTimestamp';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@mastra/playground-ui/components/Tooltip';
+import { Txt } from '@mastra/playground-ui/components/Txt';
+import { useLinkComponent } from '@mastra/playground-ui/lib/framework';
+import { formatDuration } from '@mastra/playground-ui/utils/duration';
+import { AlertTriangleIcon } from 'lucide-react';
+import { WorkflowRunStatusInline } from './workflow-run-status-inline';
+
+export interface ScheduleTriggersListProps {
+  triggers: ScheduleTriggerResponse[];
+  isLoading: boolean;
+  workflowId?: string;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  setEndOfListElement?: (el: HTMLDivElement | null) => void;
+}
+
+const COLUMNS = 'auto auto auto auto 1fr';
+
+// Warn when the scheduler published noticeably late (>30s) but skip cases where
+// the row is almost certainly stale (paused schedule, long downtime, clock skew).
+const DRIFT_WARN_MIN_MS = 30_000;
+const DRIFT_WARN_MAX_MS = 5 * 60_000;
+
+export function ScheduleTriggersList({
+  triggers,
+  isLoading,
+  workflowId,
+  hasNextPage,
+  isFetchingNextPage,
+  setEndOfListElement,
+}: ScheduleTriggersListProps) {
+  const { Link, paths } = useLinkComponent();
+
+  const isTriggerLinked = (t: ScheduleTriggerResponse) => Boolean(workflowId && t.runId && t.outcome !== 'failed');
+  const interactiveCount = triggers.filter(isTriggerLinked).length;
+  const { containerRef, getRowProps } = useDataListKeyboard({ count: interactiveCount });
+  let interactiveIndex = -1;
+
+  if (isLoading) {
+    return <DataListSkeleton columns={COLUMNS} />;
+  }
+
+  if (triggers.length === 0) {
+    return (
+      <Txt variant="body" tone="muted" className="p-4">
+        No trigger history yet.
+      </Txt>
+    );
+  }
+
+  return (
+    <DataList columns={COLUMNS} className="min-w-0" scrollRef={containerRef}>
+      <DataList.Top>
+        <DataList.TopCell>Run</DataList.TopCell>
+        <DataList.TopCell>Status</DataList.TopCell>
+        <DataList.TopCell>Started</DataList.TopCell>
+        <DataList.TopCell>Duration</DataList.TopCell>
+        <DataList.TopCell> </DataList.TopCell>
+      </DataList.Top>
+
+      {triggers.map(t => {
+        const driftMs = t.actualFireAt - t.scheduledFireAt;
+        const driftValue = formatDuration(driftMs, { signed: true });
+        const isPublishFailure = t.outcome === 'failed';
+        const errorMessage = isPublishFailure ? t.error : t.run?.error;
+        const absDrift = Math.abs(driftMs);
+        const showDriftWarning = !isPublishFailure && absDrift > DRIFT_WARN_MIN_MS && absDrift <= DRIFT_WARN_MAX_MS;
+
+        const rowKey = `${t.scheduleId}-${t.runId}-${t.actualFireAt}`;
+        const isLinked = isTriggerLinked(t);
+        if (isLinked) interactiveIndex += 1;
+        const runIdLabel = (
+          <Txt
+            as="span"
+            variant="caption"
+            font="mono"
+            tone={isLinked ? undefined : 'muted'}
+            className={isLinked ? 'whitespace-nowrap text-accent1' : 'whitespace-nowrap'}
+          >
+            {t.runId}
+          </Txt>
+        );
+
+        const cells = (
+          <>
+            <DataList.Cell>{runIdLabel}</DataList.Cell>
+
+            <DataList.Cell>
+              <span className="inline-flex items-center gap-2">
+                {isPublishFailure ? (
+                  <span className="inline-flex items-center gap-1.5 text-caption whitespace-nowrap text-accent2">
+                    <AlertTriangleIcon size={14} />
+                    publish failed
+                  </span>
+                ) : t.run ? (
+                  <WorkflowRunStatusInline status={t.run.status} />
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 text-caption whitespace-nowrap text-muted-foreground">
+                    pending
+                  </span>
+                )}
+                {errorMessage ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex text-accent2">
+                        <AlertTriangleIcon size={14} />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>{errorMessage}</TooltipContent>
+                  </Tooltip>
+                ) : null}
+              </span>
+            </DataList.Cell>
+
+            <DataList.Cell>
+              <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                {t.actualFireAt ? <RelativeTimestamp value={t.actualFireAt} /> : '—'}
+                {showDriftWarning ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex text-accent3">
+                        <AlertTriangleIcon size={14} />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>Published {driftValue} after the scheduled fire time</TooltipContent>
+                  </Tooltip>
+                ) : null}
+              </span>
+            </DataList.Cell>
+
+            <DataList.Cell>
+              {t.run ? (
+                <Txt as="span" variant="body-sm" font="mono">
+                  {formatDuration(t.run.durationMs) || '—'}
+                </Txt>
+              ) : (
+                <span className="text-muted-foreground">—</span>
+              )}
+            </DataList.Cell>
+            <DataList.Cell> </DataList.Cell>
+          </>
+        );
+
+        return isLinked ? (
+          <DataList.RowLink
+            key={rowKey}
+            to={paths.workflowRunLink(workflowId!, t.runId!)}
+            LinkComponent={Link}
+            {...getRowProps(interactiveIndex)}
+          >
+            {cells}
+          </DataList.RowLink>
+        ) : (
+          <DataList.RowStatic key={rowKey}>{cells}</DataList.RowStatic>
+        );
+      })}
+      <DataList.NextPageLoading
+        isLoading={isFetchingNextPage}
+        hasMore={hasNextPage}
+        setEndOfListElement={setEndOfListElement}
+      />
+    </DataList>
+  );
+}

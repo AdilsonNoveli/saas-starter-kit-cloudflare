@@ -1,143 +1,107 @@
-# Letta Code
+# Mastra
 
-[![npm](https://img.shields.io/npm/v/@letta-ai/letta-code.svg?style=flat-square)](https://www.npmjs.com/package/@letta-ai/letta-code) [![Discord](https://img.shields.io/badge/discord-join-blue?style=flat-square&logo=discord)](https://discord.gg/letta)
+[![npm version](https://badge.fury.io/js/@mastra%2Fcore.svg)](https://www.npmjs.com/package/@mastra/core)
+[![CodeQl](https://github.com/mastra-ai/mastra/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/mastra-ai/mastra/actions/workflows/github-code-scanning/codeql)
+[![GitHub Repo stars](https://img.shields.io/github/stars/mastra-ai/mastra)](https://github.com/mastra-ai/mastra/stargazers)
+[![Discord](https://img.shields.io/discord/1309558646228779139?logo=discord&label=Discord&labelColor=white&color=7289DA)](https://discord.gg/mastra-ai)
+[![Twitter Follow](https://img.shields.io/twitter/follow/mastra?style=social)](https://x.com/mastra)
+[![NPM Downloads](https://img.shields.io/npm/dm/%40mastra%252Fcore)](https://www.npmjs.com/package/@mastra/core)
+[![Static Badge](https://img.shields.io/badge/Y%20Combinator-W25-orange)](https://www.ycombinator.com/companies?batch=W25)
 
-Letta Code is a stateful agent harness for creating agents that are more like people than tools. Letta Code agents have memory, identity, and a sense of experience over time. They learn and evolve over long horizons through rewriting their own memory, skills, prompts, and even the harness itself (through mods). 
+Mastra is a framework for building AI-powered applications and agents with a modern TypeScript stack.
 
-Letta Code can be used interactively, or to power always-on agents that work proactively. Interact with agents through:
-* A local [**CLI**](https://docs.letta.com/letta-code/cli)
-* The [**desktop app**](https://docs.letta.com/letta-code/desktop-app) for macOS, Windows, and Linux
-* Your browser, including [mobile](https://docs.letta.com/letta-code/remote-mobile), at [chat.letta.com](https://chat.letta.com)
-* Messaging integrations, including [Telegram](https://docs.letta.com/letta-code/channels#telegram-cli), [Slack](https://docs.letta.com/letta-code/channels#slack-cli), [Discord](https://docs.letta.com/letta-code/channels#discord-cli), and [custom channels](https://github.com/letta-ai/letta-code/blob/main/src/channels/README.md)
+It includes everything you need to go from early prototypes to production-ready applications. Mastra integrates with frontend and backend frameworks like React, Next.js, and Node, or you can deploy it anywhere as a standalone server. It's the easiest way to build, tune, and scale reliable AI products.
 
-![](https://github.com/letta-ai/letta-code/blob/main/assets/letta-code-demo.gif)
+## Why Mastra?
 
-## Feature Overview
+Purpose-built for TypeScript and designed around established AI patterns, Mastra gives you everything you need to build great AI applications out-of-the-box.
 
-> [!TIP]
-> Letta Code agents are designed to be self-configuring. If you want to configure something (e.g. skills, behavior, hooks, permissions), try asking your agent to do it for you.
+Some highlights include:
 
-| Feature | Description |
-|---|---|
-| [Self-improvement & Learning](https://docs.letta.com/letta-code/memory) | Agents programmatically rewrite their context to improve and adapt over time, including system prompt learning (through [memory blocks](https://www.letta.com/blog/memory-blocks)) and [skill learning](https://www.letta.com/blog/skill-learning). Configure periodic dreaming with `/sleeptime`, investigate agent behavior with `/doctor [symptom]`, and view memory with `/palace` |
-| [Message search](https://docs.letta.com/letta-code/slash-commands) | Search across all messages and agents with `/search`. Agent can also search their own conversations or the conversations of other agents |
-| [MemFS](https://docs.letta.com/letta-code/memfs) | All context (including memory blocks) is tracked via git. Sync context to a custom GitHub repository by setting `/memory-repository set git@github.com:...` |
-| [Skills](https://docs.letta.com/letta-code/skills) | Loads global skills (`~/.letta`), project-scoped skills (`.agents/skills`), and agent-scoped skills (stored in MemFS). View skills with `/skills` and create with `/skill-creator` |
-| [Subagents & Multi-agent](https://docs.letta.com/letta-code/subagents) | Call built-in subagents (general-purpose, forked, recall) in the background. Agents can call any other agent (including themselves) as subagents |
-| [Messaging Integrations](https://docs.letta.com/letta-code/channels) | Chat with the same agent from Slack, Telegram, your browser (chat.letta.com) including mobile, and through [custom channels](https://github.com/letta-ai/skills/blob/main/letta/creating-letta-code-channels/SKILL.md) |
-| [Hooks](https://docs.letta.com/letta-code/hooks) | Run custom scripts at key points of agent execution to automate workflows |
-| [Permissions](https://docs.letta.com/letta-code/permissions) | Set permission modes and customize what actions are auto-approved or auto-denied |
-| [Crons & Schedules](https://docs.letta.com/letta-code/scheduling) | Configure heartbeats and crons, and let agents work across time with self-managed schedules |
-| [Remote computers](https://docs.letta.com/platform/computers/byom) (requires signing in with Letta) | Agents work across multiple computers. Connect any machine by running `letta server --computer-name "..."` |
-| [Secrets](https://docs.letta.com/letta-code/secrets) (requires signing in with Letta) | Make secrets available as environment variables (across machines) while obfuscating their values from context |
+- [**Model routing**](https://mastra.ai/models): Connect to 40+ providers through one standard interface. Use models from OpenAI, Anthropic, Gemini, and more.
 
-See the full list of slash commands in our [documentation](https://docs.letta.com/letta-code/slash-commands).
+- [**Agents**](https://mastra.ai/docs/agents/overview): Build autonomous agents that use LLMs and tools to solve open-ended tasks. Agents reason about goals, decide which tools to use, and iterate internally until the model emits a final answer or an optional stopping condition is met.
+
+- [**Workflows**](https://mastra.ai/docs/workflows/overview): When you need explicit control over execution, use Mastra's graph-based workflow engine to orchestrate complex multi-step processes. Mastra workflows use an intuitive syntax for control flow (`.then()`, `.branch()`, `.parallel()`).
+
+- [**Human-in-the-loop**](https://mastra.ai/docs/workflows/suspend-and-resume): Suspend an agent or workflow and await user input or approval before resuming. Mastra uses [storage](https://mastra.ai/docs/server-db/storage) to remember execution state, so you can pause indefinitely and resume where you left off.
+
+- **Context management**: Give your agents the right context at the right time. Provide [conversation history](https://mastra.ai/docs/memory/conversation-history), [retrieve](https://mastra.ai/docs/rag/overview) data from your sources (APIs, databases, files), and add human-like memory with [Observational Memory](https://mastra.ai/docs/memory/observational-memory) so your agents behave coherently.
+
+- **Integrations**: Bundle agents and workflows into existing React, Next.js, or Node.js apps, or ship them as standalone endpoints. When building UIs, integrate with agentic libraries like Vercel's AI SDK UI and CopilotKit to bring your AI assistant to life on the web.
+
+- [**MCP servers**](https://mastra.ai/docs/tools-mcp/mcp-overview): Author Model Context Protocol servers, exposing agents, tools, and other structured resources via the MCP interface. These can then be accessed by any system or agent that supports the protocol.
+
+- **Production essentials**: Shipping reliable agents takes ongoing insight, evaluation, and iteration. With built-in [evals](https://mastra.ai/docs/evals/overview) and [observability](https://mastra.ai/docs/observability/overview), Mastra gives you the tools to observe, measure, and refine continuously.
 
 ## Get started
 
-Install the package via [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm):
+The **recommended** way to get started with Mastra is by running the command below:
 
-```bash
-npm install -g @letta-ai/letta-code
+```shell
+npm create mastra@latest
 ```
 
-Navigate to your project directory and run `letta` (see command-line options [in the docs](https://docs.letta.com/letta-code/commands)). You can also run the tutorial agent with: 
-```
-letta --new-agent --personality tutorial
-```
+Follow the [Installation guide](https://mastra.ai/docs) for step-by-step setup with the CLI or a manual install.
 
-Letta Cloud is the default. On first launch, choose to sign in with Letta or proceed locally; your choice is saved for future runs. Run `letta setup` to choose again, or `letta backend cloud` / `letta backend local` to change the default. Use `--backend cloud` or `--backend local` for a one-off override without changing the saved default.
+If you're new to AI agents, check out our [templates](https://mastra.ai/docs/getting-started/templates), [course](https://mastra.ai/course), and [YouTube videos](https://youtube.com/@mastra-ai) to start building with Mastra today.
 
-Run `/connect` to configure your own LLM API keys (OpenAI / ChatGPT, Anthropic, Z.ai coding plan, etc.), and use `/model` to swap models.
+<details>
 
-You can also download the [**desktop app**](https://docs.letta.com/letta-code/desktop-app) for macOS, Windows, and Linux. Agents created in the CLI are available via the desktop app, and vice versa.
+<summary><strong>Alternative:</strong> Use this pre-built prompt to get started</summary>
 
-## Letta Cloud
+```md
+Create a new Mastra project. Mastra is a framework for AI applications and agents on a modern TypeScript stack. Before running the command, ask these questions one at a time and wait for each answer unless it was already provided:
 
-Agents stored in Letta Cloud keep their memory, identity, and conversations there while the Letta Code harness can run on any connected computer: your laptop, [GitHub Actions](https://github.com/letta-ai/letta-code-action), a managed cloud sandbox, a remote VM, or a Mac Mini. You can chat with the same agents through [chat.letta.com](https://chat.letta.com/) or the desktop app.
+1. Project name? (default: "my-mastra-app")
+2. Provider? (required; options: "openai", "anthropic", "google", "xai")
 
-```mermaid
-graph TD
-    LettaCloud["Letta Cloud<br/>Agent state"]
-    LettaCloud --> A["💻 Your Laptop"]
-    LettaCloud --> B["☁️ Cloud VM"]
-    LettaCloud --> C["🖥️ Mac Mini"]
-    LettaCloud --> D["📦 Managed Sandbox"]
-```
+If the provider isn't supported, ask again and list the supported values.
 
-Run `/login` from the CLI or sign in through the desktop app to access agents in your Letta account.
+Run: `npm create mastra@latest <project-name> -- --llm <provider>`
 
-### Remote computers
-Agents stored in Letta Cloud can run across multiple machines. Connect any machine by running:
-```bash
-letta server
-letta server --computer-name "work-laptop"
-```
-List discoverable computers from the CLI:
-```bash
-letta computers list --online-only
-```
-Get the current computer connection for routing another agent onto this same machine:
-```bash
-letta computers current
-```
-Route a headless message through a specific computer:
-```bash
-letta -p --agent <agent-id> --computer "work-laptop" "hello from that machine"
-```
-Use `--computer cloud` to start or reuse the target agent's cloud sandbox.
-Agent-to-agent headless messages without `--computer` run on the same computer.
-See our guides for using [Railway](https://docs.letta.com/letta-code/remote#railway), [DigitalOcean](https://docs.letta.com/letta-code/remote#digitalocean), and [Fly.io](https://docs.letta.com/letta-code/remote#flyio) as remote computers.
+The command creates a default Mastra project, installs Mastra skills for detected coding assistants, and initializes Git when appropriate.
 
-The previous `environments`/`envs`, `--environment`/`--env`, and `--env-name`
-spellings remain available for backwards compatibility.
+After creation, enter the project directory and start the dev server: `npx bgproc start -n <project-name> -w -- npm run dev`
 
-## AgentFile deprecation
+Open Mastra Studio at `http://localhost:4111`. Studio is the interface for building, testing, and managing agents, workflows, and tools.
 
-AgentFile (`.af`) export and import are deprecated and have been removed from Letta Code. The `/export` and `/download` slash commands and the `--import` and `--from-af` CLI flags are no longer supported, including imports from the agent registry.
-
-This does not affect memory import/export or conversation transcript export.
-
-## Installing external skills
-
-Install skills into a specific agent's memory with `letta skills install <skill>`: 
-
-| Source | Example |
-|---|---|
-| GitHub | `letta skills install https://github.com/owner/repo`<br>`letta skills install https://github.com/owner/repo/tree/main/path/to/skill`<br>`letta skills install https://github.com/owner/repo/blob/main/path/to/skill/SKILL.md` |
-| [ClawHub](https://clawhub.ai/) | `openclaw skills install <skill-slug>` → `letta skills install <skill-slug>` |
-| [Hermes Skills Hub](https://hermes-agent.nousresearch.com/docs/skills/) | `hermes skills install <skill-path>` → `letta skills install <skill-path>` |
-
-To view skills run `letta skills list --agent <agent-id>`, and delete skills with `letta skills delete <skill-name> --agent <agent-id>`.
-
-## Research
-
-Letta Code is developed by the creators of [MemGPT](https://arxiv.org/abs/2310.08560) and [sleep-time compute](https://arxiv.org/abs/2504.13171) (now called "dreaming"), and driven by our [research](https://www.letta.com/research) in AI memory and continual learning.
-
-## Other
-
-Community maintained packages are available for Arch Linux users on the [AUR](https://aur.archlinux.org/packages/letta-code):
-
-```bash
-yay -S letta-code # release
-yay -S letta-code-git # nightly
+Also mention that the Mastra model router provides access to thousands of models: https://mastra.ai/models
 ```
 
-Nix users can run or install Letta Code through the repository flake:
-```bash
-nix run github:letta-ai/letta-code
-nix profile install github:letta-ai/letta-code
-```
+</details>
 
-See [docs/nix.md](docs/nix.md) for Home Manager and NixOS service examples.
+## Documentation
 
----
+Visit our [official documentation](https://mastra.ai/docs).
 
-Made with 💜 in San Francisco
+## Build with AI
 
-<img
-  referrerpolicy="no-referrer-when-downgrade"
-  src="https://static.scarf.sh/a.png?x-pxid=76801c33-8e75-4055-8eea-2c8092519a90&page=README.md"
-  alt=""
-  aria-hidden="true"
-/>
+Learn how to make your agent a Mastra expert by following the [Build with AI guide](https://mastra.ai/reference/build-with-ai).
+
+## Contributing
+
+Looking to contribute? All types of help are appreciated, from coding to testing and feature specification. Read [CONTRIBUTING.md](./CONTRIBUTING.md) for more details on how to get involved.
+
+If you are a developer and would like to contribute with code, please open an issue to discuss before opening a Pull Request.
+
+Information about the project setup can be found in the [development documentation](./DEVELOPMENT.md)
+
+## Support
+
+We have an [open community Discord](https://discord.gg/mastra-ai). Come and say hello and let us know if you have any questions or need any help getting things running.
+
+It's also super helpful if you leave the project a star here, at the [top of the page](https://github.com/mastra-ai/mastra)
+
+## Licensing
+
+This repository uses a dual-license model:
+
+- **Apache License 2.0**: The core framework and the vast majority of this codebase is open source under Apache-2.0.
+- **Mastra Enterprise License**: Code in any directory named `ee/` (e.g., `packages/core/src/auth/ee/`) is source-available under the Mastra Enterprise License. These features require a valid enterprise license for production use but can be freely used for development and testing.
+
+See [LICENSE.md](./LICENSE.md) for the full license mapping and [ee/LICENSE](./ee/LICENSE) for the enterprise license terms.
+
+## Security
+
+We are committed to maintaining the security of this repo and of Mastra as a whole. If you discover a security finding we ask you to please responsibly disclose this to us at [security@mastra.ai](mailto:security@mastra.ai) and we will get back to you.

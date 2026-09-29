@@ -1,0 +1,945 @@
+/**
+ * OAuth Authentication Tests for MCP Client/Server
+ *
+ * Tests for the MCP OAuth implementation per:
+ * - GitHub Issue: https://github.com/mastra-ai/mastra/issues/7058
+ * - MCP Auth Spec: https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization
+ *
+ * The MCP spec requires:
+ * 1. OAuth 2.0 Protected Resource Metadata (RFC9728) on servers
+ * 2. Authorization Server Discovery by clients
+ * 3. Pre-registered or Client ID Metadata Document client identity (no dynamic registration)
+ * 4. Token validation on protected endpoints
+ */
+
+import { randomUUID } from 'node:crypto';
+import { createServer } from 'node:http';
+import type { Server as HttpServer, IncomingMessage, ServerResponse } from 'node:http';
+import { exchangeAuthorization, refreshAuthorization } from '@modelcontextprotocol/client';
+import { CLIENT_CAPABILITIES_META_KEY, CLIENT_INFO_META_KEY, PROTOCOL_VERSION_META_KEY } from '@modelcontextprotocol/server';
+import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest';
+
+import type { OAuthMiddlewareResult } from '../server/oauth-middleware.js';
+import {
+  createOAuthMiddleware,
+  createStaticTokenValidator,
+  createIntrospectionValidator,
+} from '../server/oauth-middleware.js';
+import { MCPServer } from '../server/server.js';
+import type { MCPServerOAuthConfig, OAuthClientProvider } from '../shared/oauth-types.js';
+import {
+  generateProtectedResourceMetadata,
+  generateWWWAuthenticateHeader,
+  extractBearerToken,
+} from '../shared/oauth-types.js';
+import { InMemoryOAuthStorage, MCPOAuthClientProvider, createSimpleTokenProvider } from './oauth-provider.js';
+
+// =============================================================================
+// Unit Tests for OAuth Types and Helpers
+// =============================================================================
+
+describe('OAuth Types and Helpers', () => {
+  describe('generateProtectedResourceMetadata', () => {
+    it('should generate valid RFC9728 metadata', () => {
+      const config: MCPServerOAuthConfig = {
+        resource: 'https://mcp.example.com/mcp',
+        authorizationServers: ['https://auth.example.com'],
+        scopesSupported: ['mcp:read', 'mcp:write'],
+        resourceName: 'Test MCP Server',
+      };
+
+      const metadata = generateProtectedResourceMetadata(config);
+
+      expect(metadata).toEqual({
+        resource: 'https://mcp.example.com/mcp',
+        authorization_servers: ['https://auth.example.com'],
+        scopes_supported: ['mcp:read', 'mcp:write'],
+        bearer_methods_supported: ['header'],
+        resource_name: 'Test MCP Server',
+      });
+    });
+
+    it('should use default scopes when not provided', () => {
+      const config: MCPServerOAuthConfig = {
+        resource: 'https://mcp.example.com/mcp',
+        authorizationServers: ['https://auth.example.com'],
+      };
+
+      const metadata = generateProtectedResourceMetadata(config);
+
+      expect(metadata.scopes_supported).toEqual(['mcp:read', 'mcp:write']);
+    });
+  });
+
+  describe('generateWWWAuthenticateHeader', () => {
+    it('should generate a basic Bearer header', () => {
+      const header = generateWWWAuthenticateHeader();
+      expect(header).toBe('Bearer');
+    });
+
+    it('should include resource_metadata URL when provided', () => {
+      const header = generateWWWAuthenticateHeader({
+        resourceMetadataUrl: 'https://mcp.example.com/.well-known/oauth-protected-resource',
+      });
+      expect(header).toBe('Bearer resource_metadata="https://mcp.example.com/.well-known/oauth-protected-resource"');
+    });
+
+    it('should include additional params', () => {
+      const header = generateWWWAuthenticateHeader({
+        resourceMetadataUrl: 'https://mcp.example.com/.well-known/oauth-protected-resource',
+        additionalParams: {
+          error: 'invalid_token',
+          error_description: 'Token expired',
+        },
+      });
+      expect(header).toContain('error="invalid_token"');
+      expect(header).toContain('error_description="Token expired"');
+    });
+
+    it('should properly escape backslashes and quotes in header values', () => {
+      const header = generateWWWAuthenticateHeader({
+        additionalParams: {
+          error_description: 'Value with "quotes"',
+        },
+      });
+      expect(header).toContain('error_description="Value with \\"quotes\\""');
+
+      const headerWithBackslash = generateWWWAuthenticateHeader({
+        additionalParams: {
+          error_description: 'Path: C:\\Users\\test',
+        },
+      });
+      expect(headerWithBackslash).toContain('error_description="Path: C:\\\\Users\\\\test"');
+
+      // Test combined: backslash before quote should be escaped correctly
+      const headerCombined = generateWWWAuthenticateHeader({
+        additionalParams: {
+          error_description: 'test\\"value',
+        },
+      });
+      // Input: test\"value -> After escaping \ then ": test\\"value
+      expect(headerCombined).toContain('error_description="test\\\\\\"value"');
+    });
+  });
+
+  describe('extractBearerToken', () => {
+    it('should extract token from valid Bearer header', () => {
+      expect(extractBearerToken('Bearer my-token-123')).toBe('my-token-123');
+      expect(extractBearerToken('bearer my-token-456')).toBe('my-token-456');
+      expect(extractBearerToken('BEARER my-token-789')).toBe('my-token-789');
+    });
+
+    it('should return undefined for invalid headers', () => {
+      expect(extractBearerToken(null)).toBeUndefined();
+      expect(extractBearerToken(undefined)).toBeUndefined();
+      expect(extractBearerToken('')).toBeUndefined();
+      expect(extractBearerToken('Basic xyz')).toBeUndefined();
+      expect(extractBearerToken('Bearer')).toBeUndefined();
+      expect(extractBearerToken('Bearer ')).toBeUndefined();
+    });
+  });
+});
+
+// =============================================================================
+// Unit Tests for OAuth Client Provider
+// =============================================================================
+
+describe('MCPOAuthClientProvider', () => {
+  const clientMetadata = {
+    redirect_uris: ['http://localhost:3000/callback'],
+    client_name: 'Test Client',
+  };
+
+  it('requires a configured client identity instead of registering dynamically', () => {
+    expect(() => new MCPOAuthClientProvider({ redirectUrl: 'http://localhost:3000/callback', clientMetadata })).toThrow(
+      /Dynamic client registration is not supported/,
+    );
+    // No registration hook: the SDK cannot fall back to dynamic registration.
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata,
+      clientInformation: { client_id: 'pre-registered' },
+    });
+    expect((provider as unknown as Record<string, unknown>)['saveClientInformation']).toBeUndefined();
+  });
+
+  it('rejects a pre-registered client and a metadata document URL together', () => {
+    expect(
+      () =>
+        new MCPOAuthClientProvider({
+          redirectUrl: 'http://localhost:3000/callback',
+          clientMetadata,
+          clientInformation: { client_id: 'pre-registered' },
+          clientMetadataUrl: 'https://client.example.com/oauth/client-metadata.json',
+        }),
+    ).toThrow(/either clientInformation or clientMetadataUrl, not both/);
+  });
+
+  it('uses the Client ID Metadata Document URL as the client_id', () => {
+    const clientMetadataUrl = 'https://client.example.com/oauth/client-metadata.json';
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata,
+      clientMetadataUrl,
+    });
+    expect(provider.clientMetadataUrl).toBe(clientMetadataUrl);
+    expect(provider.clientInformation()).toEqual({ client_id: clientMetadataUrl });
+  });
+
+  it('rejects a metadata document URL that is not an HTTPS URL with a path', () => {
+    for (const clientMetadataUrl of ['http://client.example.com/metadata.json', 'https://client.example.com/']) {
+      expect(
+        () => new MCPOAuthClientProvider({ redirectUrl: 'http://localhost:3000/callback', clientMetadata, clientMetadataUrl }),
+      ).toThrow();
+    }
+  });
+
+  it('accepts a matching client_id in the metadata document and keeps it out of clientMetadata', () => {
+    const clientMetadataUrl = 'https://client.example.com/oauth/client.json';
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadataUrl,
+      clientMetadata: { ...clientMetadata, client_id: clientMetadataUrl },
+    });
+
+    expect(provider.clientMetadataUrl).toBe(clientMetadataUrl);
+    expect(provider.clientMetadata).not.toHaveProperty('client_id');
+  });
+
+  it('rejects a metadata document whose client_id differs from the URL', () => {
+    expect(
+      () =>
+        new MCPOAuthClientProvider({
+          redirectUrl: 'http://localhost:3000/callback',
+          clientMetadataUrl: 'https://client.example.com/oauth/client.json',
+          clientMetadata: { ...clientMetadata, client_id: 'https://other.example.com/oauth/client.json' },
+        }),
+    ).toThrow('must match clientMetadata.client_id');
+  });
+
+  it('rejects a Client ID Metadata Document without required metadata fields', () => {
+    expect(
+      () =>
+        new MCPOAuthClientProvider({
+          redirectUrl: 'http://localhost:3000/callback',
+          clientMetadataUrl: 'https://client.example.com/oauth/client.json',
+          clientMetadata: { redirect_uris: [] },
+        }),
+    ).toThrow('require client_name and at least one redirect_uri');
+  });
+
+  it('keeps persisted tokens isolated by authorization-server issuer', async () => {
+    const storage = new InMemoryOAuthStorage();
+    const provider: OAuthClientProvider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata,
+      clientInformation: { client_id: 'test-client' },
+      storage,
+    });
+    const issuerA = { issuer: 'https://auth-a.example.com' };
+    const issuerB = { issuer: 'https://auth-b.example.com' };
+
+    await provider.saveTokens({ access_token: 'token-a', token_type: 'Bearer', issuer: issuerA.issuer }, issuerA);
+    await provider.saveTokens({ access_token: 'token-b', token_type: 'Bearer', issuer: issuerB.issuer }, issuerB);
+
+    await expect(provider.tokens(issuerA)).resolves.toMatchObject({ access_token: 'token-a' });
+    await expect(provider.tokens(issuerB)).resolves.toMatchObject({ access_token: 'token-b' });
+    // The context-free read returns the most recently saved set.
+    await expect(provider.tokens()).resolves.toMatchObject({ access_token: 'token-b' });
+
+    const restored: OAuthClientProvider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata,
+      clientInformation: { client_id: 'test-client' },
+      storage,
+    });
+    await expect(restored.tokens(issuerA)).resolves.toMatchObject({ access_token: 'token-a' });
+  });
+
+  it('ignores stored tokens stamped with a different issuer than requested', async () => {
+    const storage = new InMemoryOAuthStorage();
+    const provider: OAuthClientProvider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata,
+      clientInformation: { client_id: 'test-client' },
+      storage,
+    });
+    const issuer = { issuer: 'https://auth.example.com' };
+    storage.set(
+      `tokens:${encodeURIComponent(issuer.issuer)}`,
+      JSON.stringify({ access_token: 'foreign', token_type: 'Bearer', issuer: 'https://attacker.example.com' }),
+    );
+
+    await expect(provider.tokens(issuer)).resolves.toBeUndefined();
+  });
+
+  it('tracks concurrent issuer-scoped writes so invalidate all removes every credential', async () => {
+    const storage = new InMemoryOAuthStorage();
+    const provider: OAuthClientProvider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata,
+      clientInformation: { client_id: 'test-client' },
+      storage,
+    });
+    const issuers = Array.from({ length: 25 }, (_, index) => ({ issuer: `https://auth-${index}.example.com` }));
+
+    await Promise.all(
+      issuers.map((issuer, index) =>
+        provider.saveTokens({ access_token: `token-${index}`, token_type: 'Bearer', issuer: issuer.issuer }, issuer),
+      ),
+    );
+    await Promise.all(
+      issuers.map((issuer, index) =>
+        expect(provider.tokens(issuer)).resolves.toMatchObject({ access_token: `token-${index}` }),
+      ),
+    );
+
+    await provider.invalidateCredentials!('all');
+
+    await Promise.all(issuers.map(issuer => expect(provider.tokens(issuer)).resolves.toBeUndefined()));
+    await expect(provider.tokens()).resolves.toBeUndefined();
+  });
+
+  it('does not let a token write land after invalidate all completes', async () => {
+    const backing = new InMemoryOAuthStorage();
+    let releaseScopedWrite!: () => void;
+    const scopedWriteCanFinish = new Promise<void>(resolve => (releaseScopedWrite = resolve));
+    let scopedWriteStarted!: () => void;
+    const scopedWriteDidStart = new Promise<void>(resolve => (scopedWriteStarted = resolve));
+    const storage = {
+      get: (key: string) => backing.get(key),
+      delete: (key: string) => backing.delete(key),
+      set: async (key: string, value: string) => {
+        if (key.startsWith('tokens:')) {
+          scopedWriteStarted();
+          await scopedWriteCanFinish;
+        }
+        backing.set(key, value);
+      },
+    };
+    const provider: OAuthClientProvider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata,
+      clientInformation: { client_id: 'test-client' },
+      storage,
+    });
+    const issuer = { issuer: 'https://auth-race.example.com' };
+
+    const save = provider.saveTokens({ access_token: 'racing-token', token_type: 'Bearer', issuer: issuer.issuer }, issuer);
+    await scopedWriteDidStart;
+    const invalidate = provider.invalidateCredentials!('all');
+    await new Promise(resolve => setImmediate(resolve));
+    releaseScopedWrite();
+    await Promise.all([save, invalidate]);
+
+    await expect(provider.tokens(issuer)).resolves.toBeUndefined();
+    await expect(provider.tokens()).resolves.toBeUndefined();
+  });
+
+  it('persists discovery state and drops it on discovery invalidation', async () => {
+    const provider: OAuthClientProvider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata,
+      clientInformation: { client_id: 'test-client' },
+    });
+    const state = {
+      authorizationServerUrl: 'https://auth.example.com',
+      resourceMetadataUrl: 'https://mcp.example.com/.well-known/oauth-protected-resource',
+    };
+
+    await provider.saveDiscoveryState!(state);
+    await expect(provider.discoveryState!()).resolves.toEqual(state);
+
+    await provider.invalidateCredentials!('discovery');
+    await expect(provider.discoveryState!()).resolves.toBeUndefined();
+  });
+
+  it('should return the configured redirect URL', () => {
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+    });
+
+    expect(provider.redirectUrl).toBe('http://localhost:3000/callback');
+  });
+
+  it('should return client metadata', () => {
+    const metadata = {
+      redirect_uris: ['http://localhost:3000/callback'],
+      client_name: 'Test Client',
+      grant_types: ['authorization_code'],
+    };
+
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: metadata,
+      clientInformation: { client_id: 'test-client' },
+    });
+
+    expect(provider.clientMetadata).toEqual(metadata);
+  });
+
+  it('should store and retrieve tokens', async () => {
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+    });
+
+    // Initially no tokens
+    expect(await provider.tokens()).toBeUndefined();
+
+    // Save tokens
+    const tokens = {
+      access_token: 'test-access-token',
+      token_type: 'Bearer',
+      expires_in: 3600,
+      refresh_token: 'test-refresh-token',
+    };
+    await provider.saveTokens(tokens);
+
+    // Retrieve tokens
+    expect(await provider.tokens()).toEqual(tokens);
+  });
+
+  it('should store and retrieve code verifier', async () => {
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+    });
+
+    await provider.saveCodeVerifier('test-verifier-123');
+    expect(await provider.codeVerifier()).toBe('test-verifier-123');
+  });
+
+  it('should invalidate credentials by scope', async () => {
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+    });
+
+    // Set up some data
+    await provider.saveTokens({
+      access_token: 'test-token',
+      token_type: 'Bearer',
+    });
+    await provider.saveCodeVerifier('test-verifier');
+
+    // Invalidate tokens only
+    await provider.invalidateCredentials('tokens');
+    expect(await provider.tokens()).toBeUndefined();
+
+    // Code verifier should still exist
+    expect(await provider.codeVerifier()).toBe('test-verifier');
+
+    // Invalidate all
+    await provider.invalidateCredentials('all');
+    await expect(provider.codeVerifier()).rejects.toThrow();
+  });
+
+  it('should generate state for OAuth requests', async () => {
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+    });
+
+    const state = await provider.state?.();
+    expect(state).toBeDefined();
+    expect(typeof state).toBe('string');
+    expect(state!.length).toBeGreaterThan(0);
+  });
+
+  it('should use custom state generator', async () => {
+    const customState = 'custom-state-value';
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+      stateGenerator: () => customState,
+    });
+
+    expect(await provider.state?.()).toBe(customState);
+  });
+
+  // Regression for https://github.com/mastra-ai/mastra/issues/16854.
+  // The MCP client only attaches client_id/client_secret to token requests when
+  // the provider does NOT implement addClientAuthentication. A previous empty
+  // stub on this provider was truthy and short-circuited that default,
+  // dropping credentials and breaking confidential-client OAuth.
+  it('should not implement addClientAuthentication so the SDK attaches client credentials by default', () => {
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+    });
+
+    // Bracket access since the property is intentionally absent from the type.
+    expect((provider as unknown as Record<string, unknown>)['addClientAuthentication']).toBeUndefined();
+  });
+
+  // End-to-end checks that drive the real MCP client token-exchange path with a
+  // mocked fetch. These prove the bug fix from the consumer's perspective:
+  // when our provider's (undefined) addClientAuthentication is forwarded to
+  // the SDK, client_id and client_secret end up on the wire.
+  describe('SDK token requests include client credentials', () => {
+    const clientInformation = {
+      client_id: 'test-client-id',
+      client_secret: 'test-client-secret',
+      redirect_uris: ['http://localhost:3000/callback'],
+    };
+
+    const makeProvider = () =>
+      new MCPOAuthClientProvider({
+        redirectUrl: 'http://localhost:3000/callback',
+        clientMetadata: {
+          redirect_uris: ['http://localhost:3000/callback'],
+          client_name: 'Test Client',
+        },
+        clientInformation: { client_id: 'test-client' },
+      });
+
+    const mockTokenFetch = () => {
+      const fetchFn = vi.fn(
+        async () =>
+          new Response(JSON.stringify({ access_token: 'new-access-token', token_type: 'Bearer' }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+      );
+      return fetchFn as unknown as typeof fetch;
+    };
+
+    // Reads addClientAuthentication off the provider the same way the SDK would,
+    // via bracket access since the property is intentionally absent from the type.
+    type AddClientAuthentication = Parameters<typeof exchangeAuthorization>[1]['addClientAuthentication'];
+    const readAddClientAuthentication = (provider: MCPOAuthClientProvider): AddClientAuthentication =>
+      (provider as unknown as Record<string, AddClientAuthentication>)['addClientAuthentication'];
+
+    // Force client_secret_post so credentials land in the request body,
+    // which is the exact failure mode described in the issue.
+    const postAuthMetadata = {
+      issuer: 'https://auth.example.com',
+      authorization_endpoint: 'https://auth.example.com/authorize',
+      token_endpoint: 'https://auth.example.com/token',
+      response_types_supported: ['code'],
+      token_endpoint_auth_methods_supported: ['client_secret_post'],
+    };
+
+    it('attaches client_id and client_secret during authorization code exchange', async () => {
+      const provider = makeProvider();
+      const fetchFn = mockTokenFetch();
+
+      await exchangeAuthorization('https://auth.example.com', {
+        metadata: postAuthMetadata,
+        clientInformation,
+        authorizationCode: 'auth-code',
+        codeVerifier: 'code-verifier',
+        redirectUri: 'http://localhost:3000/callback',
+        addClientAuthentication: readAddClientAuthentication(provider),
+        fetchFn,
+      });
+
+      const fetchMock = fetchFn as unknown as ReturnType<typeof vi.fn>;
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const body = fetchMock.mock.calls[0]![1]!.body as URLSearchParams;
+      expect(body.get('client_id')).toBe('test-client-id');
+      expect(body.get('client_secret')).toBe('test-client-secret');
+    });
+
+    it('attaches client_id and client_secret during refresh', async () => {
+      const provider = makeProvider();
+      const fetchFn = mockTokenFetch();
+
+      await refreshAuthorization('https://auth.example.com', {
+        metadata: postAuthMetadata,
+        clientInformation,
+        refreshToken: 'refresh-token',
+        addClientAuthentication: readAddClientAuthentication(provider),
+        fetchFn,
+      });
+
+      const fetchMock = fetchFn as unknown as ReturnType<typeof vi.fn>;
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const body = fetchMock.mock.calls[0]![1]!.body as URLSearchParams;
+      expect(body.get('client_id')).toBe('test-client-id');
+      expect(body.get('client_secret')).toBe('test-client-secret');
+    });
+  });
+});
+
+describe('createSimpleTokenProvider', () => {
+  it('should create a provider with pre-configured tokens', async () => {
+    const provider = createSimpleTokenProvider('my-access-token', {
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+    });
+
+    const tokens = await provider.tokens();
+    expect(tokens?.access_token).toBe('my-access-token');
+    expect(tokens?.token_type).toBe('Bearer');
+  });
+
+  it('should include optional token properties', async () => {
+    const provider = createSimpleTokenProvider('my-access-token', {
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+      },
+      clientInformation: { client_id: 'test-client' },
+      refreshToken: 'my-refresh-token',
+      expiresIn: 7200,
+      scope: 'mcp:read mcp:write',
+    });
+
+    const tokens = await provider.tokens();
+    expect(tokens?.refresh_token).toBe('my-refresh-token');
+    expect(tokens?.expires_in).toBe(7200);
+    expect(tokens?.scope).toBe('mcp:read mcp:write');
+  });
+});
+
+// =============================================================================
+// Unit Tests for OAuth Middleware
+// =============================================================================
+
+describe('createStaticTokenValidator', () => {
+  it('should validate tokens in the allowed list', async () => {
+    const validator = createStaticTokenValidator(['token-1', 'token-2']);
+
+    const result1 = await validator!('token-1', 'https://example.com');
+    expect(result1.valid).toBe(true);
+    expect(result1.scopes).toEqual(['mcp:read', 'mcp:write']);
+
+    const result2 = await validator!('token-2', 'https://example.com');
+    expect(result2.valid).toBe(true);
+  });
+
+  it('should reject tokens not in the allowed list', async () => {
+    const validator = createStaticTokenValidator(['token-1']);
+
+    const result = await validator!('invalid-token', 'https://example.com');
+    expect(result.valid).toBe(false);
+    expect(result.error).toBe('invalid_token');
+  });
+});
+
+describe('createIntrospectionValidator', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should return empty scopes array for empty scope string', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        active: true,
+        scope: '',
+        sub: 'user-123',
+        exp: Math.floor(Date.now() / 1000) + 3600,
+      }),
+    } as Response);
+
+    const validator = createIntrospectionValidator('https://auth.example.com/introspect');
+    const result = await validator('test-token', 'https://example.com');
+
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.scopes).toEqual([]);
+    }
+  });
+
+  it('should return empty scopes array for whitespace-only scope string', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        active: true,
+        scope: '   ',
+        sub: 'user-123',
+        exp: Math.floor(Date.now() / 1000) + 3600,
+      }),
+    } as Response);
+
+    const validator = createIntrospectionValidator('https://auth.example.com/introspect');
+    const result = await validator('test-token', 'https://example.com');
+
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.scopes).toEqual([]);
+    }
+  });
+
+  it('should parse space-separated scopes correctly', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        active: true,
+        scope: 'read write admin',
+        sub: 'user-123',
+        exp: Math.floor(Date.now() / 1000) + 3600,
+      }),
+    } as Response);
+
+    const validator = createIntrospectionValidator('https://auth.example.com/introspect');
+    const result = await validator('test-token', 'https://example.com');
+
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.scopes).toEqual(['read', 'write', 'admin']);
+    }
+  });
+
+  it('should handle undefined scope', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        active: true,
+        sub: 'user-123',
+        exp: Math.floor(Date.now() / 1000) + 3600,
+      }),
+    } as Response);
+
+    const validator = createIntrospectionValidator('https://auth.example.com/introspect');
+    const result = await validator('test-token', 'https://example.com');
+
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.scopes).toEqual([]);
+    }
+  });
+});
+
+// =============================================================================
+// Integration Tests for OAuth Middleware with HTTP Server
+// =============================================================================
+
+describe('OAuth Middleware Integration', () => {
+  const PORT = 18765 + Math.floor(Math.random() * 1000);
+  const SERVER_URL = `http://localhost:${PORT}`;
+  let httpServer: HttpServer;
+
+  const VALID_TOKEN = 'valid-test-token-' + randomUUID();
+
+  beforeAll(async () => {
+    // Create an MCP server with a simple tool
+    const mcpServer = new MCPServer({
+      id: 'oauth-test-server',
+      name: 'OAuth Test Server',
+      version: '1.0.0',
+      tools: {},
+    });
+
+    // Create OAuth middleware
+    const oauthMiddleware = createOAuthMiddleware({
+      oauth: {
+        resource: `${SERVER_URL}/mcp`,
+        authorizationServers: ['https://auth.example.com'],
+        scopesSupported: ['mcp:read', 'mcp:write'],
+        validateToken: createStaticTokenValidator([VALID_TOKEN]),
+      },
+      mcpPath: '/mcp',
+    });
+
+    // Create HTTP server with OAuth protection
+    httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+      const url = new URL(req.url || '', SERVER_URL);
+
+      // Apply OAuth middleware
+      const result: OAuthMiddlewareResult = await oauthMiddleware(req, res, url);
+      if (!result.proceed) {
+        return; // Middleware handled the response
+      }
+
+      // Continue to MCP server
+      await mcpServer.startHTTP({
+        url,
+        httpPath: '/mcp',
+        req,
+        res,
+      });
+    });
+
+    await new Promise<void>(resolve => {
+      httpServer.listen(PORT, resolve);
+    });
+  });
+
+  afterAll(async () => {
+    await new Promise<void>(resolve => {
+      httpServer.close(() => resolve());
+    });
+  });
+
+  it('should serve Protected Resource Metadata at well-known endpoint', async () => {
+    const response = await fetch(`${SERVER_URL}/.well-known/oauth-protected-resource`);
+    expect(response.ok).toBe(true);
+    expect(response.headers.get('content-type')).toBe('application/json');
+
+    const metadata = await response.json();
+    expect(metadata.resource).toBe(`${SERVER_URL}/mcp`);
+    expect(metadata.authorization_servers).toEqual(['https://auth.example.com']);
+    expect(metadata.scopes_supported).toEqual(['mcp:read', 'mcp:write']);
+    expect(metadata.bearer_methods_supported).toEqual(['header']);
+  });
+
+  it('should return 401 with WWW-Authenticate header when no token provided', async () => {
+    const response = await fetch(`${SERVER_URL}/mcp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', method: 'server/discover', id: 1 }),
+    });
+
+    expect(response.status).toBe(401);
+
+    const wwwAuth = response.headers.get('www-authenticate');
+    expect(wwwAuth).toBeDefined();
+    expect(wwwAuth).toContain('Bearer');
+    expect(wwwAuth).toContain('resource_metadata=');
+
+    const body = await response.json();
+    expect(body.error).toBe('unauthorized');
+  });
+
+  it('should return 401 when invalid token provided', async () => {
+    const response = await fetch(`${SERVER_URL}/mcp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer invalid-token',
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', method: 'server/discover', id: 1 }),
+    });
+
+    expect(response.status).toBe(401);
+
+    const wwwAuth = response.headers.get('www-authenticate');
+    expect(wwwAuth).toContain('error="invalid_token"');
+
+    const body = await response.json();
+    expect(body.error).toBe('invalid_token');
+  });
+
+  it('should allow access with valid token', async () => {
+    const response = await fetch(`${SERVER_URL}/mcp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+        Authorization: `Bearer ${VALID_TOKEN}`,
+        'mcp-protocol-version': '2026-07-28',
+        'mcp-method': 'server/discover',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'server/discover',
+        params: {
+          _meta: {
+            [PROTOCOL_VERSION_META_KEY]: '2026-07-28',
+            [CLIENT_INFO_META_KEY]: { name: 'test', version: '1.0.0' },
+            [CLIENT_CAPABILITIES_META_KEY]: {},
+          },
+        },
+        id: 1,
+      }),
+    });
+
+    // With a valid token the OAuth middleware passes the request through to the MCP
+    // handler, which answers discovery.
+    expect(response.status).toBe(200);
+    expect(response.headers.get('www-authenticate')).toBeNull();
+    const body = await response.json();
+    expect(body.result.supportedVersions).toEqual(['2026-07-28']);
+    expect(body.result._meta['io.modelcontextprotocol/serverInfo'].name).toBe('OAuth Test Server');
+  });
+
+  it('should handle CORS preflight for metadata endpoint', async () => {
+    const response = await fetch(`${SERVER_URL}/.well-known/oauth-protected-resource`, {
+      method: 'OPTIONS',
+    });
+
+    expect(response.status).toBe(204);
+    expect(response.headers.get('access-control-allow-origin')).toBe('*');
+    expect(response.headers.get('access-control-allow-methods')).toContain('GET');
+  });
+
+  it('should not protect non-MCP endpoints', async () => {
+    const response = await fetch(`${SERVER_URL}/health`);
+    // This returns 404 because the MCP server doesn't handle /health,
+    // but importantly it doesn't return 401
+    expect(response.status).not.toBe(401);
+  });
+});
+
+// =============================================================================
+// Tests demonstrating current authProvider passthrough
+// =============================================================================
+
+describe('MCPClient authProvider passthrough', () => {
+  /**
+   * This test demonstrates that Mastra's MCPClient currently supports
+   * passing an authProvider to the underlying MCP client transports.
+   *
+   * Users can implement the full OAuthClientProvider interface to handle:
+   * - Token storage and retrieval
+   * - PKCE flow management
+   * - Authorization redirects
+   */
+  it('should accept MCPOAuthClientProvider as authProvider', async () => {
+    const provider = new MCPOAuthClientProvider({
+      redirectUrl: 'http://localhost:3000/callback',
+      clientMetadata: {
+        redirect_uris: ['http://localhost:3000/callback'],
+        client_name: 'Test Client',
+        grant_types: ['authorization_code', 'refresh_token'],
+        response_types: ['code'],
+      },
+      clientInformation: { client_id: 'test-client' },
+      onRedirectToAuthorization: url => {
+        // In a real app, this would redirect the user
+        console.log(`Would redirect to: ${url}`);
+      },
+    });
+
+    // Verify the provider implements the expected interface
+    expect(provider.redirectUrl).toBeDefined();
+    expect(provider.clientMetadata).toBeDefined();
+    expect(typeof provider.tokens).toBe('function');
+    expect(typeof provider.saveTokens).toBe('function');
+    expect(typeof provider.saveCodeVerifier).toBe('function');
+    expect(typeof provider.codeVerifier).toBe('function');
+    expect(typeof provider.redirectToAuthorization).toBe('function');
+    expect(typeof provider.clientInformation).toBe('function');
+    expect(typeof provider.invalidateCredentials).toBe('function');
+  });
+});

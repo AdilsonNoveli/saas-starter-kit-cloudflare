@@ -1,0 +1,149 @@
+---
+title: "Confident AI | Observability"
+description: "Export Mastra traces to Confident AI for LLM observability and online evals, using environment credentials or explicit exporter configuration."
+packages:
+  - "@mastra/observability"
+---
+
+# Confident AI
+
+[Confident AI](https://www.confident-ai.com/) is an LLM observability and evaluation platform for teams building reliable AI applications in both development and production.
+
+The `ConfidentMastraExporter` from [`confident-trace`](https://github.com/confident-ai/confident-trace) sends your Mastra traces to Confident AI, where agent runs show up with the full agent, model, and tool hierarchy, and can be scored automatically as they arrive.
+
+## Installation
+
+```bash npm2yarn
+npm install confident-trace@latest
+```
+
+## Configuration
+
+### Prerequisites
+
+1. **Confident AI account**: Sign up at [confident-ai.com](https://app.confident-ai.com)
+1. **API key**: Generate one in your Confident AI project settings
+1. **Environment variables**: Set your credentials:
+
+```bash title=".env"
+CONFIDENT_API_KEY=confident_proj_xxxxxxxxxxxxx
+
+# Optional. EU region, defaults to the US servers
+CONFIDENT_OTEL_ENDPOINT=https://eu.otel.confident-ai.com/v1/traces
+```
+
+### Zero-Config Setup
+
+With environment variables set, use the exporter with no configuration:
+
+```typescript title="src/mastra/index.ts"
+import { Mastra } from '@mastra/core'
+import { Observability } from '@mastra/observability'
+import { ConfidentMastraExporter } from 'confident-trace/mastra'
+
+export const mastra = new Mastra({
+  observability: new Observability({
+    configs: {
+      confidentAI: {
+        serviceName: 'my-service',
+        exporters: [new ConfidentMastraExporter()],
+      },
+    },
+  }),
+})
+```
+
+### Explicit Configuration
+
+You can also pass credentials directly (takes precedence over environment variables):
+
+```typescript title="src/mastra/index.ts"
+import { Mastra } from '@mastra/core'
+import { Observability } from '@mastra/observability'
+import { ConfidentMastraExporter } from 'confident-trace/mastra'
+
+export const mastra = new Mastra({
+  observability: new Observability({
+    configs: {
+      confidentAI: {
+        serviceName: 'my-service',
+        exporters: [
+          new ConfidentMastraExporter({
+            apiKey: process.env.CONFIDENT_API_KEY,
+            endpoint: process.env.CONFIDENT_OTEL_ENDPOINT,
+          }),
+        ],
+      },
+    },
+  }),
+})
+```
+
+These options are available to you:
+
+```typescript
+new ConfidentMastraExporter({
+  apiKey: process.env.CONFIDENT_API_KEY, // Default: CONFIDENT_API_KEY
+  endpoint: process.env.CONFIDENT_OTEL_ENDPOINT, // Default: US servers
+  captureContent: false, // Omit inputs, outputs, and messages
+  maxContentBytes: 512, // Truncate captured content
+  timeoutMillis: 30000, // Flush and shutdown budget
+  resourceAttributes: { 'service.name': 'my-agent' }, // Overrides serviceName
+})
+```
+
+Traces carry Mastra's configured `serviceName` unless `resourceAttributes['service.name']` overrides it. Mastra's own sampling, filters, and span processors run before export, so whatever your pipeline lets through is what Confident AI receives.
+
+## Supported signals
+
+The exporter converts ended Mastra spans into OTLP spans, preserving trace IDs, span IDs, parent IDs, external parent IDs, and original timestamps. It needs no start-event cache, so resumed workflow spans and out-of-order completion export correctly.
+
+- **Agent and workflow execution**: Operation names, timing, status, and the parent-child relationships between steps.
+- **Model calls**: Model details, messages, finish reasons, and [token usage](https://www.confident-ai.com/docs/llm-tracing/features/token-usage-cost).
+- **Tool calls**: Tool names and their [input/output](https://www.confident-ai.com/docs/llm-tracing/features/input-output).
+- **Trace details**: The root operation's name, tags, metadata, and input/output.
+- **Errors**: Failed operations retain their error status to make failures visible in the trace.
+
+This integration exports tracing data. Mastra logs, metrics, scores, and feedback aren't included.
+
+## Custom trace metadata
+
+Metadata and tags passed through Mastra's `tracingOptions` are forwarded to the trace in Confident AI, where you can filter and group by them:
+
+```typescript
+const result = await mastra.getAgent('assistant').generate('How do you make the best coffee?', {
+  tracingOptions: {
+    metadata: { release: '2026-09', tier: 'enterprise' },
+    tags: ['production', 'support'],
+  },
+})
+```
+
+Your metadata is merged with the fields Mastra sets itself, such as `runId`. Tags apply to the root span, so they land on the trace rather than on individual spans.
+
+## Lifecycle
+
+Mastra owns this exporter. It creates its own OTLP processor and never registers, replaces, or shuts down the global OpenTelemetry provider, so there is no `init()` call to make and no preload to add to your start command.
+
+Spans are batched and sent when the exporter is shut down. Shut it down once, after every agent run and stream has finished, or a short-lived script exits before anything is sent:
+
+```typescript
+await observability.shutdown()
+```
+
+In a long-running server, shut down during graceful shutdown rather than per request. Traces can take up to 30 seconds to appear in the Observatory after being sent.
+
+## Threads and trace properties
+
+This exporter maps Mastra's own tracing surface, so trace metadata and tags come from `tracingOptions` as shown above.
+
+Grouping turns into [threads](https://www.confident-ai.com/docs/llm-tracing/features/threads) and setting trace-level properties such as user IDs use `confident-trace`'s SDK instrumentation, which attaches to Mastra directly rather than through an exporter. See the [Mastra integration guide](https://www.confident-ai.com/docs/integrations/third-party/mastra) for that setup.
+
+Choose one or the other. Do not use both at once.
+
+## Related
+
+- [Tracing Overview](/docs/observability/tracing/overview)
+- [Mastra integration guide](https://www.confident-ai.com/docs/integrations/third-party/mastra)
+- [Online evals](https://www.confident-ai.com/docs/llm-tracing/online-evals)
+- [confident-trace on GitHub](https://github.com/confident-ai/confident-trace)

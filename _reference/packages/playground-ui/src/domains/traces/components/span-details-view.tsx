@@ -1,0 +1,105 @@
+import { describeProcessorPipeline, describeSpanInput, describeSpanOutput } from '@mastra/core/observability';
+import { BracesIcon, FileInputIcon, FileOutputIcon } from 'lucide-react';
+import type { SpanRecord } from '../types';
+import {
+  SpanErrorRenderer,
+  SpanInputRenderer,
+  SpanOutputRenderer,
+  SpanPayloadSection,
+  SpanProcessorAttributes,
+} from './span-payload';
+import { asCoreSpan } from './span-payload/span-payload-registry';
+import { SpanSummaryDescription } from './span-summary-description';
+import { TraceIdButton } from './trace-id-button';
+import { DataDetailsPanel } from '@/ds/components/DataDetailsPanel';
+
+const KV = DataDetailsPanel.KeyValueList;
+
+export interface SpanDetailsViewProps {
+  spanId: string;
+  /** Full span record. Caller fetches via useSpanDetail. */
+  span: SpanRecord | undefined;
+  isLoading?: boolean;
+  onClose: () => void;
+}
+
+/**
+ * Compact span panel using `DataDetailsPanel` (popover-style). Shows basic span metadata +
+ * input/output/metadata/attributes code sections. Use this for inline span inspection; for the
+ * full-width span view with scoring tab + prev/next nav, use `SpanDataPanelView`.
+ */
+export function SpanDetailsView({ spanId, span, isLoading, onClose }: SpanDetailsViewProps) {
+  return (
+    <DataDetailsPanel>
+      <DataDetailsPanel.Header>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <DataDetailsPanel.Heading className="items-center">
+            Span
+            <TraceIdButton id={spanId} />
+          </DataDetailsPanel.Heading>
+          {span && <SpanSummaryDescription span={span} />}
+        </div>
+        <DataDetailsPanel.CloseButton onClick={onClose} />
+      </DataDetailsPanel.Header>
+
+      {isLoading ? (
+        <DataDetailsPanel.LoadingData>Loading span...</DataDetailsPanel.LoadingData>
+      ) : !span ? (
+        <DataDetailsPanel.NoData>Span not found.</DataDetailsPanel.NoData>
+      ) : (
+        <DataDetailsPanel.Content>
+          {span.spanType && (
+            <>
+              <KV>
+                <KV.Key>Type</KV.Key>
+                <KV.Value>{span.spanType}</KV.Value>
+              </KV>
+              <br />
+            </>
+          )}
+
+          <SpanPayloadSection title="Error" raw={span.error} layout="details" className="mb-3">
+            <SpanErrorRenderer span={span} />
+          </SpanPayloadSection>
+
+          <SpanPayloadSection
+            title="Input"
+            icon={<FileInputIcon />}
+            raw={span.input}
+            hasPreview={describeSpanInput(asCoreSpan(span))?.type !== 'json'}
+            layout="details"
+          >
+            <SpanInputRenderer span={span} />
+          </SpanPayloadSection>
+          <SpanPayloadSection
+            title="Output"
+            icon={<FileOutputIcon />}
+            raw={span.output}
+            hasPreview={describeSpanOutput(asCoreSpan(span))?.type !== 'json'}
+            layout="details"
+          >
+            <SpanOutputRenderer span={span} />
+          </SpanPayloadSection>
+          <SpanPayloadSection
+            title="Metadata"
+            icon={<BracesIcon />}
+            raw={span.metadata}
+            hasPreview={false}
+            layout="details"
+          >
+            {null}
+          </SpanPayloadSection>
+          <SpanPayloadSection
+            title="Attributes"
+            icon={<BracesIcon />}
+            raw={span.attributes}
+            hasPreview={describeProcessorPipeline(asCoreSpan(span)) !== undefined}
+            layout="details"
+          >
+            <SpanProcessorAttributes span={span} />
+          </SpanPayloadSection>
+        </DataDetailsPanel.Content>
+      )}
+    </DataDetailsPanel>
+  );
+}

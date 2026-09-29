@@ -1,0 +1,749 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('../issue-reconcile-worker.js', () => ({
+  IssueReconcileWorker: class {
+    readonly name = 'linear-issue-reconcile';
+
+    constructor(readonly config: unknown) {}
+  },
+}));
+
+import { defaultLinearRules } from './default-rules.js';
+import { LinearIntegration } from './integration.js';
+import type { LinearIssue, LinearIssueDetail } from './integration.js';
+
+function integration(): LinearIntegration {
+  return new LinearIntegration({ clientId: 'linear-client', clientSecret: 'linear-secret' });
+}
+
+const issue: LinearIssue = {
+  id: 'issue-1',
+  projectId: 'project-1',
+  teamId: 'team-1',
+  identifier: 'ENG-42',
+  title: 'Fix intake',
+  url: 'https://linear.app/acme/issue/ENG-42',
+  state: 'Todo',
+  stateType: 'unstarted',
+  priorityLabel: 'High',
+  assignee: 'Ada',
+  creator: 'Grace',
+  team: 'ENG',
+  labels: ['bug'],
+  createdAt: '2026-07-01T00:00:00Z',
+  updatedAt: '2026-07-02T00:00:00Z',
+};
+
+const connection = { type: 'oauth' as const, accessToken: 'linear-token' };
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
+});
+
+describe('LinearIntegration capability surface', () => {
+  it('owns isolated immutable rules with defaults and constructor overrides', () => {
+    const handler = vi.fn();
+    const rules = { issueObserved: handler, issueClosed: null };
+    const first = new LinearIntegration({ clientId: 'client', clientSecret: 'secret', rules });
+    rules.issueObserved = vi.fn();
+    expect(first.rules.issueObserved).toBe(handler);
+    expect(first.rules.issueClosed).toBeNull();
+    expect(Object.isFrozen(first.rules)).toBe(true);
+    expect(integration().rules).toEqual(defaultLinearRules);
+  });
+
+  it('validates rules at construction', () => {
+    expect(
+      () =>
+        new LinearIntegration({
+          clientId: 'client',
+          clientSecret: 'secret',
+          // @ts-expect-error Validate JavaScript configuration at the boundary.
+          rules: { issueObserved: false },
+        }),
+    ).toThrow(/must be a function/);
+  });
+
+  it('normalizes Linear issues through the shared Intake contract', async () => {
+    const linear = integration();
+    const listActiveIssues = vi
+      .spyOn(linear, 'listActiveIssues')
+      .mockResolvedValue({ issues: [issue], nextCursor: 'cursor-2' });
+
+    await expect(
+      linear.intake.listIssues({
+        connection,
+        sourceIds: ['project-1'],
+        labels: ['bug', 'urgent'],
+      }),
+    ).resolves.toEqual({
+      issues: [
+        expect.objectContaining({
+          id: 'issue-1',
+          identifier: 'ENG-42',
+          source: 'ENG',
+          priority: 'High',
+          labels: ['bug'],
+        }),
+      ],
+      nextCursor: expect.any(String),
+    });
+    expect(listActiveIssues).toHaveBeenCalledWith('linear-token', undefined, ['project-1'], ['bug', 'urgent']);
+  });
+
+  it('passes label filters to Linear GraphQL', async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({ data: { issues: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } } } }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const linear = integration();
+
+    await linear.listActiveIssues('linear-token', 'cursor-1', ['project-1'], ['bug', 'urgent']);
+
+    const request = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as {
+      query: string;
+      variables: Record<string, unknown>;
+    };
+    expect(request.query).toContain('labels: { name: { in: $labels } }');
+    expect(request.variables).toMatchObject({ labels: ['bug', 'urgent'] });
+  });
+
+  it('maps a projectless active issue to projectId: null without throwing', async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            data: {
+              issues: {
+                nodes: [
+                  {
+                    id: 'issue-2',
+                    identifier: 'ENG-7',
+                    title: 'Projectless bug',
+                    url: 'https://linear.app/acme/issue/ENG-7',
+                    priorityLabel: 'No priority',
+                    createdAt: '2026-07-01T00:00:00Z',
+                    updatedAt: '2026-07-02T00:00:00Z',
+                    state: { name: 'Triage', type: 'triage' },
+                    project: null,
+                    assignee: null,
+                    creator: null,
+                    team: { key: 'ENG' },
+                    labels: { nodes: [] },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const linear = integration();
+
+    const page = await linear.listActiveIssues('linear-token');
+
+    expect(page.issues).toEqual([
+      expect.objectContaining({ id: 'issue-2', identifier: 'ENG-7', projectId: null, team: 'ENG' }),
+    ]);
+  });
+
+  it('lists workspace teams for the intake-source picker', async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            data: {
+              teams: {
+                nodes: [
+                  { id: 'team-1', key: 'ENG', name: 'Engineering' },
+                  { id: 'team-2', key: 'OPS', name: 'Operations' },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const linear = integration();
+
+    await expect(linear.listTeams('linear-token')).resolves.toEqual([
+      { id: 'team-1', key: 'ENG', name: 'Engineering', sourceId: 'linear-team:team-1' },
+      { id: 'team-2', key: 'OPS', name: 'Operations', sourceId: 'linear-team:team-2' },
+    ]);
+  });
+
+  it('rejects a team page that hands back the cursor it was asked for', async () => {
+    const stuckPage = () =>
+      new Response(
+        JSON.stringify({
+          data: {
+            teams: {
+              nodes: [{ id: 'team-1', key: 'ENG', name: 'Engineering' }],
+              pageInfo: { hasNextPage: true, endCursor: 'stuck' },
+            },
+          },
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      );
+    const fetchMock = vi.fn(async () => stuckPage());
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(integration().listTeams('linear-token')).rejects.toMatchObject({ code: 'invalid_cursor' });
+    // The first page is asked without a cursor and the second with it; nothing beyond that.
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('follows team pagination cursors for the complete source catalog', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: {
+              teams: {
+                nodes: [{ id: 'team-1', key: 'ENG', name: 'Engineering' }],
+                pageInfo: { hasNextPage: true, endCursor: 'teams-page-2' },
+              },
+            },
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            data: {
+              teams: {
+                nodes: [{ id: 'team-101', key: 'OPS', name: 'Operations' }],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(integration().listTeams('linear-token')).resolves.toEqual([
+      { id: 'team-1', key: 'ENG', name: 'Engineering', sourceId: 'linear-team:team-1' },
+      { id: 'team-101', key: 'OPS', name: 'Operations', sourceId: 'linear-team:team-101' },
+    ]);
+    const secondRequest = JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body)) as {
+      query: string;
+      variables: Record<string, unknown>;
+    };
+    expect(secondRequest.variables).toEqual({ first: 100, after: 'teams-page-2' });
+  });
+  it('applies a team filter (and no project filter) when teamIds is provided', async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({ data: { issues: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } } } }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const linear = integration();
+
+    await linear.listActiveIssues('linear-token', undefined, undefined, undefined, ['team-1', 'team-2']);
+
+    const request = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body)) as {
+      query: string;
+      variables: Record<string, unknown>;
+    };
+    expect(request.query).toContain('team: { id: { in: $teamIds } }');
+    expect(request.query).not.toContain('project: { id: { in: $projectIds } }');
+    expect(request.variables).toMatchObject({ teamIds: ['team-1', 'team-2'] });
+  });
+
+  it('lists team sources and dedupes an overlapping issue in favour of the project (most-specific-wins)', async () => {
+    const linear = integration();
+    const teamSourceId = `linear-team:team-1`;
+    const secondTeamSourceId = `linear-team:team-2`;
+    const overlapping: LinearIssue = { ...issue, id: 'issue-1', projectId: 'project-1' };
+    const projectlessTeamIssue: LinearIssue = {
+      ...issue,
+      id: 'issue-2',
+      identifier: 'OPS-99',
+      projectId: null,
+      teamId: 'team-2',
+      team: 'OPS',
+    };
+
+    const listActiveIssues = vi
+      .spyOn(linear, 'listActiveIssues')
+      // First call = project source listing.
+      .mockResolvedValueOnce({ issues: [overlapping], nextCursor: null })
+      // Second call = team source listing (includes the overlap + a projectless issue).
+      .mockResolvedValueOnce({ issues: [overlapping, projectlessTeamIssue], nextCursor: null });
+
+    const result = await linear.intake.listIssues({
+      connection,
+      sourceIds: ['project-1', teamSourceId, secondTeamSourceId],
+    });
+
+    // Project call: projectIds=['project-1'], no teamIds.
+    expect(listActiveIssues).toHaveBeenNthCalledWith(1, 'linear-token', undefined, ['project-1'], undefined);
+    // Team call: no projectIds, teamIds=['team-1'].
+    expect(listActiveIssues).toHaveBeenNthCalledWith(2, 'linear-token', undefined, undefined, undefined, [
+      'team-1',
+      'team-2',
+    ]);
+
+    // issue-1 appears once, attributed to the project source; issue-2 kept via team.
+    expect(result.issues).toHaveLength(2);
+    const overlap = result.issues.find(i => i.id === 'issue-1')!;
+    expect(overlap.sourceId).toBe('project-1');
+    const projectless = result.issues.find(i => i.id === 'issue-2')!;
+    expect(projectless.sourceId).toBe(secondTeamSourceId);
+  });
+
+  it('preserves the actual project id when a team is the selected intake source', async () => {
+    const linear = integration();
+    const teamSourceId = 'linear-team:team-1';
+    const teamIssue: LinearIssue = { ...issue, projectId: 'project-1', teamId: 'team-1' };
+    vi.spyOn(linear, 'loadConnection').mockResolvedValue({} as never);
+    vi.spyOn(linear, 'getFreshAccessToken').mockResolvedValue('linear-token');
+    vi.spyOn(linear, 'listActiveIssues').mockResolvedValue({ issues: [teamIssue], nextCursor: null });
+
+    const page = await linear.intake.listIssues({ connection, sourceIds: [teamSourceId] });
+    expect(page.issues[0]).toMatchObject({ sourceId: teamSourceId, projectId: 'project-1' });
+
+    const listed = await linear.intake.listItems({ orgId: 'org-1', userId: 'user-1', sourceIds: [teamSourceId] });
+    expect(listed.items[0]).toMatchObject({
+      sourceId: teamSourceId,
+      metadata: { linearProjectId: 'project-1' },
+    });
+  });
+
+  it('returns projectless team issues from the generic listItems surface', async () => {
+    const linear = integration();
+    const teamSourceId = 'linear-team:team-1';
+    const projectlessTeamIssue: LinearIssue = {
+      ...issue,
+      id: 'issue-2',
+      identifier: 'ENG-99',
+      projectId: null,
+    };
+    vi.spyOn(linear, 'loadConnection').mockResolvedValue({} as never);
+    vi.spyOn(linear, 'getFreshAccessToken').mockResolvedValue('linear-token');
+    const listActiveIssues = vi
+      .spyOn(linear, 'listActiveIssues')
+      .mockResolvedValue({ issues: [projectlessTeamIssue], nextCursor: null });
+
+    const result = await linear.intake.listItems({
+      orgId: 'org-1',
+      userId: 'user-1',
+      sourceIds: [teamSourceId],
+    });
+
+    expect(listActiveIssues).toHaveBeenCalledWith('linear-token', undefined, undefined, undefined, ['team-1']);
+    expect(result.items).toEqual([
+      expect.objectContaining({ sourceId: teamSourceId, source: expect.objectContaining({ externalId: 'issue-2' }) }),
+    ]);
+  });
+  it('forwards attribution scope through the generic listItems surface', async () => {
+    const linear = integration();
+    const teamSourceId = 'linear-team:team-1';
+    const overlapping: LinearIssue = { ...issue, projectId: 'project-1', teamId: 'team-1' };
+    vi.spyOn(linear, 'loadConnection').mockResolvedValue({} as never);
+    vi.spyOn(linear, 'getFreshAccessToken').mockResolvedValue('linear-token');
+    const listActiveIssues = vi
+      .spyOn(linear, 'listActiveIssues')
+      .mockResolvedValue({ issues: [overlapping], nextCursor: null });
+
+    const result = await linear.intake.listItems({
+      orgId: 'org-1',
+      userId: 'user-1',
+      sourceIds: [teamSourceId],
+      attributionSourceIds: ['project-1', teamSourceId],
+    });
+
+    expect(listActiveIssues).toHaveBeenCalledTimes(1);
+    expect(listActiveIssues).toHaveBeenCalledWith('linear-token', undefined, undefined, undefined, ['team-1']);
+    expect(result.items).toEqual([]);
+  });
+
+  it('keeps a selected-project issue out of an earlier team page', async () => {
+    const linear = integration();
+    const overlapping: LinearIssue = { ...issue, projectId: 'project-1', teamId: 'team-1' };
+    vi.spyOn(linear, 'listActiveIssues')
+      // The project stream has not reached the overlapping issue yet.
+      .mockResolvedValueOnce({ issues: [], nextCursor: 'project-next' })
+      // The team stream sees it on this page.
+      .mockResolvedValueOnce({ issues: [overlapping], nextCursor: null });
+
+    const result = await linear.intake.listIssues({
+      connection,
+      sourceIds: ['project-1', 'linear-team:team-1'],
+    });
+
+    // The team stream is partitioned by selected projects, so the issue can
+    // only appear later under its more-specific project source.
+    expect(result.issues).toEqual([]);
+    expect(result.nextCursor).not.toBeNull();
+  });
+
+  it('uses complete attribution while fetching only the routed team source', async () => {
+    const linear = integration();
+    const teamSourceId = 'linear-team:team-1';
+    const overlapping: LinearIssue = { ...issue, projectId: 'project-1', teamId: 'team-1' };
+    const listActiveIssues = vi
+      .spyOn(linear, 'listActiveIssues')
+      .mockResolvedValue({ issues: [overlapping], nextCursor: null });
+
+    const result = await linear.intake.listIssues({
+      connection,
+      sourceIds: [teamSourceId],
+      attributionSourceIds: ['project-1', teamSourceId],
+    });
+
+    expect(listActiveIssues).toHaveBeenCalledTimes(1);
+    expect(listActiveIssues).toHaveBeenCalledWith('linear-token', undefined, undefined, undefined, ['team-1']);
+    expect(result.issues).toEqual([]);
+  });
+
+  it('keeps one project query while binding its cursor to the selected sources', async () => {
+    const linear = integration();
+    const listActiveIssues = vi
+      .spyOn(linear, 'listActiveIssues')
+      .mockResolvedValueOnce({ issues: [issue], nextCursor: 'next' })
+      .mockResolvedValueOnce({ issues: [issue], nextCursor: null });
+
+    const first = await linear.intake.listIssues({ connection, sourceIds: ['project-1', 'project-2'] });
+    const second = await linear.intake.listIssues({
+      connection,
+      sourceIds: ['project-1', 'project-2'],
+      cursor: first.nextCursor!,
+    });
+
+    expect(listActiveIssues).toHaveBeenNthCalledWith(
+      1,
+      'linear-token',
+      undefined,
+      ['project-1', 'project-2'],
+      undefined,
+    );
+    expect(listActiveIssues).toHaveBeenNthCalledWith(2, 'linear-token', 'next', ['project-1', 'project-2'], undefined);
+    expect(first.nextCursor).toEqual(expect.any(String));
+    expect(second.nextCursor).toBeNull();
+
+    await expect(
+      linear.intake.listIssues({
+        connection,
+        sourceIds: ['project-1', 'project-3'],
+        cursor: first.nextCursor!,
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_cursor' });
+    await expect(
+      linear.intake.listIssues({
+        connection,
+        sourceIds: ['project-1', 'project-2'],
+        attributionSourceIds: ['project-1', 'project-2', 'project-3'],
+        cursor: first.nextCursor!,
+      }),
+    ).rejects.toMatchObject({ code: 'invalid_cursor' });
+    expect(listActiveIssues).toHaveBeenCalledTimes(2);
+  });
+
+  it('fetches issue details without a project', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              data: {
+                issue: {
+                  id: 'issue-1',
+                  identifier: 'ENG-42',
+                  title: 'Fix intake',
+                  description: 'Issue body',
+                  url: 'https://linear.app/acme/issue/ENG-42',
+                  priorityLabel: 'High',
+                  createdAt: '2026-07-01T00:00:00Z',
+                  updatedAt: '2026-07-02T00:00:00Z',
+                  state: { name: 'Todo', type: 'unstarted' },
+                  project: null,
+                  assignee: { name: 'Ada' },
+                  creator: { name: 'Grace' },
+                  team: { key: 'ENG' },
+                  labels: { nodes: [{ name: 'bug' }] },
+                  comments: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
+                },
+              },
+            }),
+            { status: 200, headers: { 'content-type': 'application/json' } },
+          ),
+      ),
+    );
+
+    await expect(integration().fetchIssueDetail('linear-token', 'ENG-42')).resolves.toMatchObject({
+      id: 'issue-1',
+      projectId: null,
+      identifier: 'ENG-42',
+      title: 'Fix intake',
+    });
+  });
+
+  it('fetches issue details and creates comments through the shared Intake contract', async () => {
+    const linear = integration();
+    const detail: LinearIssueDetail = {
+      ...issue,
+      description: 'Issue body',
+      comments: [{ author: 'Grace', body: 'Looking now', createdAt: '2026-07-03T00:00:00Z' }],
+    };
+    vi.spyOn(linear, 'fetchIssueDetail').mockResolvedValue(detail);
+    vi.spyOn(linear, 'createIssueComment').mockResolvedValue({
+      id: 'comment-1',
+      url: 'https://linear.app/acme/issue/ENG-42#comment-comment-1',
+    });
+
+    await expect(linear.intake.getIssue({ connection, issueId: 'ENG-42' })).resolves.toMatchObject({
+      description: 'Issue body',
+      commentCount: 1,
+      comments: [{ author: 'Grace', body: 'Looking now' }],
+    });
+    await expect(linear.intake.createComment({ connection, issueId: 'ENG-42', body: 'Done' })).resolves.toEqual({
+      id: 'comment-1',
+      url: 'https://linear.app/acme/issue/ENG-42#comment-comment-1',
+    });
+  });
+
+  it('resolves a byType target to a workflow state and issues a Linear mutation', async () => {
+    const linear = integration();
+    const detail: LinearIssueDetail = {
+      ...issue,
+      description: null,
+      comments: [],
+    };
+    vi.spyOn(linear, 'fetchIssueDetail').mockResolvedValue(detail);
+    const graphql = vi.fn(async (_url: string, init: RequestInit | undefined) => {
+      const body = JSON.parse(String(init?.body)) as { query: string; variables?: Record<string, unknown> };
+      if (body.query.includes('TeamStates')) {
+        return new Response(
+          JSON.stringify({
+            data: {
+              team: {
+                states: {
+                  nodes: [
+                    { id: 'state-todo', name: 'Todo', type: 'unstarted' },
+                    { id: 'state-done', name: 'Done', type: 'completed' },
+                  ],
+                },
+              },
+            },
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        );
+      }
+      return new Response(JSON.stringify({ data: { issueUpdate: { success: true } } }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    vi.stubGlobal('fetch', graphql);
+
+    await linear.intake.updateIssue({
+      connection,
+      issueId: 'issue-1',
+      state: { kind: 'byType', stateType: 'completed' },
+    });
+
+    const updateCall = graphql.mock.calls.find(call =>
+      String((call[1] as RequestInit).body).includes('UpdateIssueState'),
+    );
+    expect(updateCall).toBeDefined();
+    const updatePayload = JSON.parse(String((updateCall![1] as RequestInit).body)) as {
+      variables: { id: string; stateId: string };
+    };
+    expect(updatePayload.variables).toEqual({ id: 'issue-1', stateId: 'state-done' });
+  });
+
+  it('skips the mutation when the current state already matches the target', async () => {
+    const linear = integration();
+    const detail: LinearIssueDetail = { ...issue, description: null, comments: [] };
+    vi.spyOn(linear, 'fetchIssueDetail').mockResolvedValue(detail);
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            data: { team: { states: { nodes: [{ id: 'state-todo', name: 'Todo', type: 'unstarted' }] } } },
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await linear.intake.updateIssue({
+      connection,
+      issueId: 'issue-1',
+      state: { kind: 'byName', name: 'Todo' },
+    });
+    expect(result).toMatchObject({ state: 'Todo' });
+    // Only the team-states query was made — no mutation.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns null when no workflow state matches the target', async () => {
+    const linear = integration();
+    const detail: LinearIssueDetail = { ...issue, description: null, comments: [] };
+    vi.spyOn(linear, 'fetchIssueDetail').mockResolvedValue(detail);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ data: { team: { states: { nodes: [] } } } }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          }),
+      ),
+    );
+    await expect(
+      linear.intake.updateIssue({
+        connection,
+        issueId: 'issue-1',
+        state: { kind: 'byType', stateType: 'completed' },
+      }),
+    ).resolves.toBeNull();
+  });
+
+  it('rejects an installation connection instead of silently misusing it', async () => {
+    const linear = integration();
+    await expect(
+      linear.intake.listIssues({
+        connection: { type: 'app-installation', installationId: 7 },
+        sourceIds: [],
+      }),
+    ).rejects.toThrow('Linear capabilities require an OAuth connection.');
+  });
+
+  it('resolves dispatch context from the org OAuth connection with a fresh token', async () => {
+    const linear = integration();
+    vi.spyOn(linear, 'loadConnection').mockResolvedValue({ id: 'conn-1' } as never);
+    vi.spyOn(linear, 'getFreshAccessToken').mockResolvedValue('fresh-token');
+
+    await expect(
+      linear.intake.resolveIntakeDispatch!({
+        orgId: 'org-1',
+        externalSource: { type: 'issue', externalId: 'issue-uuid-1' },
+      }),
+    ).resolves.toEqual({
+      connection: { type: 'oauth', accessToken: 'fresh-token' },
+      issueId: 'issue-uuid-1',
+    });
+  });
+
+  it('returns null dispatch context for non-issue sources or missing connections', async () => {
+    const linear = integration();
+    const loadConnection = vi.spyOn(linear, 'loadConnection').mockResolvedValue(null);
+
+    await expect(
+      linear.intake.resolveIntakeDispatch!({
+        orgId: 'org-1',
+        externalSource: { type: 'pull-request', externalId: 'x' },
+      }),
+    ).resolves.toBeNull();
+    expect(loadConnection).not.toHaveBeenCalled();
+
+    await expect(
+      linear.intake.resolveIntakeDispatch!({
+        orgId: 'org-1',
+        externalSource: { type: 'issue', externalId: 'issue-uuid-1' },
+      }),
+    ).resolves.toBeNull();
+    expect(loadConnection).toHaveBeenCalledWith('org-1');
+  });
+
+  it('provides intake without claiming source-control support', () => {
+    const linear = integration();
+
+    expect(linear.id).toBe('linear');
+    expect(linear.intake).toBeDefined();
+    expect('versionControl' in linear).toBe(false);
+  });
+
+  it('throws listing every missing required field', () => {
+    expect(() => new LinearIntegration({ clientId: '', clientSecret: '' })).toThrow(/clientId, clientSecret/);
+  });
+});
+
+describe('LinearIntegration workers', () => {
+  const context = {
+    controller: {},
+    storage: {
+      generic: {},
+      sourceControl: {},
+      projects: { listAll: async () => [] },
+      intake: {},
+    },
+    runtime: { configVersion: 'test-v1', workItems: {} },
+  };
+
+  it('registers a standalone issue reconciler worker', () => {
+    const linear = integration() as unknown as {
+      workers(ctx: unknown): Array<{ name: string }>;
+    };
+
+    expect(linear.workers(context).map(worker => worker.name)).toEqual(['linear-issue-reconcile']);
+  });
+
+  it('uses the issue reconcile switch before the legacy switch', () => {
+    vi.stubEnv('MASTRACODE_LINEAR_RECONCILE_ENABLED', 'false');
+    vi.stubEnv('MASTRACODE_LINEAR_ISSUE_RECONCILE_ENABLED', 'true');
+    const linear = integration() as unknown as {
+      workers(ctx: unknown): Array<{ name: string }>;
+    };
+
+    expect(linear.workers(context).map(worker => worker.name)).toEqual(['linear-issue-reconcile']);
+  });
+
+  it('uses the issue reconcile interval before the legacy interval and falls back when invalid', () => {
+    vi.stubEnv('MASTRACODE_LINEAR_RECONCILE_INTERVAL_MS', '120000');
+    vi.stubEnv('MASTRACODE_LINEAR_ISSUE_RECONCILE_INTERVAL_MS', '60000');
+    const linear = integration() as unknown as {
+      workers(ctx: unknown): Array<{ config: { intervalMs?: number } }>;
+    };
+
+    expect(linear.workers(context)[0]?.config).toMatchObject({ intervalMs: 60000 });
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.stubEnv('MASTRACODE_LINEAR_ISSUE_RECONCILE_INTERVAL_MS', 'invalid');
+    expect(linear.workers(context)[0]?.config).toMatchObject({ intervalMs: 120000 });
+    expect(warn).toHaveBeenCalledWith(
+      '[Linear reconciliation] MASTRACODE_LINEAR_ISSUE_RECONCILE_INTERVAL_MS must be a positive integer; received "invalid".',
+    );
+  });
+
+  it('falls back from an invalid issue reconcile switch and warns', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.stubEnv('MASTRACODE_LINEAR_RECONCILE_ENABLED', 'false');
+    vi.stubEnv('MASTRACODE_LINEAR_ISSUE_RECONCILE_ENABLED', 'yes');
+    const linear = integration() as unknown as {
+      workers(ctx: unknown): Array<{ name: string }>;
+    };
+
+    expect(linear.workers(context)).toEqual([]);
+    expect(warn).toHaveBeenCalledWith(
+      '[Linear reconciliation] MASTRACODE_LINEAR_ISSUE_RECONCILE_ENABLED must be true or false; received "yes".',
+    );
+  });
+
+  it('does not register when issue reconciliation is disabled', () => {
+    vi.stubEnv('MASTRACODE_LINEAR_ISSUE_RECONCILE_ENABLED', 'false');
+    const linear = integration() as unknown as {
+      workers(ctx: unknown): Array<{ name: string }>;
+    };
+
+    expect(linear.workers(context)).toEqual([]);
+  });
+});

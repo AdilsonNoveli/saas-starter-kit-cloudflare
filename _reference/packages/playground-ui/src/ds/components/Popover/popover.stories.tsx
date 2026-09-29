@@ -1,0 +1,158 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Settings } from 'lucide-react';
+import { Button } from '../Button';
+import { Input } from '../Input';
+import { Label } from '../Label';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
+
+const meta: Meta<typeof Popover> = {
+  title: 'Feedback/Popover',
+  component: Popover,
+  parameters: {
+    layout: 'centered',
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof Popover>;
+
+export const Default: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger>Open Popover</PopoverTrigger>
+      <PopoverContent>
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="text-subheading">Dimensions</h4>
+            <p className="text-body text-muted-foreground">Set the dimensions for the layer.</p>
+          </div>
+          <div className="grid gap-2">
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="width">Width</Label>
+              <Input id="width" defaultValue="100%" className="col-span-2 h-8" />
+            </div>
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="height">Height</Label>
+              <Input id="height" defaultValue="25px" className="col-span-2 h-8" />
+            </div>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  ),
+};
+
+/** The trigger is a design-system Button: `variant`, `size` and `tooltip` apply directly. */
+export const Variants: Story = {
+  render: () => (
+    <div className="grid gap-4">
+      {(['default', 'ghost', 'primary'] as const).map(variant => (
+        <div key={variant} className="flex items-center gap-2">
+          {(['sm', 'md', 'lg'] as const).map(size => (
+            <Popover key={size}>
+              <PopoverTrigger variant={variant} size={size}>
+                {variant} / {size}
+              </PopoverTrigger>
+              <PopoverContent>
+                <p className="text-body">Popover content.</p>
+              </PopoverContent>
+            </Popover>
+          ))}
+          <Popover>
+            <PopoverTrigger variant={variant} size="icon-md" tooltip="Settings">
+              <Settings />
+            </PopoverTrigger>
+            <PopoverContent>
+              <p className="text-body">Popover content.</p>
+            </PopoverContent>
+          </Popover>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+/** Pass `render` to project the popover behavior onto your own element; `variant`/`size` are then ignored. */
+export const CustomRender: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger render={<Button size="md">Open Popover</Button>} />
+      <PopoverContent>
+        <p className="text-body">Popover content.</p>
+      </PopoverContent>
+    </Popover>
+  ),
+};
+
+export const WithIconTrigger: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger variant="ghost" size="icon-md" tooltip="Settings">
+        <Settings />
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="text-subheading">Settings</h4>
+            <p className="text-body text-muted-foreground">Manage your preferences.</p>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  ),
+};
+
+export const AlignStart: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger>Align Start</PopoverTrigger>
+      <PopoverContent align="start">
+        <p className="text-body">This popover is aligned to the start.</p>
+      </PopoverContent>
+    </Popover>
+  ),
+};
+
+export const AlignEnd: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger>Align End</PopoverTrigger>
+      <PopoverContent align="end">
+        <p className="text-body">This popover is aligned to the end.</p>
+      </PopoverContent>
+    </Popover>
+  ),
+};
+
+export const SideTop: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger>Open Above</PopoverTrigger>
+      <PopoverContent side="top">
+        <p className="text-body">This popover opens above the trigger.</p>
+      </PopoverContent>
+    </Popover>
+  ),
+};
+
+export const SideRight: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger>Open Right</PopoverTrigger>
+      <PopoverContent side="right">
+        <p className="text-body">This popover opens to the right.</p>
+      </PopoverContent>
+    </Popover>
+  ),
+};
+
+export const SimpleText: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger variant="ghost">?</PopoverTrigger>
+      <PopoverContent className="w-60">
+        <p className="text-body text-foreground">This is helpful information about the feature.</p>
+      </PopoverContent>
+    </Popover>
+  ),
+};

@@ -1,1 +1,0 @@
-export const DEFAULT_PRODUCT_STATUS_ORDER = 1;

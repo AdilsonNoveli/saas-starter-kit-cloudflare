@@ -1,0 +1,463 @@
+/**
+ * GitHub Copilot OAuth Provider
+ *
+ * Uses OAuth tokens from AuthStorage to authenticate with GitHub Copilot's chat API.
+ * The Copilot API speaks an OpenAI-compatible chat format, so we plug
+ * `@ai-sdk/openai-compatible` into Copilot's API URL and use a custom fetch to inject
+ * the bearer token and Copilot-specific headers.
+ *
+ * Inspired by:
+ *   - opencode: https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/plugin/github-copilot/copilot.ts
+ *   - pi-mono:  https://github.com/badlogic/pi-mono/blob/main/packages/ai/src/utils/oauth/github-copilot.ts
+ */
+
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import type { MastraModelConfig } from '@mastra/core/llm';
+import type { JSONSchema7 } from '@mastra/schema-compat';
+import { applyCompatLayer, GoogleSchemaCompatLayer } from '@mastra/schema-compat';
+import { wrapLanguageModel } from 'ai';
+import type { LanguageModelMiddleware } from 'ai';
+import { ProviderAuthRequiredError } from '../auth/provider-auth-error.js';
+import { COPILOT_HEADERS, fetchCopilotModels, getGitHubCopilotBaseUrl } from '../auth/providers/github-copilot.js';
+import type { CopilotModelEntry, GitHubCopilotCredentials } from '../auth/providers/github-copilot.js';
+import { AuthStorage } from '../auth/storage.js';
+import type { CredentialStore, OAuthCredential } from '../auth/types.js';
+
+const COPILOT_PROVIDER_ID = 'github-copilot';
+
+// Singleton auth storage instance (shared with claude-max.ts / openai-codex.ts when not overridden).
+let authStorageInstance: AuthStorage | null = null;
+
+/** Get or create the shared AuthStorage instance. */
+export function getAuthStorage(): AuthStorage {
+  if (!authStorageInstance) {
+    authStorageInstance = new AuthStorage();
+  }
+  return authStorageInstance;
+}
+
+/** Set a custom AuthStorage instance (useful for tests / TUI integration). */
+export function setAuthStorage(storage: AuthStorage | undefined): void {
+  authStorageInstance = storage ?? null;
+}
+
+/**
+ * Heuristic: did this request come from the agent (e.g. tool result follow-ups) rather
+ * than a fresh user turn? Mirrors opencode's `isAgent` logic — Copilot bills these
+ * differently via the `x-initiator` header.
+ */
+function detectIsAgent(body: unknown): boolean {
+  if (!body || typeof body !== 'object') return false;
+  const obj = body as Record<string, unknown>;
+
+  const messages = obj.messages;
+  if (Array.isArray(messages) && messages.length > 0) {
+    const last = messages[messages.length - 1] as { role?: string; content?: unknown };
+    if (last?.role && last.role !== 'user') return true;
+    if (Array.isArray(last?.content)) {
+      // If the last user turn carries any tool_result parts, treat it as an agent turn.
+      const hasToolResult = last.content.some(
+        (part: unknown) => part && typeof part === 'object' && (part as { type?: string }).type === 'tool_result',
+      );
+      if (hasToolResult) return true;
+    }
+  }
+
+  const input = obj.input;
+  if (Array.isArray(input) && input.length > 0) {
+    const last = input[input.length - 1] as { role?: string };
+    if (last?.role && last.role !== 'user') return true;
+  }
+
+  return false;
+}
+
+/** Detect image/vision content in a request body. */
+function detectIsVision(body: unknown): boolean {
+  if (!body || typeof body !== 'object') return false;
+  const obj = body as Record<string, unknown>;
+
+  const matchPart = (part: unknown): boolean => {
+    if (!part || typeof part !== 'object') return false;
+    const t = (part as { type?: string }).type;
+    return t === 'image' || t === 'image_url' || t === 'input_image';
+  };
+
+  const messages = obj.messages;
+  if (Array.isArray(messages)) {
+    return messages.some(
+      (msg: unknown) =>
+        msg &&
+        typeof msg === 'object' &&
+        Array.isArray((msg as { content?: unknown }).content) &&
+        ((msg as { content: unknown[] }).content as unknown[]).some(matchPart),
+    );
+  }
+
+  const input = obj.input;
+  if (Array.isArray(input)) {
+    return input.some(
+      (item: unknown) =>
+        item &&
+        typeof item === 'object' &&
+        Array.isArray((item as { content?: unknown }).content) &&
+        ((item as { content: unknown[] }).content as unknown[]).some(matchPart),
+    );
+  }
+
+  return false;
+}
+
+/**
+ * Build a fetch wrapper that authenticates with GitHub Copilot OAuth.
+ *
+ * - Injects the short-lived Copilot bearer token (auto-refreshed by AuthStorage).
+ * - Adds the VS Code-like Copilot headers required by the API.
+ * - Rewrites the request URL onto the per-token API base when `rewriteUrl` is true.
+ */
+export function buildGitHubCopilotOAuthFetch(
+  opts: { authStorage?: CredentialStore; rewriteUrl?: boolean } = {},
+): typeof fetch {
+  return (async (url: string | URL | Request, init?: Parameters<typeof fetch>[1]) => {
+    const { headers: initHeaders, ...requestInit } = init ?? {};
+    const request = new Request(url, requestInit);
+    const storage = opts.authStorage ?? getAuthStorage();
+    storage.reload();
+
+    const cred = storage.get(COPILOT_PROVIDER_ID);
+    if (!cred || cred.type !== 'oauth') {
+      throw new ProviderAuthRequiredError('Not logged in to GitHub Copilot.');
+    }
+
+    let accessToken: string | undefined;
+    let activeCred: OAuthCredential | undefined;
+    if (storage.getOAuthCredential) {
+      activeCred = await storage.getOAuthCredential(COPILOT_PROVIDER_ID);
+      accessToken = activeCred?.access;
+    } else {
+      accessToken = await storage.getApiKey(COPILOT_PROVIDER_ID);
+      storage.reload();
+      const reloaded = storage.get(COPILOT_PROVIDER_ID);
+      activeCred = reloaded?.type === 'oauth' ? { ...reloaded, access: accessToken ?? reloaded.access } : undefined;
+    }
+    if (!accessToken || !activeCred) {
+      throw new ProviderAuthRequiredError('Failed to refresh the GitHub Copilot token.');
+    }
+    const enterpriseUrl = (activeCred as GitHubCopilotCredentials).enterpriseUrl;
+
+    let parsedBody: unknown;
+    try {
+      const body = await request.clone().text();
+      parsedBody = body ? JSON.parse(body) : undefined;
+    } catch {
+      parsedBody = undefined;
+    }
+    const isAgent = detectIsAgent(parsedBody);
+    const isVision = detectIsVision(parsedBody);
+
+    const headers = new Headers(url instanceof Request ? url.headers : undefined);
+    if (initHeaders) new Headers(initHeaders).forEach((value, key) => headers.set(key, value));
+    headers.delete('authorization');
+    headers.delete('x-api-key');
+    headers.set('Authorization', `Bearer ${accessToken}`);
+    headers.set('x-initiator', isAgent ? 'agent' : 'user');
+    headers.set('Openai-Intent', 'conversation-edits');
+    if (isVision) {
+      headers.set('Copilot-Vision-Request', 'true');
+    }
+    for (const [key, value] of Object.entries(COPILOT_HEADERS)) {
+      // Only set if caller didn't already provide it (allow overrides for tests).
+      if (!headers.has(key)) {
+        headers.set(key, value);
+      }
+    }
+
+    const finalUrl =
+      opts.rewriteUrl !== false ? rewriteToCopilotBase(request, accessToken, enterpriseUrl) : new URL(request.url);
+
+    const body = request.method === 'GET' || request.method === 'HEAD' ? undefined : request.body;
+    const finalRequest = new Request(finalUrl, {
+      method: request.method,
+      headers,
+      body,
+      signal: request.signal,
+      redirect: request.redirect,
+      integrity: request.integrity,
+      ...(body ? ({ duplex: 'half' } as RequestInit) : {}),
+    });
+    try {
+      return await fetch(finalRequest);
+    } catch (error) {
+      if (error && typeof error === 'object') {
+        Object.assign(error as Record<string, unknown>, {
+          requestUrl: finalUrl.toString(),
+        });
+      }
+      throw error;
+    }
+  }) as typeof fetch;
+}
+
+function rewriteToCopilotBase(url: string | URL | Request, token: string, enterpriseDomain?: string): URL {
+  const original = url instanceof URL ? url : new URL(typeof url === 'string' ? url : (url as Request).url);
+  const base = new URL(getGitHubCopilotBaseUrl(token, enterpriseDomain));
+  // Copilot's OpenAI-compatible API serves endpoints at the root of the base host
+  // (`/chat/completions`, `/responses`, `/models`, ...) — not under a `/v1/` prefix
+  // like api.openai.com does. The @ai-sdk/openai default baseURL is
+  // `https://api.openai.com/v1`, so the SDK builds requests like
+  // `https://api.openai.com/v1/chat/completions`. Strip the leading `/v1` segment
+  // when rewriting onto the Copilot base or Copilot will return 404 Not Found.
+  const pathname = original.pathname.replace(/^\/v1(\/|$)/, '/');
+  return new URL(`${pathname}${original.search}`, base);
+}
+
+function isGeminiModel(modelId: string): boolean {
+  return modelId.startsWith('gemini-');
+}
+
+function applyGeminiSchemaCompatToTools(modelId: string, tools: unknown): unknown {
+  if (!Array.isArray(tools)) {
+    return tools;
+  }
+
+  const compatLayer = new GoogleSchemaCompatLayer({
+    provider: COPILOT_PROVIDER_ID,
+    modelId,
+    supportsStructuredOutputs: false,
+  });
+
+  return tools.map(tool => {
+    if (!tool || typeof tool !== 'object' || (tool as { type?: unknown }).type !== 'function') {
+      return tool;
+    }
+
+    const functionTool = tool as { inputSchema?: JSONSchema7 };
+    if (!functionTool.inputSchema) {
+      return tool;
+    }
+
+    return {
+      ...functionTool,
+      inputSchema: applyCompatLayer({
+        schema: functionTool.inputSchema,
+        compatLayers: [compatLayer],
+        mode: 'aiSdkSchema',
+      }).jsonSchema as JSONSchema7,
+    };
+  });
+}
+
+/** Middleware that prevents sending parameters Copilot's endpoint rejects. */
+function createCopilotMiddleware(modelId: string): LanguageModelMiddleware {
+  return {
+    specificationVersion: 'v3',
+    transformParams: async ({ params }) => {
+      if (params.temperature !== undefined && params.temperature !== null) {
+        delete params.topP;
+      }
+
+      if (isGeminiModel(modelId)) {
+        (params as { tools?: unknown }).tools = applyGeminiSchemaCompatToTools(
+          modelId,
+          (params as { tools?: unknown }).tools,
+        );
+      }
+
+      return params;
+    },
+  };
+}
+
+/**
+ * Creates a model that talks to GitHub Copilot using OAuth credentials.
+ *
+ * Copilot's `/chat/completions` endpoint is OpenAI-compatible, but GitHub Copilot
+ * is not OpenAI. Use the generic OpenAI-compatible adapter with Copilot's base URL
+ * instead of the OpenAI provider plus URL rewriting.
+ */
+export function githubCopilotProvider(
+  modelId: string = 'gpt-4.1',
+  options?: { headers?: Record<string, string>; authStorage?: CredentialStore },
+): MastraModelConfig {
+  const headers = options?.headers;
+  const copilot = createOpenAICompatible({
+    name: COPILOT_PROVIDER_ID,
+    baseURL: 'https://api.githubcopilot.com',
+    apiKey: process.env.NODE_ENV === 'test' || process.env.VITEST ? 'test-api-key' : 'oauth-placeholder',
+    headers,
+    fetch:
+      process.env.NODE_ENV === 'test' || process.env.VITEST
+        ? undefined
+        : (buildGitHubCopilotOAuthFetch({ rewriteUrl: false, authStorage: options?.authStorage }) as any),
+  });
+
+  return wrapLanguageModel({
+    model: copilot.chatModel(modelId),
+    middleware: [createCopilotMiddleware(modelId)],
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Live model catalog
+// ---------------------------------------------------------------------------
+
+/**
+ * Hard-coded fallback advertised when the live `/models` request fails (network
+ * down, expired token, etc.). Keep this conservative because the live catalog is
+ * the source of truth for the user's currently-enabled Copilot models.
+ *
+ * Available across all paid Copilot tiers and free of premium-request charges.
+ */
+const COPILOT_FALLBACK_MODELS: CopilotModelEntry[] = [
+  {
+    id: 'gpt-4.1',
+    name: 'GPT-4.1',
+    vendor: 'OpenAI',
+    supportedEndpoints: ['/chat/completions'],
+    isAnthropicShaped: false,
+    supportsVision: true,
+    supportsToolCalls: true,
+  },
+];
+
+const CATALOG_TTL_MS = 10 * 60 * 1000;
+const CATALOG_FAILURE_TTL_MS = 60 * 1000;
+const CATALOG_FETCH_TIMEOUT_MS = 5_000;
+
+interface CatalogCacheEntry {
+  fetchedAt: number;
+  ttl: number;
+  models: CopilotModelEntry[];
+}
+
+const catalogCache = new Map<string, CatalogCacheEntry>();
+const inflightFetches = new Map<string, Promise<CopilotModelEntry[]>>();
+
+/**
+ * Resolve the account identity for a credential read through `getApiKey`, which
+ * may await a refresh with a rotation landing inside it. The registry is
+ * consulted on both sides of that await, and only an id that survived it names
+ * the account that produced the token: an id that moved describes whichever
+ * account is active *now*, so trusting it would file this fetch's models under
+ * the wrong account and serve them to it. Unidentified is the safe answer — the
+ * caller then skips the TTL cache, exactly as it does when the store exposes no
+ * registry at all. (`AuthStorage` never needs this: its snapshots name their
+ * account.)
+ */
+function readStableAccountId(storage: CredentialStore, idBeforeToken: string | undefined): string | undefined {
+  const idAfterToken = storage.getActiveAccount?.(COPILOT_PROVIDER_ID)?.id;
+  return idBeforeToken !== undefined && idBeforeToken === idAfterToken ? idAfterToken : undefined;
+}
+
+/** Reset the in-process Copilot catalog cache (test seam, also useful after logout). */
+export function clearCopilotCatalogCache(): void {
+  catalogCache.clear();
+  inflightFetches.clear();
+}
+
+/**
+ * Return the user's currently-available Copilot models.
+ *
+ * - Returns `[]` when the user is not logged in to GitHub Copilot.
+ * - Returns the cached list when a recent fetch succeeded.
+ * - On the cache-miss / expired path, fetches `/models` with a 5s timeout, filters
+ *   to picker-enabled and non-policy-disabled models, then caches for 10 minutes.
+ * - On fetch failure, returns a small hard-coded fallback (so packs still work
+ *   offline) and caches that for 1 minute to avoid hammering the API.
+ *
+ * Concurrent calls during a fetch share the inflight promise.
+ */
+export async function getCopilotModelCatalog(
+  opts: { authStorage?: CredentialStore } = {},
+): Promise<CopilotModelEntry[]> {
+  const storage = opts.authStorage ?? getAuthStorage();
+
+  // Resolve one coherent credential snapshot before consulting the cache so a
+  // token can never be paired with another account's enterprise endpoint.
+  // `getOAuthCredential` is optional (deployed stores have no local registry),
+  // so fall back to the always-present `getApiKey`, taking any enterprise
+  // endpoint from the same slot via `get()`.
+  let accessToken: string | undefined;
+  let accountInstanceId: string | undefined;
+  let enterpriseUrl: string | undefined;
+  if (storage.getOAuthCredential) {
+    const credential = await storage.getOAuthCredential(COPILOT_PROVIDER_ID);
+    if (!credential || credential.type !== 'oauth') return [];
+    accessToken = credential.access;
+    // A snapshot that names its account is coherent by construction — the store
+    // read the identity and the token in the same breath. One that does not
+    // cannot be attributed to a registry entry we then read afterwards, because
+    // a rotation may have landed in between; leave it unnamed so the caller
+    // skips the TTL cache instead of guessing. (`AuthStorage` always stamps.)
+    accountInstanceId = credential.accountInstanceId;
+    enterpriseUrl = (credential as GitHubCopilotCredentials).enterpriseUrl;
+  } else {
+    // This store republishes its registry but not the OAuth snapshot API, so the
+    // identity has to come from the registry. `getApiKey` may await a refresh and
+    // a rotation can land inside it, so bracket the fetch: only an id that held
+    // still names the account that produced this token.
+    const idBeforeToken = storage.getActiveAccount?.(COPILOT_PROVIDER_ID)?.id;
+    accessToken = await storage.getApiKey(COPILOT_PROVIDER_ID);
+    if (!accessToken) return [];
+    accountInstanceId = readStableAccountId(storage, idBeforeToken);
+    const stored = storage.get(COPILOT_PROVIDER_ID);
+    if (stored?.type === 'oauth') {
+      enterpriseUrl = (stored as GitHubCopilotCredentials).enterpriseUrl;
+    }
+    // The id is non-secret, and keying per account is what keeps entitlements
+    // (per account, per `github-copilot-catalog.test.ts`) from leaking across a
+    // rotation. Deriving the key from the token is what `cba11389e7` removed.
+  }
+  const baseUrl = getGitHubCopilotBaseUrl(accessToken, enterpriseUrl);
+  // No identity means the store cannot name the account it just served, so the
+  // TTL cache cannot be keyed per account — one entry would outlive the request
+  // and serve those models to every other account of the store. The in-flight
+  // map is no safer: two callers that resolved *different* accounts of an
+  // unnamed store would otherwise collide on one key and share whichever
+  // catalog was fetched first. So both caches are identified-only, and an
+  // unnamed store pays one `/models` request per call.
+  const credentialKey = accountInstanceId === undefined ? undefined : `${accountInstanceId}\0${baseUrl}`;
+  const dedupeKey = credentialKey;
+
+  const now = Date.now();
+  const cached = credentialKey ? catalogCache.get(credentialKey) : undefined;
+  if (cached && now - cached.fetchedAt < cached.ttl) return cached.models;
+
+  const existingFetch = dedupeKey === undefined ? undefined : inflightFetches.get(dedupeKey);
+  if (existingFetch) return existingFetch;
+
+  const fetchPromise = (async (): Promise<CopilotModelEntry[]> => {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), CATALOG_FETCH_TIMEOUT_MS);
+      try {
+        const models = await fetchCopilotModels({
+          baseUrl,
+          bearerToken: accessToken,
+          signal: controller.signal,
+        });
+        if (credentialKey) catalogCache.set(credentialKey, { fetchedAt: Date.now(), ttl: CATALOG_TTL_MS, models });
+        return models;
+      } finally {
+        clearTimeout(timer);
+      }
+    } catch (error) {
+      if (credentialKey) {
+        catalogCache.set(credentialKey, {
+          fetchedAt: Date.now(),
+          ttl: CATALOG_FAILURE_TTL_MS,
+          models: COPILOT_FALLBACK_MODELS,
+        });
+      }
+      console.warn(
+        'Failed to fetch live GitHub Copilot models, using fallback list:',
+        error instanceof Error ? error.message : error,
+      );
+      return COPILOT_FALLBACK_MODELS;
+    } finally {
+      if (dedupeKey !== undefined) inflightFetches.delete(dedupeKey);
+    }
+  })();
+  if (dedupeKey !== undefined) inflightFetches.set(dedupeKey, fetchPromise);
+  return fetchPromise;
+}

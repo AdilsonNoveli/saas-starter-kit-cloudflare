@@ -1,0 +1,48 @@
+import type { ProcessStep } from './shared';
+import { Spinner } from '@/ds/components/Spinner';
+import { transitions } from '@/ds/primitives/transitions';
+import { cn } from '@/lib/utils';
+
+export type ProcessStepProgressBarProps = {
+  steps: ProcessStep[];
+};
+
+export function ProcessStepProgressBar({ steps }: ProcessStepProgressBarProps) {
+  const totalSteps = steps.length;
+  const completedSteps = steps.filter(step => step.status === 'success').length;
+
+  return (
+    <div className="flex w-full flex-col content-center justify-center gap-4">
+      <div className="grid w-full grid-cols-[0_repeat(9,1fr)]">
+        {steps.map((step: ProcessStep, idx: number) => {
+          return (
+            <div
+              key={step.id}
+              className={cn('relative flex h-8 items-center justify-end', transitions.colors, {
+                'bg-accent1Dark': step.status === 'success' && steps?.[idx - 1]?.status === 'success',
+              })}
+            >
+              <div
+                className={cn(
+                  'absolute right-0 z-10 flex size-8 translate-x-1/2 items-center justify-center self-center rounded-full bg-fill text-column text-muted-foreground motion-reduce:transition-none',
+                  transitions.colors,
+                  transitions.transform,
+                  {
+                    'border border-dashed border-placeholder': step.status === 'pending',
+                    'scale-110 bg-accent1Dark text-notice-success-fg': step.status === 'success',
+                    'scale-110 bg-accent2Dark text-notice-destructive-fg': step.status === 'failed',
+                  },
+                )}
+              >
+                {step.status === 'running' ? <Spinner /> : idx + 1}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className={cn('text-center text-caption text-muted-foreground', transitions.colors)}>
+        {completedSteps} of {totalSteps} steps completed
+      </div>
+    </div>
+  );
+}

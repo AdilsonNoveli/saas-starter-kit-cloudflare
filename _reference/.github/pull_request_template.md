@@ -1,25 +1,24 @@
-## Summary
+## Description
 
-<!-- Explain what changed, why it is needed, and any important failure modes or tradeoffs. -->
+<!-- Required: Provide a brief description of the changes in this PR. -->
 
-## Verification
+## Related issue(s)
 
-<!-- List the exact checks you ran and their results. -->
+<!-- Required: Link to the issue(s) this PR addresses, e.g. with: Fixes #123. PRs without linked issues will be closed. High-quality issues with reproductions are preferred to vague pull requests. -->
 
-## AI Disclosure
+## Type of change
 
-<!-- Select exactly one authorship option, then acknowledge the policy. -->
+- [ ] Bug fix (non-breaking change that fixes an issue)
+- [ ] New feature (non-breaking change that adds functionality)
+- [ ] Breaking change (fix or feature that would cause existing functionality to change)
+- [ ] Documentation update
+- [ ] Code refactoring
+- [ ] Performance improvement
+- [ ] Test update
 
-- [ ] This pull request was written entirely by a human
-- [ ] This pull request was written with AI assistance and reviewed and edited by a human
-- [ ] I have read the [AI Policy](https://github.com/letta-ai/letta-code/blob/main/AI_POLICY.md) and agree to its terms
+## Checklist
 
-## AI Tool(s) Used
-
-<!-- List every AI tool used to research, write, or modify this pull request. If none were used, enter: None -->
-
-## Human Verification
-
-<!-- Copy the following phrase exactly, without the surrounding comment:
-I have reviewed and understand every change in this pull request and take responsibility for its correctness.
--->
+- [ ] I have linked the related issue(s) in the description above
+- [ ] I have made corresponding changes to the documentation (if applicable)
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] I have addressed all Coderabbit comments on this PR

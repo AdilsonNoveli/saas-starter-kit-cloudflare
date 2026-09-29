@@ -1,0 +1,513 @@
+import { getErrorFromUnknown } from '@mastra/core/error';
+import type { TracingOptions } from '@mastra/core/observability';
+import type { RequestContext } from '@mastra/core/request-context';
+import type { Body, RouteResponse } from '../route-types.generated.js';
+import type { ClientOptions, WorkflowRunResult, StreamVNextChunkType, TimeTravelParams } from '../types';
+
+import { parseClientRequestContext } from '../utils';
+import { createRecordSeparatorJsonTransform } from '../utils/stream-transforms';
+import { BaseResource } from './base';
+
+/**
+ * Deserializes the error property in a workflow result back to an Error instance.
+ * Server sends SerializedError (plain object), client converts to Error for instanceof checks.
+ */
+function deserializeWorkflowError<T extends WorkflowRunResult>(result: T): T {
+  if (result.status === 'failed' && result.error) {
+    result.error = getErrorFromUnknown(result.error, {
+      fallbackMessage: 'Unknown workflow error',
+      supportSerialization: false,
+    });
+  }
+  return result;
+}
+
+type WorkflowStartParams = Omit<Body<'POST /workflows/:workflowId/start'>, 'inputData' | 'requestContext'> & {
+  inputData: Record<string, any>;
+  requestContext?: RequestContext | Record<string, any>;
+};
+type WorkflowResumeParams = Omit<Body<'POST /workflows/:workflowId/resume'>, 'resumeData' | 'requestContext'> & {
+  resumeData?: Record<string, any>;
+  requestContext?: RequestContext | Record<string, any>;
+};
+
+export class Run extends BaseResource {
+  constructor(
+    options: ClientOptions,
+    private workflowId: string,
+    public readonly runId: string,
+  ) {
+    super(options);
+  }
+
+  private createChunkTransformStream<T = StreamVNextChunkType>(): TransformStream<ArrayBuffer, T> {
+    return createRecordSeparatorJsonTransform<T>();
+  }
+
+  /**
+   * Cancels a specific workflow run by its ID
+   * @returns Promise containing a success message
+   * @deprecated Use `cancel()` instead
+   */
+  cancelRun(): Promise<RouteResponse<'POST /workflows/:workflowId/runs/:runId/cancel'>> {
+    return this.request(`/workflows/${this.workflowId}/runs/${encodeURIComponent(this.runId)}/cancel`, {
+      method: 'POST',
+    });
+  }
+
+  /**
+   * Cancels a workflow run.
+   *
+   * This method aborts any running steps and updates the workflow status to 'canceled' .
+   * It works for both actively running workflows and suspended/waiting workflows.
+   *
+   * ## How cancellation works
+   *
+   * When called, the workflow will:
+   * 1. **Trigger the abort signal** - Uses the standard Web API AbortSignal to notify running steps
+   * 2. **Prevent subsequent steps** - No further steps will be executed
+   *
+   * ## Abort signal behavior
+   *
+   * Steps that check the `abortSignal` parameter can respond to cancellation:
+   * - Steps can listen to the 'abort' event: `abortSignal.addEventListener('abort', callback)`
+   * - Steps can check if already aborted: `if (abortSignal.aborted) { ... }`
+   * - Useful for canceling timeouts, network requests, or long-running operations
+   *
+   * **Note:** Steps must actively check the abort signal to be canceled mid-execution.
+   * Steps that don't check the signal will run to completion, but subsequent steps won't execute.
+   *
+   * @returns Promise that resolves with `{ message: 'Workflow run canceled' }` when cancellation succeeds
+   * @throws {HTTPException} 400 - If workflow ID or run ID is missing
+   * @throws {HTTPException} 404 - If workflow or workflow run is not found
+   *
+   * @example
+   * ```typescript
+   * const run = await workflow.createRun({ runId: 'run-123' });
+   * await run.cancel();
+   * // Returns: { message: 'Workflow run canceled' }
+   * ```
+   *
+   * @example
+   * ```typescript
+   * // Example of a step that responds to cancellation
+   * const step = createStep({
+   *   id: 'long-running-step',
+   *   execute: async ({ inputData, abortSignal, abort }) => {
+   *     const timeout = new Promise((resolve) => {
+   *       const timer = setTimeout(() => resolve('done'), 10000);
+   *
+   *       // Clean up if canceled
+   *       abortSignal.addEventListener('abort', () => {
+   *         clearTimeout(timer);
+   *         resolve('canceled');
+   *       });
+   *     });
+   *
+   *     const result = await timeout;
+   *
+   *     // Check if aborted after async operation
+   *     if (abortSignal.aborted) {
+   *       return abort(); // Stop execution
+   *     }
+   *
+   *     return { result };
+   *   }
+   * });
+   * ```
+   */
+  cancel(): Promise<RouteResponse<'POST /workflows/:workflowId/runs/:runId/cancel'>> {
+    return this.request(`/workflows/${this.workflowId}/runs/${encodeURIComponent(this.runId)}/cancel`, {
+      method: 'POST',
+    });
+  }
+
+  /**
+   * Starts a workflow run synchronously without waiting for the workflow to complete
+   * @param params - Object containing the inputData, initialState and requestContext
+   * @returns Promise containing success message
+   */
+  start(params: WorkflowStartParams): Promise<RouteResponse<'POST /workflows/:workflowId/start'>> {
+    const requestContext = parseClientRequestContext(params.requestContext);
+    return this.request(`/workflows/${this.workflowId}/start?runId=${encodeURIComponent(this.runId)}`, {
+      method: 'POST',
+      body: {
+        inputData: params?.inputData,
+        initialState: params?.initialState,
+        requestContext,
+        tracingOptions: params.tracingOptions,
+        perStep: params.perStep,
+      },
+    });
+  }
+
+  /**
+   * Resumes a suspended workflow step synchronously without waiting for the workflow to complete
+   * @param params - Object containing the step, resumeData and requestContext
+   * @returns Promise containing success message
+   */
+  resume({
+    step,
+    resumeData,
+    tracingOptions,
+    perStep,
+    forEachIndex,
+    ...rest
+  }: WorkflowResumeParams): Promise<RouteResponse<'POST /workflows/:workflowId/resume'>> {
+    const requestContext = parseClientRequestContext(rest.requestContext);
+    return this.request(`/workflows/${this.workflowId}/resume?runId=${encodeURIComponent(this.runId)}`, {
+      method: 'POST',
+      body: {
+        step,
+        resumeData,
+        requestContext,
+        tracingOptions,
+        perStep,
+        forEachIndex,
+      },
+    });
+  }
+
+  /**
+   * Starts a workflow run asynchronously and returns a promise that resolves when the workflow is complete
+   * @param params - Object containing the inputData, initialState and requestContext
+   * @returns Promise containing the workflow execution results
+   */
+  startAsync(
+    params: Omit<Body<'POST /workflows/:workflowId/start-async'>, 'requestContext'> & {
+      requestContext?: RequestContext | Record<string, any>;
+    },
+  ): Promise<WorkflowRunResult> {
+    const searchParams = new URLSearchParams();
+
+    searchParams.set('runId', this.runId);
+
+    const requestContext = parseClientRequestContext(params.requestContext);
+
+    return this.request<RouteResponse<'POST /workflows/:workflowId/start-async'>>(
+      `/workflows/${this.workflowId}/start-async?${searchParams.toString()}`,
+      {
+        method: 'POST',
+        body: {
+          inputData: params.inputData,
+          initialState: params.initialState,
+          requestContext,
+          tracingOptions: params.tracingOptions,
+          resourceId: params.resourceId,
+          perStep: params.perStep,
+        },
+      },
+    ).then(result => deserializeWorkflowError(result as WorkflowRunResult));
+  }
+
+  /**
+   * Starts a workflow run and returns a stream
+   * @param params - Object containing the inputData, initialState and requestContext
+   * @returns Promise containing the workflow execution results
+   */
+  async stream(params: {
+    inputData: Record<string, any>;
+    initialState?: Record<string, any>;
+    requestContext?: RequestContext | Record<string, any>;
+    tracingOptions?: TracingOptions;
+    resourceId?: string;
+    perStep?: boolean;
+    closeOnSuspend?: boolean;
+  }): Promise<globalThis.ReadableStream<StreamVNextChunkType>> {
+    const searchParams = new URLSearchParams();
+
+    searchParams.set('runId', this.runId);
+
+    const requestContext = parseClientRequestContext(params.requestContext);
+    const response: Response = await this.request(`/workflows/${this.workflowId}/stream?${searchParams.toString()}`, {
+      method: 'POST',
+      body: {
+        inputData: params.inputData,
+        initialState: params.initialState,
+        requestContext,
+        tracingOptions: params.tracingOptions,
+        resourceId: params.resourceId,
+        perStep: params.perStep,
+        closeOnSuspend: params.closeOnSuspend,
+      },
+      stream: true,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to stream workflow: ${response.statusText}`);
+    }
+
+    if (!response.body) {
+      throw new Error('Response body is null');
+    }
+
+    // Pipe the response body through the transform stream
+    return response.body.pipeThrough(this.createChunkTransformStream());
+  }
+
+  /**
+   * Observe (reconnect to) an existing workflow stream.
+   * Use this to resume receiving events after a disconnection.
+   *
+   * @param params.offset - Optional position to resume from (0-based). If omitted, replays all events.
+   * @returns Promise containing a ReadableStream of workflow events
+   *
+   * @example
+   * ```typescript
+   * // Reconnect to a workflow stream from a specific position
+   * const stream = await run.observe({ offset: 42 });
+   *
+   * for await (const event of stream) {
+   *   console.log('Received:', event);
+   * }
+   * ```
+   */
+  async observe(params?: { offset?: number }): Promise<globalThis.ReadableStream<StreamVNextChunkType>> {
+    const searchParams = new URLSearchParams();
+    searchParams.set('runId', this.runId);
+    if (params?.offset !== undefined) {
+      searchParams.set('offset', String(params.offset));
+    }
+
+    const response: Response = await this.request(`/workflows/${this.workflowId}/observe?${searchParams.toString()}`, {
+      method: 'POST',
+      stream: true,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to observe workflow stream: ${response.statusText}`);
+    }
+
+    if (!response.body) {
+      throw new Error('Response body is null');
+    }
+
+    // Pipe the response body through the transform stream
+    return response.body.pipeThrough(this.createChunkTransformStream());
+  }
+
+  /**
+   * Observes workflow stream for a workflow run
+   * @deprecated Use `observe()` instead for better control over replay position
+   * @returns Promise containing the workflow execution results
+   */
+  async observeStream() {
+    return this.observe();
+  }
+
+  /**
+   * Resumes a suspended workflow step asynchronously and returns a promise that resolves when the workflow is complete
+   * @param params - Object containing the step, resumeData and requestContext
+   * @returns Promise containing the workflow resume results
+   */
+  resumeAsync(
+    params: Omit<Body<'POST /workflows/:workflowId/resume-async'>, 'requestContext'> & {
+      requestContext?: RequestContext | Record<string, any>;
+    },
+  ): Promise<WorkflowRunResult> {
+    const requestContext = parseClientRequestContext(params.requestContext);
+    return this.request<RouteResponse<'POST /workflows/:workflowId/resume-async'>>(
+      `/workflows/${this.workflowId}/resume-async?runId=${encodeURIComponent(this.runId)}`,
+      {
+        method: 'POST',
+        body: {
+          step: params.step,
+          resumeData: params.resumeData,
+          requestContext,
+          tracingOptions: params.tracingOptions,
+          perStep: params.perStep,
+          forEachIndex: params.forEachIndex,
+        },
+      },
+    ).then(result => deserializeWorkflowError(result as WorkflowRunResult));
+  }
+
+  /**
+   * Resumes a suspended workflow step without waiting for the workflow to complete (fire-and-forget)
+   * and returns immediately with the runId. The workflow continues executing in the background.
+   *
+   * Use this when you want to dispatch a resume and return immediately (e.g. an HTTP handler that
+   * never needs the resolved result inline). For Inngest-backed workflows this also avoids the
+   * `getRunOutput()` polling race that `resumeAsync()` can hit.
+   *
+   * TODO(v2): in Mastra v2 this fire-and-forget behavior should become the behavior of
+   * `resumeAsync()` (to mirror `start`/`resume` fire-and-forget semantics), and this method
+   * should be removed. Kept as a separate method in v1 to avoid a breaking contract change.
+   *
+   * @param params - Object containing the step, resumeData and requestContext
+   * @returns Promise containing the runId of the resumed workflow run
+   */
+  resumeNoWait(params: WorkflowResumeParams): Promise<RouteResponse<'POST /workflows/:workflowId/resume-no-wait'>> {
+    const requestContext = parseClientRequestContext(params.requestContext);
+    return this.request(`/workflows/${this.workflowId}/resume-no-wait?runId=${encodeURIComponent(this.runId)}`, {
+      method: 'POST',
+      body: {
+        step: params.step,
+        resumeData: params.resumeData,
+        requestContext,
+        tracingOptions: params.tracingOptions,
+        perStep: params.perStep,
+        forEachIndex: params.forEachIndex,
+      },
+    });
+  }
+
+  /**
+   * Resumes a suspended workflow step that uses stream asynchronously and returns a promise that resolves when the workflow is complete
+   * @param params - Object containing the step, resumeData and requestContext
+   * @returns Promise containing the workflow resume results
+   */
+  async resumeStream(params: {
+    step?: string | string[];
+    resumeData?: Record<string, any>;
+    requestContext?: RequestContext | Record<string, any>;
+    tracingOptions?: TracingOptions;
+    perStep?: boolean;
+    forEachIndex?: number;
+  }): Promise<globalThis.ReadableStream<StreamVNextChunkType>> {
+    const searchParams = new URLSearchParams();
+    searchParams.set('runId', this.runId);
+    const requestContext = parseClientRequestContext(params.requestContext);
+    const response: Response = await this.request(
+      `/workflows/${this.workflowId}/resume-stream?${searchParams.toString()}`,
+      {
+        method: 'POST',
+        body: {
+          step: params.step,
+          resumeData: params.resumeData,
+          requestContext,
+          tracingOptions: params.tracingOptions,
+          perStep: params.perStep,
+          forEachIndex: params.forEachIndex,
+        },
+        stream: true,
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to stream vNext workflow: ${response.statusText}`);
+    }
+
+    if (!response.body) {
+      throw new Error('Response body is null');
+    }
+
+    // Pipe the response body through the transform stream
+    return response.body.pipeThrough(this.createChunkTransformStream());
+  }
+
+  /**
+   * Restarts an active workflow run synchronously without waiting for the workflow to complete
+   * @param params - Object containing the requestContext
+   * @returns Promise containing success message
+   */
+  restart(
+    params: Omit<Body<'POST /workflows/:workflowId/restart'>, 'requestContext'> & {
+      requestContext?: RequestContext | Record<string, any>;
+    },
+  ): Promise<RouteResponse<'POST /workflows/:workflowId/restart'>> {
+    const requestContext = parseClientRequestContext(params.requestContext);
+    return this.request(`/workflows/${this.workflowId}/restart?runId=${encodeURIComponent(this.runId)}`, {
+      method: 'POST',
+      body: {
+        requestContext,
+        tracingOptions: params.tracingOptions,
+      },
+    });
+  }
+
+  /**
+   * Restarts an active workflow run asynchronously
+   * @param params - optional object containing the requestContext
+   * @returns Promise containing the workflow restart results
+   */
+  restartAsync(
+    params?: Omit<Body<'POST /workflows/:workflowId/restart-async'>, 'requestContext'> & {
+      requestContext?: RequestContext | Record<string, any>;
+    },
+  ): Promise<WorkflowRunResult> {
+    const requestContext = parseClientRequestContext(params?.requestContext);
+    return this.request<RouteResponse<'POST /workflows/:workflowId/restart-async'>>(
+      `/workflows/${this.workflowId}/restart-async?runId=${encodeURIComponent(this.runId)}`,
+      {
+        method: 'POST',
+        body: {
+          requestContext,
+          tracingOptions: params?.tracingOptions,
+        },
+      },
+    ).then(result => deserializeWorkflowError(result as WorkflowRunResult));
+  }
+
+  /**
+   * Time travels a workflow run synchronously without waiting for the workflow to complete
+   * @param params - Object containing the step, inputData, resumeData, initialState, context, nestedStepsContext, requestContext and tracingOptions
+   * @returns Promise containing success message
+   */
+  timeTravel({
+    requestContext: paramsRequestContext,
+    ...params
+  }: TimeTravelParams): Promise<RouteResponse<'POST /workflows/:workflowId/time-travel'>> {
+    const requestContext = parseClientRequestContext(paramsRequestContext);
+    return this.request(`/workflows/${this.workflowId}/time-travel?runId=${encodeURIComponent(this.runId)}`, {
+      method: 'POST',
+      body: {
+        ...params,
+        requestContext,
+      },
+    });
+  }
+
+  /**
+   * Time travels a workflow run asynchronously
+   * @param params - Object containing the step, inputData, resumeData, initialState, context, nestedStepsContext, requestContext and tracingOptions
+   * @returns Promise containing the workflow time travel results
+   */
+  timeTravelAsync({ requestContext: paramsRequestContext, ...params }: TimeTravelParams): Promise<WorkflowRunResult> {
+    const requestContext = parseClientRequestContext(paramsRequestContext);
+    return this.request<RouteResponse<'POST /workflows/:workflowId/time-travel-async'>>(
+      `/workflows/${this.workflowId}/time-travel-async?runId=${encodeURIComponent(this.runId)}`,
+      {
+        method: 'POST',
+        body: {
+          ...params,
+          requestContext,
+        },
+      },
+    ).then(result => deserializeWorkflowError(result as WorkflowRunResult));
+  }
+
+  /**
+   * Time travels a workflow run and returns a stream
+   * @param params - Object containing the step, inputData, resumeData, initialState, context, nestedStepsContext, requestContext and tracingOptions
+   * @returns Promise containing the workflow execution results
+   */
+  async timeTravelStream({
+    requestContext: paramsRequestContext,
+    ...params
+  }: TimeTravelParams): Promise<globalThis.ReadableStream<StreamVNextChunkType>> {
+    const requestContext = parseClientRequestContext(paramsRequestContext);
+    const response: Response = await this.request(
+      `/workflows/${this.workflowId}/time-travel-stream?runId=${encodeURIComponent(this.runId)}`,
+      {
+        method: 'POST',
+        body: {
+          ...params,
+          requestContext,
+        },
+        stream: true,
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to time travel workflow: ${response.statusText}`);
+    }
+
+    if (!response.body) {
+      throw new Error('Response body is null');
+    }
+
+    // Pipe the response body through the transform stream
+    return response.body.pipeThrough(this.createChunkTransformStream());
+  }
+}

@@ -1,0 +1,66 @@
+import React from 'react';
+import { cn } from '@/lib/utils';
+
+export interface MainHeaderRootProps {
+  children?: React.ReactNode;
+  title?: string | 'loading';
+  description?: string | 'loading';
+  icon?: React.ReactNode;
+  withMargins?: boolean;
+  className?: string;
+}
+
+export function MainHeaderRoot({
+  children,
+  title,
+  description,
+  icon,
+  className,
+  withMargins = true,
+}: MainHeaderRootProps) {
+  const titleIsLoading = title === 'loading';
+  const descriptionIsLoading = description === 'loading';
+
+  return children ? (
+    <header
+      className={cn(
+        'grid w-full grid-cols-[1fr_auto] gap-8',
+        {
+          'mt-6 mb-4': withMargins,
+        },
+        className,
+      )}
+    >
+      {children}
+    </header>
+  ) : (
+    <header className={cn('grid gap-1 py-3', className)}>
+      <h1
+        className={cn(
+          'flex items-center gap-2 text-heading text-foreground',
+          '[&>svg]:size-6 [&>svg]:text-muted-foreground',
+          {
+            'w-60 max-w-[50%] animate-pulse rounded-md bg-muted': titleIsLoading,
+          },
+        )}
+      >
+        {titleIsLoading ? (
+          <>&nbsp;</>
+        ) : (
+          <>
+            {icon && icon} {title}
+          </>
+        )}
+      </h1>
+      {description && (
+        <p
+          className={cn('m-0 text-caption text-muted-foreground', {
+            'w-[40rem] max-w-[80%] animate-pulse rounded-md bg-muted': descriptionIsLoading,
+          })}
+        >
+          {descriptionIsLoading ? <>&nbsp;</> : description}
+        </p>
+      )}
+    </header>
+  );
+}

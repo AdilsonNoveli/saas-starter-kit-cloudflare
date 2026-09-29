@@ -1,0 +1,130 @@
+import type { RequestOptions, ClientOptions } from '../types';
+import { MastraClientError } from '../types';
+import { mergeAbortSignals, normalizeRoutePath } from '../utils';
+
+export class BaseResource {
+  readonly options: ClientOptions;
+  protected readonly apiPrefix: string;
+
+  constructor(options: ClientOptions) {
+    this.options = options;
+    this.apiPrefix = normalizeRoutePath(options.apiPrefix ?? '/api');
+  }
+
+  /**
+   * Makes an HTTP request to the API with retries and exponential backoff
+   * @param path - The API endpoint path (without prefix, e.g., '/agents')
+   * @param options - Optional request configuration
+   * @returns Promise containing the response data
+   */
+  public async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    let lastError: Error | null = null;
+    const {
+      baseUrl,
+      retries: defaultRetries = 3,
+      backoffMs = 100,
+      maxBackoffMs = 1000,
+      headers = {},
+      credentials,
+      fetch: customFetch,
+    } = this.options;
+    const { retries: requestRetries, ...fetchOptions } = options;
+    const retries = requestRetries ?? defaultRetries;
+    if (!Number.isSafeInteger(retries) || retries < 0) {
+      throw new RangeError('retries must be a non-negative safe integer');
+    }
+    const signal = mergeAbortSignals(this.options.abortSignal, fetchOptions.signal);
+    const fetchFn = customFetch || fetch;
+
+    let delay = backoffMs;
+
+    const fullPath = `${this.apiPrefix}${path}`;
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      if (signal?.aborted) {
+        throw signal.reason ?? new DOMException('This operation was aborted', 'AbortError');
+      }
+      try {
+        const response = await fetchFn(`${baseUrl.replace(/\/$/, '')}${fullPath}`, {
+          ...fetchOptions,
+          headers: {
+            ...(fetchOptions.body &&
+            !(fetchOptions.body instanceof FormData) &&
+            (fetchOptions.method === 'POST' ||
+              fetchOptions.method === 'PUT' ||
+              fetchOptions.method === 'PATCH' ||
+              fetchOptions.method === 'DELETE')
+              ? { 'content-type': 'application/json' }
+              : {}),
+            ...headers,
+            ...fetchOptions.headers,
+            // TODO: Bring this back once we figure out what we/users need to do to make this work with cross-origin requests
+            // 'x-mastra-client-type': 'js',
+          },
+          signal,
+          credentials: fetchOptions.credentials ?? credentials,
+          body:
+            fetchOptions.body instanceof FormData
+              ? fetchOptions.body
+              : fetchOptions.body
+                ? JSON.stringify(fetchOptions.body)
+                : undefined,
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.text();
+          let parsedBody: unknown;
+          let errorMessage = `HTTP error! status: ${response.status}`;
+          try {
+            parsedBody = JSON.parse(errorBody);
+            errorMessage += ` - ${JSON.stringify(parsedBody)}`;
+          } catch {
+            if (errorBody) {
+              errorMessage += ` - ${errorBody}`;
+            }
+          }
+          throw new MastraClientError(response.status, response.statusText, errorMessage, parsedBody);
+        }
+
+        if (options.stream) {
+          return response as unknown as T;
+        }
+
+        const data = await response.json();
+        return data as T;
+      } catch (error) {
+        lastError = error as Error;
+
+        // Aborted requests must not be retried
+        if (signal?.aborted || (error as Error)?.name === 'AbortError') {
+          throw error;
+        }
+
+        // Don't retry 4xx client errors or 501 Not Implemented - they won't resolve with retries
+        const status = (error as Error & { status?: number }).status;
+        if (status !== undefined && ((status >= 400 && status < 500) || status === 501)) {
+          throw error;
+        }
+
+        if (attempt === retries) {
+          break;
+        }
+
+        await new Promise<void>((resolve, reject) => {
+          const timer = setTimeout(() => {
+            signal?.removeEventListener('abort', onAbort);
+            resolve();
+          }, delay);
+          const onAbort = () => {
+            clearTimeout(timer);
+            reject(signal?.reason ?? new DOMException('This operation was aborted', 'AbortError'));
+          };
+          signal?.addEventListener('abort', onAbort, { once: true });
+        });
+        delay = Math.min(delay * 2, maxBackoffMs);
+      }
+    }
+
+    throw lastError || new Error('Request failed');
+  }
+}

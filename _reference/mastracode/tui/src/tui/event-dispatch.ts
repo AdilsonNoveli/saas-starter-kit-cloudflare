@@ -1,0 +1,696 @@
+/**
+ * Event dispatcher: maps AgentControllerEvent types to extracted handler functions.
+ */
+import { getCurrentGitBranchAsync } from '@mastra/code-sdk/utils/project';
+import type {
+  AgentControllerEvent,
+  AgentControllerThread,
+  MastraDBMessage,
+  MastraMessagePart,
+} from '@mastra/core/agent-controller';
+import type { TaskItemSnapshot } from '@mastra/core/signals';
+import type { AskUserSelectionMode } from '@mastra/core/tools';
+
+import { acceptBackgroundActivity, getBackgroundActivitiesForTarget } from './background-activity.js';
+import { getBackgroundToolMetadata } from './background-tool-result.js';
+import {
+  handleAgentStart,
+  handleAgentEnd,
+  handleAgentAborted,
+  handleAgentError,
+  handleGoalEvaluation,
+  handleMessageStart,
+  handleMessageUpdate,
+  handlePackFallbackState,
+  handleMessageEnd,
+  handleOMObservationStart,
+  handleOMObservationEnd,
+  handleOMReflectionStart,
+  handleOMReflectionEnd,
+  handleOMFailed,
+  handleOMBufferingStart,
+  handleOMBufferingEnd,
+  handleOMBufferingFailed,
+  handleOMActivation,
+  handleOMThreadTitleUpdated,
+  handleAskQuestion,
+  handleSandboxAccessRequest,
+  handlePlanApproval,
+  handleSubagentStart,
+  handleSubagentToolStart,
+  handleSubagentToolEnd,
+  handleSubagentEnd,
+  handleToolApprovalRequired,
+  handleToolStart,
+  handleToolUpdate,
+  handleCommandExit,
+  handleShellOutput,
+  handleToolInputStart,
+  handleToolInputDelta,
+  handleToolInputEnd,
+  handleToolEnd,
+  clearPendingShellOutputs,
+  clearToolInputParsers,
+} from './handlers/index.js';
+import type { EventHandlerContext } from './handlers/types.js';
+import { flushRender } from './render-scheduler.js';
+import type { TUIState } from './state.js';
+import { getGithubPrSubscriptionsFromMetadata } from './state.js';
+import { isEventRoutedToCurrentThread } from './thread-routing.js';
+import { setCurrentThreadTitle } from './thread-title.js';
+
+/**
+ * Dispatch a AgentControllerEvent to the appropriate handler.
+ */
+function trackInteractivePrompt(
+  ectx: EventHandlerContext,
+  promptType: string,
+  properties?: Record<string, unknown>,
+): void {
+  ectx.analytics?.trackInteractivePrompt(promptType, properties);
+}
+
+function isMessageForCurrentThread(message: MastraDBMessage, state: TUIState): boolean {
+  if (state.pendingNewThread) return !message.threadId;
+  return !message.threadId || message.threadId === state.session.thread.getId();
+}
+
+const threadLifecycleGenerations = new WeakMap<TUIState, number>();
+
+export function getThreadLifecycleGeneration(state: TUIState): number {
+  return threadLifecycleGenerations.get(state) ?? 0;
+}
+
+function beginThreadLifecycle(state: TUIState, threadId: string): (() => boolean) | undefined {
+  if (threadId !== state.session.thread.getId()) return undefined;
+
+  const generation = (threadLifecycleGenerations.get(state) ?? 0) + 1;
+  threadLifecycleGenerations.set(state, generation);
+  return () => threadLifecycleGenerations.get(state) === generation && state.session.thread.getId() === threadId;
+}
+
+async function clearThreadState(state: TUIState, isCurrent: () => boolean): Promise<boolean> {
+  const updates = { tasks: [], activePlan: null, sandboxAllowedPaths: [] };
+  if (state.session.state.setIf) {
+    return state.session.state.setIf(updates, isCurrent);
+  }
+  if (!isCurrent()) return false;
+  await state.session.state.set(updates);
+  return isCurrent();
+}
+
+function applyMessageUpdate(
+  message: MastraDBMessage,
+  update: Extract<AgentControllerEvent, { type: 'message_update' }>['event'],
+): MastraDBMessage | undefined {
+  if (message.role !== 'assistant' || typeof message.content === 'string') return undefined;
+
+  const parts = [...message.content.parts];
+  if (update.type === 'text-delta') {
+    const textIndex = parts.findLastIndex(part => part.type === 'text');
+    const textPart = parts[textIndex];
+    if (!textPart || textPart.type !== 'text') return undefined;
+    parts[textIndex] = { ...textPart, text: textPart.text + update.delta };
+  } else if (update.type === 'reasoning-delta') {
+    const reasoningPart = parts[update.index];
+    if (!reasoningPart || reasoningPart.type !== 'reasoning') return undefined;
+    const reasoning = reasoningPart.reasoning + update.delta;
+    parts[update.index] = { ...reasoningPart, reasoning, details: [{ type: 'text', text: reasoning }] };
+  } else {
+    parts[update.index] = update.part;
+  }
+
+  return { ...message, content: { ...message.content, parts } };
+}
+
+/**
+ * Providers sometimes hold a whole response and send it at once after generating it,
+ * so it arrives within a few milliseconds and its generation time is unobservable.
+ * Such steps keep the last reading instead of dividing by the delivery time.
+ */
+const MIN_DECODE_WINDOW_SEC = 0.05;
+
+/** An empty thinking or text block: the model has started generating it. */
+function isGenerationBlockStart(
+  part: MastraMessagePart | undefined,
+): part is Extract<MastraMessagePart, { type: 'text' | 'reasoning' }> {
+  if (part?.type === 'text') return part.text === '';
+  if (part?.type === 'reasoning') {
+    return part.reasoning === '' && part.details.every(detail => detail.type !== 'text' || detail.text === '');
+  }
+  return false;
+}
+
+/**
+ * Opens the step's decode window when a block starts generating rather than at its first
+ * delta: providers can hold a block and deliver it in one late burst (notably summarized
+ * thinking), which would otherwise divide the whole block by milliseconds. The window is
+ * bound to the assistant message, so a step whose usage never arrived cannot leave its
+ * interval open over the next step. Tool arguments stream before their step's
+ * message_start, so they carry the message id; unstamped ones (older servers) keep the
+ * current window.
+ */
+function markGenerationStart(state: TUIState, messageId: string | undefined, isReasoning: boolean, now = Date.now()) {
+  if (messageId !== undefined && state.decodeMessageId !== messageId) {
+    state.decodeMessageId = messageId;
+    state.decodeStartedAt = now;
+    state.decodeLastDeltaAt = 0;
+    state.decodeHasReasoning = isReasoning;
+    return;
+  }
+  if (state.decodeStartedAt === 0) state.decodeStartedAt = now;
+  // Thinking can start after the window opened on text; the window measured it, so
+  // usage_update must not subtract it as if it had never streamed.
+  if (isReasoning) state.decodeHasReasoning = true;
+}
+
+export async function dispatchEvent(
+  event: AgentControllerEvent,
+  ectx: EventHandlerContext,
+  state: TUIState,
+): Promise<void> {
+  // Tool events carry the thread that produced them; a call parked on a detached
+  // thread must not drive the current thread's UI.
+  if (!isEventRoutedToCurrentThread(event, state)) {
+    return;
+  }
+
+  switch (event.type) {
+    case 'agent_start':
+      clearToolInputParsers();
+      clearPendingShellOutputs();
+      // Reset tokens/sec at the start of a new turn (not at the end) so the
+      // last turn's reading stays visible while idle — short single-step turns
+      // would otherwise zero it before it could be read.
+      state.tokensPerSec = 0;
+      state.decodeMessageId = undefined;
+      state.decodeStartedAt = 0;
+      state.decodeLastDeltaAt = 0;
+      state.decodeHasReasoning = false;
+      state.agentRunStartedAt = Date.now();
+      state.agentRunLastStreamPartAt = state.agentRunStartedAt;
+      state.lastAgentRunDurationMs = undefined;
+      state.lastAgentRunEndedAt = undefined;
+      state.lastAgentRunEndReason = undefined;
+      ectx.updateStatusLine();
+      handleAgentStart(ectx);
+      break;
+
+    case 'agent_end':
+      // Keep tokensPerSec as the last turn's reading while idle.
+      state.decodeMessageId = undefined;
+      state.decodeStartedAt = 0;
+      state.decodeLastDeltaAt = 0;
+      state.decodeHasReasoning = false;
+      if (state.agentRunStartedAt !== undefined) {
+        const now = Date.now();
+        state.lastAgentRunDurationMs = Math.max(0, now - state.agentRunStartedAt);
+        state.lastAgentRunEndedAt = now;
+        state.lastAgentRunEndReason = event.reason === 'aborted' || event.reason === 'error' ? event.reason : 'done';
+        state.agentRunStartedAt = undefined;
+        state.agentRunLastStreamPartAt = undefined;
+      }
+      ectx.updateStatusLine();
+      if (event.reason === 'aborted') {
+        clearPendingShellOutputs();
+        handleAgentAborted(ectx);
+      } else if (event.reason === 'error') {
+        clearPendingShellOutputs();
+        handleAgentError(ectx);
+      } else {
+        handleAgentEnd(ectx);
+      }
+      break;
+
+    case 'message_start':
+      if (isMessageForCurrentThread(event.message, state)) {
+        // The first thinking or text block of a message arrives inside its message_start.
+        const firstPart = event.message.content.parts.at(-1);
+        if (event.message.role === 'assistant' && isGenerationBlockStart(firstPart)) {
+          markGenerationStart(state, event.message.id, firstPart.type === 'reasoning');
+        }
+        handleMessageStart(ectx, event.message);
+      }
+      break;
+
+    case 'message_update': {
+      const message = state.streamingMessage;
+      if (!message || message.id !== event.id || !isMessageForCurrentThread(message, state)) break;
+
+      const updated = applyMessageUpdate(message, event.event);
+      if (!updated) break;
+
+      // Measure streamed generation, including thinking, but never replayed tool results.
+      if (event.event.type === 'part' && isGenerationBlockStart(event.event.part)) {
+        markGenerationStart(state, event.id, event.event.part.type === 'reasoning');
+      } else if (
+        (event.event.type === 'text-delta' || event.event.type === 'reasoning-delta') &&
+        event.event.delta.length > 0
+      ) {
+        const now = Date.now();
+        state.agentRunLastStreamPartAt = now;
+        markGenerationStart(state, event.id, event.event.type === 'reasoning-delta', now);
+        state.decodeLastDeltaAt = now;
+        ectx.updateStatusLine();
+      }
+      handleMessageUpdate(ectx, updated);
+      break;
+    }
+
+    case 'message_end':
+      if (state.streamingMessage?.id === event.id && isMessageForCurrentThread(state.streamingMessage, state)) {
+        handleMessageEnd(ectx, state.streamingMessage);
+      }
+      break;
+
+    case 'tool_start':
+      state.agentRunLastStreamPartAt = Date.now();
+      if (state.options.backgroundToolsEnabled) {
+        const threadId = event.threadId ?? state.session.thread.getId();
+        if (threadId) {
+          state.backgroundToolContexts.set(event.toolCallId, {
+            toolName: event.toolName,
+            resourceId: state.session.identity.getResourceId(),
+            threadId,
+            createdAt: Date.now(),
+          });
+        }
+      }
+      handleToolStart(ectx, event.toolCallId, event.toolName, event.args);
+      break;
+
+    case 'tool_approval_required':
+      trackInteractivePrompt(ectx, 'tool_approval_required', {
+        toolName: event.toolName,
+        // The producer's thread id, not the session's: they only differ if the
+        // call belongs to a detached thread, which the routing guard drops.
+        threadId: event.threadId ?? state.session.thread.getId(),
+        resourceId: state.session.identity.getResourceId(),
+      });
+      handleToolApprovalRequired(ectx, event.toolCallId, event.toolName, event.args);
+      break;
+
+    case 'tool_update':
+      state.agentRunLastStreamPartAt = Date.now();
+      handleToolUpdate(ectx, event.toolCallId, event.partialResult);
+      break;
+
+    case 'shell_output':
+      state.agentRunLastStreamPartAt = Date.now();
+      handleShellOutput(ectx, event.toolCallId, event.output, event.stream);
+      break;
+
+    case 'command_exit':
+      handleCommandExit(ectx, event.toolCallId, event.exitCode, event.success);
+      break;
+
+    case 'tool_input_start':
+      if (event.toolName === 'ask_user' || event.toolName === 'request_access' || event.toolName === 'submit_plan') {
+        trackInteractivePrompt(ectx, event.toolName, {
+          toolName: event.toolName,
+          threadId: state.session.thread.getId(),
+          resourceId: state.session.identity.getResourceId(),
+        });
+      }
+      markGenerationStart(state, event.messageId, false);
+      handleToolInputStart(ectx, event.toolCallId, event.toolName);
+      break;
+
+    case 'tool_input_delta':
+      // Display processors may transform argsTextDelta to a non-string payload.
+      if (typeof event.argsTextDelta === 'string') {
+        if (event.argsTextDelta.length > 0) {
+          const now = Date.now();
+          markGenerationStart(state, event.messageId, false, now);
+          state.decodeLastDeltaAt = now;
+        }
+        handleToolInputDelta(ectx, event.toolCallId, event.argsTextDelta);
+      }
+      break;
+
+    case 'tool_input_end':
+      handleToolInputEnd(ectx, event.toolCallId);
+      break;
+
+    case 'tool_end': {
+      state.agentRunLastStreamPartAt = Date.now();
+      if (state.options.backgroundToolsEnabled) {
+        const background = getBackgroundToolMetadata(event.providerMetadata);
+        const taskId = !event.isError && background?.status === 'running' ? background.taskId : undefined;
+        const context = state.backgroundToolContexts.get(event.toolCallId);
+        if (taskId && context) {
+          acceptBackgroundActivity(state.backgroundActivities, taskId, event.toolCallId, context);
+          state.backgroundToolContexts.delete(event.toolCallId);
+          state.globalBackgroundNotice.setActivities(
+            getBackgroundActivitiesForTarget(
+              state.backgroundActivities,
+              state.session.identity.getResourceId(),
+              state.pendingNewThread ? null : state.session.thread.getId(),
+            ),
+          );
+          flushRender(state);
+        }
+        if (!taskId) state.backgroundToolContexts.delete(event.toolCallId);
+      }
+      handleToolEnd(ectx, event.toolCallId, event.result, event.isError, event.providerMetadata);
+      break;
+    }
+
+    case 'info':
+      ectx.showInfo(event.message);
+      break;
+
+    case 'error':
+      ectx.showFormattedError(event);
+      break;
+
+    case 'mode_changed':
+      await ectx.refreshModelAuthStatus();
+      break;
+
+    case 'model_changed':
+      await ectx.refreshModelAuthStatus();
+      break;
+
+    case 'thread_changed': {
+      const isCurrent = beginThreadLifecycle(state, event.threadId);
+      if (!isCurrent) break;
+
+      ectx.showInfo(`Switched to thread: ${event.threadId}`);
+      state.latestRequestPromptTokens = undefined;
+      state.backgroundToolContexts?.clear();
+      // Clear per-thread ephemeral state first so renderExistingMessages
+      // and other downstream observers see clean state.
+      if (!(await clearThreadState(state, isCurrent))) break;
+      state.previousPlanSnapshot = undefined;
+      if (state.taskProgress) {
+        state.taskProgress.updateTasks([]);
+        flushRender(state);
+      }
+      state.taskToolInsertIndex = -1;
+      await ectx.renderExistingMessages(isCurrent);
+      if (!isCurrent()) break;
+      await state.controller.loadOMProgress(state.session, isCurrent);
+      if (!isCurrent()) break;
+      // Refresh git branch async so TUI status line reflects the current branch
+      getCurrentGitBranchAsync(state.projectInfo.rootPath).then(freshBranch => {
+        if (freshBranch && isCurrent()) {
+          state.projectInfo.gitBranch = freshBranch;
+          ectx.updateStatusLine();
+        }
+      });
+      // Update current thread title for status line display
+      const threads = await state.session.thread.list();
+      if (!isCurrent()) break;
+      const currentThread = threads.find((t: AgentControllerThread) => t.id === event.threadId);
+      if (currentThread) {
+        setCurrentThreadTitle(state, currentThread.title);
+        const metadata = currentThread.metadata as Record<string, unknown> | undefined;
+        state.activeGithubPrSubscriptions = getGithubPrSubscriptionsFromMetadata(metadata);
+        state.githubPrPollingActive = false;
+        state.githubPrGradientAnimator?.stop();
+        // Load the objective from the durable ThreadState slot, falling back to
+        // the legacy thread-metadata goal for pre-migration threads.
+        await state.goalManager.loadFromThread(state, isCurrent);
+        if (!isCurrent()) break;
+        if (!state.goalManager.getGoal()) {
+          state.goalManager.loadFromThreadMetadata(metadata);
+        }
+      }
+      break;
+    }
+
+    case 'thread_created': {
+      const isCurrent = beginThreadLifecycle(state, event.thread.id);
+      if (!isCurrent) break;
+
+      ectx.showInfo(`Created thread: ${event.thread.id}`);
+      state.latestRequestPromptTokens = undefined;
+      state.backgroundToolContexts?.clear();
+      // Update current thread title for status line display
+      setCurrentThreadTitle(state, event.thread.title);
+      state.activeGithubPrSubscriptions = getGithubPrSubscriptionsFromMetadata(
+        event.thread.metadata as Record<string, unknown> | undefined,
+      );
+      state.githubPrPollingActive = false;
+      state.githubPrGradientAnimator?.stop();
+      // If /goal started without an existing thread, save that pending goal to the
+      // newly-created thread. Otherwise load the thread's own goal metadata so goals
+      // do not bleed into unrelated new threads.
+      const shouldPersistPendingGoal = state.goalManager?.consumePersistOnNextThreadCreate() ?? false;
+      if (shouldPersistPendingGoal) {
+        state.goalManager?.saveToThread(state).catch(() => {});
+      } else {
+        state.goalManager?.loadFromThreadMetadata(event.thread.metadata as Record<string, unknown> | undefined);
+      }
+      // Sync inherited resource-level settings
+      const tState = state.session.state.get() as any;
+      if (typeof tState?.escapeAsCancel === 'boolean') {
+        state.editor.escapeEnabled = tState.escapeAsCancel;
+      }
+      // Clear per-thread ephemeral state so new threads start clean.
+      if (!(await clearThreadState(state, isCurrent))) break;
+      state.previousPlanSnapshot = undefined;
+      if (state.taskProgress) {
+        state.taskProgress.updateTasks([]);
+      }
+      state.taskToolInsertIndex = -1;
+      break;
+    }
+
+    case 'usage_update': {
+      // Token accumulation handled by AgentController display state. Keep the
+      // latest step separate for context auditing; cumulative usage is billing data.
+      state.latestRequestPromptTokens = event.usage.promptTokens ?? 0;
+      // Provider output already includes reasoning. Measure only streamed generation,
+      // not initial waiting, tool execution, or usage delivery.
+      const completionTokens = event.usage.completionTokens ?? 0;
+      const reportedReasoning = event.usage.reasoningTokens ?? 0;
+      // Thinking that never streamed has no observable duration, so measure the output
+      // we did see rather than dividing hidden tokens by a text-only window.
+      const stepTokens =
+        reportedReasoning > 0 && !state.decodeHasReasoning ? completionTokens - reportedReasoning : completionTokens;
+      const decodeSec = (state.decodeLastDeltaAt - state.decodeStartedAt) / 1000;
+      if (state.decodeStartedAt > 0 && decodeSec >= MIN_DECODE_WINDOW_SEC && stepTokens > 0) {
+        const instantaneous = stepTokens / decodeSec;
+        const alpha = 0.3;
+        const ema = state.tokensPerSec > 0 ? alpha * instantaneous + (1 - alpha) * state.tokensPerSec : instantaneous;
+        state.tokensPerSec = Math.round(ema);
+      }
+      state.decodeMessageId = undefined;
+      state.decodeStartedAt = 0;
+      state.decodeLastDeltaAt = 0;
+      state.decodeHasReasoning = false;
+      ectx.updateStatusLine();
+      state.ui.requestRender();
+      break;
+    }
+
+    // Observational Memory events
+    case 'om_status':
+      // All state updates handled by AgentController applyDisplayStateUpdate
+      break;
+
+    case 'om_observation_start':
+      handleOMObservationStart(ectx, event.cycleId, event.tokensToObserve);
+      break;
+
+    case 'om_observation_end':
+      handleOMObservationEnd(
+        ectx,
+        event.cycleId,
+        event.durationMs,
+        event.tokensObserved,
+        event.observationTokens,
+        event.observations,
+        event.currentTask,
+        event.suggestedResponse,
+      );
+      break;
+
+    case 'om_observation_failed':
+      handleOMFailed(ectx, event.cycleId, event.error, 'observation');
+      break;
+
+    case 'om_reflection_start':
+      handleOMReflectionStart(ectx, event.cycleId, event.tokensToReflect);
+      break;
+
+    case 'om_reflection_end':
+      handleOMReflectionEnd(ectx, event.cycleId, event.durationMs, event.compressedTokens, event.observations);
+      break;
+
+    case 'om_reflection_failed':
+      handleOMFailed(ectx, event.cycleId, event.error, 'reflection');
+      break;
+
+    case 'om_buffering_start':
+      handleOMBufferingStart(ectx, event.operationType, event.tokensToBuffer);
+      break;
+
+    case 'om_buffering_end':
+      handleOMBufferingEnd(ectx, event.operationType, event.tokensBuffered, event.bufferedTokens, event.observations);
+      break;
+
+    case 'om_buffering_failed':
+      handleOMBufferingFailed(ectx, event.operationType, event.error);
+      break;
+
+    case 'om_activation': {
+      const activationEvent = event as Extract<AgentControllerEvent, { type: 'om_activation' }> & {
+        triggeredBy?: 'threshold' | 'ttl' | 'provider_change';
+        lastActivityAt?: number;
+        ttlExpiredMs?: number;
+        activateAfterIdle?: number;
+        previousModel?: string;
+        currentModel?: string;
+      };
+      handleOMActivation(
+        ectx,
+        activationEvent.operationType,
+        activationEvent.tokensActivated,
+        activationEvent.observationTokens,
+        activationEvent.triggeredBy,
+        activationEvent.activateAfterIdle,
+        activationEvent.ttlExpiredMs,
+        activationEvent.previousModel,
+        activationEvent.currentModel,
+      );
+      break;
+    }
+
+    case 'thread_title_updated':
+      if (event.threadId !== state.session.thread.getId()) break;
+      setCurrentThreadTitle(state, event.title);
+      ectx.updateStatusLine();
+      break;
+
+    case 'om_thread_title_updated':
+      if (event.threadId !== state.session.thread.getId()) break;
+      setCurrentThreadTitle(state, event.newTitle);
+      handleOMThreadTitleUpdated(ectx, event.newTitle, event.oldTitle);
+      ectx.updateStatusLine();
+      break;
+
+    case 'follow_up_queued': {
+      ectx.updateStatusLine();
+      break;
+    }
+
+    case 'workspace_ready':
+      // Workspace initialized successfully - silent unless verbose
+      break;
+
+    case 'workspace_error':
+      ectx.showError(`Workspace: ${event.error.message}`);
+      break;
+
+    case 'workspace_status_changed':
+      if (event.status === 'error' && event.error) {
+        ectx.showError(`Workspace: ${event.error.message}`);
+      }
+      break;
+
+    // Subagent / Task delegation events
+    case 'subagent_start':
+      handleSubagentStart(ectx, event.toolCallId, event.agentType, event.task, event.modelId, event.forked);
+      break;
+
+    case 'subagent_tool_start':
+      handleSubagentToolStart(ectx, event.toolCallId, event.subToolName, event.subToolArgs);
+      break;
+
+    case 'subagent_tool_end':
+      handleSubagentToolEnd(ectx, event.toolCallId, event.subToolName, event.subToolResult, event.isError);
+      break;
+
+    case 'subagent_text_delta':
+      // Text deltas are streamed but we don't render them incrementally
+      // (the final result is shown via tool_end for the parent tool call)
+      break;
+
+    case 'subagent_end':
+      handleSubagentEnd(ectx, event.toolCallId, event.isError, event.durationMs, event.result);
+      break;
+
+    case 'task_updated': {
+      const tasks = event.tasks as TaskItemSnapshot[];
+      if (state.taskProgress) {
+        state.taskProgress.updateTasks(tasks ?? []);
+
+        // Defensive cleanup for older or non-streaming task_write components.
+        // Current task tools update the pinned component directly through task_updated.
+        let insertIndex = -1;
+        for (let i = state.allToolComponents.length - 1; i >= 0; i--) {
+          const comp = state.allToolComponents[i];
+          if ((comp as any).toolName === 'task_write') {
+            insertIndex = state.chatContainer.children.indexOf(comp as any);
+            state.chatContainer.removeChild(comp as any);
+            state.allToolComponents.splice(i, 1);
+            break;
+          }
+        }
+        // Fall back to the position recorded during streaming (when no inline component was created)
+        if (insertIndex === -1 && state.taskToolInsertIndex >= 0) {
+          insertIndex = state.taskToolInsertIndex;
+          state.taskToolInsertIndex = -1;
+        }
+
+        const previousTasks = state.session.displayState.get().previousTasks;
+        if (tasks?.length > 0 && tasks.every(task => task.status === 'completed')) {
+          ectx.renderCompletedTasksInline(tasks, insertIndex);
+        } else if (previousTasks.length > 0 && (!tasks || tasks.length === 0)) {
+          ectx.renderClearedTasksInline(previousTasks, insertIndex);
+        } else if (tasks?.length > 0) {
+          ectx.renderTaskDeltaInline(previousTasks, tasks, insertIndex);
+        }
+
+        state.ui.requestRender();
+      }
+      break;
+    }
+
+    case 'goal_evaluation': {
+      handleGoalEvaluation(ectx, event.payload);
+      break;
+    }
+
+    case 'tool_suspended': {
+      // Interactive built-in tools pause via the native tool-suspension primitive.
+      // Route the suspension to the matching prompt UI using the suspend payload;
+      // the UI resumes the tool by calling controller.session.respondToToolSuspension({ toolCallId }).
+      const payload = (event.suspendPayload ?? {}) as Record<string, unknown>;
+      if (event.toolName === 'request_access' || payload.kind === 'sandbox_access_request') {
+        await handleSandboxAccessRequest(
+          ectx,
+          event.toolCallId,
+          String(payload.path ?? ''),
+          String(payload.reason ?? ''),
+        );
+      } else if (event.toolName === 'ask_user') {
+        await handleAskQuestion(
+          ectx,
+          event.toolCallId,
+          String(payload.question ?? ''),
+          payload.options as Array<{ label: string; description?: string }> | undefined,
+          payload.selectionMode as AskUserSelectionMode | undefined,
+        );
+      } else if (event.toolName === 'submit_plan') {
+        await handlePlanApproval(ectx, event.toolCallId, String(payload.path ?? ''));
+      }
+      break;
+    }
+
+    case 'state_changed':
+      await handlePackFallbackState(ectx, event);
+      break;
+
+    case 'display_state_changed':
+      // The AgentController emits this after every event with the updated display state.
+      // Use it as the single trigger for status-line re-renders since all the
+      // fields it reads (isRunning, omProgress, buffering flags) are now
+      // maintained by the AgentController.
+      ectx.updateStatusLine();
+      break;
+  }
+}

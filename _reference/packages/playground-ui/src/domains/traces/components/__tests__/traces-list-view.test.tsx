@@ -1,0 +1,688 @@
+// @vitest-environment jsdom
+import '@/test/jsdom-polyfills';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, assert, beforeAll, describe, expect, it, vi } from 'vitest';
+
+import { TracesListView } from '../traces-list-view';
+import type { TracesListViewTrace } from '../traces-list-view';
+
+// jsdom implements neither ResizeObserver nor element layout; without both the
+// virtualizer sees a zero-height scroll container and renders no rows. The stub
+// reports a fixed viewport size for every observed element so rows materialize.
+beforeAll(() => {
+  class ResizeObserverStub {
+    callback: ResizeObserverCallback;
+    constructor(callback: ResizeObserverCallback) {
+      this.callback = callback;
+    }
+    observe(target: Element) {
+      this.callback(
+        [
+          {
+            target,
+            contentRect: new DOMRect(0, 0, 800, 600),
+            borderBoxSize: [{ inlineSize: 800, blockSize: 600 }],
+            contentBoxSize: [{ inlineSize: 800, blockSize: 600 }],
+            devicePixelContentBoxSize: [{ inlineSize: 800, blockSize: 600 }],
+          },
+        ],
+        this as unknown as ResizeObserver,
+      );
+    }
+    unobserve() {}
+    disconnect() {}
+  }
+  globalThis.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 800, 600));
+  // Base UI waits for the menu's exit animations; jsdom has no Web Animations API.
+  Element.prototype.getAnimations ??= () => [];
+});
+
+const timestamp = new Date('2026-06-10T00:00:00.000Z');
+
+function makeTrace(
+  overrides: Partial<TracesListViewTrace> & Pick<TracesListViewTrace, 'traceId'>,
+): TracesListViewTrace {
+  return {
+    name: `run ${overrides.traceId}`,
+    createdAt: timestamp,
+    startedAt: timestamp,
+    ...overrides,
+  };
+}
+
+afterEach(() => cleanup());
+
+function headerTexts(container: HTMLElement): (string | null)[] {
+  const top = container.querySelector('.data-list-top');
+  assert(top);
+  return Array.from(top.children).map(cell => cell.textContent);
+}
+
+describe('TracesListView columns', () => {
+  describe('when no column preferences are provided', () => {
+    it('renders the default headers in order with the matching grid', () => {
+      const { container } = render(<TracesListView traces={[]} onTraceClick={vi.fn()} />);
+
+      const grid = container.querySelector<HTMLElement>('[style*="grid-template-columns"]');
+      const top = container.querySelector('.data-list-top');
+      assert(grid);
+      assert(top);
+      const headers = Array.from(top.children).map(cell => cell.textContent);
+      expect(headers).toEqual([
+        'Start',
+        'Primitive type',
+        'Primitive name',
+        'Input',
+        'Status',
+        'Duration',
+        'Est. cost',
+      ]);
+      expect(screen.queryByText('Created')).toBeNull();
+      expect(screen.queryByText('Entity')).toBeNull();
+      expect(grid.style.gridTemplateColumns).toBe('11rem 7rem 14rem minmax(8rem,1fr) 6rem 7rem 8rem');
+    });
+  });
+
+  describe('when optional and metadata columns are selected', () => {
+    it('renders every selected header in the matching grid', () => {
+      const { container } = render(
+        <TracesListView
+          traces={[]}
+          columnPreferences={{
+            visibleColumns: ['duration', 'inputTokens', 'outputTokens', 'estimatedCost'],
+            customColumns: [],
+            metadataKeys: ['tenantId'],
+          }}
+          onTraceClick={vi.fn()}
+        />,
+      );
+
+      expect(screen.queryByText('Input')).toBeNull();
+      expect(screen.queryByText('Primitive type')).toBeNull();
+      expect(screen.getByText('Duration')).toBeTruthy();
+      expect(screen.getByText('Input tokens')).toBeTruthy();
+      expect(screen.getByText('Output tokens')).toBeTruthy();
+      expect(screen.getByText('Est. cost')).toBeTruthy();
+      expect(screen.getByText('tenantId')).toBeTruthy();
+
+      const grid = container.querySelector<HTMLElement>('[style*="grid-template-columns"]');
+      assert(grid);
+      expect(grid.style.gridTemplateColumns).toBe('11rem minmax(8rem,1fr) 6rem 7rem 8rem 8rem 8rem minmax(8rem,14rem)');
+    });
+  });
+});
+
+describe('TracesListView — status column', () => {
+  // Status is the last default column only when the trailing optional ones are hidden.
+  const statusLast = { visibleColumns: [], customColumns: [], metadataKeys: [] } as const;
+
+  it('renders the computed status carried by lightweight rows', () => {
+    render(
+      <TracesListView
+        columnPreferences={statusLast}
+        traces={[
+          makeTrace({ traceId: 'trace-failed', status: 'error', endedAt: timestamp }),
+          makeTrace({ traceId: 'trace-succeeded', status: 'success', endedAt: timestamp }),
+          makeTrace({ traceId: 'trace-running', status: 'running' }),
+        ]}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    const statuses = screen.getAllByRole('button').map(row => row.lastElementChild?.textContent);
+    expect(statuses).toEqual(['ERR', 'OK', 'RUN']);
+  });
+
+  it('renders a dash when a row carries no status', () => {
+    render(
+      <TracesListView
+        columnPreferences={statusLast}
+        traces={[makeTrace({ traceId: 'trace-unknown' })]}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    const statuses = screen.getAllByRole('button').map(row => row.lastElementChild?.textContent);
+    expect(statuses).toEqual(['-']);
+  });
+});
+
+describe('TracesListView — name column', () => {
+  it('shows the primitive name, falling back to the span name', () => {
+    render(
+      <TracesListView
+        traces={[
+          makeTrace({ traceId: 'trace-named', entityName: 'Chef Agent V2 Model', name: 'chef-model-v2-agent' }),
+          makeTrace({ traceId: 'trace-unnamed', name: 'custom span' }),
+        ]}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Chef Agent V2 Model')).not.toBeNull();
+    expect(screen.queryByText('chef-model-v2-agent')).toBeNull();
+    expect(screen.getByText('custom span')).not.toBeNull();
+  });
+});
+
+describe('TracesListView — type column', () => {
+  describe('when rows carry an entity type', () => {
+    it('labels each row by its entity type', () => {
+      render(
+        <TracesListView
+          traces={[
+            makeTrace({ traceId: 'trace-agent', entityType: 'agent', name: 'weatherAgent' }),
+            makeTrace({ traceId: 'trace-tool', entityType: 'tool', name: 'fetchWeather' }),
+          ]}
+          onTraceClick={vi.fn()}
+        />,
+      );
+
+      expect(screen.getByText('Agent')).not.toBeNull();
+      expect(screen.getByText('Tool')).not.toBeNull();
+      expect(screen.getByText('weatherAgent')).not.toBeNull();
+      expect(screen.getByText('fetchWeather')).not.toBeNull();
+    });
+  });
+});
+
+describe('TracesListView — rows', () => {
+  it('reports the trace behind the row that was clicked', () => {
+    const onTraceClick = vi.fn();
+    const first = makeTrace({ traceId: 'trace-1' });
+    render(<TracesListView traces={[first, makeTrace({ traceId: 'trace-2' })]} onTraceClick={onTraceClick} />);
+
+    screen.getAllByRole('button')[1]?.click();
+
+    expect(onTraceClick).toHaveBeenCalledWith(expect.objectContaining({ traceId: 'trace-2' }));
+  });
+
+  it('features the selected trace and leaves the others plain', () => {
+    render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1' }), makeTrace({ traceId: 'trace-2' })]}
+        featuredTraceId="trace-2"
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    const rows = screen.getAllByRole('button');
+    expect(rows[0]?.hasAttribute('data-featured')).toBe(false);
+    expect(rows[1]?.hasAttribute('data-featured')).toBe(true);
+  });
+
+  it('needs the span to match too when branch rows share a trace', () => {
+    render(
+      <TracesListView
+        traces={[
+          makeTrace({ traceId: 'trace-1', spanId: 'span-a', name: 'branch a' }),
+          makeTrace({ traceId: 'trace-1', spanId: 'span-b', name: 'branch b' }),
+        ]}
+        featuredTraceId="trace-1"
+        featuredSpanId="span-b"
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    const rows = screen.getAllByRole('button');
+    expect(rows[0]?.hasAttribute('data-featured')).toBe(false);
+    expect(rows[1]?.hasAttribute('data-featured')).toBe(true);
+  });
+
+  it('tints only the rows that just arrived', () => {
+    render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1' }), makeTrace({ traceId: 'trace-2' })]}
+        recentlyAddedKeys={new Set(['trace-2:'])}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    const rows = screen.getAllByRole('button');
+    expect(rows[0]?.className).not.toContain('animate-row-highlight');
+    expect(rows[1]?.className).toContain('animate-row-highlight');
+  });
+
+  it('tints nothing when no rows are marked as new', () => {
+    render(<TracesListView traces={[makeTrace({ traceId: 'trace-1' })]} onTraceClick={vi.fn()} />);
+
+    expect(screen.getAllByRole('button')[0]?.className).not.toContain('animate-row-highlight');
+  });
+
+  it('stamps a row by when it started, not when the record was created', () => {
+    render(
+      <TracesListView
+        traces={[
+          makeTrace({
+            traceId: 'trace-1',
+            startedAt: new Date('2026-06-11T08:30:00.000Z'),
+            createdAt: new Date('2026-06-12T19:45:00.000Z'),
+          }),
+        ]}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    const row = screen.getAllByRole('button')[0];
+    const startedLabel = new Date('2026-06-11T08:30:00.000Z').getDate().toString();
+    expect(row?.textContent).toContain(startedLabel);
+    expect(row?.textContent).not.toContain(new Date('2026-06-12T19:45:00.000Z').getDate().toString());
+  });
+
+  it('falls back to the created time when the trace never started', () => {
+    render(
+      <TracesListView
+        traces={[
+          makeTrace({
+            traceId: 'trace-1',
+            startedAt: null,
+            createdAt: new Date('2026-06-11T08:30:00.000Z'),
+          }),
+        ]}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    // The row is stamped from createdAt rather than left blank.
+    const row = screen.getAllByRole('button')[0];
+    expect(row?.textContent).toContain(new Date('2026-06-11T08:30:00.000Z').getDate().toString());
+  });
+
+  it('prefers the preview the server rendered over one derived from the raw input', () => {
+    render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1', inputPreview: 'server preview', input: { raw: 'local input' } })]}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('server preview')).toBeTruthy();
+    expect(screen.queryByText(/local input/)).toBeNull();
+  });
+
+  it('derives a preview itself when the row carries none', () => {
+    render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1', input: { prompt: 'what is the weather' } })]}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(/what is the weather/)).toBeTruthy();
+  });
+
+  it('explains the level icon only where rows mix traces and subtraces', () => {
+    const trigger = (root: HTMLElement) => root.querySelector('[data-base-ui-tooltip-trigger]');
+
+    const flat = render(<TracesListView traces={[makeTrace({ traceId: 'trace-1' })]} onTraceClick={vi.fn()} />);
+    expect(trigger(flat.container)).toBeNull();
+
+    cleanup();
+
+    const branches = render(
+      <TracesListView traces={[makeTrace({ traceId: 'trace-1' })]} isBranchesMode onTraceClick={vi.fn()} />,
+    );
+    expect(trigger(branches.container)).not.toBeNull();
+  });
+});
+
+describe('TracesListView — empty and loading', () => {
+  it('shows a skeleton while the first page is loading', () => {
+    render(<TracesListView traces={[]} isLoading onTraceClick={vi.fn()} />);
+
+    // The skeleton stands in for the list — no empty-state copy yet.
+    expect(screen.queryByText('No traces found yet')).toBeNull();
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+
+  it('distinguishes an empty result from an empty filter result', () => {
+    const unfiltered = render(<TracesListView traces={[]} onTraceClick={vi.fn()} />);
+    expect(screen.getByText('No traces found yet')).toBeTruthy();
+    expect(unfiltered.container).toBeTruthy();
+
+    cleanup();
+
+    render(<TracesListView traces={[]} filtersApplied onTraceClick={vi.fn()} />);
+    expect(screen.getByText('No traces found for applied filters')).toBeTruthy();
+  });
+});
+
+describe('TracesListView — usage cells', () => {
+  const usageColumns = {
+    visibleColumns: ['inputTokens', 'outputTokens', 'estimatedCost'] as const,
+    customColumns: [],
+    metadataKeys: [] as string[],
+  };
+
+  describe('when the total tokens column is visible and usage is present', () => {
+    it('shows the sum of input and output tokens', () => {
+      const { container } = render(
+        <TracesListView
+          traces={[makeTrace({ traceId: 'trace-1' })]}
+          columnPreferences={{ visibleColumns: ['totalTokens'], customColumns: [], metadataKeys: [] }}
+          usageByTraceId={new Map([['trace-1', { inputTokens: 12_000, outputTokens: 400 }]])}
+          onTraceClick={vi.fn()}
+        />,
+      );
+
+      const headers = headerTexts(container);
+      expect(headers).toEqual(['Start', 'Primitive name', 'Status', 'Total tokens']);
+      expect(screen.getByText('12.4K')).toBeTruthy();
+    });
+
+    it('leaves the cell blank when neither token count is known', () => {
+      render(
+        <TracesListView
+          traces={[makeTrace({ traceId: 'trace-1' })]}
+          columnPreferences={{ visibleColumns: ['totalTokens'], customColumns: [], metadataKeys: [] }}
+          usageByTraceId={new Map([['trace-1', { estimatedCost: 1 }]])}
+          onTraceClick={vi.fn()}
+        />,
+      );
+
+      expect(screen.getAllByRole('button')[0]?.textContent).not.toContain('NaN');
+      expect(screen.queryByText('0')).toBeNull();
+    });
+  });
+
+  it('shows the totals for the trace they belong to', () => {
+    render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1' })]}
+        columnPreferences={usageColumns}
+        usageByTraceId={
+          new Map([['trace-1', { inputTokens: 12_400, outputTokens: 800, estimatedCost: 0.0123, costUnit: 'eur' }]])
+        }
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('12.4K')).toBeTruthy();
+    expect(screen.getByText('800')).toBeTruthy();
+    expect(screen.getByText('0.01 eur')).toBeTruthy();
+  });
+
+  it('leaves the usage cells blank for a trace with no totals', () => {
+    render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1' })]}
+        columnPreferences={usageColumns}
+        usageByTraceId={new Map()}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('12.4K')).toBeNull();
+    expect(screen.getAllByRole('button')[0]?.textContent).not.toContain('NaN');
+  });
+});
+
+describe('TracesListView — metadata cells', () => {
+  it('shows the value under each selected metadata key', () => {
+    render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1', metadata: { tenantId: 'acme', region: 'eu-west-1' } })]}
+        columnPreferences={{ visibleColumns: [], customColumns: [], metadataKeys: ['tenantId', 'region'] }}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('acme')).toBeTruthy();
+    expect(screen.getByText('eu-west-1')).toBeTruthy();
+  });
+
+  it('leaves the cell alone when the trace carries no such key', () => {
+    render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1', metadata: { tenantId: 'acme' } })]}
+        columnPreferences={{ visibleColumns: [], customColumns: [], metadataKeys: ['tenantId', 'missing'] }}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('acme')).toBeTruthy();
+    expect(screen.getAllByRole('button')[0]?.textContent).not.toContain('undefined');
+  });
+});
+
+describe('TracesListView — environment and end time cells', () => {
+  describe('when the environment column is visible', () => {
+    it('renders the header and the value, with a dash when the trace has none', () => {
+      const { container } = render(
+        <TracesListView
+          traces={[
+            makeTrace({ traceId: 'trace-1', environment: 'production' }),
+            makeTrace({ traceId: 'trace-2', environment: null }),
+          ]}
+          columnPreferences={{ visibleColumns: ['environment'], customColumns: [], metadataKeys: [] }}
+          onTraceClick={vi.fn()}
+        />,
+      );
+
+      const headers = headerTexts(container);
+      expect(headers).toEqual(['Start', 'Primitive name', 'Status', 'Environment']);
+      expect(screen.getByText('production')).toBeTruthy();
+      expect(screen.getByText('—')).toBeTruthy();
+    });
+  });
+
+  describe('when the end time column is visible', () => {
+    it('formats the end timestamp like the start one, without the year', () => {
+      render(
+        <TracesListView
+          traces={[makeTrace({ traceId: 'trace-1', endedAt: new Date(2026, 5, 10, 13, 7, 47) })]}
+          columnPreferences={{ visibleColumns: ['endTime'], customColumns: [], metadataKeys: [] }}
+          onTraceClick={vi.fn()}
+        />,
+      );
+
+      expect(screen.getByText('End')).toBeTruthy();
+      const endedAt = new Date(2026, 5, 10, 13, 7, 47);
+      const title = new Intl.DateTimeFormat(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+      }).format(endedAt);
+      const visible = new Intl.DateTimeFormat(undefined, {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+      }).format(endedAt);
+      expect(screen.getByTitle(title).textContent).toBe(visible);
+    });
+  });
+});
+
+describe('TracesListView — custom columns', () => {
+  describe('when a threadId custom column is added', () => {
+    it('renders the header and each row value', () => {
+      const { container } = render(
+        <TracesListView
+          traces={[makeTrace({ traceId: 'trace-1', threadId: 'thread-42' })]}
+          columnPreferences={{ visibleColumns: [], customColumns: ['threadId'], metadataKeys: [] }}
+          onTraceClick={vi.fn()}
+        />,
+      );
+
+      const headers = headerTexts(container);
+      expect(headers).toEqual(['Start', 'Primitive name', 'Status', 'Thread ID']);
+      expect(screen.getByText('thread-42')).toBeTruthy();
+    });
+
+    it('offers to filter by any value currently listed from the header menu', async () => {
+      const onFilterByField = vi.fn();
+      render(
+        <TracesListView
+          traces={[
+            makeTrace({ traceId: 'trace-1', threadId: 'thread-42' }),
+            makeTrace({ traceId: 'trace-2', threadId: 'thread-42' }),
+            makeTrace({ traceId: 'trace-3', threadId: 'thread-7' }),
+            makeTrace({ traceId: 'trace-4', threadId: null }),
+          ]}
+          columnPreferences={{ visibleColumns: [], customColumns: ['threadId'], metadataKeys: [] }}
+          onTraceClick={vi.fn()}
+          onFilterByField={onFilterByField}
+        />,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Thread ID' }));
+
+      const items = await screen.findAllByRole('menuitem');
+      expect(items.map(item => item.textContent)).toEqual(['thread-42', 'thread-7']);
+
+      const second = items[1];
+      assert(second);
+      fireEvent.click(second);
+      expect(onFilterByField).toHaveBeenCalledWith('threadId', 'thread-7');
+    });
+
+    it('renders a plain header when no filter handler is wired', () => {
+      render(
+        <TracesListView
+          traces={[makeTrace({ traceId: 'trace-1', threadId: 'thread-42' })]}
+          columnPreferences={{ visibleColumns: [], customColumns: ['threadId'], metadataKeys: [] }}
+          onTraceClick={vi.fn()}
+        />,
+      );
+
+      expect(screen.queryByRole('button', { name: 'Thread ID' })).toBeNull();
+      expect(screen.getByText('Thread ID')).toBeTruthy();
+    });
+  });
+});
+
+describe('TracesListView — scrolling back to the top', () => {
+  it('re-reads the scroll position once a fresh query resolves', () => {
+    const dispatchEvent = vi.spyOn(HTMLElement.prototype, 'dispatchEvent');
+    const { rerender } = render(<TracesListView traces={[]} isLoading onTraceClick={vi.fn()} />);
+    dispatchEvent.mockClear();
+
+    rerender(<TracesListView traces={[makeTrace({ traceId: 'trace-1' })]} onTraceClick={vi.fn()} />);
+
+    // The list swapped its scroll container, so the virtualizer has to be told
+    // to read the new element's scrollTop rather than keep the old offset.
+    expect(dispatchEvent.mock.calls.some(([event]) => event.type === 'scroll')).toBe(true);
+    dispatchEvent.mockRestore();
+  });
+
+  it('leaves the scroll position alone while paginating', () => {
+    const { rerender } = render(<TracesListView traces={[makeTrace({ traceId: 'trace-1' })]} onTraceClick={vi.fn()} />);
+    const dispatchEvent = vi.spyOn(HTMLElement.prototype, 'dispatchEvent');
+
+    rerender(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1' }), makeTrace({ traceId: 'trace-2' })]}
+        isFetchingNextPage
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(dispatchEvent.mock.calls.some(([event]) => event.type === 'scroll')).toBe(false);
+    dispatchEvent.mockRestore();
+  });
+
+  it('leaves the scroll position alone when a query starts', () => {
+    const { rerender } = render(<TracesListView traces={[makeTrace({ traceId: 'trace-1' })]} onTraceClick={vi.fn()} />);
+    const dispatchEvent = vi.spyOn(HTMLElement.prototype, 'dispatchEvent');
+
+    rerender(<TracesListView traces={[]} isLoading onTraceClick={vi.fn()} />);
+
+    expect(dispatchEvent.mock.calls.some(([event]) => event.type === 'scroll')).toBe(false);
+    dispatchEvent.mockRestore();
+  });
+});
+
+describe('TracesListView — the virtual window', () => {
+  const spacersIn = (container: HTMLElement) =>
+    Array.from(container.querySelectorAll<HTMLElement>('.col-span-full[style*="height"]')).map(
+      spacer => spacer.style.height,
+    );
+
+  it('reserves no room above or below a list that fits', () => {
+    const { container } = render(
+      <TracesListView
+        traces={[makeTrace({ traceId: 'trace-1' }), makeTrace({ traceId: 'trace-2' })]}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    // Every row is on screen, so nothing is scrolled past in either direction.
+    expect(spacersIn(container)).toEqual([]);
+  });
+
+  it('reserves room below for the rows it did not render', () => {
+    const traces = Array.from({ length: 400 }, (_, index) => makeTrace({ traceId: `trace-${index}` }));
+    const { container } = render(<TracesListView traces={traces} onTraceClick={vi.fn()} />);
+
+    expect(screen.getAllByRole('button').length).toBeLessThan(traces.length);
+
+    // The window opens at the top: nothing is scrolled past above it, and the
+    // rows below it still hold their place in the scroll height.
+    const spacers = spacersIn(container);
+    expect(spacers).toHaveLength(1);
+    expect(Number.parseFloat(spacers[0] ?? '0')).toBeGreaterThan(0);
+  });
+});
+
+describe('TracesListView — the duration column', () => {
+  it('shows how long each trace took', () => {
+    render(
+      <TracesListView
+        traces={[
+          makeTrace({
+            traceId: 'trace-1',
+            startedAt: new Date('2026-06-10T00:00:00.000Z'),
+            endedAt: new Date('2026-06-10T00:00:46.301Z'),
+          }),
+        ]}
+        columnPreferences={{ visibleColumns: ['duration'], customColumns: [], metadataKeys: [] }}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('46.3s')).toBeTruthy();
+  });
+
+  it('leaves the duration out when the column is not selected', () => {
+    render(
+      <TracesListView
+        traces={[
+          makeTrace({
+            traceId: 'trace-1',
+            startedAt: new Date('2026-06-10T00:00:00.000Z'),
+            endedAt: new Date('2026-06-10T00:00:46.301Z'),
+          }),
+        ]}
+        columnPreferences={{ visibleColumns: [], customColumns: [], metadataKeys: [] }}
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('46.3s')).toBeNull();
+  });
+});
+
+describe('TracesListView — featuring by trace alone', () => {
+  it('features a branch row by its trace when no span was named', () => {
+    render(
+      <TracesListView
+        traces={[
+          makeTrace({ traceId: 'trace-1', spanId: 'span-a', name: 'branch a' }),
+          makeTrace({ traceId: 'trace-2', spanId: 'span-b', name: 'branch b' }),
+        ]}
+        featuredTraceId="trace-1"
+        onTraceClick={vi.fn()}
+      />,
+    );
+
+    const rows = screen.getAllByRole('button');
+    expect(rows[0]?.hasAttribute('data-featured')).toBe(true);
+    expect(rows[1]?.hasAttribute('data-featured')).toBe(false);
+  });
+});

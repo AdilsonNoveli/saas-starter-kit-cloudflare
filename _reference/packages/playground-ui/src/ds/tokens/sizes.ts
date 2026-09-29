@@ -1,0 +1,17 @@
+export const Sizes = {
+  'icon-xs': '12px',
+  'icon-sm': '14px',
+  'icon-md': '16px',
+  'icon-lg': '20px',
+  'control-sm': '1.75rem',
+  'control-md': '1.875rem',
+  'control-lg': '2rem',
+  'header-default': '40px',
+  'table-header': '28px',
+  'table-row': '40px',
+  'table-row-small': '32px',
+  'avatar-sm': '24px',
+  'avatar-md': '32px',
+  'avatar-lg': '40px',
+  dropdown: '300px',
+};

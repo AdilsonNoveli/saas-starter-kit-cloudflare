@@ -1,0 +1,92 @@
+import { Slider as SliderPrimitive } from '@base-ui/react/slider';
+
+import { cn } from '@/lib/utils';
+
+export type SliderProps = Omit<SliderPrimitive.Root.Props, 'onValueChange' | 'onValueCommitted'> &
+  Pick<SliderPrimitive.Thumb.Props, 'getAriaLabel'> & {
+    onValueChange?: (value: number[], eventDetails: SliderPrimitive.Root.ChangeEventDetails) => void;
+    onValueCommitted?: (value: number[], eventDetails: SliderPrimitive.Root.CommitEventDetails) => void;
+  };
+
+function toArray(value: number | readonly number[]): number[] {
+  if (typeof value === 'number') {
+    return [value];
+  }
+  return [...value];
+}
+
+const Slider = ({
+  className,
+  defaultValue,
+  value,
+  min = 0,
+  max = 100,
+  onValueChange,
+  onValueCommitted,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  getAriaLabel,
+  ...props
+}: SliderProps) => {
+  const currentValue = value ?? defaultValue ?? min;
+  const values = typeof currentValue === 'number' ? [currentValue] : currentValue;
+
+  return (
+    <SliderPrimitive.Root
+      className={cn('w-full', className)}
+      defaultValue={defaultValue}
+      value={value}
+      min={min}
+      max={max}
+      thumbAlignment="edge"
+      onValueChange={onValueChange ? (next, details) => onValueChange(toArray(next), details) : undefined}
+      onValueCommitted={onValueCommitted ? (next, details) => onValueCommitted(toArray(next), details) : undefined}
+      {...props}
+    >
+      <SliderPrimitive.Control
+        className={cn(
+          'group relative flex w-full cursor-pointer touch-none items-center select-none',
+          'data-[orientation=horizontal]:py-3',
+          'data-[orientation=vertical]:h-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col data-[orientation=vertical]:px-3',
+          'data-[disabled]:pointer-events-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+        )}
+      >
+        <SliderPrimitive.Track
+          className={cn(
+            'relative grow overflow-hidden rounded-full bg-fill-strong select-none',
+            'data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full',
+            'data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5',
+          )}
+        >
+          <SliderPrimitive.Indicator
+            className={cn(
+              'bg-foreground select-none',
+              'data-[orientation=horizontal]:h-full',
+              'data-[orientation=vertical]:w-full',
+            )}
+          />
+        </SliderPrimitive.Track>
+        {values.map((_, index) => (
+          <SliderPrimitive.Thumb
+            key={index}
+            index={index}
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabelledBy}
+            getAriaLabel={getAriaLabel}
+            className={cn(
+              'relative block h-5 w-2.5 shrink-0 rounded-full border-2 border-foreground bg-placeholder outline-hidden select-none',
+              'after:absolute after:-inset-2 after:content-[""]',
+              'transition-shadow duration-normal',
+              'hover:ring-2 hover:ring-border-hover',
+              'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-border-focus',
+              'data-[orientation=vertical]:h-2.5 data-[orientation=vertical]:w-5',
+              'data-[disabled]:pointer-events-none',
+            )}
+          />
+        ))}
+      </SliderPrimitive.Control>
+    </SliderPrimitive.Root>
+  );
+};
+
+export { Slider };

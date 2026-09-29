@@ -1,0 +1,95 @@
+@property --composer-ring-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --composer-ring-spin {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@property --composer-ring-strength {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.composer-ring {
+  --composer-ring-color: var(--composer-tone-color);
+  --composer-ring-edge: color-mix(in oklab, var(--placeholder) 40%, transparent);
+  --composer-spotlight-x: 50%;
+  --composer-spotlight-y: 50%;
+  --composer-spotlight-strength: 0;
+
+  background-color: var(--composer-ring-edge);
+  background-image: conic-gradient(
+    from calc(var(--composer-ring-angle) + var(--composer-ring-spin) - 60deg),
+    transparent 0deg,
+    color-mix(in oklab, var(--composer-ring-color) calc(var(--composer-ring-strength) * 100%), transparent) 60deg,
+    transparent 120deg
+  );
+  transition:
+    --composer-ring-strength 320ms ease-out,
+    box-shadow 320ms ease-out;
+}
+
+.composer-ring > [data-slot='composer-box'] {
+  border: 0;
+}
+
+.composer-ring:focus-within {
+  background-color: var(--border-strong);
+}
+
+@media (hover: hover) {
+  .composer-ring:hover {
+    --composer-ring-strength: 0.4;
+  }
+
+  .composer-ring[data-busy='false']:hover {
+    --composer-spotlight-strength: 1;
+  }
+}
+
+.composer-ring[data-busy='true'] {
+  --composer-ring-strength: 0.65;
+
+  animation: composer-ring-spin 2.4s linear infinite;
+  box-shadow: 0 4px 20px -4px color-mix(in oklab, var(--composer-ring-color) 12%, transparent);
+}
+
+@keyframes composer-ring-spin {
+  from {
+    --composer-ring-spin: 0deg;
+  }
+
+  to {
+    --composer-ring-spin: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .composer-ring {
+    transition: none;
+  }
+
+  .composer-ring[data-busy='true'] {
+    animation: none;
+  }
+}
+
+html.light .composer-ring {
+  --composer-ring-edge: color-mix(in oklab, var(--border-strong) 40%, transparent);
+}
+
+@media (forced-colors: active) {
+  .composer-ring {
+    outline: 1px solid CanvasText;
+  }
+
+  .composer-ring:focus-within {
+    outline: 2px solid Highlight;
+  }
+}

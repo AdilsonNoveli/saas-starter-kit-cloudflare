@@ -1,0 +1,383 @@
+import { jsonLanguage } from '@codemirror/lang-json';
+import { markdown, markdownLanguage } from '@codemirror/lang-markdown';
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { EditorState, Prec } from '@codemirror/state';
+import type { Extension } from '@codemirror/state';
+import { EditorView } from '@codemirror/view';
+import { tags as t } from '@lezer/highlight';
+import { draculaInit } from '@uiw/codemirror-theme-dracula';
+import CodeMirror from '@uiw/react-codemirror';
+import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
+import { cva } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
+import { forwardRef, useMemo } from 'react';
+import type { HTMLAttributes } from 'react';
+import { codeLanguages } from './code-languages';
+import { createVariableAutocomplete } from './variable-autocomplete-extension';
+import { variableHighlight } from './variable-highlight-extension';
+import { CopyButton } from '@/ds/components/CopyButton';
+import { useTheme } from '@/ds/components/ThemeProvider';
+import { fieldErrorRimWithin, inputSurfaceAndFocusWithinStyle } from '@/ds/primitives/form-element';
+import type { JsonSchema } from '@/lib/json-schema';
+import { cn } from '@/lib/utils';
+
+export type CodeEditorLanguage = 'json' | 'markdown';
+
+/** Original dark theme — draculaInit + custom overrides. Unchanged from before light mode work. */
+function buildDarkTheme(): Extension {
+  const baseTheme = draculaInit({
+    settings: {
+      fontFamily: 'var(--font-mono)',
+      fontSize: 'var(--text-body-sm)',
+      lineHighlight: 'transparent',
+      gutterBackground: 'transparent',
+      gutterForeground: 'var(--placeholder)',
+      background: 'transparent',
+      foreground: 'var(--foreground)',
+      caret: 'var(--foreground)',
+    },
+    styles: [
+      { tag: [t.className, t.propertyName], color: 'var(--foreground)' },
+      { tag: t.heading, color: 'var(--accent3)', fontWeight: 'bold' },
+      {
+        tag: [t.heading1, t.heading2, t.heading3, t.heading4, t.heading5, t.heading6],
+        color: 'var(--accent3)',
+        fontWeight: 'bold',
+      },
+      { tag: t.emphasis, fontStyle: 'italic', color: 'var(--foreground)' },
+      { tag: t.strong, fontWeight: 'bold', color: 'var(--foreground)' },
+      { tag: t.link, color: 'var(--accent3)', textDecoration: 'underline' },
+      { tag: t.url, color: 'var(--accent3)' },
+      { tag: t.monospace, color: 'var(--foreground)' },
+      { tag: t.strikethrough, textDecoration: 'line-through' },
+      { tag: t.quote, fontStyle: 'italic', color: 'var(--placeholder)' },
+    ],
+  });
+
+  const customLineNumberTheme = EditorView.theme({
+    '.cm-editor': {
+      backgroundColor: 'transparent',
+    },
+    '.cm-content': {
+      color: 'var(--foreground)',
+      caretColor: 'var(--foreground)',
+    },
+    '.cm-lineNumbers .cm-gutterElement': {
+      color: 'var(--placeholder)',
+    },
+    '.cm-activeLineGutter': {
+      color: 'var(--muted-foreground)',
+    },
+    '.cm-cursor': {
+      borderLeftColor: 'var(--foreground)',
+    },
+    '.cm-selectionBackground, .cm-content ::selection': {
+      backgroundColor: 'color-mix(in srgb, var(--accent3) 22%, transparent)',
+    },
+    '.cm-tooltip-autocomplete': {
+      backgroundColor: 'var(--background)',
+      border: '1px solid var(--border)',
+      borderRadius: '6px',
+      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+    },
+    '.cm-tooltip-autocomplete > ul': {
+      fontFamily: 'var(--font-mono)',
+    },
+    '.cm-completionLabel': {
+      color: 'var(--foreground)',
+    },
+    '.cm-completionDetail': {
+      color: 'var(--muted-foreground)',
+      fontSize: 'var(--text-caption)',
+      marginLeft: 'auto',
+      paddingLeft: '12px',
+    },
+    '.cm-completionInfo': {
+      backgroundColor: 'var(--background)',
+      border: '1px solid var(--border)',
+      color: 'var(--muted-foreground)',
+      padding: '8px 12px',
+    },
+    '.cm-completionIcon': {
+      display: 'none',
+    },
+    'ul.cm-completionList li[aria-selected]': {
+      backgroundColor: 'var(--fill-hover)',
+      color: 'var(--foreground)',
+    },
+    '.cm-line .cm-variable-highlight': {
+      color: 'var(--accent6) !important',
+      fontWeight: '500',
+    },
+  });
+
+  return [baseTheme, customLineNumberTheme];
+}
+
+function buildLightTheme(): Extension {
+  const editorTheme = EditorView.theme({
+    '&': {
+      backgroundColor: 'transparent',
+      color: 'var(--foreground)',
+      fontSize: 'var(--text-body-sm)',
+    },
+    '&.cm-editor .cm-scroller': {
+      fontFamily: 'var(--font-mono)',
+    },
+    '.cm-gutters': {
+      backgroundColor: 'transparent',
+      color: 'var(--placeholder)',
+      borderRight: 'none',
+    },
+    '.cm-content': {
+      color: 'var(--foreground)',
+      caretColor: 'var(--foreground)',
+    },
+    '.cm-activeLine': {
+      backgroundColor: 'transparent',
+    },
+    '.cm-lineNumbers .cm-gutterElement': {
+      color: 'var(--placeholder)',
+    },
+    '.cm-activeLineGutter': {
+      backgroundColor: 'transparent',
+      color: 'var(--muted-foreground)',
+    },
+    '.cm-cursor, .cm-dropCursor': {
+      borderLeftColor: 'var(--foreground)',
+    },
+    '&.cm-focused .cm-selectionBackground, & .cm-line::selection, & .cm-selectionLayer .cm-selectionBackground, .cm-content ::selection':
+      {
+        background: 'color-mix(in srgb, var(--accent3) 22%, transparent) !important',
+      },
+    '.cm-tooltip-autocomplete': {
+      backgroundColor: 'var(--background)',
+      border: '1px solid var(--border)',
+      borderRadius: '6px',
+      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+    },
+    '.cm-tooltip-autocomplete > ul': {
+      fontFamily: 'var(--font-mono)',
+    },
+    '.cm-completionLabel': {
+      color: 'var(--foreground)',
+    },
+    '.cm-completionDetail': {
+      color: 'var(--muted-foreground)',
+      fontSize: 'var(--text-caption)',
+      marginLeft: 'auto',
+      paddingLeft: '12px',
+    },
+    '.cm-completionInfo': {
+      backgroundColor: 'var(--background)',
+      border: '1px solid var(--border)',
+      color: 'var(--muted-foreground)',
+      padding: '8px 12px',
+    },
+    '.cm-completionIcon': {
+      display: 'none',
+    },
+    'ul.cm-completionList li[aria-selected]': {
+      backgroundColor: 'var(--fill-hover)',
+      color: 'var(--foreground)',
+    },
+    '.cm-line .cm-variable-highlight': {
+      color: 'var(--accent6) !important',
+      fontWeight: '500',
+    },
+  });
+
+  const highlightStyle = HighlightStyle.define([
+    { tag: [t.comment, t.bracket], color: 'var(--placeholder)' },
+    { tag: [t.string, t.meta, t.regexp], color: 'var(--accent1)' },
+    { tag: [t.atom, t.bool, t.special(t.variableName)], color: 'var(--accent6)' },
+    { tag: [t.keyword, t.operator, t.tagName], color: 'var(--accent2)' },
+    { tag: [t.function(t.propertyName), t.propertyName], color: 'var(--accent5)' },
+    {
+      tag: [t.definition(t.variableName), t.function(t.variableName), t.className, t.attributeName],
+      color: 'var(--accent3)',
+    },
+    { tag: [t.variableName, t.number], color: 'var(--accent5)' },
+    { tag: [t.name, t.quote], color: 'var(--accent1)' },
+    { tag: t.heading, color: 'var(--accent3)', fontWeight: 'bold' },
+    {
+      tag: [t.heading1, t.heading2, t.heading3, t.heading4, t.heading5, t.heading6],
+      color: 'var(--accent3)',
+      fontWeight: 'bold',
+    },
+    { tag: [t.emphasis], fontStyle: 'italic', color: 'var(--foreground)' },
+    { tag: [t.strong], fontWeight: 'bold', color: 'var(--foreground)' },
+    { tag: t.link, color: 'var(--accent3)', textDecoration: 'underline' },
+    { tag: t.url, color: 'var(--accent3)' },
+    { tag: t.monospace, color: 'var(--foreground)' },
+    { tag: t.strikethrough, textDecoration: 'line-through' },
+    { tag: [t.deleted], color: 'var(--accent2)' },
+    { tag: t.invalid, color: 'var(--error)' },
+    { tag: [t.standard(t.tagName)], color: 'var(--accent1)' },
+  ]);
+
+  return [editorTheme, syntaxHighlighting(highlightStyle)];
+}
+
+// eslint-disable-next-line react-refresh/only-export-components -- shared hook intentionally co-located with the editor it themes
+export const useCodemirrorTheme = (): Extension => {
+  const isDark = useTheme().resolvedTheme === 'dark';
+  return useMemo(() => (isDark ? buildDarkTheme() : buildLightTheme()), [isDark]);
+};
+
+const codeEditorVariants = cva(
+  cn(
+    'relative overflow-hidden font-mono outline-hidden focus-within:outline-hidden focus:outline-hidden',
+    'transition-colors duration-normal ease-out-custom',
+  ),
+  {
+    variants: {
+      variant: {
+        default: cn(inputSurfaceAndFocusWithinStyle, 'rounded-md p-1', fieldErrorRimWithin),
+        embedded: 'rounded-none border-none bg-transparent p-0',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  },
+);
+
+const editorFocusAttributes = Prec.highest(
+  EditorView.editorAttributes.of({
+    style: 'outline: none',
+  }),
+);
+
+const editorFocusTheme = Prec.highest(
+  EditorView.theme({
+    '&': {
+      outline: 'none',
+    },
+    '&.cm-focused': {
+      outline: 'none',
+    },
+    '.cm-scroller': {
+      outline: 'none',
+    },
+    '.cm-content': {
+      outline: 'none',
+    },
+    '.cm-content:focus': {
+      outline: 'none',
+    },
+  }),
+);
+
+const editorFocusExtensions: Extension[] = [editorFocusAttributes, editorFocusTheme];
+
+type CodeEditorContentAttributes = {
+  'aria-label': string;
+  id?: string;
+  'aria-describedby'?: string;
+  'aria-invalid'?: string;
+};
+
+export type CodeEditorProps = {
+  data?: Record<string, unknown> | Array<Record<string, unknown>>;
+  value?: string;
+  onChange?: (value: string) => void;
+  showCopyButton?: boolean;
+  className?: string;
+  highlightVariables?: boolean;
+  language?: CodeEditorLanguage;
+  placeholder?: string;
+  /** JSON Schema to enable variable autocomplete for {{variable}} placeholders (markdown only) */
+  schema?: JsonSchema;
+  autoFocus?: boolean;
+  /** Show line numbers in the gutter (default: true) */
+  lineNumbers?: boolean;
+  /** Wrap long lines within the editor viewport (default: true) */
+  lineWrapping?: boolean;
+  /** When false, makes the editor read-only */
+  editable?: boolean;
+} & VariantProps<typeof codeEditorVariants> &
+  Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>;
+
+export const CodeEditor = forwardRef<ReactCodeMirrorRef, CodeEditorProps>(
+  (
+    {
+      data,
+      value,
+      onChange,
+      showCopyButton = true,
+      className,
+      language = 'json',
+      highlightVariables = false,
+      placeholder,
+      schema,
+      autoFocus,
+      lineNumbers = true,
+      lineWrapping = true,
+      editable,
+      variant,
+      id,
+      'aria-label': ariaLabel = 'Code editor',
+      'aria-describedby': ariaDescribedBy,
+      'aria-invalid': ariaInvalid,
+      ...props
+    },
+    ref,
+  ) => {
+    const theme = useCodemirrorTheme();
+    const formattedCode = data ? JSON.stringify(data, null, 2) : (value ?? '');
+
+    const extensions = useMemo(() => {
+      const contentAttributes: CodeEditorContentAttributes = { 'aria-label': ariaLabel };
+      if (id) contentAttributes.id = id;
+      if (ariaDescribedBy) contentAttributes['aria-describedby'] = ariaDescribedBy;
+      if (ariaInvalid !== undefined) contentAttributes['aria-invalid'] = String(ariaInvalid);
+
+      const exts: Extension[] = [...editorFocusExtensions, EditorView.contentAttributes.of(contentAttributes)];
+
+      if (lineWrapping) {
+        exts.push(EditorView.lineWrapping);
+      }
+
+      if (language === 'json') {
+        exts.push(jsonLanguage);
+      } else if (language === 'markdown') {
+        exts.push(markdown({ base: markdownLanguage, codeLanguages }));
+      }
+
+      if (highlightVariables && language === 'markdown') {
+        exts.push(variableHighlight);
+      }
+
+      if (schema && language === 'markdown') {
+        exts.push(createVariableAutocomplete(schema));
+      }
+
+      if (editable === false) {
+        exts.push(EditorState.readOnly.of(true));
+      }
+
+      return exts;
+    }, [language, highlightVariables, schema, editable, lineWrapping, id, ariaLabel, ariaDescribedBy, ariaInvalid]);
+
+    return (
+      <div className={cn(codeEditorVariants({ variant }), className)} {...props}>
+        {showCopyButton && <CopyButton content={formattedCode} className="absolute top-2 right-2 z-20" />}
+        <CodeMirror
+          ref={ref}
+          value={formattedCode}
+          theme={theme}
+          extensions={extensions}
+          onChange={onChange}
+          editable={editable}
+          aria-label={ariaLabel}
+          placeholder={placeholder}
+          height="100%"
+          style={{ height: '100%' }}
+          autoFocus={autoFocus}
+          basicSetup={{ lineNumbers }}
+        />
+      </div>
+    );
+  },
+);

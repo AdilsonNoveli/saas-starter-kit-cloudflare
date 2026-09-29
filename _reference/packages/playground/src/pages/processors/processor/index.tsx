@@ -1,0 +1,61 @@
+import { PageLayout } from '@mastra/playground-ui/components/PageLayout';
+import { Skeleton } from '@mastra/playground-ui/components/Skeleton';
+import { PermissionDenied } from '@mastra/playground-ui/domains/auth/components/permission-denied';
+import { SessionExpired } from '@mastra/playground-ui/domains/auth/components/session-expired';
+import { is401UnauthorizedError, is403ForbiddenError } from '@mastra/playground-ui/utils/errors';
+import { useParams, Navigate } from 'react-router';
+import { PageBreadcrumbs } from '@/components/ui/page-breadcrumbs';
+import { navCrumb, processorCrumb } from '@/domains/navigation/crumbs';
+import { ProcessorPanel } from '@/domains/processors/components/processor-panel';
+import { useProcessor } from '@/domains/processors/hooks/use-processors';
+
+const crumbs = [navCrumb('/processors'), processorCrumb];
+
+export function Processor() {
+  const { processorId } = useParams();
+  const { data: processor, isLoading, error } = useProcessor(processorId!);
+
+  // 401 check - session expired
+  if (error && is401UnauthorizedError(error)) {
+    return (
+      <PageLayout breadcrumbs={<PageBreadcrumbs crumbs={crumbs} />}>
+        <h1 className="sr-only">{processorId}</h1>
+        <SessionExpired variant="fill" />
+      </PageLayout>
+    );
+  }
+
+  // 403 check - permission denied for processors
+  if (error && is403ForbiddenError(error)) {
+    return (
+      <PageLayout breadcrumbs={<PageBreadcrumbs crumbs={crumbs} />}>
+        <h1 className="sr-only">{processorId}</h1>
+        <PermissionDenied variant="fill" resource="processors" />
+      </PageLayout>
+    );
+  }
+
+  // If this is a workflow processor, redirect to the workflow graph UI
+  if (!isLoading && processor?.isWorkflow) {
+    return <Navigate to={`/workflows/${processorId}/graph`} replace />;
+  }
+
+  if (isLoading) {
+    return (
+      <PageLayout breadcrumbs={<PageBreadcrumbs crumbs={crumbs} />}>
+        <h1 className="sr-only">{processorId}</h1>
+        <Skeleton className="mb-4 h-8 w-48" />
+        <Skeleton className="h-32 w-full" />
+      </PageLayout>
+    );
+  }
+
+  return (
+    <PageLayout variant="fit" breadcrumbs={<PageBreadcrumbs crumbs={crumbs} />}>
+      <h1 className="sr-only">{processorId}</h1>
+      <div className="h-full w-full overflow-y-hidden">
+        <ProcessorPanel processorId={processorId!} />
+      </div>
+    </PageLayout>
+  );
+}

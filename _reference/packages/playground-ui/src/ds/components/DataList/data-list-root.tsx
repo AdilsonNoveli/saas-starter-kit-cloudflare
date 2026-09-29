@@ -1,0 +1,173 @@
+import type { CSSProperties, ReactNode, RefObject } from 'react';
+import { ScrollArea } from '@/ds/components/ScrollArea/scroll-area';
+import type { ScrollAreaMask, ScrollAreaProps } from '@/ds/components/ScrollArea/scroll-area';
+import { FluidMenuItems, useFluidMenu } from '@/ds/primitives/fluid-menu';
+import { raisedSurfaceStyle } from '@/ds/primitives/raised-surface';
+import { cn } from '@/lib/utils';
+
+/**
+ * Horizontal sizing of the list grid.
+ *
+ * - `content`: the grid is as wide as its widest content (`w-max`) and the
+ *   ScrollArea scrolls horizontally when it exceeds the container.
+ * - `container`: the grid fills the container width and never exceeds it;
+ *   flexible tracks (`minmax(0, 1fr)`) shrink so truncating cells ellipsize
+ *   instead of widening the table.
+ */
+export type DataListFit = 'content' | 'container';
+
+/**
+ * Surface treatment of the list.
+ *
+ * - `default`: rows sit as wells inside a raised card panel — the same material
+ *   and elevation as a card, a popover or a settings container.
+ * - `light`: no panel behind the rows; rows sit directly on the page.
+ */
+export type DataListVariant = 'default' | 'light';
+
+export type DataListRootProps = Omit<ScrollAreaProps, 'children' | 'orientation' | 'mask' | 'viewportRef'> & {
+  children: ReactNode;
+  columns: string;
+  /** Grid width behavior; defaults to `content` (existing horizontal-scroll sizing). */
+  fit?: DataListFit;
+  /** Surface treatment; defaults to `default` (rows on a raised card panel). */
+  variant?: DataListVariant;
+  /**
+   * Edge fades from the underlying ScrollArea. DataList keeps the top fade off
+   * by default so it does not fade the sticky top header.
+   */
+  mask?: ScrollAreaMask;
+  /**
+   * Ref to the scroll container — pass this to TanStack Virtual's
+   * `getScrollElement` when virtualizing. Without it, the ScrollArea viewport
+   * scrolls normally.
+   */
+  scrollRef?: RefObject<HTMLDivElement | null>;
+};
+
+type DataListRootStyle = CSSProperties & {
+  '--data-list-background'?: string;
+};
+
+function getDataListMask(mask: ScrollAreaMask | undefined): ScrollAreaMask {
+  if (mask === undefined) return { top: false };
+  if (mask === true || mask === false) return mask;
+
+  return { top: false, ...mask };
+}
+
+/**
+ * The root owns the unified table treatment so standalone and wrapped rows look
+ * identical without requiring a per-row index. The ScrollArea provides the
+ * fixed frame; this grid paints the sticky header and separators. The root is
+ * the only element that defines a color: sticky parts read the background
+ * through `--data-list-background` so they stay opaque while scrolling, and
+ * rows/header draw no separators, borders or rings of their own.
+ */
+const dataListGridStyles = [
+  'gap-y-px',
+  // Rows are siblings of the header, so first/last are found via sibling combinators.
+  '[&_.data-list-row:not(.data-list-row~.data-list-row)]:rounded-t-lg',
+  '[&_.data-list-row:not(:has(~.data-list-row))]:rounded-b-lg',
+  '[&_.data-list-row:not(.data-list-row~.data-list-row)>.data-list-sticky-start]:rounded-tl-lg',
+  '[&_.data-list-row:not(:has(~.data-list-row))>.data-list-sticky-start]:rounded-bl-lg',
+  // Subheaders split the rows into sections; each section gets its own rounded ends.
+  '[&_.data-list-subheader+.data-list-row]:rounded-t-lg',
+  '[&_.data-list-row:has(+.data-list-subheader)]:rounded-b-lg',
+  '[&_.data-list-subheader+.data-list-row>.data-list-sticky-start]:rounded-tl-lg',
+  '[&_.data-list-row:has(+.data-list-subheader)>.data-list-sticky-start]:rounded-bl-lg',
+  // The fluid highlight follows the same ends: rounded only when the active
+  // row is the first/last of its section, square everywhere else. `:has()`
+  // cannot nest, so "last" is written as "no row follows the active one".
+  '[&:has(.data-list-row[data-fluid-hover-active]:not(.data-list-row~.data-list-row))_[data-slot=fluid-hover-highlight]]:rounded-t-lg',
+  '[&:has(.data-list-row[data-fluid-hover-active]):not(:has(.data-list-row[data-fluid-hover-active]~.data-list-row))_[data-slot=fluid-hover-highlight]]:rounded-b-lg',
+  '[&:has(.data-list-subheader+.data-list-row[data-fluid-hover-active])_[data-slot=fluid-hover-highlight]]:rounded-t-lg',
+  '[&:has(.data-list-row[data-fluid-hover-active]+.data-list-subheader)_[data-slot=fluid-hover-highlight]]:rounded-b-lg',
+  '[&_.data-list-top]:bg-(--data-list-background)',
+  '[&_.data-list-row>.data-list-sticky-start]:bg-background',
+  // A sticky cell must stay opaque over horizontally scrolled cells, so it
+  // cannot show the fluid highlight through; it takes the opaque twin of a fill
+  // rung over the row well instead, the same level a selected row rests on.
+  '[&_.data-list-row[data-fluid-hover-active]>.data-list-sticky-start]:bg-surface-panel',
+  '[&_.data-list-row>.data-list-sticky-start]:after:right-0',
+  '[&_.data-list-top>.data-list-sticky-start]:after:right-0',
+] as const;
+
+const dataListVariantClasses: Record<DataListVariant, string> = {
+  default: raisedSurfaceStyle,
+  light: '',
+};
+
+// The sticky header reads this so it stays opaque while scrolling: the panel
+// material by default, the page surface when there is no panel.
+const dataListVariantBackground: Record<DataListVariant, string> = {
+  default: 'var(--card)',
+  light: 'var(--background)',
+};
+
+const dataListFitClasses: Record<DataListFit, string> = {
+  content: 'w-max max-w-none min-w-full',
+  container: 'w-full max-w-full',
+};
+
+export function DataListRoot({
+  children,
+  columns,
+  className,
+  fit = 'content',
+  variant = 'default',
+  mask,
+  scrollRef,
+  ...props
+}: DataListRootProps) {
+  const gridStyle: DataListRootStyle = {
+    '--data-list-background': dataListVariantBackground[variant],
+    gridTemplateColumns: columns,
+  };
+
+  // One hover surface travels between rows (same primitive as menus/selects).
+  // Subheaders, pagination and whitespace stay inert, so no gap-click routing.
+  const menu = useFluidMenu<HTMLDivElement>({ gapClick: false });
+
+  const grid = (
+    <div
+      // Lists scroll inside the ScrollArea viewport (below); the grid just lays out.
+      // It is also the offsetParent rows are measured against and the highlight is positioned in.
+      className={cn('grid content-start', ...dataListGridStyles, dataListFitClasses[fit], menu.containerClassName)}
+      style={gridStyle}
+      {...menu.getContainerProps({})}
+    >
+      {/* The highlight is the old row hover color. It sits between each row's
+          `before` surface (-z-2) and the row content (see `dataListRowOuterStyles`). */}
+      <FluidMenuItems menu={menu} className="rounded-none bg-fill-subtle">
+        {children}
+      </FluidMenuItems>
+    </div>
+  );
+
+  // DataList uses the DS ScrollArea: an overlay scrollbar, so the sticky header
+  // spans the full width. Masks default to every overflowing edge except the
+  // top — a top fade would fade the opaque sticky header. A virtualizing list
+  // passes `scrollRef`, forwarded as `viewportRef` so it scrolls this viewport.
+  return (
+    <ScrollArea
+      {...props}
+      orientation="both"
+      mask={getDataListMask(mask)}
+      viewportRef={scrollRef}
+      // Outer radius = row radius (8px) + 4px inset so the corners stay concentric.
+      // Size to content but never exceed the parent. Flex (unlike grid `1fr`) lays
+      // items out against the max-height-clamped container, so short lists stay
+      // compact and long ones shrink the viewport and scroll. `self-start` stops
+      // a grid/flex parent from stretching the root to the full row height.
+      viewPortClassName="min-h-0 flex-1 basis-auto"
+      className={cn(
+        'flex max-h-full w-full flex-col self-start rounded-xl p-1',
+        dataListVariantClasses[variant],
+        className,
+      )}
+    >
+      {grid}
+    </ScrollArea>
+  );
+}

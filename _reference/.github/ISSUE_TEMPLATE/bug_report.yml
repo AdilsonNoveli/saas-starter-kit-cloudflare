@@ -1,105 +1,70 @@
-name: Bug report
-description: Report a reproducible problem with Letta Code
-labels: ["bug"]
+name: Bug Report
+description: Report a bug to help us improve Mastra
+title: '[BUG] '
+labels: ['bug']
 body:
   - type: markdown
     attributes:
       value: |
-        Before filing, search existing issues and confirm the problem is reproducible on a current Letta Code release.
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible to help us address the issue quickly. Creating a high-quality issue will greatly decrease the time it takes to fix it. A maintainer needs to approve your bug report before you or other community members can open PRs for it.
+
+  - type: textarea
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+      placeholder: 'When trying to use the workflow feature with an agent, the execution fails with an error message...'
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Create a new project with `npx create-mastra@latest`
+        2. Add the following code to `src/workflows/example.ts`
+        3. Run `npm run dev`
+        4. Try to execute the workflow
+        5. See error
+    validations:
+      required: true
+
+  - type: input
+    id: bug-reproduction
+    attributes:
+      label: Link to Minimal Reproducible Example
+      description: 'Follow the [instructions](https://github.com/mastra-ai/mastra/blob/main/CONTRIBUTING.md#minimal-reproduction) to create a minimal reproduction of the problem. **A minimal reproduction is required** so that others can help debug your issue. If a report is vague (e.g. just a generic error message) and has no reproduction, it may be closed. Not sure how to create a minimal example? [Read our guide](https://github.com/mastra-ai/mastra/blob/main/CONTRIBUTING.md#minimal-reproduction)'
+      placeholder: 'https://github.com/your-username/your-repo'
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: 'The workflow should execute successfully and return the expected result.'
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Environment Information
+      description: Run "npx envinfo --system --browsers --binaries --npmPackages --npmGlobalPackages" in your project directory and paste the output here.
+      render: shell
+      placeholder: |
+        In addition to the "npx envinfo" output, please also include:
+
+        - LLM Provider: (e.g., OpenAI, Anthropic, Google Gemini)
+        - Browser (if applicable): (e.g., Chrome 120)
+    validations:
+      required: true
 
   - type: checkboxes
-    id: ai-disclosure
     attributes:
-      label: AI Disclosure
-      description: |
-        All issue authors must comply with our [AI Usage Policy](https://github.com/letta-ai/letta-code/blob/main/AI_POLICY.md).
-        Select **exactly one** authorship option, identify every AI tool used below, and acknowledge the policy.
+      label: Verification
+      description: Before submitting, please make sure you've completed the following
       options:
-        - label: This issue was written entirely by a human
-        - label: This issue was written with AI assistance and **reviewed and edited by a human**
-        - label: I have read the [AI Policy](https://github.com/letta-ai/letta-code/blob/main/AI_POLICY.md) and agree to its terms
+        - label: I have searched the existing issues to make sure this is not a duplicate
           required: true
-    validations:
-      required: true
-
-  - type: input
-    id: ai-tools
-    attributes:
-      label: AI Tool(s) Used
-      description: List every AI tool used to research or write this issue. If no AI tool was used, enter `None`.
-      placeholder: "e.g. Letta Code and ChatGPT, or None"
-    validations:
-      required: true
-
-  - type: textarea
-    id: human-verification
-    attributes:
-      label: Human Verification
-      description: |
-        Copy and paste the following phrase **exactly**:
-        `I have personally reproduced or verified this issue, reviewed its contents, and take responsibility for its accuracy.`
-      placeholder: "I have personally reproduced or verified this issue, reviewed its contents, and take responsibility for its accuracy."
-    validations:
-      required: true
-
-  - type: textarea
-    id: description
-    attributes:
-      label: Describe the bug
-      description: Explain what happened and what you expected to happen.
-    validations:
-      required: true
-
-  - type: input
-    id: version
-    attributes:
-      label: Letta Code version
-      description: Run `letta --version`.
-      placeholder: "e.g. 0.29.12"
-    validations:
-      required: true
-
-  - type: dropdown
-    id: surface
-    attributes:
-      label: Where did this happen?
-      options:
-        - CLI
-        - Letta Code Desktop
-        - App Server / SDK
-        - Channel integration
-        - Other
-    validations:
-      required: true
-
-  - type: input
-    id: os
-    attributes:
-      label: Operating system
-      placeholder: "e.g. macOS 15.6, Ubuntu 24.04, Windows 11"
-    validations:
-      required: true
-
-  - type: textarea
-    id: steps
-    attributes:
-      label: Steps to reproduce
-      description: Provide the smallest deterministic reproduction you can.
-      placeholder: |
-        1. Run ...
-        2. Configure ...
-        3. Observe ...
-    validations:
-      required: true
-
-  - type: textarea
-    id: logs
-    attributes:
-      label: Relevant logs, screenshots, or recordings
-      description: Remove secrets and other sensitive data before posting.
-
-  - type: textarea
-    id: context
-    attributes:
-      label: Additional context
-      description: Include any other information needed to understand or reproduce the problem.
+        - label: I have included sufficient information for the team to reproduce and understand the issue
+          required: true

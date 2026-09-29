@@ -1,0 +1,169 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { syncToServer } from '@/lib/carddav/sync';
+import { updatePersonFromVCardInTransaction, savePhotoForPerson } from '@/lib/carddav/vcard-import';
+import type { ParsedVCardData } from '@/lib/carddav/types';
+import { createModuleLogger } from '@/lib/logger';
+import { apiResponse, handleApiError, withAuth } from '@/lib/api-utils';
+import { z } from 'zod';
+import { customFieldValuesInclude } from '@/lib/prisma-queries';
+
+const log = createModuleLogger('carddav');
+
+const resolveSchema = z.object({
+  resolution: z.enum(['keep_local', 'keep_remote', 'merged']),
+});
+
+export const POST = withAuth(async (request, session, context) => {
+  try {
+    const { id } = await context.params;
+    const validationResult = resolveSchema.safeParse(await request.json());
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid resolution type', details: validationResult.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { resolution } = validationResult.data;
+
+    // Get conflict
+    const conflict = await prisma.cardDavConflict.findUnique({
+      where: { id },
+      include: {
+        mapping: {
+          include: {
+            person: {
+              include: {
+                phoneNumbers: true,
+                emails: true,
+                addresses: true,
+                urls: true,
+                imHandles: true,
+                locations: true,
+                customFields: true,
+                customFieldValues: customFieldValuesInclude(),
+              },
+            },
+            connection: true,
+          },
+        },
+      },
+    });
+
+    if (!conflict) {
+      return apiResponse.notFound('Conflict not found');
+    }
+
+    // Verify user owns this connection
+    if (conflict.mapping.connection.userId !== session.user.id) {
+      return apiResponse.forbidden();
+    }
+
+    // Already resolved?
+    if (conflict.resolvedAt) {
+      return apiResponse.error('Conflict already resolved');
+    }
+
+    if (resolution === 'keep_local') {
+      // Keep local version - mark as resolved, set sync status to pending push
+      await prisma.cardDavConflict.update({
+        where: { id },
+        data: {
+          resolvedAt: new Date(),
+          resolution: 'keep_local',
+          resolvedBy: 'user',
+        },
+      });
+
+      await prisma.cardDavMapping.update({
+        where: { id: conflict.mappingId },
+        data: {
+          syncStatus: 'pending',
+          lastLocalChange: new Date(),
+        },
+      });
+    } else if (resolution === 'keep_remote') {
+      // Keep remote version - update person with remote data.
+      // remoteVersion is already ParsedVCardData (stored by syncFromServer),
+      // not raw vCard text, so use it directly.
+      const remoteData = JSON.parse(conflict.remoteVersion) as ParsedVCardData;
+
+      // When a non-FULL name format is active, the N field contains the display
+      // name (e.g., "Mom") not the real name. Skip name fields even on
+      // keep_remote to preserve the canonical names in Nametag's database.
+      const skipNameFields =
+        conflict.mapping.connection.cardDavNameFormat !== 'FULL'
+        || !!conflict.mapping.person.displayNameOverride;
+
+      // Wrap all operations in a single interactive transaction for atomicity
+      await prisma.$transaction(async (tx) => {
+        // Update person with remote data (delete multi-value fields + recreate)
+        await updatePersonFromVCardInTransaction(
+          tx,
+          conflict.mapping.personId,
+          remoteData,
+          { skipNameFields },
+        );
+
+        await tx.cardDavConflict.update({
+          where: { id },
+          data: {
+            resolvedAt: new Date(),
+            resolution: 'keep_remote',
+            resolvedBy: 'user',
+          },
+        });
+
+        await tx.cardDavMapping.update({
+          where: { id: conflict.mappingId },
+          data: {
+            syncStatus: 'synced',
+            lastRemoteChange: new Date(),
+            lastSyncedAt: new Date(),
+          },
+        });
+      });
+
+      // Save photo as file if present (outside transaction - file I/O)
+      if (remoteData.photo) {
+        await savePhotoForPerson(
+          session.user.id,
+          conflict.mapping.personId,
+          remoteData.photo,
+        );
+      }
+    } else if (resolution === 'merged') {
+      // For merged, we expect the client to send the merged data
+      // This is handled separately - for now just mark as resolved
+      await prisma.cardDavConflict.update({
+        where: { id },
+        data: {
+          resolvedAt: new Date(),
+          resolution: 'merged',
+          resolvedBy: 'user',
+        },
+      });
+
+      await prisma.cardDavMapping.update({
+        where: { id: conflict.mappingId },
+        data: {
+          syncStatus: 'pending',
+          lastLocalChange: new Date(),
+        },
+      });
+    }
+
+    // Push pending changes to server in the background
+    if (resolution === 'keep_local' || resolution === 'merged') {
+      syncToServer(session.user.id).catch((error) => {
+        log.error({ err: error instanceof Error ? error : new Error(String(error)) }, 'Background sync after conflict resolution failed');
+      });
+    }
+
+    return apiResponse.success();
+  } catch (error) {
+    return handleApiError(error, 'carddav-conflict-resolve');
+  }
+});

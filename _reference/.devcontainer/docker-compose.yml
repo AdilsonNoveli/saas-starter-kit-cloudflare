@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    image: node:20
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    network_mode: service:db
+    env_file:
+      - ../.env
+    environment:
+      # Override database settings to use docker services
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_NAME=nametag_db
+      - DB_USER=nametag
+      - DB_PASSWORD=nametag_dev_password
+      # Override Redis to use docker service
+      - REDIS_URL=redis://:nametag_dev_password@localhost:6379
+      # Override app URL for dev container
+      - NEXTAUTH_URL=http://localhost:3000
+      - NODE_ENV=development
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nametag
+      POSTGRES_PASSWORD: nametag_dev_password
+      POSTGRES_DB: nametag_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U nametag -d nametag_db]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --requirepass nametag_dev_password
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD, redis-cli, --raw, incr, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    network_mode: service:db
+
+volumes:
+  postgres-data:
+  redis-data:

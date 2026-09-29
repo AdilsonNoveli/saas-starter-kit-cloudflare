@@ -1,0 +1,1328 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// ---------------------------------------------------------------------------
+// Mocks (must be defined before any imports that use them)
+// ---------------------------------------------------------------------------
+
+const mocks = vi.hoisted(() => {
+  // Individual mock functions
+  const personCreate = vi.fn();
+  const personUpdate = vi.fn();
+  const personFindUnique = vi.fn();
+  const transaction = vi.fn();
+  const cardDavMappingDeleteMany = vi.fn();
+  const personGroupDeleteMany = vi.fn();
+  const personGroupCreateMany = vi.fn();
+  const relationshipUpdateMany = vi.fn();
+  const personPhoneUpdateMany = vi.fn();
+  const personPhoneDeleteMany = vi.fn();
+  const personEmailUpdateMany = vi.fn();
+  const personEmailDeleteMany = vi.fn();
+  const personAddressUpdateMany = vi.fn();
+  const personAddressDeleteMany = vi.fn();
+  const personUrlUpdateMany = vi.fn();
+  const personUrlDeleteMany = vi.fn();
+  const personIMUpdateMany = vi.fn();
+  const personIMDeleteMany = vi.fn();
+  const personLocationUpdateMany = vi.fn();
+  const personLocationDeleteMany = vi.fn();
+  const personCustomFieldUpdateMany = vi.fn();
+  const personCustomFieldDeleteMany = vi.fn();
+  const personCustomFieldValueUpdateMany = vi.fn();
+  const personCustomFieldValueDeleteMany = vi.fn();
+  const importantDateFindMany = vi.fn();
+  const importantDateUpdateMany = vi.fn();
+  const importantDateDeleteMany = vi.fn();
+  const journalEntryPersonFindMany = vi.fn();
+  const journalEntryPersonUpdateMany = vi.fn();
+  const journalEntryPersonDeleteMany = vi.fn();
+  const deletedAwarePersonFindUnique = vi.fn();
+  const deletedAwarePersonUpdate = vi.fn();
+  const deletedAwareDisconnect = vi.fn();
+  const autoExportPerson = vi.fn();
+  const autoUpdatePerson = vi.fn();
+
+  const mockTxClient = {
+    person: { update: personUpdate },
+    cardDavMapping: { deleteMany: cardDavMappingDeleteMany, findUnique: vi.fn() },
+    personGroup: { deleteMany: personGroupDeleteMany, createMany: personGroupCreateMany },
+    relationship: { updateMany: relationshipUpdateMany },
+    personPhone: { updateMany: personPhoneUpdateMany, deleteMany: personPhoneDeleteMany },
+    personEmail: { updateMany: personEmailUpdateMany, deleteMany: personEmailDeleteMany },
+    personAddress: { updateMany: personAddressUpdateMany, deleteMany: personAddressDeleteMany },
+    personUrl: { updateMany: personUrlUpdateMany, deleteMany: personUrlDeleteMany },
+    personIM: { updateMany: personIMUpdateMany, deleteMany: personIMDeleteMany },
+    personLocation: { updateMany: personLocationUpdateMany, deleteMany: personLocationDeleteMany },
+    personCustomField: { updateMany: personCustomFieldUpdateMany, deleteMany: personCustomFieldDeleteMany },
+    personCustomFieldValue: { updateMany: personCustomFieldValueUpdateMany, deleteMany: personCustomFieldValueDeleteMany },
+    importantDate: { findMany: importantDateFindMany, updateMany: importantDateUpdateMany, deleteMany: importantDateDeleteMany },
+    journalEntryPerson: {
+      findMany: journalEntryPersonFindMany,
+      updateMany: journalEntryPersonUpdateMany,
+      deleteMany: journalEntryPersonDeleteMany,
+    },
+  };
+
+  return {
+    personCreate,
+    personUpdate,
+    personFindUnique,
+    transaction,
+    cardDavMappingDeleteMany,
+    personGroupDeleteMany,
+    personGroupCreateMany,
+    relationshipUpdateMany,
+    personPhoneUpdateMany,
+    personPhoneDeleteMany,
+    personEmailUpdateMany,
+    personEmailDeleteMany,
+    personAddressUpdateMany,
+    personAddressDeleteMany,
+    personUrlUpdateMany,
+    personUrlDeleteMany,
+    personIMUpdateMany,
+    personIMDeleteMany,
+    personLocationUpdateMany,
+    personLocationDeleteMany,
+    personCustomFieldUpdateMany,
+    personCustomFieldDeleteMany,
+    personCustomFieldValueUpdateMany,
+    personCustomFieldValueDeleteMany,
+    importantDateFindMany,
+    importantDateUpdateMany,
+    importantDateDeleteMany,
+    journalEntryPersonFindMany,
+    journalEntryPersonUpdateMany,
+    journalEntryPersonDeleteMany,
+    deletedAwarePersonFindUnique,
+    deletedAwarePersonUpdate,
+    deletedAwareDisconnect,
+    autoExportPerson,
+    autoUpdatePerson,
+    mockTxClient,
+  };
+});
+
+vi.mock('../../../lib/prisma', () => ({
+  prisma: {
+    person: {
+      create: mocks.personCreate,
+      update: mocks.personUpdate,
+      findUnique: mocks.personFindUnique,
+    },
+    $transaction: mocks.transaction,
+    cardDavMapping: { deleteMany: mocks.cardDavMappingDeleteMany },
+    personGroup: {
+      deleteMany: mocks.personGroupDeleteMany,
+      createMany: mocks.personGroupCreateMany,
+    },
+    relationship: { updateMany: mocks.relationshipUpdateMany },
+    personPhone: { updateMany: mocks.personPhoneUpdateMany, deleteMany: mocks.personPhoneDeleteMany },
+    personEmail: { updateMany: mocks.personEmailUpdateMany, deleteMany: mocks.personEmailDeleteMany },
+    personAddress: { updateMany: mocks.personAddressUpdateMany, deleteMany: mocks.personAddressDeleteMany },
+    personUrl: { updateMany: mocks.personUrlUpdateMany, deleteMany: mocks.personUrlDeleteMany },
+    personIM: { updateMany: mocks.personIMUpdateMany, deleteMany: mocks.personIMDeleteMany },
+    personLocation: { updateMany: mocks.personLocationUpdateMany, deleteMany: mocks.personLocationDeleteMany },
+    personCustomField: { updateMany: mocks.personCustomFieldUpdateMany, deleteMany: mocks.personCustomFieldDeleteMany },
+    importantDate: { findMany: mocks.importantDateFindMany, updateMany: mocks.importantDateUpdateMany, deleteMany: mocks.importantDateDeleteMany },
+    journalEntryPerson: {
+      findMany: mocks.journalEntryPersonFindMany,
+      updateMany: mocks.journalEntryPersonUpdateMany,
+      deleteMany: mocks.journalEntryPersonDeleteMany,
+    },
+  },
+  prismaIncludingDeleted: {
+    person: {
+      findUnique: mocks.deletedAwarePersonFindUnique,
+      update: mocks.deletedAwarePersonUpdate,
+    },
+    $disconnect: mocks.deletedAwareDisconnect,
+  },
+}));
+
+vi.mock('../../../lib/carddav/auto-export', () => ({
+  autoExportPerson: mocks.autoExportPerson,
+  autoUpdatePerson: mocks.autoUpdatePerson,
+}));
+
+// ---------------------------------------------------------------------------
+// Module under test (imported AFTER mocks)
+// ---------------------------------------------------------------------------
+
+import {
+  createPerson,
+  updatePerson,
+  deletePerson,
+  restorePerson,
+  mergePeople,
+} from '../../../lib/services/person';
+import type { PersonUpdateInput } from '../../../lib/services/person';
+import { TIMEZONES, setProcessTimezone, restoreTimezoneAfterEach } from '../../helpers/timezone';
+
+type IncomingImportantDate = NonNullable<PersonUpdateInput['importantDates']>[number];
+
+// ---------------------------------------------------------------------------
+// Test helpers
+// ---------------------------------------------------------------------------
+
+const USER_ID = 'user-1';
+const PERSON_ID = 'person-1';
+const SOURCE_ID = 'person-2';
+
+function makeMinimalPersonData() {
+  return {
+    name: 'Alice',
+    relationshipToUserId: 'rel-type-1',
+  };
+}
+
+function makeFullPersonData() {
+  return {
+    name: 'Alice',
+    surname: 'Smith',
+    middleName: 'M',
+    secondLastName: 'Jones',
+    nickname: 'Ali',
+    prefix: 'Dr',
+    suffix: 'Jr',
+    uid: 'uid-123',
+    organization: 'Acme',
+    jobTitle: 'Engineer',
+    photo: null,
+    gender: 'F',
+    anniversary: '2020-06-15',
+    lastContact: '2024-01-01',
+    notes: 'Some notes',
+    relationshipToUserId: 'rel-type-1',
+    groupIds: ['group-1', 'group-2'],
+    importantDates: [
+      {
+        title: 'Birthday',
+        date: '1990-03-14',
+        reminderEnabled: false,
+      },
+    ],
+    contactReminderEnabled: false,
+    cardDavSyncEnabled: true,
+    phoneNumbers: [{ type: 'mobile', number: '+1234567890' }],
+    emails: [{ type: 'work', email: 'alice@example.com' }],
+    addresses: [
+      {
+        type: 'home',
+        streetLine1: '123 Main St',
+        streetLine2: null,
+        locality: 'Springfield',
+        region: 'IL',
+        postalCode: '62701',
+        country: 'US',
+      },
+    ],
+    urls: [{ type: 'website', url: 'https://alice.example.com' }],
+    imHandles: [{ protocol: 'telegram' as const, handle: '@alice' }],
+    locations: [{ type: 'home' as const, latitude: 40.7128, longitude: -74.006 }],
+    customFields: [{ key: 'X-CUSTOM', value: 'value1', type: null }],
+  };
+}
+
+function makeExistingPerson(overrides: Record<string, unknown> = {}) {
+  return {
+    id: PERSON_ID,
+    userId: USER_ID,
+    deletedAt: null,
+    name: 'Alice',
+    surname: null,
+    cardDavSyncEnabled: true,
+    contactReminderEnabled: false,
+    ...overrides,
+  };
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  mocks.autoExportPerson.mockResolvedValue(undefined);
+  mocks.autoUpdatePerson.mockResolvedValue(undefined);
+  mocks.deletedAwareDisconnect.mockResolvedValue(undefined);
+  mocks.importantDateFindMany.mockResolvedValue([]);
+});
+
+// ===========================================================================
+// createPerson
+// ===========================================================================
+
+describe('createPerson', () => {
+  const createdPerson = { id: PERSON_ID, name: 'Alice', groups: [] };
+
+  beforeEach(() => {
+    mocks.personCreate.mockResolvedValue(createdPerson);
+  });
+
+  it('calls prisma.person.create with user connect and sanitized name', async () => {
+    await createPerson(USER_ID, makeMinimalPersonData());
+
+    expect(mocks.personCreate).toHaveBeenCalledOnce();
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.user).toEqual({ connect: { id: USER_ID } });
+    expect(call.data.name).toBe('Alice');
+  });
+
+  it('connects relationshipToUser when provided', async () => {
+    await createPerson(USER_ID, makeMinimalPersonData());
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.relationshipToUser).toEqual({ connect: { id: 'rel-type-1' } });
+  });
+
+  /**
+   * Calendar dates are stored as UTC midnight everywhere else in the app (the
+   * important-dates API and the CardDAV importer both do this). Rewriting the
+   * year in local time here stored a different instant for the same day, so
+   * the same birthday rendered differently depending on which endpoint had
+   * written it last.
+   */
+  describe('year-unknown important dates', () => {
+    restoreTimezoneAfterEach();
+
+    it.each(TIMEZONES)(
+      'stores August 10 at UTC midnight under year 1604 in %s',
+      async (tz) => {
+        setProcessTimezone(tz);
+
+        await createPerson(USER_ID, {
+          ...makeMinimalPersonData(),
+          importantDates: [{ title: 'Birthday', date: '2026-08-10', yearUnknown: true, reminderEnabled: false }],
+        });
+
+        const call = mocks.personCreate.mock.calls[0][0];
+        const stored = call.data.importantDates.create[0].date as Date;
+        expect(stored.toISOString()).toBe('1604-08-10T00:00:00.000Z');
+      },
+    );
+
+    it('leaves a known-year date at UTC midnight on its own day', async () => {
+      await createPerson(USER_ID, {
+        ...makeMinimalPersonData(),
+        importantDates: [{ title: 'Birthday', date: '1990-03-14', reminderEnabled: false }],
+      });
+
+      const call = mocks.personCreate.mock.calls[0][0];
+      const stored = call.data.importantDates.create[0].date as Date;
+      expect(stored.toISOString()).toBe('1990-03-14T00:00:00.000Z');
+    });
+  });
+
+  it('omits relationshipToUser when not provided', async () => {
+    const data = { name: 'Bob' };
+    await createPerson(USER_ID, data);
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.relationshipToUser).toBeUndefined();
+  });
+
+  it('creates group associations when groupIds are provided', async () => {
+    const data = { ...makeMinimalPersonData(), groupIds: ['g1', 'g2'] };
+    await createPerson(USER_ID, data);
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.groups).toEqual({
+      create: [{ groupId: 'g1' }, { groupId: 'g2' }],
+    });
+  });
+
+  it('omits groups when groupIds not provided', async () => {
+    await createPerson(USER_ID, makeMinimalPersonData());
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.groups).toBeUndefined();
+  });
+
+  it('creates phoneNumbers when provided', async () => {
+    const data = {
+      ...makeMinimalPersonData(),
+      phoneNumbers: [{ type: 'mobile', number: '+1234567890' }],
+    };
+    await createPerson(USER_ID, data);
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.phoneNumbers).toEqual({
+      create: [{ type: 'mobile', number: '+1234567890' }],
+    });
+  });
+
+  it('creates emails when provided', async () => {
+    const data = {
+      ...makeMinimalPersonData(),
+      emails: [{ type: 'work', email: 'test@example.com' }],
+    };
+    await createPerson(USER_ID, data);
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.emails).toEqual({
+      create: [{ type: 'work', email: 'test@example.com' }],
+    });
+  });
+
+  it('creates addresses with null coercion for optional fields', async () => {
+    const data = {
+      ...makeMinimalPersonData(),
+      addresses: [{ type: 'home', streetLine1: '123 Main St' }],
+    };
+    await createPerson(USER_ID, data);
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.addresses.create[0]).toMatchObject({
+      type: 'home',
+      streetLine1: '123 Main St',
+      streetLine2: null,
+      locality: null,
+      region: null,
+      postalCode: null,
+      country: null,
+    });
+  });
+
+  it('creates importantDates with correct date transformation', async () => {
+    const data = {
+      ...makeMinimalPersonData(),
+      importantDates: [{ title: 'Birthday', date: '1990-03-14', reminderEnabled: false }],
+    };
+    await createPerson(USER_ID, data);
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.importantDates.create[0]).toMatchObject({
+      title: 'Birthday',
+      reminderEnabled: false,
+      reminderType: null,
+    });
+    expect(call.data.importantDates.create[0].date).toBeInstanceOf(Date);
+  });
+
+  it('sets year to 1604 when yearUnknown is true', async () => {
+    const data = {
+      ...makeMinimalPersonData(),
+      importantDates: [{ title: 'Birthday', date: '1990-03-14', yearUnknown: true, reminderEnabled: false }],
+    };
+    await createPerson(USER_ID, data);
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    const dateValue = call.data.importantDates.create[0].date as Date;
+    expect(dateValue.getFullYear()).toBe(1604);
+  });
+
+  it('converts anniversary string to Date', async () => {
+    const data = { ...makeMinimalPersonData(), anniversary: '2020-06-15' };
+    await createPerson(USER_ID, data);
+
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.anniversary).toBeInstanceOf(Date);
+  });
+
+  it('sets anniversary to null when not provided', async () => {
+    await createPerson(USER_ID, makeMinimalPersonData());
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.anniversary).toBeNull();
+  });
+
+  it('returns the created person', async () => {
+    const result = await createPerson(USER_ID, makeMinimalPersonData());
+    expect(result).toEqual(createdPerson);
+  });
+
+  it('schedules auto-export when cardDavSyncEnabled is not false', async () => {
+    await createPerson(USER_ID, makeMinimalPersonData());
+    await Promise.resolve();
+    expect(mocks.autoExportPerson).toHaveBeenCalledWith(PERSON_ID);
+  });
+
+  it('does NOT schedule auto-export when cardDavSyncEnabled is false', async () => {
+    const data = { ...makeMinimalPersonData(), cardDavSyncEnabled: false };
+    await createPerson(USER_ID, data);
+    await Promise.resolve();
+    expect(mocks.autoExportPerson).not.toHaveBeenCalled();
+  });
+
+  it('defaults cardDavSyncEnabled to true', async () => {
+    await createPerson(USER_ID, makeMinimalPersonData());
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.cardDavSyncEnabled).toBe(true);
+  });
+
+  it('includes all multi-value fields from full data', async () => {
+    await createPerson(USER_ID, makeFullPersonData());
+    const call = mocks.personCreate.mock.calls[0][0];
+    expect(call.data.phoneNumbers).toBeDefined();
+    expect(call.data.emails).toBeDefined();
+    expect(call.data.addresses).toBeDefined();
+    expect(call.data.urls).toBeDefined();
+    expect(call.data.imHandles).toBeDefined();
+    expect(call.data.locations).toBeDefined();
+    expect(call.data.customFields).toBeDefined();
+  });
+});
+
+// ===========================================================================
+// updatePerson
+// ===========================================================================
+
+describe('updatePerson', () => {
+  const updatedPerson = { id: PERSON_ID, name: 'Alice Updated', groups: [] };
+
+  beforeEach(() => {
+    mocks.personFindUnique.mockResolvedValue(makeExistingPerson());
+    mocks.personUpdate.mockResolvedValue(updatedPerson);
+  });
+
+  it('returns null when person not found', async () => {
+    mocks.personFindUnique.mockResolvedValue(null);
+    const result = await updatePerson(PERSON_ID, USER_ID, { name: 'Alice' });
+    expect(result).toBeNull();
+    expect(mocks.personUpdate).not.toHaveBeenCalled();
+  });
+
+  it('verifies ownership by including userId in findUnique where', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { name: 'Alice' });
+    expect(mocks.personFindUnique).toHaveBeenCalledWith({
+      where: { id: PERSON_ID, userId: USER_ID, deletedAt: null },
+    });
+  });
+
+  it('only includes fields that are provided in updateData', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { name: 'NewName' });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data).toHaveProperty('name');
+    expect(call.data).not.toHaveProperty('surname');
+    expect(call.data).not.toHaveProperty('notes');
+  });
+
+  it('sanitizes name field', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { name: 'Alice' });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.name).toBe('Alice');
+  });
+
+  it('uses deleteMany+create for groupIds', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { groupIds: ['g1', 'g2'] });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.groups).toEqual({
+      deleteMany: {},
+      create: [{ groupId: 'g1' }, { groupId: 'g2' }],
+    });
+  });
+
+  it('uses deleteMany+create for phoneNumbers', async () => {
+    await updatePerson(PERSON_ID, USER_ID, {
+      phoneNumbers: [{ type: 'mobile', number: '+1' }],
+    });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.phoneNumbers).toEqual({
+      deleteMany: {},
+      create: [{ type: 'mobile', number: '+1' }],
+    });
+  });
+
+  it('uses deleteMany+create for emails', async () => {
+    await updatePerson(PERSON_ID, USER_ID, {
+      emails: [{ type: 'work', email: 'a@b.com' }],
+    });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.emails).toEqual({
+      deleteMany: {},
+      create: [{ type: 'work', email: 'a@b.com' }],
+    });
+  });
+
+  it('soft-deletes removed importantDates and recreates kept ones', async () => {
+    // Shaped like the select the update path issues, which reads the schedule
+    // columns as well as the ids.
+    const storedShape = {
+      date: new Date(Date.UTC(1990, 2, 14)),
+      reminderType: null,
+      reminderInterval: null,
+      reminderIntervalUnit: null,
+      reminderLeadDays: null,
+      lastReminderSent: null,
+      lastLeadReminderSent: null,
+    };
+    mocks.importantDateFindMany.mockResolvedValue([
+      { id: 'date-1', ...storedShape },
+      { id: 'date-2', ...storedShape },
+    ]);
+
+    await updatePerson(PERSON_ID, USER_ID, {
+      importantDates: [{ id: 'date-1', title: 'Birthday', date: '1990-03-14', reminderEnabled: false }],
+    });
+
+    // date-2 was removed, should be soft-deleted
+    expect(mocks.importantDateUpdateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['date-2'] } },
+      data: { deletedAt: expect.any(Date) },
+    });
+    // date-1 is kept, hard-deleted then recreated
+    expect(mocks.importantDateDeleteMany).toHaveBeenCalledWith({
+      where: { personId: PERSON_ID, id: { in: ['date-1'] } },
+    });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.importantDates.create).toHaveLength(1);
+  });
+
+  // Kept dates are deleted and recreated, which would otherwise reset the
+  // reminder bookkeeping. Losing it re-arms mail that already went out: saving
+  // an unrelated field would resend the advance notice for every date still
+  // inside its lead window, and the day-of reminder for anything due today.
+  const STAMPS = {
+    lastReminderSent: new Date('2026-03-14T09:00:00Z'),
+    lastLeadReminderSent: new Date('2026-02-12T09:00:00Z'),
+  };
+
+  /** A stored row for 14 March 1990 with a yearly reminder and a 7 day lead. */
+  function storedDate(overrides: Record<string, unknown> = {}) {
+    return {
+      id: 'date-1',
+      date: new Date(Date.UTC(1990, 2, 14)),
+      reminderType: 'RECURRING',
+      reminderInterval: 1,
+      reminderIntervalUnit: 'YEARS',
+      reminderLeadDays: 7,
+      ...STAMPS,
+      ...overrides,
+    };
+  }
+
+  /** The matching input, unchanged unless a test says otherwise. */
+  function incomingDate(
+    overrides: Partial<IncomingImportantDate> = {}
+  ): IncomingImportantDate {
+    return {
+      id: 'date-1',
+      title: 'Birthday',
+      date: '1990-03-14',
+      reminderEnabled: true,
+      reminderType: 'RECURRING',
+      reminderInterval: 1,
+      reminderIntervalUnit: 'YEARS',
+      reminderLeadDays: 7,
+      ...overrides,
+    };
+  }
+
+  function createdDate() {
+    return mocks.personUpdate.mock.calls[0][0].data.importantDates.create[0];
+  }
+
+  it('carries reminder send timestamps across the recreate of kept importantDates', async () => {
+    mocks.importantDateFindMany.mockResolvedValue([storedDate()]);
+
+    await updatePerson(PERSON_ID, USER_ID, { importantDates: [incomingDate()] });
+
+    expect(createdDate()).toMatchObject(STAMPS);
+  });
+
+  // A stamp records "the reminder for this schedule already fired". Carrying it
+  // onto a different date silences the corrected one: fixing a birthday from
+  // March to September after the March mail went out would leave
+  // lastReminderSent in the current year, and the yearly branch skips September.
+  it('drops the timestamps when the date itself was corrected', async () => {
+    mocks.importantDateFindMany.mockResolvedValue([storedDate()]);
+
+    await updatePerson(PERSON_ID, USER_ID, {
+      importantDates: [incomingDate({ date: '1990-09-15' })],
+    });
+
+    const created = createdDate();
+    expect(created.lastReminderSent).toBeUndefined();
+    expect(created.lastLeadReminderSent).toBeUndefined();
+  });
+
+  it('drops the timestamps when the recurrence interval changed', async () => {
+    mocks.importantDateFindMany.mockResolvedValue([storedDate()]);
+
+    await updatePerson(PERSON_ID, USER_ID, {
+      importantDates: [incomingDate({ reminderInterval: 2 })],
+    });
+
+    const created = createdDate();
+    expect(created.lastReminderSent).toBeUndefined();
+    expect(created.lastLeadReminderSent).toBeUndefined();
+  });
+
+  // The day-of history is still accurate, but the lead window moved, so the old
+  // send would sit inside the new window and suppress it.
+  it('keeps the day-of stamp but clears the lead stamp when only the lead time changed', async () => {
+    mocks.importantDateFindMany.mockResolvedValue([storedDate()]);
+
+    await updatePerson(PERSON_ID, USER_ID, {
+      importantDates: [incomingDate({ reminderLeadDays: 30 })],
+    });
+
+    const created = createdDate();
+    expect(created.lastReminderSent).toEqual(STAMPS.lastReminderSent);
+    expect(created.lastLeadReminderSent).toBeNull();
+  });
+
+  // Ids are client-supplied. Without a personId scope on the delete, naming
+  // someone else's date id would hard-delete their row.
+  it('scopes the hard delete of kept dates to this person', async () => {
+    mocks.importantDateFindMany.mockResolvedValue([storedDate()]);
+
+    await updatePerson(PERSON_ID, USER_ID, { importantDates: [incomingDate()] });
+
+    expect(mocks.importantDateDeleteMany).toHaveBeenCalledWith({
+      where: { personId: PERSON_ID, id: { in: ['date-1'] } },
+    });
+  });
+
+  it('leaves send timestamps unset for newly added importantDates', async () => {
+    mocks.importantDateFindMany.mockResolvedValue([]);
+
+    await updatePerson(PERSON_ID, USER_ID, {
+      importantDates: [{ title: 'Birthday', date: '1990-03-14', reminderEnabled: false }],
+    });
+
+    const created = mocks.personUpdate.mock.calls[0][0].data.importantDates.create[0];
+    expect(created.lastReminderSent).toBeUndefined();
+    expect(created.lastLeadReminderSent).toBeUndefined();
+  });
+
+  it('uses deleteMany+create for addresses with null coercion', async () => {
+    await updatePerson(PERSON_ID, USER_ID, {
+      addresses: [{ type: 'home' }],
+    });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.addresses.create[0]).toMatchObject({
+      type: 'home',
+      streetLine1: null,
+      streetLine2: null,
+    });
+  });
+
+  it('uses deleteMany+create for urls', async () => {
+    await updatePerson(PERSON_ID, USER_ID, {
+      urls: [{ type: 'website', url: 'https://example.com' }],
+    });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.urls).toEqual({
+      deleteMany: {},
+      create: [{ type: 'website', url: 'https://example.com' }],
+    });
+  });
+
+  it('uses deleteMany+create for imHandles', async () => {
+    await updatePerson(PERSON_ID, USER_ID, {
+      imHandles: [{ protocol: 'telegram' as const, handle: '@alice' }],
+    });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.imHandles).toEqual({
+      deleteMany: {},
+      create: [{ protocol: 'telegram', handle: '@alice' }],
+    });
+  });
+
+  it('uses deleteMany+create for locations', async () => {
+    await updatePerson(PERSON_ID, USER_ID, {
+      locations: [{ type: 'home' as const, latitude: 40, longitude: -74 }],
+    });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.locations).toEqual({
+      deleteMany: {},
+      create: [{ type: 'home', latitude: 40, longitude: -74 }],
+    });
+  });
+
+  it('uses deleteMany+create for customFields', async () => {
+    await updatePerson(PERSON_ID, USER_ID, {
+      customFields: [{ key: 'X-FOO', value: 'bar' }],
+    });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.customFields).toEqual({
+      deleteMany: {},
+      create: [{ key: 'X-FOO', value: 'bar', type: null }],
+    });
+  });
+
+  it('connects relationshipToUser when id provided', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { relationshipToUserId: 'rel-type-1' });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.relationshipToUser).toEqual({ connect: { id: 'rel-type-1' } });
+  });
+
+  it('disconnects relationshipToUser when null provided', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { relationshipToUserId: null });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.relationshipToUser).toEqual({ disconnect: true });
+  });
+
+  it('does not include relationshipToUser when not in data', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { name: 'Alice' });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data).not.toHaveProperty('relationshipToUser');
+  });
+
+  it('returns the updated person', async () => {
+    const result = await updatePerson(PERSON_ID, USER_ID, { name: 'Alice' });
+    expect(result).toEqual(updatedPerson);
+  });
+
+  it('schedules auto-update when cardDavSyncEnabled is not false', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { name: 'Alice' });
+    await Promise.resolve();
+    expect(mocks.autoUpdatePerson).toHaveBeenCalledWith(PERSON_ID);
+  });
+
+  it('does NOT schedule auto-update when cardDavSyncEnabled is false', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { cardDavSyncEnabled: false });
+    await Promise.resolve();
+    expect(mocks.autoUpdatePerson).not.toHaveBeenCalled();
+  });
+
+  it('does NOT schedule auto-update when stored cardDavSyncEnabled is false and input omits it', async () => {
+    mocks.personFindUnique.mockResolvedValue(makeExistingPerson({ cardDavSyncEnabled: false }));
+    await updatePerson(PERSON_ID, USER_ID, { name: 'Bob' });
+    await Promise.resolve();
+    expect(mocks.autoUpdatePerson).not.toHaveBeenCalled();
+  });
+
+  it('converts anniversary string to Date', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { anniversary: '2020-06-15' });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.anniversary).toBeInstanceOf(Date);
+  });
+
+  it('sets anniversary to null when null provided', async () => {
+    await updatePerson(PERSON_ID, USER_ID, { anniversary: null });
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.data.anniversary).toBeNull();
+  });
+});
+
+// ===========================================================================
+// deletePerson
+// ===========================================================================
+
+describe('deletePerson', () => {
+  beforeEach(() => {
+    mocks.personFindUnique.mockResolvedValue(makeExistingPerson());
+    mocks.personUpdate.mockResolvedValue({ id: PERSON_ID });
+  });
+
+  it('returns null when person not found', async () => {
+    mocks.personFindUnique.mockResolvedValue(null);
+    const result = await deletePerson(PERSON_ID, USER_ID);
+    expect(result).toBeNull();
+    expect(mocks.personUpdate).not.toHaveBeenCalled();
+  });
+
+  it('verifies ownership in findUnique', async () => {
+    await deletePerson(PERSON_ID, USER_ID);
+    expect(mocks.personFindUnique).toHaveBeenCalledWith({
+      where: { id: PERSON_ID, userId: USER_ID, deletedAt: null },
+    });
+  });
+
+  it('sets deletedAt on the person', async () => {
+    await deletePerson(PERSON_ID, USER_ID);
+    const call = mocks.personUpdate.mock.calls[0][0];
+    expect(call.where).toEqual({ id: PERSON_ID });
+    expect(call.data.deletedAt).toBeInstanceOf(Date);
+  });
+
+  it('deletes CardDAV mapping before soft-deleting', async () => {
+    await deletePerson(PERSON_ID, USER_ID);
+    expect(mocks.cardDavMappingDeleteMany).toHaveBeenCalledWith({
+      where: { personId: PERSON_ID },
+    });
+  });
+
+  it('returns the person id on success', async () => {
+    const result = await deletePerson(PERSON_ID, USER_ID);
+    expect(result).toBe(PERSON_ID);
+  });
+});
+
+// ===========================================================================
+// restorePerson
+// ===========================================================================
+
+describe('restorePerson', () => {
+  beforeEach(() => {
+    mocks.deletedAwarePersonFindUnique.mockResolvedValue({
+      id: PERSON_ID,
+      userId: USER_ID,
+      deletedAt: new Date('2024-01-01'),
+    });
+    mocks.deletedAwarePersonUpdate.mockResolvedValue({ id: PERSON_ID });
+  });
+
+  it('returns null when person not found', async () => {
+    mocks.deletedAwarePersonFindUnique.mockResolvedValue(null);
+    const result = await restorePerson(PERSON_ID, USER_ID);
+    expect(result).toBeNull();
+    expect(mocks.deletedAwarePersonUpdate).not.toHaveBeenCalled();
+  });
+
+  it('returns null when person is not soft-deleted', async () => {
+    mocks.deletedAwarePersonFindUnique.mockResolvedValue({
+      id: PERSON_ID,
+      userId: USER_ID,
+      deletedAt: null,
+    });
+    const result = await restorePerson(PERSON_ID, USER_ID);
+    expect(result).toBeNull();
+    expect(mocks.deletedAwarePersonUpdate).not.toHaveBeenCalled();
+  });
+
+  it('clears deletedAt on restore', async () => {
+    await restorePerson(PERSON_ID, USER_ID);
+    const call = mocks.deletedAwarePersonUpdate.mock.calls[0][0];
+    expect(call.where).toEqual({ id: PERSON_ID });
+    expect(call.data).toEqual({ deletedAt: null });
+  });
+
+  it('returns the person id on success', async () => {
+    const result = await restorePerson(PERSON_ID, USER_ID);
+    expect(result).toBe(PERSON_ID);
+  });
+
+  it('looks the person up scoped to the owning user', async () => {
+    await restorePerson(PERSON_ID, USER_ID);
+    expect(mocks.deletedAwarePersonFindUnique).toHaveBeenCalledWith({
+      where: { id: PERSON_ID, userId: USER_ID },
+    });
+  });
+
+  it('never disconnects the shared client', async () => {
+    // prismaIncludingDeleted is a process-wide singleton with its own pool.
+    // Disconnecting it here would tear the pool out from under other requests.
+    await restorePerson(PERSON_ID, USER_ID);
+    expect(mocks.deletedAwareDisconnect).not.toHaveBeenCalled();
+  });
+
+  it('propagates a lookup failure and still does not disconnect', async () => {
+    mocks.deletedAwarePersonFindUnique.mockRejectedValue(new Error('db error'));
+    await expect(restorePerson(PERSON_ID, USER_ID)).rejects.toThrow('db error');
+    expect(mocks.deletedAwareDisconnect).not.toHaveBeenCalled();
+  });
+});
+
+// ===========================================================================
+// mergePeople
+// ===========================================================================
+
+describe('mergePeople', () => {
+  function makePersonForMerge(id: string, overrides: Record<string, unknown> = {}) {
+    return {
+      id,
+      userId: USER_ID,
+      deletedAt: null,
+      name: id === PERSON_ID ? 'Alice' : 'Alicia',
+      surname: null,
+      middleName: null,
+      secondLastName: null,
+      nickname: null,
+      prefix: null,
+      suffix: null,
+      organization: null,
+      jobTitle: null,
+      gender: null,
+      photo: null,
+      notes: null,
+      anniversary: null,
+      lastContact: null,
+      relationshipToUserId: null,
+      cardDavMapping: null,
+      groups: [] as Array<{ groupId: string; personId: string }>,
+      relationshipsFrom: [] as Array<{ id: string; personId: string; relatedPersonId: string; deletedAt: null }>,
+      relationshipsTo: [] as Array<{ id: string; personId: string; relatedPersonId: string; deletedAt: null }>,
+      phoneNumbers: [] as Array<{ id: string; number: string; type: string }>,
+      emails: [] as Array<{ id: string; email: string; type: string }>,
+      addresses: [] as Array<{ id: string; type: string; streetLine1: string | null; streetLine2: string | null; locality: string | null; region: string | null; postalCode: string | null; country: string | null }>,
+      urls: [] as Array<{ id: string; url: string; type: string }>,
+      imHandles: [] as Array<{ id: string; protocol: string; handle: string }>,
+      locations: [] as Array<{ id: string; latitude: number; longitude: number }>,
+      customFields: [] as Array<{ id: string; key: string; value: string }>,
+      customFieldValues: [] as Array<{ id: string; templateId: string; value: string }>,
+      importantDates: [] as Array<{ id: string; title: string; date: Date }>,
+      ...overrides,
+    };
+  }
+
+  beforeEach(() => {
+    mocks.personFindUnique
+      .mockResolvedValueOnce(makePersonForMerge(PERSON_ID))
+      .mockResolvedValueOnce(makePersonForMerge(SOURCE_ID));
+
+    // $transaction: execute callback with a tx client that has the same mocks
+    mocks.transaction.mockImplementation(
+      async (callback: (tx: unknown) => Promise<unknown>) => {
+        return callback(mocks.mockTxClient);
+      }
+    );
+
+    mocks.personUpdate.mockResolvedValue({ id: PERSON_ID });
+    mocks.mockTxClient.person.update.mockResolvedValue({ id: PERSON_ID });
+    mocks.mockTxClient.cardDavMapping.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.cardDavMapping.findUnique.mockResolvedValue(null);
+    mocks.mockTxClient.personGroup.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personGroup.createMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.relationship.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personPhone.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personPhone.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personEmail.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personEmail.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personAddress.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personAddress.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personUrl.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personUrl.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personIM.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personIM.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personLocation.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personLocation.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personCustomField.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personCustomField.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personCustomFieldValue.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.personCustomFieldValue.deleteMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.importantDate.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.importantDate.deleteMany.mockResolvedValue({ count: 0 });
+    // Default: target has no existing journal references → updateMany still
+    // runs unconditionally, but deleteMany is skipped. Tests that exercise
+    // the collision path override findMany per-test.
+    mocks.mockTxClient.journalEntryPerson.findMany.mockResolvedValue([]);
+    mocks.mockTxClient.journalEntryPerson.updateMany.mockResolvedValue({ count: 0 });
+    mocks.mockTxClient.journalEntryPerson.deleteMany.mockResolvedValue({ count: 0 });
+  });
+
+  it('returns null when target not found', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(makePersonForMerge(SOURCE_ID));
+    const result = await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+    expect(result).toBeNull();
+    expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+
+  it('returns null when source not found', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(makePersonForMerge(PERSON_ID))
+      .mockResolvedValueOnce(null);
+    const result = await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+    expect(result).toBeNull();
+    expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+
+  it('returns targetId on success', async () => {
+    const result = await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+    expect(result).toBe(PERSON_ID);
+  });
+
+  it('runs operations inside a transaction', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+    expect(mocks.transaction).toHaveBeenCalledOnce();
+  });
+
+  it('soft-deletes the source person in the transaction', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+    const calls = mocks.mockTxClient.person.update.mock.calls;
+    const softDeleteCall = calls.find(
+      (c: unknown[]) => {
+        const arg = c[0] as { where: { id: string }; data: { deletedAt?: unknown } };
+        return arg.where.id === SOURCE_ID && arg.data.deletedAt instanceof Date;
+      }
+    );
+    expect(softDeleteCall).toBeDefined();
+  });
+
+  it('deletes source CardDAV mapping in transaction', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+    expect(mocks.mockTxClient.cardDavMapping.deleteMany).toHaveBeenCalledWith({
+      where: { personId: SOURCE_ID },
+    });
+  });
+
+  it('deletes source group memberships in transaction', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+    expect(mocks.mockTxClient.personGroup.deleteMany).toHaveBeenCalledWith({
+      where: { personId: SOURCE_ID },
+    });
+  });
+
+  it('applies scalar overrides to target', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID, { name: 'Alice Override', surname: 'Smith' });
+    const call = mocks.mockTxClient.person.update.mock.calls.find(
+      (c: unknown[]) => (c[0] as { where: { id: string } }).where.id === PERSON_ID
+    );
+    if (!call) throw new Error('Expected update call for target person');
+    const data = (call[0] as { data: Record<string, unknown> }).data;
+    expect(data.name).toBe('Alice Override');
+    expect(data.surname).toBe('Smith');
+  });
+
+  it('applies the deprecated cardDavDisplayName alias as displayNameOverride', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID, { cardDavDisplayName: 'Mom' });
+    const call = mocks.mockTxClient.person.update.mock.calls.find(
+      (c: unknown[]) => (c[0] as { where: { id: string } }).where.id === PERSON_ID
+    );
+    if (!call) throw new Error('Expected update call for target person');
+    const data = (call[0] as { data: Record<string, unknown> }).data;
+    expect(data.displayNameOverride).toBe('Mom');
+    expect(data).not.toHaveProperty('cardDavDisplayName');
+  });
+
+  it('prefers explicit displayNameOverride over the deprecated alias', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID, {
+      displayNameOverride: 'Dad',
+      cardDavDisplayName: 'Mom',
+    });
+    const call = mocks.mockTxClient.person.update.mock.calls.find(
+      (c: unknown[]) => (c[0] as { where: { id: string } }).where.id === PERSON_ID
+    );
+    if (!call) throw new Error('Expected update call for target person');
+    const data = (call[0] as { data: Record<string, unknown> }).data;
+    expect(data.displayNameOverride).toBe('Dad');
+  });
+
+  it('clearing via the alias (null) blocks auto-transfer from source', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(makePersonForMerge(PERSON_ID, { displayNameOverride: null }))
+      .mockResolvedValueOnce(makePersonForMerge(SOURCE_ID, { displayNameOverride: 'Boss' }));
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID, { cardDavDisplayName: null });
+
+    const call = mocks.mockTxClient.person.update.mock.calls.find(
+      (c: unknown[]) => (c[0] as { where: { id: string } }).where.id === PERSON_ID
+    );
+    if (!call) throw new Error('Expected update call for target person');
+    const data = (call[0] as { data: Record<string, unknown> }).data;
+    expect(data.displayNameOverride).toBeNull();
+  });
+
+  it('auto-transfers scalar fields that are empty on target', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(makePersonForMerge(PERSON_ID, { name: 'Alice', surname: null }))
+      .mockResolvedValueOnce(makePersonForMerge(SOURCE_ID, { name: 'Alicia', surname: 'Smith' }));
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    const call = mocks.mockTxClient.person.update.mock.calls.find(
+      (c: unknown[]) => (c[0] as { where: { id: string } }).where.id === PERSON_ID
+    );
+    if (!call) throw new Error('Expected update call for target person');
+    const data = (call[0] as { data: Record<string, unknown> }).data;
+    expect(data.surname).toBe('Smith');
+  });
+
+  it('transfers non-duplicate phone numbers to target', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(
+        makePersonForMerge(PERSON_ID, {
+          phoneNumbers: [{ id: 'ph1', number: '+1111', type: 'mobile' }],
+        })
+      )
+      .mockResolvedValueOnce(
+        makePersonForMerge(SOURCE_ID, {
+          phoneNumbers: [
+            { id: 'ph2', number: '+2222', type: 'work' },   // new
+            { id: 'ph3', number: '+1111', type: 'mobile' },  // duplicate
+          ],
+        })
+      );
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    expect(mocks.mockTxClient.personPhone.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['ph2'] } },
+      data: { personId: PERSON_ID },
+    });
+    expect(mocks.mockTxClient.personPhone.deleteMany).toHaveBeenCalledWith({
+      where: { personId: SOURCE_ID },
+    });
+  });
+
+  it('transfers new group memberships to target', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(
+        makePersonForMerge(PERSON_ID, {
+          groups: [{ groupId: 'g1', personId: PERSON_ID }],
+        })
+      )
+      .mockResolvedValueOnce(
+        makePersonForMerge(SOURCE_ID, {
+          groups: [
+            { groupId: 'g1', personId: SOURCE_ID },
+            { groupId: 'g2', personId: SOURCE_ID },
+          ],
+        })
+      );
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    expect(mocks.mockTxClient.personGroup.createMany).toHaveBeenCalledWith({
+      data: [{ personId: PERSON_ID, groupId: 'g2' }],
+    });
+  });
+
+  it('re-parents relationships from source to target (skipping self-refs)', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(
+        makePersonForMerge(PERSON_ID, {
+          relationshipsFrom: [],
+        })
+      )
+      .mockResolvedValueOnce(
+        makePersonForMerge(SOURCE_ID, {
+          relationshipsFrom: [
+            { id: 'rel-1', personId: SOURCE_ID, relatedPersonId: 'person-3', deletedAt: null },
+            { id: 'rel-self', personId: SOURCE_ID, relatedPersonId: PERSON_ID, deletedAt: null },
+          ],
+        })
+      );
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    expect(mocks.mockTxClient.relationship.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['rel-1'] } },
+      data: { personId: PERSON_ID },
+    });
+  });
+
+  it('soft-deletes self-referential (leftover) relationships', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(makePersonForMerge(PERSON_ID))
+      .mockResolvedValueOnce(
+        makePersonForMerge(SOURCE_ID, {
+          relationshipsFrom: [
+            { id: 'rel-self', personId: SOURCE_ID, relatedPersonId: PERSON_ID, deletedAt: null },
+          ],
+        })
+      );
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    expect(mocks.mockTxClient.relationship.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: { in: ['rel-self'] } },
+        data: expect.objectContaining({ deletedAt: expect.any(Date) }),
+      })
+    );
+  });
+
+  it('does not call personGroup.createMany when no new groups', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+    expect(mocks.mockTxClient.personGroup.createMany).not.toHaveBeenCalled();
+  });
+
+  it('re-parents source journal entry references to target', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    expect(mocks.mockTxClient.journalEntryPerson.updateMany).toHaveBeenCalledTimes(1);
+    expect(mocks.mockTxClient.journalEntryPerson.updateMany).toHaveBeenCalledWith({
+      where: { personId: SOURCE_ID },
+      data: { personId: PERSON_ID },
+    });
+  });
+
+  it('removes source journal references that would collide with target', async () => {
+    mocks.mockTxClient.journalEntryPerson.findMany.mockResolvedValueOnce([
+      { journalEntryId: 'je-1' },
+      { journalEntryId: 'je-2' },
+    ]);
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    expect(mocks.mockTxClient.journalEntryPerson.deleteMany).toHaveBeenCalledTimes(1);
+    expect(mocks.mockTxClient.journalEntryPerson.deleteMany).toHaveBeenCalledWith({
+      where: {
+        personId: SOURCE_ID,
+        journalEntryId: { in: ['je-1', 'je-2'] },
+      },
+    });
+    expect(mocks.mockTxClient.journalEntryPerson.updateMany).toHaveBeenCalledTimes(1);
+    expect(mocks.mockTxClient.journalEntryPerson.updateMany).toHaveBeenCalledWith({
+      where: { personId: SOURCE_ID },
+      data: { personId: PERSON_ID },
+    });
+
+    // Order matters: the bare updateMany would throw P2002 on the
+    // (journalEntryId, personId) unique constraint if it ran before delete.
+    const deleteOrder = mocks.mockTxClient.journalEntryPerson.deleteMany.mock.invocationCallOrder[0];
+    const updateOrder = mocks.mockTxClient.journalEntryPerson.updateMany.mock.invocationCallOrder[0];
+    expect(deleteOrder).toBeLessThan(updateOrder);
+  });
+
+  it('does not delete journal references when target has none', async () => {
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    expect(mocks.mockTxClient.journalEntryPerson.deleteMany).not.toHaveBeenCalled();
+  });
+
+  // ─── M4: custom field values transfer ─────────────────────────
+
+  it('transfers source customFieldValues for template ids not present on target', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(
+        makePersonForMerge(PERSON_ID, {
+          customFieldValues: [{ id: 'cfv-target', templateId: 'tpl-A', value: 'yes' }],
+        })
+      )
+      .mockResolvedValueOnce(
+        makePersonForMerge(SOURCE_ID, {
+          customFieldValues: [
+            { id: 'cfv-source-B', templateId: 'tpl-B', value: '42' },  // new template → transfer
+            { id: 'cfv-source-A', templateId: 'tpl-A', value: 'no' },  // duplicate template → skip (target wins)
+          ],
+        })
+      );
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    // Only tpl-B value should be transferred
+    expect(mocks.mockTxClient.personCustomFieldValue.updateMany).toHaveBeenCalledWith({
+      where: { id: { in: ['cfv-source-B'] } },
+      data: { personId: PERSON_ID },
+    });
+    // Cleanup must be called to remove remaining source values
+    expect(mocks.mockTxClient.personCustomFieldValue.deleteMany).toHaveBeenCalledWith({
+      where: { personId: SOURCE_ID },
+    });
+  });
+
+  it('target custom field value wins when both source and target have the same templateId', async () => {
+    mocks.personFindUnique
+      .mockReset()
+      .mockResolvedValueOnce(
+        makePersonForMerge(PERSON_ID, {
+          customFieldValues: [{ id: 'cfv-target-X', templateId: 'tpl-X', value: 'keep-me' }],
+        })
+      )
+      .mockResolvedValueOnce(
+        makePersonForMerge(SOURCE_ID, {
+          customFieldValues: [{ id: 'cfv-source-X', templateId: 'tpl-X', value: 'drop-me' }],
+        })
+      );
+
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    // updateMany must NOT have been called (no values to transfer)
+    expect(mocks.mockTxClient.personCustomFieldValue.updateMany).not.toHaveBeenCalled();
+    // Cleanup must still run
+    expect(mocks.mockTxClient.personCustomFieldValue.deleteMany).toHaveBeenCalledWith({
+      where: { personId: SOURCE_ID },
+    });
+  });
+
+  it('does not call personCustomFieldValue.updateMany when source has no values', async () => {
+    // Default makePersonForMerge has empty customFieldValues
+    await mergePeople(PERSON_ID, SOURCE_ID, USER_ID);
+
+    expect(mocks.mockTxClient.personCustomFieldValue.updateMany).not.toHaveBeenCalled();
+    // Cleanup still runs (deleteMany with empty result is fine)
+    expect(mocks.mockTxClient.personCustomFieldValue.deleteMany).toHaveBeenCalledWith({
+      where: { personId: SOURCE_ID },
+    });
+  });
+});

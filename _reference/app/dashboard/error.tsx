@@ -1,0 +1,54 @@
+'use client';
+
+import { useEffect } from 'react';
+import Link from 'next/link';
+import OfflineNotice from '@/components/OfflineNotice';
+import { useIsOffline } from '@/hooks/useIsOffline';
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  const isOffline = useIsOffline();
+
+  useEffect(() => {
+    console.error('Dashboard error:', error);
+  }, [error]);
+
+  // A failed request while the device is offline is not a crash. Show the calm
+  // offline page rather than an alarming "something went wrong".
+  if (isOffline) {
+    return <OfflineNotice />;
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <div className="max-w-md w-full text-center">
+        <div className="text-6xl mb-4">📊</div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">
+          Failed to load dashboard
+        </h2>
+        <p className="text-muted mb-6">
+          There was a problem loading your dashboard. This might be due to a temporary issue with your data.
+        </p>
+        <div className="flex justify-center space-x-3">
+          <button
+            onClick={reset}
+            className="px-6 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+          >
+            Try Again
+          </button>
+          <Link
+            href="/people"
+            className="px-6 py-2 border border-border text-muted rounded-lg font-medium hover:bg-surface-elevated transition-colors"
+          >
+            Go to People
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}

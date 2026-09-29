@@ -1,0 +1,141 @@
+name: PR Verification
+
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set build environment (CI)
+        run: |
+          echo "DATABASE_URL=postgresql://localhost:5432/dummy" >> "$GITHUB_ENV"
+          echo "NEXTAUTH_URL=http://localhost:3000" >> "$GITHUB_ENV"
+          echo "RESEND_API_KEY=re_build_time_key" >> "$GITHUB_ENV"
+          echo "EMAIL_DOMAIN=build.example.com" >> "$GITHUB_ENV"
+          echo "NEXT_TELEMETRY_DISABLED=1" >> "$GITHUB_ENV"
+          printf "NEXTAUTH_SECRET=" >> "$GITHUB_ENV"
+          head -c 32 < /dev/zero | tr '\0' 'x' >> "$GITHUB_ENV"
+          printf "\n" >> "$GITHUB_ENV"
+          printf "CRON_SECRET=" >> "$GITHUB_ENV"
+          head -c 16 < /dev/zero | tr '\0' 'x' >> "$GITHUB_ENV"
+          printf "\n" >> "$GITHUB_ENV"
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set test environment
+        run: |
+          echo "DATABASE_URL=postgresql://localhost:5432/dummy" >> "$GITHUB_ENV"
+          echo "NEXTAUTH_URL=http://localhost:3000" >> "$GITHUB_ENV"
+          echo "RESEND_API_KEY=re_test_key" >> "$GITHUB_ENV"
+          echo "EMAIL_DOMAIN=test.example.com" >> "$GITHUB_ENV"
+          echo "NEXT_TELEMETRY_DISABLED=1" >> "$GITHUB_ENV"
+          printf "NEXTAUTH_SECRET=" >> "$GITHUB_ENV"
+          head -c 32 < /dev/zero | tr '\0' 'x' >> "$GITHUB_ENV"
+          printf "\n" >> "$GITHUB_ENV"
+          printf "CRON_SECRET=" >> "$GITHUB_ENV"
+          head -c 16 < /dev/zero | tr '\0' 'x' >> "$GITHUB_ENV"
+          printf "\n" >> "$GITHUB_ENV"
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run unit tests
+        run: npm run test:run
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set build environment (CI)
+        run: |
+          echo "DATABASE_URL=postgresql://localhost:5432/dummy" >> "$GITHUB_ENV"
+          echo "NEXTAUTH_URL=http://localhost:3000" >> "$GITHUB_ENV"
+          echo "RESEND_API_KEY=re_build_time_key" >> "$GITHUB_ENV"
+          echo "EMAIL_DOMAIN=build.example.com" >> "$GITHUB_ENV"
+          echo "NEXT_TELEMETRY_DISABLED=1" >> "$GITHUB_ENV"
+          printf "NEXTAUTH_SECRET=" >> "$GITHUB_ENV"
+          head -c 32 < /dev/zero | tr '\0' 'x' >> "$GITHUB_ENV"
+          printf "\n" >> "$GITHUB_ENV"
+          printf "CRON_SECRET=" >> "$GITHUB_ENV"
+          head -c 16 < /dev/zero | tr '\0' 'x' >> "$GITHUB_ENV"
+          printf "\n" >> "$GITHUB_ENV"
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build application
+        run: npm run build

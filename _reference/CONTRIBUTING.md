@@ -1,148 +1,418 @@
-# Contributing to Mastra
+# Contributing to Nametag
 
-Welcome to Mastra! We welcome contributions of any size and skill level. You can _best_ help by creating high-quality issues with good reproductions and descriptions. Thanks for taking the time to contribute!
+Thanks for your interest in contributing! This guide covers how to report issues, propose changes, and submit pull requests. For hands-on setup instructions and code guidelines, see the docs site:
 
-> [!Tip]
->
-> **For new contributors:** Take a look at [https://github.com/firstcontributions/first-contributions](https://github.com/firstcontributions/first-contributions) for helpful information on contributing to open source projects.
+- [Development setup guide](https://docs.nametag.one/contributing/development/) - Dev Container and local development options, running tests, and common commands
+- [Code guidelines](https://docs.nametag.one/contributing/guidelines/) - code style, project structure, commit message format, and PR verification steps
 
-## Contributor guidelines
+## How to Contribute
 
-Please read the guidance below about what to do if you:
+### Reporting Bugs
 
-- [Found a bug](#did-you-find-a-bug)
-- [Want to open a Pull Request](#do-you-want-to-open-a-pull-request)
-- [Want to add a new feature or change an existing one](#do-you-intend-to-add-a-new-feature-or-change-an-existing-one)
-- [Want to improve documentation](#want-to-improve-documentation)
+Before creating a bug report, search existing issues to avoid duplicates.
 
-Read the [Development Guide](./DEVELOPMENT.md) for information on setting up a development environment.
+Include:
 
-### Did you find a bug?
+- Clear description of the issue
+- Steps to reproduce
+- Expected vs actual behavior
+- Screenshots if applicable
+- Environment (OS, browser, Node version)
 
-- Ensure that the bug was not already reported by searching in the [GitHub issues](https://github.com/mastra-ai/mastra/issues)
-- If you're unable to find an open issue addressing the problem, [open a new bug report](https://github.com/mastra-ai/mastra/issues/new?template=bug_report.yml) providing a [minimal reproduction](#minimal-reproduction) of the issue.
+### Suggesting Features
 
-Be sure to include a title and clear description, as much relevant information as possible, and a **code sample** or an **executable test case** demonstrating the expected behavior that is not occurring.
+Feature requests are welcome! Please describe:
 
-### Do you want to open a Pull Request?
+- What problem it solves
+- Who would benefit from it
+- Possible implementation approach (optional)
 
-Follow the [Development Guide](./DEVELOPMENT.md) to learn how to set up this repository and run its tests. After successfully testing things locally, open a pull request with your changes.
+### Submitting Pull Requests
 
-**Required:** Your PR description must include a link to the issue(s) it addresses (e.g. with `Fixes #1234`, `Closes #1234`). PRs without linked issues will be closed.
-
-Also ensure that the PR description clearly describes the problem and solution.
-
-**Important:** Coderabbit and Mastra Platform will automatically comment on your pull request with feedback and suggestions. Please address all comments to ensure a smooth review process. If you disagree with a suggestion, respond with your reasoning so maintainers can review. Afterward, a maintainer will review your PR and either provide feedback or merge it.
-
-### Do you intend to add a new feature or change an existing one?
-
-- Open a [feature request](https://github.com/mastra-ai/mastra/issues/new?template=feature_request.yml) and wait for feedback from the Mastra maintainers
-- A Pull Request can only be opened for feature requests when there is no "status: needs triage" or "status: needs approval" label. If an issue still has those labels, the PR will automatically be closed.
-
-### Want to improve documentation?
-
-Read the [documentation contribution guidelines](./docs/CONTRIBUTING.md) for more details.
-
-## Enterprise Edition (EE) code
-
-Some features in this repository are licensed under the Mastra Enterprise License rather than Apache-2.0. EE code lives in directories named `ee/` within existing packages (e.g., `packages/core/src/auth/ee/`).
-
-**Contributing to EE code**: Contributions to EE-licensed code are welcome. By submitting changes to code within `ee/` directories, you agree that your contributions will be licensed under the Mastra Enterprise License.
-
-**Identifying EE code**: Any directory named `ee/` and its contents are covered by the enterprise license. All other code is Apache-2.0. See [LICENSE.md](./LICENSE.md) for the full mapping.
-
-## Minimal reproduction
-
-A minimal reproduction is a simplified Mastra project that demonstrates a bug with the least amount of code necessary. This helps isolate the issue and makes it easier for maintainers to verify and fix the problem. A minimal reproduction also proves that the bug is not caused by other parts of your codebase or environment. Lastly, creating a minimal reproduction often helps you identify the root cause of the issue yourself.
-
-### 1. Start with a fresh project
-
-Create a new Mastra project:
+1. **Create a feature branch** from `master`:
 
 ```bash
-npx create-mastra@latest bug-reproduction
-cd bug-reproduction
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/bug-description
 ```
 
-Alternatively, you can start from one of the examples in the `/examples` directory that's closest to your use case, then strip it down to the minimum.
+2. **Make your changes** following our [code guidelines](https://docs.nametag.one/contributing/guidelines/)
 
-### 2. Add only what's needed to demonstrate the bug
+3. **Test your changes**:
 
-**Do add:**
+```bash
+# Quick verification (recommended - runs lint, typecheck, unit tests, and build)
+npm run verify
 
-- The specific Mastra packages related to the issue (e.g., `@mastra/core`, `@mastra/rag`, `@mastra/pg`)
-- Minimal configuration to reproduce the bug
-- Only the code that triggers the error
+# Full verification including E2E tests (optional but recommended for larger changes)
+npm run verify:all
+```
 
-**Don't add:**
+4. **Commit with clear messages**:
 
-- Your entire production codebase
-- Multiple unrelated features
-- Custom UI components or styling
-- Business logic unrelated to the bug
-- Environment-specific configurations
+```bash
+git commit -m "feat: add birthday reminder notifications"
+git commit -m "fix: resolve duplicate person creation"
+git commit -m "docs: update API documentation"
+```
 
-**For specific issues:**
+5. **Push and create a PR**:
 
-- **Agents**: Include only the minimal agent configuration and tools needed
-- **Integrations**: Add only the specific integration that's problematic
-- **Storage/Memory**: Include only the relevant store adapter
-- **Workflows**: Include only the minimal workflow steps that reproduce the issue
-- **Tools**: Add only the tool causing the problem
+```bash
+git push origin feature/your-feature-name
+```
 
-### 3. Verify the reproduction
+Then open a pull request on GitHub.
 
-Test that your minimal reproduction actually demonstrates the problem:
+**PR Guidelines:**
 
-- Run the reproduction in a clean environment
-- Confirm you see the expected error or unexpected behavior
-- Try removing code to see if you can make it even more minimal
-- If you fixed the issue while creating the reproduction, document what you changed
+- Keep PRs focused on a single feature or fix
+- Link to related issues
+- Add a clear description of what changed and why
+- Include screenshots for UI changes
+- Ensure all checks pass (lint, typecheck, tests, build) - these run automatically via GitHub Actions
+- Run `npm run verify` locally before pushing to catch issues early
+- Update documentation if needed
 
-### 4. Publish and share
+## Adding a New Language
 
-Create a public GitHub repository with your reproduction:
+Want to add support for a new language to Nametag? Follow this guide.
 
-1. Push your code to GitHub
-2. Add a clear README.md that includes:
-   - Description of the expected vs actual behavior
-   - Exact steps to reproduce (install, build, run commands)
-   - Which command or action triggers the error
-   - Your environment (Node version, package manager, OS)
-3. Link to the repository in your GitHub issue
+### Prerequisites
 
-### Troubleshooting common scenarios
+Before starting, ensure you have:
 
-**LLM/API keys**:
+- Fluency in the target language or access to reliable translation resources (preferrably you are a native speaker)
+- The correct locale code for your language (format: `language-COUNTRY`, e.g., `fr-FR`, `de-DE`, `pt-BR`)
+- The flag icon code from the [flag-icons library](https://flagicons.lipis.dev/)
 
-- Use mock responses when possible to avoid requiring real API keys
-- If real keys are needed, clearly document which services require authentication
-- If possible, use OpenAI as it is widely accessible
-- Consider using environment variable examples: `OPENAI_API_KEY=your-key-here`
+### Step 1: Create Translation File
 
-**Docker services**:
+Create a new JSON file in `/locales/{locale-code}.json`:
 
-- Note if the reproduction requires `pnpm dev:services:up` for PostgreSQL, Redis, etc.
-- Specify which services are needed
+```bash
+# Example for French (France)
+cp locales/en.json locales/fr-FR.json
+```
 
-**Build vs runtime issues**:
+Translate all strings in the new file. Keep the same structure and keys as the English version.
 
-- Clarify if the bug occurs during `mastra build`, `mastra dev`, or at runtime
-- Include build output if it's a build-time error
+### Step 2: Update Locale Configuration
 
-**Monorepo context**:
+Edit `/lib/locale.ts`:
 
-- If the issue is in a specific package, mention which one
-- Note if the issue only occurs when built from the monorepo root
+**Add to SUPPORTED_LOCALES array** (around line 7):
 
-### Optional steps
+```typescript
+export const SUPPORTED_LOCALES = ["en", "es-ES", "ja-JP", "fr-FR"] as const;
+//                                                        ^^^^^^^ Add your locale
+```
 
-For complex reproductions, you may also need to:
+**Add language mapping in `normalizeLocale()` function** (around line 48):
 
-- **Observability**: Include logs from observability providers if relevant to the issue
-- **Production-only bugs**: If the issue only occurs in deployed environments, provide details about your deployment platform (Vercel, Netlify, Cloudflare, etc.)
-- **Specific LLM models**: Document if the bug only occurs with certain models or providers
-- **Screenshots/videos**: For UI-related issues, include visual documentation of the problem
-- **Network traces**: For integration issues, include relevant network request/response data
+```typescript
+if (languageCode === "ja") {
+  return "ja-JP";
+}
 
-A well-crafted minimal reproduction is the best way to get your issue resolved quickly.
+// Add your language mapping
+if (languageCode === "fr") {
+  return "fr-FR";
+}
+```
+
+**Add language mapping in `detectBrowserLocale()` function** (around line 148):
+
+```typescript
+if (languageCode === "ja") {
+  return "ja-JP";
+}
+
+// Add your language mapping
+if (languageCode === "fr") {
+  return "fr-FR";
+}
+```
+
+### Step 3: Update i18n Configuration
+
+Edit `/i18n.ts`:
+
+**Add language code mapping** (around line 48):
+
+```typescript
+if (languageCode === "ja") {
+  locale = "ja-JP";
+  break;
+}
+
+// Add your language mapping
+if (languageCode === "fr") {
+  locale = "fr-FR";
+  break;
+}
+```
+
+### Step 4: Update LanguageSelector Component
+
+Edit `/components/LanguageSelector.tsx`:
+
+**Update TypeScript types** (line 9):
+
+```typescript
+interface LanguageSelectorProps {
+  currentLanguage: "en" | "es-ES" | "ja-JP" | "fr-FR";
+  //                                          ^^^^^^^ Add your locale
+}
+```
+
+**Add to LANGUAGES array** (around line 12):
+
+```typescript
+const LANGUAGES = [
+  { code: "en" as const, name: "English", flag: "gb" },
+  { code: "es-ES" as const, name: "Español (España)", flag: "es" },
+  { code: "ja-JP" as const, name: "日本語", flag: "jp" },
+  { code: "fr-FR" as const, name: "Français (France)", flag: "fr" },
+  //                                                    ^^^^ Flag code from flag-icons
+];
+```
+
+**Add to labelMap** (around line 18):
+
+```typescript
+const labelMap = {
+  en: "en",
+  "es-ES": "esES",
+  "ja-JP": "jaJP",
+  "fr-FR": "frFR", // Convert hyphen to camelCase: fr-FR to frFR
+} as const;
+```
+
+**Update handleLanguageChange type** (line 28):
+
+```typescript
+const handleLanguageChange = async (newLanguage: 'en' | 'es-ES' | 'ja-JP' | 'fr-FR') => {
+  //                                                                          ^^^^^^^ Add your locale
+```
+
+### Step 5: Update API Route
+
+Edit `/app/api/user/language/route.ts`:
+
+**Update error message** (around line 27):
+
+```typescript
+return NextResponse.json(
+  { error: "Invalid language. Supported languages: en, es-ES, ja-JP, fr-FR" },
+  //                                                                 ^^^^^^^ Add your locale
+  { status: 400 },
+);
+```
+
+### Step 6: Add Language Names to All Translation Files
+
+Add your language name to **ALL** locale files under `settings.appearance.language`:
+
+**In `/locales/en.json`**:
+
+```json
+"language": {
+  "title": "Language",
+  "description": "Choose your preferred language",
+  "en": "English",
+  "esES": "Español (España)",
+  "jaJP": "日本語",
+  "frFR": "Français (France)"
+}
+```
+
+**In `/locales/es-ES.json`**:
+
+```json
+"language": {
+  "title": "Idioma",
+  "description": "Elige tu idioma preferido",
+  "en": "English",
+  "esES": "Español (España)",
+  "jaJP": "日本語",
+  "frFR": "Français (France)"
+}
+```
+
+**In `/locales/ja-JP.json`**:
+
+```json
+"language": {
+  "title": "言語",
+  "description": "お好みの言語を選択してください",
+  "en": "English",
+  "esES": "Español (España)",
+  "jaJP": "日本語",
+  "frFR": "Français (France)"
+}
+```
+
+**And in your new locale file** (e.g., `/locales/fr-FR.json`):
+
+```json
+"language": {
+  "title": "Langue",
+  "description": "Choisissez votre langue préférée",
+  "en": "English",
+  "esES": "Español (España)",
+  "jaJP": "日本語",
+  "frFR": "Français (France)"
+}
+```
+
+### Step 7: Add Tests
+
+Edit `/tests/lib/locale.test.ts`:
+
+Add test cases for your new language:
+
+```typescript
+// In isSupportedLocale tests
+it('should return true for "fr-FR"', () => {
+  expect(isSupportedLocale("fr-FR")).toBe(true);
+});
+
+// In normalizeLocale tests
+it('should pass through "fr-FR"', () => {
+  expect(normalizeLocale("fr-FR")).toBe("fr-FR");
+});
+
+it('should map "fr" to "fr-FR"', () => {
+  expect(normalizeLocale("fr")).toBe("fr-FR");
+});
+
+// In detectBrowserLocale tests
+it("should detect French from Accept-Language header", async () => {
+  const { headers } = await import("next/headers");
+  vi.mocked(headers).mockResolvedValue({
+    get: vi.fn().mockReturnValue("fr-FR,fr;q=0.9,en;q=0.8"),
+  } as any);
+
+  const locale = await detectBrowserLocale();
+
+  expect(locale).toBe("fr-FR");
+});
+
+it('should map "fr" to "fr-FR"', async () => {
+  const { headers } = await import("next/headers");
+  vi.mocked(headers).mockResolvedValue({
+    get: vi.fn().mockReturnValue("fr,en;q=0.9"),
+  } as any);
+
+  const locale = await detectBrowserLocale();
+
+  expect(locale).toBe("fr-FR");
+});
+```
+
+### Important Notes
+
+**Locale Code Format:**
+
+- Use the format `language-COUNTRY` (e.g., `fr-FR`, `pt-BR`, `zh-CN`)
+- Language code: lowercase, 2 letters (ISO 639-1)
+- Country code: uppercase, 2 letters (ISO 3166-1 alpha-2)
+- Exception: English uses just `en` without country code
+
+**LabelMap Convention:**
+
+- Convert locale codes to camelCase for labelMap keys
+- Remove hyphens: `fr-FR` to `frFR`, `pt-BR` to `ptBR`
+- Used for accessing translations in the LanguageSelector component
+
+**Flag Icons:**
+
+- Find your flag code at [flagicons.lipis.dev](https://flagicons.lipis.dev/)
+- Usually the lowercase country code (e.g., `fr`, `de`, `jp`)
+- Exception: Great Britain uses `gb` instead of `uk`
+
+**Translation Quality:**
+
+- Ensure all strings are properly translated (no English fallbacks)
+- Test the app in the new language to verify context
+- Pay attention to:
+  - Proper capitalization for the target language
+  - Gender-specific forms (if applicable)
+  - Pluralization rules
+  - Date/time format preferences
+  - Cultural appropriateness
+
+### Testing Your Translation
+
+1. **Start the development server:**
+
+   ```bash
+   npm run dev
+   ```
+
+2. **Navigate to Settings → Appearance → Language**
+
+3. **Select your new language** and verify:
+   - Language appears in the selector
+   - Flag icon displays correctly
+   - All UI text is translated
+   - No English strings remain
+   - Forms, buttons, and error messages are translated
+   - Date formatting is appropriate
+
+4. **Run tests:**
+
+   ```bash
+   npm run test
+   ```
+
+5. **Build the application:**
+   ```bash
+   npm run build
+   ```
+
+### Submitting Your Translation
+
+1. Create a feature branch:
+
+   ```bash
+   git checkout -b feat/add-{language}-translation
+   ```
+
+2. Commit your changes:
+
+   ```bash
+   git commit -m "feat: add {Language} translation"
+   ```
+
+3. Push and create a Pull Request:
+
+   ```bash
+   git push origin feat/add-{language}-translation
+   ```
+
+4. In your PR description:
+   - Mention that you've added support for {Language}
+   - Confirm all 7 files have been updated
+   - Note if you're a native speaker or used translation tools
+   - Include screenshots of the language selector with your language
+
+### Getting Help
+
+If you need assistance:
+
+- For translation help: Use AI tools like ChatGPT, DeepL, or Google Translate
+- For technical help: Open an issue or discussion on GitHub
+- For locale code questions: Check [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) and [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+
+## Questions or Issues?
+
+- Open an issue for bugs or feature requests
+- Start a discussion for questions or ideas
+- Check existing issues before creating new ones
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the AGPL-3.0 License.

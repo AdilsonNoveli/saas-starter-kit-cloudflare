@@ -1,0 +1,133 @@
+# Production Docker Compose Configuration
+# Use this for production and self-hosted deployments with proper secrets management
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: nametag-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nametag-network
+
+  redis: # Optional. Comment out to disable Redis. See README.md for more details.
+    image: redis:7-alpine
+    container_name: nametag-redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:?Redis password required}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [CMD, redis-cli, --raw, incr, ping]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nametag-network
+
+  app:
+    image: ghcr.io/mattogodoy/nametag:latest
+    container_name: nametag-app
+    restart: unless-stopped
+    labels:
+      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "nametag"}]'
+    ports:
+      - 3000:3000
+      # TRUSTED_PROXY_HEADER / TRUSTED_PROXY_COUNT (see .env.example /
+      # docs/self-hosting/reverse-proxy.md) only protect rate limiting if
+      # this port cannot be reached except through your reverse proxy.
+      # Publishing it on all interfaces, as above, lets anyone who can reach
+      # the host bypass the proxy (and the header it sets) entirely. If you
+      # run a reverse proxy in front of Nametag (recommended for any
+      # instance reachable from outside your own network), bind this to
+      # localhost instead so only the proxy on the same host can reach it:
+      #   - "127.0.0.1:3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - photo_data:/app/data/photos
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:  # Optional. Comment out to disable Redis. See README.md for more details.
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, wget, -q, --spider, http://localhost:3000/api/health]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - nametag-network
+      - proxy
+
+  # Database backup service
+  backup:
+    image: prodrigestivill/postgres-backup-local
+    container_name: nametag-backup
+    restart: always
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - SCHEDULE=@daily
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=6
+      - HEALTHCHECK_PORT=8080
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      - db
+    networks:
+      - nametag-network
+
+  # Cron service for scheduled jobs
+  cron:
+    image: alpine:3.19
+    container_name: nametag-cron
+    restart: always
+    environment:
+      - CRON_SECRET=${CRON_SECRET}
+    depends_on:
+      - app
+    command: >
+      sh -c "
+        echo '0 8 * * * wget -q -O - --header=\"Authorization: Bearer '\"$$CRON_SECRET\"'\" http://app:3000/api/cron/send-reminders > /proc/1/fd/1 2>&1' > /etc/crontabs/root &&
+        echo '0 3 * * * wget -q -O - --header=\"Authorization: Bearer '\"$$CRON_SECRET\"'\" http://app:3000/api/cron/purge-deleted > /proc/1/fd/1 2>&1' >> /etc/crontabs/root &&
+        echo '0 2,10,18 * * * wget -q -O - --header=\"Authorization: Bearer '\"$$CRON_SECRET\"'\" http://app:3000/api/cron/carddav-sync > /proc/1/fd/1 2>&1' >> /etc/crontabs/root &&
+        echo '*/5 * * * * wget -q -O - --header=\"Authorization: Bearer '\"$$CRON_SECRET\"'\" http://app:3000/api/cron/geocode > /proc/1/fd/1 2>&1' >> /etc/crontabs/root &&
+        crond -f -l 2
+      "
+    networks:
+      - nametag-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data: # Optional. Comment out to disable Redis. See README.md for more details.
+    driver: local
+  photo_data:
+    driver: local
+
+networks:
+  nametag-network:
+    external: true
+    name: nametag-network
+  proxy: # for reverse proxy (e.g., Nginx Proxy Manager) to access the app without exposing ports to the outside world
+    external: true

@@ -1,0 +1,221 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { createCardDavClient } from '@/lib/carddav/client';
+import { getAddressBook } from '@/lib/carddav/address-book';
+import { personToVCard } from '@/lib/carddav/vcard-export';
+import { v4 as uuidv4 } from 'uuid';
+import { buildLocalHash } from '@/lib/carddav/hash';
+import { createModuleLogger } from '@/lib/logger';
+import { withAuth } from '@/lib/api-utils';
+import { z } from 'zod';
+import { customFieldValuesInclude } from '@/lib/prisma-queries';
+
+const log = createModuleLogger('carddav');
+
+const exportBulkSchema = z.object({
+  personIds: z.array(z.string()).min(1, 'No contacts selected for export'),
+});
+
+export const POST = withAuth(async (request, session) => {
+  try {
+
+    const body = await request.json();
+    const validationResult = exportBulkSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validationResult.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { personIds } = validationResult.data;
+
+    // Get connection
+    const connection = await prisma.cardDavConnection.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (!connection) {
+      return NextResponse.json(
+        { error: 'CardDAV connection not found' },
+        { status: 404 }
+      );
+    }
+
+    if (!connection.syncEnabled) {
+      return NextResponse.json(
+        { error: 'Sync is disabled for this connection' },
+        { status: 400 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { nameOrder: true },
+    });
+
+    // Create CardDAV client
+    const client = await createCardDavClient(connection);
+
+    // Get address book
+    let addressBook;
+    try {
+      addressBook = await getAddressBook(client, connection);
+    } catch {
+      return NextResponse.json(
+        { error: 'No address books found' },
+        { status: 404 }
+      );
+    }
+
+    // Get people to export
+    const people = await prisma.person.findMany({
+      where: {
+        id: { in: personIds },
+        userId: session.user.id,
+        deletedAt: null,
+      },
+      include: {
+        phoneNumbers: true,
+        emails: true,
+        addresses: true,
+        urls: true,
+        imHandles: true,
+        locations: true,
+        customFields: true,
+        customFieldValues: customFieldValuesInclude(),
+        importantDates: { where: { deletedAt: null } },
+        relationshipsFrom: {
+          include: {
+            relatedPerson: true,
+          },
+        },
+        groups: {
+          where: { group: { deletedAt: null } },
+          include: {
+            group: true,
+          },
+        },
+      },
+    });
+
+    if (people.length === 0) {
+      return NextResponse.json(
+        { error: 'No contacts found to export' },
+        { status: 404 }
+      );
+    }
+
+    // Pre-fetch all existing mappings for the requested person IDs in one query
+    // to avoid N+1 per-person queries in the export loop.
+    const existingMappings = await prisma.cardDavMapping.findMany({
+      where: { personId: { in: personIds }, connectionId: connection.id },
+      select: { personId: true },
+    });
+    const alreadyMappedPersonIds = new Set(existingMappings.map((m) => m.personId));
+
+    const results = {
+      exported: 0,
+      skipped: 0,
+      errors: 0,
+      errorMessages: [] as string[],
+    };
+
+    // Process each person with rate limiting (50 per batch)
+    const batchSize = 50;
+    for (let i = 0; i < people.length; i += batchSize) {
+      const batch = people.slice(i, i + batchSize);
+
+      for (const person of batch) {
+        try {
+          // Check if already exported (O(1) set lookup instead of per-person query)
+          if (alreadyMappedPersonIds.has(person.id)) {
+            results.skipped++;
+            continue; // Already exported
+          }
+
+          // Ensure person has a UID
+          const uid: string = person.uid || uuidv4();
+          if (!person.uid) {
+            await prisma.person.update({
+              where: { id: person.id },
+              data: { uid },
+            });
+          }
+
+          // Convert to vCard
+          const vCardData = personToVCard(person, {
+            cardDavNameFormat: connection.cardDavNameFormat,
+            nameOrder: user?.nameOrder,
+          });
+
+          // Create vCard on server
+          const filename = `${uid}.vcf`;
+          const created = await client.createVCard(addressBook, vCardData, filename);
+
+          // Create mapping
+          const localHash = buildLocalHash(person);
+
+          await prisma.cardDavMapping.create({
+            data: {
+              connectionId: connection.id,
+              personId: person.id,
+              uid,
+              href: created.url,
+              etag: created.etag,
+              syncStatus: 'synced',
+              lastSyncedAt: new Date(),
+              localVersion: localHash,
+            },
+          });
+
+          // Ensure ongoing sync is enabled for explicitly exported persons
+          await prisma.person.update({
+            where: { id: person.id },
+            data: { cardDavSyncEnabled: true },
+          });
+
+          results.exported++;
+        } catch (error) {
+          log.error({ err: error instanceof Error ? error : new Error(String(error)), personName: `${person.name} ${person.surname || ''}`.trim() }, 'Error exporting contact');
+          results.errors++;
+          results.errorMessages.push(
+            `Failed to export ${person.name} ${person.surname || ''}: ${
+              error instanceof Error ? error.message : 'Unknown error'
+            }`
+          );
+        }
+      }
+
+      // Small delay between batches to avoid overwhelming the server
+      if (i + batchSize < people.length) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    }
+
+    // Update connection last sync time
+    await prisma.cardDavConnection.update({
+      where: { id: connection.id },
+      data: {
+        lastSyncAt: new Date(),
+        lastError: null,
+        lastErrorAt: null,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      exported: results.exported,
+      skipped: results.skipped,
+      errors: results.errors,
+      errorMessages: results.errorMessages,
+    });
+  } catch (error) {
+    log.error({ err: error instanceof Error ? error : new Error(String(error)) }, 'Bulk export failed');
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+});

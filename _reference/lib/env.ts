@@ -1,0 +1,327 @@
+import { z } from 'zod';
+
+/**
+ * Environment variable validation
+ * This ensures all required environment variables are present at startup
+ */
+
+// z.coerce.boolean() treats any non-empty string (including 'false') as true.
+// This schema correctly handles 'false' and '0' as falsy values.
+const booleanFromString = z
+  .string()
+  .transform((val) => val !== 'false' && val !== '0' && val !== '')
+  .pipe(z.boolean())
+  .or(z.boolean())
+  .default(false);
+
+/**
+ * Treat a blank value in `.env` as "not set".
+ *
+ * `envSchema.safeParse(process.env)` sees `VAR=` as the empty string, not as
+ * `undefined`, and `.default()` only fires for `undefined`. For a coerced
+ * number that is actively dangerous: `Number('') === 0`, so `VAR=` passes a
+ * `.min(0)` floor and silently becomes 0 rather than the documented default.
+ * That is how `TRUSTED_PROXY_COUNT=` would mean "trust no proxy" (collapsing
+ * every rate limit into one shared bucket) instead of the documented 1.
+ *
+ * Wrap any optional or defaulted variable in this. The one place it must NOT
+ * be used is `DB_PASSWORD`, where an empty password is a real, supported
+ * value rather than an unset one.
+ */
+function blankAsUndefined<T extends z.ZodTypeAny>(schema: T) {
+  return z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    schema
+  );
+}
+
+const envSchema = z.object({
+  // Database - either DATABASE_URL or individual DB_* variables
+  DATABASE_URL: z.string().min(1).optional(),
+  DB_HOST: z.string().min(1).optional(),
+  DB_PORT: z.coerce.number().min(1).max(65535).optional(),
+  DB_NAME: z.string().min(1).optional(),
+  DB_USER: z.string().min(1).optional(),
+  DB_PASSWORD: z.string().optional(), // Optional to allow empty passwords
+
+  // NextAuth
+  NEXTAUTH_URL: z.string().url('NEXTAUTH_URL must be a valid URL'),
+  NEXTAUTH_SECRET: z
+    .string()
+    .min(32, 'NEXTAUTH_SECRET must be at least 32 characters'),
+
+  // Email (Resend) - Only required in SaaS mode
+  RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required').optional(),
+  EMAIL_DOMAIN: z.string().min(1, 'EMAIL_DOMAIN is required').optional(),
+
+  // Email (SMTP) - Optional alternative to Resend
+  SMTP_HOST: z.string().min(1).optional(),
+  SMTP_PORT: z.coerce.number().min(1).max(65535).optional(),
+  SMTP_SECURE: booleanFromString.optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_REQUIRE_TLS: booleanFromString.default(true).optional(),
+  SMTP_FROM: z.string().optional(), // Override from address (e.g., for servers that reject custom from addresses)
+
+  // Google OAuth - Only required in SaaS mode
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+
+  // Stripe - Only required in SaaS mode
+  STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
+
+  // Cron
+  CRON_SECRET: z.string().min(16, 'CRON_SECRET must be at least 16 characters'),
+
+  // Redis (Optional for development, recommended for production)
+  REDIS_URL: z.string().url().optional(),
+
+  // Optional
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
+  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+
+  // SaaS mode - enables billing and tier limits (undocumented, for internal use)
+  SAAS_MODE: booleanFromString,
+
+  // Disable registration after first user (useful for public-facing self-hosted instances)
+  DISABLE_REGISTRATION: booleanFromString,
+
+  // Geocoding for the map feature
+  GEOCODER_URL: z.string().url().default('https://nominatim.openstreetmap.org'),
+  DISABLE_GEOCODING: booleanFromString,
+
+  // OIDC provider (self-hosted only)
+  OIDC_ISSUER_URL: z.string().url().optional(),
+  OIDC_CLIENT_ID: z.string().min(1).optional(),
+  OIDC_CLIENT_SECRET: z.string().min(1).optional(),
+  OIDC_DISPLAY_NAME: z.string().min(1).default('SSO'),
+
+  // Disable password login (requires OIDC to be fully configured)
+  DISABLE_PASSWORD_LOGIN: booleanFromString,
+
+  // Application URL for generating links in emails (optional, defaults to NEXTAUTH_URL)
+  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+
+  // Photo processing
+  PHOTO_SIZE: z.coerce.number().int().min(64).max(4096).default(256),
+  PHOTO_QUALITY: z.coerce.number().int().min(1).max(100).default(80),
+
+  // Web push (optional). All three are required together; the channel is
+  // hidden when any is missing. Generate a pair with:
+  //   npm run generate-vapid-keys
+  VAPID_PUBLIC_KEY: blankAsUndefined(z.string().min(1).optional()),
+  VAPID_PRIVATE_KEY: blankAsUndefined(z.string().min(1).optional()),
+  VAPID_SUBJECT: blankAsUndefined(z.string().min(1).optional()),
+
+  // Number of reverse proxy hops in front of this app that are trusted to
+  // append to X-Forwarded-For (or set X-Real-IP). Defaults to 1, matching
+  // both documented reverse-proxy configs (a single nginx or Caddy in
+  // front). See docs/self-hosting/reverse-proxy.md for how to choose a
+  // different value.
+  // Wrapped in blankAsUndefined because this is the one variable where a
+  // blank value is silently wrong rather than loudly wrong: `Number('')` is
+  // 0, which clears the `.min(0)` floor and means "trust no proxy".
+  TRUSTED_PROXY_COUNT: blankAsUndefined(z.coerce.number().int().min(0).default(1)),
+
+  // Which header the trusted proxy actually manages. This cannot be
+  // inferred from the request: a proxy that replaces X-Real-IP but never
+  // touches X-Forwarded-For, and a proxy that correctly appends to
+  // X-Forwarded-For, can produce headers that are indistinguishable at
+  // runtime from a single request. Guessing wrong in either direction
+  // trusts an attacker-controlled value, so the operator must say which
+  // header their proxy sets rather than have the app infer it.
+  // Defaults to 'x-forwarded-for', matching both documented reverse-proxy
+  // configs (nginx with proxy_add_x_forwarded_for, Caddy) and preserving
+  // pre-existing behaviour for anyone upgrading without setting this.
+  // 'cf-connecting-ip' is for deployments behind Cloudflare, which
+  // OVERWRITES CF-Connecting-IP with the visitor address on every request
+  // rather than appending to it. This mode is only sound when the origin
+  // refuses connections that did not come from Cloudflare (IP allowlist,
+  // Authenticated Origin Pulls, or a Cloudflare Tunnel); see
+  // docs/self-hosting/reverse-proxy.md.
+  TRUSTED_PROXY_HEADER: blankAsUndefined(
+    z.enum(['x-forwarded-for', 'x-real-ip', 'cf-connecting-ip']).default('x-forwarded-for')
+  ),
+});
+
+/**
+ * Get the application URL for generating links.
+ * Falls back to NEXTAUTH_URL if NEXT_PUBLIC_APP_URL is not set.
+ * This allows users to set just NEXTAUTH_URL for most deployments.
+ */
+export function getAppUrl(): string {
+  const env = getEnv();
+  return env.NEXT_PUBLIC_APP_URL || env.NEXTAUTH_URL;
+}
+
+export type Env = z.infer<typeof envSchema>;
+
+/**
+ * Validates environment variables and returns typed env object
+ * Throws an error with details if validation fails
+ */
+export function validateEnv(): Env {
+  const result = envSchema.safeParse(process.env);
+
+  if (!result.success) {
+    const errors = result.error.issues.map(
+      (issue) => `  - ${issue.path.join('.')}: ${issue.message}`
+    );
+
+    console.error('\n❌ Invalid environment variables:\n');
+    console.error(errors.join('\n'));
+    console.error('\nPlease check your .env file.\n');
+
+    throw new Error('Invalid environment configuration');
+  }
+
+  // Database URL validation and construction
+  if (!result.data.DATABASE_URL) {
+    // If DATABASE_URL is not set, try to construct it from DB_* variables
+    const { DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD } = result.data;
+    const requiredDbVars = { DB_HOST, DB_PORT, DB_NAME, DB_USER };
+    const missingVars = Object.entries(requiredDbVars)
+      .filter(([_, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingVars.length > 0) {
+      console.error('\n❌ Invalid environment variables:\n');
+      console.error('  - Database configuration is incomplete.');
+      console.error('\n  You must provide either:');
+      console.error('    1. DATABASE_URL (connection string), OR');
+      console.error('    2. All of: DB_HOST, DB_PORT, DB_NAME, DB_USER (and optionally DB_PASSWORD)');
+      console.error(`\n  Missing: ${missingVars.join(', ')}`);
+      console.error('\nPlease check your .env file.\n');
+      throw new Error('Invalid environment configuration');
+    }
+
+    // Construct DATABASE_URL from individual variables
+    const password = DB_PASSWORD ? `:${DB_PASSWORD}` : '';
+    result.data.DATABASE_URL = `postgresql://${DB_USER}${password}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+  }
+
+  // Additional validation: Email and OAuth settings required in SaaS mode
+  if (result.data.SAAS_MODE) {
+    const missing = [];
+
+    // Require either Resend OR SMTP for email
+    const hasResend = !!result.data.RESEND_API_KEY;
+    const hasSmtp = !!(result.data.SMTP_HOST && result.data.SMTP_PORT);
+    if (!hasResend && !hasSmtp) {
+      missing.push('RESEND_API_KEY or SMTP_HOST+SMTP_PORT');
+    }
+
+    if (!result.data.EMAIL_DOMAIN) missing.push('EMAIL_DOMAIN');
+    if (!result.data.GOOGLE_CLIENT_ID) missing.push('GOOGLE_CLIENT_ID');
+    if (!result.data.GOOGLE_CLIENT_SECRET) missing.push('GOOGLE_CLIENT_SECRET');
+    if (!result.data.STRIPE_WEBHOOK_SECRET) missing.push('STRIPE_WEBHOOK_SECRET');
+
+    if (missing.length > 0) {
+      console.error('\n❌ Invalid environment variables:\n');
+      console.error(`  - The following are required when SAAS_MODE is enabled: ${missing.join(', ')}`);
+      console.error('\nPlease check your .env file.\n');
+      throw new Error(`Invalid environment configuration: missing ${missing.join(', ')}`);
+    }
+  }
+
+  // Validate SMTP configuration - if any SMTP var is set, host and port are required
+  const smtpVars = [
+    result.data.SMTP_HOST,
+    result.data.SMTP_PORT,
+    result.data.SMTP_USER,
+    result.data.SMTP_PASS,
+  ];
+  const hasAnySmtpConfig = smtpVars.some(v => v !== undefined);
+
+  if (hasAnySmtpConfig && (!result.data.SMTP_HOST || !result.data.SMTP_PORT)) {
+    console.error('\n❌ Invalid environment variables:\n');
+    console.error('  - If any SMTP_* variable is set, both SMTP_HOST and SMTP_PORT are required');
+    console.error('\nPlease check your .env file.\n');
+    throw new Error('Invalid environment configuration');
+  }
+
+  // Partial VAPID config is always a mistake: it means someone intended to
+  // enable push and missed a variable, which would otherwise fail silently by
+  // hiding the feature.
+  const vapidVars = [
+    result.data.VAPID_PUBLIC_KEY,
+    result.data.VAPID_PRIVATE_KEY,
+    result.data.VAPID_SUBJECT,
+  ];
+  const setVapidCount = vapidVars.filter((v) => v !== undefined).length;
+
+  if (setVapidCount > 0 && setVapidCount < 3) {
+    console.error('\n❌ Invalid environment variables:\n');
+    console.error(
+      '  - VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY and VAPID_SUBJECT must all be set together'
+    );
+    console.error('\n  Generate a keypair with: npm run generate-vapid-keys\n');
+    throw new Error('Invalid environment configuration');
+  }
+
+  // RFC 8292 allows either a mailto: address or an https: URL as the VAPID
+  // subject, and the bundled web-push library accepts both. Rejecting https:
+  // here would take the whole app down at startup for a self-hoster who
+  // followed the spec, so both forms are accepted.
+  if (
+    result.data.VAPID_SUBJECT &&
+    !result.data.VAPID_SUBJECT.startsWith('mailto:') &&
+    !result.data.VAPID_SUBJECT.startsWith('https://')
+  ) {
+    console.error('\n❌ Invalid environment variables:\n');
+    console.error(
+      '  - VAPID_SUBJECT must be a mailto: address or an https: URL, for example mailto:admin@example.com'
+    );
+    console.error('\nPlease check your .env file.\n');
+    throw new Error('Invalid environment configuration');
+  }
+
+  // Validate that EMAIL_DOMAIN is set if either email provider is configured
+  const hasEmailProvider =
+    (result.data.RESEND_API_KEY) ||
+    (result.data.SMTP_HOST && result.data.SMTP_PORT);
+
+  if (hasEmailProvider && !result.data.EMAIL_DOMAIN) {
+    console.error('\n❌ Invalid environment variables:\n');
+    console.error('  - EMAIL_DOMAIN is required when email is configured (Resend or SMTP)');
+    console.error('\nPlease check your .env file.\n');
+    throw new Error('Invalid environment configuration');
+  }
+
+  // Validate that OIDC is fully configured when password login is disabled
+  if (result.data.DISABLE_PASSWORD_LOGIN) {
+    const missingOidc = [];
+    if (!result.data.OIDC_ISSUER_URL) missingOidc.push('OIDC_ISSUER_URL');
+    if (!result.data.OIDC_CLIENT_ID) missingOidc.push('OIDC_CLIENT_ID');
+    if (!result.data.OIDC_CLIENT_SECRET) missingOidc.push('OIDC_CLIENT_SECRET');
+
+    if (missingOidc.length > 0) {
+      console.error('\n❌ Invalid environment variables:\n');
+      console.error(`  - DISABLE_PASSWORD_LOGIN requires a fully configured OIDC provider. Missing: ${missingOidc.join(', ')}`);
+      console.error('\nPlease check your .env file.\n');
+      throw new Error(`Invalid environment configuration: DISABLE_PASSWORD_LOGIN requires ${missingOidc.join(', ')}`);
+    }
+  }
+
+  return result.data;
+}
+
+// Validate on module load in production
+// In development, we validate lazily to allow hot reload
+let _env: Env | null = null;
+
+export function getEnv(): Env {
+  if (!_env) {
+    _env = validateEnv();
+  }
+  return _env;
+}
+
+// For convenience, export individual env vars with type safety
+export const env = new Proxy({} as Env, {
+  get(_, prop: string) {
+    return getEnv()[prop as keyof Env];
+  },
+});

@@ -1,0 +1,457 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
+
+// Use vi.hoisted to create mocks before hoisting
+const mocks = vi.hoisted(() => ({
+  personFindUnique: vi.fn(),
+  userFindUnique: vi.fn(),
+}));
+
+// Mock Prisma
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    person: {
+      findUnique: mocks.personFindUnique,
+    },
+    user: {
+      findUnique: mocks.userFindUnique,
+    },
+  },
+}));
+
+// Mock auth
+vi.mock('@/lib/auth', () => ({
+  auth: vi.fn(() =>
+    Promise.resolve({
+      user: { id: 'user123', email: 'test@example.com', name: 'Test' },
+    }),
+  ),
+}));
+
+// Mock logger
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+  },
+  createModuleLogger: vi.fn(() => ({
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  })),
+}));
+
+// Import after mocking
+import { GET } from '@/app/api/people/[id]/graph/route';
+
+const { personFindUnique, userFindUnique } = mocks;
+
+describe('People Graph API Route', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    userFindUnique.mockResolvedValue({ photo: null });
+  });
+
+  describe('deduplication of edges', () => {
+    it('should deduplicate edges between related people when both directions exist', async () => {
+      const request = new NextRequest(
+        'http://localhost:3000/api/people/person-1/graph',
+      );
+
+      const mockPerson = {
+        id: 'person-1',
+        name: 'Alice',
+        surname: 'Smith',
+        nickname: null,
+        relationshipToUser: null,
+        groups: [],
+        relationshipsFrom: [
+          {
+            personId: 'person-1',
+            relatedPersonId: 'person-2',
+            relationshipType: {
+              label: 'friend',
+              color: '#00FF00',
+              inverse: {
+                label: 'friend',
+                color: '#00FF00',
+              },
+            },
+            relatedPerson: {
+              id: 'person-2',
+              name: 'Bob',
+              surname: 'Johnson',
+              nickname: null,
+              relationshipToUser: null,
+              groups: [],
+              relationshipsFrom: [
+                {
+                  personId: 'person-2',
+                  relatedPersonId: 'person-1',
+                  relationshipType: {
+                    label: 'friend',
+                    color: '#00FF00',
+                    inverse: {
+                      label: 'friend',
+                      color: '#00FF00',
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      };
+
+      personFindUnique.mockResolvedValue(mockPerson);
+
+      const response = await GET(request, {
+        params: Promise.resolve({ id: 'person-1' }),
+      });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      // Should have 3 nodes: person-1 (center), user, person-2
+      expect(body.nodes).toHaveLength(3);
+      // Should have 2 edges (deduplicated): person-1 -> person-2 and person-2 -> person-1
+      expect(body.edges).toHaveLength(2);
+      expect(body.edges).toContainEqual({
+        source: 'person-1',
+        target: 'person-2',
+        type: 'friend',
+        color: '#00FF00',
+        sourceLabel: 'Alice Smith',
+        targetLabel: 'Bob Johnson',
+      });
+      expect(body.edges).toContainEqual({
+        source: 'person-2',
+        target: 'person-1',
+        type: 'friend',
+        color: '#00FF00',
+        sourceLabel: 'Bob Johnson',
+        targetLabel: 'Alice Smith',
+      });
+    });
+
+    it('should deduplicate edges when processing relationships from multiple related people', async () => {
+      const request = new NextRequest(
+        'http://localhost:3000/api/people/person-1/graph',
+      );
+
+      const mockPerson = {
+        id: 'person-1',
+        name: 'Alice',
+        surname: 'Smith',
+        nickname: null,
+        relationshipToUser: null,
+        groups: [],
+        relationshipsFrom: [
+          {
+            personId: 'person-1',
+            relatedPersonId: 'person-2',
+            relationshipType: {
+              label: 'child',
+              color: '#00FF00',
+              inverse: {
+                label: 'parent',
+                color: '#0000FF',
+              },
+            },
+            relatedPerson: {
+              id: 'person-2',
+              name: 'Bob',
+              surname: 'Johnson',
+              nickname: null,
+              relationshipToUser: null,
+              groups: [],
+              relationshipsFrom: [
+                {
+                  personId: 'person-2',
+                  relatedPersonId: 'person-1',
+                  relationshipType: {
+                    label: 'parent',
+                    color: '#0000FF',
+                    inverse: {
+                      label: 'child',
+                      color: '#00FF00',
+                    },
+                  },
+                },
+                {
+                  personId: 'person-2',
+                  relatedPersonId: 'person-3',
+                  relationshipType: {
+                    label: 'colleague',
+                    color: '#FF0000',
+                    inverse: {
+                      label: 'colleague',
+                      color: '#FF0000',
+                    },
+                  },
+                },
+              ],
+            },
+          },
+          {
+            personId: 'person-1',
+            relatedPersonId: 'person-3',
+            relationshipType: {
+              label: 'friend',
+              color: '#FFFF00',
+              inverse: {
+                label: 'friend',
+                color: '#FFFF00',
+              },
+            },
+            relatedPerson: {
+              id: 'person-3',
+              name: 'Charlie',
+              surname: 'Brown',
+              nickname: null,
+              relationshipToUser: null,
+              groups: [],
+              relationshipsFrom: [
+                {
+                  personId: 'person-3',
+                  relatedPersonId: 'person-1',
+                  relationshipType: {
+                    label: 'friend',
+                    color: '#FFFF00',
+                    inverse: {
+                      label: 'friend',
+                      color: '#FFFF00',
+                    },
+                  },
+                },
+                {
+                  personId: 'person-3',
+                  relatedPersonId: 'person-2',
+                  relationshipType: {
+                    label: 'colleague',
+                    color: '#FF0000',
+                    inverse: {
+                      label: 'colleague',
+                      color: '#FF0000',
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      };
+
+      personFindUnique.mockResolvedValue(mockPerson);
+
+      const response = await GET(request, {
+        params: Promise.resolve({ id: 'person-1' }),
+      });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      // Should have 4 nodes: person-1 (center), user, person-2, person-3
+      expect(body.nodes).toHaveLength(4);
+      // person-1 -> person-2 (forward + inverse) = 2 edges
+      // person-1 -> person-3 (forward + inverse) = 2 edges
+      // person-2 -> person-3 (forward + inverse) = 2 edges
+      expect(body.edges.length).toBe(6);
+      // Check that person-2 -> person-3 edge exists
+      expect(body.edges).toContainEqual({
+        source: 'person-2',
+        target: 'person-3',
+        type: 'colleague',
+        color: '#FF0000',
+        sourceLabel: 'Bob Johnson',
+        targetLabel: 'Charlie Brown',
+      });
+      // Check that person-3 -> person-2 edge exists
+      expect(body.edges).toContainEqual({
+        source: 'person-3',
+        target: 'person-2',
+        type: 'colleague',
+        color: '#FF0000',
+        sourceLabel: 'Charlie Brown',
+        targetLabel: 'Bob Johnson',
+      });
+    });
+
+    it('should filter out edges to people not directly related to person', async () => {
+      const request = new NextRequest(
+        'http://localhost:3000/api/people/person-1/graph',
+      );
+
+      const mockPerson = {
+        id: 'person-1',
+        name: 'Alice',
+        surname: 'Smith',
+        nickname: null,
+        relationshipToUser: null,
+        groups: [],
+        relationshipsFrom: [
+          {
+            personId: 'person-1',
+            relatedPersonId: 'person-2',
+            relationshipType: {
+              label: 'friend',
+              color: '#00FF00',
+              inverse: null,
+            },
+            relatedPerson: {
+              id: 'person-2',
+              name: 'Bob',
+              surname: 'Johnson',
+              nickname: null,
+              relationshipToUser: null,
+              groups: [],
+              relationshipsFrom: [
+                {
+                  personId: 'person-2',
+                  relatedPersonId: 'person-3', // Not in the graph (person-3 is not a direct relationship of person-1)
+                  relationshipType: {
+                    label: 'acquaintance',
+                    color: '#CCCCCC',
+                    inverse: null,
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      };
+
+      personFindUnique.mockResolvedValue(mockPerson);
+
+      const response = await GET(request, {
+        params: Promise.resolve({ id: 'person-1' }),
+      });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      // Should have 3 nodes: person-1 (center), user, person-2
+      expect(body.nodes).toHaveLength(3);
+      // Should have 2 edges: person-1 -> person-2 (forward) and person-2 -> person-1 (inverse fallback)
+      // person-3 is not in the graph so its edges are filtered out
+      expect(body.edges).toHaveLength(2);
+      expect(body.edges).toContainEqual({
+        source: 'person-1',
+        target: 'person-2',
+        type: 'friend',
+        color: '#00FF00',
+        sourceLabel: 'Alice Smith',
+        targetLabel: 'Bob Johnson',
+      });
+      expect(body.edges).toContainEqual({
+        source: 'person-2',
+        target: 'person-1',
+        type: 'friend',
+        color: '#00FF00',
+        sourceLabel: 'Bob Johnson',
+        targetLabel: 'Alice Smith',
+      });
+    });
+
+    it('should include user relationships for the center person', async () => {
+      const request = new NextRequest(
+        'http://localhost:3000/api/people/person-1/graph',
+      );
+
+      const mockPerson = {
+        id: 'person-1',
+        name: 'Alice',
+        surname: 'Smith',
+        nickname: null,
+        relationshipToUser: {
+          label: 'family',
+          color: '#FF0000',
+          inverse: {
+            label: 'family',
+            color: '#FF0000',
+          },
+        },
+        groups: [],
+        relationshipsFrom: [],
+      };
+
+      personFindUnique.mockResolvedValue(mockPerson);
+
+      const response = await GET(request, {
+        params: Promise.resolve({ id: 'person-1' }),
+      });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      // Should have 2 nodes: person-1 (center) and user
+      expect(body.nodes).toHaveLength(2);
+      // Should have 2 edges: person-1 -> user and user -> person-1
+      expect(body.edges).toHaveLength(2);
+      expect(body.edges).toContainEqual({
+        source: 'person-1',
+        target: 'user-user123',
+        type: 'family',
+        color: '#FF0000',
+        sourceLabel: 'Alice Smith',
+        targetLabel: 'You',
+      });
+      expect(body.edges).toContainEqual({
+        source: 'user-user123',
+        target: 'person-1',
+        type: 'family',
+        color: '#FF0000',
+        sourceLabel: 'You',
+        targetLabel: 'Alice Smith',
+      });
+    });
+
+    it('should create both user relationship edges when inverse is null (symmetric fallback)', async () => {
+      const request = new NextRequest(
+        'http://localhost:3000/api/people/person-1/graph',
+      );
+
+      const mockPerson = {
+        id: 'person-1',
+        name: 'Alice',
+        surname: 'Smith',
+        nickname: null,
+        relationshipToUser: {
+          label: 'Relative',
+          color: '#6366F1',
+          inverse: null,
+        },
+        groups: [],
+        relationshipsFrom: [],
+      };
+
+      personFindUnique.mockResolvedValue(mockPerson);
+
+      const response = await GET(request, {
+        params: Promise.resolve({ id: 'person-1' }),
+      });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.nodes).toHaveLength(2);
+      // Should have 2 edges even with null inverse: person -> user and user -> person
+      expect(body.edges).toHaveLength(2);
+      expect(body.edges).toContainEqual({
+        source: 'person-1',
+        target: 'user-user123',
+        type: 'Relative',
+        color: '#6366F1',
+        sourceLabel: 'Alice Smith',
+        targetLabel: 'You',
+      });
+      // Inverse edge falls back to type itself
+      expect(body.edges).toContainEqual({
+        source: 'user-user123',
+        target: 'person-1',
+        type: 'Relative',
+        color: '#6366F1',
+        sourceLabel: 'You',
+        targetLabel: 'Alice Smith',
+      });
+    });
+  });
+});

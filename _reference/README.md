@@ -1,107 +1,159 @@
-# Mastra
+# Nametag
 
-[![npm version](https://badge.fury.io/js/@mastra%2Fcore.svg)](https://www.npmjs.com/package/@mastra/core)
-[![CodeQl](https://github.com/mastra-ai/mastra/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/mastra-ai/mastra/actions/workflows/github-code-scanning/codeql)
-[![GitHub Repo stars](https://img.shields.io/github/stars/mastra-ai/mastra)](https://github.com/mastra-ai/mastra/stargazers)
-[![Discord](https://img.shields.io/discord/1309558646228779139?logo=discord&label=Discord&labelColor=white&color=7289DA)](https://discord.gg/mastra-ai)
-[![Twitter Follow](https://img.shields.io/twitter/follow/mastra?style=social)](https://x.com/mastra)
-[![NPM Downloads](https://img.shields.io/npm/dm/%40mastra%252Fcore)](https://www.npmjs.com/package/@mastra/core)
-[![Static Badge](https://img.shields.io/badge/Y%20Combinator-W25-orange)](https://www.ycombinator.com/companies?batch=W25)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
 
-Mastra is a framework for building AI-powered applications and agents with a modern TypeScript stack.
+> **⚠️ Active Development Notice**
+>
+> Nametag is under active development and may introduce breaking changes between releases. Please read the [release notes](https://github.com/mattogodoy/nametag/releases) carefully before updating to ensure a smooth upgrade process.
 
-It includes everything you need to go from early prototypes to production-ready applications. Mastra integrates with frontend and backend frameworks like React, Next.js, and Node, or you can deploy it anywhere as a standalone server. It's the easiest way to build, tune, and scale reliable AI products.
+Nametag is a personal relationships manager that helps you remember the people in your life and how they're connected. Track birthdays, contact information, how people are connected, and visualize your network as an interactive graph.
 
-## Why Mastra?
+![Dashboard](docs/screenshots/dashboard-dark.png)
+_Dashboard with network overview and statistics_
 
-Purpose-built for TypeScript and designed around established AI patterns, Mastra gives you everything you need to build great AI applications out-of-the-box.
+**[Try the hosted version →](https://nametag.one)**
 
-Some highlights include:
-
-- [**Model routing**](https://mastra.ai/models): Connect to 40+ providers through one standard interface. Use models from OpenAI, Anthropic, Gemini, and more.
-
-- [**Agents**](https://mastra.ai/docs/agents/overview): Build autonomous agents that use LLMs and tools to solve open-ended tasks. Agents reason about goals, decide which tools to use, and iterate internally until the model emits a final answer or an optional stopping condition is met.
-
-- [**Workflows**](https://mastra.ai/docs/workflows/overview): When you need explicit control over execution, use Mastra's graph-based workflow engine to orchestrate complex multi-step processes. Mastra workflows use an intuitive syntax for control flow (`.then()`, `.branch()`, `.parallel()`).
-
-- [**Human-in-the-loop**](https://mastra.ai/docs/workflows/suspend-and-resume): Suspend an agent or workflow and await user input or approval before resuming. Mastra uses [storage](https://mastra.ai/docs/server-db/storage) to remember execution state, so you can pause indefinitely and resume where you left off.
-
-- **Context management**: Give your agents the right context at the right time. Provide [conversation history](https://mastra.ai/docs/memory/conversation-history), [retrieve](https://mastra.ai/docs/rag/overview) data from your sources (APIs, databases, files), and add human-like memory with [Observational Memory](https://mastra.ai/docs/memory/observational-memory) so your agents behave coherently.
-
-- **Integrations**: Bundle agents and workflows into existing React, Next.js, or Node.js apps, or ship them as standalone endpoints. When building UIs, integrate with agentic libraries like Vercel's AI SDK UI and CopilotKit to bring your AI assistant to life on the web.
-
-- [**MCP servers**](https://mastra.ai/docs/tools-mcp/mcp-overview): Author Model Context Protocol servers, exposing agents, tools, and other structured resources via the MCP interface. These can then be accessed by any system or agent that supports the protocol.
-
-- **Production essentials**: Shipping reliable agents takes ongoing insight, evaluation, and iteration. With built-in [evals](https://mastra.ai/docs/evals/overview) and [observability](https://mastra.ai/docs/observability/overview), Mastra gives you the tools to observe, measure, and refine continuously.
-
-## Get started
-
-The **recommended** way to get started with Mastra is by running the command below:
-
-```shell
-npm create mastra@latest
-```
-
-Follow the [Installation guide](https://mastra.ai/docs) for step-by-step setup with the CLI or a manual install.
-
-If you're new to AI agents, check out our [templates](https://mastra.ai/docs/getting-started/templates), [course](https://mastra.ai/course), and [YouTube videos](https://youtube.com/@mastra-ai) to start building with Mastra today.
+## Screenshots
 
 <details>
+<summary>View screenshots</summary>
 
-<summary><strong>Alternative:</strong> Use this pre-built prompt to get started</summary>
+![Dashboard dark theme](docs/screenshots/dashboard-dark.png)
+![Dashboard light theme](docs/screenshots/dashboard-light.png)
+_Main dashboard with a network graph of relationships_
 
-```md
-Create a new Mastra project. Mastra is a framework for AI applications and agents on a modern TypeScript stack. Before running the command, ask these questions one at a time and wait for each answer unless it was already provided:
+---
 
-1. Project name? (default: "my-mastra-app")
-2. Provider? (required; options: "openai", "anthropic", "google", "xai")
+![People dark theme](docs/screenshots/people-dark.png)
+![People light theme](docs/screenshots/people-light.png)
+_People list page_
 
-If the provider isn't supported, ask again and list the supported values.
+---
 
-Run: `npm create mastra@latest <project-name> -- --llm <provider>`
+![Groups dark theme](docs/screenshots/groups-dark.png)
+![Groups light theme](docs/screenshots/groups-light.png)
+_Groups page_
 
-The command creates a default Mastra project, installs Mastra skills for detected coding assistants, and initializes Git when appropriate.
+---
 
-After creation, enter the project directory and start the dev server: `npx bgproc start -n <project-name> -w -- npm run dev`
+![Journal dark theme](docs/screenshots/journal-dark.png)
+![Journal light theme](docs/screenshots/journal-light.png)
+_Journal page_
 
-Open Mastra Studio at `http://localhost:4111`. Studio is the interface for building, testing, and managing agents, workflows, and tools.
+---
 
-Also mention that the Mastra model router provides access to thousands of models: https://mastra.ai/models
-```
+![Relationships dark theme](docs/screenshots/relationships-dark.png)
+![Relationships light theme](docs/screenshots/relationships-light.png)
+_Relationships page_
 
 </details>
 
-## Documentation
+## Features
 
-Visit our [official documentation](https://mastra.ai/docs).
+- Track people with flexible attributes (name, birthday, important dates, photos, and user-defined custom fields)
+- Map relationships between people with custom relationship types
+- Visualize your network with interactive force-directed graphs
+- Organize contacts into custom groups
+- Interactive map view with geocoded addresses and clustered markers
+- Journal for logging interactions and notes over time
+- Set reminders for important dates and staying in touch
+- CardDAV sync with Google Contacts, iCloud, Outlook, and Nextcloud
+- vCard and JSON import/export
+- Duplicate detection and contact merging
+- Global fuzzy search with accent-insensitive matching
+- REST API with OpenAPI documentation and token authentication
+- OIDC / SSO authentication support
+- Installable as a PWA
+- Trash with soft-delete and restore
+- Bulk operations (delete, group assignment, relationships)
+- Messaging app quick links (WhatsApp, Signal, Telegram, and more)
+- Full dark and light theme support
+- Multiple languages (English, Spanish, Japanese, Norwegian, German, Chinese, Italian, Russian, Dutch)
+- Mobile-responsive design
+- Multi-platform Docker support (AMD64 and ARM64)
 
-## Build with AI
+## Hosted vs Self-Hosted
 
-Learn how to make your agent a Mastra expert by following the [Build with AI guide](https://mastra.ai/reference/build-with-ai).
+We offer a hosted version at [nametag.one](https://nametag.one) with a generous free tier and affordable paid plans, which helps fund development. You can also self-host Nametag for free with unlimited contacts and complete data ownership.
+
+See the [installation guide](https://docs.nametag.one/self-hosting/installation/) in the docs to get started with self-hosting.
+
+## Quick Start (Self-Hosted)
+
+```bash
+mkdir nametag && cd nametag
+# add a docker-compose.yml and .env file (see the installation guide)
+docker compose up -d
+```
+
+Then visit `http://localhost:3000`. For the full installation guide, environment variables, email, OIDC, Redis, and reverse proxy setup, see the docs.
+
+**[Read the full docs →](https://docs.nametag.one)**
 
 ## Contributing
 
-Looking to contribute? All types of help are appreciated, from coding to testing and feature specification. Read [CONTRIBUTING.md](./CONTRIBUTING.md) for more details on how to get involved.
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved, and the [development setup guide](https://docs.nametag.one/contributing/development/) for detailed instructions on running Nametag locally.
 
-If you are a developer and would like to contribute with code, please open an issue to discuss before opening a Pull Request.
+## Roadmap
 
-Information about the project setup can be found in the [development documentation](./DEVELOPMENT.md)
+ℹ️ _Contributions to any of these items are very welcome! Items that require the most help will have the **[HELP NEEDED]** tag. If you want to contribute to an item that does not have a PR or Issue associated to it, please create it yoursef._
+
+### To do
+
+Future features and improvements, ordered by priority:
+
+- [ ] **[HELP NEEDED]** Mobile app (Native apps for Android and iOS are preferred)
+- [ ] Add support for SQLite databases
+- [ ] Add notification support [[Issue #6](https://github.com/mattogodoy/nametag/issues/6)]
+- [ ] Support multi-user groups [[Issue #37](https://github.com/mattogodoy/nametag/issues/37)]
+- [ ] Immich integration [[Issue #46](https://github.com/mattogodoy/nametag/issues/46)]
+- [ ] **[HELP NEEDED]** Additional language translations (Portuguese, Korean, etc.)
+
+### Done
+
+Features and improvements that have already been implemented:
+
+- [x] ~~UI/UX improvements and accessibility enhancements~~
+- [x] ~~Documentation improvements (API, deployment, functionality, development, etc)~~
+- [x] ~~SMTP support~~ [[Issue #4](https://github.com/mattogodoy/nametag/issues/4), [PR #21](https://github.com/mattogodoy/nametag/pull/21)]
+- [x] ~~Option to disable registration~~ [[Issue #9](https://github.com/mattogodoy/nametag/issues/9), [PR #17](https://github.com/mattogodoy/nametag/pull/17)]
+- [x] ~~ARM build for docker images~~ [[Issue #14](https://github.com/mattogodoy/nametag/issues/14), [PR #18](https://github.com/mattogodoy/nametag/pull/18)]
+- [x] ~~Improve development setup to make contributors' lives easier~~ [[PR #25](https://github.com/mattogodoy/nametag/pull/25)]
+- [x] ~~Implement CardDAV support~~ [[Issue #15](https://github.com/mattogodoy/nametag/issues/15), [PR #82](https://github.com/mattogodoy/nametag/pull/82)]
+- [x] ~~API for third-party integrations~~ [[Issue #29](https://github.com/mattogodoy/nametag/issues/29), [PR #70](https://github.com/mattogodoy/nametag/pull/70)]
+- [x] ~~Add photos to people~~ [[Issue #19](https://github.com/mattogodoy/nametag/issues/19), [PR #135](https://github.com/mattogodoy/nametag/pull/135)]
+- [x] ~~Add custom template titles for important dates~~ [[Issue #23](https://github.com/mattogodoy/nametag/issues/23), [PR #176](https://github.com/mattogodoy/nametag/pull/176)]
+- [x] ~~Add journaling capabilities~~ [[Issue #28](https://github.com/mattogodoy/nametag/issues/28), [PR #192](https://github.com/mattogodoy/nametag/pull/192)]
+- [x] ~~Implement OIDC~~ [[Issue #10](https://github.com/mattogodoy/nametag/issues/10)]
+- [x] ~~Add map to show people's locations~~ [[Issue #26](https://github.com/mattogodoy/nametag/issues/26), [PR #341](https://github.com/mattogodoy/nametag/pull/341)]
+- [x] ~~Full-text fuzzy search~~ [[PR #301](https://github.com/mattogodoy/nametag/pull/301)]
+- [x] ~~Configurable photo compression~~ [[PR #331](https://github.com/mattogodoy/nametag/pull/331)]
+- [x] ~~HEIC photo support~~ [[PR #357](https://github.com/mattogodoy/nametag/pull/357)]
+- [x] ~~Messaging app quick links~~ [[PR #375](https://github.com/mattogodoy/nametag/pull/375)]
+- [x] ~~PWA / installable app with offline support~~ [[PR #379](https://github.com/mattogodoy/nametag/pull/379)]
+- [x] ~~Duplicate detection and contact merging~~
+- [x] ~~Custom field templates~~
+- [x] ~~Trash with soft-delete and restore~~
+- [x] ~~Data import/export (JSON)~~
+- [x] ~~Bulk operations~~
+- [x] ~~Eastern name order support~~
+
+## License
+
+Licensed under the [GNU Affero General Public License v3.0](LICENSE). This ensures that if you modify and deploy Nametag, you must make your source code available.
 
 ## Support
 
-We have an [open community Discord](https://discord.gg/mastra-ai). Come and say hello and let us know if you have any questions or need any help getting things running.
+- **Hosted version**: For support with the hosted service, email support@nametag.one
+- **Self-hosting**: Open an issue on GitHub, or check the [docs](https://docs.nametag.one)
+- **Security issues**: See [SECURITY.md](SECURITY.md)
 
-It's also super helpful if you leave the project a star here, at the [top of the page](https://github.com/mastra-ai/mastra)
+## Support Development
 
-## Licensing
+If you find Nametag useful and want to support its development, you can buy me a coffee! ☕
 
-This repository uses a dual-license model:
+<a href="https://www.buymeacoffee.com/mattogodoy" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
-- **Apache License 2.0**: The core framework and the vast majority of this codebase is open source under Apache-2.0.
-- **Mastra Enterprise License**: Code in any directory named `ee/` (e.g., `packages/core/src/auth/ee/`) is source-available under the Mastra Enterprise License. These features require a valid enterprise license for production use but can be freely used for development and testing.
+---
 
-See [LICENSE.md](./LICENSE.md) for the full license mapping and [ee/LICENSE](./ee/LICENSE) for the enterprise license terms.
-
-## Security
-
-We are committed to maintaining the security of this repo and of Mastra as a whole. If you discover a security finding we ask you to please responsibly disclose this to us at [security@mastra.ai](mailto:security@mastra.ai) and we will get back to you.
+Built with care for people who care about people.

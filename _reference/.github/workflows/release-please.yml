@@ -1,0 +1,202 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to generate notes for (e.g. v0.58.3)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  GEMINI_MODEL: gemini-3.6-flash
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.repository == 'mattogodoy/nametag'
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+  ai-release-summary:
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: >-
+      always()
+      && github.repository == 'mattogodoy/nametag'
+      && (needs.release-please.outputs.release_created == 'true'
+          || github.event_name == 'workflow_dispatch')
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release tag
+        id: tag
+        env:
+          DISPATCH_TAG: ${{ inputs.tag }}
+          RELEASE_TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: |
+          set -euo pipefail
+          TAG="${DISPATCH_TAG:-$RELEASE_TAG}"
+
+          if [ -z "$TAG" ]; then
+            echo "No release tag available." >&2
+            exit 1
+          fi
+
+          if ! git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "Tag ${TAG} does not exist." >&2
+            exit 1
+          fi
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Get merged PRs since previous tag
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          # The tag immediately preceding TAG in version order. Empty on the
+          # first release. Listing every tag and picking the second entry would
+          # only be correct when TAG is the newest one, which is not true when
+          # this workflow is dispatched manually against an older release.
+          PREV_TAG=$(git tag --sort=-v:refname --list 'v*' \
+            | grep -A1 -x -F "$TAG" \
+            | sed -n '2p' || true)
+
+          # Get the date of the previous tag (or epoch if first release)
+          if [ -n "$PREV_TAG" ]; then
+            SINCE_DATE=$(git log --format=%aI "$PREV_TAG" -1)
+          else
+            SINCE_DATE="2000-01-01T00:00:00+00:00"
+          fi
+
+          # Get the date of the current tag to bound the search
+          TAG_DATE=$(git log --format=%aI "$TAG" -1)
+
+          # Fetch merged PRs since the previous tag, excluding release-please bot
+          PR_JSON=$(gh pr list \
+            --state merged \
+            --search "merged:${SINCE_DATE}..${TAG_DATE}" \
+            --json number,title,body,author \
+            --limit 50 2>/dev/null || echo "[]")
+
+          # Exclude release-please's own PR. Matching on author alone is not
+          # enough: PAT_TOKEN opens those PRs under a human account, so they
+          # look like ordinary contributions and their changelog dump would
+          # otherwise be fed back in as context.
+          PR_TEXT=$(printf '%s' "$PR_JSON" | jq -r '
+            [.[]
+              | select(.author.login != "release-please[bot]")
+              | select(.title | startswith("chore(master): release") | not)
+            ] |
+            if length == 0 then "NO_PRS_FOUND"
+            else
+              .[] |
+              "### PR #\(.number): \(.title)\n\(.body // "" | .[:1500])\n"
+            end
+          ')
+
+          # Fallback to commit log if no PRs found
+          if [ "$PR_TEXT" = "NO_PRS_FOUND" ] || [ -z "$PR_TEXT" ]; then
+            if [ -n "$PREV_TAG" ]; then
+              COMMIT_LOG=$(git log "${PREV_TAG}..${TAG}" --oneline --no-merges)
+            else
+              COMMIT_LOG=$(git log "$TAG" --oneline --no-merges)
+            fi
+            FILTERED=$(echo "$COMMIT_LOG" | grep -E "^[a-f0-9]+ (feat|fix|perf)" || echo "No notable changes")
+            {
+              echo "INPUT FORMAT: COMMITS"
+              echo ""
+              echo "$FILTERED"
+            } > "$RUNNER_TEMP/context.md"
+          else
+            {
+              echo "INPUT FORMAT: PULL REQUESTS"
+              echo ""
+              echo "$PR_TEXT"
+            } > "$RUNNER_TEMP/context.md"
+          fi
+
+      - name: Generate AI release summary
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+
+          # Splice the PR context into the prompt template. awk copies both
+          # sides verbatim, so nothing in the untrusted context is ever
+          # interpreted by the shell.
+          awk -v ctx="$RUNNER_TEMP/context.md" '
+            $0 == "{{CONTEXT}}" { while ((getline line < ctx) > 0) print line; next }
+            { print }
+          ' .github/release-notes-prompt.md > "$RUNNER_TEMP/prompt.txt"
+
+          jq -Rs '{
+            contents: [{ parts: [{ text: . }] }],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 8192,
+              thinkingConfig: { thinkingLevel: "low" }
+            }
+          }' < "$RUNNER_TEMP/prompt.txt" > "$RUNNER_TEMP/payload.json"
+
+          HTTP_CODE=$(curl -sS --max-time 180 \
+            -w '%{http_code}' -o "$RUNNER_TEMP/response.json" \
+            -X POST "https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent" \
+            -H "x-goog-api-key: ${GEMINI_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            --data-binary "@$RUNNER_TEMP/payload.json")
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Gemini API returned HTTP ${HTTP_CODE}:" >&2
+            cat "$RUNNER_TEMP/response.json" >&2
+            exit 1
+          fi
+
+          FINISH=$(jq -r '.candidates[0].finishReason // "UNKNOWN"' "$RUNNER_TEMP/response.json")
+          if [ "$FINISH" != "STOP" ]; then
+            echo "Gemini stopped early (finishReason: ${FINISH}):" >&2
+            cat "$RUNNER_TEMP/response.json" >&2
+            exit 1
+          fi
+
+          jq -r '[.candidates[0].content.parts[]?.text // empty] | join("")' \
+            "$RUNNER_TEMP/response.json" > "$RUNNER_TEMP/summary.md"
+
+          if [ ! -s "$RUNNER_TEMP/summary.md" ]; then
+            echo "Gemini returned an empty summary:" >&2
+            cat "$RUNNER_TEMP/response.json" >&2
+            exit 1
+          fi
+
+      - name: Update release with summary
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          {
+            cat "$RUNNER_TEMP/summary.md"
+            echo ""
+            echo "---"
+            echo ""
+            echo "For full details, see the [changelog](https://github.com/mattogodoy/nametag/blob/master/CHANGELOG.md)."
+          } > "$RUNNER_TEMP/release-body.md"
+
+          gh release edit "$TAG" --notes-file "$RUNNER_TEMP/release-body.md"

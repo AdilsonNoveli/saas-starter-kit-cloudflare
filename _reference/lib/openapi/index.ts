@@ -1,0 +1,469 @@
+import packageJson from '../../package.json';
+import { sharedSchemas } from './schemas';
+import { authPaths } from './auth';
+import { peoplePaths } from './people';
+import { groupsPaths } from './groups';
+import { relationshipsPaths } from './relationships';
+import { dashboardPaths } from './dashboard';
+import { userPaths } from './user';
+import { billingPaths } from './billing';
+import { carddavPaths } from './carddav';
+import { journalPaths } from './journal';
+import { customFieldsPaths } from './customFields';
+import { apiTokenPaths } from './apiTokens';
+import { mapPaths } from './map';
+import { notificationsPaths } from './notifications';
+import { jsonResponse, ref400, ref401, ref404, refSuccess, pathParam, jsonBody, resp, sessionOrToken } from './helpers';
+
+// OpenAPI 3.1.0 specification generator for the Nametag API.
+// Request body schemas are generated from Zod validation schemas (single source of truth).
+// Response schemas, component schemas, and endpoint metadata are hand-crafted.
+
+export interface OpenAPISpec {
+  openapi: string;
+  info: { title: string; version: string; description: string; license: { name: string; url: string } };
+  servers: Array<{ url: string; description: string }>;
+  tags: Array<{ name: string; description: string }>;
+  components: Record<string, unknown>;
+  paths: Record<string, Record<string, unknown>>;
+}
+
+export function generateOpenAPISpec(): OpenAPISpec {
+  return {
+    openapi: '3.1.0',
+    info: {
+      title: 'Nametag API',
+      version: packageJson.version,
+      description:
+        'API for Nametag, a personal relationships manager. ' +
+        'Track the people in your life, map relationships, manage groups, ' +
+        'set reminders for important dates, and visualize your personal network.',
+      license: {
+        name: 'AGPL-3.0',
+        url: 'https://www.gnu.org/licenses/agpl-3.0.html',
+      },
+    },
+    servers: [
+      {
+        url: '/',
+        description: 'Current instance',
+      },
+    ],
+    tags: [
+      { name: 'Auth', description: 'Registration, login, password reset, and email verification' },
+      { name: 'People', description: 'Manage people (contacts) in your network' },
+      { name: 'Groups', description: 'Organize people into custom groups' },
+      { name: 'Relationships', description: 'Connections between people in your network' },
+      { name: 'Relationship Types', description: 'Custom types for relationships (e.g. Parent, Friend)' },
+      { name: 'Important Dates', description: 'Birthdays, anniversaries, and other dates with optional reminders' },
+      { name: 'Custom Fields', description: 'User-defined typed fields applied to people' },
+      { name: 'Journal', description: 'Journal entries with optional people tags' },
+      { name: 'Dashboard', description: 'Dashboard statistics, upcoming events, and network graph' },
+      { name: 'User Settings', description: 'Profile, preferences, data export/import, and account management' },
+      { name: 'API Tokens', description: 'Create and revoke personal API tokens for programmatic access' },
+      { name: 'Billing', description: 'Subscription management, checkout, and payment history (SaaS mode only)' },
+      { name: 'Deleted Items', description: 'View and restore soft-deleted items' },
+      { name: 'CardDAV', description: 'CardDAV server connection, bidirectional sync, import/export, and conflict resolution' },
+      { name: 'vCard', description: 'Direct vCard file import and upload for preview' },
+      { name: 'Photos', description: 'Person and user photo management' },
+      { name: 'Map', description: 'Map markers and address geocoding' },
+      { name: 'Notifications', description: 'Reminder delivery channels: email and browser push' },
+      { name: 'Cron', description: 'Background jobs authenticated via CRON_SECRET bearer token' },
+      { name: 'System', description: 'Health checks and system endpoints' },
+    ],
+    components: {
+      securitySchemes: {
+        session: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'authjs.session-token',
+          description: 'NextAuth.js session cookie obtained after login via /api/auth/callback/credentials',
+        },
+        cronBearer: {
+          type: 'http',
+          scheme: 'bearer',
+          description: 'Bearer token matching the CRON_SECRET environment variable. Used by background cron jobs.',
+        },
+        apiToken: {
+          type: 'http',
+          scheme: 'bearer',
+          description:
+            'Per-user personal API token sent as `Authorization: Bearer <token>`. ' +
+            'Created and revoked in Settings → API Tokens. Read-only (`READ`) tokens are ' +
+            'restricted to GET, HEAD, and OPTIONS; a write attempt returns 403. ' +
+            'Each endpoint lists the schemes it accepts: those showing only `session` ' +
+            'reject bearer tokens outright, which covers token management, billing, and ' +
+            'the CardDAV endpoints that read or replace stored server credentials.',
+        },
+      },
+      schemas: sharedSchemas(),
+    },
+    paths: {
+      ...authPaths(),
+      ...peoplePaths(),
+      ...groupsPaths(),
+      ...relationshipsPaths(),
+      ...dashboardPaths(),
+      ...userPaths(),
+      ...billingPaths(),
+      ...carddavPaths(),
+      ...journalPaths(),
+      ...customFieldsPaths(),
+      ...apiTokenPaths(),
+      ...mapPaths(),
+      ...notificationsPaths(),
+
+      // Photos (non-person-specific)
+      '/api/photos/{personId}': {
+        get: {
+          tags: ['Photos'],
+          summary: 'Get person photo',
+          description: 'Returns the photo image for a person. Served from disk with appropriate MIME type and caching headers.',
+          security: sessionOrToken(),
+          parameters: [pathParam('personId', 'Person ID')],
+          responses: {
+            '200': {
+              description: 'Photo image',
+              content: {
+                'image/*': { schema: { type: 'string', format: 'binary' } },
+              },
+            },
+            '404': ref404(),
+          },
+        },
+      },
+      '/api/photos/user': {
+        get: {
+          tags: ['Photos'],
+          summary: 'Get current user photo',
+          description: 'Returns the photo image for the logged-in user.',
+          security: sessionOrToken(),
+          responses: {
+            '200': {
+              description: 'Photo image',
+              content: {
+                'image/*': { schema: { type: 'string', format: 'binary' } },
+              },
+            },
+            '401': ref401(),
+            '404': ref404(),
+          },
+        },
+      },
+      '/api/photos/convert': {
+        post: {
+          tags: ['Photos'],
+          summary: 'Convert HEIC photo to JPEG',
+          description: 'Accepts a HEIC/HEIF image file and returns a JPEG conversion. Applies automatic orientation correction and configurable quality. Does not store anything.',
+          security: sessionOrToken(),
+          requestBody: {
+            description: 'HEIC photo file to convert',
+            required: true,
+            content: {
+              'multipart/form-data': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    photo: {
+                      type: 'string',
+                      format: 'binary',
+                      description: 'HEIC/HEIF format photo file (max 50MB)',
+                    },
+                  },
+                  required: ['photo'],
+                },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'Converted JPEG photo',
+              content: {
+                'image/jpeg': { schema: { type: 'string', format: 'binary' } },
+              },
+            },
+            '400': ref400(),
+            '401': ref401(),
+            '413': { description: 'File too large (max 50MB)' },
+          },
+        },
+      },
+
+      // Cron (purge)
+      '/api/cron/purge-deleted': {
+        get: {
+          tags: ['Cron'],
+          summary: 'Purge old deleted records',
+          description: 'Permanently deletes soft-deleted records older than the 30-day retention period. Deletes in foreign-key order and removes photo files from disk.',
+          security: [{ cronBearer: [] }],
+          responses: {
+            '200': jsonResponse('Purge results', {
+              type: 'object',
+              properties: {
+                success: { type: 'boolean' },
+                purged: {
+                  type: 'object',
+                  properties: {
+                    importantDates: { type: 'integer' },
+                    personGroups: { type: 'integer' },
+                    relationships: { type: 'integer' },
+                    groups: { type: 'integer' },
+                    relationshipTypes: { type: 'integer' },
+                    people: { type: 'integer' },
+                  },
+                },
+                retentionDays: { type: 'integer' },
+                cutoffDate: { type: 'string', format: 'date-time' },
+              },
+            }),
+            '401': ref401(),
+          },
+        },
+      },
+
+      // Cron (reminders)
+      '/api/cron/send-reminders': {
+        get: {
+          tags: ['Cron'],
+          summary: 'Send due reminder emails',
+          description:
+            'Sends reminder emails for important dates and contact reminders that are due, ' +
+            'including advance-notice lead reminders sent a configurable number of days before ' +
+            'an important date, and the opt-in weekly digest for users whose chosen weekday is ' +
+            'today. Each email carries a one-time unsubscribe token. Intended to run once a day.',
+          security: [{ cronBearer: [] }],
+          responses: {
+            '200': jsonResponse('Reminder run results', {
+              type: 'object',
+              properties: {
+                success: { type: 'boolean' },
+                sent: { type: 'integer' },
+                errors: { type: 'integer' },
+                skipped: {
+                  type: 'integer',
+                  description:
+                    'Reminders that were due but not delivered because no email provider is ' +
+                    'configured. These are not marked as sent and will be retried on the next run.',
+                },
+                processedImportantDates: { type: 'integer' },
+                processedContactReminders: { type: 'integer' },
+                digestsSent: { type: 'integer' },
+              },
+            }),
+            '401': ref401(),
+          },
+        },
+      },
+
+      // Cron (geocode)
+      '/api/cron/geocode': {
+        get: {
+          tags: ['Cron'],
+          summary: 'Geocode pending addresses',
+          description: 'Processes a bounded batch of addresses awaiting geocoding for users who have opted in, skipping soft-deleted people. When geocoding is disabled instance-wide, returns { success, disabled, reason } instead of batch counts. When a run is already in progress, returns { success, alreadyRunning, reason }. When the provider rate limits, the batch stops early and rateLimited is true.',
+          security: [{ cronBearer: [] }],
+          responses: {
+            '200': jsonResponse('Geocoding batch results', {
+              type: 'object',
+              properties: {
+                success: { type: 'boolean' },
+                processed: { type: 'integer' },
+                geocoded: { type: 'integer' },
+                failed: { type: 'integer' },
+                pending: { type: 'integer' },
+                skipped: { type: 'integer' },
+                rateLimited: { type: 'boolean' },
+                disabled: { type: 'boolean' },
+                alreadyRunning: { type: 'boolean' },
+                reason: { type: 'string' },
+              },
+            }),
+            '401': ref401(),
+          },
+        },
+      },
+
+      // System
+      '/api/health': {
+        get: {
+          tags: ['System'],
+          summary: 'Health check',
+          description: 'Returns the health status of the application and its database connection.',
+          responses: {
+            '200': jsonResponse('Healthy', {
+              type: 'object',
+              properties: {
+                status: { type: 'string', enum: ['healthy'] },
+                timestamp: { type: 'string', format: 'date-time' },
+                uptime: { type: 'number' },
+                checks: {
+                  type: 'object',
+                  properties: {
+                    database: {
+                      type: 'object',
+                      properties: {
+                        status: { type: 'string' },
+                        latency: { type: 'string' },
+                      },
+                    },
+                  },
+                },
+              },
+            }),
+            '503': resp('Unhealthy'),
+          },
+        },
+      },
+      '/api/log-error': {
+        post: {
+          tags: ['System'],
+          summary: 'Report a client-side error',
+          description:
+            'Records an error that occurred in the browser. Unauthenticated by necessity, ' +
+            'since an error that breaks the session still needs to be reportable, so the ' +
+            'payload is treated as untrusted: the body is capped at 64KB, each field is ' +
+            'accepted only if it is a string and then truncated, and reports are rate ' +
+            'limited per IP.',
+          requestBody: jsonBody({
+            type: 'object',
+            properties: {
+              message: { type: 'string', maxLength: 1024 },
+              stack: { type: 'string', maxLength: 8192 },
+              digest: { type: 'string', maxLength: 256 },
+              url: { type: 'string', maxLength: 2048 },
+              userAgent: { type: 'string', maxLength: 512 },
+            },
+          }),
+          responses: {
+            '200': refSuccess(),
+            '400': ref400(),
+            '413': resp('Report body too large'),
+            '429': resp('Too many reports from this client'),
+          },
+        },
+      },
+      '/api/webhooks/stripe': {
+        post: {
+          tags: ['System'],
+          summary: 'Stripe webhook receiver',
+          description:
+            'Receives Stripe subscription and payment events. Authenticated by the ' +
+            '`stripe-signature` header rather than a session or token, and idempotent: ' +
+            'a repeated event id is acknowledged without being reprocessed. ' +
+            'Only active in SaaS mode.',
+          responses: {
+            '200': jsonResponse('Event acknowledged', {
+              type: 'object',
+              properties: { received: { type: 'boolean' } },
+            }),
+            '400': resp('Missing or invalid signature'),
+            '500': resp('Webhook secret not configured, or handler failure'),
+          },
+        },
+      },
+      '/api/dev/clear-rate-limits': {
+        delete: {
+          tags: ['System'],
+          summary: 'Clear rate limits',
+          description:
+            'Clears stored rate-limit counters, for unblocking an account that has locked ' +
+            'itself out. Requires `Authorization: Bearer $CRON_SECRET` in every environment, ' +
+            'and requires Redis. The matched keys are not returned, since they embed client ' +
+            'IPs and attempted email addresses.',
+          security: [{ cronBearer: [] }],
+          parameters: [
+            {
+              name: 'type',
+              in: 'query',
+              schema: { type: 'string' },
+              description: 'Clear only this category, for example `login`. Required unless `all=true`.',
+            },
+            {
+              name: 'all',
+              in: 'query',
+              schema: { type: 'boolean' },
+              description: 'Clear every category.',
+            },
+          ],
+          responses: {
+            '200': jsonResponse('Counters cleared', {
+              type: 'object',
+              properties: {
+                message: { type: 'string' },
+                pattern: { type: 'string' },
+                count: { type: 'integer' },
+              },
+            }),
+            '400': ref400(),
+            '401': ref401(),
+            '503': resp('Redis not available'),
+          },
+        },
+      },
+      '/api/unsubscribe': {
+        post: {
+          tags: ['System'],
+          summary: 'Unsubscribe from email reminders',
+          description: 'Disables a specific reminder using a one-time unsubscribe token from an email.',
+          requestBody: jsonBody({
+            type: 'object',
+            properties: { token: { type: 'string' } },
+            required: ['token'],
+          }),
+          responses: {
+            '200': jsonResponse('Unsubscribed', {
+              type: 'object',
+              properties: {
+                success: { type: 'boolean' },
+                reminderType: { type: 'string' },
+              },
+            }),
+            '400': ref400(),
+          },
+        },
+      },
+      '/api/openapi.json': {
+        get: {
+          tags: ['System'],
+          summary: 'OpenAPI specification',
+          description: 'Returns this OpenAPI 3.1.0 specification document describing all available API endpoints.',
+          responses: {
+            '200': {
+              description: 'OpenAPI spec',
+              content: { 'application/json': { schema: { type: 'object' } } },
+            },
+          },
+        },
+      },
+      '/api/docs': {
+        get: {
+          tags: ['System'],
+          summary: 'Swagger UI',
+          description: 'Interactive API documentation powered by Swagger UI.',
+          responses: {
+            '200': {
+              description: 'HTML page',
+              content: { 'text/html': { schema: { type: 'string' } } },
+            },
+          },
+        },
+      },
+      '/api/version': {
+        get: {
+          tags: ['System'],
+          summary: 'Application version',
+          description: 'Returns the current installed version of the application. Useful for monitoring tools like release-argus.',
+          responses: {
+            '200': jsonResponse('Version info', {
+              type: 'object',
+              properties: {
+                version: { type: 'string', example: '0.17.1' },
+              },
+              required: ['version'],
+            }),
+          },
+        },
+      },
+    },
+  };
+}

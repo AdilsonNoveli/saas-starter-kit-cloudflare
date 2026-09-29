@@ -1,0 +1,1009 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// User Model - Authentication and preferences
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  password           String?   // Optional for OAuth users
+  name               String
+  surname            String?
+  nickname           String?
+  theme              Theme     @default(DARK)
+  dateFormat         DateFormat @default(MDY)
+  nameOrder          NameOrder @default(WESTERN)
+  nameDisplayFormat  NameDisplayFormat @default(FULL)
+  graphMode          String?           // 'individuals' | 'bubbles' | null (unset → individuals)
+  geocodingEnabled   Boolean   @default(true) // Send contact addresses to the geocoder for the map
+  defaultReminderLeadDays Int       @default(0)     // 0 = day-of reminder only
+  weeklyDigestEnabled     Boolean   @default(false) // Opt-in
+  weeklyDigestWeekday     Int       @default(1)     // 0 = Sunday ... 6 = Saturday
+  lastWeeklyDigestSent    DateTime?
+  emailRemindersEnabled   Boolean   @default(true)
+  language           String?   @default("en") // "en" or "es-ES"
+  emailVerified      Boolean   @default(false)
+  emailVerifyToken   String?   @unique
+  emailVerifyExpires DateTime?
+  emailVerifySentAt  DateTime?
+  passwordResetToken   String?   @unique
+  passwordResetExpires DateTime?
+  passwordResetSentAt  DateTime?
+  lastLoginAt          DateTime?
+  failedLoginAttempts  Int       @default(0)
+  lockedUntil          DateTime?
+
+  photo              String?
+
+  // OAuth fields
+  provider           String?   // e.g., "google", "credentials"
+  providerAccountId  String?   // OAuth provider's user ID
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  // Relations
+  people                Person[]
+  groups                Group[]
+  relationshipTypes     RelationshipType[]
+  subscription          Subscription?
+  unsubscribeTokens     UnsubscribeToken[]
+  pushSubscriptions     PushSubscription[]
+  apiTokens             ApiToken[]
+  cardDavConnection     CardDavConnection?
+  cardDavPendingImports CardDavPendingImport[]
+  customFieldTemplates  CustomFieldTemplate[]
+  duplicateDismissals   DuplicateDismissal[]
+  notificationEndpoints NotificationEndpoint[]
+
+  journalEntries        JournalEntry[]
+
+  @@unique([provider, providerAccountId])
+  @@map("users")
+}
+
+// Person Model - Core entity representing people in the user's network
+model Person {
+  id                          String                @id @default(cuid())
+  userId                      String
+  name                        String
+  surname                     String?
+  middleName                  String?
+  secondLastName              String?
+  nickname                    String?
+  lastContact                 DateTime?
+  notes                       String?               @db.Text
+  relationshipToUserId        String?               // Relationship from user to this person (nullable for indirect connections)
+  contactReminderEnabled      Boolean               @default(false)
+  contactReminderInterval     Int?
+  contactReminderIntervalUnit ReminderIntervalUnit?
+  lastContactReminderSent     DateTime?
+  cardDavSyncEnabled          Boolean               @default(true)
+  displayNameOverride         String?
+  createdAt                   DateTime              @default(now())
+  updatedAt                   DateTime              @updatedAt
+  deletedAt                   DateTime?
+
+  // vCard Identification
+  prefix                      String?               // Honorific prefix (Dr., Mr.)
+  suffix                      String?               // Honorific suffix (Jr., III)
+
+  // vCard UID for CardDAV
+  uid                         String?               // Required for sync
+
+  // Professional
+  organization                String?               // ORG (Company)
+  jobTitle                    String?               // TITLE
+
+  // Other vCard fields
+  photo                       String?               // URL or base64
+  gender                      String?               // GENDER
+  anniversary                 DateTime?             // ANNIVERSARY
+
+  // Relations
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relationshipToUser RelationshipType?      @relation("UserRelationship", fields: [relationshipToUserId], references: [id])
+  groups             PersonGroup[]
+  relationshipsFrom  Relationship[]         @relation("PersonRelationships")
+  relationshipsTo    Relationship[]         @relation("RelatedPersonRelationships")
+  importantDates     ImportantDate[]
+  phoneNumbers       PersonPhone[]
+  emails             PersonEmail[]
+  addresses          PersonAddress[]
+  urls               PersonUrl[]
+  imHandles          PersonIM[]
+  locations          PersonLocation[]
+  customFields       PersonCustomField[]
+  customFieldValues  PersonCustomFieldValue[]
+  cardDavMapping     CardDavMapping?
+  dismissalsAsA      DuplicateDismissal[]   @relation("DismissalPersonA")
+  dismissalsAsB      DuplicateDismissal[]   @relation("DismissalPersonB")
+  journalEntries     JournalEntryPerson[]
+
+  @@index([userId])
+  @@index([relationshipToUserId])
+  @@index([userId, lastContact]) // For recent contacts query
+  @@index([userId, name]) // For name sorting/search
+  @@index([userId, surname]) // For surname sorting/search
+  @@index([userId, middleName]) // For middle name sorting/search
+  @@index([userId, secondLastName]) // For second last name sorting/search
+  @@index([userId, nickname]) // For nickname sorting/search
+  @@index([contactReminderEnabled, lastContact]) // For contact reminder queries
+  @@index([userId, deletedAt]) // For soft delete filtering
+  @@unique([userId, uid])
+  @@map("people")
+}
+
+// Group Model - User-defined categories for organizing people
+model Group {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  color       String?   // Hex color for UI visualization
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  people PersonGroup[]
+
+  @@index([userId])
+  @@index([userId, deletedAt]) // For soft delete filtering
+  @@map("groups")
+}
+
+// PersonGroup - Many-to-many join table between Person and Group
+model PersonGroup {
+  personId String
+  groupId  String
+  addedAt  DateTime @default(now())
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  group  Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([personId, groupId])
+  @@index([personId])
+  @@index([groupId])
+  @@map("person_groups")
+}
+
+// JournalEntry Model - User journal entries about encounters with people
+model JournalEntry {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  date      DateTime
+  hasTime   Boolean   @default(false)
+  body      String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  user   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  people JournalEntryPerson[]
+
+  @@index([userId, date])
+  @@index([userId, deletedAt])
+  @@map("journal_entries")
+}
+
+// JournalEntryPerson - Many-to-many join between JournalEntry and Person
+model JournalEntryPerson {
+  id             String @id @default(cuid())
+  journalEntryId String
+  personId       String
+
+  // Relations
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  person       Person       @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([journalEntryId, personId])
+  @@index([personId])
+  @@map("journal_entry_people")
+}
+
+// Relationship Model - Connections between people
+model Relationship {
+  id                 String            @id @default(cuid())
+  personId           String
+  relatedPersonId    String
+  relationshipTypeId String?
+  notes              String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  deletedAt          DateTime?
+
+  // Relations
+  person           Person            @relation("PersonRelationships", fields: [personId], references: [id], onDelete: Cascade)
+  relatedPerson    Person            @relation("RelatedPersonRelationships", fields: [relatedPersonId], references: [id], onDelete: Cascade)
+  relationshipType RelationshipType? @relation(fields: [relationshipTypeId], references: [id])
+
+  @@index([personId])
+  @@index([relatedPersonId])
+  @@index([relationshipTypeId])
+  @@index([personId, deletedAt]) // For soft delete filtering
+  @@map("relationships")
+}
+
+// ImportantDate Model - Important dates for a person (birthdays, anniversaries, etc.)
+model ImportantDate {
+  id                   String                @id @default(cuid())
+  personId             String
+  title                String                // e.g., "Birthday", "Anniversary", "First met"
+  type                 String?               // Predefined type key: "birthday", "anniversary", "nameday", "memorial"
+  date                 DateTime
+  reminderEnabled      Boolean               @default(false)
+  reminderType         ReminderType?
+  reminderInterval     Int?                  // For recurring reminders
+  reminderIntervalUnit ReminderIntervalUnit? // For recurring reminders
+  lastReminderSent     DateTime?             // Track when last reminder was sent
+  reminderLeadDays     Int?      // null = inherit User.defaultReminderLeadDays
+  lastLeadReminderSent DateTime? // Tracked separately from lastReminderSent
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  deletedAt            DateTime?
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  // NOTE: Uniqueness of (personId, type) for predefined types is enforced at the
+  // application layer (POST/PUT/restore endpoints). A partial unique index is not used
+  // because Prisma doesn't support partial indexes and would generate drift migrations.
+  @@index([personId])
+  @@index([personId, date]) // For sorting by date
+  @@index([reminderEnabled, date]) // For querying due reminders
+  @@index([personId, deletedAt]) // For soft delete filtering
+  @@map("important_dates")
+}
+
+enum ReminderType {
+  ONCE
+  RECURRING
+}
+
+enum ReminderIntervalUnit {
+  DAYS
+  WEEKS
+  MONTHS
+  YEARS
+}
+
+enum ReminderEntityType {
+  IMPORTANT_DATE
+  CONTACT
+  WEEKLY_DIGEST
+}
+
+// RelationshipType Model - User-defined relationship types
+model RelationshipType {
+  id          String         @id @default(cuid())
+  userId      String         // Owner of this relationship type
+  name        String         // Unique identifier (PARENT, CHILD, etc.)
+  label       String         // Display name
+  color       String?        // Hex color for UI
+  inverseId   String?        // ID of the inverse relationship type
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inverse             RelationshipType?  @relation("InverseRelationship", fields: [inverseId], references: [id], onDelete: SetNull)
+  inverseOf           RelationshipType[] @relation("InverseRelationship")
+  relationships       Relationship[]
+  peopleWithRelation  Person[]           @relation("UserRelationship")
+
+  @@index([userId])
+  @@index([userId, deletedAt]) // For soft delete filtering
+  @@map("relationship_types")
+}
+
+// Enums
+enum Theme {
+  LIGHT
+  DARK
+}
+
+enum DateFormat {
+  MDY // MM/DD/YYYY (e.g., 12/31/2024)
+  DMY // DD/MM/YYYY (e.g., 31/12/2024)
+  YMD // YYYY-MM-DD (e.g., 2024-12-31)
+}
+
+enum NameOrder {
+  WESTERN // Given Name Surname (e.g., "John Smith")
+  EASTERN // Surname Given Name (e.g., "Smith John")
+}
+
+enum NameDisplayFormat {
+  FULL
+  NICKNAME_PREFERRED
+  SHORT
+}
+
+enum CardDavNameFormat {
+  FULL
+  FIRST_LAST
+  NICKNAME_PREFERRED
+  SHORT
+}
+
+// ============================================
+// BILLING & SUBSCRIPTION MODELS
+// ============================================
+
+enum SubscriptionTier {
+  FREE
+  PERSONAL
+  PRO
+}
+
+enum BillingFrequency {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+  PAUSED
+}
+
+enum PromotionDurationType {
+  FIXED    // Has specific start/end dates
+  RELATIVE // Duration calculated from activation (e.g., 30 days)
+  FOREVER  // Never expires
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  CANCELED
+}
+
+// Subscription Model - One-to-one with User
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  tier                 SubscriptionTier   @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  billingFrequency     BillingFrequency?  // NULL for free tier
+  tierStartedAt        DateTime           @default(now())
+
+  // Stripe fields
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+
+  // Billing period
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+
+  // Complimentary access (free PRO access for friends/family)
+  isComplimentary      Boolean            @default(false)
+
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  // Relations
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  promotion            UserPromotion?
+  paymentHistory       PaymentHistory[]
+
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
+  @@map("subscriptions")
+}
+
+// Promotion Model - Admin-managed discount codes
+model Promotion {
+  id                 String                @id @default(cuid())
+  code               String                @unique // e.g., "LAUNCH20", "FRIEND50"
+  description        String
+  discountPercent    Int                   // 0-100
+
+  // Duration type: fixed dates or relative
+  durationType       PromotionDurationType
+
+  // For FIXED duration type
+  fixedStartDate     DateTime?
+  fixedEndDate       DateTime?
+
+  // For RELATIVE duration type (e.g., "30 days from activation")
+  relativeDays       Int?
+
+  // Limits
+  maxRedemptions     Int?                  // NULL = unlimited
+  currentRedemptions Int                   @default(0)
+
+  // Status
+  isActive           Boolean               @default(true)
+
+  // Stripe coupon reference (for Stripe-side discounts)
+  stripeCouponId     String?               @unique
+
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  // Relations
+  userPromotions     UserPromotion[]
+
+  @@map("promotions")
+}
+
+// UserPromotion Model - User's active promotion (one per subscription)
+model UserPromotion {
+  id             String       @id @default(cuid())
+  subscriptionId String       @unique // One promotion per subscription
+  promotionId    String
+  activatedAt    DateTime     @default(now())
+
+  // Relations
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  promotion      Promotion    @relation(fields: [promotionId], references: [id], onDelete: Restrict)
+
+  @@index([promotionId])
+  @@map("user_promotions")
+}
+
+// PaymentHistory Model - Record of all payments
+model PaymentHistory {
+  id                    String        @id @default(cuid())
+  subscriptionId        String
+
+  // Stripe data
+  stripePaymentIntentId String?       @unique
+  stripeInvoiceId       String?       @unique
+
+  // Payment details
+  amount                Int           // In cents
+  currency              String        @default("usd")
+  status                PaymentStatus
+  description           String?
+
+  // Original price before discount
+  originalAmount        Int?
+  discountAmount        Int?
+  promotionCode         String?       // Snapshot of promo code used
+
+  // Timestamps
+  paidAt                DateTime?
+  createdAt             DateTime      @default(now())
+
+  // Relations
+  subscription          Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([createdAt])
+  @@map("payment_history")
+}
+
+// ============================================
+// ADMIN & MONITORING MODELS
+// ============================================
+
+// CronJobLog Model - Track cron job executions
+model CronJobLog {
+  id         String   @id @default(cuid())
+  jobName    String   // e.g., "send-reminders", "purge-deleted"
+  status     String   // "started", "completed", "failed"
+  message    String?
+  executedAt DateTime @default(now())
+  duration   Int?     // Duration in milliseconds
+
+  @@index([jobName, executedAt])
+  @@map("cron_job_logs")
+}
+
+// AdminAuditLog Model - Track admin panel actions
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  action     String   // "user.update", "promo.create", "recovery.restore"
+  targetType String   // "user", "person", "promotion"
+  targetId   String
+  details    Json?    // Before/after values
+  adminEmail String
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([action, createdAt])
+  @@index([targetType, targetId])
+  @@map("admin_audit_logs")
+}
+
+// UnsubscribeToken Model - Secure tokens for one-click reminder unsubscribe
+model UnsubscribeToken {
+  id           String              @id @default(cuid())
+  token        String              @unique
+  userId       String
+  reminderType ReminderEntityType
+  entityId     String              // Either ImportantDate.id or Person.id
+  used         Boolean             @default(false)
+  usedAt       DateTime?
+  expiresAt    DateTime
+  createdAt    DateTime            @default(now())
+
+  // Relations
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([entityId, reminderType])
+  @@index([expiresAt])
+  @@map("unsubscribe_tokens")
+}
+
+// PushSubscription Model - one row per browser that granted notification permission
+//
+// Not soft-deletable on purpose. A revoked device must stop receiving pushes
+// immediately, and a soft-deleted row that some query forgot to filter would
+// keep getting notifications the user believes they turned off.
+model PushSubscription {
+  id        String  @id @default(cuid())
+  userId    String
+  // The push service URL issued by the browser. Unique so that a browser
+  // re-subscribing updates its row instead of accumulating duplicates.
+  endpoint  String  @unique @db.Text
+  p256dh    String
+  auth      String
+  // Raw User-Agent at subscribe time, used only to label the device in settings.
+  userAgent String?
+
+  lastSuccessAt DateTime?
+
+  consecutiveFailures Int       @default(0)
+  // Coarse category from OutboundFailureCode. Never a response body: storing
+  // one would turn the settings page into a read oracle for internal services.
+  lastFailureCode     String?
+  autoDisabledAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+// Scope of an API token: read-only or full read/write access.
+enum ApiTokenScope {
+  READ
+  READ_WRITE
+}
+
+// ApiToken Model - Per-user, revocable personal access tokens for the REST API.
+// Sent as `Authorization: Bearer <token>`. Only the SHA-256 hash is stored.
+model ApiToken {
+  id         String        @id @default(cuid())
+  userId     String
+  name       String        // User-provided label (e.g. "MCP server", "backup script")
+  tokenHash  String        @unique // SHA-256 of the plaintext token; plaintext is never stored
+  prefix     String        // First chars of the token, shown in the UI for recognition
+  scope      ApiTokenScope @default(READ_WRITE)
+  lastUsedAt DateTime?
+  expiresAt  DateTime?     // null = never expires
+  createdAt  DateTime      @default(now())
+
+  // Relations
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("api_tokens")
+}
+
+// ============================================
+// CARDDAV MULTI-VALUE CONTACT TABLES
+// ============================================
+
+// PersonPhone - Phone numbers (work, home, mobile, fax)
+model PersonPhone {
+  id        String   @id @default(cuid())
+  personId  String
+  type      String   // Any string value (predefined or custom)
+  number    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@map("person_phones")
+}
+
+// PersonEmail - Email addresses
+model PersonEmail {
+  id        String   @id @default(cuid())
+  personId  String
+  type      String   // Any string value (predefined or custom)
+  email     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@map("person_emails")
+}
+
+// PersonAddress - Physical addresses
+model PersonAddress {
+  id          String   @id @default(cuid())
+  personId    String
+  type        String   // Any string value (predefined or custom)
+  streetLine1 String?  // First line of street address
+  streetLine2 String?  // Second line (apt, suite, etc.)
+  locality    String?  // City
+  region      String?  // State/Province
+  postalCode  String?
+  country     String?
+  latitude      Decimal?  @db.Decimal(10, 8)
+  longitude     Decimal?  @db.Decimal(11, 8)
+  geocodedAt    DateTime?
+  geocodeStatus String?   // "pending" | "success" | "failed" | "disabled"
+  geocodeHash   String?   // SHA-256 of normalized address fields at geocode time
+  createdAt   DateTime @default(now())
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@index([geocodeStatus])
+  @@map("person_addresses")
+}
+
+// PersonUrl - URLs
+model PersonUrl {
+  id        String   @id @default(cuid())
+  personId  String
+  type      String   // Any string value (predefined or custom)
+  url       String
+  createdAt DateTime @default(now())
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@map("person_urls")
+}
+
+// PersonIM - Instant messaging handles
+model PersonIM {
+  id        String   @id @default(cuid())
+  personId  String
+  protocol  String   // "skype", "whatsapp", "telegram", "signal", "other"
+  handle    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@map("person_im_handles")
+}
+
+// PersonLocation - Geographic locations (GEO property)
+model PersonLocation {
+  id        String   @id @default(cuid())
+  personId  String
+  type      String   // "home", "work", "other"
+  latitude  Decimal  @db.Decimal(10, 8) // e.g., 37.386013
+  longitude Decimal  @db.Decimal(11, 8) // e.g., -122.082932
+  label     String?  // Optional label (e.g., "Main Office")
+  createdAt DateTime @default(now())
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@map("person_locations")
+}
+
+// GeocodeCache - Caches geocoder lookups by normalized-address hash.
+// Needed because person updates recreate PersonAddress rows (deleteMany + create
+// in lib/services/person.ts), which would otherwise wipe geocode results and
+// re-hit the provider on every edit. Failed lookups are cached too.
+model GeocodeCache {
+  hash      String   @id
+  latitude  Decimal? @db.Decimal(10, 8)
+  longitude Decimal? @db.Decimal(11, 8)
+  status    String   // "success" | "failed"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("geocode_cache")
+}
+
+// PersonCustomField - Custom fields (X- properties)
+model PersonCustomField {
+  id        String   @id @default(cuid())
+  personId  String
+  key       String   // e.g., "X-SPOUSE"
+  value     String   @db.Text
+  type      String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
+  @@map("person_custom_fields")
+}
+
+// ============================================
+// CARDDAV SYNC METADATA TABLES
+// ============================================
+
+// CardDavConnection - User's CardDAV server connection
+model CardDavConnection {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+
+  // Server config
+  serverUrl        String
+  username         String
+  password         String   // Encrypted with AES-256-GCM
+  provider         String?  // "google", "icloud", "outlook", "nextcloud", "custom"
+  addressBookUrl   String?  // URL of the selected address book collection
+  addressBookName  String?  // Display name for the UI
+
+  // Sync config
+  syncEnabled      Boolean  @default(true)
+  autoSyncInterval Int      @default(43200) // 12 hours in seconds
+  lastSyncAt       DateTime?
+  syncToken        String?  // For incremental sync
+
+  // Behavior
+  autoExportNew    Boolean  @default(true)
+  importMode       String   @default("manual") // "manual", "notify", "auto"
+  cardDavNameFormat CardDavNameFormat @default(FULL)
+
+  // Error tracking
+  lastError        String?
+  lastErrorAt      DateTime?
+
+  // Sync locking
+  syncInProgress   Boolean   @default(false)
+  syncStartedAt    DateTime?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  user             User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mappings         CardDavMapping[]
+  pendingImports   CardDavPendingImport[]
+
+  @@map("carddav_connections")
+}
+
+// CardDavMapping - Mapping between Nametag Person and CardDAV vCard
+model CardDavMapping {
+  id               String   @id @default(cuid())
+  connectionId     String
+  personId         String   @unique
+
+  // CardDAV identifiers
+  uid              String   // vCard UID
+  href             String   // Resource URL
+  etag             String?  // For optimistic locking
+
+  // Sync state
+  lastSyncedAt     DateTime?
+  lastLocalChange  DateTime?
+  lastRemoteChange DateTime?
+  syncStatus       String   @default("synced") // "synced", "pending", "conflict"
+
+  // For conflict detection
+  localVersion     String?  // Hash of local data
+  remoteVersion    String?  // Hash of remote data
+
+  preservedProperties Json?  // Unknown vCard properties preserved for round-tripping
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  connection CardDavConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  person     Person             @relation(fields: [personId], references: [id], onDelete: Cascade)
+  conflicts  CardDavConflict[]
+
+  @@unique([connectionId, uid])
+  @@index([connectionId])
+  @@index([syncStatus])
+  @@map("carddav_mappings")
+}
+
+// CardDavPendingImport - New contacts discovered on CardDAV server or uploaded via file
+model CardDavPendingImport {
+  id           String   @id @default(cuid())
+
+  // For CardDAV-discovered contacts, points to the user's connection.
+  // NULL for file imports (no CardDAV connection involved).
+  connectionId String?
+
+  // Direct user ownership — used for file imports and as a denormalized
+  // convenience for CardDAV imports.
+  uploadedByUserId String?
+
+  uid          String
+  href         String
+  etag         String?  // ETag from server for tracking changes
+  vCardData    String   @db.Text
+  displayName  String   // For UI preview
+
+  discoveredAt DateTime @default(now())
+  notifiedAt   DateTime?
+
+  // Relations
+  connection   CardDavConnection? @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  uploadedBy   User?              @relation(fields: [uploadedByUserId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, uid])
+  @@index([connectionId])
+  @@index([uploadedByUserId])
+  @@map("carddav_pending_imports")
+}
+
+// CardDavConflict - Conflict resolution history
+model CardDavConflict {
+  id            String   @id @default(cuid())
+  mappingId     String
+
+  // Conflict data
+  localVersion  String   @db.Text // JSON snapshot
+  remoteVersion String   @db.Text // JSON snapshot
+
+  // Resolution
+  resolvedAt    DateTime?
+  resolution    String?  // "keep_local", "keep_remote", "merged"
+  resolvedBy    String?  // "user", "auto"
+
+  createdAt     DateTime @default(now())
+
+  // Relations
+  mapping CardDavMapping @relation(fields: [mappingId], references: [id], onDelete: Cascade)
+
+  @@index([mappingId])
+  @@index([resolvedAt])
+  @@map("carddav_conflicts")
+}
+
+// Dismissed duplicate pairs – prevents false positives from reappearing
+model DuplicateDismissal {
+  id        String   @id @default(cuid())
+  userId    String
+  personAId String   // Always the lexicographically smaller ID
+  personBId String   // Always the lexicographically larger ID
+  createdAt DateTime @default(now())
+
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  personA Person @relation("DismissalPersonA", fields: [personAId], references: [id], onDelete: Cascade)
+  personB Person @relation("DismissalPersonB", fields: [personBId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, personAId, personBId])
+  @@index([userId])
+  @@map("duplicate_dismissals")
+}
+
+// Stripe webhook idempotency – prevents duplicate event processing
+model StripeEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique
+  processedAt DateTime @default(now())
+
+  @@index([processedAt])
+  @@map("stripe_events")
+}
+
+// ============================================
+// CUSTOM FIELD MODELS
+// ============================================
+
+// CustomFieldTemplate - User-defined typed field schema
+model CustomFieldTemplate {
+  id        String          @id @default(cuid())
+  userId    String
+  name      String
+  slug      String
+  type      CustomFieldType
+  options   String[]        @default([])
+  order     Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime?
+
+  // Relations
+  user   User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  values PersonCustomFieldValue[]
+
+  // Note: uniqueness on (userId, slug) is enforced ONLY for non-deleted rows
+  // via a partial unique index defined in the migration. This lets users
+  // recreate a template with the same name after soft-deleting the previous one.
+  @@index([userId, slug])
+  @@index([userId, deletedAt])
+  @@map("custom_field_templates")
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  BOOLEAN
+  SELECT
+}
+
+// PersonCustomFieldValue - Per-person value for a CustomFieldTemplate
+model PersonCustomFieldValue {
+  id         String   @id @default(cuid())
+  personId   String
+  templateId String
+  value      String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  person   Person              @relation(fields: [personId], references: [id], onDelete: Cascade)
+  template CustomFieldTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([personId, templateId])
+  @@index([templateId, value])
+  @@map("person_custom_field_values")
+}
+
+enum NotificationEndpointType {
+  NTFY
+  WEBHOOK
+}
+
+// NotificationEndpoint Model - a user-configured outbound delivery destination
+//
+// Not soft-deletable on purpose. A soft-deleted webhook that some query forgot
+// to filter would keep firing at a URL the user believes they removed, which
+// is a worse failure than losing the audit trail of a deleted row.
+model NotificationEndpoint {
+  id      String                   @id @default(cuid())
+  userId  String
+  type    NotificationEndpointType
+  label   String
+  url     String
+  // AES-256-GCM. An ntfy access token, or a webhook HMAC signing secret.
+  secret  String?
+  enabled Boolean                  @default(true)
+
+  consecutiveFailures Int       @default(0)
+  lastSuccessAt       DateTime?
+  lastFailureAt       DateTime?
+  // Coarse category from OutboundFailureCode. Never a response body: storing
+  // one would turn the settings page into a read oracle for internal services.
+  lastFailureCode     String?
+  autoDisabledAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Mirrors PushSubscription.endpoint's @unique: adding the same destination
+  // twice would multiply every reminder into duplicate publishes and consume
+  // the user's whole endpoint cap on repeats of one destination.
+  @@unique([userId, url])
+  @@index([userId, enabled])
+  @@map("notification_endpoints")
+}

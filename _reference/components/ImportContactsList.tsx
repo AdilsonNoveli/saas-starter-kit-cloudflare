@@ -1,0 +1,357 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { parseVCard as vCardToPerson } from '@/lib/carddav/vcard-parser';
+import CompactContactRow from './CompactContactRow';
+import GroupsSelector from './GroupsSelector';
+import { useSearchIndex } from '@/components/SearchIndexProvider';
+
+interface PendingImport {
+  id: string;
+  uid: string;
+  href: string;
+  vCardData: string;
+  displayName: string;
+  discoveredAt: Date;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  color: string | null;
+}
+
+interface RelationshipType {
+  id: string;
+  label: string;
+  color: string | null;
+}
+
+interface ImportContactsListProps {
+  pendingImports: PendingImport[];
+  groups: Group[];
+  relationshipTypes: RelationshipType[];
+  isFileImport?: boolean;
+  existingUids?: string[];
+}
+
+export default function ImportContactsList({
+  pendingImports,
+  groups,
+  relationshipTypes,
+  isFileImport = false,
+  existingUids = [],
+}: ImportContactsListProps) {
+  const t = useTranslations('settings.carddav.import');
+  const router = useRouter();
+  const { refreshIndex } = useSearchIndex();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
+  const [perContactGroups, setPerContactGroups] = useState<Map<string, string[]>>(new Map());
+  const [availableGroups, setAvailableGroups] = useState<Group[]>(groups);
+  const [globalRelationshipTypeId, setGlobalRelationshipTypeId] = useState<string>('');
+  const [perContactRelationshipTypeId, setPerContactRelationshipTypeId] = useState<Map<string, string>>(new Map());
+  const [importing, setImporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const existingUidSet = useMemo(() => new Set(existingUids), [existingUids]);
+  const [updateExistingIds, setUpdateExistingIds] = useState<Set<string>>(new Set());
+
+  const handleToggleContact = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === pendingImports.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(pendingImports.map((p) => p.id)));
+    }
+  };
+
+  const handleGroupCreated = (group: Group) => {
+    setAvailableGroups((prev) => {
+      if (prev.some((g) => g.id === group.id)) return prev;
+      return [...prev, group];
+    });
+  };
+
+  const handlePerContactGroupsChange = (contactId: string, groupIds: string[]) => {
+    setPerContactGroups((prev) => {
+      const newMap = new Map(prev);
+      if (groupIds.length === 0) {
+        newMap.delete(contactId);
+      } else {
+        newMap.set(contactId, groupIds);
+      }
+      return newMap;
+    });
+  };
+
+  const handleToggleUpdateExisting = (id: string) => {
+    setUpdateExistingIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handlePerContactRelationshipChange = (contactId: string, relationshipTypeId: string) => {
+    setPerContactRelationshipTypeId((prev) => {
+      const newMap = new Map(prev);
+      if (relationshipTypeId === '') {
+        newMap.delete(contactId);
+      } else {
+        newMap.set(contactId, relationshipTypeId);
+      }
+      return newMap;
+    });
+  };
+
+  // Detect unsaved changes
+  const hasUnsavedChanges = selectedIds.size > 0 || selectedGroupIds.length > 0 || perContactGroups.size > 0 || globalRelationshipTypeId !== '' || perContactRelationshipTypeId.size > 0 || updateExistingIds.size > 0;
+
+  // Warn before leaving page with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  const handleCancel = () => {
+    const redirectUrl = isFileImport ? '/people' : '/settings/carddav';
+    if (hasUnsavedChanges) {
+      if (window.confirm(t('confirmLeave'))) {
+        router.push(redirectUrl);
+      }
+    } else {
+      router.push(redirectUrl);
+    }
+  };
+
+  const handleImport = async () => {
+    if (selectedIds.size === 0) {
+      setError(t('noContactsSelected'));
+      return;
+    }
+
+    setImporting(true);
+    setError(null);
+
+    try {
+      // Build per-contact groups object
+      const perContactGroupsObj: Record<string, string[]> = {};
+      perContactGroups.forEach((groupIds, contactId) => {
+        perContactGroupsObj[contactId] = groupIds;
+      });
+
+      // Build per-contact relationships object
+      const perContactRelObj: Record<string, string> = {};
+      perContactRelationshipTypeId.forEach((relId, contactId) => {
+        perContactRelObj[contactId] = relId;
+      });
+
+      const response = await fetch('/api/carddav/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          importIds: Array.from(selectedIds),
+          globalGroupIds: selectedGroupIds,
+          perContactGroups: perContactGroupsObj,
+          globalRelationshipTypeId: globalRelationshipTypeId || null,
+          perContactRelationshipTypeId: perContactRelObj,
+          updateExistingIds: Array.from(updateExistingIds),
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        if (response.status === 403 && data.code === 'LIMIT_EXCEEDED') {
+          throw new Error(t('importLimitExceeded', {
+            available: data.available ?? 0,
+            requested: data.requested ?? 0,
+          }));
+        }
+        throw new Error(data.error || t('importFailed'));
+      }
+
+      const data = await response.json();
+
+      // Redirect immediately with query params for toast notification
+      const params = new URLSearchParams({
+        importSuccess: 'true',
+        imported: data.imported.toString(),
+        updated: (data.updated ?? 0).toString(),
+        skipped: data.skipped.toString(),
+        errors: data.errors.toString(),
+      });
+      const redirectUrl = isFileImport ? '/people' : '/settings/carddav';
+      refreshIndex();
+      router.push(`${redirectUrl}?${params.toString()}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('importFailed'));
+      setImporting(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const parsedVCards = useMemo(
+    () =>
+      new Map(
+        pendingImports.map((pi) => {
+          try {
+            return [pi.id, vCardToPerson(pi.vCardData)] as const;
+          } catch {
+            return [pi.id, null] as const;
+          }
+        })
+      ),
+    [pendingImports]
+  );
+
+  const allSelected = selectedIds.size === pendingImports.length;
+
+  return (
+    <div className="space-y-6">
+      {/* Global Settings: Groups + Relationship side by side */}
+      <div className={`grid gap-4 ${relationshipTypes.length > 0 ? 'md:grid-cols-2' : ''}`}>
+        {/* Group Selection */}
+        <div className="border border-border rounded-lg p-4">
+          <h3 className="font-semibold text-foreground mb-3">
+            {t('assignToGroups')}
+          </h3>
+          <p className="text-sm text-muted mb-3">
+            {t('assignToGroupsDescription')}
+          </p>
+          <GroupsSelector
+            availableGroups={availableGroups}
+            selectedGroupIds={selectedGroupIds}
+            onChange={setSelectedGroupIds}
+            onGroupCreated={handleGroupCreated}
+          />
+        </div>
+
+        {/* Relationship Selection */}
+        {relationshipTypes.length > 0 && (
+          <div className="border border-border rounded-lg p-4">
+            <h3 className="font-semibold text-foreground mb-3">
+              {t('assignRelationship')}
+            </h3>
+            <p className="text-sm text-muted mb-3">
+              {t('assignRelationshipDescription')}
+            </p>
+            <select
+              value={globalRelationshipTypeId}
+              onChange={(e) => setGlobalRelationshipTypeId(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-primary focus:border-primary"
+            >
+              <option value="">{t('noRelationship')}</option>
+              {relationshipTypes.map((rt) => (
+                <option key={rt.id} value={rt.id}>
+                  {rt.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted mt-2">
+              {t('relationshipPrecedenceHelp')}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Contacts List */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between pb-3 border-b border-border">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={handleSelectAll}
+              className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+            />
+            <span className="font-medium text-foreground">
+              {allSelected ? t('deselectAll') : t('selectAll')}
+            </span>
+          </label>
+          <span className="text-sm text-muted">
+            {selectedIds.size} {t('selected')}
+          </span>
+        </div>
+
+        {pendingImports.map((pendingImport) => {
+          const parsed = parsedVCards.get(pendingImport.id) ?? null;
+          const isSelected = selectedIds.has(pendingImport.id);
+          const contactGroupIds = perContactGroups.get(pendingImport.id) || [];
+
+          const isExisting = existingUidSet.has(pendingImport.uid);
+          const willUpdate = updateExistingIds.has(pendingImport.id);
+
+          return (
+            <CompactContactRow
+              key={pendingImport.id}
+              pendingImport={pendingImport}
+              isSelected={isSelected}
+              onToggle={handleToggleContact}
+              availableGroups={availableGroups}
+              selectedGroupIds={contactGroupIds}
+              onGroupsChange={handlePerContactGroupsChange}
+              onGroupCreated={handleGroupCreated}
+              parsedData={parsed}
+              relationshipTypes={relationshipTypes}
+              selectedRelationshipTypeId={perContactRelationshipTypeId.get(pendingImport.id) || ''}
+              onRelationshipChange={handlePerContactRelationshipChange}
+              isExisting={isExisting}
+              willUpdate={willUpdate}
+              onToggleUpdate={handleToggleUpdateExisting}
+            />
+          );
+        })}
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 pt-4 border-t border-border">
+        <button
+          onClick={handleImport}
+          disabled={importing || selectedIds.size === 0}
+          className="px-6 py-2 bg-primary text-on-primary rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+        >
+          {importing
+            ? t('importing')
+            : t('importSelected', { count: selectedIds.size })}
+        </button>
+        <button
+          onClick={handleCancel}
+          disabled={importing}
+          className="px-6 py-2 bg-surface-elevated text-foreground rounded-lg hover:bg-surface-elevated/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+        >
+          {t('cancel')}
+        </button>
+      </div>
+    </div>
+  );
+}

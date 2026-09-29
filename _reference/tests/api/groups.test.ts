@@ -1,0 +1,419 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// Use vi.hoisted to create mocks before hoisting
+const mocks = vi.hoisted(() => ({
+  groupFindUnique: vi.fn(),
+  groupFindMany: vi.fn(),
+  groupFindFirst: vi.fn(),
+  groupCreate: vi.fn(),
+  groupUpdate: vi.fn(),
+  groupDelete: vi.fn(),
+}));
+
+// Mock Prisma
+vi.mock('../../lib/prisma', () => ({
+  prisma: {
+    group: {
+      findUnique: mocks.groupFindUnique,
+      findMany: mocks.groupFindMany,
+      findFirst: mocks.groupFindFirst,
+      create: mocks.groupCreate,
+      update: mocks.groupUpdate,
+      delete: mocks.groupDelete,
+    },
+  },
+}));
+
+// Mock auth
+vi.mock('../../lib/auth', () => ({
+  auth: vi.fn(() =>
+    Promise.resolve({
+      user: { id: 'user-123', email: 'test@example.com', name: 'Test' },
+    })
+  ),
+}));
+
+// Mock billing
+vi.mock('../../lib/billing', () => ({
+  canCreateResource: vi.fn(() => Promise.resolve({ allowed: true, current: 0, limit: 10, tier: 'FREE', isUnlimited: false })),
+  canEnableReminder: vi.fn(() => Promise.resolve({ allowed: true, current: 0, limit: 5, isUnlimited: false })),
+  getUserUsage: vi.fn(() => Promise.resolve({ people: 0, groups: 0, reminders: 0 })),
+}));
+
+// Import after mocking
+import { GET, POST } from '../../app/api/groups/route';
+
+describe('Groups API', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('GET /api/groups', () => {
+    it('should return list of groups for authenticated user', async () => {
+      const mockGroups = [
+        { id: 'group-1', name: 'Friends', color: '#FF5733', people: [] },
+        { id: 'group-2', name: 'Family', color: '#33FF57', people: [] },
+      ];
+
+      mocks.groupFindMany.mockResolvedValue(mockGroups);
+
+      const request = new Request('http://localhost/api/groups');
+      const response = await GET(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.groups).toEqual(mockGroups);
+    });
+
+    it('should only return groups for current user', async () => {
+      mocks.groupFindMany.mockResolvedValue([]);
+
+      const request = new Request('http://localhost/api/groups');
+      await GET(request);
+
+      expect(mocks.groupFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'user-123', deletedAt: null },
+        })
+      );
+    });
+
+    it('should order groups by name', async () => {
+      mocks.groupFindMany.mockResolvedValue([]);
+
+      const request = new Request('http://localhost/api/groups');
+      await GET(request);
+
+      expect(mocks.groupFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { name: 'asc' },
+        })
+      );
+    });
+
+    it('should include people in groups', async () => {
+      mocks.groupFindMany.mockResolvedValue([]);
+
+      const request = new Request('http://localhost/api/groups');
+      await GET(request);
+
+      expect(mocks.groupFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: expect.objectContaining({
+            people: expect.any(Object),
+          }),
+        })
+      );
+    });
+
+    it('should exclude soft-deleted people from group members', async () => {
+      mocks.groupFindMany.mockResolvedValue([]);
+
+      const request = new Request('http://localhost/api/groups');
+      await GET(request);
+
+      expect(mocks.groupFindMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: expect.objectContaining({
+            people: expect.objectContaining({
+              where: { person: { deletedAt: null } },
+            }),
+          }),
+        })
+      );
+    });
+  });
+
+  describe('POST /api/groups', () => {
+    it('should create a group with valid data', async () => {
+      const newGroup = {
+        id: 'group-new',
+        name: 'Work',
+        description: 'Work colleagues',
+        color: '#0000FF',
+      };
+
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue(newGroup);
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'Work',
+          description: 'Work colleagues',
+          color: '#0000FF',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(201);
+      expect(body.group).toEqual(newGroup);
+    });
+
+    it('should require name field', async () => {
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ description: 'No name' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Validation failed');
+    });
+
+    it('should reject duplicate group names', async () => {
+      mocks.groupFindFirst.mockResolvedValue({ id: 'existing', name: 'Friends' });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Friends' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toContain('already exists');
+    });
+
+    it('should check for duplicate names case-insensitively', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'friends' });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'friends' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await POST(request);
+
+      expect(mocks.groupFindFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            name: expect.objectContaining({
+              mode: 'insensitive',
+            }),
+          }),
+        })
+      );
+    });
+
+    it('should allow optional description', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'Test' });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            description: null,
+          }),
+        })
+      );
+    });
+
+    it('should allow optional color', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'Test' });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            color: expect.stringMatching(/^#[0-9a-f]{6}$/),
+          }),
+        })
+      );
+    });
+
+    it('should associate group with current user', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'Test' });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await POST(request);
+
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            userId: 'user-123',
+          }),
+        })
+      );
+    });
+
+    it('should create a group with people when peopleIds provided', async () => {
+      const newGroup = {
+        id: 'group-new',
+        name: 'Family',
+        description: 'Family members',
+        color: '#FF0000',
+        people: [
+          { person: { id: 'person-1', name: 'John' } },
+          { person: { id: 'person-2', name: 'Jane' } },
+        ],
+      };
+
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue(newGroup);
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'Family',
+          description: 'Family members',
+          color: '#FF0000',
+          peopleIds: ['person-1', 'person-2'],
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(201);
+      expect(body.group).toEqual(newGroup);
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            people: {
+              create: [
+                { person: { connect: { id: 'person-1' } } },
+                { person: { connect: { id: 'person-2' } } },
+              ],
+            },
+          }),
+          include: expect.objectContaining({
+            people: expect.objectContaining({
+              where: { person: { deletedAt: null } },
+            }),
+          }),
+        })
+      );
+    });
+
+    it('should exclude soft-deleted people from created group response', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'Test', people: [] });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await POST(request);
+
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          include: expect.objectContaining({
+            people: expect.objectContaining({
+              where: { person: { deletedAt: null } },
+            }),
+          }),
+        })
+      );
+    });
+
+    it('should create a group without people when peopleIds not provided', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'Test', people: [] });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.not.objectContaining({
+            people: expect.anything(),
+          }),
+        })
+      );
+    });
+
+    it('should create a group without people when peopleIds is empty array', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'Test', people: [] });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test', peopleIds: [] }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.not.objectContaining({
+            people: expect.anything(),
+          }),
+        })
+      );
+    });
+
+    it('should reject invalid peopleIds (not an array)', async () => {
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test', peopleIds: 'invalid' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Validation failed');
+    });
+
+    it('should reject peopleIds with non-string values', async () => {
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test', peopleIds: [123, 456] }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Validation failed');
+    });
+  });
+});

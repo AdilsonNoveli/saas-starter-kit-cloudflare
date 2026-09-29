@@ -1,0 +1,25 @@
+{
+  "output": "CHANGELOG.md",
+  "template": "compact",
+  "unreleased": true,
+  "commitLimit": false,
+  "backfillLimit": false,
+  "hideCredit": true,
+  "package": "package.json",
+  "replaceText": {
+    "^feat": "✨ Feature",
+    "^fix": "🐛 Fix",
+    "^perf": "⚡ Performance",
+    "^docs": "📝 Docs",
+    "^refactor": "♻️ Refactor",
+    "^test": "✅ Test",
+    "^chore": "🔧 Chore",
+    "^ci": "👷 CI",
+    "^style": "💄 Style",
+    "^build": "📦 Build",
+    "^revert": "⏪ Revert"
+  },
+  "includeBranch": [
+    "master"
+  ]
+}

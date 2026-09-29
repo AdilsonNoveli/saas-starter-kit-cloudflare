@@ -1,0 +1,1081 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// Use vi.hoisted to create mocks before hoisting
+const mocks = vi.hoisted(() => ({
+  userFindUnique: vi.fn(),
+  userCreate: vi.fn(),
+  userUpdate: vi.fn(),
+  userCount: vi.fn(),
+  sendEmail: vi.fn(),
+  checkRateLimitAsync: vi.fn(), // For rate-limit-redis (async)
+  checkRateLimitSync: vi.fn(),  // For rate-limit (sync)
+  bcryptHash: vi.fn(),
+  bcryptCompare: vi.fn(),
+  isFeatureEnabled: vi.fn(),
+}));
+
+// Mock Prisma
+vi.mock('../../lib/prisma', () => ({
+  prisma: {
+    user: {
+      findUnique: mocks.userFindUnique,
+      create: mocks.userCreate,
+      update: mocks.userUpdate,
+      count: mocks.userCount,
+    },
+  },
+}));
+
+// Mock email
+vi.mock('../../lib/email', () => ({
+  sendEmail: mocks.sendEmail,
+  emailTemplates: {
+    accountVerification: vi.fn(() => ({
+      subject: 'Verify',
+      html: '<p>Verify</p>',
+      text: 'Verify',
+    })),
+    passwordReset: vi.fn(() => ({
+      subject: 'Reset',
+      html: '<p>Reset</p>',
+      text: 'Reset',
+    })),
+  },
+}));
+
+// Mock rate limit - must match the actual import paths
+// register uses rate-limit-redis (async)
+vi.mock('../../lib/rate-limit-redis', () => ({
+  checkRateLimit: mocks.checkRateLimitAsync,
+  resetRateLimit: vi.fn(),
+}));
+
+// forgot-password uses rate-limit (sync)
+vi.mock('../../lib/rate-limit', () => ({
+  checkRateLimit: mocks.checkRateLimitSync,
+  resetRateLimit: vi.fn(),
+}));
+
+// Mock bcrypt
+vi.mock('bcryptjs', () => ({
+  hash: mocks.bcryptHash,
+  compare: mocks.bcryptCompare,
+  default: {
+    hash: mocks.bcryptHash,
+    compare: mocks.bcryptCompare,
+  },
+}));
+
+// Mock logger
+vi.mock('../../lib/logger', () => ({
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+  securityLogger: {
+    rateLimitExceeded: vi.fn(),
+    suspiciousActivity: vi.fn(),
+    authenticationFailure: vi.fn(),
+    authenticationSuccess: vi.fn(),
+  },
+  createModuleLogger: vi.fn(() => ({
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  })),
+}));
+
+// Mock billing
+vi.mock('../../lib/billing', () => ({
+  createFreeSubscription: vi.fn(() => Promise.resolve({ id: 'sub-1', tier: 'FREE' })),
+}));
+
+// Mock relationship types
+vi.mock('../../lib/relationship-types', () => ({
+  createPreloadedRelationshipTypes: vi.fn(() => Promise.resolve()),
+}));
+
+// Mock features
+vi.mock('../../lib/features', () => ({
+  isFeatureEnabled: mocks.isFeatureEnabled,
+  isSaasMode: vi.fn(() => mocks.isFeatureEnabled('emailVerification')),
+}));
+
+// Import after mocking
+import { POST as register } from '../../app/api/auth/register/route';
+import { POST as forgotPassword } from '../../app/api/auth/forgot-password/route';
+
+describe('Auth API', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Async rate limit (for register)
+    mocks.checkRateLimitAsync.mockResolvedValue(null);
+    // Sync rate limit (for forgot-password)
+    mocks.checkRateLimitSync.mockReturnValue(null);
+    mocks.sendEmail.mockResolvedValue({ success: true });
+    mocks.bcryptHash.mockResolvedValue('hashed-password');
+    // Default to SaaS mode (email verification enabled) for backwards compatibility
+    mocks.isFeatureEnabled.mockReturnValue(true);
+    // Reset environment variable
+    delete process.env.DISABLE_REGISTRATION;
+  });
+
+  describe('POST /api/auth/register', () => {
+    it('should register a new user successfully', async () => {
+      const newUser = {
+        id: 'user-123',
+        email: 'test@example.com',
+        name: 'Test User',
+      };
+
+      mocks.userFindUnique.mockResolvedValue(null);
+      mocks.userCreate.mockResolvedValue(newUser);
+
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'ValidPassword123!',
+          name: 'Test User',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await register(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(201);
+      expect(body.message).toContain('verify');
+      expect(body.user.email).toBe('test@example.com');
+      expect(mocks.sendEmail).toHaveBeenCalled();
+    });
+
+    it('should reject if email already exists', async () => {
+      mocks.userFindUnique.mockResolvedValue({
+        id: 'existing-user',
+        email: 'test@example.com',
+      });
+
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'ValidPassword123!',
+          name: 'Test User',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await register(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toContain('already exists');
+    });
+
+    it('should require email field', async () => {
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          password: 'ValidPassword123!',
+          name: 'Test User',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await register(request);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should require name field', async () => {
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'ValidPassword123!',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await register(request);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should validate password strength', async () => {
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'weak',
+          name: 'Test User',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await register(request);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should validate email format', async () => {
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'not-an-email',
+          password: 'ValidPassword123!',
+          name: 'Test User',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await register(request);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return the same status as today for a malformed body, not a 500, and still consume the unkeyed rate limit', async () => {
+      // Catches: moving body parsing outside the try/catch when reordering
+      // it ahead of the email-keyed rate limit check, which would turn a
+      // client mistake into an unhandled exception. Also catches: dropping
+      // the unkeyed pre-parse check entirely, which would let a flood of
+      // malformed bodies (never reaching the email-keyed check) bypass rate
+      // limiting altogether.
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: '{not valid json',
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await register(request);
+
+      expect(response.status).toBe(400);
+      expect(mocks.checkRateLimitAsync).toHaveBeenCalledTimes(1);
+      expect(mocks.checkRateLimitAsync).toHaveBeenCalledWith(request, 'register');
+    });
+
+    it('should rate limit by the normalized email, so two casings share a bucket', async () => {
+      // Catches: passing the raw (un-normalized) email as the rate-limit
+      // identifier, which would let "Foo@x.com" and "foo@x.com" bypass a
+      // shared limit by alternating case.
+      mocks.userFindUnique.mockResolvedValue(null);
+      mocks.userCreate.mockResolvedValue({ id: 'user-123', email: 'case@example.com', name: 'Test' });
+
+      const upper = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'Case@Example.COM', password: 'ValidPassword123!', name: 'Test' }),
+        headers: { 'content-type': 'application/json' },
+      });
+      const lower = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'case@example.com', password: 'ValidPassword123!', name: 'Test' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await register(upper);
+      await register(lower);
+
+      // Each request makes two calls: an unkeyed pre-parse check (no third
+      // argument) and an email-keyed check after parsing. Only the keyed
+      // calls are relevant to bucket sharing.
+      const identifiers = mocks.checkRateLimitAsync.mock.calls
+        .map((call) => call[2])
+        .filter((identifier): identifier is string => identifier !== undefined);
+      expect(identifiers).toEqual(['case@example.com', 'case@example.com']);
+    });
+
+    it('should hash the password before storing', async () => {
+      mocks.userFindUnique.mockResolvedValue(null);
+      mocks.userCreate.mockResolvedValue({ id: 'user-123', email: 'test@example.com', name: 'Test' });
+
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'ValidPassword123!',
+          name: 'Test User',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await register(request);
+
+      expect(mocks.bcryptHash).toHaveBeenCalledWith('ValidPassword123!', 10);
+      expect(mocks.userCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            password: 'hashed-password',
+          }),
+        })
+      );
+    });
+
+    it('should respect rate limiting', async () => {
+      mocks.checkRateLimitAsync.mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: 'Too many attempts' }), {
+          status: 429,
+        })
+      );
+
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'ValidPassword123!',
+          name: 'Test User',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await register(request);
+
+      expect(response.status).toBe(429);
+      expect(mocks.userCreate).not.toHaveBeenCalled();
+    });
+
+    it('should store a hashed verification token, not the raw token', async () => {
+      mocks.userFindUnique.mockResolvedValue(null);
+      mocks.userCreate.mockResolvedValue({
+        id: 'user-123',
+        email: 'test@example.com',
+        name: 'Test',
+      });
+
+      const request = new Request('http://localhost/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'ValidPassword123!',
+          name: 'Test',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await register(request);
+
+      const createCall = mocks.userCreate.mock.calls[0][0];
+      const storedToken = createCall.data.emailVerifyToken;
+      // Token should be a 64-char hex string (SHA-256 output)
+      expect(storedToken).toMatch(/^[a-f0-9]{64}$/);
+      // The email should contain the raw token, not the hash
+      const emailCall = mocks.sendEmail.mock.calls[0];
+      const emailBody = JSON.stringify(emailCall);
+      // The stored token should NOT appear in the email (email has the raw token)
+      expect(emailBody).not.toContain(storedToken);
+    });
+
+    describe('Self-Hosted Mode (email verification disabled)', () => {
+      beforeEach(() => {
+        mocks.isFeatureEnabled.mockImplementation((feature: string) => {
+          if (feature === 'passwordLogin') return true;
+          return false;
+        });
+      });
+
+      it('should auto-verify users in self-hosted mode', async () => {
+        const newUser = {
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+          emailVerified: true,
+        };
+
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue(newUser);
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+        const body = await response.json();
+
+        expect(response.status).toBe(201);
+        expect(body.message).toContain('can now log in');
+        expect(body.message).not.toContain('verify');
+        expect(mocks.userCreate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({
+              emailVerified: true,
+              emailVerifyToken: null,
+            }),
+          })
+        );
+      });
+
+      it('should not send verification email in self-hosted mode', async () => {
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        await register(request);
+
+        expect(mocks.sendEmail).not.toHaveBeenCalled();
+      });
+
+      it('should not generate verification token in self-hosted mode', async () => {
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        await register(request);
+
+        expect(mocks.userCreate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({
+              emailVerifyToken: null,
+              emailVerifyExpires: null,
+            }),
+          })
+        );
+      });
+    });
+
+    describe('SaaS Mode (email verification enabled)', () => {
+      beforeEach(() => {
+        // Enable email verification for SaaS mode
+        mocks.isFeatureEnabled.mockReturnValue(true);
+      });
+
+      it('should require email verification in SaaS mode', async () => {
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+        const body = await response.json();
+
+        expect(response.status).toBe(201);
+        expect(body.message).toContain('verify');
+        expect(mocks.userCreate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({
+              emailVerified: false,
+            }),
+          })
+        );
+      });
+
+      it('should send verification email in SaaS mode', async () => {
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        await register(request);
+
+        expect(mocks.sendEmail).toHaveBeenCalled();
+      });
+
+      it('should generate verification token in SaaS mode', async () => {
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        await register(request);
+
+        expect(mocks.userCreate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({
+              emailVerifyToken: expect.any(String),
+              emailVerifyExpires: expect.any(Date),
+            }),
+          })
+        );
+      });
+    });
+
+    describe('DISABLE_REGISTRATION Feature', () => {
+      it('should allow registration when DISABLE_REGISTRATION is not set', async () => {
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+
+        expect(response.status).toBe(201);
+        expect(mocks.userCount).not.toHaveBeenCalled();
+      });
+
+      it('should allow registration when DISABLE_REGISTRATION is false', async () => {
+        process.env.DISABLE_REGISTRATION = 'false';
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+
+        expect(response.status).toBe(201);
+        expect(mocks.userCount).not.toHaveBeenCalled();
+      });
+
+      it('should allow first user when DISABLE_REGISTRATION is true and no users exist', async () => {
+        process.env.DISABLE_REGISTRATION = 'true';
+        mocks.userCount.mockResolvedValue(0);
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+        const body = await response.json();
+
+        expect(response.status).toBe(201);
+        expect(mocks.userCount).toHaveBeenCalled();
+        expect(body.user.email).toBe('test@example.com');
+      });
+
+      it('should block registration when DISABLE_REGISTRATION is true and users exist', async () => {
+        process.env.DISABLE_REGISTRATION = 'true';
+        mocks.userCount.mockResolvedValue(1);
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+        const body = await response.json();
+
+        expect(response.status).toBe(403);
+        expect(body.error).toBe('Registration is currently disabled');
+        expect(mocks.userCreate).not.toHaveBeenCalled();
+        expect(mocks.userFindUnique).not.toHaveBeenCalled();
+      });
+
+      it('should block registration when DISABLE_REGISTRATION is true and multiple users exist', async () => {
+        process.env.DISABLE_REGISTRATION = 'true';
+        mocks.userCount.mockResolvedValue(5);
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'second.user@example.com',
+            password: 'ValidPassword123!',
+            name: 'Second User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+        const body = await response.json();
+
+        expect(response.status).toBe(403);
+        expect(body.error).toBe('Registration is currently disabled');
+        expect(mocks.userCreate).not.toHaveBeenCalled();
+      });
+
+      it('rate limits by IP before parsing, then by email, before the DISABLE_REGISTRATION user-count check', async () => {
+        // Pins the deliberate order: an unkeyed IP check runs first (before
+        // the body is parsed), then an email-keyed check once the body is
+        // parsed and validated, and only then is the user count queried.
+        // Getting this backwards either lets a flood of requests reach the
+        // database count query before any rate limit applies, or (the
+        // original bug this route was fixed for) never rate limits a
+        // request that DISABLE_REGISTRATION would go on to block anyway.
+        process.env.DISABLE_REGISTRATION = 'true';
+        const callOrder: string[] = [];
+        mocks.checkRateLimitAsync.mockImplementation(async () => {
+          callOrder.push('rateLimit');
+          return null;
+        });
+        mocks.userCount.mockImplementation(async () => {
+          callOrder.push('userCount');
+          return 1;
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'test@example.com',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+
+        expect(response.status).toBe(403);
+        expect(callOrder).toEqual(['rateLimit', 'rateLimit', 'userCount']);
+        expect(mocks.checkRateLimitAsync).toHaveBeenNthCalledWith(1, request, 'register');
+        // The second check uses a DIFFERENT rate-limit type from the first.
+        // The IP-keyed one does the ordinary work; the email-keyed one exists
+        // only to bound a proxy-pool mail bomb and is deliberately looser, so
+        // that exhausting a victim's address bucket requires actually sending
+        // them that many emails. Reusing 'register' for both would put an
+        // ordinary user's IP allowance and the anti-mail-bomb ceiling on the
+        // same number.
+        expect(mocks.checkRateLimitAsync).toHaveBeenNthCalledWith(
+          2,
+          request,
+          'registerPerEmail',
+          'test@example.com'
+        );
+      });
+    });
+
+    describe('Email Case Sensitivity', () => {
+      it('should normalize email to lowercase during registration', async () => {
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'test@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'Bob@Test.COM',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        await register(request);
+
+        // Check that email was normalized before lookup
+        expect(mocks.userFindUnique).toHaveBeenCalledWith({
+          where: { email: 'bob@test.com' },
+        });
+
+        // Check that email was normalized before storage
+        expect(mocks.userCreate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({
+              email: 'bob@test.com',
+            }),
+          })
+        );
+      });
+
+      it('should prevent duplicate registration with different email case', async () => {
+        // Simulate existing user with lowercase email
+        mocks.userFindUnique.mockResolvedValue({
+          id: 'existing-user',
+          email: 'test@example.com',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'Test@Example.COM',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        const response = await register(request);
+        const body = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(body.error).toContain('already exists');
+        expect(mocks.userFindUnique).toHaveBeenCalledWith({
+          where: { email: 'test@example.com' },
+        });
+      });
+
+      it('should handle all uppercase email', async () => {
+        mocks.userFindUnique.mockResolvedValue(null);
+        mocks.userCreate.mockResolvedValue({
+          id: 'user-123',
+          email: 'user@example.com',
+          name: 'Test User',
+        });
+
+        const request = new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            email: 'USER@EXAMPLE.COM',
+            password: 'ValidPassword123!',
+            name: 'Test User',
+          }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        await register(request);
+
+        // Should normalize to lowercase
+        expect(mocks.userFindUnique).toHaveBeenCalledWith({
+          where: { email: 'user@example.com' },
+        });
+        expect(mocks.userCreate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({
+              email: 'user@example.com',
+            }),
+          })
+        );
+      });
+    });
+  });
+
+  describe('POST /api/auth/forgot-password', () => {
+    it('should respect rate limiting', async () => {
+      // Override the mock just for this test
+      mocks.checkRateLimitSync.mockReturnValueOnce(
+        new Response(JSON.stringify({ error: 'Too many attempts' }), {
+          status: 429,
+        })
+      );
+
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'test@example.com' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await forgotPassword(request);
+
+      expect(response.status).toBe(429);
+    });
+
+    it('should send reset email for existing user', async () => {
+      mocks.userFindUnique.mockResolvedValue({
+        id: 'user-123',
+        passwordResetSentAt: null,
+      });
+      mocks.userUpdate.mockResolvedValue({});
+
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'test@example.com' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await forgotPassword(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(mocks.sendEmail).toHaveBeenCalled();
+      expect(body.message).toBeDefined();
+    });
+
+    it('should return same response for non-existent user (security)', async () => {
+      mocks.userFindUnique.mockResolvedValue(null);
+
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'nonexistent@example.com' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await forgotPassword(request);
+      const body = await response.json();
+
+      // Should return 200 to not reveal if email exists
+      expect(response.status).toBe(200);
+      expect(body.message).toBeDefined();
+      expect(mocks.sendEmail).not.toHaveBeenCalled();
+    });
+
+    it('should enforce cooldown period', async () => {
+      const recentTime = new Date(Date.now() - 30 * 1000); // 30 seconds ago
+      mocks.userFindUnique.mockResolvedValue({
+        id: 'user-123',
+        passwordResetSentAt: recentTime,
+      });
+
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'test@example.com' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await forgotPassword(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(429);
+      expect(body.retryAfter).toBeDefined();
+      expect(mocks.sendEmail).not.toHaveBeenCalled();
+    });
+
+    it('should store a hashed reset token, not the raw token', async () => {
+      mocks.userFindUnique.mockResolvedValue({
+        id: 'user-123',
+        passwordResetSentAt: null,
+      });
+      mocks.userUpdate.mockResolvedValue({});
+
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'test@example.com' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await forgotPassword(request);
+
+      const updateCall = mocks.userUpdate.mock.calls[0][0];
+      const storedToken = updateCall.data.passwordResetToken;
+      // Token should be a 64-char hex string (SHA-256 output)
+      expect(storedToken).toMatch(/^[a-f0-9]{64}$/);
+      // The email should contain the raw token, not the hash
+      const emailCall = mocks.sendEmail.mock.calls[0];
+      const emailBody = JSON.stringify(emailCall);
+      // The stored token should NOT appear in the email (email has the raw token)
+      expect(emailBody).not.toContain(storedToken);
+    });
+
+    it('should allow reset after cooldown expires', async () => {
+      const oldTime = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes ago
+      mocks.userFindUnique.mockResolvedValue({
+        id: 'user-123',
+        passwordResetSentAt: oldTime,
+      });
+      mocks.userUpdate.mockResolvedValue({});
+
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'test@example.com' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await forgotPassword(request);
+
+      expect(response.status).toBe(200);
+      expect(mocks.sendEmail).toHaveBeenCalled();
+    });
+
+    it('should require email field', async () => {
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({}),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await forgotPassword(request);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should validate email format', async () => {
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'not-an-email' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await forgotPassword(request);
+
+      expect(response.status).toBe(400);
+    });
+
+    it('should return the same status as today for a malformed body, not a 500, and still consume the unkeyed rate limit', async () => {
+      // Catches: moving body parsing outside the try/catch when reordering
+      // it ahead of the email-keyed rate limit check, which would turn a
+      // client mistake into an unhandled exception. Also catches: dropping
+      // the unkeyed pre-parse check entirely, which would let a flood of
+      // malformed bodies (never reaching the email-keyed check) bypass rate
+      // limiting altogether.
+      const request = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: '{not valid json',
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await forgotPassword(request);
+
+      expect(response.status).toBe(400);
+      expect(mocks.checkRateLimitSync).toHaveBeenCalledTimes(1);
+      expect(mocks.checkRateLimitSync).toHaveBeenCalledWith(request, 'forgotPassword');
+    });
+
+    it('should rate limit by the normalized email, so two casings share a bucket', async () => {
+      // Catches: passing the raw (un-normalized) email as the rate-limit
+      // identifier, which would let "Foo@x.com" and "foo@x.com" bypass a
+      // shared limit by alternating case.
+      mocks.userFindUnique.mockResolvedValue(null);
+
+      const upper = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'Case@Example.COM' }),
+        headers: { 'content-type': 'application/json' },
+      });
+      const lower = new Request('http://localhost/api/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'case@example.com' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      await forgotPassword(upper);
+      await forgotPassword(lower);
+
+      // Each request makes two calls: an unkeyed pre-parse check (no third
+      // argument) and an email-keyed check after parsing. Only the keyed
+      // calls are relevant to bucket sharing.
+      const identifiers = mocks.checkRateLimitSync.mock.calls
+        .map((call) => call[2])
+        .filter((identifier): identifier is string => identifier !== undefined);
+      expect(identifiers).toEqual(['case@example.com', 'case@example.com']);
+    });
+
+    describe('Email Case Sensitivity', () => {
+      it('should normalize email to lowercase when looking up user', async () => {
+        mocks.userFindUnique.mockResolvedValue({
+          id: 'user-123',
+          passwordResetSentAt: null,
+        });
+        mocks.userUpdate.mockResolvedValue({});
+
+        const request = new Request('http://localhost/api/auth/forgot-password', {
+          method: 'POST',
+          body: JSON.stringify({ email: 'Test@Example.COM' }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        await forgotPassword(request);
+
+        // Check that email was normalized before lookup
+        expect(mocks.userFindUnique).toHaveBeenCalledWith({
+          where: { email: 'test@example.com' },
+          select: {
+            id: true,
+            passwordResetSentAt: true,
+          },
+        });
+      });
+
+      it('should send reset email to normalized address', async () => {
+        mocks.userFindUnique.mockResolvedValue({
+          id: 'user-123',
+          passwordResetSentAt: null,
+        });
+        mocks.userUpdate.mockResolvedValue({});
+
+        const request = new Request('http://localhost/api/auth/forgot-password', {
+          method: 'POST',
+          body: JSON.stringify({ email: 'Admin@Company.COM' }),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        await forgotPassword(request);
+
+        expect(mocks.sendEmail).toHaveBeenCalledWith(
+          expect.objectContaining({
+            to: 'admin@company.com',
+          })
+        );
+      });
+    });
+  });
+});

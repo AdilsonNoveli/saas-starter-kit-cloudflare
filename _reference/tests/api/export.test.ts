@@ -1,0 +1,589 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// Use vi.hoisted to create mocks before hoisting
+const mocks = vi.hoisted(() => ({
+  userFindUnique: vi.fn(),
+  personFindMany: vi.fn(),
+  groupFindMany: vi.fn(),
+  relationshipTypeFindMany: vi.fn(),
+  journalEntryFindMany: vi.fn(),
+  customFieldTemplateFindMany: vi.fn(),
+  notificationEndpointFindMany: vi.fn(),
+  pushSubscriptionFindMany: vi.fn(),
+}));
+
+// Mock Prisma
+vi.mock('../../lib/prisma', () => ({
+  prisma: {
+    user: {
+      findUnique: mocks.userFindUnique,
+    },
+    person: {
+      findMany: mocks.personFindMany,
+    },
+    group: {
+      findMany: mocks.groupFindMany,
+    },
+    relationshipType: {
+      findMany: mocks.relationshipTypeFindMany,
+    },
+    journalEntry: {
+      findMany: mocks.journalEntryFindMany,
+    },
+    customFieldTemplate: {
+      findMany: mocks.customFieldTemplateFindMany,
+    },
+    notificationEndpoint: {
+      findMany: mocks.notificationEndpointFindMany,
+    },
+    pushSubscription: {
+      findMany: mocks.pushSubscriptionFindMany,
+    },
+  },
+}));
+
+// Mock auth
+vi.mock('../../lib/auth', () => ({
+  auth: vi.fn(() =>
+    Promise.resolve({
+      user: { id: 'user-123', email: 'test@example.com', name: 'Test' },
+    })
+  ),
+}));
+
+// Import after mocking
+import { GET as exportData } from '../../app/api/user/export/route';
+
+describe('Export API', () => {
+  const mockUser = {
+    email: 'test@example.com',
+    name: 'Test User',
+    theme: 'DARK',
+    dateFormat: 'MDY',
+    createdAt: new Date('2024-01-01'),
+  };
+
+  const mockGroups = [
+    { id: 'group-1', name: 'Family', description: 'Family members', color: '#FF0000' },
+    { id: 'group-2', name: 'Friends', description: 'Close friends', color: '#00FF00' },
+    { id: 'group-3', name: 'Work', description: 'Colleagues', color: '#0000FF' },
+  ];
+
+  const emptyMultiValues = {
+    phoneNumbers: [],
+    emails: [],
+    addresses: [],
+    urls: [],
+    imHandles: [],
+    locations: [],
+    customFields: [],
+    customFieldValues: [],
+  };
+
+  const nullPersonFields = {
+    secondLastName: null,
+    prefix: null,
+    suffix: null,
+    organization: null,
+    jobTitle: null,
+    photo: null,
+    gender: null,
+    anniversary: null,
+    contactReminderEnabled: false,
+    contactReminderInterval: null,
+    contactReminderIntervalUnit: null,
+  };
+
+  const mockPeople = [
+    {
+      id: 'person-1',
+      name: 'John',
+      middleName: 'Michael',
+      surname: 'Doe',
+      nickname: null,
+      lastContact: null,
+      notes: null,
+      ...nullPersonFields,
+      prefix: 'Dr.',
+      organization: 'Acme Corp',
+      jobTitle: 'Engineer',
+      relationshipToUser: { id: 'rel-1', name: 'friend', label: 'Friend' },
+      groups: [
+        { group: { id: 'group-1', name: 'Family' } },
+        { group: { id: 'group-2', name: 'Friends' } },
+      ],
+      relationshipsFrom: [
+        {
+          relatedPersonId: 'person-2',
+          relatedPerson: { id: 'person-2', name: 'Jane', surname: 'Doe', nickname: null },
+          relationshipType: { id: 'type-1', name: 'spouse', label: 'Spouse' },
+          notes: null,
+        },
+      ],
+      importantDates: [
+        { title: 'Birthday', date: new Date('1990-05-15') },
+        { title: 'Anniversary', date: new Date('2015-06-20') },
+      ],
+      phoneNumbers: [{ type: 'mobile', number: '+1234567890' }],
+      emails: [{ type: 'work', email: 'john@acme.com' }],
+      addresses: [
+        {
+          type: 'home',
+          streetLine1: '123 Main St',
+          streetLine2: 'Apt 4',
+          locality: 'Springfield',
+          region: 'IL',
+          postalCode: '62701',
+          country: 'US',
+        },
+      ],
+      urls: [{ type: 'homepage', url: 'https://johndoe.com' }],
+      imHandles: [{ protocol: 'telegram', handle: '@johndoe' }],
+      locations: [{ type: 'home', latitude: 39.7817, longitude: -89.6501, label: 'Home' }],
+      customFields: [{ key: 'X-HOBBY', value: 'Guitar', type: null }],
+      customFieldValues: [
+        { value: 'vegan', template: { slug: 'diet' } },
+      ],
+    },
+    {
+      id: 'person-2',
+      name: 'Jane',
+      middleName: null,
+      surname: 'Doe',
+      nickname: null,
+      lastContact: null,
+      notes: null,
+      ...nullPersonFields,
+      relationshipToUser: null,
+      groups: [{ group: { id: 'group-1', name: 'Family' } }],
+      relationshipsFrom: [
+        {
+          relatedPersonId: 'person-1',
+          relatedPerson: { id: 'person-1', name: 'John', surname: 'Doe', nickname: null },
+          relationshipType: { id: 'type-1', name: 'spouse', label: 'Spouse' },
+          notes: null,
+        },
+      ],
+      importantDates: [],
+      ...emptyMultiValues,
+    },
+    {
+      id: 'person-3',
+      name: 'Bob',
+      middleName: null,
+      surname: 'Smith',
+      nickname: 'Bobby',
+      lastContact: null,
+      notes: null,
+      ...nullPersonFields,
+      relationshipToUser: null,
+      groups: [{ group: { id: 'group-3', name: 'Work' } }],
+      relationshipsFrom: [],
+      importantDates: [{ title: 'Birthday', date: new Date('1985-12-25') }],
+      ...emptyMultiValues,
+    },
+  ];
+
+  const mockRelationshipTypes = [
+    { id: 'type-1', name: 'spouse', label: 'Spouse', color: '#FF00FF', inverseId: 'type-1' },
+  ];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.userFindUnique.mockResolvedValue(mockUser);
+    mocks.groupFindMany.mockResolvedValue(mockGroups);
+    mocks.relationshipTypeFindMany.mockResolvedValue(mockRelationshipTypes);
+    mocks.journalEntryFindMany.mockResolvedValue([]);
+    mocks.customFieldTemplateFindMany.mockResolvedValue([]);
+    mocks.notificationEndpointFindMany.mockResolvedValue([]);
+    mocks.pushSubscriptionFindMany.mockResolvedValue([]);
+  });
+
+  describe('GET /api/user/export', () => {
+    it('should export all data when no groupIds filter is provided', async () => {
+      mocks.personFindMany.mockResolvedValue(mockPeople);
+
+      const request = new Request('http://localhost/api/user/export', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.version).toBe('1.2');
+      expect(body.people).toHaveLength(3);
+      expect(body.groups).toHaveLength(3);
+      expect(body.relationshipTypes).toHaveLength(1);
+    });
+
+    it('should filter people by group when groupIds is provided', async () => {
+      // When filtering by group-1 (Family), only person-1 and person-2 should be returned
+      const familyPeople = mockPeople.filter((p) =>
+        p.groups.some((g) => g.group.id === 'group-1')
+      );
+      mocks.personFindMany.mockResolvedValue(familyPeople);
+
+      const request = new Request('http://localhost/api/user/export?groupIds=group-1', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.people).toHaveLength(2);
+      expect(body.people.map((p: { id: string }) => p.id)).toContain('person-1');
+      expect(body.people.map((p: { id: string }) => p.id)).toContain('person-2');
+      expect(body.people.map((p: { id: string }) => p.id)).not.toContain('person-3');
+    });
+
+    it('should only export specified groups, not all groups people belong to', async () => {
+      // Person-1 belongs to both Family and Friends, but if we only export Family,
+      // the Friends group should not be in the exported groups
+      const familyPeople = mockPeople.filter((p) =>
+        p.groups.some((g) => g.group.id === 'group-1')
+      );
+      mocks.personFindMany.mockResolvedValue(familyPeople);
+
+      const request = new Request('http://localhost/api/user/export?groupIds=group-1', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      // Only the Family group should be exported
+      expect(body.groups).toHaveLength(1);
+      expect(body.groups[0].name).toBe('Family');
+      // Person-1's groups should only show Family, not Friends
+      const person1 = body.people.find((p: { id: string }) => p.id === 'person-1');
+      expect(person1.groups).toEqual(['Family']);
+      expect(person1.groups).not.toContain('Friends');
+    });
+
+    it('should filter relationships to only include those between exported people', async () => {
+      // When filtering by group-3 (Work), only person-3 is included
+      // person-3 has no relationships with other people in Work group
+      const workPeople = mockPeople.filter((p) =>
+        p.groups.some((g) => g.group.id === 'group-3')
+      );
+      mocks.personFindMany.mockResolvedValue(workPeople);
+
+      const request = new Request('http://localhost/api/user/export?groupIds=group-3', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.people).toHaveLength(1);
+      expect(body.people[0].id).toBe('person-3');
+      expect(body.people[0].relationships).toHaveLength(0);
+    });
+
+    it('should support multiple group IDs', async () => {
+      // Export both Family and Work groups
+      const filteredPeople = mockPeople.filter((p) =>
+        p.groups.some((g) => g.group.id === 'group-1' || g.group.id === 'group-3')
+      );
+      mocks.personFindMany.mockResolvedValue(filteredPeople);
+
+      const request = new Request('http://localhost/api/user/export?groupIds=group-1,group-3', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.people).toHaveLength(3);
+      expect(body.groups).toHaveLength(2);
+      expect(body.groups.map((g: { name: string }) => g.name)).toContain('Family');
+      expect(body.groups.map((g: { name: string }) => g.name)).toContain('Work');
+      expect(body.groups.map((g: { name: string }) => g.name)).not.toContain('Friends');
+    });
+
+    it('should include relationships between people in the same exported groups', async () => {
+      // When exporting Family group, person-1 and person-2 both belong to it
+      // Their spouse relationship should be included
+      const familyPeople = mockPeople.filter((p) =>
+        p.groups.some((g) => g.group.id === 'group-1')
+      );
+      mocks.personFindMany.mockResolvedValue(familyPeople);
+
+      const request = new Request('http://localhost/api/user/export?groupIds=group-1', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      const person1 = body.people.find((p: { id: string }) => p.id === 'person-1');
+      expect(person1.relationships).toHaveLength(1);
+      expect(person1.relationships[0].relatedPersonId).toBe('person-2');
+    });
+
+    it('should export journal people with stable IDs and canonical names (not display overrides)', async () => {
+      mocks.personFindMany.mockResolvedValue(mockPeople);
+      mocks.journalEntryFindMany.mockResolvedValue([
+        {
+          id: 'entry-1',
+          title: 'Dinner',
+          date: new Date('2026-05-01T00:00:00.000Z'),
+          body: 'Nice dinner',
+          people: [
+            {
+              person: {
+                id: 'person-1',
+                name: 'Robert',
+                surname: 'Johnson',
+                middleName: null,
+                secondLastName: null,
+                nickname: null,
+                displayNameOverride: 'Dad',
+              },
+            },
+          ],
+        },
+      ]);
+
+      const request = new Request('http://localhost/api/user/export', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.journalEntries).toHaveLength(1);
+      expect(body.journalEntries[0].peopleIds).toEqual(['person-1']);
+      // Canonical name keeps old-version round-trips working; the override is
+      // a display concern and must not leak into identity/matching data.
+      expect(body.journalEntries[0].people).toEqual(['Robert Johnson']);
+    });
+
+    it('should include all person fields in export', async () => {
+      mocks.personFindMany.mockResolvedValue(mockPeople);
+
+      const request = new Request('http://localhost/api/user/export', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+
+      const person1 = body.people.find((p: { id: string }) => p.id === 'person-1');
+
+      // Scalar fields
+      expect(person1.middleName).toBe('Michael');
+      expect(person1.prefix).toBe('Dr.');
+      expect(person1.organization).toBe('Acme Corp');
+      expect(person1.jobTitle).toBe('Engineer');
+      expect(person1.secondLastName).toBeNull();
+      expect(person1.suffix).toBeNull();
+      expect(person1.photo).toBeNull();
+      expect(person1.gender).toBeNull();
+      expect(person1.anniversary).toBeNull();
+      expect(person1.contactReminderEnabled).toBe(false);
+      expect(person1.contactReminderInterval).toBeNull();
+      expect(person1.contactReminderIntervalUnit).toBeNull();
+
+      // Important dates
+      expect(person1.importantDates).toHaveLength(2);
+      expect(person1.importantDates[0].title).toBe('Birthday');
+
+      // Multi-value fields
+      expect(person1.phoneNumbers).toEqual([{ type: 'mobile', number: '+1234567890' }]);
+      expect(person1.emails).toEqual([{ type: 'work', email: 'john@acme.com' }]);
+      expect(person1.addresses).toEqual([
+        {
+          type: 'home',
+          streetLine1: '123 Main St',
+          streetLine2: 'Apt 4',
+          locality: 'Springfield',
+          region: 'IL',
+          postalCode: '62701',
+          country: 'US',
+        },
+      ]);
+      expect(person1.urls).toEqual([{ type: 'homepage', url: 'https://johndoe.com' }]);
+      expect(person1.imHandles).toEqual([{ protocol: 'telegram', handle: '@johndoe' }]);
+      expect(person1.locations).toHaveLength(1);
+      expect(person1.locations[0].label).toBe('Home');
+      expect(person1.customFields).toEqual([{ key: 'X-HOBBY', value: 'Guitar', type: null }]);
+
+      // Person with empty multi-value fields
+      const person2 = body.people.find((p: { id: string }) => p.id === 'person-2');
+      expect(person2.middleName).toBeNull();
+      expect(person2.importantDates).toHaveLength(0);
+      expect(person2.phoneNumbers).toHaveLength(0);
+      expect(person2.emails).toHaveLength(0);
+      expect(person2.addresses).toHaveLength(0);
+      expect(person2.urls).toHaveLength(0);
+      expect(person2.imHandles).toHaveLength(0);
+      expect(person2.locations).toHaveLength(0);
+      expect(person2.customFields).toHaveLength(0);
+    });
+
+    it('should return empty people array when no people match the group filter', async () => {
+      mocks.personFindMany.mockResolvedValue([]);
+
+      const request = new Request('http://localhost/api/user/export?groupIds=non-existent-group', {
+        method: 'GET',
+      });
+
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.people).toHaveLength(0);
+      expect(body.groups).toHaveLength(0);
+    });
+
+    it('should include customFieldTemplates in the export', async () => {
+      mocks.personFindMany.mockResolvedValue(mockPeople);
+      mocks.customFieldTemplateFindMany.mockResolvedValue([
+        {
+          id: 'tpl-1',
+          name: 'Diet',
+          slug: 'diet',
+          type: 'SELECT',
+          options: ['vegan', 'omnivore'],
+          order: 0,
+          createdAt: new Date('2024-01-01'),
+          updatedAt: new Date('2024-01-01'),
+          deletedAt: null,
+        },
+      ]);
+
+      const request = new Request('http://localhost/api/user/export', { method: 'GET' });
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.customFieldTemplates).toHaveLength(1);
+      expect(body.customFieldTemplates[0]).toEqual({
+        name: 'Diet',
+        slug: 'diet',
+        type: 'SELECT',
+        options: ['vegan', 'omnivore'],
+        order: 0,
+      });
+    });
+
+    it('should include per-person customFieldValues keyed by slug in the export', async () => {
+      mocks.personFindMany.mockResolvedValue(mockPeople);
+
+      const request = new Request('http://localhost/api/user/export', { method: 'GET' });
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      const person1 = body.people.find((p: { id: string }) => p.id === 'person-1');
+      expect(person1.customFieldValues).toEqual([{ slug: 'diet', value: 'vegan' }]);
+
+      const person2 = body.people.find((p: { id: string }) => p.id === 'person-2');
+      expect(person2.customFieldValues).toHaveLength(0);
+    });
+
+    it('should include empty customFieldTemplates array when none exist', async () => {
+      mocks.personFindMany.mockResolvedValue(mockPeople);
+      // customFieldTemplateFindMany already returns [] by default in beforeEach
+
+      const request = new Request('http://localhost/api/user/export', { method: 'GET' });
+      const response = await exportData(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.customFieldTemplates).toEqual([]);
+    });
+  });
+});
+
+describe('GET /api/user/export - notification destinations', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.userFindUnique.mockResolvedValue({
+      email: 'user@example.com',
+      name: 'Test',
+      theme: 'LIGHT',
+      dateFormat: 'DMY',
+      createdAt: new Date('2026-01-01'),
+    });
+    mocks.personFindMany.mockResolvedValue([]);
+    mocks.groupFindMany.mockResolvedValue([]);
+    mocks.relationshipTypeFindMany.mockResolvedValue([]);
+    mocks.journalEntryFindMany.mockResolvedValue([]);
+    mocks.customFieldTemplateFindMany.mockResolvedValue([]);
+    mocks.notificationEndpointFindMany.mockResolvedValue([]);
+    mocks.pushSubscriptionFindMany.mockResolvedValue([]);
+  });
+
+  it('includes notification destinations, which are user-authored data', async () => {
+    mocks.notificationEndpointFindMany.mockResolvedValue([
+      {
+        type: 'NTFY',
+        label: 'Phone',
+        url: 'https://ntfy.sh/my-topic',
+        enabled: true,
+        createdAt: new Date('2026-02-01'),
+      },
+    ]);
+
+    const response = await exportData(new Request('http://localhost/api/user/export'));
+    const body = await response.json();
+
+    expect(body.notificationEndpoints).toHaveLength(1);
+    expect(body.notificationEndpoints[0].label).toBe('Phone');
+    expect(body.notificationEndpoints[0].url).toBe('https://ntfy.sh/my-topic');
+  });
+
+  it('never selects the encrypted endpoint secret', async () => {
+    // The secret is write-only from the client's point of view everywhere
+    // else in the app, so an export would be the single place it leaked back
+    // out. Asserted on the SELECT rather than only on the response body: a
+    // version that selects it and forgets to strip it later would still pass
+    // a body-only check today and leak the moment the shape changes.
+    await exportData(new Request('http://localhost/api/user/export'));
+
+    const select = mocks.notificationEndpointFindMany.mock.calls[0][0].select;
+    expect(select).not.toHaveProperty('secret');
+    expect(select.secret).toBeUndefined();
+  });
+
+  it('includes push devices without their push-service credentials', async () => {
+    // endpoint, p256dh and auth are credentials, not user data. endpoint in
+    // particular is the key the subscribe route upserts on, so anyone who
+    // learns a victim's endpoint can move that row to their own account and
+    // silently kill the victim's push.
+    mocks.pushSubscriptionFindMany.mockResolvedValue([
+      { userAgent: 'Mozilla/5.0 (Macintosh) Chrome/120', createdAt: new Date('2026-02-01') },
+    ]);
+
+    const response = await exportData(new Request('http://localhost/api/user/export'));
+    const body = await response.json();
+
+    expect(body.pushSubscriptions).toHaveLength(1);
+    expect(body.pushSubscriptions[0].userAgent).toContain('Chrome');
+
+    const select = mocks.pushSubscriptionFindMany.mock.calls[0][0].select;
+    for (const credential of ['endpoint', 'p256dh', 'auth']) {
+      expect(select[credential]).toBeUndefined();
+    }
+  });
+
+  it('scopes both queries to the signed-in user', async () => {
+    await exportData(new Request('http://localhost/api/user/export'));
+
+    expect(mocks.notificationEndpointFindMany.mock.calls[0][0].where).toEqual({
+      userId: 'user-123',
+    });
+    expect(mocks.pushSubscriptionFindMany.mock.calls[0][0].where).toEqual({ userId: 'user-123' });
+  });
+});

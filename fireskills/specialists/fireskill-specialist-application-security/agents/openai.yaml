@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Application Security"
+  short_description: "Threats, controls, and security testing"
+  default_prompt: "Use $fireskill-specialist-application-security to guide this task with specialized security patterns and validation."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Domain Modeling"
+  short_description: "Ubiquitous language, invariants, and domain boundaries"
+  default_prompt: "Use $fireskill-specialist-domain-modeling to guide this domain modeling task with bounded contexts, aggregates, and ubiquitous language."

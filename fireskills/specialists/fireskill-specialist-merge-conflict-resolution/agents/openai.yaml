@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Git Conflict Resolution"
+  short_description: "Conflicts resolved by the intent of both sides"
+  default_prompt: "Use $fireskill-specialist-merge-conflict-resolution to guide this task with specialized standards and validation."

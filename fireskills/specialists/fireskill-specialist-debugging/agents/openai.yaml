@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Debugging"
+  short_description: "Diagnosis through reproduction and falsifiable hypotheses"
+  default_prompt: "Use $fireskill-specialist-debugging to isolate root cause, reproduce the defect, and structure a verifiable diagnosis."

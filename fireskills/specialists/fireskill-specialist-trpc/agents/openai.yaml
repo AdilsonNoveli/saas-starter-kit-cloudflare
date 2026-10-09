@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - tRPC"
+  short_description: "Nuxfire tRPC v10 routers and procedures"
+  default_prompt: "Use $fireskill-specialist-trpc to guide this task with specialized standards and validation."

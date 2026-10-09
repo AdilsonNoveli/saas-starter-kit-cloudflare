@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - TypeScript"
+  short_description: "Strict TypeScript and type-safe contracts"
+  default_prompt: "Use $fireskill-specialist-typescript to guide this task with specialized TypeScript patterns and strict verification."

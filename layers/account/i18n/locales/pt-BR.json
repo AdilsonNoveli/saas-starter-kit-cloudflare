@@ -1,0 +1,215 @@
+{
+  "account": {
+    "header": {
+      "language": "Idioma",
+      "colorMode": "Alterar o tema",
+      "notSaved": "A escolha vale neste aparelho, mas não foi salva na sua conta."
+    },
+    "preferences": {
+      "locale": {
+        "label": "Idioma"
+      },
+      "timeZone": {
+        "label": "Fuso horário",
+        "search": "Buscar fuso horário",
+        "empty": "Nenhum fuso horário corresponde à busca."
+      },
+      "theme": {
+        "label": "Tema",
+        "system": "Sistema",
+        "light": "Claro",
+        "dark": "Escuro"
+      },
+      "dateFormat": {
+        "label": "Formato de data",
+        "DMY": "Dia, mês e ano",
+        "MDY": "Mês, dia e ano",
+        "YMD": "Ano, mês e dia"
+      },
+      "nameOrder": {
+        "label": "Ordem do nome",
+        "WESTERN": "Nome antes do sobrenome",
+        "EASTERN": "Sobrenome antes do nome"
+      }
+    },
+    "onboarding": {
+      "brand": {
+        "title": "Boas-vindas",
+        "lead": "Antes de começar, ajuste o básico: como você se chama, como prefere ver datas e horários, e o Espaço onde você vai trabalhar.",
+        "later": "Você pode mudar tudo isso depois em Conta."
+      },
+      "steps": {
+        "profile": "Perfil",
+        "preferences": "Preferências",
+        "space": "Espaço"
+      },
+      "position": "Etapa {current} de {total}: {title}",
+      "lengthError": "Use de {min} a {max} caracteres.",
+      "actions": {
+        "back": "Voltar",
+        "next": "Continuar",
+        "create": "Criar o Espaço e entrar",
+        "join": "Entrar no Espaço"
+      },
+      "profile": {
+        "title": "Seu nome",
+        "description": "É assim que as pessoas do seu Espaço vão ver você.",
+        "name": "Nome"
+      },
+      "preferences": {
+        "title": "Suas preferências",
+        "description": "Os valores vêm do seu navegador. Confira e ajuste se precisar."
+      },
+      "space": {
+        "title": "Seu Espaço",
+        "description": "É onde você vai trabalhar no app. Escolha um nome e o endereço dele.",
+        "name": "Nome do Espaço",
+        "slug": "Endereço",
+        "slugHint": "Aparece no link do Espaço. Use letras minúsculas sem acento, números e hífens.",
+        "inviteTitle": "Um convite espera por você",
+        "inviteDescription": "Há um convite para você entrar no Espaço {name}. Ao concluir, você passa a fazer parte dele."
+      },
+      "failed": "Não foi possível concluir"
+    },
+    "common": {
+      "cancel": "Cancelar",
+      "discard": "Descartar alterações",
+      "retry": "Tentar de novo"
+    },
+    "settings": {
+      "title": "Conta",
+      "tabs": {
+        "profile": "Perfil",
+        "preferences": "Preferências",
+        "notifications": "Notificações",
+        "security": "Segurança"
+      }
+    },
+    "profile": {
+      "title": "Perfil",
+      "description": "É assim que as pessoas veem você no app.",
+      "name": "Nome",
+      "save": "Salvar perfil",
+      "saved": "Perfil salvo",
+      "saveFailed": "Não foi possível salvar o perfil",
+      "avatar": {
+        "label": "Foto",
+        "hint": "Use uma imagem JPG ou PNG.",
+        "alt": "Sua foto",
+        "updated": "Foto atualizada",
+        "updateFailed": "Não foi possível enviar a foto",
+        "removed": "Foto removida",
+        "removeFailed": "Não foi possível remover a foto"
+      }
+    },
+    "preferencesPage": {
+      "title": "Preferências",
+      "description": "Idioma, tema, fuso horário e o jeito de mostrar datas e nomes. O idioma e o tema mudam assim que você escolhe; salve para levar a escolha aos seus outros aparelhos.",
+      "save": "Salvar preferências",
+      "saved": "Preferências salvas",
+      "saveFailed": "Não foi possível salvar as preferências",
+      "loadFailed": "Não foi possível carregar as suas preferências. Recarregue a página para tentar de novo."
+    },
+    "security": {
+      "password": {
+        "title": "Senha",
+        "description": "Para trocar a senha, você recebe um código no seu e-mail e escolhe a nova senha na página de entrada.",
+        "provider": "Sua conta não tem senha neste app. Se você entra pelo Google ou pelo GitHub, a senha é a desse serviço e muda por lá.",
+        "change": "Trocar senha"
+      },
+      "mfa": {
+        "title": "Autenticação em dois fatores",
+        "enabledDescription": "Ativa. Ao entrar por um aparelho ou navegador novo, você digita também um código do seu aplicativo autenticador.",
+        "disabledDescription": "Além da senha, peça um código do seu aplicativo autenticador ao entrar.",
+        "enable": "Ativar",
+        "disable": "Desativar",
+        "disableConfirm": {
+          "title": "Desativar a autenticação em dois fatores",
+          "description": "Para entrar, só a senha volta a ser pedida. Você pode ativar de novo quando quiser."
+        },
+        "disabled": "Autenticação em dois fatores desativada",
+        "disableFailed": "Não foi possível desativar"
+      },
+      "danger": {
+        "title": "Zona de perigo",
+        "description": "Exclui de vez a sua conta, as suas credenciais e o seu perfil. Não dá para desfazer.",
+        "delete": "Excluir conta",
+        "confirmBody": "Isso apaga de vez as suas credenciais, as sessões abertas e o seu perfil. Os Espaços de que você não é dono continuam como estão. Se você é o único dono de um Espaço com outras pessoas, remova essas pessoas ou passe a propriedade antes.",
+        "confirmLabel": "Digite {email} para confirmar",
+        "confirm": "Excluir de vez",
+        "failed": "Não foi possível excluir a conta"
+      }
+    },
+    "email": {
+      "title": "E-mail",
+      "description": "O endereço com que você entra e recebe os avisos do app.",
+      "current": "E-mail atual",
+      "change": "Trocar e-mail",
+      "statusFailed": "Não foi possível ler os dados de e-mail e senha da sua conta. Recarregue a página para tentar de novo.",
+      "pendingWarning": {
+        "title": "Convites e compras pendentes ficam no endereço atual",
+        "description": "Convites para Espaços e compras ainda não resgatadas que foram enviados para o e-mail atual não passam para o novo. Depois da troca, peça a quem enviou que mande de novo."
+      },
+      "newEmail": "Novo e-mail",
+      "newEmailHelp": "Um código vai para o e-mail atual e outro para o novo. Os dois confirmam a troca.",
+      "invalidEmail": "Digite um e-mail completo, com nome e domínio separados por arroba.",
+      "send": "Enviar códigos",
+      "codesSent": "Um código foi enviado para {current} e outro para {next}. Digite os dois para confirmar a troca.",
+      "currentCode": "Código do e-mail atual",
+      "newCode": "Código do novo e-mail",
+      "codeFormat": "Digite o código do e-mail, só com números.",
+      "confirm": "Confirmar troca",
+      "resend": "Pedir códigos novos",
+      "changed": "E-mail trocado",
+      "changedDescription": "Agora você entra com {email}.",
+      "failed": "Não foi possível trocar o e-mail"
+    },
+    "sessions": {
+      "title": "Sessões ativas",
+      "description": "Os aparelhos e navegadores em que a sua conta está aberta. Encerre os que você não reconhece.",
+      "device": "{browser} em {os}",
+      "unknownBrowser": "Navegador desconhecido",
+      "unknownSystem": "Sistema desconhecido",
+      "unknownPlace": "Local não identificado",
+      "createdAt": "Criada em",
+      "lastUsedAt": "Último uso",
+      "current": "Esta sessão",
+      "revoke": "Encerrar",
+      "revokeLabel": "Encerrar a sessão {device}",
+      "revokeConfirm": {
+        "title": "Encerrar a sessão {device}",
+        "description": "Quem estiver usando esse aparelho vai precisar entrar de novo."
+      },
+      "revoked": "Sessão encerrada",
+      "revokeFailed": "Não foi possível encerrar",
+      "signOutOthers": "Sair das outras sessões",
+      "signOutOthersConfirm": {
+        "title": "Sair das outras sessões",
+        "description": "Os outros aparelhos e navegadores vão precisar entrar de novo. Esta sessão continua aberta.",
+        "action": "Sair das outras"
+      },
+      "signedOutOthers": "Nenhuma outra sessão estava aberta. | Uma outra sessão foi encerrada. | {count} outras sessões foram encerradas.",
+      "onlyThis": "Só esta sessão está aberta.",
+      "loadFailed": "Não foi possível carregar as sessões."
+    }
+  },
+  "errors": {
+    "slug_taken": "Outro Espaço já usa esse endereço. Escolha um endereço diferente.",
+    "slug_reserved": "Esse endereço é reservado pelo app. Escolha um endereço diferente.",
+    "slug_invalid": "O endereço aceita só letras minúsculas sem acento, números e hífens. Ajuste o endereço e tente de novo.",
+    "email_taken": "Esse e-mail já pertence a outra conta. Use um endereço diferente.",
+    "email_unchanged": "Esse já é o seu e-mail atual. Digite o novo endereço que você quer usar.",
+    "email_managed_by_provider": "Seu e-mail vem da conta Google ou GitHub com que você entra, por isso não muda aqui. Troque o e-mail nesse serviço.",
+    "invalid_code": "O código não confere. Copie o código do e-mail mais recente e tente de novo.",
+    "code_expired": "O código venceu. Peça a troca de novo para receber códigos novos.",
+    "too_many_requests": "Foram muitas tentativas seguidas. Espere alguns minutos e tente de novo.",
+    "invalid_time_zone": "Esse fuso horário não foi reconhecido. Escolha um fuso da lista.",
+    "invalid_locale": "Esse idioma não está disponível. Escolha português, inglês ou espanhol.",
+    "invalid_theme": "Esse tema não está disponível. Escolha sistema, claro ou escuro.",
+    "invalid_date_format": "Esse formato de data não está disponível. Escolha um formato da lista.",
+    "invalid_name_order": "Essa ordem do nome não está disponível. Escolha uma ordem da lista.",
+    "invite_unavailable": "Esse convite não vale mais: ele venceu, foi cancelado ou já foi usado. Peça um convite novo para quem convidou você.",
+    "generic": "Não foi possível concluir a ação. Tente de novo em instantes.",
+    "cannot_revoke_current_session": "Esta é a sessão que você está usando agora. Para encerrá-la, saia da conta."
+  }
+}

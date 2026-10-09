@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Software Architecture"
+  short_description: "Boundaries, decisions, and architectural evolution"
+  default_prompt: "Use $fireskill-specialist-software-architecture to guide this task with specialized standards and validation."

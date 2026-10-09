@@ -1,0 +1,52 @@
+{
+  "name": "@nuxfire/emails",
+  "version": "0.0.0",
+  "description": "React Email templates and transactional mailer wrappers",
+  "type": "module",
+  "scripts": {
+    "dev": "email dev --dir templates",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./props": "./props.ts",
+    "./mailer": "./mailer/index.ts",
+    "./mailer/errors": "./mailer/errors.ts",
+    "./mailer/transports/ses": "./mailer/transports/ses.ts",
+    "./mailer/transports/json": "./mailer/transports/json.ts",
+    "./mailer/transports/smtp": "./mailer/transports/smtp.ts",
+    "./mailer/transports/brevo": "./mailer/transports/brevo.ts",
+    "./mailer/transports/resend": "./mailer/transports/resend.ts",
+    "./mailer/transports/mailgun": "./mailer/transports/mailgun.ts",
+    "./mailer/transports/sparkpost": "./mailer/transports/sparkpost.ts",
+    "./mailer/transports/cloudflare": "./mailer/transports/cloudflare.ts",
+    "./mailer/transports/postmark": "./mailer/transports/postmark.ts",
+    "./mailer/messengers/memory": "./mailer/messengers/memory-queue.ts"
+  },
+  "devDependencies": {
+    "react-email": "^4.0.0",
+    "@aws-sdk/client-sesv2": "^3.1115.0",
+    "@types/nodemailer": "^8.0.1"
+  },
+  "dependencies": {
+    "@nuxfire/tokens": "workspace:*",
+    "@react-email/components": "^0.0.31",
+    "@types/react": "^19.0.2",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "@poppinss/macroable": "^1.1.2",
+    "@poppinss/object-builder": "^1.1.0",
+    "fastq": "^1.20.1",
+    "ical-generator": "^11.1.0",
+    "ky": "^2.0.2",
+    "nodemailer": "10.0.2"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-sesv2": "^3.997.0"
+  },
+  "peerDependenciesMeta": {
+    "@aws-sdk/client-sesv2": {
+      "optional": true
+    }
+  }
+}

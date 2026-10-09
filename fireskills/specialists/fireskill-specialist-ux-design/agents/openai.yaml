@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - UX Design"
+  short_description: "Useful, understandable, and validated flows"
+  default_prompt: "Use $fireskill-specialist-ux-design to guide this task with specialized standards and validation."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - 07 - Implement"
+  short_description: "Executes production tasks from spec section 14"
+  default_prompt: "Use $fireskill-07-implement to execute tasks in section 14 of specs/<state>/<NNNN>-<slug>/spec.md, write production code, and record verifiable evidence. Orchestrate automatic transitions with announcement, execution, and resumption in the same conversation."

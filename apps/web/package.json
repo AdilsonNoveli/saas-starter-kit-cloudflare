@@ -1,0 +1,41 @@
+{
+  "name": "@nuxfire/web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun run clean:build-cache && nuxt build",
+    "clean:build-cache": "bun ../../scripts/clean-nuxt-build-cache.ts",
+    "dev": "nuxt dev",
+    "generate": "bun run clean:build-cache && nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "format": "prettier . --write",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@nuxfire/tokens": "workspace:*",
+    "@nuxt/content": "^3.16.0",
+    "@nuxt/eslint": "0.7.3",
+    "@nuxt/fonts": "^0.14.0",
+    "@nuxt/image": "^2.1.0",
+    "@nuxt/scripts": "^1.3.8",
+    "@nuxt/ui": "^4.8.1",
+    "@nuxtjs/i18n": "^10.6.0",
+    "@nuxtjs/seo": "^5.3.14",
+    "@vueuse/nuxt": "^14.4.0",
+    "date-fns": "^4.1.0",
+    "eslint": "^8.57.0 || ^9.0.0",
+    "nuxt": "^4.5.2",
+    "nuxt-svgo": "4.0.9",
+    "unenv": "1.10.0",
+    "vue": "3.5.42",
+    "vue-router": "5.3.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "better-sqlite3": "^12.5.0",
+    "@iconify-json/lucide": "^1.2.129",
+    "typescript": "^5",
+    "vue-tsc": "^2.2.10"
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Billing"
+  short_description: "Stripe, Paddle, webhooks, and subscriptions in Nuxfire"
+  default_prompt: "Use $fireskill-specialist-billing to guide this payment and subscription task with specialized patterns and validation."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - 02 - Backlog"
+  short_description: "Refines backlog candidates into testable briefs"
+  default_prompt: "Use $fireskill-02-backlog to search references, record or update the backlog item, resolve gaps via adaptive questions, and execute automated handoffs to $fireskill-03-specify."

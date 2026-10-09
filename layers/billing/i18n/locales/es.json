@@ -1,0 +1,177 @@
+{
+  "billing": {
+    "admin": {
+      "plans": {
+        "form": {
+          "createTitle": "Nuevo plan",
+          "createDescription": "Crea un plan al que los clientes puedan suscribirse.",
+          "editTitle": "Editar {name}",
+          "editDescription": "Los cambios se aplican a todos los Espacios que ya están en este plan.",
+          "name": { "label": "Nombre", "placeholder": "Pro" },
+          "tier": {
+            "label": "Nivel",
+            "help": "Texto libre, ej.: FREE o PRO.",
+            "placeholder": "PRO"
+          },
+          "description": {
+            "label": "Descripción",
+            "placeholder": "Todo lo que necesita un Espacio en crecimiento"
+          },
+          "provider": {
+            "label": "Proveedor",
+            "help": "Déjalo vacío para un plan gratuito.",
+            "placeholder": "Selecciona un proveedor"
+          },
+          "period": {
+            "label": "Período",
+            "help": "Intervalo de facturación del interruptor en la página de facturación.",
+            "placeholder": "Selecciona un período"
+          },
+          "amount": {
+            "label": "Importe",
+            "help": "Se cobra en la moneda seleccionada, ej.: 179.90.",
+            "placeholder": "179.00"
+          },
+          "currency": { "label": "Moneda", "placeholder": "Selecciona una moneda" },
+          "stripePriceLabel": "Precio en Stripe:",
+          "stripePriceNote": "— cambiar el importe, la moneda o el período crea un nuevo Precio y archiva este.",
+          "price": { "label": "Precio", "placeholder": "$29" },
+          "providerPriceId": { "label": "ID de precio del proveedor", "placeholder": "price_..." },
+          "maxSeats": {
+            "label": "Asientos máximos",
+            "help": "Déjalo vacío para ilimitado.",
+            "placeholder": "Ilimitado"
+          },
+          "features": {
+            "heading": "Funciones y límites",
+            "subheading": "Campos extra y cuotas que se muestran en la tabla comparativa.",
+            "add": "Agregar función",
+            "namePlaceholder": "Nombre de la función (ej.: números de WhatsApp, almacenamiento)",
+            "valuePlaceholder": "Valor (ej.: 5, Ilimitado, true)",
+            "remove": "Quitar función",
+            "empty": "No se agregaron funciones personalizadas. Haz clic en \"Agregar función\" para configurar campos extra de este plan."
+          },
+          "preview": {
+            "label": "Vista previa",
+            "defaultName": "Nombre del plan",
+            "seatsUpTo": "Hasta {count} asientos",
+            "seatsUnlimited": "Asientos ilimitados",
+            "tier": "Nivel {tier}",
+            "tierDefault": "Personalizado",
+            "included": "Incluido"
+          },
+          "actions": { "cancel": "Cancelar", "save": "Guardar cambios", "create": "Crear plan" },
+          "validation": {
+            "required": "Obligatorio",
+            "stripeAmountRequired": "Obligatorio para un plan gestionado por Stripe",
+            "stripeCurrencyRequired": "Obligatorio para un plan gestionado por Stripe",
+            "maxSeatsInvalid": "Déjalo vacío para ilimitado, o ingresa un número entero mayor que cero"
+          },
+          "notify": {
+            "updatedTitle": "Plan actualizado",
+            "createdTitle": "Plan creado",
+            "savedBody": "{name} se guardó.",
+            "updateFailedTitle": "Error al actualizar el plan",
+            "createFailedTitle": "Error al crear el plan",
+            "genericError": "Algo salió mal"
+          }
+        },
+        "buyerTeam": {
+          "label": "Después de la compra",
+          "help": "Dónde entra el comprador después de pagar este plan.",
+          "modes": {
+            "NEW_TEAM": {
+              "label": "Un Espacio nuevo, solo suyo",
+              "description": "El comprador pasa a ser su propietario."
+            },
+            "EXISTING_TEAM": {
+              "label": "Un Espacio que ya existe",
+              "description": "El comprador entra en el Espacio que elijas."
+            }
+          },
+          "team": {
+            "label": "Espacio en el que entra el comprador",
+            "placeholder": "Buscar Espacio por nombre",
+            "empty": "Ningún Espacio coincide",
+            "required": "Elige el Espacio en el que entra el comprador.",
+            "loadFailed": "No se pudieron cargar los Espacios"
+          },
+          "column": "El comprador entra en",
+          "newTeam": "Un Espacio nuevo por comprador",
+          "joins": "Entra en {space}",
+          "teamRemoved": "Espacio eliminado, elige otro"
+        },
+        "publicOffer": {
+          "label": "Mostrar en la landing page",
+          "help": "El botón de compra de la landing page apunta al plan marcado aquí. Activarlo en un plan lo desactiva automáticamente en los demás.",
+          "badge": "En la landing page",
+          "menuHide": "Quitar de la landing page",
+          "notifyOnTitle": "Ahora se muestra en la landing page",
+          "notifyOnBody": "{plan} ahora es el botón de compra de la landing page.",
+          "notifyOffTitle": "Eliminado de la landing page",
+          "notifyOffBody": "{plan} ya no aparece en la landing page.",
+          "notifyErrorTitle": "Error al actualizar la oferta de la landing page"
+        }
+      },
+      "pendingPurchases": {
+        "title": "Compras pendientes",
+        "searchPlaceholder": "Filtrar por correo...",
+        "statusFilter": "Estado",
+        "allStatuses": "Todos los estados",
+        "status": {
+          "PENDING": "Pendiente",
+          "CLAIMED": "Reclamada",
+          "EXPIRED": "Vencida",
+          "REJECTED": "Rechazada"
+        },
+        "columns": {
+          "email": "Correo",
+          "plan": "Plan",
+          "provider": "Proveedor",
+          "status": "Estado",
+          "reason": "Motivo",
+          "createdAt": "Creada"
+        }
+      }
+    },
+    "buy": {
+      "notFound": {
+        "title": "Plan no encontrado",
+        "description": "Este plan ya no está disponible."
+      },
+      "emailLabel": "Correo",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "submit": "Continuar al pago",
+      "genericError": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "claim": {
+      "title": "Tu compra del plan {plan} está confirmada",
+      "destination": {
+        "new_space": "Entrarás en un Espacio nuevo, solo tuyo.",
+        "existing_space": "Te unirás al Espacio {name}.",
+        "missing_space": "El Espacio de esta compra ya no existe. Contacta con soporte para recibir ayuda."
+      },
+      "notFound": {
+        "title": "Enlace no encontrado",
+        "description": "Este enlace no existe o venció."
+      },
+      "expired": {
+        "title": "Este enlace venció",
+        "description": "Los enlaces de reclamo valen 30 días después de la compra. Contacta al soporte para ayuda."
+      },
+      "rejected": {
+        "title": "No se pudo completar esta compra",
+        "description": "Contacta al soporte para ayuda."
+      },
+      "alreadyClaimed": {
+        "title": "Ya configurado",
+        "description": "Esta compra ya fue reclamada."
+      },
+      "teamNameLabel": "Nombre del Espacio",
+      "teamSlugLabel": "Dirección del Espacio",
+      "createTeam": "Crear mi Espacio",
+      "joinTeam": "Unirme al Espacio",
+      "genericError": "Algo salió mal. Inténtalo de nuevo."
+    }
+  }
+}

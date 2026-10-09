@@ -1,0 +1,29 @@
+{
+  "name": "@nuxfire/login",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun run clean:build-cache && nuxt generate",
+    "clean:build-cache": "bun ../../scripts/clean-nuxt-build-cache.ts",
+    "dev": "nuxt dev",
+    "generate": "bun run clean:build-cache && nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@nuxfire/tokens": "workspace:*",
+    "@nuxt/fonts": "0.10.3",
+    "@nuxt/ui": "^4.8.1",
+    "@nuxtjs/i18n": "^10.6.0",
+    "nuxt": "^4.5.2",
+    "unenv": "1.10.0",
+    "vue": "3.5.42",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@iconify-json/ph": "^1.2.2",
+    "typescript": "^5",
+    "vue-tsc": "^2.2.10"
+  }
+}

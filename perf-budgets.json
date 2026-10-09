@@ -1,0 +1,379 @@
+{
+  "schema": 1,
+  "staleTolerancePct": 2,
+  "regressionTolerancePct": 0.1,
+  "images": {
+    "maxBytes": 200000
+  },
+  "pages": {
+    "/": {
+      "js": "allowed",
+      "lcp": {
+        "kind": "text"
+      }
+    },
+    "/pt-br": {
+      "js": "allowed",
+      "lcp": {
+        "kind": "text"
+      }
+    },
+    "/es": {
+      "js": "allowed",
+      "lcp": {
+        "kind": "text"
+      }
+    }
+  },
+  "budgets": [
+    {
+      "route": "/",
+      "metric": "html",
+      "limit": 22000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-10-03 on the Serelius 15-section narrative landing page, brotli quality 9; limit = measured ~18KB plus 20 percent); raised from 16000 for full 15-section narrative copy",
+      "since": "2026-10-03"
+    },
+    {
+      "route": "/",
+      "metric": "js",
+      "limit": 261789,
+      "kind": "baseline",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25; raised from 259386 by 2403 bytes when the owner asked for the testimonial marquee back, DEC-014; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/",
+      "metric": "css",
+      "limit": 40000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/",
+      "metric": "images",
+      "limit": 60000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/",
+      "metric": "requests",
+      "limit": 64,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/pt-br",
+      "metric": "html",
+      "limit": 22000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-10-03 on the Serelius 15-section narrative landing page, brotli quality 9; limit = measured ~18.3KB plus 20 percent); raised from 16000 for full 15-section narrative copy",
+      "since": "2026-10-03"
+    },
+    {
+      "route": "/pt-br",
+      "metric": "js",
+      "limit": 261789,
+      "kind": "baseline",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25; raised from 259386 by 2403 bytes when the owner asked for the testimonial marquee back, DEC-014; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/pt-br",
+      "metric": "css",
+      "limit": 40000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/pt-br",
+      "metric": "images",
+      "limit": 60000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/pt-br",
+      "metric": "requests",
+      "limit": 64,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/es",
+      "metric": "html",
+      "limit": 22000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-10-03 on the Serelius 15-section narrative landing page, brotli quality 9; limit = measured ~18.5KB plus 20 percent); raised from 16000 for full 15-section narrative copy",
+      "since": "2026-10-03"
+    },
+    {
+      "route": "/es",
+      "metric": "js",
+      "limit": 261789,
+      "kind": "baseline",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (measured 2026-09-25; raised from 259386 by 2403 bytes when the owner asked for the testimonial marquee back, DEC-014; the shell of Nuxt and Nuxt UI is the rest; lazy hydration is the next lever)",
+      "removedBy": "SPEC-0003",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/es",
+      "metric": "css",
+      "limit": 40000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/es",
+      "metric": "images",
+      "limit": 60000,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    },
+    {
+      "route": "/es",
+      "metric": "requests",
+      "limit": 64,
+      "kind": "budget",
+      "source": "specs/draft/0003-landing-refactor-one-offer/spec.md (NFR-001, NFR-002; measured 2026-09-25 on the refactored home, brotli quality 9; limit = measured plus about 25 percent, a project decision)",
+      "since": "2026-09-25"
+    }
+  ],
+  "allow": [
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/nuxt-layers-modular-b2b-es.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/nuxt-layers-modular-b2b.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/cloudflare-queues-background-jobs-en.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/nuxt4-cloudflare-saas-en.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/cloudflare-queues-background-jobs-es.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/nuxt4-cloudflare-saas-es.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/nuxt4-cloudflare-saas.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/cloudflare-queues-background-jobs.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/typescript-end-to-end-typesafety.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/git-branching-stage-production.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/nuxt-layers-modular-b2b-en.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/typescript-end-to-end-typesafety-en.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/multi-tenancy-rbac-postgresql-en.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/websockets-durable-objects-en.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/vibe-coding-ai-cursor-claude-en.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/multi-tenancy-rbac-postgresql.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/multi-tenancy-rbac-postgresql-es.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/typescript-end-to-end-typesafety-es.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/vibe-coding-ai-cursor-claude-es.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/vibe-coding-ai-cursor-claude.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/websockets-durable-objects.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/blog/websockets-durable-objects-es.svg",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/token-name-cloudflare.webp",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/Edit-Cloudflare-Workers.webp",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/pecified-domains.webp",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/Workers-Routes.webp",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/edit-account.webp",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/Review-token.webp",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/create-token.webp",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/tokens.png",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-max-bytes",
+      "where": "(site)",
+      "match": "/images/docs/tokens.png",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "img-dimensions",
+      "where": "(site)",
+      "match": "/images/docs/Get-started-with-R2.webp",
+      "removedBy": "BACKLOG-web-image-dimensions",
+      "since": "2026-09-25"
+    }
+  ]
+}

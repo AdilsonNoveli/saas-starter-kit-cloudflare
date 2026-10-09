@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Setup"
+  short_description: "Prepares and monitors project context"
+  default_prompt: "Use $fireskill-setup to detect stack, consult confirmed answers, adapt questions to user experience level, and monitor documentation blockers."

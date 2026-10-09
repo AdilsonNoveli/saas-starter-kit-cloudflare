@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Code Review"
+  short_description: "Review by contract, risk, and evidence"
+  default_prompt: "Use $fireskill-specialist-code-review to guide this code review with structured findings, severity ratings, and evidence citations."

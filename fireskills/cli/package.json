@@ -1,0 +1,24 @@
+{
+  "name": "@nuxfire/fireskill-cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fireskills CLI: spec states, effort, progress and milestones. Derived from the Specsfy CLI (MIT).",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "fireskill": "src/main.ts"
+  },
+  "scripts": {
+    "fireskill": "bun src/main.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "typescript": "^5",
+    "vitest": "^5.0.0"
+  }
+}

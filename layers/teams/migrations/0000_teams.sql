@@ -1,0 +1,84 @@
+CREATE TABLE "DeadLetterRecord" (
+	"id" text PRIMARY KEY NOT NULL,
+	"message" jsonb NOT NULL,
+	"error" text NOT NULL,
+	"teamId" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"replayedAt" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "Job" (
+	"id" text PRIMARY KEY NOT NULL,
+	"message" text NOT NULL,
+	"status" text DEFAULT 'pending' NOT NULL,
+	"teamId" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "Permission" (
+	"title" text NOT NULL,
+	"description" text,
+	"action" text NOT NULL,
+	"roleId" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "Permission_action_roleId_pk" PRIMARY KEY("action","roleId")
+);
+--> statement-breakpoint
+CREATE TABLE "Role" (
+	"id" text PRIMARY KEY NOT NULL,
+	"teamId" text,
+	"name" text NOT NULL,
+	"description" text,
+	"isSystemRole" boolean DEFAULT false NOT NULL,
+	"isDefault" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "TeamInvite" (
+	"id" text PRIMARY KEY NOT NULL,
+	"email" text NOT NULL,
+	"teamId" text NOT NULL,
+	"invitedById" text NOT NULL,
+	"roleId" text NOT NULL,
+	"status" text DEFAULT 'PENDING' NOT NULL,
+	"expiresAt" timestamp with time zone,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "TeamInvite_teamId_email_unique" UNIQUE("teamId","email")
+);
+--> statement-breakpoint
+CREATE TABLE "TeamMembership" (
+	"id" text PRIMARY KEY NOT NULL,
+	"teamId" text NOT NULL,
+	"userId" text NOT NULL,
+	"roleId" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "TeamMembership_teamId_userId_unique" UNIQUE("teamId","userId")
+);
+--> statement-breakpoint
+CREATE TABLE "Team" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"slug" text NOT NULL,
+	"description" text,
+	"logo" text,
+	"status" text DEFAULT 'ACTIVE' NOT NULL,
+	"planId" text,
+	"maxSeats" integer,
+	"stripeCustomerId" text,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "Team_slug_unique" UNIQUE("slug")
+);
+--> statement-breakpoint
+ALTER TABLE "DeadLetterRecord" ADD CONSTRAINT "DeadLetterRecord_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Job" ADD CONSTRAINT "Job_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Permission" ADD CONSTRAINT "Permission_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_invitedById_User_id_fk" FOREIGN KEY ("invitedById") REFERENCES "public"."User"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "TeamInvite" ADD CONSTRAINT "TeamInvite_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "TeamMembership" ADD CONSTRAINT "TeamMembership_roleId_Role_id_fk" FOREIGN KEY ("roleId") REFERENCES "public"."Role"("id") ON DELETE no action ON UPDATE no action;

@@ -1,0 +1,129 @@
+// Branding — the installation's identity: product name, production domain and the
+// full sender e-mail address.
+//
+// Single source of truth: the BRAND_* variables in the stage's env file
+// (`.env.production` for the `production` stage, `.env.stage` for every other one),
+// with a real environment variable of the same name taking precedence (CI).
+//
+// This module is read by everything that runs at build/deploy time: infra/, the
+// doctor and Nuxt configs. Runtime code never reads it — Workers can't read files —
+// infra hands the values to the Worker that needs them (see infra/emails.ts).
+//
+// There are deliberately no defaults: a missing or malformed value stops the
+// deploy with the exact variable to fix, instead of shipping another product's
+// identity or a domain that Cloudflare later rejects with an unrelated error.
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+export interface Branding {
+  /** Product/company name: sender display name, e-mail subjects and logo alt text. */
+  name: string;
+  /** Production domain. Every other stage deploys under `<stage>.dev.<domain>`. */
+  domain: string;
+  /** Complete sender address (e.g. contact@acme.io). The provider must have verified it. */
+  email: string;
+}
+
+export const BRANDING_VARS = {
+  name: "BRAND_NAME",
+  domain: "BRAND_DOMAIN",
+  email: "BRAND_EMAIL",
+} as const satisfies Record<keyof Branding, string>;
+
+export class BrandingError extends Error {
+  constructor(
+    readonly file: string,
+    readonly issues: string[],
+  ) {
+    super(
+      `Invalid branding in ${file}:\n${issues.map((i) => `  - ${i}`).join("\n")}\n` +
+        `Set ${Object.values(BRANDING_VARS).join(", ")} in the "Branding" section of ${file} (template: .env.example).`,
+    );
+    this.name = "BrandingError";
+  }
+}
+
+/** `.env.production` for the production stage, `.env.stage` for every other stage. */
+export const envFileName = (stage: string) =>
+  stage === "production" ? ".env.production" : ".env.stage";
+
+/** Minimal dotenv syntax: `KEY=value`, optional `export `, quotes and ` # comments`. */
+export function parseEnvFile(text: string): Map<string, string> {
+  const values = new Map<string, string>();
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim().replace(/^export\s+/, "");
+    if (!line || line.startsWith("#")) continue;
+    const eq = line.indexOf("=");
+    if (eq === -1) continue;
+    const key = line.slice(0, eq).trim();
+    const rest = line.slice(eq + 1).trim();
+    const quote = rest[0];
+    const closing = quote === '"' || quote === "'" ? rest.indexOf(quote, 1) : -1;
+    values.set(
+      key,
+      closing === -1 ? rest.replace(/\s+#.*$/, "") : rest.slice(1, closing),
+    );
+  }
+  return values;
+}
+
+const LABEL = "[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?";
+// At least two labels, the last one starting with a letter (a real public suffix,
+// punycode included). Rejects schemes, paths, ports, `localhost` and IPs.
+const HOSTNAME = new RegExp(`^(?:${LABEL}\\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?$`);
+const ATEXT = "[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+";
+const LOCAL_PART = new RegExp(`^${ATEXT}(?:\\.${ATEXT})*$`);
+// Unicode "control" characters (line breaks included): they would let a name inject
+// headers into the e-mail's From line.
+const CONTROL_CHARS = /\p{Cc}/u;
+
+const isHostname = (v: string) => v.length <= 253 && HOSTNAME.test(v);
+
+function validateName(value: string): string | undefined {
+  if (!value) return `${BRANDING_VARS.name} is missing — your product or company name.`;
+  if (CONTROL_CHARS.test(value) || value.length > 80)
+    return `${BRANDING_VARS.name} must be at most 80 characters, with no line breaks or control characters.`;
+}
+
+function validateDomain(value: string): string | undefined {
+  if (!value) return `${BRANDING_VARS.domain} is missing — your production domain (e.g. acme.io).`;
+  if (!isHostname(value))
+    return `${BRANDING_VARS.domain}="${value}" is not a valid domain — use the bare name (e.g. acme.io), without https://, a path or a port.`;
+}
+
+function validateEmail(value: string): string | undefined {
+  if (!value)
+    return `${BRANDING_VARS.email} is missing — the complete sender address (e.g. contact@acme.io).`;
+  const at = value.lastIndexOf("@");
+  const local = value.slice(0, at);
+  const host = value.slice(at + 1).toLowerCase();
+  if (at < 1 || local.length > 64 || !LOCAL_PART.test(local) || !isHostname(host))
+    return `${BRANDING_VARS.email}="${value}" is not a complete e-mail address — use the address only (contact@acme.io); the display name comes from ${BRANDING_VARS.name}.`;
+}
+
+export interface LoadBrandingOptions {
+  stage: string;
+  /** Repository root, where the stage's env file lives. */
+  root: string;
+  /** Overrides the file, variable by variable. Defaults to `process.env`. */
+  env?: Record<string, string | undefined>;
+}
+
+export function loadBranding({ stage, root, env = process.env }: LoadBrandingOptions): Branding {
+  const file = envFileName(stage);
+  const path = join(root, file);
+  const fromFile = existsSync(path) ? parseEnvFile(readFileSync(path, "utf8")) : new Map<string, string>();
+  const read = (key: string) => (env[key] || fromFile.get(key) || "").trim();
+
+  const name = read(BRANDING_VARS.name);
+  const domain = read(BRANDING_VARS.domain).toLowerCase();
+  const email = read(BRANDING_VARS.email);
+
+  const issues = [validateName(name), validateDomain(domain), validateEmail(email)].filter(
+    (issue): issue is string => issue !== undefined,
+  );
+  if (issues.length) throw new BrandingError(file, issues);
+
+  const at = email.lastIndexOf("@");
+  return { name, domain, email: `${email.slice(0, at)}@${email.slice(at + 1).toLowerCase()}` };
+}

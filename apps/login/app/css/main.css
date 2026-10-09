@@ -1,0 +1,22 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+@import "@nuxfire/tokens/theme.css";
+
+/*
+ * This app has no light/dark toggle — app.vue pins `useColorMode().preference
+ * = "dark"`, which puts the `.dark` class on <html> (server-rendered too),
+ * so it picks up @nuxfire/tokens' `.dark` mapping same as the other
+ * apps. This is just a same-tick guard so native form controls/scrollbars
+ * render dark from the very first paint, before that class lands.
+ */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--ui-bg);
+  color: var(--ui-text);
+  min-height: 100vh;
+  margin: 0;
+}
+

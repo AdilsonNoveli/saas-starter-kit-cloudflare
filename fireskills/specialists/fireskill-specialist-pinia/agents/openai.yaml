@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Pinia"
+  short_description: "Pinia stores, SSR, and hydration in Nuxfire Nuxt"
+  default_prompt: "Use $fireskill-specialist-pinia to guide this task with specialized Pinia store patterns and validation."

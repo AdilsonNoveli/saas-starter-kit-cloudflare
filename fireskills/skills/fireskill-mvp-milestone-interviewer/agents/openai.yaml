@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - MVP Interview"
+  short_description: "Imports technical requirements from MVP"
+  default_prompt: "Use $fireskill-mvp-milestone-interviewer to import MVP as M01 and generate backlogs and Draft specs only for development requirements, without creating Inboxes or copying business context."

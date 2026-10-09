@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Nuxt Authorization"
+  short_description: "Team RBAC: defineAbility, authorize, and Can in Nuxfire"
+  default_prompt: "Use $fireskill-specialist-nuxt-authorization to guide this task with specialized authorization patterns and validation."

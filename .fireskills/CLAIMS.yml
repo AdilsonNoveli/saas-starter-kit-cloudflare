@@ -1,0 +1,31 @@
+# Claim ledger: every factual claim, testimonial and time-limited offer that a human reads in a
+# marketing text (apps/web/i18n/locales/*.json, namespace `landing`) has a record here, and a
+# machine checks that the record still holds: `bun run check:copy`.
+#
+# Evidence kinds:
+#   repo-count      files (globs) + pattern (regex) + equals: the pattern occurs exactly `equals` times
+#   repo-file       path (+ optional contains regex): the file exists (and contains it)
+#   url             url + retrieved (YYYY-MM-DD): a primary source that says it
+#   owner-statement by + on (YYYY-MM-DD): the owner states it and answers for it
+#
+# `notClaims` lists a key whose number is not a claim (a version, a year) with the reason.
+# `testimonials` holds a record per testimonial: the person exists, used the product, gave
+# consent, has their own photo (image "" when shown without one), and where it came from (16 CFR 465.2).
+# `offers` holds the dated limit that backs an urgency phrase (Directive 2005/29/EC Annex I(7)).
+schema: 1
+claims: []
+notClaims:
+  - key: landing.control.titleHighlight
+    reason: "ênfase expressiva sobre soberania do usuário sobre o assistente"
+  - key: landing.realDay.contact.status
+    reason: "valor de um cartão de exemplo, rotulado como exemplo ilustrativo na seção (landing.realDay.eyebrow)"
+  - key: landing.realDay.signals.0
+    reason: "valor de um cartão de exemplo, rotulado como exemplo ilustrativo na seção (landing.realDay.eyebrow)"
+  - key: landing.realDay.signals.4
+    reason: "valor de um cartão de exemplo, rotulado como exemplo ilustrativo na seção (landing.realDay.eyebrow)"
+  - key: landing.hero.art.dayText
+    reason: "contato fictício do cartão de exemplo do topo da página; o mesmo exemplo da seção rotulada como ilustrativa"
+  - key: landing.evidence.art.rows.history.value
+    reason: "valor do mesmo contato fictício do cartão de exemplo"
+testimonials: []
+offers: []

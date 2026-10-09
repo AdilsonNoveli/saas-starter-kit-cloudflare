@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "marketingNamespaces": [
+    "landing"
+  ],
+  "locales": {
+    "en": "apps/web/i18n/locales/en.json",
+    "pt-br": "apps/web/i18n/locales/pt-BR.json",
+    "es": "apps/web/i18n/locales/es.json"
+  },
+  "vueRoots": [
+    "apps",
+    "layers"
+  ],
+  "marketingFilePattern": "^apps/web/app/(?:components/landing|components/testimonial|components/pricing|pages)/",
+  "claimPatterns": [
+    {
+      "name": "percentage",
+      "regex": "\\d+(?:[.,]\\d+)?\\s?%"
+    },
+    {
+      "name": "multiplier",
+      "regex": "\\b\\d+(?:[.,]\\d+)?\\s?[x×]\\b"
+    },
+    {
+      "name": "price",
+      "regex": "(?:\\$|€|R\\$)\\s?\\d"
+    },
+    {
+      "name": "count",
+      "regex": "\\b\\d[\\d.,]*\\+?\\s+(?:[\\w-]+\\s+){0,2}(?:tables?|tabelas?|tablas?|features?|recursos?|funcionalidades?|funciones?|specialists?|especialistas?|devs?|developers?|desenvolvedores?|desarrolladores?|users?|usu[aá]rios?|usuarios?|customers?|clientes?|hours?|horas?|days?|dias?|d[ií]as?|weeks?|semanas?|months?|meses?|minutes?|minutos?|ms|seconds?|segundos?|cities|cidades|ciudades|layers?|camadas?|capas?|integrations?|integra[cç][oõ]es|integraciones)"
+    },
+    {
+      "name": "absolute",
+      "regex": "\\b(?:zero|never|nunca|jam[aá]s|always|sempre|siempre|millions?|milh[oõ]es|millones|guaranteed|garantid[oa]s?|garantizad[oa]s?|battle-tested|unlimited|ilimitad[oa]s?|instant(?:ly)?|instant[aâ]ne[oa]s?|imediat[oa]s?|inmediat[oa]s?)\\b"
+    }
+  ],
+  "urgencyPatterns": [
+    {
+      "name": "today-only",
+      "regex": "\\b(?:only today|today only|last (?:spots?|seats?|chance)|ends (?:today|tonight)|somente hoje|s[oó] hoje|[uú]ltimas vagas|solo hoy|[uú]ltimas plazas|termina hoy)\\b"
+    },
+    {
+      "name": "limited-time",
+      "regex": "\\b(?:limited[- ]time|por tempo limitado|tempo limitado|tiempo limitado|while (?:supplies|stock) last|enquanto durarem|hasta agotar)\\b"
+    },
+    {
+      "name": "launch-price",
+      "regex": "\\b(?:launch pricing|early[- ]bird|pre[- ]?lan[cç]amento|precio de lanzamiento|pre[- ]lanzamiento)\\b"
+    }
+  ],
+  "testimonialKeyPattern": "^landing\\.testimonials\\.items\\.",
+  "staticImagePattern": "/static/[A-Za-z0-9_-]+\\.(?:jpe?g|png|webp)",
+  "literalAttributes": [
+    "label",
+    "title",
+    "placeholder",
+    "description",
+    "aria-label",
+    "alt",
+    "subtitle",
+    "text",
+    "tooltip"
+  ],
+  "owners": [
+    {
+      "pattern": "^(?:en|pt-br|es):landing\\.|^landing\\.|^apps/web/",
+      "removedBy": "BACKLOG-landing-refactor"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - 04 - Validate"
+  short_description: "Validates spec against Specsfy/2.0 standard"
+  default_prompt: "Use $fireskill-04-validate to validate whether specs/<state>/<NNNN>-<slug>/spec.md adheres to the Specsfy/2.0 format and is ready for Act II. Orchestrate automatic transitions with announcement, execution, and resumption in the same conversation."

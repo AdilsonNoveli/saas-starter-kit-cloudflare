@@ -1,0 +1,215 @@
+{
+  "account": {
+    "header": {
+      "language": "Idioma",
+      "colorMode": "Cambiar el tema",
+      "notSaved": "La elección vale en este dispositivo, pero no se guardó en tu cuenta."
+    },
+    "preferences": {
+      "locale": {
+        "label": "Idioma"
+      },
+      "timeZone": {
+        "label": "Zona horaria",
+        "search": "Buscar zona horaria",
+        "empty": "Ninguna zona horaria coincide con la búsqueda."
+      },
+      "theme": {
+        "label": "Tema",
+        "system": "Sistema",
+        "light": "Claro",
+        "dark": "Oscuro"
+      },
+      "dateFormat": {
+        "label": "Formato de fecha",
+        "DMY": "Día, mes y año",
+        "MDY": "Mes, día y año",
+        "YMD": "Año, mes y día"
+      },
+      "nameOrder": {
+        "label": "Orden del nombre",
+        "WESTERN": "Nombre antes del apellido",
+        "EASTERN": "Apellido antes del nombre"
+      }
+    },
+    "onboarding": {
+      "brand": {
+        "title": "Te damos la bienvenida",
+        "lead": "Antes de empezar, ajusta lo básico: cómo te llamas, cómo prefieres ver fechas y horas, y el Espacio donde vas a trabajar.",
+        "later": "Puedes cambiar todo esto después en Cuenta."
+      },
+      "steps": {
+        "profile": "Perfil",
+        "preferences": "Preferencias",
+        "space": "Espacio"
+      },
+      "position": "Paso {current} de {total}: {title}",
+      "lengthError": "Usa de {min} a {max} caracteres.",
+      "actions": {
+        "back": "Volver",
+        "next": "Continuar",
+        "create": "Crear el Espacio y entrar",
+        "join": "Entrar en el Espacio"
+      },
+      "profile": {
+        "title": "Tu nombre",
+        "description": "Así te verán las personas de tu Espacio.",
+        "name": "Nombre"
+      },
+      "preferences": {
+        "title": "Tus preferencias",
+        "description": "Estos valores vienen de tu navegador. Revísalos y ajústalos si hace falta."
+      },
+      "space": {
+        "title": "Tu Espacio",
+        "description": "Es donde vas a trabajar en la app. Elige su nombre y su dirección.",
+        "name": "Nombre del Espacio",
+        "slug": "Dirección",
+        "slugHint": "Aparece en el enlace del Espacio. Usa letras minúsculas sin tilde, números y guiones.",
+        "inviteTitle": "Una invitación te espera",
+        "inviteDescription": "Tienes una invitación para entrar en el Espacio {name}. Al terminar, pasas a formar parte de él."
+      },
+      "failed": "No se pudo terminar"
+    },
+    "common": {
+      "cancel": "Cancelar",
+      "discard": "Descartar cambios",
+      "retry": "Intentar de nuevo"
+    },
+    "settings": {
+      "title": "Cuenta",
+      "tabs": {
+        "profile": "Perfil",
+        "preferences": "Preferencias",
+        "notifications": "Notificaciones",
+        "security": "Seguridad"
+      }
+    },
+    "profile": {
+      "title": "Perfil",
+      "description": "Así te ven las personas en la app.",
+      "name": "Nombre",
+      "save": "Guardar perfil",
+      "saved": "Perfil guardado",
+      "saveFailed": "No se pudo guardar el perfil",
+      "avatar": {
+        "label": "Foto",
+        "hint": "Usa una imagen JPG o PNG.",
+        "alt": "Tu foto",
+        "updated": "Foto actualizada",
+        "updateFailed": "No se pudo subir la foto",
+        "removed": "Foto eliminada",
+        "removeFailed": "No se pudo eliminar la foto"
+      }
+    },
+    "preferencesPage": {
+      "title": "Preferencias",
+      "description": "Idioma, tema, zona horaria y cómo se muestran las fechas y los nombres. El idioma y el tema cambian en cuanto los eliges; guarda para llevar tu elección a tus otros dispositivos.",
+      "save": "Guardar preferencias",
+      "saved": "Preferencias guardadas",
+      "saveFailed": "No se pudieron guardar las preferencias",
+      "loadFailed": "No se pudieron cargar tus preferencias. Recarga la página para intentar de nuevo."
+    },
+    "security": {
+      "password": {
+        "title": "Contraseña",
+        "description": "Para cambiar la contraseña, recibes un código en tu correo y eliges la nueva contraseña en la página de acceso.",
+        "provider": "Tu cuenta no tiene contraseña en esta app. Si entras con Google o GitHub, la contraseña es la de ese servicio y se cambia allí.",
+        "change": "Cambiar contraseña"
+      },
+      "mfa": {
+        "title": "Autenticación en dos pasos",
+        "enabledDescription": "Activa. Al entrar desde un dispositivo o navegador nuevo, también escribes un código de tu aplicación de autenticación.",
+        "disabledDescription": "Además de la contraseña, pide un código de tu aplicación de autenticación al entrar.",
+        "enable": "Activar",
+        "disable": "Desactivar",
+        "disableConfirm": {
+          "title": "Desactivar la autenticación en dos pasos",
+          "description": "Para entrar, solo se pedirá la contraseña. Puedes activarla de nuevo cuando quieras."
+        },
+        "disabled": "Autenticación en dos pasos desactivada",
+        "disableFailed": "No se pudo desactivar"
+      },
+      "danger": {
+        "title": "Zona de peligro",
+        "description": "Elimina para siempre tu cuenta, tus credenciales y tu perfil. No se puede deshacer.",
+        "delete": "Eliminar cuenta",
+        "confirmBody": "Esto borra para siempre tus credenciales, tus sesiones abiertas y tu perfil. Los Espacios de los que no eres dueño siguen como están. Si eres el único dueño de un Espacio con otras personas, quítalas o traspasa la propiedad antes.",
+        "confirmLabel": "Escribe {email} para confirmar",
+        "confirm": "Eliminar para siempre",
+        "failed": "No se pudo eliminar la cuenta"
+      }
+    },
+    "email": {
+      "title": "Correo",
+      "description": "La dirección con la que entras y donde recibes los avisos de la app.",
+      "current": "Correo actual",
+      "change": "Cambiar correo",
+      "statusFailed": "No se pudieron leer los datos de correo y contraseña de tu cuenta. Recarga la página para intentar de nuevo.",
+      "pendingWarning": {
+        "title": "Las invitaciones y compras pendientes se quedan en la dirección actual",
+        "description": "Las invitaciones a Espacios y las compras aún no reclamadas que se enviaron al correo actual no pasan al nuevo. Después del cambio, pide a quien las envió que las mande de nuevo."
+      },
+      "newEmail": "Correo nuevo",
+      "newEmailHelp": "Un código va al correo actual y otro al nuevo. Los dos confirman el cambio.",
+      "invalidEmail": "Escribe un correo completo, con un nombre y un dominio separados por una arroba.",
+      "send": "Enviar códigos",
+      "codesSent": "Se envió un código a {current} y otro a {next}. Escribe los dos para confirmar el cambio.",
+      "currentCode": "Código del correo actual",
+      "newCode": "Código del correo nuevo",
+      "codeFormat": "Escribe el código del correo, solo con números.",
+      "confirm": "Confirmar cambio",
+      "resend": "Pedir códigos nuevos",
+      "changed": "Correo cambiado",
+      "changedDescription": "Ahora entras con {email}.",
+      "failed": "No se pudo cambiar el correo"
+    },
+    "sessions": {
+      "title": "Sesiones activas",
+      "description": "Los dispositivos y navegadores donde tu cuenta está abierta. Cierra los que no reconozcas.",
+      "device": "{browser} en {os}",
+      "unknownBrowser": "Navegador desconocido",
+      "unknownSystem": "Sistema desconocido",
+      "unknownPlace": "Ubicación no identificada",
+      "createdAt": "Iniciada el",
+      "lastUsedAt": "Último uso",
+      "current": "Esta sesión",
+      "revoke": "Cerrar",
+      "revokeLabel": "Cerrar la sesión {device}",
+      "revokeConfirm": {
+        "title": "Cerrar la sesión {device}",
+        "description": "Quien esté usando ese dispositivo tendrá que entrar de nuevo."
+      },
+      "revoked": "Sesión cerrada",
+      "revokeFailed": "No se pudo cerrar",
+      "signOutOthers": "Cerrar las otras sesiones",
+      "signOutOthersConfirm": {
+        "title": "Cerrar las otras sesiones",
+        "description": "Los otros dispositivos y navegadores tendrán que entrar de nuevo. Esta sesión sigue abierta.",
+        "action": "Cerrar las otras"
+      },
+      "signedOutOthers": "No había otra sesión abierta. | Se cerró otra sesión. | Se cerraron {count} sesiones más.",
+      "onlyThis": "Solo esta sesión está abierta.",
+      "loadFailed": "No se pudieron cargar las sesiones."
+    }
+  },
+  "errors": {
+    "slug_taken": "Otro Espacio ya usa esta dirección. Elige una dirección diferente.",
+    "slug_reserved": "Esta dirección está reservada por la aplicación. Elige una dirección diferente.",
+    "slug_invalid": "La dirección solo admite letras minúsculas sin tilde, números y guiones. Ajústala e inténtalo de nuevo.",
+    "email_taken": "Este correo ya pertenece a otra cuenta. Usa una dirección diferente.",
+    "email_unchanged": "Este ya es tu correo actual. Escribe la nueva dirección que quieres usar.",
+    "email_managed_by_provider": "Tu correo viene de la cuenta de Google o GitHub con la que entras, así que no se cambia aquí. Cámbialo en ese servicio.",
+    "invalid_code": "El código no coincide. Copia el código del correo más reciente e inténtalo de nuevo.",
+    "code_expired": "El código venció. Solicita el cambio de nuevo para recibir códigos nuevos.",
+    "too_many_requests": "Demasiados intentos seguidos. Espera unos minutos e inténtalo de nuevo.",
+    "invalid_time_zone": "No se reconoce esta zona horaria. Elige una de la lista.",
+    "invalid_locale": "Este idioma no está disponible. Elige español, inglés o portugués.",
+    "invalid_theme": "Este tema no está disponible. Elige sistema, claro u oscuro.",
+    "invalid_date_format": "Este formato de fecha no está disponible. Elige uno de la lista.",
+    "invalid_name_order": "Este orden del nombre no está disponible. Elige uno de la lista.",
+    "invite_unavailable": "Esta invitación ya no es válida: venció, se canceló o ya se usó. Pide una nueva a quien te invitó.",
+    "generic": "No se pudo completar la acción. Inténtalo de nuevo en unos instantes.",
+    "cannot_revoke_current_session": "Esta es la sesión que estás usando ahora. Para cerrarla, cierra la sesión."
+  }
+}

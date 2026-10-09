@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Documentator"
+  short_description: "Rebuilds technical documentation and package inventory"
+  default_prompt: "Use $fireskill-documentator to rebuild technical documentation in docs/ and package inventory in .fireskills/PACKAGES.md."

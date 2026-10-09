@@ -1,0 +1,253 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+@import "@nuxfire/tokens/theme.css";
+
+/*
+ * Local to this component only (the animated shiny CTA button below), so they
+ * stay out of @nuxfire/tokens. Every value derives from a token (`--ui-*`,
+ * `--color-flame/fire-*`, `--ui-success`); nothing here repeats a hex code.
+ */
+:root {
+  --background: var(--ui-bg);
+  --shiny-text: var(--ui-text-highlighted);
+  --shiny-dot: color-mix(in oklab, var(--ui-text-highlighted) 15%, transparent);
+
+  --color-brand: var(--sr-action);
+  --color-brand-hover: var(--sr-action-hover);
+  --color-brand-secondary: var(--color-fire-500);
+  --color-brand-light: var(--color-ember-200);
+
+  /* Buy CTA — dedicated brand green, not the generic `--ui-success` state color */
+  --color-cta: var(--sr-success);
+  --color-cta-foreground: #ffffff;
+}
+
+.dark {
+  --shiny-dot: color-mix(in oklab, var(--ui-text-highlighted) 50%, transparent);
+}
+
+/* Hide scrollbars cross-browser while preserving scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Brand signature gradient using fire-500 and fire-700 */
+.bg-brand-gradient {
+  background: linear-gradient(135deg, var(--color-fire-500), var(--color-fire-700));
+}
+
+.text-brand-gradient {
+  background: linear-gradient(135deg, var(--color-fire-500), var(--color-fire-700));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================================
+   Animated Shiny Button
+   ========================================================================== */
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-angle-offset {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Spinning border animation */
+@keyframes border-spin {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+/* Sliding shine animation */
+@keyframes shimmer {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Text breathing animation */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* Classe principal: .shiny-button */
+.shiny-button {
+  --gradient-angle: 0deg;
+  --gradient-angle-offset: 0deg;
+  --gradient-shine: var(--color-brand-secondary);
+  --gradient-brand: var(--color-brand);
+
+  /* Estrutura base */
+  position: relative;
+  overflow: hidden;
+
+  /* Animated conic-gradient background */
+  background:
+    linear-gradient(var(--background), var(--background)) padding-box,
+    conic-gradient(
+      from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
+      transparent 0%,
+      var(--gradient-brand) 5%,
+      var(--gradient-shine) 15%,
+      var(--gradient-brand) 30%,
+      transparent 40%,
+      transparent 100%
+    ) border-box;
+
+  /* Borda e sombras */
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-brand) 20%, transparent);
+  isolation: isolate;
+
+  /* Border animation */
+  animation: border-spin 2.5s linear infinite;
+  cursor: pointer;
+  color: var(--shiny-text, currentColor);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Variante verde do shiny-button — cor de marca da CTA de compra (--color-cta) */
+.shiny-button.shiny-button-green,
+.shiny-button-green {
+  --shiny-text: var(--color-cta-foreground);
+  --gradient-shine: color-mix(in oklab, var(--color-cta) 70%, white);
+  --gradient-brand: var(--color-cta);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-cta) 35%, transparent);
+  color: var(--color-cta-foreground);
+}
+/* Pseudo-elemento ::before - Grade de pontos animada */
+.shiny-button::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  background: radial-gradient(
+    circle at 2px 2px,
+    var(--shiny-dot) 0.5px,
+    transparent 0
+  ) padding-box;
+  background-size: 4px 4px;
+  background-repeat: space;
+  mask-image: conic-gradient(
+    from calc(var(--gradient-angle) + 45deg),
+    black,
+    transparent 10% 90%,
+    black
+  );
+  -webkit-mask-image: conic-gradient(
+    from calc(var(--gradient-angle) + 45deg),
+    black,
+    transparent 10% 90%,
+    black
+  );
+  border-radius: inherit;
+  opacity: 0.4;
+}
+
+/* Pseudo-elemento ::after - Brilho deslizante */
+.shiny-button::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(-50deg, transparent, var(--gradient-shine), transparent);
+  mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+  -webkit-mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+  opacity: 0.6;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Content (span) - text with the correct z-index */
+/* IMPORTANT: no width/height 100% — the span grows with its content (intrinsic) */
+.shiny-button > span {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--shiny-text, currentColor);
+}
+
+/* Content ::before - breathing shine */
+.shiny-button > span::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  width: calc(100% + 1rem);
+  height: calc(100% + 1rem);
+  box-shadow: inset 0 -1ex 2rem 4px var(--gradient-brand);
+  opacity: 0;
+  border-radius: inherit;
+  animation: breathe 4.5s linear infinite;
+}
+
+.shiny-button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--color-brand-secondary) 40%, transparent),
+    0 6px 24px color-mix(in oklab, var(--color-brand) 25%, transparent);
+}
+
+/* Estado :active - Feedback de clique */
+.shiny-button:active {
+  transform: translateY(1px);
+}
+
+/* ==========================================================================
+   Pricing Card Animated Border Glow
+   ========================================================================== */
+.pricing-card-animated {
+  --gradient-angle: 0deg;
+  position: relative;
+  border-radius: 1.5rem;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    transparent 0%,
+    var(--ui-success) 12%,
+    color-mix(in oklab, var(--ui-success) 70%, white) 22%,
+    color-mix(in oklab, var(--ui-warning) 70%, white) 35%,
+    var(--ui-warning) 45%,
+    transparent 60%,
+    transparent 100%
+  );
+  animation: border-spin 6s linear infinite;
+  box-shadow: 0 4px 24px -2px color-mix(in oklab, var(--ui-success) 8%, transparent);
+}
+
+.dark .pricing-card-animated {
+  box-shadow: 0 4px 24px -2px color-mix(in oklab, var(--ui-success) 12%, transparent);
+}
+
+

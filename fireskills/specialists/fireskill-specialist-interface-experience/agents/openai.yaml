@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Interface Experience"
+  short_description: "Discovery and delivery of complete user interfaces"
+  default_prompt: "Use $fireskill-specialist-interface-experience to analyze the current system and guide this UI delivery."

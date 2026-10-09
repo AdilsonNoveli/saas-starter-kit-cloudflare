@@ -1,0 +1,13 @@
+{
+  "name": "@nuxfire/manifest",
+  "version": "0.0.0",
+  "description": "Manifest definitions and schema validation for Nuxt layers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./index.ts"
+  }
+}

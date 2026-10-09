@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Interviewer"
+  short_description: "Interviews a spec based on its state"
+  default_prompt: "Use $fireskill-interviewer to interview about the spec in its current state and record only confirmed responses."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Aux Stack"
+  short_description: "Monitors and maintains the project technical stack"
+  default_prompt: "Use $fireskill-aux-stack to monitor the stack and update .fireskills/STACK.md without losing existing data."

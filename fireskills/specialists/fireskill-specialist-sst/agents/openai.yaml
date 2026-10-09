@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - SST"
+  short_description: "SST 4 on Cloudflare: infra, secrets, stages, and deploy"
+  default_prompt: "Use $fireskill-specialist-sst to guide this task with specialized standards and validation."

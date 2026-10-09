@@ -1,0 +1,108 @@
+{
+  "teams": {
+    "select": {
+      "title": "Espacios"
+    },
+    "switcher": {
+      "title": "Elige un Espacio",
+      "create": "Crear un Espacio",
+      "settings": "Configuración del Espacio",
+      "settingsOf": "Configuración de {name}",
+      "emptyTitle": "Aún no hay Espacios",
+      "emptyDescription": "Los Espacios que crees o a los que te unas aparecen aquí.",
+      "placeholder": "Elige un Espacio",
+      "avatarAlt": "Espacio"
+    },
+    "create": {
+      "title": "Crear un Espacio",
+      "close": "Cerrar",
+      "nameLabel": "Nombre del Espacio",
+      "namePlaceholder": "Escribe un nombre para el Espacio",
+      "nameLength": "Usa entre 2 y 50 caracteres.",
+      "slugLabel": "Dirección",
+      "slugPlaceholder": "mi-espacio",
+      "submit": "Crear Espacio",
+      "failed": "El Espacio no se creó"
+    },
+    "dashboard": {
+      "created": "Espacio creado el"
+    },
+    "settings": {
+      "title": "Configuración",
+      "general": {
+        "title": "General",
+        "description": "Los miembros y las personas que invitas ven esta información.",
+        "save": "Guardar cambios",
+        "logoLabel": "Logo del Espacio",
+        "nameLabel": "Nombre del Espacio",
+        "namePlaceholder": "Nombre del Espacio",
+        "saved": "Configuración guardada",
+        "savedDescription": "El nombre del Espacio se actualizó.",
+        "saveFailed": "La configuración no se guardó",
+        "logoUpdated": "Logo actualizado",
+        "logoUploadFailed": "El logo no se subió",
+        "logoRemoved": "Logo eliminado",
+        "logoRemoveFailed": "El logo no se eliminó"
+      },
+      "members": {
+        "inviteTitle": "Invitar personas",
+        "emailLabel": "Correo",
+        "emailPlaceholder": "nombre{'@'}empresa.com",
+        "emailInvalid": "Escribe un correo como nombre{'@'}empresa.com.",
+        "roleLabel": "Rol",
+        "roleRequired": "Elige un rol.",
+        "inviteSubmit": "Enviar invitación",
+        "tabMembers": "Miembros",
+        "tabInvites": "Invitaciones",
+        "emptyMembersTitle": "Aún no hay miembros",
+        "emptyMembersDescription": "Las personas que acepten una invitación aparecen aquí.",
+        "emptyInvitesTitle": "No hay invitaciones pendientes",
+        "emptyInvitesDescription": "Las invitaciones que envíes quedan aquí hasta que las acepten.",
+        "tryAgain": "Inténtalo de nuevo en un momento.",
+        "inviteSent": "Invitación enviada",
+        "inviteSentDescription": "{email} recibirá un correo con el enlace.",
+        "inviteFailed": "La invitación no se envió",
+        "roleUpdated": "Rol actualizado",
+        "roleUpdatedDescription": "El rol del miembro cambió.",
+        "roleUpdateFailed": "El rol no cambió",
+        "memberRemoved": "Miembro eliminado",
+        "memberRemovedDescription": "Esta persona ya no tiene acceso al Espacio.",
+        "memberRemoveFailed": "El miembro no se eliminó",
+        "inviteRoleUpdated": "Rol de la invitación actualizado",
+        "inviteRoleUpdatedDescription": "La persona entra con el nuevo rol cuando acepte.",
+        "inviteRoleUpdateFailed": "El rol de la invitación no cambió",
+        "inviteRemoved": "Invitación cancelada",
+        "inviteRemovedDescription": "El enlace del correo ya no funciona.",
+        "inviteRemoveFailed": "La invitación no se canceló",
+        "invitedBy": "Invitación de {name}",
+        "cancelInvite": "Cancelar invitación"
+      },
+      "danger": {
+        "title": "Eliminar Espacio",
+        "description": "Eliminar un Espacio lo quita para todos los miembros y no se puede deshacer.",
+        "action": "Eliminar este Espacio",
+        "confirmDescription": "¿Eliminar el Espacio {name}? Sus miembros pierden el acceso y no se puede deshacer.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar Espacio"
+      }
+    },
+    "invite": {
+      "title": "Invitación a un Espacio",
+      "close": "Cerrar",
+      "invitedBy": "Invitación de {name} ({email})",
+      "message": "Te invitaron a unirte a este Espacio como {role}.",
+      "notFoundTitle": "Invitación no encontrada",
+      "notFoundDescription": "Esta invitación no existe o venció. Pide una nueva a quien te invitó.",
+      "decline": "Rechazar",
+      "accept": "Aceptar",
+      "errors": {
+        "BAD_REQUEST": "Esta invitación ya no es válida. Pide una nueva a quien te invitó.",
+        "NOT_FOUND": "Esta invitación no existe o se envió a otro correo. Inicia sesión con la dirección que la recibió.",
+        "CONFLICT": "Ya eres miembro de este Espacio.",
+        "FORBIDDEN": "Este Espacio llegó al límite de miembros de su plan. Pide a un dueño del Espacio que libere un lugar o cambie el plan.",
+        "UNAUTHORIZED": "Tu sesión terminó. Inicia sesión de nuevo para aceptar la invitación.",
+        "UNKNOWN": "No se pudo aceptar la invitación. Inténtalo de nuevo en un momento."
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - 01 - Inbox"
+  short_description: "Captures and preserves raw thoughts without asking questions"
+  default_prompt: "Use $fireskill-01-inbox to record this input immediately, without questions, into specs/inbox/."

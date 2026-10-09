@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Web API Design"
+  short_description: "Compatible and resilient HTTP contracts"
+  default_prompt: "Use $fireskill-specialist-web-api-design to guide this task with specialized standards and validation."

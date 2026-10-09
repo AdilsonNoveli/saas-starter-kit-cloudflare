@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Nuxt UI"
+  short_description: "@nuxt/ui v4 with Nuxfire tokens and standards"
+  default_prompt: "Use $fireskill-specialist-nuxt-ui to guide this task with specialized standards and validation."

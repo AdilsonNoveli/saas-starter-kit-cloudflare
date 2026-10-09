@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Versioning"
+  short_description: "VERSION aligned between release and deployment"
+  default_prompt: "Use $fireskill-specialist-versioning to prepare and verify the version for this delivery."

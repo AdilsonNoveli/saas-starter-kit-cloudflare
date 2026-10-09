@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Gitflow"
+  short_description: "Gitflow branches by explicit project decision"
+  default_prompt: "Use $fireskill-specialist-gitflow to guide this branching task with strict Gitflow topology, naming, and non-fast-forward merge conventions."

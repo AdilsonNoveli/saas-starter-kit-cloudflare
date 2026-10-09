@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Data Modeling"
+  short_description: "Entities, relations, and persistent data models"
+  default_prompt: "Use $fireskill-specialist-data-modeling to analyze and model persistent data for this deliverable."

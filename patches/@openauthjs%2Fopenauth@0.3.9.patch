@@ -1,0 +1,257 @@
+diff --git a/node_modules/@openauthjs/openauth/.bun-tag-240791ab27323c03 b/.bun-tag-240791ab27323c03
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/@openauthjs/openauth/.bun-tag-770870cd1ffbc566 b/.bun-tag-770870cd1ffbc566
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/@openauthjs/openauth/.bun-tag-78e191f29ae24569 b/.bun-tag-78e191f29ae24569
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/@openauthjs/openauth/.bun-tag-a45c4d4083d5ab8c b/.bun-tag-a45c4d4083d5ab8c
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/@openauthjs/openauth/.bun-tag-c26e450caa712309 b/.bun-tag-c26e450caa712309
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/@openauthjs/openauth/.bun-tag-f8b290af2dbcee55 b/.bun-tag-f8b290af2dbcee55
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/esm/client.js b/dist/esm/client.js
+index 4bc24e2ab546dc38ddd3480844b4af92138dc32f..a3eeeddc1f1653ef872673ed5797be30e38aee33 100644
+--- a/dist/esm/client.js
++++ b/dist/esm/client.js
+@@ -32,7 +32,15 @@ function createClient(input) {
+     const cached = jwksCache.get(issuer);
+     if (cached)
+       return cached;
+-    const keyset = await (f || fetch)(wk.jwks_uri).then((r) => r.json());
++    // Defensive cap, not just for this account's KV-list slowness (see
++    // keys.js/cloudflare.js) — a slow/unreachable issuer anywhere should
++    // fail cleanly instead of hanging the caller indefinitely.
++    const keyset = await Promise.race([
++      (f || fetch)(wk.jwks_uri).then((r) => r.json()),
++      new Promise((_, reject) =>
++        setTimeout(() => reject(new Error(`fetch(${wk.jwks_uri}) did not resolve within 10000ms`)), 10000)
++      )
++    ]);
+     const result2 = createLocalJWKSet(keyset);
+     jwksCache.set(issuer, result2);
+     return result2;
+diff --git a/dist/esm/keys.js b/dist/esm/keys.js
+index ae78568953e36dfee196ce268fb1d1324f312d6d..4ebe717dc60bf9e826455ae488432e348b4a70d3 100644
+--- a/dist/esm/keys.js
++++ b/dist/esm/keys.js
+@@ -11,52 +11,77 @@ import { Storage } from "./storage/storage.js";
+ var signingAlg = "ES256";
+ var encryptionAlg = "RSA-OAEP-512";
+ async function legacySigningKeys(storage) {
+-  const alg = "RS512";
+-  const results = [];
+-  const scanner = Storage.scan(storage, ["oauth:key"]);
+-  for await (const [_key, value] of scanner) {
+-    const publicKey = await importSPKI(value.publicKey, alg, {
+-      extractable: true
+-    });
+-    const privateKey = await importPKCS8(value.privateKey, alg);
+-    const jwk = await exportJWK(publicKey);
+-    jwk.kid = value.id;
+-    results.push({
+-      id: value.id,
+-      alg,
+-      created: new Date(value.created),
+-      public: publicKey,
+-      private: privateKey,
+-      expired: new Date(1735858114000),
+-      jwk
+-    });
+-  }
+-  return results;
++  // Never used by this project — nothing was ever written under the
++  // "oauth:key" prefix this migrates from (confirmed by direct inspection
++  // of the KV namespace). Storage.scan() here is a LIST operation, and
++  // this account's KV has been observed taking 10+ seconds or hanging
++  // outright on LIST under load (GET/PUT have not shown this). Skipping
++  // it removes one guaranteed-empty LIST from every cold isolate.
++  return [];
++}
++async function importKeyRecord(value, alg, use) {
++  const publicKey = await importSPKI(value.publicKey, alg, {
++    extractable: true
++  });
++  const privateKey = await importPKCS8(value.privateKey, alg);
++  const jwk = await exportJWK(publicKey);
++  jwk.kid = value.id;
++  if (use) jwk.use = use;
++  return {
++    id: value.id,
++    alg,
++    created: new Date(value.created),
++    expired: value.expired ? new Date(value.expired) : undefined,
++    public: publicKey,
++    private: privateKey,
++    jwk
++  };
+ }
+ async function signingKeys(storage) {
++  // Fast path: a pointer to the current key (one GET) instead of scanning
++  // the whole "signing:key" prefix (a LIST). LIST is what has been
++  // observed hanging/throttled on this account's KV; GET has not, and
++  // carries a far higher free-tier daily quota (100k vs 1k for LIST).
++  // Trade-off: only the current key is exposed via this path, so a token
++  // signed by a since-rotated key won't verify — acceptable here since a
++  // failed verify degrades to "please log in again", not a hang.
++  const pointer = await Storage.get(storage, ["signing:current"]);
++  if (pointer) {
++    const current = await Storage.get(storage, ["signing:key", pointer]);
++    if (current && !current.expired) {
++      return [await importKeyRecord(current, signingAlg, "sig")];
++    }
++  }
+   const results = [];
++  const raw = /* @__PURE__ */ new Map();
+   const scanner = Storage.scan(storage, ["signing:key"]);
+   for await (const [_key, value] of scanner) {
+-    const publicKey = await importSPKI(value.publicKey, value.alg, {
+-      extractable: true
+-    });
+-    const privateKey = await importPKCS8(value.privateKey, value.alg);
+-    const jwk = await exportJWK(publicKey);
+-    jwk.kid = value.id;
+-    jwk.use = "sig";
+-    results.push({
+-      id: value.id,
+-      alg: signingAlg,
+-      created: new Date(value.created),
+-      expired: value.expired ? new Date(value.expired) : undefined,
+-      public: publicKey,
+-      private: privateKey,
+-      jwk
+-    });
++    raw.set(value.id, value);
++    results.push(await importKeyRecord(value, signingAlg, "sig"));
+   }
+   results.sort((a, b) => b.created.getTime() - a.created.getTime());
+-  if (results.filter((item) => !item.expired).length)
++  // Self-healing: nothing upstream marks a generated key as expired, and
++  // generation below has no lock against concurrent callers — when
++  // multiple isolates race here with zero valid keys (routine right after
++  // a deploy), each one generates its own, and the pile grows without
++  // bound. Expire all but the single newest non-expired key on every scan
++  // so any race's duplicates get pruned on the very next call.
++  const activeSigning = results.filter((item) => !item.expired);
++  if (activeSigning.length > 1) {
++    const expiredAt = Date.now();
++    for (const stale of activeSigning.slice(1)) {
++      stale.expired = new Date(expiredAt);
++      await Storage.set(storage, ["signing:key", stale.id], {
++        ...raw.get(stale.id),
++        expired: expiredAt
++      });
++    }
++  }
++  const winner = results.find((item) => !item.expired);
++  if (winner) {
++    await Storage.set(storage, ["signing:current"], winner.id);
+     return results;
++  }
+   const key = await generateKeyPair(signingAlg, {
+     extractable: true
+   });
+@@ -68,31 +93,43 @@ async function signingKeys(storage) {
+     alg: signingAlg
+   };
+   await Storage.set(storage, ["signing:key", serialized.id], serialized);
++  await Storage.set(storage, ["signing:current"], serialized.id);
+   return signingKeys(storage);
+ }
+ async function encryptionKeys(storage) {
++  // Fast path — see the matching comment in signingKeys() above.
++  const pointer = await Storage.get(storage, ["encryption:current"]);
++  if (pointer) {
++    const current = await Storage.get(storage, ["encryption:key", pointer]);
++    if (current && !current.expired) {
++      return [await importKeyRecord(current, encryptionAlg)];
++    }
++  }
+   const results = [];
++  const raw = /* @__PURE__ */ new Map();
+   const scanner = Storage.scan(storage, ["encryption:key"]);
+   for await (const [_key, value] of scanner) {
+-    const publicKey = await importSPKI(value.publicKey, value.alg, {
+-      extractable: true
+-    });
+-    const privateKey = await importPKCS8(value.privateKey, value.alg);
+-    const jwk = await exportJWK(publicKey);
+-    jwk.kid = value.id;
+-    results.push({
+-      id: value.id,
+-      alg: encryptionAlg,
+-      created: new Date(value.created),
+-      expired: value.expired ? new Date(value.expired) : undefined,
+-      public: publicKey,
+-      private: privateKey,
+-      jwk
+-    });
++    raw.set(value.id, value);
++    results.push(await importKeyRecord(value, encryptionAlg));
+   }
+   results.sort((a, b) => b.created.getTime() - a.created.getTime());
+-  if (results.filter((item) => !item.expired).length)
++  // Self-healing — see the matching comment in signingKeys() above.
++  const activeEncryption = results.filter((item) => !item.expired);
++  if (activeEncryption.length > 1) {
++    const expiredAt = Date.now();
++    for (const stale of activeEncryption.slice(1)) {
++      stale.expired = new Date(expiredAt);
++      await Storage.set(storage, ["encryption:key", stale.id], {
++        ...raw.get(stale.id),
++        expired: expiredAt
++      });
++    }
++  }
++  const winner = results.find((item) => !item.expired);
++  if (winner) {
++    await Storage.set(storage, ["encryption:current"], winner.id);
+     return results;
++  }
+   const key = await generateKeyPair(encryptionAlg, {
+     extractable: true
+   });
+@@ -104,6 +141,7 @@ async function encryptionKeys(storage) {
+     alg: encryptionAlg
+   };
+   await Storage.set(storage, ["encryption:key", serialized.id], serialized);
++  await Storage.set(storage, ["encryption:current"], serialized.id);
+   return encryptionKeys(storage);
+ }
+ export {
+diff --git a/dist/esm/storage/cloudflare.js b/dist/esm/storage/cloudflare.js
+index da1680f81e1718274d1856be33de6492e7790f89..83561f08b0c19eea09593ddf98b882aabdf47eb8 100644
+--- a/dist/esm/storage/cloudflare.js
++++ b/dist/esm/storage/cloudflare.js
+@@ -19,10 +19,21 @@ function CloudflareStorage(options) {
+     async* scan(prefix) {
+       let cursor;
+       while (true) {
+-        const result = await options.namespace.list({
+-          prefix: joinKey([...prefix, ""]),
+-          cursor
+-        });
++        // KV LIST has been observed on this account taking 10s+ or hanging
++        // outright under load (GET/PUT have not shown this) — a hard cap
++        // here means a caller gets a clean rejection instead of joining an
++        // indefinite hang. keys.js's callers avoid this path entirely once
++        // bootstrapped (see its "current" pointer fast path); this timeout
++        // only matters for genuinely rare/first-time scans.
++        const result = await Promise.race([
++          options.namespace.list({
++            prefix: joinKey([...prefix, ""]),
++            cursor
++          }),
++          new Promise((_, reject) =>
++            setTimeout(() => reject(new Error(`KV list() did not resolve within 8000ms (prefix=${joinKey(prefix)})`)), 8000)
++          )
++        ]);
+         for (const key of result.keys) {
+           const value = await options.namespace.get(key.name, "json");
+           if (value !== null) {

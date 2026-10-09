@@ -1,0 +1,1272 @@
+{
+  "schema": 1,
+  "allow": [
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryCodes.vue",
+      "match": "Recovery codes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryCodes.vue",
+      "match": "Copy",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryCodes.vue",
+      "match": "Download",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryCodes.vue",
+      "match": "Each code works once. Store them somewhere safe, like a password manager. They won't be shown again, and anyone holding one can get into your account.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Recovery codes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Generate new codes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryPanel.vue",
+      "match": "I've saved these codes somewhere safe",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Done",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Six-digit code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaRecoveryPanel.vue",
+      "match": "Generate codes",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "I've saved these codes somewhere safe",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "Done",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "Generate code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "QR code for your authenticator app",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "Recovery code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "ABCD-EFGH-JKMN",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "Use recovery code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "Six-digit code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "Can't scan it? Type this",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "into your app instead.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/account/app/components/account/MfaSetupModal.vue",
+      "match": "Keep it secret — anyone holding it can generate your codes.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardActivity.vue",
+      "match": "Recent Activity",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardActivity.vue",
+      "match": "No recent member or invite activity yet.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardChart.client.vue",
+      "match": "Member Growth",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardChart.client.vue",
+      "match": "Illustrative data",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/components/team-dashboard/TeamDashboardChart.server.vue",
+      "match": "Member Growth",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/[[team]]/dashboard.vue",
+      "match": "Dashboard",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/app/app/pages/[[team]]/dashboard.vue",
+      "match": "Notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthAgreement.vue",
+      "match": "By continuing, you agree to our",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthAgreement.vue",
+      "match": "Terms of Service",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthAgreement.vue",
+      "match": "and",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthAgreement.vue",
+      "match": "Privacy Policy",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthLayout.vue",
+      "match": "Enterprise Security",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthSocialLogin.vue",
+      "match": "GitHub",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/components/AuthSocialLogin.vue",
+      "match": "Google",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Success",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Error",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Account Email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "name@company.com",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Verification Code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Enter the one-time code sent to your email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "New Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Must be at least 8 characters",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Enter new password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Confirm New Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Confirm new password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Didn't receive the code?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Resend",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Remember your password?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/forgot-password.vue",
+      "match": "Sign in",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Authentication Failed",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Verification code sent",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Verification Code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Enter the one-time code sent to your inbox",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "name@company.com",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Enter password (optional for code sign-in)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Or continue with",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Forgot password?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Didn't receive a code?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Resend",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Return to email sign in",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Don't have an account?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/login.vue",
+      "match": "Create account",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Registration Error",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Confirmation Sent",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Verification Code",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Enter the one-time code sent to your email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Work Email",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "name@company.com",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Must be at least 8 characters",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Create a strong password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Confirm Password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Confirm your password",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Or register with",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Already have an account?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/login/app/pages/signup.vue",
+      "match": "Sign in",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/pages/docs/[...slug].vue",
+      "match": "content",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "apps/web/app/pages/docs/[...slug].vue",
+      "match": ".md",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/AdminDataTable.vue",
+      "match": "Display",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/AdminDataTable.vue",
+      "match": "of",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/AdminDataTable.vue",
+      "match": "row(s) selected.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/ReactivateModal.vue",
+      "match": "Members regain access to this company immediately.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/ReactivateModal.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/ReactivateModal.vue",
+      "match": "Reactivate",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/SuspendModal.vue",
+      "match": "Members lose access to this company immediately. You can reactivate it at any time.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/SuspendModal.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/companies/SuspendModal.vue",
+      "match": "Suspend",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "Replay this message?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "The message goes back to the job queue and is processed again from the start.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "Replay",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/components/admin/queue/ReplayModal.vue",
+      "match": "Company:",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/layouts/admin.vue",
+      "match": "Admin",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/audit-log.vue",
+      "match": "Audit Log",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/audit-log.vue",
+      "match": "Refresh",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Back",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Reactivate",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Suspend",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Company",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Subscription",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "Status",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "This company has no members.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/[id].vue",
+      "match": "No subscription on record.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/index.vue",
+      "match": "Companies",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/index.vue",
+      "match": "Filter status",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/companies/index.vue",
+      "match": "Refresh",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/index.vue",
+      "match": "Overview",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/index.vue",
+      "match": "Manage companies",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/index.vue",
+      "match": "Recent Companies",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/index.vue",
+      "match": "No companies yet.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Queue",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Refresh",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Cron logs",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "The 20 most recent platform cron runs.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Dead letter queue",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/admin/app/pages/admin/queue/index.vue",
+      "match": "Messages that exhausted every retry. Replaying sends one back to the job queue.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingComparisonTable.vue",
+      "match": "No plans available for the selected billing cycle.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingComparisonTable.vue",
+      "match": "Features & Limits",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingComparisonTable.vue",
+      "match": "Current",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingComparisonTable.vue",
+      "match": "No specific features listed for these plans.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingPeriodToggle.vue",
+      "match": "Billing cycle",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingPortalActions.vue",
+      "match": "Manage Billing",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/components/billing/BillingPortalActions.vue",
+      "match": "Cancel Subscription",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Refresh",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Settings",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Billing",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Your plan, add-ons, payment methods, and invoices.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Try again",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Plans",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/[[team]]/settings/billing.vue",
+      "match": "Compare plans and manage your subscription.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/admin/plans/index.vue",
+      "match": "Plans",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/admin/plans/index.vue",
+      "match": "Show archived",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/admin/plans/index.vue",
+      "match": "Setup Stripe portal",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/billing/app/pages/admin/plans/index.vue",
+      "match": "New plan",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Search cards...",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Column name...",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Save column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Add column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "Search",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "column(s)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "card(s)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "(filtrando)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoard.vue",
+      "match": "New column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoardCreateModal.vue",
+      "match": "New board",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoardCreateModal.vue",
+      "match": "Name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoardCreateModal.vue",
+      "match": "Board name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanBoardCreateModal.vue",
+      "match": "Create",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanCard.vue",
+      "match": "Delete card",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumn.vue",
+      "match": "Add card...",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumn.vue",
+      "match": "Add card",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumn.vue",
+      "match": "card(s)",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumn.vue",
+      "match": "Nenhum card",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Save",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Cancel",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Edit column name",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Edit column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/components/KanbanColumnHeader.vue",
+      "match": "Delete column",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/[boardId].vue",
+      "match": "All boards",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/index.vue",
+      "match": "Kanban",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/index.vue",
+      "match": "Board options",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/index.vue",
+      "match": "New board",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/kanban/app/pages/[[team]]/kanban/index.vue",
+      "match": "Abrir board",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/components/NotificationsSlideover.vue",
+      "match": "Notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/components/NotificationsSlideover.vue",
+      "match": "No notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/account-settings/notifications.vue",
+      "match": "Receive notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/account-settings/notifications.vue",
+      "match": "Want to receive notifications?",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Notifications",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Live notification demo",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "This Starter Kit ships a full real-time notification pipeline: a database row plus a WebSocket push over Cloudflare Durable Objects. Pick a team member below and send them a notification — it lands instantly in their bell, in the top bar of the team dashboard, with no page refresh.",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Choose a team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Member",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Choose a member",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Title",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Welcome to the team",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Message",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Your team now has 10 members",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    },
+    {
+      "rule": "literal-text",
+      "where": "layers/notifications/app/pages/admin/notifications.vue",
+      "match": "Send notification",
+      "removedBy": "BACKLOG-app-ui-copy",
+      "since": "2026-09-25"
+    }
+  ]
+}

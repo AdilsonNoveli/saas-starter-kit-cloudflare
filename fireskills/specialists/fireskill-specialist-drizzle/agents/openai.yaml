@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Drizzle"
+  short_description: "Drizzle ORM, per-layer schemas, and Nuxfire migrations"
+  default_prompt: "Use $fireskill-specialist-drizzle to guide this task with specialized standards and validation."

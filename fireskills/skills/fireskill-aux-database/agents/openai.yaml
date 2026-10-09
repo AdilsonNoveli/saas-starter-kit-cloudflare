@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Aux Database"
+  short_description: "Monitors and maintains database documentation"
+  default_prompt: "Use $fireskill-aux-database to monitor persistence and update .fireskills/DATABASE.md after data changes."

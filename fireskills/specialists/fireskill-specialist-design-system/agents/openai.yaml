@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Design System"
+  short_description: "Visual governance and global SaaS standards"
+  default_prompt: "Use $fireskill-specialist-design-system to create or update DESIGNSYSTEM.MD before designing screens, enforcing CRUD patterns, states, and scoped exceptions."

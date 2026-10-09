@@ -1,0 +1,285 @@
+{
+  "welcome": "Welcome to the dashboard!",
+  "nuxtSiteConfig": {
+    "name": "Nuxfire",
+    "description": "Production-ready enterprise-grade Nuxt starter kit for Cloudflare."
+  },
+  "nav": {
+    "brand": "Nuxfire",
+    "home": "Home",
+    "pricing": "Pricing",
+    "docs": "Docs",
+    "blog": "Blog",
+    "login": "LOGIN",
+    "openMenu": "Open menu",
+    "language": "Language",
+    "colorMode": "Change color theme"
+  },
+  "footer": {
+    "tagline": "Production-ready enterprise-grade Nuxt starter kit for Cloudflare. Launch your SaaS in days, not months.",
+    "copyright": "© {year} Nuxfire. All rights reserved.",
+    "legalTitle": "Legal",
+    "navTitle": "Navigation",
+    "legal": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "license": "License"
+    }
+  },
+  "search": {
+    "docs": {
+      "trigger": "Search docs...",
+      "placeholder": "Search documentation..."
+    },
+    "blog": {
+      "trigger": "Search posts...",
+      "placeholder": "Search articles..."
+    },
+    "groups": {
+      "pages": "Pages"
+    }
+  },
+  "docs": {
+    "footer": {
+      "copyright": "© {year} Nuxfire",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "index": {
+      "emptyState": "More products land here as they ship"
+    },
+    "productCard": {
+      "learnMore": "Learn more",
+      "openAriaLabel": "{title} — open documentation"
+    },
+    "badges": {
+      "saasStarterKit": "Enterprise Grade",
+      "fireskills": "Spec-Driven Methodology"
+    },
+    "sidebar": {
+      "badge": "Nuxfire Monorepo",
+      "description": "100% complete source code ownership and access to the VIP Group.",
+      "cta": "GET ACCESS"
+    },
+    "banner": {
+      "badge": "Nuxfire Production Kit",
+      "title": "Ready to build and launch your SaaS?",
+      "description": "Get 100% full source code ownership, zero proprietary wrappers, and architecture engineered for millions of requests on Cloudflare.",
+      "cta": "Get Instant Access"
+    },
+    "indexCta": {
+      "badge": "Full Source Code Access",
+      "title": "Ready to build your SaaS with Nuxfire?",
+      "description": "Instant access to the complete source code and exclusive VIP Group. Start today with production-ready auth, payments, multi-tenancy, and database.",
+      "cta": "Get Instant Access"
+    },
+    "onThisPage": "On this page",
+    "emptyPage": {
+      "title": "Empty Page",
+      "description": "Start writing in {path} to see this page taking shape."
+    },
+    "notFound": "This page could not be found."
+  },
+  "blog": {
+    "seoTitle": "Blog",
+    "title": "Blog",
+    "subtitle": "Articles, tutorials, and architecture guides to build and scale your SaaS with Nuxt 4 and Cloudflare Workers.",
+    "readArticle": "Read article",
+    "postLanguage": "Article language: {language}",
+    "defaultCategory": "Engineering",
+    "emptyTitle": "No articles published yet",
+    "emptyDescription": "New articles will be published soon."
+  },
+  "signup": {
+    "seoTitle": "Sign Up - Community Registration",
+    "title": "Redirecting to Registration",
+    "description": "Taking you to the community registration and onboarding dashboard...",
+    "manualLink": "Click here if not redirected automatically"
+  },
+  "landing": {
+    "seoTitle": "Starter kit to build your SaaS on Nuxt and Cloudflare",
+    "seoDescription": "Start your SaaS with login, teams, billing, an admin panel and deploy already built. A Nuxt kit for Cloudflare, with a method for your AI to build the rest.",
+    "hero": {
+      "badge": "Nuxt, Cloudflare and Stripe",
+      "title": "Start your SaaS with login, billing and deploy already built.",
+      "subtitle": "Nuxfire is a Nuxt kit for Cloudflare with teams, permissions, payments, an admin panel and a method for your AI to build the rest from a spec and tests.",
+      "cta": "Get Nuxfire",
+      "ctaTalk": "Talk to WhatsApp",
+      "priceLine": "{launch} for the first {limit} licenses, then {regular}. One payment, with {months} months of updates."
+    },
+    "problem": {
+      "title": "Your idea is clear. What slows you down is the rest.",
+      "body": "Login, teams, permissions, billing, emails, queues, an admin panel and deploy. Each piece takes time, and asking an AI to build all of it from scratch tends to give you a different design each time.",
+      "pieces": {
+        "auth": "Login",
+        "teams": "Teams",
+        "permissions": "Permissions",
+        "billing": "Billing",
+        "emails": "Emails",
+        "queues": "Queues",
+        "admin": "Admin panel",
+        "deploy": "Deploy"
+      }
+    },
+    "outcomes": {
+      "title": "What you get",
+      "linkLabel": "See how it works",
+      "items": {
+        "auth": {
+          "title": "Login and accounts",
+          "text": "Email and password, email codes, social login and app-based MFA."
+        },
+        "teams": {
+          "title": "Teams and permissions",
+          "text": "Workspaces, invitations with roles and permissions by role."
+        },
+        "billing": {
+          "title": "Billing",
+          "text": "Plans, checkout, customer portal and webhooks with Stripe, and Paddle as an alternative."
+        },
+        "admin": {
+          "title": "Admin panel",
+          "text": "Accounts, plans, queues and audit in a separate area protected by MFA."
+        },
+        "realtime": {
+          "title": "Realtime and background jobs",
+          "text": "Live notifications and background jobs on Cloudflare."
+        },
+        "deploy": {
+          "title": "Deploy",
+          "text": "One command publishes the app to your Cloudflare account."
+        }
+      },
+      "eyebrow": "In the kit"
+    },
+    "method": {
+      "title": "A method for your AI to follow, instead of trial and error",
+      "body": "Fireskills comes with the kit. You describe the idea; the AI writes the spec, then the tests and finally the code, with specialists for each part of the project.",
+      "cta": "See the step by step",
+      "steps": {
+        "idea": {
+          "title": "Describe the idea",
+          "text": "Say in one sentence what you want to build."
+        },
+        "spec": {
+          "title": "Approve the spec",
+          "text": "The AI turns the idea into rules and scenarios you check before any code is written."
+        },
+        "ship": {
+          "title": "Ship",
+          "text": "The tests pass, the docs are updated and the deploy goes out with one command."
+        }
+      },
+      "eyebrow": "Method"
+    },
+    "audience": {
+      "title": "Who it is for",
+      "forTitle": "It is for you if",
+      "forText": "You build SaaS with the help of AI, such as Cursor and Claude Code, and want to start from a ready base instead of assembling every piece.",
+      "notTitle": "It may not be for you if",
+      "notText": "You are looking for a no-code tool: here you edit TypeScript. Or you do not plan to publish on Cloudflare.",
+      "eyebrow": "Who"
+    },
+    "testimonials": {
+      "title": "Who has used it",
+      "subtitle": "More than 10 devs have tested Nuxfire.",
+      "items": {
+        "item1": {
+          "name": "Alex Rivera",
+          "role": "Full-Stack Dev · Discord Community",
+          "quote": "Configuring multi-tenancy auth and Stripe webhooks usually takes weeks on every project. With Nuxfire, I had billing and team management live in a single weekend..."
+        },
+        "item2": {
+          "name": "Marcus Vance",
+          "role": "Platform Lead · GitHub Tester",
+          "quote": "The Cloudflare Workers and Hyperdrive Postgres setup is insanely fast. Zero cold starts across global edges, and the SST deployment pipeline worked on the first try..."
+        },
+        "item3": {
+          "name": "Elena Rostova",
+          "role": "SaaS Founder · Early Access",
+          "quote": "Most boilerplates give you fragile code that breaks with real users. Nuxfire has proper RBAC, invite flows, and audit logs wired up. Saved me 2 months of work..."
+        },
+        "item4": {
+          "name": "Liam O'Connor",
+          "role": "Backend Architect · Discord",
+          "quote": "I was skeptical about running Nuxt 4 and Drizzle on edge Workers, but the architecture is brilliant. Clean separation between Web, App, and Auth without complexity..."
+        },
+        "item5": {
+          "name": "Sofia Mendes",
+          "role": "Cloud Engineer · GitHub Tester",
+          "quote": "The real-time WebSocket Durable Objects and background queue setup out of the box is what sold me. We replaced our old Redis BullMQ stack and cut bills to zero..."
+        },
+        "item6": {
+          "name": "Daniel Zhao",
+          "role": "Indie Builder · Early Adopter",
+          "quote": "Nuxt UI v4 components with D1 content docs and Stripe customer portal integration made launching our B2B app effortless. Built by senior engineers for production..."
+        },
+        "item7": {
+          "name": "Kavita Patel",
+          "role": "Nuxt Developer · Discord Community",
+          "quote": "The end-to-end type safety between Drizzle ORM and tRPC is immaculate. Refactoring schemas never causes hidden runtime bugs. Easily the best Nuxt starter kit..."
+        },
+        "item8": {
+          "name": "Jordan Blake",
+          "role": "Product Engineer · Early Access",
+          "quote": "Stop wasting time building auth and team permissions from scratch. We migrated our MVP to Nuxfire and shipped our first paid subscriptions 48 hours later. Worth it..."
+        }
+      },
+      "eyebrow": "Testimonials"
+    },
+    "offer": {
+      "title": "Start today",
+      "launchLabel": "Launch: first {limit} licenses",
+      "regularLabel": "Then {regular}",
+      "payOnce": "One payment",
+      "updates": "{months} months of updates included",
+      "includedTitle": "What the license includes",
+      "included": {
+        "source": "The full source code of the monorepo",
+        "teams": "Teams, invitations and permissions",
+        "auth": "Login with email, code, social login and MFA",
+        "billing": "Billing with Stripe and Paddle",
+        "realtime": "Realtime and queues on Cloudflare",
+        "admin": "Admin panel with audit",
+        "kanban": "A ready kanban module",
+        "docs": "Documentation and the Fireskills method"
+      },
+      "license": "Use the code in as many products as you like. The full terms are on the license page.",
+      "licenseLink": "Read the license",
+      "refund": "Refunds: we follow what the law requires. The Brazilian Consumer Defense Code provides a right to withdraw within seven days for purchases made outside a commercial establishment.",
+      "cta": "Get Nuxfire for {price}",
+      "ctaSoon": "Purchase available soon",
+      "payment": "Card through Stripe checkout. To pay with Pix, message support on WhatsApp.",
+      "talkTitle": "Prefer to talk first?",
+      "talkText": "Arrange a conversation on the support WhatsApp and ask your questions before you buy.",
+      "talkCta": "Message on WhatsApp",
+      "talkMessage": "Hello! I would like to talk about Nuxfire.",
+      "eyebrow": "Offer"
+    },
+    "faq": {
+      "title": "Questions from people about to buy",
+      "items": {
+        "needs": {
+          "question": "What do I need to know to use it?",
+          "answer": "The basics of TypeScript and the command line, and a Cloudflare account. The rest is in the documentation."
+        },
+        "commercial": {
+          "question": "Can I use it in commercial and client projects?",
+          "answer": "Yes: the license lets you create as many end products as you like and sell them. It does not allow redistributing the code itself, and freelancers need one license per client. Read the full terms on the license page."
+        },
+        "updates": {
+          "question": "Which updates are included?",
+          "answer": "{months} months of updates are included in the price, with no subscription."
+        },
+        "contact": {
+          "question": "How do I talk to you before buying?",
+          "answer": "On the support WhatsApp. We arrange a conversation and answer your questions before the purchase."
+        },
+        "pay": {
+          "question": "How do I pay?",
+          "answer": "By card, in the Stripe checkout. To pay with Pix, message support on WhatsApp."
+        }
+      }
+    }
+  }
+}

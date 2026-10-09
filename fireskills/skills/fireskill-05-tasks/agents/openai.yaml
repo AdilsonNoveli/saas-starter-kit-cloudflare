@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - 05 - Tasks"
+  short_description: "Decomposes spec into ordered tasks with TDD traceability"
+  default_prompt: "Use $fireskill-05-tasks to break down specs/<state>/<NNNN>-<slug>/spec.md into verifiable tasks in section 14 and plan execution order. Orchestrate automatic transitions with announcement, execution, and resumption in the same conversation."

@@ -1,0 +1,4 @@
+# Text files are checked out with LF on every platform. The Vitest policy tests and the
+# Fireskills scripts read files raw and assume LF; with core.autocrlf=true on Windows a checkout
+# rewrote tracked files as CRLF and made specialists-catalog.test.ts fail locally (CI on Linux was fine).
+* text=auto eol=lf

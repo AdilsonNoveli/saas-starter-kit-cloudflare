@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Milestone Governance"
+  short_description: "Updates the milestone roadmap"
+  default_prompt: "Use $fireskill-milestone-governor to analyze milestones, maintain the index derived from specs and backlog, and suggest confirmable adjustments."

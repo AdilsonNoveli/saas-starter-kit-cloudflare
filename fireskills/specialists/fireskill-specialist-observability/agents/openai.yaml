@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - Observability"
+  short_description: "Logs, metrics, traces, SLOs, and alerts"
+  default_prompt: "Use $fireskill-specialist-observability to guide this task with specialized standards and validation."

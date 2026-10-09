@@ -1,0 +1,452 @@
+/**
+ * Single source of truth for design tokens across every Serelius Nuxt app
+ * (app, web, login). Import this AFTER `@import "@nuxt/ui";` in
+ * each app's main.css so these overrides win over Nuxt UI's own defaults.
+ *
+ * Everything here — fonts, the brand accent palettes, the neutral surface
+ * scale, corner radius, and the dark-mode surface/text/border mapping — is
+ * defined exactly once. An app's own main.css should not redeclare any of
+ * these; app-specific CSS is for things that are genuinely local (a
+ * one-off animation, a component-scoped effect variable), never a second
+ * copy of a token defined here.
+ *
+ * Rebranding (swapping the serelius brand palette or the ink neutral scale)
+ * means editing the hex values below in ONE place — every app picks it up
+ * automatically. Because every token is a CSS custom property (not a
+ * hardcoded utility class baked into components), this is also the right
+ * foundation for a future per-tenant theme editor: overriding a handful of
+ * `--ui-*`/`--color-*` variables at runtime (e.g. injected from an admin
+ * panel) reaches every component for free — no component code to touch.
+ */
+
+/*
+ * `index.ts` emits Tailwind class names (the sharedUiConfig component
+ * overrides). This package reaches each app through a node_modules symlink,
+ * which Tailwind does not scan by default, so without this line any class
+ * that exists ONLY here is silently dropped: it lands in the DOM with no CSS
+ * rule behind it. Verified the hard way — `before:bg-primary/15` rendered as
+ * a class with no generated rule until this was added.
+ */
+@source "./index.ts";
+
+@theme static {
+  --font-sans: "Atkinson Hyperlegible", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-fire-300: #ff4a2e;     /* foco / texto de destaque / marca do checkbox no dark (4,7:1 no raised) */
+  --color-fire-500: #fe1c02;     /* PRINCIPAL: botões, ação, seleção (4,8:1 no canvas dark) */
+  --color-fire-700: #c91600;     /* hover e texto de destaque no claro (5,8:1 com branco, 5,2:1 no canvas) */
+
+  --color-ember-200: #ffc266;    /* brasa clara */
+  --color-ember-400: #ff8a00;    /* marca-texto: laranja do degradê (texto grafite por cima) */
+
+  /* Nomes antigos mantidos como alias para não quebrar classes existentes */
+  --color-serelius-50: #fafef1;
+  --color-serelius-100: #f4fde3;
+  --color-serelius-200: #ebfbcb;
+  --color-serelius-300: #ddf9a9;
+  --color-serelius-400: var(--color-fire-500);   /* era #bcf354 */
+  --color-highlight:    var(--color-fire-500);   /* era #bcf354 */
+  --color-on-highlight: #ffffff;
+  --color-lime-500:     var(--color-fire-700);   /* hover da ação no dark (era #a9e03f) */
+  --color-lime-ink:     var(--color-fire-700);   /* texto/ícone de destaque no claro (era #46620e) */
+  --color-orchid-300:   var(--color-fire-300);
+  --color-orchid-500:   var(--color-fire-500);
+  --color-orchid-700:   var(--color-fire-700);
+  --color-menthol-200:  var(--color-ember-200);
+  --color-menthol-400:  var(--color-ember-400);
+  --color-menthol-700:  var(--color-fire-700);
+  --color-serelius-500: #1c2b33;
+  --color-serelius-600: #162329;
+  --color-serelius-700: #111b20;
+  --color-serelius-800: #0d1418;
+  --color-serelius-900: #0b1217;
+  --color-serelius-950: #070b0d;
+
+  /*
+   * Neutral scale (`ui.colors.neutral` and `secondary`), derived from the ink `#1C2B33` (hue 201): the
+   * same hue at lower saturation and higher lightness, so surfaces and text belong to the brand instead
+   * of fighting it. 900 is the ink itself and 950 is the dark-theme canvas.
+   */
+  --color-ink-50: #f7f9fa;
+  --color-ink-100: #edf1f2;
+  --color-ink-200: #dbe2e6;
+  --color-ink-300: #c1ccd2;
+  --color-ink-400: #9cacb4;
+  --color-ink-500: #728a97;
+  --color-ink-600: #526c7a;
+  --color-ink-700: #395360;
+  --color-ink-800: #283d48;
+  --color-ink-850: #21333d;
+  --color-ink-900: #1c2b33;
+  --color-ink-910: #162329;
+  --color-ink-925: #111a1f;
+  --color-ink-950: #0b1217;
+
+  /*
+   * Escala grafite: mesmos degraus da escala `ink`, para o remap do dark ser 1:1.
+   * Matiz da tinta (200°) com saturação 5-8%: cinza-grafite quase neutro, da família da marca.
+   */
+  --color-graphite-50: #f7f8f8;
+  --color-graphite-100: #eef0f1;
+  --color-graphite-200: #d8dcde;
+  --color-graphite-300: #b8bec1;
+  --color-graphite-400: #98a0a4;
+  --color-graphite-500: #788287;
+  --color-graphite-600: #5b6367;
+  --color-graphite-700: #43494c;
+  --color-graphite-800: #323739;
+  --color-graphite-850: #292c2e;
+  --color-graphite-900: #222426;
+  --color-graphite-910: #1c1e1f;
+  --color-graphite-925: #161718;
+  --color-graphite-950: #111213;
+
+  /* Texto do dark (substitui a escala mist no dark) */
+  --color-graphite-text-100: #f1f3f4;
+  --color-graphite-text-200: #cdd2d5;  /* 12.3:1 no canvas */
+  --color-graphite-text-300: #a3aaae;  /*  8.0:1 */
+  --color-graphite-text-400: #878e92;  /*  5.6:1 no canvas, 4.7:1 no raised */
+
+  /* Mist text scale for fallback */
+  --color-mist-100: #f1f5f8;
+  --color-mist-200: #c9d5db;
+  --color-mist-300: #9fb1ba;
+  --color-mist-400: #7f939e;
+
+  /*
+   * Warm surface scale of the light theme (decision D11): 100 is the canvas `#F2EFE8`, 50 is the raised
+   * surface (a card is lighter than the page), 150 to 200 are muted and selected rows, 300 to 500 are
+   * borders. Text never uses this scale: it stays on `ink` / `graphite`.
+   */
+  --color-sand-50: #faf8f4;
+  --color-sand-100: #f2efe8;
+  --color-sand-150: #ece9e0;
+  --color-sand-200: #e8e4d9;
+  --color-sand-300: #d9d4c5;
+  --color-sand-400: #c2bcab;
+  --color-sand-500: #a8a18f;
+
+  /*
+   * Corner radius, capped at 3px everywhere (decision D11: almost square). Tailwind and Nuxt UI draw
+   * `rounded-md`, `rounded-xl`, `rounded-2xl`... from these variables, so capping them here caps every
+   * component at once; `rounded-full` is not a variable and is handled by `sharedUiConfig` and the policy test.
+   */
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 3px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
+  --radius-3xl: 3px;
+  --radius-4xl: 3px;
+
+  /* Brightest text of the dark theme and the logo drawn for dark backgrounds. */
+  --color-paper: #f7f8f8;
+}
+
+:root {
+  color-scheme: light;
+
+  /*
+   * Enterprise-grade corner radius. Nuxt UI derives its whole `rounded-*`
+   * scale from this single variable (--radius-lg: calc(var(--ui-radius) *
+   * 2), etc.), so lowering it here tightens every component consistently.
+   */
+  --ui-radius: 0.1875rem; /* 3px, the most any corner may have */
+
+  /*
+   * Serelius scale (prefix `--sr-` keeps it clear of Nuxt UI's own `--radius-*`).
+   * Radius is almost square: 0 in tables, 2px in controls, 3px in cards, panels and modals; nothing above 3px.
+   * Density is "aerada": 56px list rows, 24px gaps, 20x16 padding; form controls stay 36px tall.
+   * Motion uses four durations and four curves; nothing else is accepted in a PR.
+   */
+  --sr-radius-none: 0;
+  --sr-radius-xs: 2px;
+  --sr-radius-sm: 3px;
+  --sr-radius-md: 3px;
+  --sr-radius-lg: 3px;
+
+  --sr-density-row-h: 56px;
+  --sr-density-gap: 24px;
+  --sr-density-pad-x: 20px;
+  --sr-density-pad-y: 16px;
+  --sr-control-h: 36px;
+
+  --sr-motion-fast-duration: 120ms;
+  --sr-motion-fast-easing: cubic-bezier(0.2, 0, 0, 1);
+  --sr-motion-base-duration: 200ms;
+  --sr-motion-base-easing: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --sr-motion-slow-duration: 320ms;
+  --sr-motion-slow-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --sr-motion-spring-duration: 420ms;
+  --sr-motion-spring-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Focus ring: always 2px with a 2px offset, in the action color of the active theme (a11y). */
+  --sr-focus-ring-width: 2px;
+  --sr-focus-ring-offset: 2px;
+  --sr-focus-ring-color: var(--color-fire-500);
+
+  /* Radius aliases within D11 (max 3px) */
+  --sr-radius-control: 2px;
+  --sr-radius-card: 3px;
+  --sr-radius-modal: 3px;
+  --sr-radius-max: 3px;
+
+  /* Serelius semantic tokens (--sr-*) - Light mode (Warm Canvas) */
+  --sr-canvas: var(--color-sand-100);
+  --sr-sunken: var(--color-sand-150);
+  --sr-surface: var(--color-sand-50);
+  --sr-raised: var(--color-sand-200);
+  --sr-overlay: rgba(28, 43, 51, 0.42);
+
+  /* Bordas em 3 níveis */
+  --sr-border-card: var(--color-sand-300);     /* #d9d4c5: cards, painéis, divisores, linhas de tabela */
+  --sr-border-control: var(--color-sand-400);  /* #c2bcab: inputs, botões outline, chips, tiles */
+  --sr-border-strong: var(--color-sand-500);   /* #a8a18f: hover de controle, ênfase */
+
+  /* Textos semânticos em grafite (16:1 / 10,5:1 / 8:1 / 5,3:1 sobre o canvas) */
+  --sr-text-highlight: var(--color-graphite-950);
+  --sr-text: var(--color-graphite-800);
+  --sr-text-muted: var(--color-graphite-700);
+  --sr-text-dimmed: var(--color-graphite-600);
+
+  /* Ação em fogo (branding Serelius FOGO VIVO) */
+  --sr-action: var(--color-fire-500);
+  --sr-action-hover: var(--color-fire-700);
+  --sr-on-action: #ffffff;
+  --sr-focus: var(--color-fire-500);
+
+  --sr-highlight: var(--color-fire-500);
+  --sr-on-highlight: #ffffff;
+  --sr-mark: var(--color-ember-400);
+  --sr-on-mark: var(--color-graphite-950);
+  --sr-selected-bg: rgba(254, 28, 2, 0.12);
+  --sr-selected-border: var(--color-fire-500);
+  --sr-accent-text: var(--color-fire-700);   /* links, ícones e números */
+
+  /* Estados vivos no claro (≥ 4.9:1 sobre o canvas). Fundo = cor a 10-12%, borda = cor a 55%. */
+  --sr-success: #0a7044;
+  --sr-success-bg: rgba(10, 112, 68, 0.12);
+  --sr-warning: #9f5200;
+  --sr-warning-bg: rgba(159, 82, 0, 0.12);
+  --sr-danger: #b92d24;
+  --sr-danger-bg: rgba(185, 45, 36, 0.12);
+  --sr-info: #135fa8;
+  --sr-info-bg: rgba(19, 95, 168, 0.12);
+  --sr-check: var(--color-fire-700);
+
+  /* 8 trilhas de identidade de pessoas e categorias */
+  --sr-track-1: #ac4d40;
+  --sr-track-2: #bd7c20;
+  --sr-track-3: #7e6f01;
+  --sr-track-4: #11a19b;
+  --sr-track-5: #0b7a9a;
+  --sr-track-6: #608bda;
+  --sr-track-7: #7b5bad;
+  --sr-track-8: #cc77b1;
+
+  /* Sombras suaves e dessaturadas */
+  --sr-shadow-xs: 0 1px 2px 0 rgba(20, 18, 14, 0.04);
+  --sr-shadow-sm: 0 1px 2px 0 rgba(20, 18, 14, 0.05), 0 1px 1px 0 rgba(20, 18, 14, 0.03);
+  --sr-shadow-md: 0 4px 12px -2px rgba(20, 18, 14, 0.06), 0 2px 4px -1px rgba(20, 18, 14, 0.04);
+  --sr-shadow-lg: 0 12px 32px -6px rgba(20, 18, 14, 0.10), 0 4px 12px -2px rgba(20, 18, 14, 0.06);
+
+  /* Layout e dimensões */
+  --sr-sidebar-rail: 72px;
+  --sr-sidebar-w: 256px;
+  --sr-sidebar-bg: var(--color-sand-50);
+  --sr-control-h-compact: 32px;
+  --sr-row-h: 56px;
+
+  /* Action: fire with white text. */
+  --ui-primary: var(--color-fire-500);
+  --ui-text-inverted: #ffffff;
+
+  /* Surfaces: the warm canvas `#F2EFE8`, a lighter raised surface, and warm muted and selected states. */
+  --ui-bg: var(--color-sand-100);
+  --ui-bg-muted: var(--color-sand-150);
+  --ui-bg-elevated: var(--color-sand-50);
+  --ui-bg-accented: var(--color-sand-200);
+
+  --ui-border: var(--color-sand-400);
+  --ui-border-muted: var(--color-sand-300);
+  --ui-border-accented: var(--color-sand-500);
+
+  /* Text tiers, all at or above WCAG AA (4.5:1) on the beige canvas */
+  --ui-text-highlighted: var(--color-graphite-950);
+  --ui-text: var(--color-graphite-800);
+  --ui-text-muted: var(--color-graphite-700);
+  --ui-text-dimmed: var(--color-graphite-600);
+
+  /* Illustration contract variables (ArtSlot) */
+  --art-ink: var(--color-graphite-950);
+  --art-accent: var(--color-fire-500);
+  --art-soft: var(--color-sand-200);
+}
+
+/*
+ * Dark theme (grafite). Canvas é grafite-950; a ação é o lima com texto grafite-950.
+ * O remap de `ink` faz com que qualquer classe Nuxt UI `neutral` ou `ink-*` também
+ * fique grafite no dark, sem tocar no tema claro.
+ */
+.dark {
+  color-scheme: dark;
+
+  --color-ink-50: var(--color-graphite-50);
+  --color-ink-100: var(--color-graphite-100);
+  --color-ink-200: var(--color-graphite-200);
+  --color-ink-300: var(--color-graphite-300);
+  --color-ink-400: var(--color-graphite-400);
+  --color-ink-500: var(--color-graphite-500);
+  --color-ink-600: var(--color-graphite-600);
+  --color-ink-700: var(--color-graphite-700);
+  --color-ink-800: var(--color-graphite-800);
+  --color-ink-850: var(--color-graphite-850);
+  --color-ink-900: var(--color-graphite-900);
+  --color-ink-910: var(--color-graphite-910);
+  --color-ink-925: var(--color-graphite-925);
+  --color-ink-950: var(--color-graphite-950);
+
+  --color-mist-100: var(--color-graphite-text-100);
+  --color-mist-200: var(--color-graphite-text-200);
+  --color-mist-300: var(--color-graphite-text-300);
+  --color-mist-400: var(--color-graphite-text-400);
+  --color-paper: var(--color-graphite-50);
+
+  /* Camadas (estilo painéis do Illustrator): canvas → sunken → surface → raised */
+  --sr-canvas: var(--color-graphite-950);
+  --sr-sunken: var(--color-graphite-925);
+  --sr-surface: var(--color-graphite-910);
+  --sr-raised: var(--color-graphite-900);
+  --sr-overlay: rgba(0, 0, 0, 0.62);
+
+  /* Bordas fazem o trabalho da sombra. Um degrau acima do que era no dark azulado. */
+  --sr-border-card: var(--color-graphite-800);  /* 1.39:1 sobre surface */
+  --sr-border-control: var(--color-graphite-700);  /* 1.83:1 */
+  --sr-border-strong: var(--color-graphite-600);
+
+  --sr-text-highlight: var(--color-paper);
+  --sr-text: var(--color-graphite-text-200);
+  --sr-text-muted: var(--color-graphite-text-300);
+  --sr-text-dimmed: var(--color-graphite-text-400);
+
+  /* Fogo: ação, foco, seleção e destaque. Texto sobre fogo é sempre branco. */
+  --sr-action: var(--color-fire-500);
+  --sr-action-hover: var(--color-fire-700);
+  --sr-on-action: #ffffff;   /* usar peso 600+ nos botões: 3,9:1 sobre #fe1c02 */
+  --sr-highlight: var(--color-fire-500);
+  --sr-on-highlight: #ffffff;
+  --sr-focus: var(--color-fire-300);   /* anel de foco mais claro para ler no escuro */
+  --sr-focus-ring-color: var(--color-fire-300);
+  --sr-selected-bg: rgba(254, 28, 2, 0.18);
+  --sr-selected-border: var(--color-fire-300);
+  --sr-mark: var(--color-ember-400);  /* marca-texto (Brasa) */
+  --sr-on-mark: var(--color-graphite-950);
+  --sr-accent-text: var(--color-fire-300);
+
+  /* Estados. O sucesso migra para menta (hue ~160°) para não ser confundido com o lima da marca. */
+  --sr-success: #4fe0a6;
+  --sr-success-bg: rgba(79, 224, 166, 0.14);
+  --sr-warning: #f5b83d;
+  --sr-warning-bg: rgba(245, 184, 61, 0.14);
+  --sr-danger: #ff7e6b;
+  --sr-danger-bg: rgba(255, 126, 107, 0.14);
+  --sr-info: #5ab8ff;
+  --sr-info-bg: rgba(90, 184, 255, 0.14);
+  --sr-check: var(--color-fire-300);
+
+  /* Trilhas de identidade: inalteradas, exceto a 3, que ficava perto demais do lima */
+  --sr-track-1: #f89080;
+  --sr-track-2: #ca8931;
+  --sr-track-3: #e3c24a;
+  --sr-track-4: #0cafa8;
+  --sr-track-5: #4ccffb;
+  --sr-track-6: #6c97e7;
+  --sr-track-7: #be9ef6;
+  --sr-track-8: #cc77b1;
+
+  /* Sombra só em camadas flutuantes. Painéis fixos usam borda. */
+  --sr-shadow-xs: none;
+  --sr-shadow-sm: none;
+  --sr-shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--color-graphite-800);
+  --sr-shadow-lg: 0 16px 40px -8px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--color-graphite-700);
+
+  --sr-sidebar-bg: #141617;
+
+  --ui-primary: var(--color-fire-500);
+  --ui-text-inverted: #ffffff;
+
+  --ui-bg: var(--color-graphite-950);
+  --ui-bg-muted: var(--color-graphite-925);
+  --ui-bg-elevated: var(--color-graphite-900);
+  --ui-bg-accented: var(--color-graphite-800);
+
+  --ui-border: var(--color-graphite-700);
+  --ui-border-muted: var(--color-graphite-800);
+  --ui-border-accented: var(--color-graphite-600);
+
+  --ui-text-highlighted: var(--color-paper);
+  --ui-text: var(--color-graphite-text-200);
+  --ui-text-muted: var(--color-graphite-text-300);
+  --ui-text-dimmed: var(--color-graphite-text-400);
+
+  /* Illustration contract variables (ArtSlot) */
+  --art-ink: var(--color-paper);
+  --art-accent: var(--color-fire-500);
+  --art-soft: var(--color-graphite-800);
+}
+
+/* ───────────────────────── DENSIDADE POR ATRIBUTO ─────────────────────────
+   Marketing e landing ficam aerados; telas de dados (tabelas, inbox, kanban) usam <html data-density="compacta">.  */
+[data-density="equilibrada"] {
+  --sr-density-row-h: 44px;
+  --sr-density-gap: 16px;
+  --sr-density-pad-x: 16px;
+  --sr-density-pad-y: 10px;
+  --sr-control-h: 32px;
+  --sr-row-h: 44px;
+}
+[data-density="compacta"] {
+  --sr-density-row-h: 32px;
+  --sr-density-gap: 8px;
+  --sr-density-pad-x: 10px;
+  --sr-density-pad-y: 6px;
+  --sr-control-h: 28px;
+  --sr-row-h: 32px;
+}
+
+/* Reduced motion: every duration collapses to zero, so no component animates for people who ask for none. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sr-motion-fast-duration: 0ms;
+    --sr-motion-base-duration: 0ms;
+    --sr-motion-slow-duration: 0ms;
+    --sr-motion-spring-duration: 0ms;
+  }
+}
+
+:focus-visible {
+  outline: var(--sr-focus-ring-width) solid var(--sr-focus-ring-color);
+  outline-offset: var(--sr-focus-ring-offset);
+}
+
+html,
+body {
+  background-color: var(--ui-bg, var(--color-sand-100));
+  color: var(--ui-text, var(--color-ink-800));
+}
+
+html.dark,
+html.dark body {
+  background-color: var(--ui-bg);
+  color: var(--ui-text);
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+.text-muted {
+  color: var(--ui-text-muted);
+}

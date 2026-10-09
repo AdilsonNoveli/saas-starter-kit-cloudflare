@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - The Jury"
+  short_description: "Collegial deliberation for high-impact decisions"
+  default_prompt: "Use $fireskill-the-jury to decide this high-impact question with a panel of 3 to 5 subagents, blind round, explicit rubric, and verdict with recorded dissent."

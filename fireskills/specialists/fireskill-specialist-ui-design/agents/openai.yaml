@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fireskill - Specialist - UI Design"
+  short_description: "Clear and consistent interfaces and dashboards"
+  default_prompt: "Use $fireskill-specialist-ui-design to guide this task with specialized standards and validation."

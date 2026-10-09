@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "#nuxfire/config": ["./config.ts"]
+    }
+  }
+}

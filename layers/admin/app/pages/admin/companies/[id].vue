@@ -7,7 +7,7 @@
         </template>
 
         <template #right>
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -19,7 +19,7 @@
         <div class="flex items-center justify-between gap-4">
           <UButton
             label="Back"
-            icon="i-lucide-arrow-left"
+            icon="i-ph-arrow-left-duotone"
             color="neutral"
             variant="ghost"
             to="/admin/companies"
@@ -31,14 +31,14 @@
               :team="{ id: team.id, name: team.name }"
               @success="refresh"
             >
-              <UButton label="Reactivate" icon="i-lucide-circle-check" />
+              <UButton label="Reactivate" icon="i-ph-check-circle-duotone" />
             </AdminCompaniesReactivateModal>
             <AdminCompaniesSuspendModal
               v-else
               :team="{ id: team.id, name: team.name }"
               @success="refresh"
             >
-              <UButton label="Suspend" icon="i-lucide-ban" color="error" />
+              <UButton label="Suspend" icon="i-ph-prohibit-duotone" color="error" />
             </AdminCompaniesSuspendModal>
           </div>
         </div>

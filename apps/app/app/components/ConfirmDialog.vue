@@ -52,9 +52,9 @@ const tone = computed(() => request.value?.options.color ?? "error");
 const icon = computed(
   () =>
     ({
-      error: "i-lucide-trash-2",
-      warning: "i-lucide-triangle-alert",
-      primary: "i-lucide-info",
+      error: "i-ph-trash-duotone",
+      warning: "i-ph-warning-duotone",
+      primary: "i-ph-info-duotone",
     })[tone.value],
 );
 

@@ -25,18 +25,29 @@ export interface VerificationEmailProps {
   username?: string;
 }
 
+/** Same codes as the app's locales (`apps/app/nuxt.config.ts`). Absent means English. */
+export type EmailLocale = "en" | "pt-br" | "es";
+
 export interface InviteEmailProps {
   teamName: string;
   invitedBy: string;
   username?: string;
   inviteLink: string;
+  /** The inviter's language, from their preferences (DEC-016). */
+  locale?: EmailLocale;
 }
+
+/** Where the buyer lands; the template words it in its own language. */
+export type PurchaseClaimDestination =
+  | { kind: "new_space" }
+  | { kind: "existing_space"; name: string }
+  | { kind: "missing_space" };
 
 export interface PurchaseClaimEmailProps {
   planName: string;
-  /** "a new team of your own" or the destination team's name, already worded for display. */
-  destinationSummary: string;
+  destination: PurchaseClaimDestination;
   claimLink: string;
+  locale?: EmailLocale;
 }
 
 export interface EmailProps {

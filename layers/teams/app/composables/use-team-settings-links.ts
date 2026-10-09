@@ -43,7 +43,7 @@ export function useTeamSettingsLinks(teamID: Ref<string>) {
   return computed<NavigationMenuItem[]>(() => [
     {
       label: "General",
-      icon: "i-lucide-settings",
+      icon: "i-ph-gear-duotone",
       to: `${baseRoute.value}/settings`,
       exact: true,
     },
@@ -51,7 +51,7 @@ export function useTeamSettingsLinks(teamID: Ref<string>) {
       ? [
           {
             label: "Members",
-            icon: "i-lucide-users",
+            icon: "i-ph-users-duotone",
             to: `${baseRoute.value}/settings/members`,
           },
         ]
@@ -63,7 +63,7 @@ export function useTeamSettingsLinks(teamID: Ref<string>) {
             // this team", not credentials/2FA/sessions. The route stays
             // /settings/security so existing links/bookmarks keep working.
             label: "Danger Zone",
-            icon: "i-lucide-shield",
+            icon: "i-ph-shield-duotone",
             to: `${baseRoute.value}/settings/security`,
           },
         ]

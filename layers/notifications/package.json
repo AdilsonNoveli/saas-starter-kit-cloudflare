@@ -1,6 +1,7 @@
 {
   "name": "@nuxfire/layer-notifications",
   "version": "1.0.0",
+  "description": "Nuxt layer providing in-app notifications and WebSocket real-time delivery",
   "private": true,
   "type": "module",
   "scripts": {

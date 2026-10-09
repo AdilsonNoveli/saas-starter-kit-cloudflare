@@ -1,3 +1,5 @@
+import { createWsTicket } from "@nuxfire/crypto";
+
 export default defineEventHandler(async (event) => {
   const user = await getUser(event);
   if (!user?.id) {

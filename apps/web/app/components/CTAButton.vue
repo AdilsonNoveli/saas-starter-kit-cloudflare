@@ -6,8 +6,8 @@
     :class="[
       'group inline-flex items-center justify-center font-bold uppercase tracking-wider select-none cursor-pointer',
       isShiny
-        ? (color === 'green' ? 'shiny-button shiny-button-green' : 'shiny-button')
-        : (color === 'green' ? 'bg-[var(--color-cta)] hover:bg-[var(--color-cta)]/90 text-[var(--color-cta-foreground)] duration-200 active:scale-95 shadow-sm' : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white duration-200 active:scale-95 shadow-sm'),
+        ? (color === 'green' ? 'shiny-button shiny-button-green text-zinc-950 font-bold' : 'shiny-button')
+        : (color === 'green' ? 'bg-[#00c951] hover:bg-[#00df59] text-zinc-950 font-bold duration-200 active:scale-95 shadow-md shadow-[#00c951]/25' : 'bg-[var(--color-brand)] hover:bg-[var(--color-brand-hover)] text-white duration-200 active:scale-95 shadow-sm'),
       sizeClasses,
       radiusClasses,
       widthClasses,

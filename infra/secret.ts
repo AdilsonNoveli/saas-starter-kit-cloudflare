@@ -79,7 +79,7 @@ secretList.PlatformAdminEncryptionKey = new sst.Secret(
 );
 
 // Self-service two-factor authentication for regular users
-// (apps/app/server/utils/user-mfa-session.ts, .../mfa-crypto.ts).
+// (layers/account/server/utils/user-mfa-session.ts, packages/crypto/aes.ts).
 // Deliberately separate secrets from the platform-admin pair above, even
 // though the mechanism is the same: rotating one must never invalidate MFA
 // (or force a re-challenge) for the other population, and a deploy that only

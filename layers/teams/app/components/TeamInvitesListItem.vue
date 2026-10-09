@@ -3,9 +3,9 @@
     <div class="flex items-center gap-2">
       <div class="flex flex-col text-sm">
         <span class="font-medium">{{ inviteRow.email }}</span>
-        <span class="text-muted"
-          >Invited by {{ inviteRow.invitedBy.name }}</span
-        >
+        <span class="text-muted">{{
+          t("teams.settings.members.invitedBy", { name: inviteRow.invitedBy.name ?? "" })
+        }}</span>
       </div>
     </div>
     <div class="flex items-center gap-2">
@@ -27,7 +27,7 @@
       </Bouncer>
       <Can :ability="deleteInviteAbility" :args="[teamId]">
         <UDropdownMenu :items="dropdownItems">
-          <UButton color="neutral" icon="i-lucide-ellipsis-vertical" />
+          <UButton color="neutral" icon="i-ph-dots-three-vertical-duotone" />
         </UDropdownMenu>
       </Can>
     </div>
@@ -65,12 +65,14 @@ const emit = defineEmits<{
   remove: [inviteId: string];
 }>();
 
+const { t } = useI18n();
+
 const inviteRow = computed(() => props.invite as InviteWithRelations);
 
 const dropdownItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
-      label: "Remove",
+      label: t("teams.settings.members.cancelInvite"),
       color: "error" as const,
       onSelect: () => emit("remove", props.invite.id),
     },

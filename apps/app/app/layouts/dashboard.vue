@@ -121,7 +121,7 @@ const closeSidebar = () => {
 const links = computed<NavigationMenuItem[]>(() => [
   {
     label: "Dashboard",
-    icon: "i-lucide-bolt",
+    icon: "i-ph-lightning-duotone",
     to: `${baseRoute.value}/dashboard`,
     onSelect: closeSidebar,
   },
@@ -147,7 +147,7 @@ const links = computed<NavigationMenuItem[]>(() => [
 const settingsItems = computed<NavigationMenuItem[]>(() => [
   {
     label: "Settings",
-    icon: "i-lucide-settings",
+    icon: "i-ph-gear-duotone",
     to: `${baseRoute.value}/settings`,
     onSelect: closeSidebar,
   },

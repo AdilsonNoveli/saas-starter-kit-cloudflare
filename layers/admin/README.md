@@ -40,7 +40,7 @@ Root with no domain logic left in it.
 
 | Path                                              | Role                                                                              |
 | ------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `layer.manifest.ts`                               | identity; `requires: ["billing", "notifications"]`, `permissions: []`             |
+| `layer.manifest.ts`                               | identity; `requires: ["notifications", "account"]`, `permissions: []`             |
 | `nuxt.config.ts`                                  | `$meta.name` + `components: [{ path: "./components" }]`, no `prefix`, no `srcDir` |
 | `server/database/schema.ts`                       | `platform_role` pgEnum, `PlatformAdmin` + relations, `AuditLog`                   |
 | `server/trpc/router.ts`                           | exports `routers` = `{ admin }` — the aggregator                                  |
@@ -129,18 +129,27 @@ Root with no domain logic left in it.
   `apps/functions/src/{jobs-consumer,dlq-consumer}.ts`, not admin-domain
   data. This layer only reads them, through the `@nuxfire/functions/schema`
   barrel — same reasoning that kept them in core through every prior extraction.
-- **Three files stayed in `apps/app` on purpose.**
-  `server/utils/mfa-crypto.ts` is generic AES-GCM for TOTP seeds, shared by
-  `PlatformAdmin.mfaSecret` **and** `User.mfaSecret` (regular-user self-service
-  2FA, an unrelated concern). `server/utils/audit-log.ts` holds
-  `recordAuditLog()`, which the Composition Root's own
+- **What this layer shares with the regular-user MFA lives elsewhere.**
+  The AES-GCM for TOTP seeds, shared by `PlatformAdmin.mfaSecret` **and**
+  `User.mfaSecret`, is `encryptSecret`/`decryptSecret` from `@nuxfire/crypto`
+  (`packages/crypto`), and the recovery-code database functions come from
+  `@nuxfire/layer-account/server/utils/mfa-recovery`; both are explicit
+  imports since SPEC-0009, as is the rate limit, taken from the app's single
+  wrapper `~~/server/utils/rate-limit`.
+  `<AccountMfaSetupModal>` and `<AccountMfaRecoveryPanel>` now live in
+  `layers/account/app/components/account/` and take a `scope` prop that serves
+  both the admin and the regular-user flows — `app/layouts/admin.vue` and
+  `app/pages/admin/index.vue` here keep referencing them by name, cross-layer,
+  with no import. `server/utils/audit-log.ts` stayed in `apps/app` on purpose:
+  it holds `recordAuditLog()`, which the Composition Root's own
   `platformAdminProcedure` middleware calls as its safety net and which
-  `layers/billing` also imports. `app/components/account/MfaSetupModal.vue`
-  (`<AccountMfaSetupModal>`) takes a `scope` prop and serves both the admin and
-  the regular-user flows — `app/layouts/admin.vue` here keeps referencing it by
-  name, cross-layer, with no import.
-- **`requires: ["billing", "notifications"]`, and `teams` is deliberately
-  absent.** Those two are real import edges in `server/trpc/router.ts`.
+  `layers/billing` and `layers/account` also import.
+- **`requires: ["notifications", "account"]`, and `teams` and `billing` are
+  deliberately absent.** `notifications` is a real import edge in
+  `server/trpc/router.ts`; `account` is one in the MFA routes
+  (`@nuxfire/layer-account/server/utils/mfa-recovery`) and the console renders
+  its components. The billing-aware admin routers are assembled by the
+  Composition Root (see the comment in `layer.manifest.ts`).
   `admin-teams.ts` queries `teams`/`teamMemberships`/`plans`/`subscriptions`
   through the `@nuxfire/functions/schema` aggregator barrel and never imports
   `@nuxfire/layer-teams`, so listing it would be a claim the source does not

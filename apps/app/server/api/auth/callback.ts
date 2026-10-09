@@ -1,5 +1,14 @@
-import { users } from "@nuxfire/functions/schema";
+import { userPreferences, users } from "@nuxfire/functions/schema";
+import {
+  buildSessionRecord,
+  upsertSession,
+} from "@nuxfire/layer-account/server/utils/session-registry";
+import { eq } from "drizzle-orm";
 import { getClient } from "~~/server/utils/auth";
+import { preferenceCookies } from "~~/server/utils/preference-cookies";
+
+// One year, the lifetime the i18n and color mode modules give their own cookies.
+const PREFERENCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export default defineEventHandler(async (event) => {
   try {
@@ -48,7 +57,7 @@ export default defineEventHandler(async (event) => {
           // With identity and profile stored in separate systems that can
           // only happen when the identity record was rebuilt without the
           // profile being removed with it — which the account deletion
-          // flow (server/trpc/routers/account.ts) exists to prevent.
+          // flow (layers/account/server/trpc/account.ts) exists to prevent.
           // Failing loudly beats guessing: silently reusing the other row
           // would hand this login someone else's data, and silently
           // rewriting its id would orphan every TeamMembership,
@@ -62,6 +71,60 @@ export default defineEventHandler(async (event) => {
             );
           }
           throw error;
+        }
+        // SPEC-0010 (DEC-008): the browser reaches this handler itself, so
+        // this is where its User-Agent and Cloudflare place are real. The row
+        // is metadata only (the issuer decides which sessions are alive), so
+        // a failure to record it is logged and never blocks the login.
+        try {
+          await upsertSession(
+            buildSessionRecord({
+              sid: session.sid,
+              userId: session.id,
+              userAgent: getRequestHeader(event, "user-agent"),
+              cf: (event.context as { cf?: unknown }).cf,
+              now: new Date(),
+            }),
+          );
+        } catch (error) {
+          const err = error as { message?: string; name?: string; stack?: string };
+          console.error("auth callback: session registration failed", {
+            message: err?.message,
+            name: err?.name,
+            stack: err?.stack,
+          });
+        }
+        // SPEC-0010 (DEC-006): copy the server preference into the cookies
+        // the i18n and color mode modules read, before the redirect, so a new
+        // browser's first paint already has the person's locale and theme.
+        // No row (not onboarded yet) leaves the browser's own cookies alone.
+        try {
+          const [row] = await useDB()
+            .select({
+              locale: userPreferences.locale,
+              theme: userPreferences.theme,
+            })
+            .from(userPreferences)
+            .where(eq(userPreferences.userId, session.id));
+          if (row) {
+            for (const [name, value] of Object.entries(preferenceCookies(row))) {
+              setCookie(event, name, value, {
+                path: "/",
+                sameSite: "lax",
+                secure: true,
+                maxAge: PREFERENCE_COOKIE_MAX_AGE_SECONDS,
+                // Both modules read them in the browser too.
+                httpOnly: false,
+              });
+            }
+          }
+        } catch (error) {
+          const err = error as { message?: string; name?: string; stack?: string };
+          console.error("auth callback: preference cookies failed", {
+            message: err?.message,
+            name: err?.name,
+            stack: err?.stack,
+          });
         }
       } else {
         console.error(

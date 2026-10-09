@@ -3,7 +3,7 @@
 Based on `layers/kanban/server/database/schema.ts` (a feature layer) and
 rules documented in `nuxfire-drizzle.md`. Since SPEC-0006 (2026-09-28,
 extended the same day to `admin`/`notifications`, then to `teams`) there
-are **six independent migration histories** — base and one per layer that
+are **seven independent migration histories** — base and one per layer that
 owns tables and has its own `drizzle.config.ts` — never a single shared
 one. Which layers get their own history is **not** simply "core vs.
 feature" — see "Can this layer's history be independent?" below, the
@@ -178,15 +178,12 @@ avoid.
 
 Generate from that layer's own directory (`cd layers/<name>`) if it has an
 independent history, or from `apps/functions/` if it's folded into the
-base — exactly as in "New Table in an Existing Layer" above. The new
-migration lands in that history's own `migrations/` folder as
-`0001_<something>.sql`, `0002_...`, etc. — never touches another history.
+base. Under the database change policy (`.fireskills/RULES.md`) the change is made by **editing the init of that history** (remove the old `0000_*` init, its `meta/*_snapshot.json` and its `_journal.json` entry, regenerate with `drizzle-kit generate`, re-add non-generated lines) and the responsible person resets the database and redeploys from zero (guarded `bun run db:reset`, then `bun run deploy`). No `0001_<something>.sql` patch files — a new numbered init only on a version bump. Never touches another history.
 
 ## Modifying Existing Columns or Tables
 
-- Adding a nullable column or column with defaults: additive migration, completely safe.
-- Renaming, deleting, altering column types, or adding `NOT NULL`: **expand/contract**
-  across two migrations and two deployments (see `nuxfire-drizzle.md` §5).
+- Every change — adding, renaming, deleting, altering types, `NOT NULL` — is an edit of the init plus a database reset (policy above). Expand/contract is **not used**.
+- Change, in the same edit, every consumer of the old shape.
 - Never edit an already-applied `.sql` file or its `meta/*_snapshot.json`/`_journal.json`
   entries by hand — the documented, empirically-verified exceptions (SPEC-0006's
   snapshot surgery; the two full base consolidations that followed it, safe

@@ -11,7 +11,7 @@
       :aria-label="`Collapse column ${name}`"
       @click="emit('collapse')"
     >
-      <UIcon name="i-lucide-chevron-first" class="size-3.5" />
+      <UIcon name="i-ph-caret-line-left-duotone" class="size-3.5" />
     </button>
 
     <!-- Inline title edit mode -->
@@ -30,7 +30,7 @@
         title="Save"
         @click="saveEdit"
       >
-        <UIcon name="i-lucide-check" class="size-3.5 text-success" />
+        <UIcon name="i-ph-check-duotone" class="size-3.5 text-success" />
       </button>
       <button
         type="button"
@@ -38,7 +38,7 @@
         title="Cancel"
         @click="cancelEdit"
       >
-        <UIcon name="i-lucide-x" class="size-3.5 text-muted" />
+        <UIcon name="i-ph-x-duotone" class="size-3.5 text-muted" />
       </button>
     </div>
 
@@ -48,7 +48,7 @@
         {{ name }}
       </span>
       <span
-        class="text-[10px] font-extrabold tabular-nums leading-none opacity-80 bg-white/60 dark:bg-black/20 px-1.5 py-0.5 rounded border border-current/20 shrink-0"
+        class="text-[10px] font-extrabold tabular-nums leading-none opacity-80 bg-default/60 px-1.5 py-0.5 rounded border border-current/20 shrink-0"
       >
         {{ cardCount }}
       </span>
@@ -63,7 +63,7 @@
         aria-label="Edit column"
         @click="startEdit"
       >
-        <UIcon name="i-lucide-pencil" class="size-3.5" />
+        <UIcon name="i-ph-pencil-duotone" class="size-3.5" />
       </button>
 
       <button
@@ -73,7 +73,7 @@
         aria-label="Delete column"
         @click="confirmDelete"
       >
-        <UIcon name="i-lucide-trash-2" class="size-3.5" />
+        <UIcon name="i-ph-trash-duotone" class="size-3.5" />
       </button>
     </div>
   </div>

@@ -1,8 +1,9 @@
 <template>
-  <SettingsPanel id="team-settings" title="Settings" :links="links" />
+  <SettingsPanel id="team-settings" :title="t('teams.settings.title')" :links="links" />
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
 const currentTeam = useCurrentTeam();
 const teamID = computed(() => currentTeam.value?.id || "");
 

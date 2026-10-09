@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@nuxfire/tokens": "workspace:*",
+    "@nuxt/fonts": "0.10.3",
     "@nuxt/ui": "^4.8.1",
     "@nuxtjs/i18n": "^10.6.0",
     "nuxt": "^4.5.2",
@@ -21,7 +22,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.129",
+    "@iconify-json/ph": "^1.2.2",
     "typescript": "^5",
     "vue-tsc": "^2.2.10"
   }

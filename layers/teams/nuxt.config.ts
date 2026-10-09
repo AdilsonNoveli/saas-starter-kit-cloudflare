@@ -16,6 +16,16 @@ export default defineNuxtConfig({
       // reference. `path` stays explicit for the same reason as kanban's.
     },
   ],
+  // The layer's own text lives in `i18n/locales/`. Without this block the
+  // module never reads those files and every key renders raw. Same codes and
+  // file names as `apps/app/nuxt.config.ts`, which they merge into.
+  i18n: {
+    locales: [
+      { code: "en", language: "en-US", file: "en.json" },
+      { code: "pt-br", language: "pt-BR", file: "pt-BR.json" },
+      { code: "es", language: "es-ES", file: "es.json" },
+    ],
+  },
 });
 
 // ---------------------------------------------------------------------------

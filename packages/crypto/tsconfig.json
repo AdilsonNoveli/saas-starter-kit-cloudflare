@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "types": ["@cloudflare/workers-types", "node"],
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules", "vitest.config.ts"]
+}

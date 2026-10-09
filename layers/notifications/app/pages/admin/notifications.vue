@@ -7,7 +7,7 @@
         </template>
 
         <template #right>
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -15,7 +15,7 @@
     <template #body>
       <UPageCard variant="subtle" class="max-w-2xl w-full mx-auto">
         <UAlert
-          icon="i-lucide-info"
+          icon="i-ph-info-duotone"
           color="neutral"
           variant="subtle"
           title="Live notification demo"
@@ -47,16 +47,16 @@
           </UFormField>
 
           <UFormField label="Title" name="title" required>
-            <UInput v-model="state.title" placeholder="Welcome aboard!" class="w-full" />
+            <UInput v-model="state.title" placeholder="Welcome to the team" class="w-full" />
           </UFormField>
 
           <UFormField label="Message" name="message" required>
-            <UTextarea v-model="state.message" :rows="3" placeholder="Your team just hit 10 members 🎉" class="w-full" />
+            <UTextarea v-model="state.message" :rows="3" placeholder="Your team now has 10 members" class="w-full" />
           </UFormField>
 
           <UButton
             type="submit"
-            icon="i-lucide-send"
+            icon="i-ph-paper-plane-tilt-duotone"
             label="Send notification"
             :loading="sending"
             class="self-start"
@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { FormSubmitEvent } from "@nuxt/ui";
 
 definePageMeta({

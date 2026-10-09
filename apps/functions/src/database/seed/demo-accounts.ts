@@ -39,6 +39,7 @@ import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../schema";
+import { createTeamWithOwner } from "@nuxfire/layer-teams/server/utils/team-creation";
 import { seedAccountPath } from "../../../../../config";
 
 const DEMO_TEAM_NAME = "Demo Company";
@@ -186,23 +187,26 @@ async function main() {
 
     // Matched on the slug, which is what makes a second run reuse the team
     // instead of stacking up another "Demo Company" beside it.
+    // A first run creates it through createTeamWithOwner, the one Space
+    // creation path (FR-006), which also adds the client as its Owner.
     let [team] = await db
       .select({ id: schema.teams.id })
       .from(schema.teams)
       .where(eq(schema.teams.slug, DEMO_TEAM_SLUG));
     if (!team) {
-      [team] = await db
-        .insert(schema.teams)
-        .values({
+      team = await db.transaction((tx) =>
+        createTeamWithOwner(tx, {
           name: DEMO_TEAM_NAME,
           slug: DEMO_TEAM_SLUG,
           description: "Sample tenant for the demo client account.",
+          ownerUserId: client.id,
           planId: freePlan.id,
-        })
-        .returning({ id: schema.teams.id });
+        }),
+      );
     }
 
-    // (teamId, userId) is unique, so this is the natural idempotent insert.
+    // (teamId, userId) is unique, so this is the natural idempotent insert:
+    // it restores the Owner membership on a rerun against an existing team.
     await db
       .insert(schema.teamMemberships)
       .values({ teamId: team.id, userId: client.id, roleId: ownerRole.id })

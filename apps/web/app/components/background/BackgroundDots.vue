@@ -39,7 +39,7 @@ const overlayVars = computed(() => ({
   background: radial-gradient(
     circle,
     color-mix(in srgb, var(--color-fire-500) 9%, transparent) 0%,
-    color-mix(in srgb, var(--color-flame-700) 4%, transparent) 45%,
+    color-mix(in srgb, var(--color-fire-700) 4%, transparent) 45%,
     transparent 70%
   );
 }

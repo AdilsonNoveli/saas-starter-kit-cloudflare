@@ -20,13 +20,16 @@
     "apps/app": {
       "name": "@nuxfire/app",
       "dependencies": {
+        "@nuxfire/crypto": "workspace:*",
         "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-account": "workspace:*",
         "@nuxfire/layer-admin": "workspace:*",
         "@nuxfire/layer-billing": "workspace:*",
         "@nuxfire/layer-kanban": "workspace:*",
         "@nuxfire/layer-notifications": "workspace:*",
         "@nuxfire/layer-teams": "workspace:*",
         "@nuxfire/manifest": "workspace:*",
+        "@nuxfire/rate-limit": "workspace:*",
         "@nuxfire/tokens": "workspace:*",
         "@nuxt/eslint": "0.7.3",
         "@nuxt/fonts": "0.10.3",
@@ -49,19 +52,17 @@
         "nuxt": "^4.5.2",
         "nuxt-authorization": "^0.3.5",
         "nuxt-svgo": "4.0.9",
-        "otpauth": "^9.5.2",
         "pinia": "^2.3.1",
         "postgres": "^3.4.5",
         "trpc-nuxt": "^0.10.22",
         "unenv": "1.10.0",
-        "uqr": "^0.1.3",
         "vue": "3.5.42",
         "vue-router": "5.3.1",
         "zod": "^3.24.1",
       },
       "devDependencies": {
         "@cloudflare/workers-types": "^4.20241230.0",
-        "@iconify-json/lucide": "^1.2.129",
+        "@iconify-json/ph": "^1.2.2",
         "typescript": "^5",
         "vitest": "^5.0.0",
         "vue-tsc": "^2.2.10",
@@ -72,12 +73,15 @@
       "version": "0.0.0",
       "dependencies": {
         "@cloudflare/workers-types": "^4.20241230.0",
+        "@nuxfire/crypto": "workspace:*",
         "@nuxfire/emails": "workspace:*",
+        "@nuxfire/layer-account": "workspace:*",
         "@nuxfire/layer-admin": "workspace:*",
         "@nuxfire/layer-billing": "workspace:*",
         "@nuxfire/layer-kanban": "workspace:*",
         "@nuxfire/layer-notifications": "workspace:*",
         "@nuxfire/layer-teams": "workspace:*",
+        "@nuxfire/rate-limit": "workspace:*",
         "@openauthjs/openauth": "^0.3.6",
         "@paralleldrive/cuid2": "^2.2.2",
         "drizzle-orm": "^0.45.2",
@@ -94,6 +98,7 @@
       "name": "@nuxfire/login",
       "dependencies": {
         "@nuxfire/tokens": "workspace:*",
+        "@nuxt/fonts": "0.10.3",
         "@nuxt/ui": "^4.8.1",
         "@nuxtjs/i18n": "^10.6.0",
         "nuxt": "^4.5.2",
@@ -102,7 +107,7 @@
         "zod": "^3.24.1",
       },
       "devDependencies": {
-        "@iconify-json/lucide": "^1.2.129",
+        "@iconify-json/ph": "^1.2.2",
         "typescript": "^5",
         "vue-tsc": "^2.2.10",
       },
@@ -136,11 +141,36 @@
         "vue-tsc": "^2.2.10",
       },
     },
+    "layers/account": {
+      "name": "@nuxfire/layer-account",
+      "version": "1.0.0",
+      "dependencies": {
+        "@nuxfire/crypto": "workspace:*",
+        "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-teams": "workspace:*",
+        "@nuxfire/manifest": "workspace:*",
+        "@nuxt/ui": "^4.8.1",
+        "@trpc/server": "^10.45.4",
+        "drizzle-orm": "^0.45.2",
+        "h3": "^1.15.11",
+        "otpauth": "^9.5.2",
+        "uqr": "^0.1.3",
+        "vue": "3.5.42",
+        "zod": "^3.24.1",
+      },
+      "devDependencies": {
+        "drizzle-kit": "^0.31.10",
+        "nuxt": "^4.5.2",
+        "vitest": "^5.0.0",
+      },
+    },
     "layers/admin": {
       "name": "@nuxfire/layer-admin",
       "version": "1.0.0",
       "dependencies": {
+        "@nuxfire/crypto": "workspace:*",
         "@nuxfire/functions": "workspace:*",
+        "@nuxfire/layer-account": "workspace:*",
         "@nuxfire/layer-notifications": "workspace:*",
         "@nuxfire/manifest": "workspace:*",
         "@nuxfire/tokens": "workspace:*",
@@ -163,6 +193,7 @@
       "name": "@nuxfire/layer-billing",
       "version": "1.0.0",
       "dependencies": {
+        "@nuxfire/crypto": "workspace:*",
         "@nuxfire/functions": "workspace:*",
         "@nuxfire/layer-teams": "workspace:*",
         "@nuxfire/manifest": "workspace:*",
@@ -246,10 +277,15 @@
         "vitest": "^5.0.0",
       },
     },
+    "packages/crypto": {
+      "name": "@nuxfire/crypto",
+      "version": "0.0.0",
+    },
     "packages/emails": {
       "name": "@nuxfire/emails",
       "version": "0.0.0",
       "dependencies": {
+        "@nuxfire/tokens": "workspace:*",
         "@poppinss/macroable": "^1.1.2",
         "@poppinss/object-builder": "^1.1.0",
         "@react-email/components": "^0.0.31",
@@ -257,7 +293,7 @@
         "fastq": "^1.20.1",
         "ical-generator": "^11.1.0",
         "ky": "^2.0.2",
-        "nodemailer": "9.1.1",
+        "nodemailer": "10.0.2",
         "react": "19.2.8",
         "react-dom": "19.2.8",
       },
@@ -275,6 +311,10 @@
     },
     "packages/manifest": {
       "name": "@nuxfire/manifest",
+      "version": "0.0.0",
+    },
+    "packages/rate-limit": {
+      "name": "@nuxfire/rate-limit",
       "version": "0.0.0",
     },
     "packages/tokens": {
@@ -552,7 +592,9 @@
 
     "@humanwhocodes/retry": ["@humanwhocodes/retry@0.4.3", "", {}, "sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ=="],
 
-    "@iconify-json/lucide": ["@iconify-json/lucide@1.2.129", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-pa0ufllJOXTDIH2BxE/BtWQEf/x46/lINDWcmncICV1/52veZ7KSBzQaVh9xDpmjDs8QN4j2Ex/LWlSSveL3yw=="],
+    "@iconify-json/lucide": ["@iconify-json/lucide@1.2.141", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-V9IC4cc7giA8PtoSeNc5GbASh4Sc5sRILu3jdGO9TMRWC+4YUeU3I3prNnoAZ5QiRZpfrjBhmXkqIdwfS//PGw=="],
+
+    "@iconify-json/ph": ["@iconify-json/ph@1.2.2", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-PgkEZNtqa8hBGjHXQa4pMwZa93hmfu8FUSjs/nv4oUU6yLsgv+gh9nu28Kqi8Fz9CCVu4hj1MZs9/60J57IzFw=="],
 
     "@iconify/collections": ["@iconify/collections@1.0.733", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-ckW+JM8b+Pt07fg5bpNbI05m6a8m7MptMb+QbRnsaNvqefvhJsqHzw1ZLtOCd2gxieDIERuIQBokZ/Ssf96sew=="],
 
@@ -704,9 +746,13 @@
 
     "@nuxfire/app": ["@nuxfire/app@workspace:apps/app"],
 
+    "@nuxfire/crypto": ["@nuxfire/crypto@workspace:packages/crypto"],
+
     "@nuxfire/emails": ["@nuxfire/emails@workspace:packages/emails"],
 
     "@nuxfire/functions": ["@nuxfire/functions@workspace:apps/functions"],
+
+    "@nuxfire/layer-account": ["@nuxfire/layer-account@workspace:layers/account"],
 
     "@nuxfire/layer-admin": ["@nuxfire/layer-admin@workspace:layers/admin"],
 
@@ -721,6 +767,8 @@
     "@nuxfire/login": ["@nuxfire/login@workspace:apps/login"],
 
     "@nuxfire/manifest": ["@nuxfire/manifest@workspace:packages/manifest"],
+
+    "@nuxfire/rate-limit": ["@nuxfire/rate-limit@workspace:packages/rate-limit"],
 
     "@nuxfire/tokens": ["@nuxfire/tokens@workspace:packages/tokens"],
 

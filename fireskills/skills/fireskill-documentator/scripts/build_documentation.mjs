@@ -18,7 +18,7 @@ async function text(path) { try { return await readFile(path, "utf8"); } catch {
 async function walk(folder) {
   const output = [];
   for (const entry of await readdir(folder, { withFileTypes: true })) {
-    if (ignored.has(entry.name)) continue;
+    if (ignored.has(entry.name) || entry.name.startsWith("_reference-")) continue;
     const path = join(folder, entry.name);
     if (entry.isDirectory()) output.push(...await walk(path)); else output.push(path);
   }

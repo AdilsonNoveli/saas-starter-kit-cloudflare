@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import type { H3Event } from "h3";
 import { count, desc, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { z } from "zod";
+import { z } from "zod/v4";
 // See the note in billing.ts: layers reach the Composition Root's tRPC
 // primitives and server utils by explicit import, never by Nitro's merge.
 // `platformAdminProcedure` in particular is built on `protectedProcedure`, NOT

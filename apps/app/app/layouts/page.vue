@@ -1,5 +1,5 @@
 <template>
-  <BackgroundDots>
+  <div class="min-h-screen">
     <slot />
-  </BackgroundDots>
+  </div>
 </template>

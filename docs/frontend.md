@@ -3,9 +3,9 @@
 <!-- specsfy:documentator:start -->
 ## Observed Surfaces
 
-- Components, pages, or views: 144.
+- Components, pages, or views: 166.
 - Tailwind: detected.
-- CSS tokens: --reka-dropdown-menu-trigger-width, --ui-primary, --vis-crosshair-line-stroke-color, --vis-crosshair-circle-stroke-color, --ui-bg, --vis-axis-grid-color, --ui-border, --vis-axis-tick-color, --vis-axis-tick-label-color, --ui-text-dimmed, --vis-tooltip-background-color, --vis-tooltip-border-color, --vis-tooltip-text-color, --ui-text-highlighted, ---, --ui-text, --ui-, --color-flame, --ui-success, --background, --shiny-text, --shiny-dot, --color-brand, --color-flame-700, --color-brand-hover, --color-flame-600, --color-brand-secondary, --color-fire-500, --color-brand-light, --color-fire-50, --color-cta, --color-mint-500, --color-cta-foreground, --color-mint-950, --color-flame-500, --color-flame-800, --gradient-angle, --gradient-angle-offset, --gradient-shine, --gradient-brand, --ui-warning, --muted, --duration, --gap, --color-, --font-sans, --font-mono, --color-flame-50, --color-flame-100, --color-flame-200, --color-flame-300, --color-flame-400, --color-flame-900, --color-flame-950, --color-fire-100, --color-fire-200, --color-fire-300, --color-fire-400, --color-fire-600, --color-fire-700, --color-fire-800, --color-fire-900, --color-fire-950, --ui-text-, --color-night-50, --color-night-100, --color-night-200, --color-night-300, --color-night-400, --color-night-500, --color-night-600, --color-night-700, --color-night-800, --color-night-900, --color-night-950, --radius-lg, --ui-radius, --ui-bg-muted, --ui-bg-elevated, --ui-bg-accented, --ui-border-muted, --ui-border-accented, --ui-text-muted.
+- CSS tokens: --reka-dropdown-menu-trigger-width, --ui-primary, --vis-crosshair-line-stroke-color, --vis-crosshair-circle-stroke-color, --ui-bg, --vis-axis-grid-color, --ui-border, --vis-axis-tick-color, --vis-axis-tick-label-color, --ui-text-dimmed, --vis-tooltip-background-color, --vis-tooltip-border-color, --vis-tooltip-text-color, --ui-text-highlighted, ---, --ui-text, --ui-, --color-flame, --ui-success, --background, --shiny-text, --shiny-dot, --color-brand, --sr-action, --color-brand-hover, --sr-action-hover, --color-brand-secondary, --color-fire-500, --color-brand-light, --color-ember-200, --color-cta, --sr-success, --color-cta-foreground, --color-fire-700, --gradient-angle, --gradient-angle-offset, --gradient-shine, --gradient-brand, --ui-warning, --sr-accent-text, --color-fire-300, --muted, --sr-on-action, --duration, --gap, --color-, --font-sans, --font-mono, --color-ember-400, --color-serelius-50, --color-serelius-100, --color-serelius-200, --color-serelius-300, --color-serelius-400, --color-highlight, --color-on-highlight, --color-lime-500, --color-lime-ink, --color-orchid-300, --color-orchid-500, --color-orchid-700, --color-menthol-200, --color-menthol-400, --color-menthol-700, --color-serelius-500, --color-serelius-600, --color-serelius-700, --color-serelius-800, --color-serelius-900, --color-serelius-950, --color-ink-50, --color-ink-100, --color-ink-200, --color-ink-300, --color-ink-400, --color-ink-500, --color-ink-600, --color-ink-700, --color-ink-800, --color-ink-850, --color-ink-900, --color-ink-910, --color-ink-925, --color-ink-950, --color-graphite-50, --color-graphite-100, --color-graphite-200, --color-graphite-300, --color-graphite-400, --color-graphite-500, --color-graphite-600, --color-graphite-700, --color-graphite-800, --color-graphite-850, --color-graphite-900, --color-graphite-910, --color-graphite-925, --color-graphite-950, --color-graphite-text-100, --color-graphite-text-200, --color-graphite-text-300, --color-graphite-text-400, --color-mist-100, --color-mist-200, --color-mist-300, --color-mist-400, --color-sand-50, --color-sand-100, --color-sand-150, --color-sand-200, --color-sand-300, --color-sand-400, --color-sand-500, --radius-xs, --radius-sm, --radius-md, --radius-lg, --radius-xl, --radius-2xl, --radius-3xl, --radius-4xl, --color-paper, --ui-radius, --sr-, --radius-, --sr-radius-none, --sr-radius-xs, --sr-radius-sm, --sr-radius-md, --sr-radius-lg, --sr-density-row-h, --sr-density-gap, --sr-density-pad-x, --sr-density-pad-y, --sr-control-h, --sr-motion-fast-duration, --sr-motion-fast-easing, --sr-motion-base-duration, --sr-motion-base-easing, --sr-motion-slow-duration, --sr-motion-slow-easing, --sr-motion-spring-duration, --sr-motion-spring-easing, --sr-focus-ring-width, --sr-focus-ring-offset, --sr-focus-ring-color, --sr-radius-control, --sr-radius-card, --sr-radius-modal, --sr-radius-max, --sr-canvas, --sr-sunken, --sr-surface, --sr-raised, --sr-overlay, --sr-border-card, --sr-border-control, --sr-border-strong, --sr-text-highlight, --sr-text, --sr-text-muted, --sr-text-dimmed, --sr-focus, --sr-highlight, --sr-on-highlight, --sr-mark, --sr-on-mark, --sr-selected-bg, --sr-selected-border, --sr-success-bg, --sr-warning, --sr-warning-bg, --sr-danger, --sr-danger-bg, --sr-info, --sr-info-bg, --sr-check, --sr-track-1, --sr-track-2, --sr-track-3, --sr-track-4, --sr-track-5, --sr-track-6, --sr-track-7, --sr-track-8, --sr-shadow-xs, --sr-shadow-sm, --sr-shadow-md, --sr-shadow-lg, --sr-sidebar-rail, --sr-sidebar-w, --sr-sidebar-bg, --sr-control-h-compact, --sr-row-h, --ui-text-inverted, --ui-bg-muted, --ui-bg-elevated, --ui-bg-accented, --ui-border-muted, --ui-border-accented, --ui-text-muted, --art-ink, --art-accent, --art-soft.
 
 | File |
 | --- |
@@ -107,6 +107,26 @@
 | apps\web\app\pages\signup.vue |
 | apps\web\app\pages\terms-of-service.vue |
 | apps\web\tailwind.config.ts |
+| layers\account\app\components\account\AccountEmailChange.vue |
+| layers\account\app\components\account\AccountHeaderActions.vue |
+| layers\account\app\components\account\AccountPreferencesForm.vue |
+| layers\account\app\components\account\AccountSessionsList.vue |
+| layers\account\app\components\account\AccountUserDropdown.vue |
+| layers\account\app\components\account\MfaRecoveryCodes.vue |
+| layers\account\app\components\account\MfaRecoveryPanel.vue |
+| layers\account\app\components\account\MfaSetupModal.vue |
+| layers\account\app\components\avatar\AvatarUploader.vue |
+| layers\account\app\components\onboarding\OnboardingPreferencesStep.vue |
+| layers\account\app\components\onboarding\OnboardingProfileStep.vue |
+| layers\account\app\components\onboarding\OnboardingSpaceStep.vue |
+| layers\account\app\components\onboarding\OnboardingSteps.vue |
+| layers\account\app\components\settings\SettingsPanel.vue |
+| layers\account\app\layouts\onboarding.vue |
+| layers\account\app\pages\account-settings\appearance.vue |
+| layers\account\app\pages\account-settings\index.vue |
+| layers\account\app\pages\account-settings\security.vue |
+| layers\account\app\pages\account-settings.vue |
+| layers\account\app\pages\onboarding.vue |
 | layers\admin\app\components\admin\AdminDataTable.vue |
 | layers\admin\app\components\admin\companies\ReactivateModal.vue |
 | layers\admin\app\components\admin\companies\SuspendModal.vue |
@@ -152,5 +172,7 @@
 | packages\emails\templates\PurchaseClaim.tsx |
 | packages\emails\templates\VerificationCode.tsx |
 | packages\emails\templates\Welcome.tsx |
+| packages\tokens\app\components\ColorModeSwitch.vue |
+| packages\tokens\app\components\LocaleSwitch.vue |
 | packages\tokens\theme.css |
 <!-- specsfy:documentator:end -->

@@ -21,7 +21,7 @@ vi.mock("./pending-purchase-repository", () => ({
     mockRecordConfirmedSubscription(...args),
 }));
 
-const mockDescribeBuyerDestination = vi.fn().mockResolvedValue("a new team of your own");
+const mockDescribeBuyerDestination = vi.fn().mockResolvedValue({ kind: "new_space" });
 vi.mock("./buyer-provisioning", () => ({
   describeBuyerDestination: (...args: unknown[]) => mockDescribeBuyerDestination(...args),
 }));
@@ -55,7 +55,7 @@ describe("paddle webhook dispatch", () => {
     mockVerifyPaddleTeam.mockReset().mockResolvedValue(true);
     mockVerifyPaddlePendingPurchase.mockReset().mockResolvedValue(true);
     mockRecordConfirmedSubscription.mockReset();
-    mockDescribeBuyerDestination.mockReset().mockResolvedValue("a new team of your own");
+    mockDescribeBuyerDestination.mockReset().mockResolvedValue({ kind: "new_space" });
     mockPlansFindFirst.mockReset().mockResolvedValue({ id: "plan_1" });
     mockPendingPurchaseFindFirst.mockReset().mockResolvedValue({
       id: "pp_1",

@@ -195,7 +195,7 @@ async function resolvePendingPurchaseConfirmation(
 
   await sendEmail(pendingPurchase.email, "PurchaseClaim", {
     planName: pendingPurchase.plan.name,
-    destinationSummary: await describeBuyerDestination(pendingPurchase.plan),
+    destination: await describeBuyerDestination(pendingPurchase.plan),
     claimLink: `${origin}/claim/${pendingPurchase.id}`,
   });
 

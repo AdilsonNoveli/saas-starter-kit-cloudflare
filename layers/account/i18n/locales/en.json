@@ -1,0 +1,215 @@
+{
+  "account": {
+    "header": {
+      "language": "Language",
+      "colorMode": "Change the theme",
+      "notSaved": "This choice applies on this device, but it wasn't saved to your account."
+    },
+    "preferences": {
+      "locale": {
+        "label": "Language"
+      },
+      "timeZone": {
+        "label": "Time zone",
+        "search": "Search time zones",
+        "empty": "No time zone matches your search."
+      },
+      "theme": {
+        "label": "Theme",
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "dateFormat": {
+        "label": "Date format",
+        "DMY": "Day, month, year",
+        "MDY": "Month, day, year",
+        "YMD": "Year, month, day"
+      },
+      "nameOrder": {
+        "label": "Name order",
+        "WESTERN": "Given name first",
+        "EASTERN": "Family name first"
+      }
+    },
+    "onboarding": {
+      "brand": {
+        "title": "Welcome",
+        "lead": "Before you start, set the basics: what to call you, how you like to see dates and times, and the Space where you will work.",
+        "later": "You can change any of this later in Account."
+      },
+      "steps": {
+        "profile": "Profile",
+        "preferences": "Preferences",
+        "space": "Space"
+      },
+      "position": "Step {current} of {total}: {title}",
+      "lengthError": "Use {min} to {max} characters.",
+      "actions": {
+        "back": "Back",
+        "next": "Continue",
+        "create": "Create the Space and enter",
+        "join": "Join the Space"
+      },
+      "profile": {
+        "title": "Your name",
+        "description": "This is how people in your Space will see you.",
+        "name": "Name"
+      },
+      "preferences": {
+        "title": "Your preferences",
+        "description": "These come from your browser. Check them and adjust if needed."
+      },
+      "space": {
+        "title": "Your Space",
+        "description": "This is where you will work in the app. Choose its name and address.",
+        "name": "Space name",
+        "slug": "Address",
+        "slugHint": "It appears in the Space's link. Use lowercase letters without accents, numbers and hyphens.",
+        "inviteTitle": "An invitation is waiting for you",
+        "inviteDescription": "You have an invitation to join the Space {name}. When you finish, you become part of it."
+      },
+      "failed": "Setup couldn't be finished"
+    },
+    "common": {
+      "cancel": "Cancel",
+      "discard": "Discard changes",
+      "retry": "Try again"
+    },
+    "settings": {
+      "title": "Account",
+      "tabs": {
+        "profile": "Profile",
+        "preferences": "Preferences",
+        "notifications": "Notifications",
+        "security": "Security"
+      }
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "This is how people see you in the app.",
+      "name": "Name",
+      "save": "Save profile",
+      "saved": "Profile saved",
+      "saveFailed": "The profile couldn't be saved",
+      "avatar": {
+        "label": "Photo",
+        "hint": "Use a JPG or PNG image.",
+        "alt": "Your photo",
+        "updated": "Photo updated",
+        "updateFailed": "The photo couldn't be uploaded",
+        "removed": "Photo removed",
+        "removeFailed": "The photo couldn't be removed"
+      }
+    },
+    "preferencesPage": {
+      "title": "Preferences",
+      "description": "Language, theme, time zone and how dates and names appear. Language and theme change as soon as you pick them; save to bring your choice to your other devices.",
+      "save": "Save preferences",
+      "saved": "Preferences saved",
+      "saveFailed": "Your preferences couldn't be saved",
+      "loadFailed": "Your preferences couldn't be loaded. Reload the page to try again."
+    },
+    "security": {
+      "password": {
+        "title": "Password",
+        "description": "To change your password, you get a code by e-mail and choose the new password on the sign-in page.",
+        "provider": "Your account has no password in this app. If you sign in with Google or GitHub, the password is that service's and changes there.",
+        "change": "Change password"
+      },
+      "mfa": {
+        "title": "Two-factor authentication",
+        "enabledDescription": "On. When you sign in on a new device or browser, you also enter a code from your authenticator app.",
+        "disabledDescription": "Ask for a code from your authenticator app on top of your password when you sign in.",
+        "enable": "Turn on",
+        "disable": "Turn off",
+        "disableConfirm": {
+          "title": "Turn off two-factor authentication",
+          "description": "Only your password will be asked when you sign in. You can turn it on again whenever you want."
+        },
+        "disabled": "Two-factor authentication turned off",
+        "disableFailed": "It couldn't be turned off"
+      },
+      "danger": {
+        "title": "Danger zone",
+        "description": "Deletes your account, credentials and profile for good. This can't be undone.",
+        "delete": "Delete account",
+        "confirmBody": "This deletes your credentials, your open sessions and your profile for good. Spaces you don't own stay as they are. If you are the only owner of a Space with other people, remove them or hand over ownership first.",
+        "confirmLabel": "Type {email} to confirm",
+        "confirm": "Delete for good",
+        "failed": "The account couldn't be deleted"
+      }
+    },
+    "email": {
+      "title": "E-mail",
+      "description": "The address you sign in with and where the app's notices go.",
+      "current": "Current e-mail",
+      "change": "Change e-mail",
+      "statusFailed": "Your account's e-mail and password details couldn't be read. Reload the page to try again.",
+      "pendingWarning": {
+        "title": "Pending invitations and purchases stay on the current address",
+        "description": "Space invitations and unclaimed purchases sent to the current e-mail don't move to the new one. After the change, ask whoever sent them to send them again."
+      },
+      "newEmail": "New e-mail",
+      "newEmailHelp": "One code goes to the current e-mail and another to the new one. Both confirm the change.",
+      "invalidEmail": "Enter a full e-mail address, with a name and a domain separated by an at sign.",
+      "send": "Send codes",
+      "codesSent": "One code was sent to {current} and another to {next}. Enter both to confirm the change.",
+      "currentCode": "Code from the current e-mail",
+      "newCode": "Code from the new e-mail",
+      "codeFormat": "Enter the code from the e-mail, digits only.",
+      "confirm": "Confirm change",
+      "resend": "Ask for new codes",
+      "changed": "E-mail changed",
+      "changedDescription": "You now sign in with {email}.",
+      "failed": "The e-mail couldn't be changed"
+    },
+    "sessions": {
+      "title": "Active sessions",
+      "description": "The devices and browsers where your account is open. End the ones you don't recognize.",
+      "device": "{browser} on {os}",
+      "unknownBrowser": "Unknown browser",
+      "unknownSystem": "Unknown system",
+      "unknownPlace": "Unidentified location",
+      "createdAt": "Started",
+      "lastUsedAt": "Last used",
+      "current": "This session",
+      "revoke": "End",
+      "revokeLabel": "End the session {device}",
+      "revokeConfirm": {
+        "title": "End the session {device}",
+        "description": "Whoever is using that device will have to sign in again."
+      },
+      "revoked": "Session ended",
+      "revokeFailed": "It couldn't be ended",
+      "signOutOthers": "Sign out of other sessions",
+      "signOutOthersConfirm": {
+        "title": "Sign out of other sessions",
+        "description": "The other devices and browsers will have to sign in again. This session stays open.",
+        "action": "Sign out of others"
+      },
+      "signedOutOthers": "No other session was open. | One other session was ended. | {count} other sessions were ended.",
+      "onlyThis": "Only this session is open.",
+      "loadFailed": "The sessions couldn't be loaded."
+    }
+  },
+  "errors": {
+    "slug_taken": "Another Space already uses this address. Choose a different one.",
+    "slug_reserved": "This address is reserved by the app. Choose a different one.",
+    "slug_invalid": "The address can use only lowercase letters without accents, numbers and hyphens. Adjust it and try again.",
+    "email_taken": "This email already belongs to another account. Use a different address.",
+    "email_unchanged": "This is already your current email. Enter the new address you want to use.",
+    "email_managed_by_provider": "Your email comes from the Google or GitHub account you sign in with, so it can't be changed here. Change it in that service instead.",
+    "invalid_code": "That code doesn't match. Copy the code from the most recent email and try again.",
+    "code_expired": "This code has expired. Request the change again to get new codes.",
+    "too_many_requests": "Too many attempts in a row. Wait a few minutes and try again.",
+    "invalid_time_zone": "This time zone isn't recognized. Pick one from the list.",
+    "invalid_locale": "This language isn't available. Choose English, Portuguese or Spanish.",
+    "invalid_theme": "This theme isn't available. Choose system, light or dark.",
+    "invalid_date_format": "This date format isn't available. Pick one from the list.",
+    "invalid_name_order": "This name order isn't available. Pick one from the list.",
+    "invite_unavailable": "This invitation is no longer valid: it expired, was canceled or was already used. Ask the person who invited you for a new one.",
+    "generic": "The action couldn't be completed. Try again in a moment.",
+    "cannot_revoke_current_session": "This is the session you are using now. To end it, sign out."
+  }
+}

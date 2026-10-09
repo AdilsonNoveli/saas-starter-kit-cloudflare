@@ -3,6 +3,7 @@
 // apps/app/nuxt.config.ts); `bun scripts/compose-layers.ts` also works
 // standalone if you just want to inspect the output.
 
+import { routers as accountRouters } from "@nuxfire/layer-account/server/trpc/router";
 import { routers as adminRouters } from "@nuxfire/layer-admin/server/trpc/router";
 import { routers as billingRouters } from "@nuxfire/layer-billing/server/trpc/router";
 import { routers as kanbanRouters } from "@nuxfire/layer-kanban/server/trpc/router";
@@ -10,6 +11,7 @@ import { routers as notificationsRouters } from "@nuxfire/layer-notifications/se
 import { routers as teamsRouters } from "@nuxfire/layer-teams/server/trpc/router";
 
 export const layerRouters = {
+  ...accountRouters,
   ...adminRouters,
   ...billingRouters,
   ...kanbanRouters,

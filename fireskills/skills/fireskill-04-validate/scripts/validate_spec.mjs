@@ -168,7 +168,11 @@ if (!input || !existsSync(input)) {
   if (status === "Complete" && /^\s*-\s+\[ \]\s+T\d{3,}/m.test(body)) {
     errors.push("Status Complete does not allow uncompleted tasks in section 14.");
   }
-  if (/\b(?:TODO|TBD|FIXME)\b|\[NEEDS CLARIFICATION/im.test(body) && !(status === "Draft" && draft)) {
+  // `TODO` is matched in capitals only: in Portuguese "todo" is an ordinary word ("todo o código"),
+  // while a real marker is always written in capitals. TBD, FIXME and the clarification flag stay
+  // case-insensitive.
+  const placeholder = /\bTODO\b/.test(body) || /\b(?:TBD|FIXME)\b|\[NEEDS CLARIFICATION/i.test(body);
+  if (placeholder && !(status === "Draft" && draft)) {
     errors.push("Unresolved placeholders found in specification.");
   }
   errors.push(...interfaceErrors(body, status));

@@ -24,12 +24,13 @@ useHead({
   meta: [{ id: "theme-color", name: "theme-color", content: themeColor }],
 });
 
+const { brandName } = useRuntimeConfig().public;
+
 useSeoMeta({
-  titleTemplate: (title) =>
-    title ? `${title} · ${appConfig.site.name}` : appConfig.site.name,
+  titleTemplate: (title) => (title ? `${title} · ${brandName}` : brandName),
   description: appConfig.site.description,
-  ogSiteName: appConfig.site.name,
-  ogTitle: appConfig.site.name,
+  ogSiteName: brandName,
+  ogTitle: brandName,
   ogDescription: appConfig.site.description,
 });
 </script>

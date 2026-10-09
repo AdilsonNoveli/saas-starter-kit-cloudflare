@@ -13,67 +13,19 @@
 # consent, has their own photo (image "" when shown without one), and where it came from (16 CFR 465.2).
 # `offers` holds the dated limit that backs an urgency phrase (Directive 2005/29/EC Annex I(7)).
 schema: 1
-claims:
-  - id: testers-more-than-ten
-    keys:
-      - landing.testimonials.subtitle
-    statement: "More than 10 developers tested Nuxfire"
-    evidence:
-      kind: owner-statement
-      by: "Owner of Nuxfire (chat, corrects the earlier 40+)"
-      on: "2026-09-25"
-    verifiedAt: "2026-09-25"
-    owner: "Owner of Nuxfire"
-  - id: testimonial-elena-two-months
-    keys:
-      - landing.testimonials.items.item3.quote
-    statement: "A user quoted on the page said the kit saved 2 months of work"
-    evidence:
-      kind: owner-statement
-      by: "Owner of Nuxfire (the quote is real, kept as given)"
-      on: "2026-09-25"
-    verifiedAt: "2026-09-25"
-    owner: "Owner of Nuxfire"
-  - id: testimonial-item2-quote
-    keys:
-      - landing.testimonials.items.item2.quote
-    statement: "A user quoted on the page said the deployment worked on the first try with zero cold starts"
-    evidence:
-      kind: owner-statement
-      by: "Owner of Nuxfire (the quote is real, kept as given)"
-      on: "2026-09-25"
-    verifiedAt: "2026-09-25"
-    owner: "Owner of Nuxfire"
-  - id: testimonial-item5-quote
-    keys:
-      - landing.testimonials.items.item5.quote
-    statement: "A user quoted on the page said the kit let them cut server bills to zero"
-    evidence:
-      kind: owner-statement
-      by: "Owner of Nuxfire (the quote is real, kept as given)"
-      on: "2026-09-25"
-    verifiedAt: "2026-09-25"
-    owner: "Owner of Nuxfire"
-  - id: testimonial-item7-quote
-    keys:
-      - landing.testimonials.items.item7.quote
-    statement: "A user quoted on the page called the type safety immaculate and the kit the best Nuxt starter"
-    evidence:
-      kind: owner-statement
-      by: "Owner of Nuxfire (the quote is real, kept as given)"
-      on: "2026-09-25"
-    verifiedAt: "2026-09-25"
-    owner: "Owner of Nuxfire"
-  - id: testimonial-item8-quote
-    keys:
-      - landing.testimonials.items.item8.quote
-    statement: "A user quoted on the page said they shipped paid subscriptions 48 hours after migrating"
-    evidence:
-      kind: owner-statement
-      by: "Owner of Nuxfire (the quote is real, kept as given)"
-      on: "2026-09-25"
-    verifiedAt: "2026-09-25"
-    owner: "Owner of Nuxfire"
-notClaims: []
+claims: []
+notClaims:
+  - key: landing.control.titleHighlight
+    reason: "ênfase expressiva sobre soberania do usuário sobre o assistente"
+  - key: landing.realDay.contact.status
+    reason: "valor de um cartão de exemplo, rotulado como exemplo ilustrativo na seção (landing.realDay.eyebrow)"
+  - key: landing.realDay.signals.0
+    reason: "valor de um cartão de exemplo, rotulado como exemplo ilustrativo na seção (landing.realDay.eyebrow)"
+  - key: landing.realDay.signals.4
+    reason: "valor de um cartão de exemplo, rotulado como exemplo ilustrativo na seção (landing.realDay.eyebrow)"
+  - key: landing.hero.art.dayText
+    reason: "contato fictício do cartão de exemplo do topo da página; o mesmo exemplo da seção rotulada como ilustrativa"
+  - key: landing.evidence.art.rows.history.value
+    reason: "valor do mesmo contato fictício do cartão de exemplo"
 testimonials: []
 offers: []

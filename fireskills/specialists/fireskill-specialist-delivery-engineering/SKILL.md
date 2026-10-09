@@ -29,8 +29,8 @@ description: "Design and review CI/CD pipelines, build artifacts, release strate
 5. Segregate credentials, permissions, and trust boundaries per pipeline job — build jobs
    must not possess production publishing credentials.
 6. Coordinate schema migrations ensuring dual-version compatibility (old and new application
-   versions coexisting during rolling deploys via expand/contract).
-7. Define rollout strategy, objective success signals, halt criteria, and rollback mechanisms
+   versions coexisting during rolling deploys via expand/contract, which the repository's database change policy overrides for its own database).
+7. (Repository override for database migrations: the database change policy in `.fireskills/RULES.md` overrides expand/contract and rollback planning — adjustments edit the init and the database is reset.) Define rollout strategy, objective success signals, halt criteria, and rollback mechanisms
    prior to deployment.
 8. Record artifact provenance, version metadata, test evidence, and rollout outcomes in an
    auditable manner.

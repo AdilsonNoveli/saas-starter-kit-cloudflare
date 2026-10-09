@@ -1,0 +1,156 @@
+{
+  "_comment": "SPEC-0009 T001 characterization vectors. Produced by running the code at generatedFromCommit (apps/app/server/utils/mfa-crypto.ts, mfa-recovery.ts, ws-ticket.ts, layers/billing/server/utils/billing/paddle-team-signature.ts) with fixed, obviously fake keys. Regenerate by importing those files at that commit and recording the same inputs; never edit by hand.",
+  "generatedFromCommit": "2cffc8f8b81a55397c16b3d6a57b03762b1d3e21",
+  "aesGcm": [
+    {
+      "key": "golden-vector-FAKE-aes-key-not-a-secret-0001",
+      "plaintext": "JBSWY3DPEHPK3PXP",
+      "ciphertext": "5nIifV5O7c5Rwzpv.6/K+nI1gYcKHpKPRAs6X9IEWOwer0j9fPJ7fWshxsoo="
+    },
+    {
+      "key": "golden-vector-FAKE-aes-key-not-a-secret-0001",
+      "plaintext": "FAKE TOTP SEED áç 🔐",
+      "ciphertext": "MY2ca0mSpgaSx1IW.hoT340oqeCW7yaruXnDbIseRFgqLPmNFBUAKc1O12ycjQHkay7CRPg=="
+    },
+    {
+      "key": "golden-vector-FAKE-aes-key-not-a-secret-0001",
+      "plaintext": "",
+      "ciphertext": "BNePix497S9l8Sx5.4Sz2h1PLbDveTi3hb3o8Vg=="
+    },
+    {
+      "key": "golden-vector-FAKE-aes-key-not-a-secret-0002",
+      "plaintext": "JBSWY3DPEHPK3PXP",
+      "ciphertext": "hxOitV7FH9Wav2X8.YiiIF60zup7CKwQ0faBFUBtawoq1UoazXoOFVkVs4xQ="
+    },
+    {
+      "key": "golden-vector-FAKE-aes-key-not-a-secret-0002",
+      "plaintext": "FAKE TOTP SEED áç 🔐",
+      "ciphertext": "zxlvmxwLboZi/OJ7.zY3TuHbWcfkpSiCGCcqpX5ul+QvKEbNmUmhmTwu4pdgiU/HaQosxkA=="
+    },
+    {
+      "key": "golden-vector-FAKE-aes-key-not-a-secret-0002",
+      "plaintext": "",
+      "ciphertext": "XTj5oyQSatzmNNGN.suc+rlSWibul/5Hh6EeWaw=="
+    }
+  ],
+  "recoveryHashes": [
+    {
+      "key": "golden-vector-FAKE-recovery-key-not-a-secret",
+      "scope": "user",
+      "userId": "u_fake_0001",
+      "normalizedCode": "ABCDEFGHJKMN",
+      "message": "nuxfire:mfa-recovery:user:u_fake_0001:ABCDEFGHJKMN",
+      "hex": "922dbbc586ce8eb1dfe981f8de2865faf436a4f5e5a7133fe208c3c09e3edb88"
+    },
+    {
+      "key": "golden-vector-FAKE-recovery-key-not-a-secret",
+      "scope": "platform",
+      "userId": "u_fake_0001",
+      "normalizedCode": "ABCDEFGHJKMN",
+      "message": "nuxfire:mfa-recovery:platform:u_fake_0001:ABCDEFGHJKMN",
+      "hex": "d7c9559b706fe767a60383beba093187fd03efd40f0ffdd93828572b16c18f43"
+    },
+    {
+      "key": "golden-vector-FAKE-recovery-key-not-a-secret",
+      "scope": "user",
+      "userId": "u_fake_0002",
+      "normalizedCode": "0123456789XZ",
+      "message": "nuxfire:mfa-recovery:user:u_fake_0002:0123456789XZ",
+      "hex": "b609f03104328f6ea6106a933d802d6023f8703aaded1b2024a03f0658c0bc31"
+    }
+  ],
+  "recoveryCodeFormat": [
+    {
+      "code": "ABCDEFGHJKMN",
+      "formatted": "ABCD-EFGH-JKMN"
+    },
+    {
+      "code": "0123456789XZ",
+      "formatted": "0123-4567-89XZ"
+    }
+  ],
+  "recoveryCodeNormalize": [
+    {
+      "input": "abcd-efgh-jkmn",
+      "normalized": "ABCDEFGHJKMN"
+    },
+    {
+      "input": " ABCD EFGH JKMN ",
+      "normalized": "ABCDEFGHJKMN"
+    },
+    {
+      "input": "OIL0-1111-1111",
+      "normalized": "011011111111"
+    },
+    {
+      "input": "",
+      "normalized": null
+    },
+    {
+      "input": "ABCD-EFGH",
+      "normalized": null
+    },
+    {
+      "input": "ABCD-EFGH-JKMU",
+      "normalized": null
+    }
+  ],
+  "wsTickets": [
+    {
+      "secret": "golden-vector-FAKE-ws-ticket-secret-not-a-secret",
+      "nowMs": 1790000000000,
+      "user": {
+        "id": "u_fake_0001",
+        "email": "fake.person@example.test",
+        "name": "Fake Person",
+        "image": ""
+      },
+      "payloadJson": "{\"id\":\"u_fake_0001\",\"email\":\"fake.person@example.test\",\"name\":\"Fake Person\",\"image\":\"\",\"exp\":1790000030000}",
+      "payloadB64": "eyJpZCI6InVfZmFrZV8wMDAxIiwiZW1haWwiOiJmYWtlLnBlcnNvbkBleGFtcGxlLnRlc3QiLCJuYW1lIjoiRmFrZSBQZXJzb24iLCJpbWFnZSI6IiIsImV4cCI6MTc5MDAwMDAzMDAwMH0",
+      "signatureB64Url": "bjlmA4Z1NqGciEmR_4MGpPAgyq_lAV0VBx2Vz3pe8W0",
+      "ticket": "eyJpZCI6InVfZmFrZV8wMDAxIiwiZW1haWwiOiJmYWtlLnBlcnNvbkBleGFtcGxlLnRlc3QiLCJuYW1lIjoiRmFrZSBQZXJzb24iLCJpbWFnZSI6IiIsImV4cCI6MTc5MDAwMDAzMDAwMH0.bjlmA4Z1NqGciEmR_4MGpPAgyq_lAV0VBx2Vz3pe8W0"
+    },
+    {
+      "secret": "golden-vector-FAKE-ws-ticket-secret-not-a-secret",
+      "nowMs": 1790000000000,
+      "user": {
+        "id": "u_fake_0002",
+        "email": "outra.pessoa@example.test",
+        "name": "Pessoa Ação ✓",
+        "image": "https://example.test/fake.png"
+      },
+      "payloadJson": "{\"id\":\"u_fake_0002\",\"email\":\"outra.pessoa@example.test\",\"name\":\"Pessoa Ação ✓\",\"image\":\"https://example.test/fake.png\",\"exp\":1790000030000}",
+      "payloadB64": "eyJpZCI6InVfZmFrZV8wMDAyIiwiZW1haWwiOiJvdXRyYS5wZXNzb2FAZXhhbXBsZS50ZXN0IiwibmFtZSI6IlBlc3NvYSBBw6fDo28g4pyTIiwiaW1hZ2UiOiJodHRwczovL2V4YW1wbGUudGVzdC9mYWtlLnBuZyIsImV4cCI6MTc5MDAwMDAzMDAwMH0",
+      "signatureB64Url": "miieek2Wvn8iyRq9UEcJyZSK23R-MCfhoKZVQuurauQ",
+      "ticket": "eyJpZCI6InVfZmFrZV8wMDAyIiwiZW1haWwiOiJvdXRyYS5wZXNzb2FAZXhhbXBsZS50ZXN0IiwibmFtZSI6IlBlc3NvYSBBw6fDo28g4pyTIiwiaW1hZ2UiOiJodHRwczovL2V4YW1wbGUudGVzdC9mYWtlLnBuZyIsImV4cCI6MTc5MDAwMDAzMDAwMH0.miieek2Wvn8iyRq9UEcJyZSK23R-MCfhoKZVQuurauQ"
+    }
+  ],
+  "paddleTeam": [
+    {
+      "secret": "golden-vector-FAKE-paddle-webhook-secret",
+      "teamId": "team_fake_0001",
+      "message": "nuxfire:paddle-checkout-team:team_fake_0001",
+      "hex": "aac68fa871a41d46c551bc36d8b5357e5f6a297525cf589f38fdd1978e971e83"
+    },
+    {
+      "secret": "golden-vector-FAKE-paddle-webhook-secret",
+      "teamId": "team_fake_0002",
+      "message": "nuxfire:paddle-checkout-team:team_fake_0002",
+      "hex": "cfac589f63f11e25a53587273b28942351f0dfd6413fceb5ae58892a8469d785"
+    }
+  ],
+  "paddlePendingPurchase": [
+    {
+      "secret": "golden-vector-FAKE-paddle-webhook-secret",
+      "pendingPurchaseId": "pp_fake_0001",
+      "message": "nuxfire:paddle-checkout-pending-purchase:pp_fake_0001",
+      "hex": "8c6f5ff0cb2efdb55133fc90ccc40cc27208a0543cf10b65c1f23129616025ef"
+    },
+    {
+      "secret": "golden-vector-FAKE-paddle-webhook-secret",
+      "pendingPurchaseId": "team_fake_0001",
+      "message": "nuxfire:paddle-checkout-pending-purchase:team_fake_0001",
+      "hex": "116d923cc6a2d1d862426673034ff23e9924c7f42712d91a40963d6bc0cd0e57"
+    }
+  ]
+}

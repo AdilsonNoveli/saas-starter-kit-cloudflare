@@ -163,3 +163,15 @@ describe("loadBranding", () => {
     ).toContain("BRAND_NAME");
   });
 });
+
+describe("Serelius brand e-mail", () => {
+  // SPECSFY: US-003 FR-007 NFR-002 AC-016
+  it("stops with the exact variable to fix when BRAND_EMAIL is missing or malformed, without a default", () => {
+    const base = { BRAND_NAME: "Serelius", BRAND_DOMAIN: "serelius.com" };
+    const missing = issuesOf(() => load("dev", base));
+    expect(missing.join()).toContain("BRAND_EMAIL");
+    const malformed = issuesOf(() => load("dev", { ...base, BRAND_EMAIL: "not-an-address" }));
+    expect(malformed.join()).toContain("BRAND_EMAIL");
+    expect(load("dev", { ...base, BRAND_EMAIL: "no-reply@serelius.com" }).email).toBe("no-reply@serelius.com");
+  });
+});

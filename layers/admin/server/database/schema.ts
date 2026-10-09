@@ -52,9 +52,8 @@ export const platformAdmins = pgTable("PlatformAdmin", {
     .references(() => users.id),
   role: platformRoleEnum("role").notNull(),
   // TOTP secret, always stored encrypted (AES-GCM, see
-  // apps/app/server/utils/mfa-crypto.ts — that helper is shared with
-  // regular-user 2FA and stays in the Composition Root) — never plaintext,
-  // and never serialised to any client.
+  // packages/crypto/aes.ts — shared with regular-user 2FA) — never
+  // plaintext, and never serialised to any client.
   mfaSecret: text("mfaSecret"),
   // null = MFA setup still pending; blocks platformAdminProcedure entirely.
   mfaEnabledAt: timestamp("mfaEnabledAt", { withTimezone: true }),

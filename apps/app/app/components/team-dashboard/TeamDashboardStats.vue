@@ -7,7 +7,7 @@
       :title="stat.title"
       variant="subtle"
       :ui="{
-        leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
+        leading: 'p-2.5 rounded-sm bg-primary/10 ring ring-inset ring-primary/25',
         title: 'font-normal text-muted text-xs uppercase',
       }"
     >
@@ -19,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
 const team = useCurrentTeam();
 const teamSlug = computed(() => team.value?.slug || "");
 const route = useRoute();
@@ -50,22 +51,22 @@ function formatDate(date?: Date | string | null) {
 const stats = computed(() => [
   {
     title: "Members",
-    icon: "i-lucide-users",
+    icon: "i-ph-users-duotone",
     value: membersData.value?.members?.length ?? 0,
   },
   {
     title: "Pending Invites",
-    icon: "i-lucide-mail",
+    icon: "i-ph-envelope-duotone",
     value: membersData.value?.invites?.length ?? 0,
   },
   {
     title: "Current Plan",
-    icon: "i-lucide-credit-card",
+    icon: "i-ph-credit-card-duotone",
     value: billingData.value?.currentPlan?.name ?? "No Plan",
   },
   {
-    title: "Team Created",
-    icon: "i-lucide-calendar",
+    title: t("teams.dashboard.created"),
+    icon: "i-ph-calendar-duotone",
     // `useCurrentTeam()` types as `teams.get | teams.list[0]`, and only the
     // former carries `createdAt` — but the team dashboard route only ever
     // populates it via `fetchCurrentTeam` -> `teams.get`, so it's always

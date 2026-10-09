@@ -1,5 +1,8 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { platformAdmins } from "@nuxfire/functions/schema";
+import { replaceRecoveryCodes } from "@nuxfire/layer-account/server/utils/mfa-recovery";
+import { rateLimit } from "~~/server/utils/rate-limit";
+import { recordAuditLog } from "~~/server/utils/audit-log";
 
 const bodySchema = z.object({
   code: z.string().regex(/^\d{6}$/),

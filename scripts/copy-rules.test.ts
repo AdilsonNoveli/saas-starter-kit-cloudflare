@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
@@ -9,6 +9,8 @@ import {
   auditLiterals,
   auditTestimonials,
   auditUrgency,
+  auditVoice,
+  auditVoiceFiles,
   detectClaims,
   flattenLocale,
   scanLiterals,
@@ -523,5 +525,47 @@ describe("check:copy command line (AC-007, AC-008)", { timeout: 60_000 }, () => 
     const { code, out } = run(project({ ledger: "schema: 2\n" }));
     expect(code).toBe(1);
     expect(out).toContain("[ledger-invalid]");
+  });
+});
+
+// SPEC-0008 (Fase 2): the Serelius voice (plano mestre, Parte 3.1 and premise P7) is enforced by
+// check:copy in apps/app, apps/login and layers/*, in locale files and in template literals.
+// apps/web is left out: its content is the kit's and is rebuilt in Phase 12.
+const voiceRoot = join(import.meta.dirname, "..");
+const voiceWalk = (dir: string): string[] =>
+  !existsSync(dir)
+    ? []
+    : readdirSync(dir).flatMap((name) => {
+        if (["node_modules", ".nuxt", ".output", "dist"].includes(name)) return [];
+        const path = join(dir, name);
+        return statSync(path).isDirectory() ? voiceWalk(path) : [path];
+      });
+const voiceFiles = (): Record<string, string> =>
+  Object.fromEntries(
+    ["apps/app", "apps/login", "layers"]
+      .flatMap((dir) => voiceWalk(join(voiceRoot, dir)))
+      .map((file) => file.replaceAll("\\", "/"))
+      .filter((file) => /i18n\/locales\/[^/]+\.json$|\.vue$/.test(file))
+      .map((file) => [file.slice(voiceRoot.replaceAll("\\", "/").length + 1), readFileSync(file, "utf8")]),
+  );
+
+describe("Serelius voice rules (SPEC-0008)", () => {
+  // SPECSFY: US-003 FR-009 NFR-003 AC-024
+  it("reports exclamation, celebration emoji, the sparkle icon and the forbidden people words", () => {
+    const found = auditVoice({ a: "Bem-vindo!", b: "Tudo certo 🎉", c: "Pergunte à IA ✨", d: "Seus contatos", e: "Suas conexões" }, "apps/app/i18n/locales/pt-BR.json", "pt-BR");
+    expect(rules(found)).toEqual(["voice-emoji", "voice-exclamation", "voice-forbidden-term"]);
+    expect(found.map((v) => v.subject).sort()).toEqual(["Bem-vindo!", "Pergunte à IA ✨", "Seus contatos", "Tudo certo 🎉"].sort());
+  });
+
+  // SPECSFY: US-003 FR-009 AC-025
+  it("finds no violation in the locale files and templates of apps/app, apps/login and the layers", () => {
+    expect(auditVoiceFiles(voiceFiles()).map((v) => `${v.where}: ${v.subject}`)).toEqual([]);
+  });
+
+  // SPECSFY: US-003 FR-009 NFR-003 AC-026
+  it("leaves apps/web out of the rule and judges the forbidden words only in Portuguese", () => {
+    expect(auditVoiceFiles({ "apps/web/i18n/locales/pt-BR.json": '{"hero":"Conheça o kit!"}' })).toEqual([]);
+    expect(rules(auditVoiceFiles({ "apps/app/i18n/locales/pt-BR.json": '{"hero":"Conheça!"}' }))).toEqual(["voice-exclamation"]);
+    expect(auditVoice({ a: "Your contacts" }, "apps/app/i18n/locales/en.json", "en")).toEqual([]);
   });
 });

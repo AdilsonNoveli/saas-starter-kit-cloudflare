@@ -83,7 +83,7 @@
             >
               <template v-if="getPlanFeatureValue(plan, featureName) === 'true'">
                 <UIcon
-                  name="i-lucide-check"
+                  name="i-ph-check-duotone"
                   class="size-4 text-primary inline-block"
                 />
               </template>

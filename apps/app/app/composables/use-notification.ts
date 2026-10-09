@@ -45,7 +45,7 @@ export function useNotification() {
         title,
         description,
         color: "error",
-        icon: "i-lucide-circle-alert",
+        icon: "i-ph-warning-circle-duotone",
       });
     },
     success(title: string, description?: string) {
@@ -53,7 +53,7 @@ export function useNotification() {
         title,
         description,
         color: "success",
-        icon: "i-lucide-circle-check",
+        icon: "i-ph-check-circle-duotone",
       });
     },
     info(title: string, description?: string) {
@@ -61,7 +61,7 @@ export function useNotification() {
         title,
         description,
         color: "info",
-        icon: "i-lucide-info",
+        icon: "i-ph-info-duotone",
       });
     },
     warning(title: string, description?: string) {
@@ -69,7 +69,7 @@ export function useNotification() {
         title,
         description,
         color: "warning",
-        icon: "i-lucide-triangle-alert",
+        icon: "i-ph-warning-duotone",
       });
     },
     /** A toast that is not a severity — e.g. a real-time push from the server. */
@@ -79,7 +79,7 @@ export function useNotification() {
         description,
         duration,
         color: "primary",
-        icon: "i-lucide-bell",
+        icon: "i-ph-bell-duotone",
       });
     },
     confirm(options: ConfirmDialogOptions) {

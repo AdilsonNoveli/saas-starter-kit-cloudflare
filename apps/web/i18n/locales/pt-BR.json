@@ -7,7 +7,7 @@
   "nav": {
     "brand": "Nuxfire",
     "home": "Início",
-    "pricing": "Preços",
+    "pricing": "Download",
     "docs": "Documentação",
     "blog": "Blog",
     "login": "ENTRAR",
@@ -104,7 +104,7 @@
       "title": "Comece seu SaaS com login, cobrança e deploy já prontos.",
       "subtitle": "O Nuxfire é um kit em Nuxt para Cloudflare com times, permissões, pagamentos, painel de admin e um método para a sua IA construir o resto por especificação e teste.",
       "cta": "Quero o Nuxfire",
-      "ctaTalk": "Falar no WhatsApp",
+      "ctaTalk": "Grupo do WhatsApp",
       "priceLine": "{launch} nas primeiras {limit} licenças, depois {regular}. Pagamento único, com {months} meses de atualizações."
     },
     "problem": {
@@ -228,12 +228,12 @@
       "eyebrow": "Depoimentos"
     },
     "offer": {
-      "title": "Comece hoje",
+      "title": "Código aberto para acelerar seu SaaS",
       "launchLabel": "Lançamento: primeiras {limit} licenças",
       "regularLabel": "Depois, {regular}",
       "payOnce": "Pagamento único",
       "updates": "{months} meses de atualizações incluídas",
-      "includedTitle": "O que está na licença",
+      "includedTitle": "O que está no kit",
       "included": {
         "source": "O código-fonte completo do monorepo",
         "teams": "Times, convites e permissões",
@@ -244,20 +244,26 @@
         "kanban": "Um módulo de kanban pronto",
         "docs": "Documentação e o método Fireskills"
       },
-      "license": "Use o código em quantos produtos quiser. Os termos completos estão na página de licença.",
-      "licenseLink": "Ler a licença",
+      "license": "Totalmente gratuito sob licença MIT. Use o código em quantos produtos quiser.",
+      "licenseLink": "Ler a licença MIT",
       "refund": "Reembolso: seguimos o que determina a lei. O Código de Defesa do Consumidor prevê o direito de desistir em até sete dias nas compras feitas fora do estabelecimento comercial.",
       "cta": "Quero o Nuxfire por {price}",
-      "ctaSoon": "Compra disponível em breve",
-      "payment": "Cartão pelo checkout da Stripe. Para pagar com Pix, chame o suporte no WhatsApp.",
-      "talkTitle": "Prefere conversar antes?",
-      "talkText": "Combine uma conversa pelo WhatsApp de suporte e tire suas dúvidas antes de comprar.",
-      "talkCta": "Chamar no WhatsApp",
+      "ctaSoon": "Apoiar o projeto",
+      "payment": "Código aberto com licença MIT. Apoio voluntário via Ko-fi.",
+      "badge": "Código Aberto · MIT",
+      "supportTitle": "Apoie o Nuxfire",
+      "supportText": "O Nuxfire é gratuito, código aberto e construído para a comunidade. Se o projeto te ajudou a economizar semanas de trabalho, considere apoiar para mantermos o projeto ativo e evoluindo.",
+      "supportCta": "Apoiar o projeto",
+      "githubCta": "Estrela no GitHub",
+      "supportMicrocopy": "Sem assinatura obrigatória. Pague o que o coração sentir.",
+      "talkTitle": "Grupo oficial no WhatsApp",
+      "talkText": "Participe do nosso grupo no WhatsApp para tirar dúvidas, sugerir melhorias e interagir com outros desenvolvedores.",
+      "talkCta": "Grupo do WhatsApp",
       "talkMessage": "Olá! Quero conversar sobre o Nuxfire.",
-      "eyebrow": "Oferta"
+      "eyebrow": "Download & Apoio"
     },
     "faq": {
-      "title": "Perguntas de quem vai comprar",
+      "title": "Perguntas frequentes",
       "items": {
         "needs": {
           "question": "O que preciso saber para usar?",
@@ -265,19 +271,23 @@
         },
         "commercial": {
           "question": "Posso usar em projetos comerciais e de clientes?",
-          "answer": "Sim: a licença permite criar quantos produtos finais quiser e vendê-los. Ela não permite redistribuir o código em si, e freelancers precisam de uma licença por cliente. Leia os termos completos na página de licença."
+          "answer": "Sim: a licença MIT permite criar quantos produtos finais quiser e utilizá-los comercialmente sem restrições."
         },
         "updates": {
-          "question": "Quais atualizações estão incluídas?",
-          "answer": "{months} meses de atualizações estão incluídos no preço, sem mensalidade."
+          "question": "Como acompanho atualizações e novidades?",
+          "answer": "O código é aberto no repositório GitHub. Correções, melhorias e novos recursos são enviados diretamente lá."
         },
         "contact": {
-          "question": "Como falo com vocês antes de comprar?",
-          "answer": "Pelo WhatsApp de suporte. Combinamos uma conversa e respondemos suas dúvidas antes da compra."
+          "question": "Como tiro dúvidas ou participo da comunidade?",
+          "answer": "Pelo grupo oficial no WhatsApp. Tiramos dúvidas, ouvimos feedbacks e ajudamos no que for preciso."
+        },
+        "support": {
+          "question": "Como posso apoiar o projeto?",
+          "answer": "Você pode apoiar com uma contribuição no Ko-fi e deixando uma estrela no nosso repositório no GitHub."
         },
         "pay": {
-          "question": "Como eu pago?",
-          "answer": "Com cartão, no checkout da Stripe. Para pagar com Pix, chame o suporte no WhatsApp."
+          "question": "O projeto é realmente gratuito?",
+          "answer": "Sim, o código é aberto e gratuito sob licença MIT. O apoio financeiro é totalmente voluntário via Ko-fi."
         }
       }
     }

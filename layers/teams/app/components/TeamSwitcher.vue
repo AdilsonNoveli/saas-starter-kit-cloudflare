@@ -1,6 +1,6 @@
 <template>
   <div class="w-full max-w-4xl mx-auto">
-    <div class="text-2xl py-6 font-medium">Select a Team</div>
+    <div class="text-2xl py-6 font-medium">{{ t("teams.switcher.title") }}</div>
 
     <div
       v-if="teamsStore.allTeams.length > 0"
@@ -16,8 +16,8 @@
         class="flex flex-col items-center justify-center gap-2 p-5 rounded-lg border-2 border-dashed border-default hover:border-accented text-dimmed hover:text-default transition-colors cursor-pointer min-h-[164px]"
         @click="showCreateTeamDialog = true"
       >
-        <UIcon name="i-lucide-circle-plus" class="size-8" />
-        <span class="text-sm font-medium">Create new team</span>
+        <UIcon name="i-ph-plus-circle-duotone" class="size-8" />
+        <span class="text-sm font-medium">{{ t("teams.switcher.create") }}</span>
       </button>
 
       <div
@@ -26,18 +26,18 @@
         class="group relative rounded-lg bg-elevated ring ring-default hover:ring-accented transition-colors overflow-hidden"
       >
         <!-- Cover banner — no cover-image field on a team yet, so this is a
-             deterministic brand-tinted gradient rather than a photo. -->
-        <div class="h-14 bg-gradient-to-br from-primary/30 to-primary/5" />
+             flat brand-tinted band rather than a photo. -->
+        <div class="h-14 bg-primary/15" />
 
-        <UTooltip text="Team Settings">
+        <UTooltip :text="t('teams.switcher.settings')">
           <UButton
-            icon="i-lucide-settings"
+            icon="i-ph-gear-duotone"
             size="xs"
             color="neutral"
             variant="solid"
-            :ui="{ base: 'rounded-full' }"
+            :ui="{ base: 'rounded-sm' }"
             class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
-            :aria-label="`${teamItem.name} settings`"
+            :aria-label="t('teams.switcher.settingsOf', { name: teamItem.name })"
             @click.stop="navigateTo(`/${teamItem.slug}/settings`)"
           />
         </UTooltip>
@@ -67,12 +67,10 @@
       v-else
       class="flex flex-col items-center justify-center p-8 text-center rounded-lg bg-elevated ring ring-default"
     >
-      <UIcon name="i-lucide-users" class="size-12 text-dimmed mb-4" />
-      <p class="text-lg font-semibold mb-2">No teams yet</p>
-      <p class="text-sm text-muted mb-4">Create your first team to get started</p>
-      <UButton icon="i-lucide-circle-plus" @click="showCreateTeamDialog = true">
-        Create New Team
-      </UButton>
+      <UIcon name="i-ph-users-duotone" class="size-12 text-dimmed mb-4" />
+      <p class="text-lg font-semibold mb-2">{{ t("teams.switcher.emptyTitle") }}</p>
+      <p class="text-sm text-muted mb-4">{{ t("teams.switcher.emptyDescription") }}</p>
+      <UButton icon="i-ph-plus-circle-duotone" :label="t('teams.switcher.create')" @click="showCreateTeamDialog = true" />
     </div>
 
     <TeamCreateModal v-model:open="showCreateTeamDialog" />
@@ -80,6 +78,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const teamsStore = useTeamsStore();

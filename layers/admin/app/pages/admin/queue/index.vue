@@ -7,7 +7,7 @@
         </template>
 
         <template #right>
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -38,7 +38,7 @@
           </div>
           <UButton
             label="Refresh"
-            icon="i-lucide-refresh-cw"
+            icon="i-ph-arrows-clockwise-duotone"
             color="neutral"
             variant="outline"
             loading-auto
@@ -140,10 +140,10 @@ async function refreshAll() {
  * has to show a zero, and an unexpected value must not invent a card.
  */
 const JOB_STATUSES = [
-  { status: "pending", label: "Pending", icon: "i-lucide-clock" },
-  { status: "processing", label: "Processing", icon: "i-lucide-loader" },
-  { status: "completed", label: "Completed", icon: "i-lucide-circle-check" },
-  { status: "failed", label: "Failed", icon: "i-lucide-circle-x" },
+  { status: "pending", label: "Pending", icon: "i-ph-clock-duotone" },
+  { status: "processing", label: "Processing", icon: "i-ph-spinner-duotone" },
+  { status: "completed", label: "Completed", icon: "i-ph-check-circle-duotone" },
+  { status: "failed", label: "Failed", icon: "i-ph-x-circle-duotone" },
 ] as const;
 
 const stats = computed(() =>
@@ -179,7 +179,7 @@ function getRowItems(row: Row<DeadLetter>): DropdownMenuItem[] {
     { type: "label", label: "Actions" },
     {
       label: "Replay",
-      icon: "i-lucide-rotate-ccw",
+      icon: "i-ph-arrow-counter-clockwise-duotone",
       // Kept visible but disabled once replayed: an empty menu reads as a bug,
       // a greyed-out item reads as "already done".
       disabled: record.replayedAt !== null,
@@ -277,7 +277,7 @@ const columns: TableColumn<DeadLetter>[] = [
           { content: { align: "end" }, items: getRowItems(row) },
           () =>
             h(UButton, {
-              icon: "i-lucide-ellipsis-vertical",
+              icon: "i-ph-dots-three-vertical-duotone",
               color: "neutral",
               variant: "ghost",
               class: "ml-auto",
@@ -299,9 +299,9 @@ function sortableHeader(
     label,
     icon: isSorted
       ? isSorted === "asc"
-        ? "i-lucide-arrow-up-narrow-wide"
-        : "i-lucide-arrow-down-wide-narrow"
-      : "i-lucide-arrow-up-down",
+        ? "i-ph-sort-ascending-duotone"
+        : "i-ph-sort-descending-duotone"
+      : "i-ph-arrows-down-up-duotone",
     class: "-mx-2.5",
     onClick,
   });

@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -64,8 +64,50 @@ function buildPaths(root: string): string[] {
 }
 
 function write(outFile: string, paths: string[]) {
+  const content = `${JSON.stringify(paths, null, 2)}\n`;
   mkdirSync(dirname(outFile), { recursive: true });
-  writeFileSync(outFile, `${JSON.stringify(paths, null, 2)}\n`);
+
+  // If the file already exists with identical content, skip writing entirely.
+  // This avoids Windows file-lock collisions during concurrent Nuxt/Nitro processes.
+  if (existsSync(outFile)) {
+    try {
+      const existing = readFileSync(outFile, "utf8");
+      if (existing === content) {
+        return;
+      }
+    } catch {
+      // If reading fails for any reason, proceed to write.
+    }
+  }
+
+  // Safe write with retry for transient Windows file-lock errors (EBUSY, EPERM, UNKNOWN)
+  const maxRetries = 5;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const tmpFile = `${outFile}.${process.pid}.${Date.now()}.tmp`;
+      writeFileSync(tmpFile, content, "utf8");
+      try {
+        renameSync(tmpFile, outFile);
+      } catch {
+        // Fallback to direct write if atomic rename is blocked on Windows
+        writeFileSync(outFile, content, "utf8");
+        try { unlinkSync(tmpFile); } catch {}
+      }
+      return;
+    } catch (err) {
+      if (attempt === maxRetries) {
+        // If still blocked but file exists, do not crash the entire build
+        if (existsSync(outFile)) {
+          console.warn(`generate-paths: could not update ${outFile} due to file lock; using existing file`);
+          return;
+        }
+        throw err;
+      }
+      // Brief sleep before retry
+      const waitTill = Date.now() + 100 * attempt;
+      while (Date.now() < waitTill) {}
+    }
+  }
 }
 
 export function generatePaths(root: string = resolve(here, "..")) {

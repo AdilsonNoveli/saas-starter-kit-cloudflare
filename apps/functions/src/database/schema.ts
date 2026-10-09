@@ -52,3 +52,8 @@ export * from "@nuxfire/layer-notifications/server/database/schema";
 // lines above it, this one created NO cycle: core-schema.ts does not import
 // layers/admin back, because nothing left in it referenced either table.
 export * from "@nuxfire/layer-admin/server/database/schema";
+// Core layer (SPEC-0010, Fase 3b): `UserPreference`, `UserSession` and
+// `EmailChangeRequest`. Unlike the four relocations above, these are new
+// tables, and they come with the layer's own history
+// (`layers/account/migrations/0000_account.sql`), never with the base's.
+export * from "@nuxfire/layer-account/server/database/schema";

@@ -32,4 +32,4 @@ Raw palette classes (expected: no output):
 git grep -n -E "\b(text|bg|border|ring|from|to|via|fill|stroke|divide|outline|decoration|shadow)-(red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-[0-9]{2,3}\b" -- apps layers
 ```
 
-Documented exceptions: the QR code in `apps/app/app/components/account/MfaSetupModal.vue` stays pure black on pure white in both themes (scanners refuse low-contrast codes).
+Documented exceptions: the QR code in `layers/account/app/components/account/MfaSetupModal.vue` stays pure black on pure white in both themes (scanners refuse low-contrast codes).

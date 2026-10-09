@@ -16,11 +16,11 @@
           <UButton
             :to="`${baseRoute}/kanban`"
             label="All boards"
-            icon="i-lucide-arrow-left"
+            icon="i-ph-arrow-left-duotone"
             color="neutral"
             variant="ghost"
           />
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -30,7 +30,7 @@
         v-if="showInitialLoader"
         class="flex flex-1 items-center justify-center py-12 text-muted"
       >
-        <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin" />
+        <UIcon name="i-ph-circle-notch-duotone" class="size-6 animate-spin" />
       </div>
 
       <KanbanBoard

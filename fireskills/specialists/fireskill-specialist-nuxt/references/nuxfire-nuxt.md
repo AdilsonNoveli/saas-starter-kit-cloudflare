@@ -52,16 +52,16 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
 |---|---|
 | `app/app.vue` | `<UApp>` + `NuxtLoadingIndicator` + `NuxtLayout` + `NuxtPage` + `<ConfirmDialog />` |
 | `app/layouts/` | `dashboard.vue` (team sidebar), `page.vue`; admin layout comes from `layers/admin` |
-| `app/pages/` | `[[team]]/dashboard.vue`, `account-settings*`, `[...path].vue` (catch-all) |
+| `app/pages/` | `[[team]]/dashboard.vue`, `buy/`, `claim/`, `[...path].vue` (catch-all); `account-settings*` comes from `layers/account` |
 | `app/middleware/` | `0.auth.global.ts`, `1.teams.global.ts` |
 | `app/plugins/` | `authorization-resolver.ts`, `websockets.client.ts` |
 | `app/composables/` | `use-trpc-client.ts`, `use-notification.ts`, `use-dashboard.ts`, `useLayerNavigation.ts` |
 | `app/utils/` | `auth.ts` (`useSession`), `date.ts`, `plan-tier.ts`, `team-status.ts`, `title-case.ts` |
-| `app/components/` | `ConfirmDialog.vue`, `account/`, `avatar/`, `background/`, `layout/`, `loader/`, `notifications/`, `settings/`, `team-dashboard/` |
-| `server/api/` | `auth/*`, `mfa/*`, `trpc/[trpc].ts`, `upload/profile-picture.ts`, `profile-pictures.get.ts` |
+| `app/components/` | `ConfirmDialog.vue`, `layout/`, `loader/`, `team-dashboard/`; `account/`, `avatar/`, `settings/` come from `layers/account` |
+| `server/api/` | `auth/*`, `trpc/[trpc].ts`; `mfa/*`, `upload/profile-picture.ts`, `profile-pictures.get.ts` come from `layers/account` |
 | `server/middleware/` | `csp.ts` |
 | `server/plugins/` | `authorization-resolver.ts`, `database-binding.ts` |
-| `server/utils/` | `audit-log`, `auth`, `db`, `mfa-crypto`, `rate-limit`, `user-mfa-session`, `user-mfa`, `ws-ticket` |
+| `server/utils/` | `audit-log`, `auth`, `db`, `rate-limit` (h3 wrapper over `packages/rate-limit`); `user-mfa`, `user-mfa-session`, `mfa-recovery` live in `layers/account`, the crypto in `packages/crypto` |
 | `server/trpc/` | see `$fireskill-specialist-trpc` |
 
 Rule: **Domain logic belongs in layers**; the Composition Root holds only shells,
@@ -101,7 +101,7 @@ tRPC composition, `nuxt.config.ts`, and core infrastructure.
 - Uploads: `hubBlob().handleUpload(event, { formKey: "files", ensure: { types: ["image/jpeg","image/png"], maxSize: "2MB" }, put: { prefix, addRandomSuffix: true } })`.
 - Logs: Never `console.error(rawError)` in Worker code (`message`/`stack` are non-enumerable
   and serialize to `{}`); extract specific fields.
-- Webhook and MFA rate-limiting: `server/utils/rate-limit.ts` (`hubKV()`).
+- Webhook and MFA rate-limiting: the algorithm is `packages/rate-limit`; `server/utils/rate-limit.ts` wraps it over `hubKV()` (`assertNotRateLimited`), and the MFA routes of `layers/account` and `layers/admin` import its single `rateLimit(key, rule)` by path (`~~/server/utils/rate-limit`).
 
 ## 6. Client Architecture
 

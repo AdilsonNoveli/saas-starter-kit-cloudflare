@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import type { H3Event } from "h3";
 import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
-import { z } from "zod";
+import { z } from "zod/v4";
 // Layers reach the Composition Root's tRPC primitives and server utils by
 // explicit import, never by Nitro's server-dir merge: these router modules are
 // imported as plain modules by the generated

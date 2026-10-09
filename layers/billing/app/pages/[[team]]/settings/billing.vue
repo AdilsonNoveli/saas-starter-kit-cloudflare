@@ -26,7 +26,7 @@
           />
           <UButton
             v-if="status !== 'pending'"
-            icon="i-lucide-refresh-cw"
+            icon="i-ph-arrows-clockwise-duotone"
             variant="ghost"
             square
             size="sm"

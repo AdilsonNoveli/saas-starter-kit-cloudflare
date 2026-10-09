@@ -1,6 +1,7 @@
 {
   "name": "@nuxfire/layer-teams",
   "version": "1.0.0",
+  "description": "Nuxt layer providing teams, memberships, invitations and RBAC permissions",
   "private": true,
   "type": "module",
   "scripts": {

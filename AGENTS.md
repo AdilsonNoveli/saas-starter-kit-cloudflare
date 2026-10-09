@@ -27,6 +27,7 @@ of this codebase. Never work from memory: work through the framework.
   and the relevant specialist is loaded.
 - Working code supersedes any documentation. Every claim about the project requires
   concrete file evidence.
+- **Database (absolute, owner rule)**: each layer owns its migration history and is toggled in `config.ts`; a new capability gets its own specific step; adjustments edit the init of the owning history and the responsible person resets the database and brings it up again from zero (guarded `bun run db:reset`, then `bun run deploy`; not part of deploy), until the application launches. Never patch migrations, `ALTER` chains or expand/contract. Agents never run destructive database commands. Full text: database change policy in `.fireskills/RULES.md`.
 - No deployments, destructive data operations, or irreversible actions without explicit user authorization.
 - Never declare work "done" without running full validation: `bun run test`, typechecks
   (`apps/app` and `bunx vue-tsc --noEmit -p server/tsconfig.json`), and checks specified by the specialist.
@@ -46,7 +47,8 @@ Project context: `.fireskills/` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `PACKA
 - Do not repeat questions already answered in `.fireskills/USER-PROFILE.md`.
 - Specs: `specs/inbox/`, `specs/backlog/`, and `specs/<state>/<NNNN>-<slug>/spec.md` as the
   sole canonical source of truth (no `plan.md`, `tasks.md`, or `research.md`).
-- Tasks that alter persistent database schemas must include `[MIGRATION]`: versioned migrations (drizzle-kit),
-  applied during deployment, never on the development database.
+- Tasks that alter persistent database schemas must include `[MIGRATION]` and follow the database change policy in
+  `.fireskills/RULES.md`: a specific step per capability, and adjustments edit the init of the owning history while the
+  responsible person resets the database and redeploys from zero until launch (not part of `bun run deploy`); agents never run destructive database commands.
 - After every implementation slice, execute `$fireskill-documentator`.
 <!-- specsfy:framework:end -->

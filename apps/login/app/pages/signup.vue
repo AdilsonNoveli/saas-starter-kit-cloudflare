@@ -1,29 +1,29 @@
 <template>
   <AuthLayout
-    :title="state === 'code' ? 'Verify your email' : 'Create your account'"
+    :title="state === 'code' ? t('auth.signup.titleCode') : t('auth.signup.title')"
     :subtitle="
       state === 'code'
-        ? 'Enter the 6-digit verification code sent to your inbox'
-        : 'Get started with Nuxfire in just a few minutes'
+        ? t('auth.signup.subtitleCode')
+        : t('auth.signup.subtitle', { brand: brandName })
     "
   >
     <!-- Status Alerts -->
     <UAlert
       v-if="errorMessage"
-      icon="i-lucide-circle-alert"
+      icon="i-ph-warning-circle-duotone"
       color="error"
       variant="subtle"
-      title="Registration Error"
+      :title="t('auth.signup.errorTitle')"
       :description="errorMessage"
     />
 
     <UAlert
       v-else-if="confirmUser"
-      icon="i-lucide-mail-check"
+      icon="i-ph-envelope-duotone"
       color="success"
       variant="subtle"
-      title="Confirmation Sent"
-      :description="`A confirmation link was sent to ${confirmUser}. Please check your email to complete registration.`"
+      :title="t('auth.signup.confirmTitle')"
+      :description="t('auth.signup.confirmDesc', { email: confirmUser })"
     />
 
     <!--
@@ -48,15 +48,15 @@
       <!-- Verification Code State -->
       <template v-if="state === 'code'">
         <UFormField
-          label="Verification Code"
+          :label="t('auth.signup.codeLabel')"
           name="code"
           required
-          description="Enter the one-time code sent to your email"
+          :description="t('auth.signup.codeDesc')"
         >
           <UInput
             v-model="data.code"
             name="code"
-            icon="i-lucide-key-round"
+            icon="i-ph-key-duotone"
             placeholder="000000"
             size="lg"
             class="w-full font-mono tracking-widest text-center text-lg"
@@ -69,13 +69,13 @@
 
       <!-- Standard Registration Fields -->
       <template v-else>
-        <UFormField label="Work Email" name="email" required>
+        <UFormField :label="t('auth.signup.emailLabel')" name="email" required>
           <UInput
             v-model="data.email"
             name="email"
             type="email"
-            icon="i-lucide-mail"
-            placeholder="name@company.com"
+            icon="i-ph-envelope-duotone"
+            :placeholder="t('auth.signup.emailPlaceholder')"
             size="lg"
             class="w-full"
             autocomplete="email"
@@ -84,28 +84,28 @@
         </UFormField>
 
         <UFormField
-          label="Password"
+          :label="t('auth.signup.passwordLabel')"
           name="password"
           required
-          description="Must be at least 8 characters"
+          :description="t('auth.signup.passwordDesc')"
         >
           <UInput
             v-model="data.password"
             name="password"
             :type="showPassword ? 'text' : 'password'"
-            icon="i-lucide-lock"
-            placeholder="Create a strong password"
+            icon="i-ph-lock-duotone"
+            :placeholder="t('auth.signup.passwordPlaceholder')"
             size="lg"
             class="w-full"
             autocomplete="new-password"
           >
             <template #trailing>
               <UButton
-                :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :icon="showPassword ? 'i-ph-eye-slash-duotone' : 'i-ph-eye-duotone'"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                :aria-label="showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')"
                 class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showPassword = !showPassword"
@@ -114,24 +114,24 @@
           </UInput>
         </UFormField>
 
-        <UFormField label="Confirm Password" name="repeat" required>
+        <UFormField :label="t('auth.signup.repeatLabel')" name="repeat" required>
           <UInput
             v-model="data.repeat"
             name="repeat"
             :type="showRepeatPassword ? 'text' : 'password'"
-            icon="i-lucide-shield-check"
-            placeholder="Confirm your password"
+            icon="i-ph-shield-check-duotone"
+            :placeholder="t('auth.signup.repeatPlaceholder')"
             size="lg"
             class="w-full"
             autocomplete="new-password"
           >
             <template #trailing>
               <UButton
-                :icon="showRepeatPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :icon="showRepeatPassword ? 'i-ph-eye-slash-duotone' : 'i-ph-eye-duotone'"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                :aria-label="showRepeatPassword ? 'Hide password' : 'Show password'"
+                :aria-label="showRepeatPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')"
                 class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showRepeatPassword = !showRepeatPassword"
@@ -150,7 +150,7 @@
         class="font-semibold justify-center text-center cursor-pointer mt-2"
         :ui="{ base: 'justify-center text-center' }"
       >
-        <span class="w-full text-center">{{ state === "code" ? "Verify Email" : "Create Account" }}</span>
+        <span class="w-full text-center">{{ state === "code" ? t("auth.signup.btnVerify") : t("auth.signup.btnCreate") }}</span>
       </UButton>
     </UForm>
 
@@ -158,7 +158,7 @@
     <template v-if="state !== 'code'">
       <template v-if="githubAuthEnabled || googleAuthEnabled">
         <div class="relative py-1">
-          <USeparator label="Or register with" class="text-xs text-dimmed uppercase tracking-wider" />
+          <USeparator :label="t('auth.signup.orRegisterWith')" class="text-xs text-dimmed uppercase tracking-wider" />
         </div>
         <AuthSocialLogin :sign-up="true" />
       </template>
@@ -169,13 +169,13 @@
     <!-- Card Footer -->
     <template #footer>
       <p class="text-sm text-muted">
-        Already have an account?
+        {{ t("auth.signup.hasAccount") }}
         <NuxtLink
           :to="`${origin}/password/authorize`"
           external
           class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 ml-1"
         >
-          Sign in
+          {{ t("auth.signup.signIn") }}
         </NuxtLink>
       </p>
     </template>
@@ -183,7 +183,7 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
 
 type SignupError =
   | "invalid_email"
@@ -192,27 +192,33 @@ type SignupError =
   | "invalid_password"
   | null;
 
-const ERROR_MESSAGES: Record<string, string> = {
-  invalid_email: "Please enter a valid email address.",
-  invalid_code: "The verification code is invalid or has expired.",
-  email_taken: "An account with this email address already exists.",
-  invalid_password: "Password must be at least 8 characters long.",
-};
+const { t } = useI18n();
 
-const registerSchema = z
-  .object({
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    repeat: z.string().min(8, "Password must be at least 8 characters"),
-  })
-  .refine((val) => val.password === val.repeat, {
-    message: "Passwords do not match",
-    path: ["repeat"],
-  });
+const ERROR_MESSAGES = computed<Record<string, string>>(() => ({
+  invalid_email: t("auth.signup.errors.invalidEmail"),
+  invalid_code: t("auth.login.errors.invalidCode"),
+  email_taken: t("auth.signup.errors.emailInUse"),
+  invalid_password: t("auth.signup.errors.weakPassword"),
+}));
 
-const verifySchema = z.object({
-  code: z.string().min(1, "Verification code is required"),
-});
+const registerSchema = computed(() =>
+  z
+    .object({
+      email: z.string().email(t("auth.signup.errors.emailValidation")),
+      password: z.string().min(8, t("auth.signup.errors.passwordValidation")),
+      repeat: z.string().min(8, t("auth.signup.errors.passwordValidation")),
+    })
+    .refine((val) => val.password === val.repeat, {
+      message: t("auth.signup.errors.passwordMismatch"),
+      path: ["repeat"],
+    }),
+);
+
+const verifySchema = computed(() =>
+  z.object({
+    code: z.string().min(1, t("auth.signup.errors.codeValidation")),
+  }),
+);
 
 const route = useRoute();
 const notification = useNotification();
@@ -222,7 +228,7 @@ const state = route.query.state?.toString();
 const err = (route.query.err?.toString() || null) as SignupError;
 
 const {
-  public: { githubAuthEnabled, googleAuthEnabled },
+  public: { brandName, githubAuthEnabled, googleAuthEnabled },
 } = useRuntimeConfig();
 
 const data = reactive({
@@ -237,13 +243,14 @@ const showPassword = ref(false);
 const showRepeatPassword = ref(false);
 const confirmUser = ref<string | null>(null);
 
-const errorMessage = ref(
-  err ? (ERROR_MESSAGES[err] ?? "An unexpected error occurred.") : "",
-);
+const errorMessage = computed(() => {
+  if (!err) return "";
+  return ERROR_MESSAGES.value[err] ?? t("auth.signup.errors.unexpected");
+});
 
 onMounted(() => {
-  if (err && ERROR_MESSAGES[err]) {
-    notification.error("Registration Error", ERROR_MESSAGES[err]);
+  if (err && ERROR_MESSAGES.value[err]) {
+    notification.error(t("auth.signup.errorTitle"), ERROR_MESSAGES.value[err]);
   }
 });
 

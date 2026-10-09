@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import {
   teams,
@@ -5,6 +6,8 @@ import {
   roles,
 } from "@nuxfire/layer-teams/server/database/schema";
 import { ensureSystemRoles } from "@nuxfire/layer-teams/server/utils/roles";
+import { createTeamWithOwner } from "@nuxfire/layer-teams/server/utils/team-creation";
+import { validateSlug } from "@nuxfire/layer-teams/shared/utils/slug";
 import { PlanBuyerTeamMode } from "../../../shared/types/enums";
 import { claimPendingPurchase } from "./pending-purchase-repository";
 import type { PendingPurchaseRow } from "./pending-purchase-repository";
@@ -84,7 +87,6 @@ export type ProvisionResult =
   | { ok: false; reason: ProvisionRejectionReason };
 
 const NAME_PATTERN = /^.{2,50}$/;
-const SLUG_PATTERN = /^[a-z0-9-]{2,50}$/;
 
 /**
  * Orchestrates FR-006/FR-007/FR-008: resolves `Plan.buyerTeamMode` into a
@@ -107,55 +109,57 @@ async function provisionNewTeam(
   const name = input.teamName?.trim() ?? "";
   const slug = input.teamSlug?.trim() ?? "";
   if (!NAME_PATTERN.test(name)) return { ok: false, reason: "invalid_team_name" };
-  if (!SLUG_PATTERN.test(slug)) return { ok: false, reason: "invalid_team_slug" };
+  // The one slug rule (layers/teams/shared/utils/slug.ts): a reserved slug is
+  // as unusable here as a malformed one.
+  if (validateSlug(slug) !== "ok") return { ok: false, reason: "invalid_team_slug" };
 
+  // Fast path for the common case; the unique index on `Team.slug` still
+  // decides a race, surfaced by createTeamWithOwner as "slug_taken" below.
   const existingTeam = await useDB().query.teams.findFirst({
     where: eq(teams.slug, slug),
   });
   if (existingTeam) return { ok: false, reason: "slug_taken" };
 
-  await ensureSystemRoles();
-  const ownerRole = await useDB().query.roles.findFirst({
-    where: and(eq(roles.name, "Owner"), eq(roles.isSystemRole, true)),
-  });
-  if (!ownerRole) throw new Error("Owner role could not be found or created");
-
-  return useDB().transaction(async (tx) => {
-    const [team] = await tx
-      .insert(teams)
-      .values({
+  try {
+    return await useDB().transaction(async (tx) => {
+      const team = await createTeamWithOwner(tx, {
         name,
         slug,
+        ownerUserId: input.userId,
         planId: input.plan.id,
         maxSeats: input.plan.maxSeats,
         stripeCustomerId: input.pendingPurchase.providerCustomerId,
-      })
-      .returning();
-    if (!team) throw new Error("Failed to create team");
+      });
 
-    await tx.insert(teamMemberships).values({
-      teamId: team.id,
-      userId: input.userId,
-      roleId: ownerRole.id,
+      const claimed = await claimPendingPurchase(
+        tx,
+        input.pendingPurchase.id,
+        input.userId,
+        team.id,
+      );
+      if (!claimed) return { ok: false, reason: "already_claimed" };
+
+      return { ok: true, teamId: team.id, teamSlug: team.slug };
     });
-
-    const claimed = await claimPendingPurchase(
-      tx,
-      input.pendingPurchase.id,
-      input.userId,
-      team.id,
-    );
-    if (!claimed) return { ok: false, reason: "already_claimed" };
-
-    return { ok: true, teamId: team.id, teamSlug: team.slug };
-  });
+  } catch (error) {
+    if (error instanceof TRPCError && error.message === "slug_taken") {
+      return { ok: false, reason: "slug_taken" };
+    }
+    throw error;
+  }
 }
 
 /**
- * Human-readable destination for a claim e-mail / claim-page summary
- * (FR-004, `checkout.getPendingPurchase`): "a new team of your own" for
- * `NEW_TEAM`, or the destination team's own name for `EXISTING_TEAM`.
+ * Where the buyer lands, as a stable shape and never as a sentence (FR-004,
+ * FR-016): the server does not know the reader's language, so the claim page
+ * (`checkout.getPendingPurchase`) words it from `billing.claim.destination.*`
+ * and the claim e-mail from its own texts in `packages/emails`.
  */
+export type BuyerDestination =
+  | { kind: "new_space" }
+  | { kind: "existing_space"; name: string }
+  | { kind: "missing_space" };
+
 export async function describeBuyerDestination(plan: {
   // `string`, not `PlanBuyerTeamMode`: `Plan.buyerTeamMode` is a plain text
   // column (like every other status-like field in this schema), so callers
@@ -163,15 +167,15 @@ export async function describeBuyerDestination(plan: {
   // stored, not the narrowed write-side type.
   buyerTeamMode: string;
   buyerTeamId: string | null;
-}): Promise<string> {
+}): Promise<BuyerDestination> {
   if (plan.buyerTeamMode === PlanBuyerTeamMode.NEW_TEAM) {
-    return "a new team of your own";
+    return { kind: "new_space" };
   }
-  if (!plan.buyerTeamId) return "a team that no longer exists";
+  if (!plan.buyerTeamId) return { kind: "missing_space" };
   const team = await useDB().query.teams.findFirst({
     where: eq(teams.id, plan.buyerTeamId),
   });
-  return team ? team.name : "a team that no longer exists";
+  return team ? { kind: "existing_space", name: team.name } : { kind: "missing_space" };
 }
 
 async function provisionExistingTeam(
@@ -186,7 +190,7 @@ async function provisionExistingTeam(
   if (!team) return { ok: false, reason: "destination_missing" };
   if (team.status !== "ACTIVE") return { ok: false, reason: "destination_suspended" };
 
-  await ensureSystemRoles();
+  await ensureSystemRoles(useDB());
   const memberRole = await useDB().query.roles.findFirst({
     where: and(eq(roles.name, "Member"), eq(roles.isSystemRole, true)),
   });

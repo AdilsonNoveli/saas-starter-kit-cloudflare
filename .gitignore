@@ -35,3 +35,6 @@ logs
 # Wrangler local state
 .wrangler/
 
+
+# Reference projects: read-only, kept on disk for consultation, never versioned (SPEC-0007)
+_reference-*

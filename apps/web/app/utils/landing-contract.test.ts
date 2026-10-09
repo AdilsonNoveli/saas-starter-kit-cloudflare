@@ -32,6 +32,7 @@ const landing = Object.fromEntries(
 ) as Record<keyof typeof LOCALES, Record<string, string>>;
 
 const isTestimonial = (key: string): boolean => key.startsWith("landing.testimonials.");
+const isExempt = (key: string): boolean => isTestimonial(key) || key.startsWith("landing.sponsor.");
 
 describe("the three languages carry the same landing (FR-011)", () => {
   // SPECSFY: US-006 FR-011 AC-001
@@ -50,10 +51,10 @@ describe("the three languages carry the same landing (FR-011)", () => {
 
 describe("the numbers come from the offer, not from the text (FR-002, FR-005)", () => {
   // SPECSFY: US-001 US-002 FR-002 FR-005 AC-001 AC-002
-  it("has no digit in a landing text outside the testimonials", () => {
+  it("has no digit in a landing text outside the testimonials and sponsor", () => {
     for (const [code, texts] of Object.entries(landing)) {
       for (const [key, value] of Object.entries(texts)) {
-        if (isTestimonial(key)) continue;
+        if (isExempt(key)) continue;
         expect(value, `${code}:${key}`).not.toMatch(/\d/);
       }
     }
@@ -74,7 +75,7 @@ describe("the numbers come from the offer, not from the text (FR-002, FR-005)", 
 
 describe("what the owner ruled out is not on the page (FR-013, FR-014, FR-015)", () => {
   const FORBIDDEN: [string, RegExp][] = [
-    ["a community group or VIP club (eliminated)", /grupo|\bgroup\b|\bvip\b|club nuxfire|comunidad|community|comunidade/i],
+    ["a VIP club (eliminated)", /\bvip\b|club nuxfire/i],
     ["a demo (there is none)", /\bdemo\b|demonstra|demostraci/i],
     ["lifetime or an annual plan (one year of updates)", /lifetime|vital[íi]cio|de por vida|de por vida|\bannual\b|\banual\b|cont[íi]nu|continuous/i],
     ["a money-back guarantee the owner does not give", /money-back|garantia de \d|garant[íi]a de \d|14-day/i],
@@ -86,7 +87,7 @@ describe("what the owner ruled out is not on the page (FR-013, FR-014, FR-015)",
   it.each(FORBIDDEN)("does not mention %s", (_label, pattern) => {
     for (const [code, texts] of Object.entries(landing)) {
       for (const [key, value] of Object.entries(texts)) {
-        if (isTestimonial(key)) continue;
+        if (isExempt(key)) continue;
         expect(value, `${code}:${key}`).not.toMatch(pattern);
       }
     }

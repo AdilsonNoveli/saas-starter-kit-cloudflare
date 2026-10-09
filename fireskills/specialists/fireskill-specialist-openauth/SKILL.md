@@ -23,14 +23,14 @@ description: Build and review authentication with OpenAuth.js in Nuxfire — iss
 ## Key Rules
 
 - Password hashes and identity profiles live **strictly in KV `AuthKV`**; PostgreSQL contains no sessions table or password fields.
-- `AuthKV` is bound **exclusively** to the `Auth` Worker. External callers request identity operations via internal endpoints (`config.ts`: `identityDeletePath`, `signOutOthersPath`, `seedAccountPath`), always via `POST` with `x-admin-secret`.
+- `AuthKV` is bound **exclusively** to the `Auth` Worker. External callers request identity operations via internal endpoints (`config.ts`: `identityDeletePath`, `sessionsRevokePath`, `identityStatePath`, `emailChangePath`, `seedAccountPath`), always via `POST` with `x-admin-secret`.
 - Internal endpoints: use **constant-time comparisons**, return **503** if secret is unconfigured, return **403** on mismatch; never fall back to open access. Invocation via service binding grants zero implicit authorization.
 - App-to-Auth communication goes through service binding `env.Auth`, re-read per request; if missing, fail with explicit error.
 - `getIssuer(env)` is instantiated **per request**; never cache `issuer()` promises globally.
 - OAuth providers are registered only when valid credentials exist (`id && secret`); `apps/login` mirrors this truth via public flags.
 - PostgreSQL user records upsert by **`session.id`** (subject ID), never by email.
 - `getUser` never returns `mfaSecret` and exposes only boolean flags for admin/MFA status.
-- Session revocation queries by `properties.email`, not by subject hash.
+- Every login issues the stable subject `user:<id>` with a per-login `sid` and a 15-minute access token (`ACCESS_TOKEN_TTL_SECONDS`); the issuer writes `["email", email, "subject"] = user:<id>` only **after** `ctx.subject`. Session revocation scans only the prefix `["oauth:refresh", "user:<id>"]` (`apps/functions/src/session-store.ts`) and spares the caller by `sid`; never scan all of `oauth:refresh`.
 - Credential rate limiting executes **before** the issuer, only on `POST` requests of the four credential routes; do not throttle OAuth providers.
 - Cookies and tokens: `nuxfire-access-token` (non-httpOnly for WebSocket handshakes), `nuxfire-refresh-token` (httpOnly); MFA and admin elevations live in separate, dedicated cookies.
 - `apps/login` keeps `ssr: false` across login, registration, and recovery routes.
@@ -57,7 +57,7 @@ description: Build and review authentication with OpenAuth.js in Nuxfire — iss
 - Rate limiting: 6th invalid password attempt within 5 minutes redirects with `err=too_many_requests` and `Retry-After` header.
 - Internal endpoints: missing secret yields 403; missing `ADMIN_SECRET` in Worker yields 503.
 - Account deletion: removes KV keys (password, user profile, refresh tokens) and PostgreSQL row; re-registration with same email succeeds cleanly.
-- `sign-out-others`: current session persists while other sessions are terminated.
+- `sessionsRevokePath` with `exceptSid`: current session persists while other sessions are terminated; with `onlySid`: only that session ends; with neither: 400.
 - Dev reset: re-registering previously deleted email triggers neither `email_taken` nor `23505`.
 - `bun run test` (Vitest) and typecheck pass across `apps/app` and `apps/functions`.
 

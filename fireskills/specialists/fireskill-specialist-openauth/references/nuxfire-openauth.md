@@ -35,18 +35,32 @@ KV reads of signing keys and holds pending promises; cached across requests, the
 request failing to await them leaves hanging promises, locking all subsequent requests
 (~10s freezes on session checks). Reinstantiation overhead is minimal.
 
-The issuer `success` callback (`ctx.subject("user", {...})`):
+The issuer `success` callback:
 1. retrieves `{ email, name?, image?, data? }` from the provider (Google userinfo;
    GitHub `/user` and `/user/emails`, selecting primary verified email);
-2. reads/updates user profiles in `["users", email]` (only `createId()` on cache miss);
-3. sends a `Welcome` email on **new account creation**;
-4. returns the subject payload `{ id, name, email, image }`.
-
+2. refuses the login when the provider returned no e-mail address, before writing anything;
+3. reads/updates user profiles in `["users", email]` (only `createId()` on cache miss);
+4. sends a `Welcome` email on **new account creation**;
+5. calls `issueUserSession(ctx, storage, user)` (`apps/functions/src/session-store.ts`), the single
+   place that opens a session. It calls `ctx.subject("user", { id, name, email, image, provider, sid }, { subject:
+   stableSubject(id), ttl: { access: ACCESS_TOKEN_TTL_SECONDS } })`: the subject is `user:<id>` for every
+   provider, `sid` is a `crypto.randomUUID()` per login that survives every renewal, and the access token
+   lives 15 minutes (`config.ts`);
+6. inside `issueUserSession`, only **after** `ctx.subject` returns, writes
+   `["email", <lower-case email>, "subject"] = user:<id>` (`rememberPasswordSubject`). On a password login
+   the provider's `invalidate` writes the properties hash to that key inside `ctx.subject`; writing
+   earlier would leave the hash and `/password/change` would revoke nothing.
 Verification code emails dispatch through `sender(env.Emails)` (`"VerificationCode"`).
 
 ## 3. Subjects (`apps/functions/src/subjects.ts`)
 
-`createSubjects({ user: baseUser })`, using `valibot` (`id`, `email`, `name`, `image`, all strings).
+`createSubjects({ user: baseUser + sid + provider })`, using `valibot` (`id`, `email`, `name`, `image`,
+`sid`, `provider`, all strings). `sid` and `provider` (`password`, `code`, `google` or `github`, the login
+that opened the session) are required: a token issued without them fails verification, so adding
+`provider` (SPEC-0010) made every existing session log in again once.
+The e-mail is normalized to lower case (`normalizeEmail`, `session-store.ts`) at the start of `success`
+and in `issueUserSession`: the profile key, the subject key, the stored address and the token all carry
+it (the code provider hands back the address as typed; the password provider already lower-cases).
 `FullUser` (with `createdAt`, `updatedAt`, `accounts[]`) represents the complete record stored in KV.
 The app depends on `@nuxfire/functions/subjects`.
 
@@ -56,7 +70,8 @@ The app depends on `@nuxfire/functions/subjects`.
   lives **strictly in KV**.
 - Identity Profile: `["users", email]` = `{ id, email, name, image, accounts[] }`.
   Its `id` becomes the subject, then `session.id` in the app, then `User.id` in Postgres.
-- `["email", email, "subject"]` and tokens `["oauth:refresh", subject, token]`.
+- `["email", email, "subject"]` = `user:<id>` and sessions `["oauth:refresh", "user:<id>", token]`
+  (properties include `sid`; the token changes on every renewal, the `sid` does not).
 - Issuer cryptographic signing keys.
 
 **Two independent keys exist per user, both required** (password and profile).
@@ -72,21 +87,29 @@ Endpoints defined in `config.ts` (shared paths across both boundaries):
 
 | Constant | Path | Operation |
 |---|---|---|
-| `identityDeletePath` | `/internal/identity/delete` | Purges credentials, profile, and all refresh tokens for an email |
-| `signOutOthersPath` | `/internal/identity/sign-out-others` | Revokes all refresh tokens for an email except the caller's |
+| `identityDeletePath` | `/internal/identity/delete` | `{ userId, email }`: revokes every session of `user:<id>` and purges credential, subject key and profile of the email; `{ ok, revokedSessions }` |
+| `sessionsRevokePath` | `/internal/identity/sessions/revoke` | `{ userId, onlySid }` revokes every record of that one session; `{ userId, exceptSid }` revokes every session of `user:<id>` whose `sid` differs; `{ ok, revoked }` |
+| `identityStatePath` | `/internal/identity/state` | `{ userId, email }`: `{ providers, hasPassword, sids }` (linked `accounts[].type` of the profile when its `id` is `userId`, whether `["email", email, "password"]` exists, the sids with a refresh record left); no credential or token in the answer |
+| `emailChangePath` | `/internal/identity/email` | `{ userId, oldEmail, newEmail, currentSid }`: moves `["users", e]`, `["email", e, "password"]` and `["email", e, "subject"]` to the lower-case new address with the same id, rewrites `properties.email` of the `currentSid` records, revokes the other sessions, removes the old keys last; `{ ok: true }` or `{ ok: false, error: "email_taken" \| "email_managed_by_provider" }` (status 200) |
 | `seedAccountPath` | `/internal/identity/seed` | Creates/resets identities with known passwords (demo seed only) |
 
 All endpoints: `POST`, `x-admin-secret` header verified using **constant-time comparison**
 (`secretsMatch`), **503** if `ADMIN_SECRET` is unconfigured (rejects instead of exposing
-unauthenticated endpoints), **403** on mismatch. Secrets are generated per stage
+unauthenticated endpoints), **403** on mismatch, **400** without `userId` (or, on
+`sessionsRevokePath`, without exactly one of `onlySid` and `exceptSid`). The gate is one function,
+`refuseInternalCall` in `auth.ts`, shared by every internal path. Secrets are generated per stage
 (`random.RandomUuid("AuthAdminSecret")`), never committed to source, reaching the app
 as `NUXT_AUTH_ADMIN_SECRET` (without `PUBLIC`). The URL is public, so **arriving via service
 binding proves nothing**: the secret provides authorization.
 Structural rationale: `AuthKV` links exclusively to the `Auth` Worker; callers outside
 it (the app, seed scripts) must **request** mutations.
-Revocation matches by `properties.email` (not subject hash) because subject hashes recalculate
-from current properties and diverge if profiles mutate (e.g., `updateProfile` changing `name`).
-Client refresh tokens format as `"{subject}:{token}"`; the final `:` separates subject from token.
+Revocation (`revokeSessions`, `apps/functions/src/session-store.ts`) scans only the prefix
+`["oauth:refresh", "user:<id>"]` and keeps only keys whose second part is exactly `user:<id>`
+(so `user:1` never reaches `user:12`); the subject depends on the id alone, so profile changes
+never hide a session. "Sign out others" identifies the caller by `sid`, not by its refresh token,
+which changes on every renewal. Repeating a revocation is harmless (KV listing can lag).
+Client refresh tokens format as `"{subject}:{token}"`; the final `:` separates subject from token,
+so user ids must not contain `:`. A revoked session keeps its access token at most 15 minutes.
 `seedAccount` is idempotent and avoids issuing new IDs for existing emails (preventing orphaned
 Postgres profiles and `TeamMembership` records).
 
@@ -105,9 +128,10 @@ This does not represent a general API throttle: standard tRPC procedures are **n
 ## 7. App Integration (`apps/app/server/`)
 
 - Cookies: `nuxfire-access-token` (**not** httpOnly: browser WebSockets require it) and
-  `nuxfire-refresh-token` (httpOnly), `sameSite: "lax"`, 1-year duration (`setTokens`).
+  `nuxfire-refresh-token` (httpOnly), `sameSite: "lax"`, `path: "/"`, 30-day sliding `maxAge`
+  (`setTokens`; idle timeout, longer than the 15-minute JWT so the refresh can renew it).
   Elevated platform admin session: `nuxfire-platform-mfa-verified`, sealed h3 session **distinct**
-  from the token pair. User MFA: `nuxfire-mfa-verified` (`user-mfa-session.ts`).
+  from the token pair. User MFA: `nuxfire-mfa-verified` (`layers/account/server/utils/user-mfa-session.ts`).
 - `api/auth/callback.ts`: exchanges `code` for tokens (`client.exchange`), sets cookies,
   reads session with **explicit tokens** (stale browser cookies could otherwise fail verification),
   executes **`User` upsert by `session.id`** (never by email: email is a mutable attribute;
@@ -116,19 +140,23 @@ This does not represent a general API throttle: standard tRPC procedures are **n
   and re-throws — do not reuse another profile's row or overwrite `id`.
 - `getUserSession`: returns early if access token is absent (avoids querying `Auth` merely to
   hear "unauthenticated"); calls `client.verify(subjects, access, { refresh })` and updates cookies
-  upon refresh.
+  upon refresh; on `verified.err` (refused renewal, expired token without valid refresh, token
+  without `sid`) deletes both token cookies (`path: "/"`) and returns `undefined`.
+- `getUser(event)` exposes the token's `sid` in the session (`ctx.session.sid` in tRPC);
+  `account.signOutOtherSessions` sends `{ userId, exceptSid }` to `sessionsRevokePath`, `account.deleteAccount` sends
+  `{ userId, email }` (`layers/account/server/trpc/account.ts`).
 - `getUser(event)`: resolves profile by **id** (matching upsert and permission criteria),
   **excluding** `mfaSecret` (payload goes to `/api/auth/session`), with team permissions,
   `isPlatformAdmin` (boolean only), and `mfaEnabled` (boolean). Absent `User` rows, falls back
   to token subject (preventing redirect loops to `/authorize`).
 - `getUserPermissions` degrades to "empty permissions" upon database errors — safety rail,
   not normal flow; logging indicates real defects.
-- Routes: `api/auth/{callback,session.get,session.delete,ws-ticket.get}`,
-  `api/mfa/{challenge,setup,status,verify}`.
+- Routes: `api/auth/{callback,session.get,session.delete,ws-ticket.get}` in `apps/app`;
+  `api/mfa/{challenge,setup,status,verify,recovery-codes}` in `layers/account/server/api/mfa/`.
 
 ## 8. Account Deletion
 
-`account.deleteAccount` (`apps/app/server/trpc/routers/account.ts`) invokes the internal
+`account.deleteAccount` (`layers/account/server/trpc/account.ts`) invokes the internal
 `Auth` endpoint via service binding with `x-admin-secret`, ensuring identity and profile
 remain synchronized.
 

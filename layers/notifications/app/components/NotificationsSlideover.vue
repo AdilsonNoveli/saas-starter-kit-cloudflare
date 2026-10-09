@@ -19,7 +19,7 @@
           <div class="flex flex-col items-end gap-2 shrink-0">
             <span
               v-if="!notification.read"
-              class="size-2 rounded-full bg-primary"
+              class="size-2 rounded-sm bg-primary"
             />
             <time
               :datetime="new Date(notification.createdAt).toISOString()"

@@ -1,5 +1,7 @@
 # Database migrations
 
+> **ABSOLUTE AND UNBREAKABLE RULE — database change policy (owner decision, 2026-09-30)** — full text in `.fireskills/RULES.md`. Summary: each layer owns its history and is toggled in `config.ts`; a new capability gets a specific, direct step; **adjustments edit the init of the owning history and the database is reset** (the responsible person resets it and redeploys from zero with `bun run deploy`; the reset is a separate guarded command, not part of deploy, per the rule); a new numbered init (`001_init.sql`) only when the application is raised to a new version (V02). In force until the application launches. No patch migrations, no `ALTER` chains, no expand/contract, no bootstrap scripts. The sections below titled *Rollback strategy* and the bootstrap paragraph of *Base and layer histories* describe the old approach and are **superseded**; they stay only as history.
+
 > **2026-09-16:** the history up to `0009_lively_mother_askani` was consolidated
 > into a single `0000_init.sql` — regenerated with `drizzle-kit generate` from
 > `schema.ts` (not hand-merged), after confirming zero drift between the old
@@ -92,6 +94,13 @@
 > (4 tables now: `User`, `MfaRecoveryCode`, `WaitlistEmail`, `Log`). Same
 > reset procedure and reasoning as the two notes above.
 
+> **SPEC-0010 (account split):** `layers/account` (`layers.core`) gained its
+> own migration history (`layers/account/migrations/0000_account.sql`,
+> `layers/account/drizzle.config.ts`, tracking table `__drizzle_migrations_account`)
+> with 4 tables: `UserPreference`, `UserMfa`, `UserMfaRecoveryCode`, `UserSession`.
+> Base remains 4 tables (`User`, `MfaRecoveryCode`, `WaitlistEmail`, `Log`), and
+> total independent migration histories are now 7 (base + 6 layers).
+
 Migrations are **generated** with Drizzle Kit (`drizzle-kit generate`, an
 author-time command always run interactively by a human) from `schema.ts`,
 but **applied** against Postgres by `scripts/run-migrations.mjs`, never by
@@ -99,6 +108,16 @@ but **applied** against Postgres by `scripts/run-migrations.mjs`, never by
 `infra/utils/nuxt.ts` runs it automatically after every `App` deploy, using
 the `DatabaseHost`/`DatabasePort`/`DatabaseUser`/`DatabasePassword`/
 `DatabaseName` secrets — see `infra/secret.ts`.
+
+## Changing the schema and starting again from zero (until launch)
+
+Under the database change policy (`.fireskills/RULES.md`), an adjustment edits the init of the owning history and the database is brought up again from zero:
+
+1. Edit the schema, then regenerate the `0000_*` init of that history (remove the old init, its `meta/*_snapshot.json` and its `_journal.json` entry, run `drizzle-kit generate` from the owning directory, re-add any non-generated line such as `CREATE EXTENSION`).
+2. Reset the stage: `bun run db:reset -- --stage <stage>`. Start with `--dry-run`: it prints the host, database and user, the schemas it will remove and the AuthKV namespace it resolved, and touches nothing. The real run asks you to type the database name, refuses `production` without `--confirm-production`, purges the `email` and `users` keys of AuthKV first (the database stays untouched if that fails), then removes the `public` and `drizzle` schemas and recreates `public`.
+3. Bring it back up: `bun run deploy -- --stage <stage>`, which re-applies every history and the seed.
+
+The reset is **not** part of `bun run deploy`, and only the person responsible for the project runs it; agents never do.
 
 ## Applying migrations at deploy time
 
@@ -230,7 +249,7 @@ was removed too — see the 2026-09-28 "base consolidation" note above; that
 is a **different, more destructive** operation, safe only when the
 environment can be reset.
 
-**A fork with real, must-not-lose data needs a bootstrap step before its
+**(Superseded by the database change policy — history only.) A fork with real, must-not-lose data needs a bootstrap step before its
 next deploy**, or `drizzle-kit migrate` will try to `CREATE TABLE
 "KanbanBoard"` etc. against tables that already exist and fail.
 `scripts/print-migration-bootstrap.mjs` prints the SQL to mark
@@ -254,6 +273,8 @@ in order, the ordinary way.
 
 ## Generating a new migration
 
+Under the database change policy, `drizzle-kit generate` is used to **regenerate the init** of the owning history (after removing the old init, its snapshot and its journal entry), not to stack a new numbered patch next to it. The commands below are the same; what changes is that the old init is removed first.
+
 Base:
 
 ```bash
@@ -276,7 +297,7 @@ diffs `schema.ts` against the last snapshot in `migrations/meta/`, but it
 can't know your intent (e.g. renaming a column vs. drop+add), so double
 check destructive changes.
 
-## Rollback strategy
+## Rollback strategy (SUPERSEDED by the database change policy above — history only)
 
 Drizzle Kit does not generate down-migrations. Rollback is handled the
 same way any Postgres schema change is:

@@ -32,7 +32,7 @@
       </Bouncer>
       <Can :ability="removeMemberAbility" :args="[teamId, member.user.id]">
         <UDropdownMenu :items="dropdownItems">
-          <UButton color="neutral" icon="i-lucide-ellipsis-vertical" />
+          <UButton color="neutral" icon="i-ph-dots-three-vertical-duotone" />
         </UDropdownMenu>
       </Can>
     </div>

@@ -44,7 +44,7 @@ discrepancies exist, the code supersedes this document.
 2. Authentication: `await getUser(event)` (`server/utils/auth.ts`); reject early if `!user.id`.
 3. Secrets? `useRuntimeConfig(event)` (non-public); define in `runtimeConfig` with `""`,
    pass via `vars` in `infra/app.ts` as `NUXT_<NAME>`, and fail closed when empty.
-4. Brute-force, webhook, or MFA attack surfaces: `server/utils/rate-limit.ts`.
+4. Brute-force, webhook, or MFA attack surfaces: `assertNotRateLimited` in `server/utils/rate-limit.ts`, or `rateLimit` from `@nuxfire/rate-limit` (never a new copy of the algorithm).
 5. Database access: `useDB()` (see `$fireskill-specialist-cloudflare-workers`).
 6. Error handling: `createError({ status, message })`; log structured fields.
 7. For internal application calls, prefer a **tRPC procedure** (`$fireskill-specialist-trpc`);

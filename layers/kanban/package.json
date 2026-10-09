@@ -1,6 +1,7 @@
 {
   "name": "@nuxfire/layer-kanban",
   "version": "1.0.0",
+  "description": "Nuxt layer providing kanban boards, lists and task management",
   "private": true,
   "type": "module",
   "scripts": {

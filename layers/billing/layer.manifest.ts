@@ -28,7 +28,7 @@ export default defineLayerManifest({
   teamSettingsTabs: [
     {
       label: "Billing",
-      icon: "i-lucide-credit-card",
+      icon: "i-ph-credit-card-duotone",
       to: "/settings/billing",
       permission: PERMISSIONS.TEAMS.BILLING.VIEW,
       order: 30,

@@ -1,3 +1,108 @@
 {
-  "teams": {}
+  "teams": {
+    "select": {
+      "title": "Espaços"
+    },
+    "switcher": {
+      "title": "Escolha um Espaço",
+      "create": "Criar um Espaço",
+      "settings": "Configurações do Espaço",
+      "settingsOf": "Configurações de {name}",
+      "emptyTitle": "Nenhum Espaço ainda",
+      "emptyDescription": "Os Espaços que você criar ou em que entrar aparecem aqui.",
+      "placeholder": "Escolha um Espaço",
+      "avatarAlt": "Espaço"
+    },
+    "create": {
+      "title": "Criar um Espaço",
+      "close": "Fechar",
+      "nameLabel": "Nome do Espaço",
+      "namePlaceholder": "Digite um nome para o Espaço",
+      "nameLength": "Use de 2 a 50 caracteres.",
+      "slugLabel": "Endereço",
+      "slugPlaceholder": "meu-espaco",
+      "submit": "Criar Espaço",
+      "failed": "O Espaço não foi criado"
+    },
+    "dashboard": {
+      "created": "Espaço criado em"
+    },
+    "settings": {
+      "title": "Configurações",
+      "general": {
+        "title": "Geral",
+        "description": "Os membros e as pessoas que você convida veem estas informações.",
+        "save": "Salvar alterações",
+        "logoLabel": "Logo do Espaço",
+        "nameLabel": "Nome do Espaço",
+        "namePlaceholder": "Nome do Espaço",
+        "saved": "Configurações salvas",
+        "savedDescription": "O nome do Espaço foi atualizado.",
+        "saveFailed": "As configurações não foram salvas",
+        "logoUpdated": "Logo atualizado",
+        "logoUploadFailed": "O logo não foi enviado",
+        "logoRemoved": "Logo removido",
+        "logoRemoveFailed": "O logo não foi removido"
+      },
+      "members": {
+        "inviteTitle": "Convidar pessoas",
+        "emailLabel": "E-mail",
+        "emailPlaceholder": "nome{'@'}empresa.com",
+        "emailInvalid": "Digite um e-mail como nome{'@'}empresa.com.",
+        "roleLabel": "Papel",
+        "roleRequired": "Escolha um papel.",
+        "inviteSubmit": "Enviar convite",
+        "tabMembers": "Membros",
+        "tabInvites": "Convites",
+        "emptyMembersTitle": "Nenhum membro ainda",
+        "emptyMembersDescription": "As pessoas que aceitarem um convite aparecem aqui.",
+        "emptyInvitesTitle": "Nenhum convite pendente",
+        "emptyInvitesDescription": "Os convites que você enviar ficam aqui até serem aceitos.",
+        "tryAgain": "Tente de novo em instantes.",
+        "inviteSent": "Convite enviado",
+        "inviteSentDescription": "{email} vai receber um e-mail com o link.",
+        "inviteFailed": "O convite não foi enviado",
+        "roleUpdated": "Papel atualizado",
+        "roleUpdatedDescription": "O papel do membro foi alterado.",
+        "roleUpdateFailed": "O papel não foi alterado",
+        "memberRemoved": "Membro removido",
+        "memberRemovedDescription": "Esta pessoa não tem mais acesso ao Espaço.",
+        "memberRemoveFailed": "O membro não foi removido",
+        "inviteRoleUpdated": "Papel do convite atualizado",
+        "inviteRoleUpdatedDescription": "A pessoa entra com o novo papel quando aceitar.",
+        "inviteRoleUpdateFailed": "O papel do convite não foi alterado",
+        "inviteRemoved": "Convite cancelado",
+        "inviteRemovedDescription": "O link do e-mail não funciona mais.",
+        "inviteRemoveFailed": "O convite não foi cancelado",
+        "invitedBy": "Convite de {name}",
+        "cancelInvite": "Cancelar convite"
+      },
+      "danger": {
+        "title": "Excluir Espaço",
+        "description": "Excluir um Espaço remove o Espaço para todos os membros, e não dá para desfazer.",
+        "action": "Excluir este Espaço",
+        "confirmDescription": "Excluir o Espaço {name}? Os membros perdem o acesso e não dá para desfazer.",
+        "cancel": "Cancelar",
+        "confirm": "Excluir Espaço"
+      }
+    },
+    "invite": {
+      "title": "Convite para um Espaço",
+      "close": "Fechar",
+      "invitedBy": "Convite de {name} ({email})",
+      "message": "Você recebeu um convite para entrar neste Espaço como {role}.",
+      "notFoundTitle": "Convite não encontrado",
+      "notFoundDescription": "Este convite não existe ou expirou. Peça um novo a quem convidou você.",
+      "decline": "Recusar",
+      "accept": "Aceitar",
+      "errors": {
+        "BAD_REQUEST": "Este convite não vale mais. Peça um novo a quem convidou você.",
+        "NOT_FOUND": "Este convite não existe ou foi enviado para outro e-mail. Entre com o endereço que recebeu o convite.",
+        "CONFLICT": "Você já é membro deste Espaço.",
+        "FORBIDDEN": "Este Espaço chegou ao limite de membros do plano. Peça a um dono do Espaço para liberar uma vaga ou trocar o plano.",
+        "UNAUTHORIZED": "Sua sessão terminou. Entre de novo para aceitar o convite.",
+        "UNKNOWN": "Não foi possível aceitar o convite. Tente de novo em instantes."
+      }
+    }
+  }
 }

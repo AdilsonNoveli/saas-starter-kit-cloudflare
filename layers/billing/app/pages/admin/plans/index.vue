@@ -7,7 +7,7 @@
         </template>
 
         <template #right>
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -24,14 +24,14 @@
           <USwitch v-model="includeArchived" label="Show archived" />
           <UButton
             label="Setup Stripe portal"
-            icon="i-lucide-credit-card"
+            icon="i-ph-credit-card-duotone"
             color="neutral"
             variant="outline"
             loading-auto
             @click="setupStripePortal"
           />
           <AdminPlansCreateEditModal @success="refresh">
-            <UButton label="New plan" icon="i-lucide-plus" />
+            <UButton label="New plan" icon="i-ph-plus-duotone" />
           </AdminPlansCreateEditModal>
         </template>
       </AdminDataTable>
@@ -78,7 +78,7 @@ function buyerTeamLabel(plan: Plan): string {
     return t("billing.admin.plans.buyerTeam.newTeam");
   }
   return plan.buyerTeamName
-    ? t("billing.admin.plans.buyerTeam.joins", { team: plan.buyerTeamName })
+    ? t("billing.admin.plans.buyerTeam.joins", { space: plan.buyerTeamName })
     : t("billing.admin.plans.buyerTeam.teamRemoved");
 }
 
@@ -170,30 +170,30 @@ function getRowItems(row: Row<Plan>): DropdownMenuItem[] {
     { type: "label", label: "Actions" },
     {
       label: "Edit",
-      icon: "i-lucide-pencil",
+      icon: "i-ph-pencil-duotone",
       onSelect: () => edit(plan),
     },
     plan.isPublicOffer
       ? {
           label: t("billing.admin.plans.publicOffer.menuHide"),
-          icon: "i-lucide-eye-off",
+          icon: "i-ph-eye-slash-duotone",
           onSelect: () => setPublicOffer(plan, false),
         }
       : {
           label: t("billing.admin.plans.publicOffer.label"),
-          icon: "i-lucide-eye",
+          icon: "i-ph-eye-duotone",
           onSelect: () => setPublicOffer(plan, true),
         },
     { type: "separator" },
     plan.isArchived
       ? {
           label: "Unarchive",
-          icon: "i-lucide-archive-restore",
+          icon: "i-ph-archive-duotone",
           onSelect: () => setArchived(plan, false),
         }
       : {
           label: "Archive",
-          icon: "i-lucide-archive",
+          icon: "i-ph-archive-duotone",
           color: "error",
           onSelect: () => setArchived(plan, true),
         },
@@ -306,7 +306,7 @@ const columns: TableColumn<Plan>[] = [
           { content: { align: "end" }, items: getRowItems(row) },
           () =>
             h(UButton, {
-              icon: "i-lucide-ellipsis-vertical",
+              icon: "i-ph-dots-three-vertical-duotone",
               color: "neutral",
               variant: "ghost",
               class: "ml-auto",
@@ -328,9 +328,9 @@ function sortableHeader(
     label,
     icon: isSorted
       ? isSorted === "asc"
-        ? "i-lucide-arrow-up-narrow-wide"
-        : "i-lucide-arrow-down-wide-narrow"
-      : "i-lucide-arrow-up-down",
+        ? "i-ph-sort-ascending-duotone"
+        : "i-ph-sort-descending-duotone"
+      : "i-ph-arrows-down-up-duotone",
     class: "-mx-2.5",
     onClick,
   });

@@ -9,14 +9,14 @@
       }"
     >
       <UButton
-        :label="collapsed ? undefined : (team?.name ?? 'Select Team')"
+        :label="collapsed ? undefined : (team?.name ?? t('teams.switcher.placeholder'))"
         :avatar="{
           src: team?.logo || undefined,
-          alt: team?.name ?? 'Team',
+          alt: team?.name ?? t('teams.switcher.avatarAlt'),
           size: collapsed ? 'xl' : '2xs',
           ui: { root: 'rounded-md' },
         }"
-        :trailing-icon="collapsed ? undefined : 'i-lucide-chevron-down'"
+        :trailing-icon="collapsed ? undefined : 'i-ph-caret-down-duotone'"
         color="neutral"
         variant="ghost"
         block
@@ -36,6 +36,7 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 
 defineProps<{ collapsed?: boolean }>();
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const teamsStore = useTeamsStore();
@@ -72,8 +73,8 @@ const items = computed<DropdownMenuItem[][]>(() => {
     ...(teamItems.length > 0 ? [teamItems] : []),
     [
       {
-        label: "Create new team",
-        icon: "i-lucide-circle-plus",
+        label: t("teams.switcher.create"),
+        icon: "i-ph-plus-circle-duotone",
         onSelect: () => {
           showCreateTeamDialog.value = true;
         },

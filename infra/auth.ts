@@ -5,6 +5,7 @@ import { emails } from "./emails";
 import { authDomain, authUrl } from "./dns";
 import { COMPATIBILITY } from "./utils/constants";
 import { build } from "./utils/builder";
+import { branding } from "./branding";
 
 export const clientID = new random.RandomUuid("AppAuthClientID");
 const kv = new sst.cloudflare.Kv("AuthKV");
@@ -47,6 +48,8 @@ const googleAuthEnabled = flags.googleAuth
 const built = await build("AuthFrontend", {
   dir: "apps/login",
   environment: {
+    // BRAND_NAME from scripts/branding.ts, baked into the static login pages at build time.
+    NUXT_PUBLIC_BRAND_NAME: branding.name,
     NUXT_PUBLIC_GITHUB_AUTH_ENABLED: githubAuthEnabled,
     NUXT_PUBLIC_GOOGLE_AUTH_ENABLED: googleAuthEnabled,
   },

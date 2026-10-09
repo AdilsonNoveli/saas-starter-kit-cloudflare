@@ -8,15 +8,15 @@
         @submit="sendInvite"
       >
         <UCard>
-          <template #header><span>Invite People</span></template>
+          <template #header><span>{{ t("teams.settings.members.inviteTitle") }}</span></template>
           <div class="flex items-start gap-2">
-            <UFormField class="flex-grow" label="Email" name="email" required>
+            <UFormField class="flex-grow" :label="t('teams.settings.members.emailLabel')" name="email" required>
               <UInput
                 v-model="inviteForm.email"
-                placeholder="Enter an email to invite"
+                :placeholder="t('teams.settings.members.emailPlaceholder')"
               />
             </UFormField>
-            <UFormField class="basis-40" label="Role" name="role" required>
+            <UFormField class="basis-40" :label="t('teams.settings.members.roleLabel')" name="role" required>
               <USelect
                 v-model="inviteForm.role"
                 :options="roles"
@@ -27,16 +27,16 @@
           </div>
           <template #footer>
             <div class="w-full gap-2 flex justify-end">
-              <UButton :loading="sendingInvite" type="submit">Invite</UButton>
+              <UButton :loading="sendingInvite" type="submit" :label="t('teams.settings.members.inviteSubmit')" />
             </div>
           </template>
         </UCard>
       </UForm>
     </Can>
     <UCard>
-      <UTabs :items="[{ label: 'Members' }, { label: 'Invites' }]">
+      <UTabs :items="tabs">
         <template #content="{ item }">
-          <div v-if="item.label === 'Members'">
+          <div v-if="item.value === 'members'">
             <div class="ring-1 ring-default rounded-lg divide-y divide-default">
               <div v-if="membersData?.members?.length">
                 <TeamMembersListItem
@@ -54,18 +54,18 @@
                 class="flex flex-col items-center justify-center p-8 text-center"
               >
                 <UIcon
-                  name="i-lucide-users"
+                  name="i-ph-users-duotone"
                   class="w-12 h-12 text-dimmed mb-4"
                 />
-                <p class="text-lg font-semibold mb-2">No team members yet</p>
+                <p class="text-lg font-semibold mb-2">{{ t("teams.settings.members.emptyMembersTitle") }}</p>
                 <p class="text-sm text-muted">
-                  Invite people to join your team
+                  {{ t("teams.settings.members.emptyMembersDescription") }}
                 </p>
               </div>
             </div>
           </div>
 
-          <div v-else-if="item.label === 'Invites'">
+          <div v-else-if="item.value === 'invites'">
             <div class="ring-1 ring-default rounded-lg divide-y divide-default">
               <div v-if="membersData?.invites?.length">
                 <TeamInvitesListItem
@@ -83,12 +83,12 @@
                 class="flex flex-col items-center justify-center p-8 text-center"
               >
                 <UIcon
-                  name="i-lucide-mail"
+                  name="i-ph-envelope-duotone"
                   class="w-12 h-12 text-dimmed mb-4"
                 />
-                <p class="text-lg font-semibold mb-2">No pending invites</p>
+                <p class="text-lg font-semibold mb-2">{{ t("teams.settings.members.emptyInvitesTitle") }}</p>
                 <p class="text-sm text-muted">
-                  Invite team members to collaborate
+                  {{ t("teams.settings.members.emptyInvitesDescription") }}
                 </p>
               </div>
             </div>
@@ -100,19 +100,20 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
 // Not `#shared/utils/abilities`: that alias only ever resolves to the
 // Composition Root's own shared/ dir, never a layer's (Fase 3, passo 1b).
 import { teamsSendInvite as sendInviteAbility } from "@nuxfire/layer-teams/shared/utils/abilities";
 
+const { t } = useI18n();
 const notification = useNotification();
 const route = useRoute();
 const teamSlug = computed(() => route.params.team as string);
 const team = useCurrentTeam();
 
 const inviteSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  role: z.string().min(1, "Role is required"),
+  email: z.string().email(t("teams.settings.members.emailInvalid")),
+  role: z.string().min(1, t("teams.settings.members.roleRequired")),
 });
 
 const inviteForm = reactive({
@@ -131,6 +132,11 @@ const removeMemberMutation = useTrpcClient().teams.removeMember;
 const updateInviteRoleMutation = useTrpcClient().invites.updateInviteRole;
 const deleteInviteMutation = useTrpcClient().invites.deleteInvite;
 
+const tabs = computed(() => [
+  { label: t("teams.settings.members.tabMembers"), value: "members" },
+  { label: t("teams.settings.members.tabInvites"), value: "invites" },
+]);
+
 const roles = computed(() => membersData.value?.roles || []);
 
 const sendingInvite = ref(false);
@@ -143,11 +149,14 @@ async function sendInvite() {
       email: inviteForm.email,
       roleId: inviteForm.role,
     });
-    notification.success("Invite Sent", `Invitation sent to ${inviteForm.email}`);
+    notification.success(
+      t("teams.settings.members.inviteSent"),
+      t("teams.settings.members.inviteSentDescription", { email: inviteForm.email }),
+    );
     await refresh();
     inviteForm.email = "";
   } catch {
-    notification.error("Invite Failed", "Unable to send invitation. Please try again.");
+    notification.error(t("teams.settings.members.inviteFailed"), t("teams.settings.members.tryAgain"));
   } finally {
     sendingInvite.value = false;
   }
@@ -161,11 +170,11 @@ async function updateMemberRole(memberId: string, newRoleId: string) {
         memberId,
         newRoleId,
       });
-      notification.success("Role Updated", "Member role has been successfully updated");
+      notification.success(t("teams.settings.members.roleUpdated"), t("teams.settings.members.roleUpdatedDescription"));
       await refresh();
     }
   } catch {
-    notification.error("Role Update Failed", "Unable to update member role. Please try again.");
+    notification.error(t("teams.settings.members.roleUpdateFailed"), t("teams.settings.members.tryAgain"));
   }
 }
 
@@ -176,9 +185,9 @@ async function removeMember(memberId: string) {
       memberId,
     });
     await refresh();
-    notification.success("Member Removed", "Member has been successfully removed from the team");
+    notification.success(t("teams.settings.members.memberRemoved"), t("teams.settings.members.memberRemovedDescription"));
   } catch {
-    notification.error("Remove Member Failed", "Unable to remove member. Please try again.");
+    notification.error(t("teams.settings.members.memberRemoveFailed"), t("teams.settings.members.tryAgain"));
   }
 }
 
@@ -191,10 +200,13 @@ async function updateInviteRole(inviteId: string, newRoleId: string) {
         newRoleId,
       });
       await refresh();
-      notification.success("Invite Role Updated", "Invite role has been successfully updated");
+      notification.success(
+        t("teams.settings.members.inviteRoleUpdated"),
+        t("teams.settings.members.inviteRoleUpdatedDescription"),
+      );
     }
   } catch {
-    notification.error("Invite Role Update Failed", "Unable to update invite role. Please try again.");
+    notification.error(t("teams.settings.members.inviteRoleUpdateFailed"), t("teams.settings.members.tryAgain"));
   }
 }
 
@@ -205,9 +217,9 @@ async function removeInvite(inviteId: string) {
       inviteId,
     });
     await refresh();
-    notification.success("Invite Removed", "Invite has been successfully deleted");
+    notification.success(t("teams.settings.members.inviteRemoved"), t("teams.settings.members.inviteRemovedDescription"));
   } catch {
-    notification.error("Remove Invite Failed", "Unable to delete invite. Please try again.");
+    notification.error(t("teams.settings.members.inviteRemoveFailed"), t("teams.settings.members.tryAgain"));
   }
 }
 </script>

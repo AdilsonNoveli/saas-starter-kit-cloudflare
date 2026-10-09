@@ -1,8 +1,9 @@
 {
   "name": "@nuxfire/tokens",
+  "version": "0.0.0",
+  "description": "Design tokens, color themes, brand assets and base layer UI switches",
   "private": true,
   "type": "module",
-  "version": "0.0.0",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },

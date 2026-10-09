@@ -71,7 +71,8 @@ CREATE TABLE "Team" (
 	"maxSeats" integer,
 	"stripeCustomerId" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "Team_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 ALTER TABLE "DeadLetterRecord" ADD CONSTRAINT "DeadLetterRecord_teamId_Team_id_fk" FOREIGN KEY ("teamId") REFERENCES "public"."Team"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

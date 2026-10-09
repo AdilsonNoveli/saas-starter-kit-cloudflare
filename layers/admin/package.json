@@ -1,6 +1,7 @@
 {
   "name": "@nuxfire/layer-admin",
   "version": "1.0.0",
+  "description": "Nuxt layer providing platform administration console, companies, plans and DLQ management",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,7 +16,9 @@
   },
   "dependencies": {
     "@nuxfire/tokens": "workspace:*",
+    "@nuxfire/crypto": "workspace:*",
     "@nuxfire/functions": "workspace:*",
+    "@nuxfire/layer-account": "workspace:*",
     "@nuxfire/layer-notifications": "workspace:*",
     "@nuxfire/manifest": "workspace:*",
     "@nuxt/ui": "^4.8.1",

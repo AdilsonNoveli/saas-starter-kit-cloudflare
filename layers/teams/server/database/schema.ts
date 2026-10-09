@@ -31,7 +31,9 @@ export const teams = pgTable("Team", {
     .primaryKey()
     .notNull(),
   name: text("name").notNull(),
-  slug: text("slug").notNull(),
+  // Unique in the database, not only in `createTeamWithOwner`: two concurrent
+  // creations with the same slug used to both pass the application check.
+  slug: text("slug").notNull().unique(),
   description: text("description"),
   logo: text("logo"),
   // "ACTIVE" | "SUSPENDED" — plain text with a default, like

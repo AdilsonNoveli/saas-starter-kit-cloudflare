@@ -229,7 +229,7 @@
                   size="xs"
                   color="primary"
                   variant="subtle"
-                  icon="i-lucide-plus"
+                  icon="i-ph-plus-duotone"
                   :label="t('billing.admin.plans.form.features.add')"
                   type="button"
                   @click="addFeature"
@@ -255,7 +255,7 @@
                     size="sm"
                   />
                   <UButton
-                    icon="i-lucide-trash-2"
+                    icon="i-ph-trash-duotone"
                     color="error"
                     variant="ghost"
                     size="xs"
@@ -306,7 +306,7 @@
 
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { RouterOutput } from "~~/server/trpc/routers";
 import {
   PaymentProvider,

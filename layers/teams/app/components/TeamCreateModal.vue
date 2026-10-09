@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="open" :dismissible="false" title="Create Team">
+  <UModal v-model:open="open" :dismissible="false" :title="t('teams.create.title')">
     <template #content>
       <UForm
         :schema="createTeamSchema"
@@ -10,28 +10,29 @@
         <UCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <span class="font-semibold">Create Team</span>
+              <span class="font-semibold">{{ t("teams.create.title") }}</span>
               <UButton
-                icon="i-lucide-x"
+                icon="i-ph-x-duotone"
                 variant="ghost"
                 color="neutral"
+                :aria-label="t('teams.create.close')"
                 @click="close"
               />
             </div>
           </template>
 
           <div class="space-y-4">
-            <UFormField label="Team Name" name="name" required>
+            <UFormField :label="t('teams.create.nameLabel')" name="name" required>
               <UInput
                 v-model="createForm.name"
-                placeholder="Enter team name"
+                :placeholder="t('teams.create.namePlaceholder')"
                 type="text"
               />
             </UFormField>
-            <UFormField label="Slug" name="slug" required>
+            <UFormField :label="t('teams.create.slugLabel')" name="slug" required>
               <UInput
                 v-model="createForm.slug"
-                placeholder="Enter team slug"
+                :placeholder="t('teams.create.slugPlaceholder')"
                 type="text"
                 @update:model-value="isSlugUserEdited = true"
               />
@@ -40,7 +41,7 @@
 
           <template #footer>
             <div class="w-full flex justify-end">
-              <UButton :loading="loading" type="submit">Create</UButton>
+              <UButton :loading="loading" type="submit" :label="t('teams.create.submit')" />
             </div>
           </template>
         </UCard>
@@ -50,24 +51,25 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
+import { slugify, validateSlug } from "@nuxfire/layer-teams/shared/utils/slug";
 
 const open = defineModel<boolean>("open", { default: false });
 
+const { t } = useI18n();
 const notification = useNotification();
 const teamsStore = useTeamsStore();
 const createMutation = useTrpcClient().teams.create;
 
+// The same limits and slug rule as `teams.create` (shared/utils/slug.ts), so
+// the form never accepts what the server refuses. Slug messages come from the
+// error catalog (`errors.slug_*`, auto-imported `translateErrorCode`).
 const createTeamSchema = z.object({
-  name: z.string().min(1).max(16),
-  slug: z
-    .string()
-    .min(1)
-    .max(16)
-    .regex(
-      /^[a-z-]*$/,
-      "Slug should contain only lower-case letters and hyphens.",
-    ),
+  name: z.string().trim().min(2, t("teams.create.nameLength")).max(50, t("teams.create.nameLength")),
+  slug: z.string().superRefine((slug, ctx) => {
+    const result = validateSlug(slug);
+    if (result !== "ok") ctx.addIssue({ code: "custom", message: translateErrorCode(result, t) });
+  }),
 });
 
 const createForm = reactive({ name: "", slug: "" });
@@ -89,11 +91,7 @@ watch(
   () => createForm.name,
   (newName) => {
     if (isSlugUserEdited.value) return;
-    createForm.slug = newName
-      .toLowerCase()
-      .replace(/[^a-z\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .slice(0, 16);
+    createForm.slug = slugify(newName);
   },
 );
 
@@ -112,7 +110,9 @@ async function create() {
       navigateTo(`/${slug}/dashboard`);
     }
   } catch (error) {
-    notification.error("Failed to create team", error instanceof Error ? error.message : "Something went wrong");
+    // The server answers a taken or refused slug with its code
+    // (`slug_taken`...); anything else becomes the generic message.
+    notification.error(t("teams.create.failed"), translateErrorCode(getErrorMessage(error), t));
   } finally {
     loading.value = false;
   }

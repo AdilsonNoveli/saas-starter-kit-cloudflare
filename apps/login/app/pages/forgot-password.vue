@@ -6,19 +6,19 @@
     <!-- Status Alerts -->
     <UAlert
       v-if="successMessage"
-      icon="i-lucide-circle-check"
+      icon="i-ph-check-circle-duotone"
       color="success"
       variant="subtle"
-      title="Success"
+      :title="t('auth.forgotPassword.successTitle')"
       :description="successMessage"
     />
 
     <UAlert
       v-if="errorMessage"
-      icon="i-lucide-circle-alert"
+      icon="i-ph-warning-circle-duotone"
       color="error"
       variant="subtle"
-      title="Error"
+      :title="t('auth.forgotPassword.errorTitle')"
       :description="errorMessage"
     />
 
@@ -49,13 +49,13 @@
 
       <!-- Step 1: Request code -->
       <template v-if="state === 'start'">
-        <UFormField label="Account Email" name="email" required>
+        <UFormField :label="t('auth.forgotPassword.emailLabel')" name="email" required>
           <UInput
             v-model="data.email"
             name="email"
             type="email"
-            icon="i-lucide-mail"
-            placeholder="name@company.com"
+            icon="i-ph-envelope-duotone"
+            :placeholder="t('auth.forgotPassword.emailPlaceholder')"
             size="lg"
             class="w-full"
             autocomplete="email"
@@ -67,15 +67,15 @@
       <!-- Step 2: Verification code -->
       <template v-if="state === 'code'">
         <UFormField
-          label="Verification Code"
+          :label="t('auth.forgotPassword.codeLabel')"
           name="code"
           required
-          description="Enter the one-time code sent to your email"
+          :description="t('auth.forgotPassword.codeDesc')"
         >
           <UInput
             v-model="data.code"
             name="code"
-            icon="i-lucide-key-round"
+            icon="i-ph-key-duotone"
             placeholder="000000"
             size="lg"
             class="w-full font-mono tracking-widest text-center text-lg"
@@ -89,17 +89,17 @@
       <!-- Step 3: New password -->
       <template v-if="state === 'update'">
         <UFormField
-          label="New Password"
+          :label="t('auth.forgotPassword.passwordLabel')"
           name="password"
           required
-          description="Must be at least 8 characters"
+          :description="t('auth.forgotPassword.passwordDesc')"
         >
           <UInput
             v-model="data.password"
             name="password"
             :type="showPassword ? 'text' : 'password'"
-            icon="i-lucide-lock"
-            placeholder="Enter new password"
+            icon="i-ph-lock-duotone"
+            :placeholder="t('auth.forgotPassword.passwordPlaceholder')"
             size="lg"
             class="w-full"
             autocomplete="new-password"
@@ -107,11 +107,11 @@
           >
             <template #trailing>
               <UButton
-                :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :icon="showPassword ? 'i-ph-eye-slash-duotone' : 'i-ph-eye-duotone'"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                :aria-label="showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')"
                 class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showPassword = !showPassword"
@@ -120,24 +120,24 @@
           </UInput>
         </UFormField>
 
-        <UFormField label="Confirm New Password" name="repeat" required>
+        <UFormField :label="t('auth.forgotPassword.repeatLabel')" name="repeat" required>
           <UInput
             v-model="data.repeat"
             name="repeat"
             :type="showRepeatPassword ? 'text' : 'password'"
-            icon="i-lucide-shield-check"
-            placeholder="Confirm new password"
+            icon="i-ph-shield-check-duotone"
+            :placeholder="t('auth.forgotPassword.repeatPlaceholder')"
             size="lg"
             class="w-full"
             autocomplete="new-password"
           >
             <template #trailing>
               <UButton
-                :icon="showRepeatPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :icon="showRepeatPassword ? 'i-ph-eye-slash-duotone' : 'i-ph-eye-duotone'"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                :aria-label="showRepeatPassword ? 'Hide password' : 'Show password'"
+                :aria-label="showRepeatPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')"
                 class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showRepeatPassword = !showRepeatPassword"
@@ -166,12 +166,12 @@
         <form :action="`${origin}/password/change`" method="POST" class="inline-flex items-center gap-1.5 text-sm text-muted">
           <input type="hidden" name="action" value="code" />
           <input type="hidden" name="email" :value="data.email" />
-          <span>Didn't receive the code?</span>
+          <span>{{ t("auth.forgotPassword.noCode") }}</span>
           <button
             type="submit"
             class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 cursor-pointer"
           >
-            Resend
+            {{ t("auth.forgotPassword.resend") }}
           </button>
         </form>
       </div>
@@ -180,13 +180,13 @@
     <!-- Card Footer -->
     <template #footer>
       <p class="text-sm text-muted">
-        Remember your password?
+        {{ t("auth.forgotPassword.rememberPassword") }}
         <NuxtLink
           :to="`${origin}/password/authorize`"
           external
           class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 ml-1"
         >
-          Sign in
+          {{ t("auth.forgotPassword.signIn") }}
         </NuxtLink>
       </p>
     </template>
@@ -194,7 +194,7 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
 
 type ForgotError =
   | "invalid_email"
@@ -203,12 +203,14 @@ type ForgotError =
   | "password_mismatch"
   | null;
 
-const ERROR_MESSAGES: Record<string, string> = {
-  invalid_email: "Please enter a valid email address.",
-  invalid_code: "The verification code is invalid or has expired.",
-  invalid_password: "Password must be at least 8 characters long.",
-  password_mismatch: "The entered passwords do not match.",
-};
+const { t } = useI18n();
+
+const ERROR_MESSAGES = computed<Record<string, string>>(() => ({
+  invalid_email: t("auth.forgotPassword.errors.invalidEmail"),
+  invalid_code: t("auth.forgotPassword.errors.invalidCode"),
+  invalid_password: t("auth.forgotPassword.errors.weakPassword"),
+  password_mismatch: t("auth.forgotPassword.errors.passwordMismatch"),
+}));
 
 const route = useRoute();
 const notification = useNotification();
@@ -216,32 +218,38 @@ const notification = useNotification();
 const state = (route.query.state?.toString() || "start") as
   "start" | "code" | "update";
 
-const startSchema = z.object({
-  email: z.string().email("Invalid email address"),
-});
+const startSchema = computed(() =>
+  z.object({
+    email: z.string().email(t("auth.forgotPassword.errors.emailValidation")),
+  }),
+);
 
-const codeSchema = z.object({
-  code: z.string().min(1, "Verification code is required"),
-});
+const codeSchema = computed(() =>
+  z.object({
+    code: z.string().min(1, t("auth.forgotPassword.errors.codeValidation")),
+  }),
+);
 
-const updateSchema = z
-  .object({
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    repeat: z.string().min(8, "Password must be at least 8 characters"),
-  })
-  .refine((val) => val.password === val.repeat, {
-    message: "Passwords do not match",
-    path: ["repeat"],
-  });
+const updateSchema = computed(() =>
+  z
+    .object({
+      password: z.string().min(8, t("auth.forgotPassword.errors.passwordValidation")),
+      repeat: z.string().min(8, t("auth.forgotPassword.errors.passwordValidation")),
+    })
+    .refine((val) => val.password === val.repeat, {
+      message: t("auth.forgotPassword.errors.passwordMismatch"),
+      path: ["repeat"],
+    }),
+);
 
 const formSchema = computed(() => {
   switch (state) {
     case "code":
-      return codeSchema;
+      return codeSchema.value;
     case "update":
-      return updateSchema;
+      return updateSchema.value;
     default:
-      return startSchema;
+      return startSchema.value;
   }
 });
 
@@ -260,33 +268,34 @@ const showRepeatPassword = ref(false);
 const successMessage = ref("");
 
 const err = (route.query.err?.toString() || null) as ForgotError;
-const errorMessage = ref(
-  err ? (ERROR_MESSAGES[err] ?? "An unexpected error occurred.") : "",
-);
+const errorMessage = computed(() => {
+  if (!err) return "";
+  return ERROR_MESSAGES.value[err] ?? t("auth.forgotPassword.errors.unexpected");
+});
 
 onMounted(() => {
-  if (err && ERROR_MESSAGES[err]) {
-    notification.error("Reset Error", ERROR_MESSAGES[err]);
+  if (err && ERROR_MESSAGES.value[err]) {
+    notification.error(t("auth.forgotPassword.errorTitle"), ERROR_MESSAGES.value[err]);
   }
 });
 
 const pageTitle = computed(() => {
-  if (state === "code") return "Check your email";
-  if (state === "update") return "Create new password";
-  return "Reset your password";
+  if (state === "code") return t("auth.login.checkEmail");
+  if (state === "update") return t("auth.forgotPassword.titleUpdate");
+  return t("auth.forgotPassword.titleStart");
 });
 
 const pageSubtitle = computed(() => {
   if (state === "code")
-    return `Enter the 6-digit verification code sent to ${data.email || "your email"}`;
-  if (state === "update") return "Choose a new strong password for your account";
-  return "Enter your email to receive a password reset code";
+    return t("auth.forgotPassword.subtitleCode", { email: data.email || t("auth.login.yourEmail") });
+  if (state === "update") return t("auth.forgotPassword.subtitleUpdate");
+  return t("auth.forgotPassword.subtitleStart");
 });
 
 const submitButtonLabel = computed(() => {
-  if (state === "code") return "Verify Code";
-  if (state === "update") return "Update Password";
-  return "Send Reset Code";
+  if (state === "code") return t("auth.forgotPassword.btnVerifyCode");
+  if (state === "update") return t("auth.forgotPassword.btnUpdatePassword");
+  return t("auth.forgotPassword.btnSendCode");
 });
 
 const handleSubmit = (e: Event) => {

@@ -11,16 +11,26 @@ import { GoogleProvider } from "@openauthjs/openauth/provider/google";
 import type { Oauth2Token } from "@openauthjs/openauth/provider/oauth2";
 import { ofetch } from "ofetch";
 import { createId } from "@paralleldrive/cuid2";
+import { secretsMatch } from "@nuxfire/crypto";
 import { subjects } from "./subjects";
+import {
+  identityState,
+  issueUserSession,
+  moveIdentityEmail,
+  normalizeEmail,
+  revokeSessions,
+} from "./session-store";
 import { clientIp, rateLimit } from "./rate-limit";
 import type { ExecutionContext, KVNamespace } from "@cloudflare/workers-types";
 import type { FullUser } from "./subjects";
 import { sender } from "./sender";
 import { EmailsWorker } from "./emails";
 import {
+  emailChangePath,
   identityDeletePath,
+  identityStatePath,
   seedAccountPath,
-  signOutOthersPath,
+  sessionsRevokePath,
 } from "../../../config";
 
 let environment: Env;
@@ -41,8 +51,9 @@ interface Env {
   AuthKV: KVNamespace;
   DEV_URL?: string;
   /**
-   * Shared with the app Worker (infra/auth.ts) to authorise
-   * identityDeletePath, signOutOthersPath and seedAccountPath.
+   * Shared with the app Worker (infra/auth.ts) to authorise the internal
+   * paths: identityDeletePath, sessionsRevokePath, identityStatePath,
+   * emailChangePath and seedAccountPath.
    */
   ADMIN_SECRET?: string;
 }
@@ -66,12 +77,32 @@ type AuthSuccessValue =
   | { provider: "github"; tokenset: Oauth2Token; clientID: string }
   | { provider: "google"; tokenset: Oauth2Token; clientID: string };
 
-/** Constant-time comparison, so a wrong secret leaks nothing through timing. */
-function secretsMatch(a: string, b: string) {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
+/**
+ * The gate every internal path shares. This Worker answers on a public custom
+ * domain, so arriving over the service binding proves nothing on its own: the
+ * shared secret, compared in constant time, is what authorises the call.
+ * Returns the refusal, or `undefined` when the call may proceed.
+ */
+function refuseInternalCall(
+  request: Request,
+  env: Env,
+  label: string,
+): Response | undefined {
+  if (request.method !== "POST") {
+    return new Response("Method not allowed", { status: 405 });
+  }
+  // No secret configured means the deploy is misconfigured. Refuse rather
+  // than fall back to an unauthenticated endpoint.
+  if (!env.ADMIN_SECRET) {
+    console.error(`${label}: ADMIN_SECRET is not configured`);
+    return new Response("Not configured", { status: 503 });
+  }
+  const presented = request.headers.get("x-admin-secret") || "";
+  if (!secretsMatch(presented, env.ADMIN_SECRET)) {
+    console.error(`${label}: rejected, secret mismatch`);
+    return new Response("Forbidden", { status: 403 });
+  }
+  return undefined;
 }
 
 /**
@@ -81,132 +112,173 @@ function secretsMatch(a: string, b: string) {
  * nowhere else — which is the point. The app owns profiles, the issuer owns
  * credentials and sessions, so the app asks for the erasure through its
  * service binding rather than reaching into this store
- * (apps/app/server/trpc/routers/account.ts).
- *
- * This Worker answers on a public custom domain, so arriving over the
- * binding proves nothing on its own: the shared secret is what authorises
- * the call. The path itself lives in the shared root config.ts.
+ * (layers/account/server/trpc/account.ts). The path itself lives in the
+ * shared root config.ts.
  */
 async function deleteIdentity(request: Request, env: Env): Promise<Response> {
-  if (request.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
-  }
-  // No secret configured means the deploy is misconfigured. Refuse rather
-  // than fall back to an unauthenticated erasure endpoint.
-  if (!env.ADMIN_SECRET) {
-    console.error("identity delete: ADMIN_SECRET is not configured");
-    return new Response("Not configured", { status: 503 });
-  }
-  const presented = request.headers.get("x-admin-secret") || "";
-  if (!secretsMatch(presented, env.ADMIN_SECRET)) {
-    console.error("identity delete: rejected, secret mismatch");
-    return new Response("Forbidden", { status: 403 });
-  }
+  const refused = refuseInternalCall(request, env, "identity delete");
+  if (refused) return refused;
 
   const body = (await request.json().catch(() => null)) as {
+    userId?: string;
     email?: string;
   } | null;
-  const email = body?.email?.toLowerCase();
-  if (!email) {
-    return new Response("Missing email", { status: 400 });
+  const userId = body?.userId;
+  if (!userId) {
+    return new Response("Missing userId", { status: 400 });
   }
+  const email = body?.email ? normalizeEmail(body.email) : undefined;
 
   const storage = CloudflareStorage({ namespace: env.AuthKV });
 
   // Sessions first. A refresh token keeps minting access tokens on its own,
   // so removing the password while leaving them in place would revoke
-  // nothing. The subject each token is filed under is a hash of the
-  // properties at issue time (see resolveSubject in the issuer) and cannot
-  // be recomputed reliably here, so match on the email each record carries.
-  let revokedSessions = 0;
-  for await (const [key, value] of Storage.scan(storage, ["oauth:refresh"])) {
-    const properties = (value as { properties?: { email?: string } })
-      ?.properties;
-    if (properties?.email?.toLowerCase() === email) {
-      await Storage.remove(storage, key);
-      revokedSessions++;
-    }
+  // nothing. Every session is filed under the stable subject user:<id>
+  // whatever the profile looked like at issue time, so the person's prefix
+  // holds all of them and nobody else's.
+  const revokedSessions = await revokeSessions(storage, userId);
+
+  // The e-mail only addresses the keys indexed by it.
+  if (email) {
+    await Storage.remove(storage, ["email", email, "password"]);
+    await Storage.remove(storage, ["email", email, "subject"]);
+    await Storage.remove(storage, ["users", email]);
   }
 
-  await Storage.remove(storage, ["email", email, "password"]);
-  await Storage.remove(storage, ["email", email, "subject"]);
-  await Storage.remove(storage, ["users", email]);
-
-  console.log("identity deleted", { email, revokedSessions });
+  console.log("identity deleted", { userId, revokedSessions });
   return Response.json({ ok: true, revokedSessions });
 }
 
 /**
- * Revokes every refresh token issued to an identity except the one the
- * caller is currently using — "sign out of all other sessions".
+ * Revokes refresh tokens of an identity in one of two modes: `onlySid` ends
+ * that one session ("end this session" in the list), `exceptSid` ends every
+ * session but the caller's ("sign out of all other sessions").
  *
- * OpenAuth's own `invalidate(subject)` (issuer.js) only ever revokes
- * everything for a resolved subject hash, and that hash is recomputed from
- * the *current* subject properties (id/name/email/image) — if the profile
- * changed since a token was issued (e.g. updateProfile changing `name`),
- * the hash no longer matches the token's own subject and nothing gets
- * revoked. Matching on `properties.email` — the same tolerant approach
- * deleteIdentity already uses above — is the reliable option.
- *
- * The refresh token a client holds is literally `"{subject}:{token}"`, and
- * the KV key it lives under is `["oauth:refresh", subject, token]` (see
- * grant handling in @openauthjs/openauth's issuer.js). That format is what
- * lets this function recognise — and skip — the caller's own session while
- * revoking every other one filed under the same email.
+ * Sessions are filed under `["oauth:refresh", "user:<id>", token]`, a
+ * subject that depends on the id alone, so a profile change never hides an
+ * older session from this scan. Sessions are named by the `sid` the access
+ * token carries, not by the refresh token: the refresh token changes on
+ * every renewal, and a renewal in the caller's same request would otherwise
+ * leave its newest record looking like someone else's.
  */
-async function signOutOtherSessions(
+async function revokeIdentitySessions(
   request: Request,
   env: Env,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
-  }
-  if (!env.ADMIN_SECRET) {
-    console.error("sign-out-others: ADMIN_SECRET is not configured");
-    return new Response("Not configured", { status: 503 });
-  }
-  const presented = request.headers.get("x-admin-secret") || "";
-  if (!secretsMatch(presented, env.ADMIN_SECRET)) {
-    console.error("sign-out-others: rejected, secret mismatch");
-    return new Response("Forbidden", { status: 403 });
-  }
+  const refused = refuseInternalCall(request, env, "sessions revoke");
+  if (refused) return refused;
 
   const body = (await request.json().catch(() => null)) as {
-    email?: string;
-    currentRefreshToken?: string;
+    userId?: string;
+    onlySid?: string;
+    exceptSid?: string;
   } | null;
-  const email = body?.email?.toLowerCase();
-  const currentRefreshToken = body?.currentRefreshToken || "";
-  if (!email) {
-    return new Response("Missing email", { status: 400 });
+  const userId = body?.userId;
+  const onlySid = body?.onlySid;
+  const exceptSid = body?.exceptSid;
+  // Exactly one mode. Without a sid this would become "sign out everywhere";
+  // with both, the call says two different things.
+  if (!userId || Boolean(onlySid) === Boolean(exceptSid)) {
+    return new Response("Missing userId, or not exactly one of onlySid and exceptSid", {
+      status: 400,
+    });
   }
-
-  // Same split the issuer itself uses when redeeming a refresh_token grant:
-  // everything before the last ":" is the subject, the tail is the token.
-  const splits = currentRefreshToken.split(":");
-  const currentToken = splits.pop();
-  const currentSubject = splits.join(":");
-  const currentKey = JSON.stringify([
-    "oauth:refresh",
-    currentSubject,
-    currentToken,
-  ]);
 
   const storage = CloudflareStorage({ namespace: env.AuthKV });
+  const revoked = await revokeSessions(
+    storage,
+    userId,
+    onlySid ? { onlySid } : { exceptSid },
+  );
 
-  let revoked = 0;
-  for await (const [key, value] of Storage.scan(storage, ["oauth:refresh"])) {
-    if (JSON.stringify(key) === currentKey) continue;
-    const properties = (value as { properties?: { email?: string } })
-      ?.properties;
-    if (properties?.email?.toLowerCase() === email) {
-      await Storage.remove(storage, key);
-      revoked++;
-    }
+  console.log("sessions revoked", {
+    userId,
+    mode: onlySid ? "only" : "except",
+    revoked,
+  });
+  return Response.json({ ok: true, revoked });
+}
+
+/**
+ * Tells the app what an identity has: the providers linked to its profile,
+ * whether a password credential exists and the sids still holding a refresh
+ * record. The app needs it for the session list and to decide whether the
+ * e-mail can be changed, and cannot read AuthKV itself. The answer carries no
+ * credential and no token.
+ */
+async function readIdentityState(request: Request, env: Env): Promise<Response> {
+  const refused = refuseInternalCall(request, env, "identity state");
+  if (refused) return refused;
+
+  const body = (await request.json().catch(() => null)) as {
+    userId?: string;
+    email?: string;
+  } | null;
+  const userId = body?.userId;
+  const email = body?.email;
+  if (!userId || !email) {
+    return new Response("Missing userId or email", { status: 400 });
   }
 
-  console.log("signed out other sessions", { email, revoked });
-  return Response.json({ ok: true, revoked });
+  const storage = CloudflareStorage({ namespace: env.AuthKV });
+  return Response.json(await identityState(storage, { userId, email }));
+}
+
+/**
+ * Moves an identity to a new e-mail once the app has confirmed both codes:
+ * same id, the caller's session keeps going with the new address, the others
+ * end. The app writes `User.email` only after this succeeds (identity first,
+ * database second); see moveIdentityEmail for why a failure in between heals.
+ */
+async function changeIdentityEmail(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  const refused = refuseInternalCall(request, env, "identity email change");
+  if (refused) return refused;
+
+  const body = (await request.json().catch(() => null)) as {
+    userId?: string;
+    oldEmail?: string;
+    newEmail?: string;
+    currentSid?: string;
+  } | null;
+  const userId = body?.userId;
+  const oldEmail = body?.oldEmail;
+  const newEmail = body?.newEmail;
+  const currentSid = body?.currentSid;
+  if (!userId || !oldEmail || !newEmail || !currentSid) {
+    return new Response(
+      "Missing userId, oldEmail, newEmail or currentSid",
+      { status: 400 },
+    );
+  }
+
+  const storage = CloudflareStorage({ namespace: env.AuthKV });
+  let result;
+  try {
+    result = await moveIdentityEmail(storage, {
+      userId,
+      oldEmail,
+      newEmail,
+      currentSid,
+    });
+  } catch (err) {
+    // Error fields are non-enumerable and log as {} in Workers.
+    const e = err as { message?: string; name?: string; stack?: string };
+    console.error("identity email change failed", {
+      userId,
+      message: e?.message,
+      name: e?.name,
+      stack: e?.stack,
+    });
+    return new Response("Could not change the e-mail", { status: 500 });
+  }
+  console.log("identity email change", {
+    userId,
+    outcome: result.ok ? "moved" : result.error,
+  });
+  return Response.json(result);
 }
 
 /**
@@ -233,28 +305,18 @@ async function signOutOtherSessions(
  * orphaned behind an identity that no longer resolves to it.
  *
  * As sensitive as deleteIdentity — it hands out a working password for an
- * arbitrary address — so it carries the exact same shared-secret gate.
+ * arbitrary address — so it carries the same shared-secret gate.
  */
 async function seedAccount(request: Request, env: Env): Promise<Response> {
-  if (request.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
-  }
-  if (!env.ADMIN_SECRET) {
-    console.error("identity seed: ADMIN_SECRET is not configured");
-    return new Response("Not configured", { status: 503 });
-  }
-  const presented = request.headers.get("x-admin-secret") || "";
-  if (!secretsMatch(presented, env.ADMIN_SECRET)) {
-    console.error("identity seed: rejected, secret mismatch");
-    return new Response("Forbidden", { status: 403 });
-  }
+  const refused = refuseInternalCall(request, env, "identity seed");
+  if (refused) return refused;
 
   const body = (await request.json().catch(() => null)) as {
     email?: string;
     password?: string;
     name?: string;
   } | null;
-  const email = body?.email?.toLowerCase();
+  const email = body?.email ? normalizeEmail(body.email) : undefined;
   const password = body?.password;
   if (!email || !password) {
     return new Response("Missing email or password", { status: 400 });
@@ -360,7 +422,8 @@ async function enforceCredentialRateLimit(
   // The code-verification steps carry no email (the flow keeps it in the
   // provider's encrypted state), so those attempts share one bucket per IP —
   // which is what limits pin-code guessing.
-  const email = form?.get("email")?.toString().toLowerCase() || "-";
+  const submitted = form?.get("email")?.toString();
+  const email = submitted ? normalizeEmail(submitted) : "-";
   const ip = clientIp(request);
 
   const { allowed, count } = await rateLimit(
@@ -622,15 +685,20 @@ function getIssuer(env: Env) {
 
       try {
         const userObject = await getUserObject();
+        if (!userObject.email) {
+          throw new Error(
+            `the ${value.provider} login returned no e-mail address`,
+          );
+        }
+        // One case for every key and every stored address: the code provider
+        // hands back the e-mail as typed, the password provider lower-cased.
+        const email = normalizeEmail(userObject.email);
         const now = new Date().toISOString();
-        const existing = (await storage.get([
-          "users",
-          userObject.email,
-        ])) as FullUser;
+        const existing = (await storage.get(["users", email])) as FullUser;
         let user;
         if (existing) {
           user = existing;
-          if (!user.email && userObject.email) user.email = userObject.email;
+          user.email = email;
           if (!user.name && userObject.name) user.name = userObject.name;
           if (!user.image && userObject.image) user.image = userObject.image;
           user.updatedAt = now;
@@ -649,7 +717,7 @@ function getIssuer(env: Env) {
         } else {
           user = {
             id: createId(),
-            email: userObject.email,
+            email,
             name: userObject.name || "",
             image: userObject.image || "",
             createdAt: now,
@@ -663,16 +731,14 @@ function getIssuer(env: Env) {
             ],
           };
           const sendEmail = sender(environment.Emails);
-          await sendEmail(userObject.email, "Welcome", {
+          await sendEmail(email, "Welcome", {
             username: userObject.name || "User",
           });
         }
-        await storage.set(["users", user.email], user);
-        return ctx.subject("user", {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
+        await storage.set(["users", email], user);
+        return await issueUserSession(ctx, storage, {
+          ...user,
+          provider: value.provider,
         });
       } catch (err) {
         // Error instances serialize to `{}` in Workers structured logs
@@ -699,8 +765,14 @@ export default {
     if (pathname === identityDeletePath) {
       return deleteIdentity(request, env);
     }
-    if (pathname === signOutOthersPath) {
-      return signOutOtherSessions(request, env);
+    if (pathname === sessionsRevokePath) {
+      return revokeIdentitySessions(request, env);
+    }
+    if (pathname === identityStatePath) {
+      return readIdentityState(request, env);
+    }
+    if (pathname === emailChangePath) {
+      return changeIdentityEmail(request, env);
     }
     if (pathname === seedAccountPath) {
       return seedAccount(request, env);

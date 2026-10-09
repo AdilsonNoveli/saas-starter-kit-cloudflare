@@ -15,7 +15,8 @@ Project context: `.fireskills/` (`PROJECT`, `STACK`, `RULES`, `DATABASE`, `PACKA
 - Do not repeat questions already answered in `.fireskills/USER-PROFILE.md`.
 - Specs: `specs/inbox/`, `specs/backlog/`, and `specs/<state>/<NNNN>-<slug>/spec.md` as the
   sole canonical source of truth (no `plan.md`, `tasks.md`, or `research.md`).
-- Tasks that alter persistent database schemas must include `[MIGRATION]`: versioned migrations (drizzle-kit),
-  applied during deployment, never on the development database.
+- Tasks that alter persistent database schemas must include `[MIGRATION]` and follow the database change policy in
+  `.fireskills/RULES.md`: a specific step per capability, and adjustments edit the init of the owning history while the
+  responsible person resets the database and redeploys from zero until launch (not part of `bun run deploy`); agents never run destructive database commands.
 - After every implementation slice, execute `$fireskill-documentator`.
 <!-- specsfy:framework:end -->

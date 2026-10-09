@@ -9,12 +9,13 @@
         <UCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <span class="font-semibold"> Team Invite </span>
+              <span class="font-semibold">{{ t("teams.invite.title") }}</span>
               <UButton
                 v-if="!invite"
-                icon="i-lucide-x"
+                icon="i-ph-x-duotone"
                 variant="ghost"
                 color="neutral"
+                :aria-label="t('teams.invite.close')"
                 @click="close"
               />
             </div>
@@ -26,28 +27,36 @@
               <div>
                 <p class="font-semibold">{{ invite.team.name }}</p>
                 <p class="text-sm text-muted">
-                  Invited by {{ invite.invitedBy.name }} ({{
-                    invite.invitedBy.email
-                  }})
+                  {{
+                    t("teams.invite.invitedBy", {
+                      name: invite.invitedBy.name ?? "",
+                      email: invite.invitedBy.email,
+                    })
+                  }}
                 </p>
               </div>
             </div>
-            <div>
-              <p>
-                You've been invited to join this team as a
-                <span class="font-semibold">{{ invite.role.name }}</span
-                >.
-              </p>
-            </div>
+            <i18n-t keypath="teams.invite.message" tag="p" scope="global">
+              <template #role>
+                <span class="font-semibold">{{ invite.role.name }}</span>
+              </template>
+            </i18n-t>
+            <UAlert
+              v-if="acceptError"
+              icon="i-ph-warning-circle-duotone"
+              variant="subtle"
+              color="error"
+              :description="acceptError"
+            />
           </div>
 
           <div v-else>
             <UAlert
-              icon="i-lucide-x"
+              icon="i-ph-x-duotone"
               variant="subtle"
               color="error"
-              title="Invite not found"
-              description="The invite doesn't exist or has expired."
+              :title="t('teams.invite.notFoundTitle')"
+              :description="t('teams.invite.notFoundDescription')"
             />
           </div>
 
@@ -57,13 +66,14 @@
                 color="error"
                 variant="outline"
                 :loading="declining"
+                :label="t('teams.invite.decline')"
                 @click="declineInvite"
-              >
-                Decline
-              </UButton>
-              <UButton :loading="accepting" @click="acceptInvite">
-                Accept
-              </UButton>
+              />
+              <UButton
+                :loading="accepting"
+                :label="t('teams.invite.accept')"
+                @click="acceptInvite"
+              />
             </div>
           </template>
         </UCard>
@@ -78,17 +88,31 @@ const inviteId = route.params.id as string;
 
 const accepting = ref(false);
 const declining = ref(false);
+const acceptError = ref("");
+
+const { t, te } = useI18n();
 
 const { data: teams } = await useTeamsList();
 const invite = useInviteStore().invite;
 
+/** The tRPC error code (`NOT_FOUND`, `CONFLICT`, `FORBIDDEN`...) of a failed call, if any. */
+function errorCode(error: unknown): string | undefined {
+  if (!error || typeof error !== "object" || !("data" in error)) return undefined;
+  const { data } = error as { data?: { code?: unknown } | null };
+  return typeof data?.code === "string" ? data.code : undefined;
+}
+
 async function acceptInvite() {
   accepting.value = true;
+  acceptError.value = "";
   try {
     await useTrpcClient().invites.acceptInvite.mutate({ inviteId });
     navigateTo(`/${invite?.team.slug}`);
-  } catch {
-    // accept invite failed
+  } catch (error) {
+    // Shown next to the action, localized by the tRPC error code; a code
+    // without its own key gets the generic one, never the server's raw text.
+    const key = `teams.invite.errors.${errorCode(error) ?? "UNKNOWN"}`;
+    acceptError.value = te(key) ? t(key) : t("teams.invite.errors.UNKNOWN");
   } finally {
     accepting.value = false;
   }
@@ -115,8 +139,10 @@ function close() {
 watch([() => teams.value, () => invite], redirect);
 onMounted(redirect);
 
+// Protected, like claim/[id].vue: an anonymous visitor goes through the
+// global auth middleware to sign in or sign up and comes back to this URL,
+// instead of reaching an accept button that can only fail (AC-007).
 definePageMeta({
   middleware: "invite",
-  auth: false,
 });
 </script>

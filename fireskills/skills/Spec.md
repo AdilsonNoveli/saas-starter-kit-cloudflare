@@ -131,7 +131,7 @@ Maintain a seamless conversational workflow rather than expecting users to manua
 
 Testing never executes against the development database. In Nuxfire, test runs requiring PostgreSQL must target an isolated test database explicitly separated from stage configuration secrets. vitest suites mock database access via procedure contexts or localized fixtures.
 
-Commands that delete, wipe, or drop database schemas are permanently forbidden (`migrate:fresh`, `migrate:reset`, `schema:drop`, `drizzle-kit drop`, `DROP DATABASE`, `DROP TABLE`, `TRUNCATE`). Explicit user authorization does not waive this guardrail.
+Commands that delete, wipe, or drop database schemas are permanently forbidden (`migrate:fresh`, `migrate:reset`, `schema:drop`, `drizzle-kit drop`, `DROP DATABASE`, `DROP TABLE`, `TRUNCATE`). Explicit user authorization does not waive this guardrail **for agents**: an agent never runs these commands. The one sanctioned reset is the owner's database change policy (`.fireskills/RULES.md`): agents edit the init of the owning history, and the responsible person resets the database and redeploys from zero (a separate guarded reset command, not part of `bun run deploy`; the manual steps the policy lists until that command exists).
 
 ## Three Acts and Lifecycle States
 

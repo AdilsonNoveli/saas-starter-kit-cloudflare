@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
-import { z } from "zod";
+import { z } from "zod/v4";
 // See the note in billing.ts: layers reach the Composition Root's tRPC
 // primitives and server utils by explicit import, never by Nitro's merge.
 import { protectedProcedure, router } from "~~/server/trpc/trpc";

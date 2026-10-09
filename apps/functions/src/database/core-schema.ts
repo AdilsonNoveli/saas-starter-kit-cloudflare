@@ -51,7 +51,7 @@ export const users = pgTable("User", {
   // Self-service TOTP, mirroring platformAdmins' own mfaSecret/mfaEnabledAt
   // pair (now in layers/admin/server/database/schema.ts) — always encrypted
   // (AES-GCM, see
-  // apps/app/server/utils/mfa-crypto.ts), never plaintext, never
+  // packages/crypto/aes.ts), never plaintext, never
   // selected by getUser()'s client-facing session query.
   mfaSecret: text("mfaSecret"),
   // null = not enrolled. protectedProcedure only demands a verified session
@@ -62,7 +62,7 @@ export const users = pgTable("User", {
 // Single-use recovery codes for a lost authenticator. One set per (user, scope):
 // "user" backs User.mfaSecret, "platform" backs PlatformAdmin.mfaSecret — two
 // independent factors, so each keeps its own codes. Only a keyed hash is stored
-// (see apps/app/server/utils/mfa-recovery.ts); the plaintext code exists once,
+// (see layers/account/server/utils/mfa-recovery.ts); the plaintext code exists once,
 // in the response that generates it. `usedAt` is set atomically on redemption.
 export const mfaRecoveryCodes = pgTable(
   "MfaRecoveryCode",

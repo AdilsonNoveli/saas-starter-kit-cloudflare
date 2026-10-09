@@ -7,7 +7,7 @@
         </template>
 
         <template #right>
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -24,7 +24,7 @@
         <template #filters>
           <UButton
             label="Refresh"
-            icon="i-lucide-refresh-cw"
+            icon="i-ph-arrows-clockwise-duotone"
             color="neutral"
             variant="outline"
             loading-auto
@@ -163,9 +163,9 @@ function sortableHeader(
     label,
     icon: isSorted
       ? isSorted === "asc"
-        ? "i-lucide-arrow-up-narrow-wide"
-        : "i-lucide-arrow-down-wide-narrow"
-      : "i-lucide-arrow-up-down",
+        ? "i-ph-sort-ascending-duotone"
+        : "i-ph-sort-descending-duotone"
+      : "i-ph-arrows-down-up-duotone",
     class: "-mx-2.5",
     onClick,
   });

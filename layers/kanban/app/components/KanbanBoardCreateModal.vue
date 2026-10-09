@@ -12,7 +12,7 @@
             <div class="flex items-center justify-between">
               <span class="font-semibold">New board</span>
               <UButton
-                icon="i-lucide-x"
+                icon="i-ph-x-duotone"
                 variant="ghost"
                 color="neutral"
                 @click="close"
@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { KanbanBoardItem } from "../../shared/types";
 
 const open = defineModel<boolean>("open", { default: false });

@@ -5,8 +5,8 @@
 
 | Type | Quantity |
 | --- | --- |
-| Code | 462 |
-| Tests | 35 |
+| Code | 614 |
+| Tests | 85 |
 
 ## Diagrams
 

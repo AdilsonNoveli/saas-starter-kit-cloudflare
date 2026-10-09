@@ -1,6 +1,7 @@
 {
   "name": "@nuxfire/layer-billing",
   "version": "1.0.0",
+  "description": "Nuxt layer providing billing, Stripe and Paddle checkout, plans and subscription management",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,6 +17,7 @@
     "./app/*": "./app/*.ts"
   },
   "dependencies": {
+    "@nuxfire/crypto": "workspace:*",
     "@nuxfire/functions": "workspace:*",
     "@nuxfire/layer-teams": "workspace:*",
     "@nuxfire/manifest": "workspace:*",

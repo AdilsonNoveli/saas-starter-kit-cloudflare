@@ -6,7 +6,7 @@
           "createTitle": "New plan",
           "createDescription": "Create a plan tenants can subscribe to.",
           "editTitle": "Edit {name}",
-          "editDescription": "Changes apply to every team already on this plan.",
+          "editDescription": "Changes apply to every Space already on this plan.",
           "name": { "label": "Name", "placeholder": "Pro" },
           "tier": {
             "label": "Tier",
@@ -15,7 +15,7 @@
           },
           "description": {
             "label": "Description",
-            "placeholder": "Everything a growing team needs"
+            "placeholder": "Everything a growing Space needs"
           },
           "provider": {
             "label": "Provider",
@@ -81,25 +81,25 @@
           "help": "Where the buyer lands once they have paid for this plan.",
           "modes": {
             "NEW_TEAM": {
-              "label": "A new team of their own",
+              "label": "A new Space of their own",
               "description": "The buyer becomes its Owner."
             },
             "EXISTING_TEAM": {
-              "label": "An existing team",
-              "description": "The buyer joins the team you choose."
+              "label": "An existing Space",
+              "description": "The buyer joins the Space you choose."
             }
           },
           "team": {
-            "label": "Team the buyer joins",
-            "placeholder": "Search teams by name",
-            "empty": "No team matches",
-            "required": "Choose the team the buyer will join.",
-            "loadFailed": "Could not load teams"
+            "label": "Space the buyer joins",
+            "placeholder": "Search Spaces by name",
+            "empty": "No Space matches",
+            "required": "Choose the Space the buyer will join.",
+            "loadFailed": "The Spaces couldn't be loaded"
           },
           "column": "Buyer lands in",
-          "newTeam": "A new team per buyer",
-          "joins": "Joins {team}",
-          "teamRemoved": "Team removed, choose another"
+          "newTeam": "A new Space per buyer",
+          "joins": "Joins {space}",
+          "teamRemoved": "Space removed, choose another"
         },
         "publicOffer": {
           "label": "Show on landing page",
@@ -146,7 +146,11 @@
     },
     "claim": {
       "title": "Your {plan} purchase is confirmed",
-      "destination": "You'll land in {destination}.",
+      "destination": {
+        "new_space": "You'll land in a new Space of your own.",
+        "existing_space": "You'll join the {name} Space.",
+        "missing_space": "The Space of this purchase no longer exists. Contact support for help."
+      },
       "notFound": {
         "title": "Link not found",
         "description": "This link doesn't exist or has expired."
@@ -163,10 +167,10 @@
         "title": "Already set up",
         "description": "This purchase has already been claimed."
       },
-      "teamNameLabel": "Team name",
-      "teamSlugLabel": "Team slug",
-      "createTeam": "Create my team",
-      "joinTeam": "Join team",
+      "teamNameLabel": "Space name",
+      "teamSlugLabel": "Space address",
+      "createTeam": "Create my Space",
+      "joinTeam": "Join the Space",
       "genericError": "Something went wrong. Please try again."
     }
   }

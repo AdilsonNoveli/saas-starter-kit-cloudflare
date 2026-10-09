@@ -13,7 +13,7 @@
         variant="outline"
         color="neutral"
         size="md"
-        icon="i-simple-icons-github"
+        icon="i-ph-github-logo-duotone"
         block
         class="font-medium hover:border-accented transition-colors"
         @click="handleSocialSignIn('github')"
@@ -27,7 +27,7 @@
         variant="outline"
         color="neutral"
         size="md"
-        icon="i-simple-icons-google"
+        icon="i-ph-google-logo-duotone"
         block
         class="font-medium hover:border-accented transition-colors"
         @click="handleSocialSignIn('google')"

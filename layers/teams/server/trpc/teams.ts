@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { and, count, eq, or, sql } from "drizzle-orm";
-import { z } from "zod";
+import { z } from "zod/v4";
 // `~~` is the Composition Root (apps/app). Layers import the shared tRPC
 // primitives and server utils explicitly instead of relying on Nitro's
 // cross-layer merge — the decision recorded at the top of
@@ -18,7 +18,8 @@ import {
   teams,
   roles,
 } from "@nuxfire/functions/schema";
-import { ensureSystemRoles } from "../utils/roles";
+import { createTeamWithOwner } from "../utils/team-creation";
+import { validateSlug } from "../../shared/utils/slug";
 import {
   teamsDeleteTeam,
   teamsGetTeamDetails,
@@ -150,69 +151,30 @@ export const teamsRouter = router({
           .string()
           .max(500, "Description must be max 500 characters")
           .optional(),
-        slug: z
-          .string()
-          .min(2, "Slug must be at least 2 characters")
-          .max(50, "Slug must be max 50 characters")
-          .regex(
-            /^[a-z0-9-]+$/,
-            "Slug can only contain lowercase letters, numbers, and hyphens",
-          ),
+        // The one slug rule (shared/utils/slug.ts): the message is the code
+        // (`slug_invalid` or `slug_reserved`) the client localizes.
+        slug: z.string().superRefine((slug, ctx) => {
+          const result = validateSlug(slug);
+          if (result !== "ok") ctx.addIssue({ code: "custom", message: result });
+        }),
       }),
     )
     .mutation(async ({ ctx: { user }, input }) => {
-      const existingTeam = await useDB().query.teams.findFirst({
-        where: eq(teams.slug, input.slug),
-      });
-
-      if (existingTeam) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: "Team slug is already in use",
-        });
-      }
-      await ensureSystemRoles();
-      const ownerRole = await useDB().query.roles.findFirst({
-        where: (role) =>
-          and(eq(role.name, "Owner"), eq(role.isSystemRole, true)),
-      });
-
-      if (!ownerRole) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Owner role could not be found or created",
-        });
-      }
-      // No `planId` (SPEC-0005): this base layer no longer reaches into
-      // billing to assign a default plan — a team is created plan-less
-      // (`planId`/`maxSeats` both null, meaning unlimited) whether billing is
-      // active or not. If billing is active, it is billing's own job to
-      // attach a plan later (checkout, or an admin assigning one) —
-      // `buyer-provisioning.ts` already writes `planId`/`maxSeats` directly
-      // into `Team` for the checkout flow, which is the allowed direction
-      // (feature → base).
-      const [team] = await useDB()
-        .insert(teams)
-        .values({
+      // No `planId` (SPEC-0005): this base layer does not reach into billing
+      // to assign a default plan — a team is created plan-less (`planId`/
+      // `maxSeats` both null, meaning unlimited) whether billing is active or
+      // not; billing attaches a plan later through the same function.
+      // A taken slug comes back as CONFLICT "slug_taken" from the unique
+      // index (AC-036), not from a read-before-write check that two
+      // concurrent creations would both pass.
+      const team = await useDB().transaction((tx) =>
+        createTeamWithOwner(tx, {
           name: input.name,
           slug: input.slug,
           description: input.description,
-        })
-        .returning();
-
-      if (!team) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create team",
-        });
-      }
-
-      await useDB().insert(teamMemberships).values({
-        teamId: team.id,
-        userId: user.id,
-        roleId: ownerRole.id,
-      });
-
+          ownerUserId: user.id,
+        }),
+      );
       return team;
     }),
   update: abilityProcedure

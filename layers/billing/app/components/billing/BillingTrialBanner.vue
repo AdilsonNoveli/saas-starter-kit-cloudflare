@@ -4,7 +4,7 @@
     class="w-full px-4 py-2.5 rounded-md border border-default bg-elevated/40 text-xs sm:text-sm text-default flex items-center justify-between"
   >
     <div class="flex items-center gap-2">
-      <span class="inline-block size-2 rounded-full bg-primary animate-pulse" />
+      <span class="inline-block size-2 rounded-sm bg-primary animate-pulse" />
       <span>{{ message }}</span>
     </div>
     <slot name="actions" />

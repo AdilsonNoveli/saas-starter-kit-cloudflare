@@ -1,7 +1,6 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
 import { desc, eq } from "drizzle-orm";
 import * as schema from "./database/schema";
+import { withDb } from "./database/with-db";
 import type { ExecutionContext, Hyperdrive } from "@cloudflare/workers-types";
 
 interface Environment {
@@ -24,36 +23,33 @@ export default {
     env: Environment,
     _ctx: ExecutionContext,
   ): Promise<void> {
-    const sql = postgres(env.AppDB.connectionString, {
-      max: 5,
-      fetch_types: false,
-    });
-    const db = drizzle(sql, { schema });
-    for (const message of batch.messages) {
-      const job = message.body as typeof schema.jobs.$inferSelect;
-      try {
-        // jobs-consumer.ts writes the real error text into the job's last log
-        // line; that is the only place it survives the retries.
-        const [failureLog] = await db
-          .select({ message: schema.logs.message })
-          .from(schema.logs)
-          .where(eq(schema.logs.jobId, job.id))
-          .orderBy(desc(schema.logs.createdAt))
-          .limit(1);
+    await withDb(env, async (db) => {
+      for (const message of batch.messages) {
+        const job = message.body as typeof schema.jobs.$inferSelect;
+        try {
+          // jobs-consumer.ts writes the real error text into the job's last log
+          // line; that is the only place it survives the retries.
+          const [failureLog] = await db
+            .select({ message: schema.logs.message })
+            .from(schema.logs)
+            .where(eq(schema.logs.jobId, job.id))
+            .orderBy(desc(schema.logs.createdAt))
+            .limit(1);
 
-        await db
-          .insert(schema.deadLetterRecords)
-          .values({
-            message: job,
-            error: failureLog?.message ?? FALLBACK_ERROR,
-            teamId: job.teamId ?? null,
-          })
-          .execute();
-      } catch (err) {
-        console.error("failed to record dead letter", job?.id, err);
+          await db
+            .insert(schema.deadLetterRecords)
+            .values({
+              message: job,
+              error: failureLog?.message ?? FALLBACK_ERROR,
+              teamId: job.teamId ?? null,
+            })
+            .execute();
+        } catch (err) {
+          console.error("failed to record dead letter", job?.id, err);
+        }
+        // Always acknowledged, recording failures included: see the note above.
+        message.ack();
       }
-      // Always acknowledged, recording failures included: see the note above.
-      message.ack();
-    }
+    });
   },
 };

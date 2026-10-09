@@ -27,8 +27,7 @@ description: Model, query, migrate, and operate PostgreSQL with integrity, indic
    speculatively based on column presence alone.
 5. Analyze transaction isolation levels, transaction duration, lock acquisition ordering,
    and expected concurrency under production load.
-6. Plan migrations ensuring dual-version compatibility (old and new application versions
-   coexisting during rolling deploys), with tested rollback strategies.
+6. Plan schema changes under the repository's database change policy (`.fireskills/RULES.md`, absolute): edit the init of the owning history and reset the database; extensions and tables belong to the specific layer that needs them. Dual-version compatibility and rollback planning apply only to a stage the owner declares as holding data that must survive.
 7. Tag execution tasks with `[MIGRATION]`, point to versioned migration scripts, apply
    to test environments, and verify migrator history before declaring completion.
 8. Validate backup, restore, monitoring, and capacity in the target environment before
@@ -46,7 +45,6 @@ description: Model, query, migrate, and operate PostgreSQL with integrity, indic
   and maintain consistent lock ordering across all code paths to eliminate deadlocks.
 - Run `EXPLAIN (ANALYZE, BUFFERS)` only where executing statements is safe (never in
   production without read replicas or rollback transactions).
-- Apply expand/contract migrations for breaking schema changes or high-volume tables:
-  never drop or rename a column read by production code in the same deployment step.
+- In this repository the database change policy (`.fireskills/RULES.md`) overrides expand/contract: adjustments edit the init and the database is reset. Expand/contract applies only to a stage the owner declares as holding data that must survive.
 - Grant least privilege: separate migration roles (DDL), application roles (DML), and
   read-only analytics roles (`SELECT` only).

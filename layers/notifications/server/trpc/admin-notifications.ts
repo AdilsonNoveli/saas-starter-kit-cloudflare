@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 // See the note in notifications.ts: layers reach the Composition Root's tRPC
 // primitives and server utils by explicit import, never by Nitro's merge.
 // `platformAdminProcedure` in particular is built on `protectedProcedure`, NOT

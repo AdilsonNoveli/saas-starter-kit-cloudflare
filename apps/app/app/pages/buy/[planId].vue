@@ -3,13 +3,13 @@
     <UCard class="w-full max-w-md">
       <template v-if="planStatus === 'pending'">
         <div class="flex justify-center py-6">
-          <UIcon name="i-lucide-loader-circle" class="animate-spin size-6" />
+          <UIcon name="i-ph-circle-notch-duotone" class="animate-spin size-6" />
         </div>
       </template>
 
       <template v-else-if="!plan">
         <UAlert
-          icon="i-lucide-circle-x"
+          icon="i-ph-x-circle-duotone"
           variant="subtle"
           color="error"
           :title="t('billing.buy.notFound.title')"
@@ -40,7 +40,7 @@
           <UAlert
             v-if="errorMessage"
             class="mt-4"
-            icon="i-lucide-circle-alert"
+            icon="i-ph-warning-circle-duotone"
             variant="subtle"
             color="error"
             :description="errorMessage"
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
 
 definePageMeta({ auth: false });
 

@@ -18,12 +18,11 @@
       <template #header="{ collapsed: isCollapsed }">
         <div class="flex items-center gap-2 w-full py-2" :class="isCollapsed && 'justify-center'">
           <template v-if="isCollapsed">
-            <img src="/nuxfire-icon.svg" alt="Nuxfire" class="h-6 w-auto dark:hidden" />
-            <img src="/nuxfire-icon-white.svg" alt="Nuxfire" class="h-6 w-auto hidden dark:block" />
+            <img src="/icon-color.svg" :alt="brandName" class="h-6 w-auto" />
           </template>
           <template v-else>
-            <img src="/nuxfire.svg" alt="Nuxfire" class="h-5 w-auto dark:hidden" />
-            <img src="/nuxfire-white.svg" alt="Nuxfire" class="h-5 w-auto hidden dark:block" />
+            <img src="/logo-clear.svg" :alt="brandName" class="h-5 w-auto dark:hidden" />
+            <img src="/logo-dark.svg" :alt="brandName" class="h-5 w-auto hidden dark:block" />
             <UBadge label="Admin" color="warning" variant="subtle" size="sm" />
           </template>
         </div>
@@ -50,9 +49,9 @@
     -->
     <div
       v-if="checkingMfa"
-      class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-default/40"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-elevated/75"
     >
-      <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin text-muted" />
+      <UIcon name="i-ph-circle-notch-duotone" class="size-6 animate-spin text-muted" />
     </div>
 
     <slot />
@@ -69,6 +68,8 @@
 
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
+
+const { brandName } = useRuntimeConfig().public;
 
 /**
  * The platform-owner shell. Deliberately not `dashboard.vue`: no team
@@ -87,7 +88,7 @@ const closeSidebar = () => {
  * The MFA gate, centralized in one modal (AccountMfaSetupModal, scope=
  * "admin") instead of the full-page pages/admin/mfa.vue this used to
  * redirect to — that page duplicated the same QR/code-form markup with a
- * plain UDashboardPanel chrome and no blurred backdrop. Every `admin.*`
+ * plain UDashboardPanel chrome and no overlay. Every `admin.*`
  * procedure already rejects an unenrolled or un-elevated admin with
  * `FORBIDDEN`, but that leaves the screens empty and the user guessing; one
  * status read as the shell mounts turns that into this modal instead.
@@ -132,44 +133,44 @@ function onMfaVerified() {
 const links = computed<NavigationMenuItem[]>(() => [
   {
     label: "Overview",
-    icon: "i-lucide-bolt",
+    icon: "i-ph-lightning-duotone",
     to: "/admin",
     exact: true,
     onSelect: closeSidebar,
   },
   {
     label: "Companies",
-    icon: "i-lucide-warehouse",
+    icon: "i-ph-warehouse-duotone",
     to: "/admin/companies",
     onSelect: closeSidebar,
   },
   {
     label: "Plans",
-    icon: "i-lucide-dollar-sign",
+    icon: "i-ph-currency-dollar-duotone",
     to: "/admin/plans",
     onSelect: closeSidebar,
   },
   {
     label: "Pending purchases",
-    icon: "i-lucide-hourglass",
+    icon: "i-ph-hourglass-duotone",
     to: "/admin/pending-purchases",
     onSelect: closeSidebar,
   },
   {
     label: "Queue",
-    icon: "i-lucide-loader",
+    icon: "i-ph-spinner-duotone",
     to: "/admin/queue",
     onSelect: closeSidebar,
   },
   {
     label: "Audit Log",
-    icon: "i-lucide-history",
+    icon: "i-ph-clock-counter-clockwise-duotone",
     to: "/admin/audit-log",
     onSelect: closeSidebar,
   },
   {
     label: "Notifications",
-    icon: "i-lucide-bell",
+    icon: "i-ph-bell-duotone",
     to: "/admin/notifications",
     onSelect: closeSidebar,
   },
@@ -177,7 +178,7 @@ const links = computed<NavigationMenuItem[]>(() => [
     // Without this the console is a one-way door: nothing else in the admin
     // shell links back to the tenant app.
     label: "Back to app",
-    icon: "i-lucide-arrow-left",
+    icon: "i-ph-arrow-left-duotone",
     to: "/dashboard",
     onSelect: closeSidebar,
   },

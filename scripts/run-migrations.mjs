@@ -44,14 +44,19 @@ try {
   console.log(`OK: ${migrationsSchema}.${migrationsTable} (${migrationsFolder}) applied successfully.`);
 } catch (error) {
   console.error(`MIGRATION FAILED for ${migrationsSchema}.${migrationsTable} (${migrationsFolder}) — full error below:`);
+  // drizzle-orm wraps the driver's error in a DrizzleQueryError and keeps the real Postgres error
+  // (code, detail, table, constraint) in `.cause`; reading only the wrapper hid "relation already
+  // exists" behind `code: undefined`.
+  const pg = error?.cause ?? error;
   console.error({
     message: error?.message,
-    code: error?.code,
-    detail: error?.detail,
-    hint: error?.hint,
-    schema_name: error?.schema_name,
-    table_name: error?.table_name,
-    constraint_name: error?.constraint_name,
+    code: pg?.code,
+    cause: pg === error ? undefined : pg?.message,
+    detail: pg?.detail,
+    hint: pg?.hint,
+    schema_name: pg?.schema_name,
+    table_name: pg?.table_name,
+    constraint_name: pg?.constraint_name,
     stack: error?.stack,
   });
   process.exitCode = 1;

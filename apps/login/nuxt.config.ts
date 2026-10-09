@@ -1,11 +1,15 @@
+import { nuxtFonts } from "../../packages/tokens";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  // Serves the brand files of packages/tokens/public from this app's root.
+  extends: ["@nuxfire/tokens"],
   compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
   nitro: {
     prerender: {
       autoSubfolderIndex: true,
-      routes: ["/login", "/signup", "/forgot-password"],
+      routes: ["/", "/login", "/signup", "/forgot-password"],
     },
   },
   // These pages are entirely driven by query-string state (?state=code,
@@ -22,12 +26,18 @@ export default defineNuxtConfig({
   // `ssr: false` makes these three routes mount fresh, client-side only —
   // no prerendered reactive content to mismatch against.
   routeRules: {
+    "/": { redirect: "/login" },
     "/login/**": { ssr: false },
     "/signup/**": { ssr: false },
     "/forgot-password/**": { ssr: false },
   },
   css: ["~/css/main.css"],
-  modules: ["@nuxt/ui", "@nuxtjs/i18n"],
+  // SPEC-0010 (DEC-006): a cookie the server reads, not localStorage, so the
+  // first paint already has the theme. Default key (`nuxt-color-mode`).
+  colorMode: { storage: "cookie" },
+  modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxtjs/i18n"],
+  // Declared once in packages/tokens (fontFamilies); no app names a font.
+  fonts: nuxtFonts,
   // `no_prefix`: these routes already force `ssr: false` (see routeRules
   // above) because of the OpenAuth query-string hydration mismatch —
   // multiplying them by three prefixed variants would widen that fragility
@@ -72,6 +82,8 @@ export default defineNuxtConfig({
   // without those env vars set.
   runtimeConfig: {
     public: {
+      // Set from NUXT_PUBLIC_BRAND_NAME in infra/auth.ts (BRAND_NAME). No default on purpose.
+      brandName: "",
       githubAuthEnabled: false,
       googleAuthEnabled: false,
     },

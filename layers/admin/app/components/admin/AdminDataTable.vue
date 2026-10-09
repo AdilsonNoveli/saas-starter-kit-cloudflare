@@ -3,7 +3,7 @@
     <UInput
       v-model="search"
       class="max-w-sm"
-      icon="i-lucide-search"
+      icon="i-ph-magnifying-glass-duotone"
       :placeholder="searchPlaceholder"
     />
 
@@ -15,7 +15,7 @@
           label="Display"
           color="neutral"
           variant="outline"
-          trailing-icon="i-lucide-settings-2"
+          trailing-icon="i-ph-sliders-duotone"
         />
       </UDropdownMenu>
     </div>

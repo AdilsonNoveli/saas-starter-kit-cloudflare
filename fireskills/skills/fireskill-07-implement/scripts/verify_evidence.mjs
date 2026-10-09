@@ -91,7 +91,9 @@ if (!spec || !root || !existsSync(spec) || !existsSync(root)) {
           // the catalog — recognized here alongside the CLI-driven ORMs
           // above so a project with no Laravel/Prisma/Supabase/Flyway/
           // Liquibase tooling isn't permanently unable to pass this gate.
-          const applied = commands.some((command) => /(?:artisan\s+migrate\b(?!:status)|prisma\s+migrate\s+(?:deploy|dev)|supabase\s+(?:db\s+push|migration\s+up)|(?:flyway|liquibase)\s+migrate\b|drizzle-kit\s+(?:migrate|push)\b|psql\b.*(?:-f\b|applied|migrations?\/))/i.test(command));
+          // `scripts/run-migrations.mjs` is this project's only apply mechanism (RULES.md: never the
+          // drizzle-kit CLI, which crashes without a TTY), so a deploy that runs it counts as the apply.
+          const applied = commands.some((command) => /(?:artisan\s+migrate\b(?!:status)|prisma\s+migrate\s+(?:deploy|dev)|supabase\s+(?:db\s+push|migration\s+up)|(?:flyway|liquibase)\s+migrate\b|drizzle-kit\s+(?:migrate|push)\b|scripts\/run-migrations\.mjs|psql\b.*(?:-f\b|applied|migrations?\/))/i.test(command));
           const verified = commands.some((command) => /(?:artisan\s+migrate:status|prisma\s+migrate\s+status|supabase\s+migration\s+list|(?:flyway|liquibase)\s+(?:info|status)\b|information_schema\.tables|\\d\b|describ(?:e|ed)\s+the\s+resulting)/i.test(command));
           if (!migrationFile) taskErrors.push("migration file does not appear in produced files");
           if (!applied) taskErrors.push("migration apply command missing");

@@ -31,7 +31,7 @@ node fireskills/skills/fireskill-setup/scripts/check_database_safety.mjs \
 
 For tests accessing Postgres, require a dedicated test database explicitly separate from staging secrets (`DATABASE_*`); existing Vitest test suites do not connect to the database. While the safety state is `PENDING`, do not execute any tests. Fix the environment, rerun verification, and proceed only after `SAFE`.
 
-Discard all commands classified as `IGNORED`. Never run, convert into tasks, or seek authorization to execute `migrate:fresh`, `migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`, `schema:drop`, `prisma migrate reset`, `drizzle-kit push --force`, `drizzle-kit drop`, `DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`, `TRUNCATE`, or equivalents. The same strict prohibition applies to indirect scripts and tests relying on `RefreshDatabase` or `DatabaseMigrations`. Use transactional isolation and minimal fixtures without clearing the database.
+Discard all commands classified as `IGNORED`. Never run, convert into tasks, or seek authorization to execute `migrate:fresh`, `migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`, `schema:drop`, `prisma migrate reset`, `drizzle-kit push --force`, `drizzle-kit drop`, `DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`, `TRUNCATE`, or equivalents. The same strict prohibition applies to indirect scripts and tests relying on `RefreshDatabase` or `DatabaseMigrations`. Use transactional isolation and minimal fixtures without clearing the database. The owner's database change policy (`.fireskills/RULES.md`) is the only sanctioned reset, carried out by the responsible person, never by an agent.
 
 ## Mandatory Visual Review
 

@@ -1,7 +1,8 @@
 {
   "name": "@nuxfire/emails",
-  "type": "module",
   "version": "0.0.0",
+  "description": "React Email templates and transactional mailer wrappers",
+  "type": "module",
   "scripts": {
     "dev": "email dev --dir templates",
     "typecheck": "tsc --noEmit"
@@ -28,6 +29,7 @@
     "@types/nodemailer": "^8.0.1"
   },
   "dependencies": {
+    "@nuxfire/tokens": "workspace:*",
     "@react-email/components": "^0.0.31",
     "@types/react": "^19.0.2",
     "react": "19.2.8",
@@ -37,7 +39,7 @@
     "fastq": "^1.20.1",
     "ical-generator": "^11.1.0",
     "ky": "^2.0.2",
-    "nodemailer": "9.1.1"
+    "nodemailer": "10.0.2"
   },
   "peerDependencies": {
     "@aws-sdk/client-sesv2": "^3.997.0"

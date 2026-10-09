@@ -8,7 +8,7 @@ export const emailBrand = (env: {
   BRAND_DOMAIN: string;
 }): EmailBrand => ({
   name: env.BRAND_NAME,
-  // Served by apps/web at the production domain (apps/web/public/pwa-192x192.png).
+  // Served by apps/web at the production domain (packages/tokens/public/pwa-192x192.png, served by every app).
   logoUrl: `https://${env.BRAND_DOMAIN}/pwa-192x192.png`,
 });
 

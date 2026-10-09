@@ -24,8 +24,13 @@ const fullUser = intersect([
   }),
 ]);
 
+// `sid` names one login and survives every renewal of it, so "sign out of the
+// other sessions" can spare the caller's records. `provider` says which login
+// opened the session (password, code, google or github), which decides whether
+// the e-mail can be changed. Both are required: a token issued before they
+// existed fails verification and the person logs in again, once.
 export const subjects = createSubjects({
-  user: baseUser,
+  user: intersect([baseUser, object({ sid: string(), provider: string() })]),
 });
 
 export type SubjectUser = InferOutput<typeof subjects.user>;

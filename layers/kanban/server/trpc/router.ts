@@ -1,6 +1,6 @@
 import { TRPCError, type AnyRouter } from "@trpc/server";
 import { asc, eq, or } from "drizzle-orm";
-import { z } from "zod";
+import { z } from "zod/v4";
 // `~~` is the Composition Root (apps/app). Layers import the shared tRPC
 // primitives and server utils explicitly instead of relying on Nitro's
 // cross-layer merge — the decision recorded at the top of

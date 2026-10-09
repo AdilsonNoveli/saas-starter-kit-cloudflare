@@ -4,7 +4,7 @@ import { COMPATIBILITY } from "./utils/constants";
 import { isDurableObjectClassProvisioned } from "./utils/durable-objects";
 
 // Signs the short-lived WS auth ticket minted by /api/auth/ws-ticket
-// (see apps/app/server/utils/ws-ticket.ts) — shared only between the App
+// (see packages/crypto/ws-ticket.ts) — shared only between the App
 // worker and this one, never exposed to the browser.
 export const wsTicketSecret = flags.websockets
   ? new random.RandomUuid("WsTicketSecret")

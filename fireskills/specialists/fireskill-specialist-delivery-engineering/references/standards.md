@@ -27,6 +27,8 @@ with features behind toggles, then canary the flag rollout across user segments.
 
 ## Migrations and Rollout Compatibility
 
+> **Repository override:** in this repository the database change policy (`.fireskills/RULES.md`, absolute, in force until the application launches) overrides the expand/contract sequence below: adjustments edit the init of the owning history and the database is reset and redeployed from zero. The sequence applies only to a stage the owner declares as holding data that must survive.
+
 - **Expand**: Add new column/table without dropping legacy structures; previous application version remains fully functional.
 - **Migrate**: Point new application code to write/read new formats while both versions coexist during rollouts.
 - **Contract**: Drop deprecated column/table only after 100% of production traffic runs on new versions and rollback windows have expired.

@@ -19,6 +19,7 @@ import {
   auditLiterals,
   auditTestimonials,
   auditUrgency,
+  auditVoiceFiles,
   flattenLocale,
   validateLedger,
   type CopyConfig,
@@ -123,7 +124,12 @@ try {
   violations.push({ rule: "ledger-invalid", where: rel(ledgerFile), message: `the ledger is not valid YAML: ${error instanceof Error ? error.message : String(error)}` });
 }
 
-violations.push(...auditLiterals(vueFiles, config.literalAttributes));
+// Serelius voice (SPEC-0008): the locale files and template literals of apps/app, apps/login and the layers.
+const voiceFiles: Record<string, string> = { ...vueFiles };
+for (const dir of config.vueRoots) {
+  for (const file of walk(join(root, dir)).filter((path) => path.replaceAll("\\", "/").includes("/i18n/locales/") && path.endsWith(".json"))) voiceFiles[rel(file)] = readFileSync(file, "utf8");
+}
+violations.push(...auditLiterals(vueFiles, config.literalAttributes), ...auditVoiceFiles(voiceFiles));
 if (ledger) {
   violations.push(
     ...auditClaims({ strings, ledger, config, io, now }),

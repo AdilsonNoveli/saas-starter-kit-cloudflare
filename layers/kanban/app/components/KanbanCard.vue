@@ -11,7 +11,7 @@
     <div class="flex items-start justify-between gap-1.5 min-w-0">
       <div class="flex items-center gap-1.5 min-w-0 flex-1">
         <UIcon
-          name="i-lucide-file-text"
+          name="i-ph-file-text-duotone"
           class="size-3.5 shrink-0 text-muted transition-colors"
         />
         <span
@@ -29,7 +29,7 @@
         title="Delete card"
         @click.stop="emit('delete', card.id)"
       >
-        <UIcon name="i-lucide-trash-2" class="size-3.5" />
+        <UIcon name="i-ph-trash-duotone" class="size-3.5" />
       </button>
     </div>
 

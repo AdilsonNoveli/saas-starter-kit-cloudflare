@@ -1,20 +1,26 @@
 import { eq } from "drizzle-orm";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { permissions, roles } from "@nuxfire/functions/schema";
+import type * as schema from "@nuxfire/functions/schema";
 import { SYSTEM_ROLES } from "@nuxfire/functions/database/seed-data";
 
-// `useDB()`, `InsertRole` and `InsertPermission` are unimported on purpose —
-// Nitro auto-imports them, and its scan covers every active layer's `server/`
-// dir, not only the Composition Root's. See the longer note in team-seats.ts.
+// The database handle is a parameter, not the Nitro `useDB()` global:
+// `createTeamWithOwner` runs this inside its own transaction, and the manual
+// demo seed (apps/functions, a plain Bun script with no Nitro) reaches it
+// through that function.
 //
 // Kept in `server/utils/`, not `shared/utils/`: this is not framework-agnostic
 // logic. It opens a database connection and writes rows; nothing client-side
 // can or should call it.
 
+type RolesDatabase = Pick<PostgresJsDatabase<typeof schema>, "insert" | "select">;
+
 async function insertSystemRole(
-  role: InsertRole,
-  rolePermissions: Omit<InsertPermission, "roleId">[],
+  db: RolesDatabase,
+  role: typeof roles.$inferInsert,
+  rolePermissions: Omit<typeof permissions.$inferInsert, "roleId">[],
 ) {
-  const [inserted] = await useDB()
+  const [inserted] = await db
     .insert(roles)
     .values(role)
     .returning({ id: roles.id });
@@ -22,7 +28,7 @@ async function insertSystemRole(
     throw new Error(`Failed to insert system role "${role.name}"`);
   }
   if (rolePermissions.length) {
-    await useDB()
+    await db
       .insert(permissions)
       .values(
         rolePermissions.map((permission) => ({
@@ -53,8 +59,8 @@ async function insertSystemRole(
  * skip: seeding is all-or-nothing here (three roles created together as a
  * set), it's just re-checked against the source of truth.
  */
-export async function ensureSystemRoles() {
-  const [existing] = await useDB()
+export async function ensureSystemRoles(db: RolesDatabase) {
+  const [existing] = await db
     .select({ id: roles.id })
     .from(roles)
     .where(eq(roles.isSystemRole, true))
@@ -62,6 +68,6 @@ export async function ensureSystemRoles() {
   if (existing) return;
 
   for (const { role, permissions: rolePermissions } of SYSTEM_ROLES) {
-    await insertSystemRole(role, rolePermissions);
+    await insertSystemRole(db, role, rolePermissions);
   }
 }

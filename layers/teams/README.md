@@ -46,6 +46,9 @@ navigation all pick it up from that one array.
 | `server/trpc/teams.ts`        | `teamsRouter` — CRUD, membership, roles, logo                                                                               |
 | `server/trpc/invites.ts`      | `invitesRouter` — send/accept/update/delete, seat enforcement                                                               |
 | `server/database/schema.ts`   | `Team`, `TeamMembership`, `TeamInvite`, `Role`, `Permission` + their relations                                              |
+| `server/utils/team-creation.ts` | `createTeamWithOwner(tx, input)` — the one place that inserts a Space and its Owner membership, inside the caller's transaction; used by `teams.create`, the account onboarding, billing's `provisionNewTeam` and the demo seed (SPEC-0010). A repeated `slug` becomes `slug_taken` through the unique index |
+| `server/utils/invite-policy.ts` | `inviteMatchesUser()` — the invite e-mail matches the signed-in person without case difference |
+| `shared/utils/slug.ts`        | `slugify`, `validateSlug` and the reserved slugs (every static route of the app); used by the create modal, the claim page and the server |
 | `server/utils/roles.ts`       | `ensureSystemRoles()` — reactive Owner/Admin/Member safety net                                                              |
 | `server/utils/team-seats.ts`  | seat counting and invite-expiry rules (+ its test)                                                                          |
 | `shared/utils/permissions.ts` | `PERMISSIONS`, the string constants abilities check against                                                                 |

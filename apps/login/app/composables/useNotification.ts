@@ -7,7 +7,7 @@ export function useNotification() {
         title,
         description,
         color: "error",
-        icon: "i-lucide-circle-alert",
+        icon: "i-ph-warning-circle-duotone",
       });
     },
     success(title: string, description?: string) {
@@ -15,7 +15,7 @@ export function useNotification() {
         title,
         description,
         color: "success",
-        icon: "i-lucide-circle-check",
+        icon: "i-ph-check-circle-duotone",
       });
     },
     info(title: string, description?: string) {
@@ -23,7 +23,7 @@ export function useNotification() {
         title,
         description,
         color: "info",
-        icon: "i-lucide-info",
+        icon: "i-ph-info-duotone",
       });
     },
   };

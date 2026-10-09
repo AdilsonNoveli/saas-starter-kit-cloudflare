@@ -29,7 +29,12 @@ export default defineLayerManifest({
   // queries `teams`/`teamMemberships`/`jobs` through the
   // `@nuxfire/functions/schema` aggregator barrel, never through
   // `@nuxfire/layer-teams` directly.
-  requires: ["notifications"],
+  //
+  // `account` (SPEC-0009): the MFA routes import the recovery-code functions
+  // from `@nuxfire/layer-account/server/utils/mfa-recovery`, and the console
+  // renders `<AccountMfaSetupModal>`, `<AccountMfaRecoveryPanel>` and
+  // `<AccountUserDropdown>` from that layer.
+  requires: ["notifications", "account"],
 
   // `navigation` is deliberately absent. This layer's sidebar is its own —
   // `app/layouts/admin.vue` builds the `/admin/*` menu inline — and the tenant

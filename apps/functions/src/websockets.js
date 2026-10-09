@@ -1,5 +1,6 @@
 import { DurableObject, WorkerEntrypoint } from "cloudflare:workers";
 import crossws from "crossws/adapters/cloudflare-durable";
+import { verifyWsTicket } from "@nuxfire/crypto";
 
 function toBufferLike(val) {
   if (val === undefined || val === null) {
@@ -47,57 +48,6 @@ function isPlainObject(value) {
 let environment;
 let _user;
 let storage;
-
-// Verifies the short-lived HMAC ticket minted by
-// apps/app/server/utils/ws-ticket.ts — mirrors that file's encoding.
-function fromBase64Url(b64url) {
-  const padded = b64url.padEnd(
-    b64url.length + ((4 - (b64url.length % 4)) % 4),
-    "=",
-  );
-  const binary = atob(padded.replace(/-/g, "+").replace(/_/g, "/"));
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
-}
-
-function toBase64Url(bytes) {
-  let binary = "";
-  for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-async function hmacSign(secret, message) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const signature = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(message),
-  );
-  return toBase64Url(new Uint8Array(signature));
-}
-
-async function verifyTicket(secret, ticket) {
-  if (!ticket) return null;
-  const [payloadB64, signature] = ticket.split(".");
-  if (!payloadB64 || !signature) return null;
-  const expectedSignature = await hmacSign(secret, payloadB64);
-  if (expectedSignature !== signature) return null;
-  let payload;
-  try {
-    payload = JSON.parse(new TextDecoder().decode(fromBase64Url(payloadB64)));
-  } catch {
-    return null;
-  }
-  if (!payload?.exp || payload.exp < Date.now()) return null;
-  return payload;
-}
 
 // Single extension point for topic authorization: add a case per topic
 // pattern here (e.g. `team:*`) instead of scattering ad-hoc checks — every
@@ -198,7 +148,7 @@ export class Websockets extends DurableObject {
         .split(",")
         .map((x) => x.trim());
       const token = protocols.shift();
-      const verified = await verifyTicket(environment.WsTicketSecret, token);
+      const verified = await verifyWsTicket(environment.WsTicketSecret, token);
       if (verified) {
         _user = {
           id: verified.id,

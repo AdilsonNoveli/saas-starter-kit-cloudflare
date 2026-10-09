@@ -7,7 +7,7 @@
         </template>
 
         <template #right>
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -21,7 +21,7 @@
           :icon="stat.icon"
           variant="subtle"
           :ui="{
-            leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25',
+            leading: 'p-2.5 rounded-sm bg-primary/10 ring ring-inset ring-primary/25',
             title: 'font-normal text-muted text-xs uppercase',
           }"
         >
@@ -33,7 +33,7 @@
 
       <UButton
         label="Manage companies"
-        icon="i-lucide-building-2"
+        icon="i-ph-buildings-duotone"
         color="neutral"
         variant="outline"
         to="/admin/companies"
@@ -90,24 +90,24 @@ const companies = computed(() => data.value ?? []);
 const stats = computed(() => [
   {
     label: "Companies",
-    icon: "i-lucide-building-2",
+    icon: "i-ph-buildings-duotone",
     value: companies.value.length,
   },
   {
     label: "Active",
-    icon: "i-lucide-circle-check",
+    icon: "i-ph-check-circle-duotone",
     value: companies.value.filter((company) => company.status === "ACTIVE")
       .length,
   },
   {
     label: "Suspended",
-    icon: "i-lucide-ban",
+    icon: "i-ph-prohibit-duotone",
     value: companies.value.filter((company) => company.status === "SUSPENDED")
       .length,
   },
   {
     label: "Total Members",
-    icon: "i-lucide-users",
+    icon: "i-ph-users-duotone",
     value: companies.value.reduce((sum, c) => sum + (c.memberCount ?? 0), 0),
   },
 ]);

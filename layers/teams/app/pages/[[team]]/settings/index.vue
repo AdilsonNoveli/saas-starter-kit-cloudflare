@@ -2,15 +2,15 @@
   <UForm id="team-general-form" :schema="schema" :state="state" @submit="save">
     <UPageCard
       v-if="showUpdate"
-      title="General"
-      description="These informations will be displayed publicly."
+      :title="t('teams.settings.general.title')"
+      :description="t('teams.settings.general.description')"
       variant="naked"
       orientation="horizontal"
       class="mb-4"
     >
       <UButton
         form="team-general-form"
-        label="Save changes"
+        :label="t('teams.settings.general.save')"
         color="neutral"
         type="submit"
         :loading="loading"
@@ -19,10 +19,10 @@
     </UPageCard>
 
     <UPageCard variant="subtle">
-      <UFormField label="Team Avatar" name="avatar">
+      <UFormField :label="t('teams.settings.general.logoLabel')" name="avatar">
         <AvatarUploader
           :src="team?.logo"
-          :alt="team?.name ?? 'Team'"
+          :alt="team?.name ?? t('teams.switcher.avatarAlt')"
           :uploading="updatingTeamLogo"
           :disabled="!showUpdate"
           size="lg"
@@ -31,11 +31,11 @@
         />
       </UFormField>
       <USeparator />
-      <UFormField label="Team Name" name="name">
+      <UFormField :label="t('teams.settings.general.nameLabel')" name="name">
         <UInput
           v-model="state.name"
           :disabled="!showUpdate"
-          placeholder="Team Name"
+          :placeholder="t('teams.settings.general.namePlaceholder')"
         />
       </UFormField>
     </UPageCard>
@@ -43,8 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
 
+const { t } = useI18n();
 const team = useCurrentTeam();
 const teamsStore = useTeamsStore();
 const teamID = computed(() => team.value?.id || "");
@@ -75,10 +76,10 @@ async function save() {
       teamIdentifier: team.value?.slug || "",
       name: state.name,
     });
-    notification.success("Team Settings Updated", "Your team settings have been successfully saved");
+    notification.success(t("teams.settings.general.saved"), t("teams.settings.general.savedDescription"));
     await teamsStore.fetchCurrentTeam();
   } catch (error) {
-    notification.error("Failed to Update Team Settings", getErrorMessage(error));
+    notification.error(t("teams.settings.general.saveFailed"), translateErrorCode(getErrorMessage(error), t));
   } finally {
     loading.value = false;
   }
@@ -95,9 +96,9 @@ async function handleAvatarUpload(file: File) {
       });
     }
     await teamsStore.fetchCurrentTeam();
-    notification.success("Profile Picture Updated");
+    notification.success(t("teams.settings.general.logoUpdated"));
   } catch (error) {
-    notification.error("Failed to Upload Profile Picture", getErrorMessage(error));
+    notification.error(t("teams.settings.general.logoUploadFailed"), translateErrorCode(getErrorMessage(error), t));
   }
   updatingTeamLogo.value = false;
 }
@@ -109,9 +110,9 @@ async function handleAvatarRemove() {
       teamIdentifier: team.value?.slug || "",
     });
     await teamsStore.fetchCurrentTeam();
-    notification.success("Team Logo Removed");
+    notification.success(t("teams.settings.general.logoRemoved"));
   } catch (error) {
-    notification.error("Failed to Remove Team Logo", getErrorMessage(error));
+    notification.error(t("teams.settings.general.logoRemoveFailed"), translateErrorCode(getErrorMessage(error), t));
   }
   updatingTeamLogo.value = false;
 }

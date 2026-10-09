@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { z } from "zod";
+import { z } from "zod/v4";
 // See admin-teams.ts: layers import the Composition Root's tRPC primitives and
 // server utils explicitly.
 import { platformAdminProcedure, router } from "~~/server/trpc/trpc";

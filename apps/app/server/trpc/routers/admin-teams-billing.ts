@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   jobs,
   plans,

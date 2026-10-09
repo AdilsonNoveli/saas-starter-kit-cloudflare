@@ -1,25 +1,26 @@
 /**
- * Deterministic per-column accent, keyed by column position. Mixed against
+ * Deterministic per-column accent, keyed by column position, taken from the semantic colors of the
+ * design tokens (no fixed hex). Mixed against
  * theme CSS variables (`--ui-bg-muted`, `--ui-border`, `--ui-text`) rather
  * than fixed hex endpoints, so the result stays correct in both light and
  * dark mode with zero JS color-mode branching — the browser re-resolves the
  * `color-mix()` whenever `.dark` flips those variables.
  */
 const KANBAN_COLUMN_ACCENTS = [
-  "#EC4899",
-  "#3B82F6",
-  "#F59E0B",
-  "#8B5CF6",
-  "#06B6D4",
-  "#10B981",
-  "#EF4444",
-  "#6B7280",
+  "var(--ui-info)",
+  "var(--ui-success)",
+  "var(--ui-warning)",
+  "var(--ui-error)",
+  "var(--ui-primary)",
+  "var(--ui-secondary)",
+  "var(--ui-text-muted)",
+  "var(--ui-border-accented)",
 ] as const;
 
 export function kanbanColumnAccentStyle(position: number | undefined) {
   const accent =
     KANBAN_COLUMN_ACCENTS[(position ?? 0) % KANBAN_COLUMN_ACCENTS.length] ??
-    "#6B7280";
+    "var(--ui-text-muted)";
 
   return {
     backgroundColor: `color-mix(in srgb, ${accent} 32%, var(--ui-bg-muted))`,

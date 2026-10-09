@@ -186,14 +186,10 @@ a column attribute was unintentionally altered.
   failure. A feature that is `false` in `config.ts`, or has no
   `migrations/` folder yet, is skipped entirely — no command runs for it.
   Never run manual migrations on shared staging databases.
-- **No down-migrations.** Rollback follows expand/contract patterns
-  (`apps/functions/src/database/MIGRATIONS.md`): additive changes remain in place;
-  destructive changes (drop, adding `NOT NULL` to existing columns, type alterations)
-  ship in separate subsequent migrations **after** consuming code is deployed.
-  Production issues are remediated by rolling forward.
+- **No down-migrations, no patch migrations, no expand/contract (database change policy, absolute — `.fireskills/RULES.md`).** Adjustments edit the init of the owning history and the database is reset by the responsible person; a new numbered init only on a version bump. The expand/contract text that used to be here is superseded.
 - Any environment that applied previous migration history (`0000`–`0009`) requires
   its `public`/`drizzle` schemas reset prior to the next `migrate` run.
-- Any environment with data predating the SPEC-0006 split (kanban/billing
+- (Superseded by the database change policy — history only.) Any environment with data predating the SPEC-0006 split (kanban/billing
   tables already created by the old shared base history) needs a one-time
   bootstrap — `scripts/print-migration-bootstrap.mjs <migrationsFolder>
   <table>` prints (never executes) the `INSERT`s that mark each feature's
@@ -202,7 +198,7 @@ a column attribute was unintentionally altered.
   algorithm exactly. Apply by hand before
   that environment's next deploy. A brand-new environment needs no
   bootstrap: all three histories just run fresh, in order.
-- Create automated database snapshots prior to any migration altering populated columns.
+- Only a stage the owner declares as holding data that must survive needs snapshots before a destructive change, with per-action authorization.
 
 ## 6. Seed Data and Manual Utility Scripts
 

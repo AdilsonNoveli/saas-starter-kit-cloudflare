@@ -31,6 +31,7 @@ const primary = computed(() => (hasCheckout.value ? { href: checkoutUrl.value } 
       <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
         <CTAButton
           v-bind="primary"
+          color="green"
           size="md"
           radius="lg"
           trailing-icon="i-lucide-arrow-right"
@@ -41,7 +42,7 @@ const primary = computed(() => (hasCheckout.value ? { href: checkoutUrl.value } 
         <UButton
           :href="whatsapp(t('landing.offer.talkMessage'))"
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
           color="neutral"
           variant="outline"
           size="lg"

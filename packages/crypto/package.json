@@ -1,0 +1,13 @@
+{
+  "name": "@nuxfire/crypto",
+  "version": "0.0.0",
+  "description": "Pure Web Crypto security primitives: AES-GCM, HMAC-SHA256, constant-time compare, and ticket helpers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./index.ts"
+  }
+}

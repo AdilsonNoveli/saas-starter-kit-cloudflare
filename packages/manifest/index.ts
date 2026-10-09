@@ -10,7 +10,7 @@
 /** A single item a layer injects into the application sidebar. */
 export interface LayerNavigationItem {
   label: string;
-  /** Icon name, e.g. `i-lucide-kanban`. */
+  /** Icon name, e.g. `i-ph-kanban-duotone`. */
   icon: string;
   /** Route, `{team}` being substituted with the active tenant slug. */
   to: string;

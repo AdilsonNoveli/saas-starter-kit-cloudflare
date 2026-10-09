@@ -6,7 +6,7 @@
           "createTitle": "Novo plano",
           "createDescription": "Crie um plano para os clientes assinarem.",
           "editTitle": "Editar {name}",
-          "editDescription": "As mudanças valem para todos os times já neste plano.",
+          "editDescription": "As mudanças valem para todos os Espaços que já estão neste plano.",
           "name": { "label": "Nome", "placeholder": "Pro" },
           "tier": {
             "label": "Nível",
@@ -15,7 +15,7 @@
           },
           "description": {
             "label": "Descrição",
-            "placeholder": "Tudo que um time em crescimento precisa"
+            "placeholder": "Tudo que um Espaço em crescimento precisa"
           },
           "provider": {
             "label": "Provedor",
@@ -81,25 +81,25 @@
           "help": "Onde o comprador entra depois de pagar por este plano.",
           "modes": {
             "NEW_TEAM": {
-              "label": "Um time novo, só dele",
-              "description": "O comprador vira o dono desse time."
+              "label": "Um Espaço novo, só dele",
+              "description": "O comprador vira o dono desse Espaço."
             },
             "EXISTING_TEAM": {
-              "label": "Um time que já existe",
-              "description": "O comprador entra no time que você escolher."
+              "label": "Um Espaço que já existe",
+              "description": "O comprador entra no Espaço que você escolher."
             }
           },
           "team": {
-            "label": "Time em que o comprador entra",
-            "placeholder": "Buscar time pelo nome",
-            "empty": "Nenhum time encontrado",
-            "required": "Escolha o time em que o comprador entra.",
-            "loadFailed": "Não foi possível carregar os times"
+            "label": "Espaço em que o comprador entra",
+            "placeholder": "Buscar Espaço pelo nome",
+            "empty": "Nenhum Espaço encontrado",
+            "required": "Escolha o Espaço em que o comprador entra.",
+            "loadFailed": "Não foi possível carregar os Espaços"
           },
           "column": "O comprador entra em",
-          "newTeam": "Um time novo por comprador",
-          "joins": "Entra em {team}",
-          "teamRemoved": "Time removido, escolha outro"
+          "newTeam": "Um Espaço novo por comprador",
+          "joins": "Entra em {space}",
+          "teamRemoved": "Espaço removido, escolha outro"
         },
         "publicOffer": {
           "label": "Mostrar na landing page",
@@ -146,7 +146,11 @@
     },
     "claim": {
       "title": "Sua compra do plano {plan} foi confirmada",
-      "destination": "Você vai entrar em {destination}.",
+      "destination": {
+        "new_space": "Você vai entrar em um Espaço novo, só seu.",
+        "existing_space": "Você vai entrar no Espaço {name}.",
+        "missing_space": "O Espaço desta compra não existe mais. Fale com o suporte para receber ajuda."
+      },
       "notFound": {
         "title": "Link não encontrado",
         "description": "Este link não existe ou expirou."
@@ -163,10 +167,10 @@
         "title": "Já configurado",
         "description": "Esta compra já foi resgatada."
       },
-      "teamNameLabel": "Nome do time",
-      "teamSlugLabel": "Slug do time",
-      "createTeam": "Criar meu time",
-      "joinTeam": "Entrar no time",
+      "teamNameLabel": "Nome do Espaço",
+      "teamSlugLabel": "Endereço do Espaço",
+      "createTeam": "Criar meu Espaço",
+      "joinTeam": "Entrar no Espaço",
       "genericError": "Algo deu errado. Tente novamente."
     }
   }

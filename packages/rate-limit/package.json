@@ -1,0 +1,13 @@
+{
+  "name": "@nuxfire/rate-limit",
+  "version": "0.0.0",
+  "description": "Fixed-window rate limiting primitives with KV and storage adapters",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./index.ts"
+  }
+}

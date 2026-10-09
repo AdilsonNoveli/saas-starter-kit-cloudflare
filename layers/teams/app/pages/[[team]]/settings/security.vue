@@ -8,22 +8,21 @@
         <UCard :ui="{ root: 'border-error/50' }">
           <template #header>
             <div class="flex items-center gap-2 text-error">
-              <UIcon name="i-lucide-triangle-alert" />
-              <span class="font-medium">Delete Team</span>
+              <UIcon name="i-ph-warning-duotone" />
+              <span class="font-medium">{{ t("teams.settings.danger.title") }}</span>
             </div>
           </template>
           <p class="text-sm text-muted">
-            Once you delete a team, there is no going back. Please be certain.
+            {{ t("teams.settings.danger.description") }}
           </p>
           <template #footer>
             <div class="w-full gap-2 flex justify-end">
               <UButton
                 color="error"
                 variant="outline"
+                :label="t('teams.settings.danger.action')"
                 @click="showDeleteConfirm = true"
-              >
-                Delete this team
-              </UButton>
+              />
             </div>
           </template>
         </UCard>
@@ -39,13 +38,12 @@
         <UCard>
           <template #header>
             <div class="flex items-center gap-2 text-error">
-              <UIcon name="i-lucide-trash" />
-              <span class="font-medium">Delete Team</span>
+              <UIcon name="i-ph-trash-duotone" />
+              <span class="font-medium">{{ t("teams.settings.danger.title") }}</span>
             </div>
           </template>
           <p class="text-sm">
-            Are you sure you want to delete this team? This action is
-            irreversible.
+            {{ t("teams.settings.danger.confirmDescription", { name: team?.name ?? "" }) }}
           </p>
           <template #footer>
             <div class="flex gap-2 w-full justify-end">
@@ -53,18 +51,16 @@
                 variant="ghost"
                 color="neutral"
                 :disabled="deleting"
+                :label="t('teams.settings.danger.cancel')"
                 @click="showDeleteConfirm = false"
-              >
-                No
-              </UButton>
+              />
               <UButton
                 :loading="deleting"
                 color="error"
                 variant="outline"
+                :label="t('teams.settings.danger.confirm')"
                 @click="deleteTeam"
-              >
-                Yes
-              </UButton>
+              />
             </div>
           </template>
         </UCard>
@@ -78,6 +74,7 @@
 // Composition Root's own shared/ dir, never a layer's (Fase 3, passo 1b).
 import { teamsDeleteTeam as deleteTeamAbility } from "@nuxfire/layer-teams/shared/utils/abilities";
 
+const { t } = useI18n();
 const team = useCurrentTeam();
 const teamsStore = useTeamsStore();
 const deleteMutation = useTrpcClient().teams.delete;

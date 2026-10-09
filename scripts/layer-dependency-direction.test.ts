@@ -130,3 +130,114 @@ describe("base layers never import a feature-owned symbol via the schema barrel"
     expect(violations).toEqual([]);
   });
 });
+
+// SPEC-0009 (Fase 3a), AC-011: the platform console's MFA no longer reaches the
+// encryption, rate-limit and recovery-code functions through Nitro's auto-import
+// of every layer's `server/utils`. Each one is imported from the package or layer
+// that owns it, and that dependency is declared, so typecheck and this test see it.
+describe("layers/admin imports its security primitives explicitly", () => {
+  const adminRoot = join(root, "layers/admin");
+  const adminPackage = JSON.parse(readFileSync(join(adminRoot, "package.json"), "utf8")) as {
+    dependencies?: Record<string, string>;
+  };
+
+  // Function name -> the module specifier it must be imported from.
+  const OWNERS: ReadonlyArray<{ name: string; from: RegExp; owner: string }> = [
+    { name: "encryptSecret", from: /^@nuxfire\/crypto$/, owner: "@nuxfire/crypto" },
+    { name: "decryptSecret", from: /^@nuxfire\/crypto$/, owner: "@nuxfire/crypto" },
+    { name: "rateLimit", from: /^~~\/server\/utils\/rate-limit$/, owner: "the app rate-limit wrapper (~~/server/utils/rate-limit)" },
+    { name: "consumeRecoveryCode", from: /^@nuxfire\/layer-account(\/|$)/, owner: "@nuxfire/layer-account" },
+    { name: "replaceRecoveryCodes", from: /^@nuxfire\/layer-account(\/|$)/, owner: "@nuxfire/layer-account" },
+    { name: "countRecoveryCodes", from: /^@nuxfire\/layer-account(\/|$)/, owner: "@nuxfire/layer-account" },
+  ];
+
+  const withoutComments = (source: string) => source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+
+  function importedFrom(source: string, name: string): string | undefined {
+    for (const match of source.matchAll(/import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+["']([^"']+)["']/g)) {
+      const names = match[1].split(",").map((part) => part.trim().split(/\s+as\s+/).pop()?.trim());
+      if (names.includes(name)) return match[2];
+    }
+    return undefined;
+  }
+
+  function autoImported(): string[] {
+    return walk(join(adminRoot, "server"))
+      .filter((path) => path.endsWith(".ts") && !path.endsWith(".test.ts"))
+      .flatMap((path) => {
+        const source = withoutComments(readFileSync(path, "utf8"));
+        return OWNERS.filter(({ name }) => new RegExp(`\\b${name}\\s*\\(`).test(source))
+          .filter(({ name, from }) => !from.test(importedFrom(source, name) ?? ""))
+          .map(({ name, owner }) => `${relative(root, path)} calls ${name} without importing it from ${owner}`);
+      });
+  }
+
+  // SPECSFY: US-003 FR-002 FR-004 NFR-002 NFR-003 AC-011
+  it("declares @nuxfire/crypto and @nuxfire/layer-account in package.json and the manifest, and no package it does not import", () => {
+    const dependencies = Object.keys(adminPackage.dependencies ?? {});
+    expect(dependencies).toEqual(
+      expect.arrayContaining(["@nuxfire/crypto", "@nuxfire/layer-account"]),
+    );
+    expect(dependencies).not.toContain("@nuxfire/rate-limit");
+    const manifest = readFileSync(join(adminRoot, "layer.manifest.ts"), "utf8");
+    const requires = /requires:\s*\[([^\]]*)\]/.exec(manifest)?.[1] ?? "";
+    expect(requires).toMatch(/["']account["']/);
+  });
+
+  // SPECSFY: US-003 FR-002 FR-004 NFR-002 NFR-003 AC-011
+  it("imports every encryption, rate-limit and recovery-code function it calls from its owner", () => {
+    // The import reader must recognise an explicit import, or every call would
+    // be reported and a real violation could hide among false positives.
+    expect(importedFrom('import { encryptSecret } from "@nuxfire/crypto";', "encryptSecret")).toBe("@nuxfire/crypto");
+    expect(importedFrom('import { rateLimit } from "~~/server/utils/rate-limit";', "rateLimit")).toBe(
+      "~~/server/utils/rate-limit",
+    );
+    expect(autoImported().join("\n")).toBe("");
+  });
+
+  // SPECSFY: US-003 FR-002 FR-004 NFR-002 NFR-003 AC-011
+  it("scans layers/account as a core layer, so it never imports a feature layer either", () => {
+    expect(layers.core).toContain("account");
+    expect(baseFiles.some((path) => relative(root, path).replace(/\\/g, "/").startsWith("layers/account/"))).toBe(true);
+  });
+});
+
+// SPEC-0010 (Fase 3b), AC-047: the intra-core edge `account` -> `teams` (the onboarding creates
+// the first Space through teams' creation function) is allowed and declared in the manifest and
+// in package.json; the reverse edge and any edge from `account` to the billing feature are not.
+describe("the account to teams edge", () => {
+  const sourcesOf = (layer: string) =>
+    walk(join(root, "layers", layer)).filter((path) => /\.(ts|vue)$/.test(path) && !/\.d\.ts$/.test(path));
+
+  // SPECSFY: FR-006 FR-018 NFR-004 NFR-007 AC-047
+  it("is declared in layers/account/layer.manifest.ts (requires) and layers/account/package.json", () => {
+    expect(layers.core).toEqual(expect.arrayContaining(["account", "teams"]));
+    const manifest = readFileSync(join(root, "layers/account/layer.manifest.ts"), "utf8");
+    const requires = /requires:\s*\[([^\]]*)\]/.exec(manifest)?.[1] ?? "";
+    expect(requires).toMatch(/["']teams["']/);
+    const pkg = JSON.parse(readFileSync(join(root, "layers/account/package.json"), "utf8")) as {
+      dependencies?: Record<string, string>;
+    };
+    expect(Object.keys(pkg.dependencies ?? {})).toContain("@nuxfire/layer-teams");
+  });
+
+  // SPECSFY: FR-006 FR-018 NFR-004 NFR-007 AC-047
+  it("is one way: no file under layers/teams imports @nuxfire/layer-account", () => {
+    const files = sourcesOf("teams");
+    expect(files.length).toBeGreaterThan(0); // guards the test itself
+    const violations = files
+      .filter((path) => /@nuxfire\/layer-account/.test(readFileSync(path, "utf8")))
+      .map((path) => relative(root, path));
+    expect(violations).toEqual([]);
+  });
+
+  // SPECSFY: FR-006 FR-018 NFR-004 NFR-007 AC-047
+  it("leaves billing out: no file under layers/account imports @nuxfire/layer-billing", () => {
+    const files = sourcesOf("account");
+    expect(files.length).toBeGreaterThan(0); // guards the test itself
+    const violations = files
+      .filter((path) => /@nuxfire\/layer-billing/.test(readFileSync(path, "utf8")))
+      .map((path) => relative(root, path));
+    expect(violations).toEqual([]);
+  });
+});

@@ -2,6 +2,7 @@
 // no tsconfig-`paths` resolution, so the alias throws "Cannot find module"
 // before Nuxt ever boots. Same reason the import below is relative too.
 import { layers } from "../../config";
+import { nuxtFonts } from "../../packages/tokens";
 import { composeLayers } from "../../scripts/compose-layers";
 
 // Single source of truth for which layers are active, feeding BOTH
@@ -32,7 +33,7 @@ const activeLayers = [...activeLayerNames].map(
 );
 
 export default defineNuxtConfig({
-  extends: activeLayers,
+  extends: [...activeLayers, "@nuxfire/tokens"],
   devtools: { enabled: true },
   modules: [
     "@nuxt/ui",
@@ -48,6 +49,10 @@ export default defineNuxtConfig({
     "nuxt-authorization",
   ],
   css: ["~/assets/css/main.css"],
+  // SPEC-0010 (DEC-006): a cookie the server reads, not localStorage, so the
+  // first paint already has the theme. Default key (`nuxt-color-mode`), the
+  // one server/utils/preference-cookies.ts writes at login.
+  colorMode: { storage: "cookie" },
   compatibilityDate: "2024-12-20",
   build: {
     transpile: ["trpc-nuxt"],
@@ -78,23 +83,19 @@ export default defineNuxtConfig({
       asyncContext: true,
     },
   },
-  app: {
-    head: {
-      // No charset/viewport here — Nuxt already sets these exact values by
-      // default (see apps/web/nuxt.config.ts, where nuxt-seo-utils flags
-      // the same two lines as dead config).
-      title: "Nuxfire",
-    },
-  },
-  fonts: {
-    families: [{ name: "Montserrat", provider: "google" }],
-  },
+  // Declared once in packages/tokens (fontFamilies); no app names a font.
+  fonts: nuxtFonts,
   svgo: {
     componentPrefix: "icon",
     autoImportPath: "~/assets/icons",
   },
   runtimeConfig: {
+    // Server-only product name (BRAND_NAME via infra/app.ts): the TOTP issuer shown in
+    // authenticator apps. No default on purpose — a missing value must be visible.
+    brandName: "",
     public: {
+      // Same value for the signed-in screens.
+      brandName: "",
       authUrl: "",
       authClientID: "",
       websocketsEndpoint: "",
@@ -123,7 +124,7 @@ export default defineNuxtConfig({
     // fall back to a weak seal. Set from NUXT_PLATFORM_MFA_SESSION_SECRET.
     platformMfaSessionSecret: "",
     // Server-only. Encrypts platform admins' TOTP seeds at rest
-    // (server/utils/mfa-crypto.ts). Deliberately separate from the
+    // (packages/crypto/aes.ts). Deliberately separate from the
     // session secret above: that one seals 30-minute cookies and can be
     // rotated at any time, while this one guards data already written to the
     // database — sharing them would mean rotating the cookie key silently

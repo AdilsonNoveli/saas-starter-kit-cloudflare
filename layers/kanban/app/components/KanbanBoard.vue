@@ -9,7 +9,7 @@
         <div class="relative w-full max-w-xs h-9 shrink-0">
           <label for="board-search" class="sr-only">Search</label>
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <UIcon name="i-lucide-search" class="w-4 h-4 text-muted" />
+            <UIcon name="i-ph-magnifying-glass-duotone" class="w-4 h-4 text-muted" />
           </div>
           <input
             id="board-search"
@@ -24,7 +24,7 @@
             class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-muted hover:text-highlighted"
             @click="searchQuery = ''"
           >
-            <UIcon name="i-lucide-x" class="w-3.5 h-3.5" />
+            <UIcon name="i-ph-x-duotone" class="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -70,7 +70,7 @@
         >
           <div class="flex items-center justify-between mb-2 text-xs font-bold uppercase tracking-wider text-muted">
             <div class="flex items-center gap-1.5">
-              <UIcon name="i-lucide-columns-3" class="size-3.5" />
+              <UIcon name="i-ph-columns-duotone" class="size-3.5" />
               <span>New column</span>
             </div>
             <button
@@ -78,7 +78,7 @@
               class="p-0.5 rounded hover:bg-muted text-muted hover:text-highlighted transition-colors focus:outline-none cursor-pointer"
               @click="isAddingColumn = false"
             >
-              <UIcon name="i-lucide-x" class="size-3.5" />
+              <UIcon name="i-ph-x-duotone" class="size-3.5" />
             </button>
           </div>
 
@@ -99,7 +99,7 @@
               :disabled="!columnState.name.trim()"
               aria-label="Save column"
             >
-              <UIcon name="i-lucide-plus" class="size-4" />
+              <UIcon name="i-ph-plus-duotone" class="size-4" />
             </button>
           </form>
         </div>
@@ -112,7 +112,7 @@
           title="Add column"
           @click="startAddColumn"
         >
-          <UIcon name="i-lucide-circle-plus" class="size-5" />
+          <UIcon name="i-ph-plus-circle-duotone" class="size-5" />
         </button>
       </div>
     </div>

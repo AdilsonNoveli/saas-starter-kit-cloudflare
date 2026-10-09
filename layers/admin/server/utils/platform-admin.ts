@@ -1,3 +1,4 @@
+import { decryptSecret } from "@nuxfire/crypto";
 import { platformAdmins } from "@nuxfire/functions/schema";
 // `and` is imported explicitly rather than relying on auto-import: VueUse
 // also exports an `and` (the `logicAnd` alias) and wins the resolution,
@@ -67,6 +68,14 @@ export async function isActivePlatformAdmin(userId: string): Promise<boolean> {
 }
 
 /**
+ * The issuer the authenticator app shows for a platform admin: the configured product name
+ * (`runtimeConfig.brandName`, set from BRAND_NAME in infra/app.ts). Never a literal.
+ */
+export function platformAdminIssuer(event: H3Event): string {
+  return useRuntimeConfig(event).brandName;
+}
+
+/**
  * Whether `code` is the current TOTP for this admin's seed. The library
  * default window (±1 step) covers ordinary clock drift; widening it multiplies
  * the codes a single guess can match.
@@ -79,7 +88,7 @@ export async function isValidPlatformTotp(
 ) {
   const { platformAdminEncryptionKey } = useRuntimeConfig(event);
   const totp = new TOTP({
-    issuer: "Nuxfire",
+    issuer: platformAdminIssuer(event),
     label,
     secret: Secret.fromBase32(
       await decryptSecret(encryptedSecret, platformAdminEncryptionKey),

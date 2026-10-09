@@ -79,10 +79,11 @@ that file notes "requires Workers Paid").
 
 ## 5. KV, Queues, Cron, and Durable Objects — Real Specifics
 
-- **KV**: Minimum TTL is 60s. The `rateLimit` in Worker `Auth` uses fixed windows
-  and enforces `Math.max(windowSeconds, 60)`. Outside Nitro (without NuxtHub), it uses
-  the raw `kv.get(key, "json")`/`kv.put(...)` API; inside the app, it uses `hubKV()`
-  (`apps/app/server/utils/rate-limit.ts`).
+- **KV**: Minimum TTL is 60s. The fixed-window `rateLimit` lives once in
+  `packages/rate-limit` (`@nuxfire/rate-limit`) and enforces `Math.max(windowSeconds, 60)`
+  (`MIN_WINDOW_SECONDS`). Worker `Auth` passes its raw `KVNamespace` through
+  `kvNamespaceStore` (`apps/functions/src/rate-limit.ts`); inside the app, the
+  wrapper passes `hubKV()` through `hubKvStore` (`apps/app/server/utils/rate-limit.ts`).
 - **Queue** (`infra/jobs.ts`): `maxConcurrency: 5`, batch size of 10 / 5s window,
   DLQ with 3 attempts. Per message: success → `message.ack()`; failure → logs `failed`
   to database and calls `message.retry()`. Message payload is the serialized `jobs`
@@ -93,7 +94,8 @@ that file notes "requires Workers Paid").
   Currently logs an entry to the `logs` table.
 - **Durable Object** (`websockets.js`): `Websockets` class with SQLite storage,
   using `crossws/adapters/cloudflare-durable`; authentication via HMAC ticket issued
-  by `apps/app/server/utils/ws-ticket.ts` (`WsTicketSecret` secret).
+  by `apps/app/server/api/auth/ws-ticket.get.ts` with `createWsTicket` and checked by
+  `verifyWsTicket` (constant time), both from `packages/crypto` (`WsTicketSecret` secret).
   - `new_sqlite_classes` is a **one-time irreversible migration**: resending it for
     an already provisioned class causes Cloudflare error 10074. `infra/utils/durable-objects.ts`
     queries Cloudflare's API and only includes the migration if the class is not yet

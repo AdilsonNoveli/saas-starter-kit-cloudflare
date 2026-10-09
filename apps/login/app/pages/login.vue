@@ -1,29 +1,29 @@
 <template>
   <AuthLayout
-    :title="state === 'code' ? 'Check your email' : 'Welcome back'"
+    :title="state === 'code' ? t('auth.login.checkEmail') : t('auth.login.welcomeBack')"
     :subtitle="
       state === 'code'
-        ? `We sent a 6-digit verification code to ${email || 'your email'}`
-        : 'Sign in to access your account and workspaces'
+        ? t('auth.login.subtitleCode', { email: email || t('auth.login.yourEmail') })
+        : t('auth.login.subtitle')
     "
   >
     <!-- Status Alerts -->
     <UAlert
       v-if="errorMessage"
-      icon="i-lucide-circle-alert"
+      icon="i-ph-warning-circle-duotone"
       color="error"
       variant="subtle"
-      title="Authentication Failed"
+      :title="t('auth.login.failedTitle')"
       :description="errorMessage"
     />
 
     <UAlert
       v-if="state === 'code' && !errorMessage"
-      icon="i-lucide-mail-check"
+      icon="i-ph-envelope-duotone"
       color="success"
       variant="subtle"
-      title="Verification code sent"
-      :description="`Please check your inbox at ${email}. The code will expire shortly.`"
+      :title="t('auth.login.codeSentTitle')"
+      :description="t('auth.login.codeSentDesc', { email })"
     />
 
     <!--
@@ -54,16 +54,16 @@
       <!-- Verification Code State -->
       <template v-if="state === 'code'">
         <UFormField
-          label="Verification Code"
+          :label="t('auth.login.codeLabel')"
           name="code"
           required
-          description="Enter the one-time code sent to your inbox"
+          :description="t('auth.login.codeDesc')"
         >
           <UInput
             v-model="data.code"
             name="code"
-            icon="i-lucide-key-round"
-            placeholder="000000"
+            icon="i-ph-key-duotone"
+            :placeholder="t('auth.login.codePlaceholder')"
             size="lg"
             class="w-full font-mono tracking-widest text-center text-lg"
             inputmode="numeric"
@@ -75,13 +75,13 @@
 
       <!-- Standard Email & Password State -->
       <template v-else>
-        <UFormField label="Email" name="email" required>
+        <UFormField :label="t('auth.login.emailLabel')" name="email" required>
           <UInput
             v-model="data.email"
             name="email"
             type="email"
-            icon="i-lucide-mail"
-            placeholder="name@company.com"
+            icon="i-ph-envelope-duotone"
+            :placeholder="t('auth.login.emailPlaceholder')"
             size="lg"
             class="w-full"
             autocomplete="email"
@@ -90,7 +90,7 @@
           />
         </UFormField>
 
-        <UFormField label="Password" name="password">
+        <UFormField :label="t('auth.login.passwordLabel')" name="password">
           <template #hint>
             <NuxtLink
               :to="`${origin}/password/change`"
@@ -98,7 +98,7 @@
               class="text-xs text-primary hover:text-primary/75 font-medium transition-colors"
               tabindex="-1"
             >
-              Forgot password?
+              {{ t("auth.login.forgotPassword") }}
             </NuxtLink>
           </template>
 
@@ -106,8 +106,8 @@
             v-model="data.password"
             name="password"
             :type="showPassword ? 'text' : 'password'"
-            icon="i-lucide-lock"
-            placeholder="Enter password (optional for code sign-in)"
+            icon="i-ph-lock-duotone"
+            :placeholder="t('auth.login.passwordPlaceholder')"
             size="lg"
             class="w-full"
             autocomplete="current-password"
@@ -115,11 +115,11 @@
           >
             <template #trailing>
               <UButton
-                :icon="showPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                :icon="showPassword ? 'i-ph-eye-slash-duotone' : 'i-ph-eye-duotone'"
                 color="neutral"
                 variant="ghost"
                 size="xs"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                :aria-label="showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')"
                 class="text-dimmed hover:text-muted cursor-pointer"
                 tabindex="-1"
                 @click="showPassword = !showPassword"
@@ -147,7 +147,7 @@
     <template v-if="state !== 'code'">
       <template v-if="githubAuthEnabled || googleAuthEnabled">
         <div class="relative py-1">
-          <USeparator label="Or continue with" class="text-xs text-dimmed uppercase tracking-wider" />
+          <USeparator :label="t('auth.login.orContinueWith')" class="text-xs text-dimmed uppercase tracking-wider" />
         </div>
         <AuthSocialLogin />
       </template>
@@ -162,12 +162,12 @@
           <form :action="`${origin}/code/authorize`" method="POST" class="inline-flex items-center gap-1.5">
             <input type="hidden" name="action" value="request" />
             <input type="hidden" name="email" :value="email" />
-            <span>Didn't receive a code?</span>
+            <span>{{ t("auth.login.noCode") }}</span>
             <button
               type="submit"
               class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 cursor-pointer"
             >
-              Resend
+              {{ t("auth.login.resend") }}
             </button>
           </form>
 
@@ -176,21 +176,21 @@
             external
             class="text-xs text-dimmed hover:text-muted transition-colors inline-flex items-center gap-1 mt-1"
           >
-            <UIcon name="i-lucide-arrow-left" class="w-3.5 h-3.5" />
-            Return to email sign in
+            <UIcon name="i-ph-arrow-left-duotone" class="w-3.5 h-3.5" />
+            {{ t("auth.login.returnToEmail") }}
           </NuxtLink>
         </div>
       </template>
 
       <template v-else>
         <p class="text-sm text-muted">
-          Don't have an account?
+          {{ t("auth.login.noAccount") }}
           <NuxtLink
             :to="`${origin}/password/register`"
             external
             class="text-primary hover:text-primary/75 font-medium transition-colors underline underline-offset-4 ml-1"
           >
-            Create account
+            {{ t("auth.login.createAccount") }}
           </NuxtLink>
         </p>
       </template>
@@ -199,27 +199,32 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
+import { z } from "zod/v4";
 
 type LoginError = "invalid_email" | "invalid_password" | "invalid_code" | null;
 
-const ERROR_MESSAGES: Record<string, string> = {
-  invalid_email: "Please enter a valid email address.",
-  invalid_password: "The credentials you provided are incorrect.",
-  invalid_code: "The verification code is invalid or has expired.",
-};
-
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().optional(),
-});
-
-const verifySchema = z.object({
-  code: z.string().min(1, "Verification code is required"),
-});
-
+const { t } = useI18n();
 const route = useRoute();
 const notification = useNotification();
+
+const ERROR_MESSAGES = computed<Record<string, string>>(() => ({
+  invalid_email: t("auth.login.errors.invalidEmail"),
+  invalid_password: t("auth.login.errors.invalidPassword"),
+  invalid_code: t("auth.login.errors.invalidCode"),
+}));
+
+const loginSchema = computed(() =>
+  z.object({
+    email: z.string().email(t("auth.login.errors.emailValidation")),
+    password: z.string().optional(),
+  }),
+);
+
+const verifySchema = computed(() =>
+  z.object({
+    code: z.string().min(1, t("auth.login.errors.codeValidation")),
+  }),
+);
 
 const origin = import.meta.dev ? route.query.origin?.toString() || "" : "";
 const email = route.query.email?.toString() || "";
@@ -239,21 +244,22 @@ const data = reactive({
 const loading = ref(false);
 const showPassword = ref(false);
 
-const errorMessage = ref(
-  err ? (ERROR_MESSAGES[err] ?? "An unexpected error occurred.") : "",
-);
+const errorMessage = computed(() => {
+  if (!err) return "";
+  return ERROR_MESSAGES.value[err] ?? t("auth.login.errors.unexpected");
+});
 
 // Trigger toast notification if an error query parameter was provided
 onMounted(() => {
-  if (err && ERROR_MESSAGES[err]) {
-    notification.error("Authentication Error", ERROR_MESSAGES[err]);
+  if (err && ERROR_MESSAGES.value[err]) {
+    notification.error(t("auth.login.errors.title"), ERROR_MESSAGES.value[err]);
   }
 });
 
 const submitButtonLabel = computed(() => {
-  if (state === "code") return "Verify Code";
-  if (data.password) return "Sign In";
-  return "Send One-Time Code";
+  if (state === "code") return t("auth.login.btnVerify");
+  if (data.password) return t("auth.login.btnSignIn");
+  return t("auth.login.btnSendCode");
 });
 
 const signIn = (e: Event) => {

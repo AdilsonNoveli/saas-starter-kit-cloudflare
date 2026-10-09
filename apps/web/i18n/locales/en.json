@@ -7,7 +7,7 @@
   "nav": {
     "brand": "Nuxfire",
     "home": "Home",
-    "pricing": "Pricing",
+    "pricing": "Download",
     "docs": "Docs",
     "blog": "Blog",
     "login": "LOGIN",
@@ -104,7 +104,7 @@
       "title": "Start your SaaS with login, billing and deploy already built.",
       "subtitle": "Nuxfire is a Nuxt kit for Cloudflare with teams, permissions, payments, an admin panel and a method for your AI to build the rest from a spec and tests.",
       "cta": "Get Nuxfire",
-      "ctaTalk": "Talk to WhatsApp",
+      "ctaTalk": "WhatsApp Group",
       "priceLine": "{launch} for the first {limit} licenses, then {regular}. One payment, with {months} months of updates."
     },
     "problem": {
@@ -228,12 +228,12 @@
       "eyebrow": "Testimonials"
     },
     "offer": {
-      "title": "Start today",
+      "title": "Open source to accelerate your SaaS",
       "launchLabel": "Launch: first {limit} licenses",
       "regularLabel": "Then {regular}",
       "payOnce": "One payment",
       "updates": "{months} months of updates included",
-      "includedTitle": "What the license includes",
+      "includedTitle": "What the kit includes",
       "included": {
         "source": "The full source code of the monorepo",
         "teams": "Teams, invitations and permissions",
@@ -244,20 +244,26 @@
         "kanban": "A ready kanban module",
         "docs": "Documentation and the Fireskills method"
       },
-      "license": "Use the code in as many products as you like. The full terms are on the license page.",
-      "licenseLink": "Read the license",
+      "license": "Completely free under the MIT license. Use in as many products as you like.",
+      "licenseLink": "Read the MIT license",
       "refund": "Refunds: we follow what the law requires. The Brazilian Consumer Defense Code provides a right to withdraw within seven days for purchases made outside a commercial establishment.",
       "cta": "Get Nuxfire for {price}",
-      "ctaSoon": "Purchase available soon",
-      "payment": "Card through Stripe checkout. To pay with Pix, message support on WhatsApp.",
-      "talkTitle": "Prefer to talk first?",
-      "talkText": "Arrange a conversation on the support WhatsApp and ask your questions before you buy.",
-      "talkCta": "Message on WhatsApp",
+      "ctaSoon": "Support the project",
+      "payment": "Open source under MIT license. Voluntary support via Ko-fi.",
+      "badge": "Open Source · MIT",
+      "supportTitle": "Support Nuxfire",
+      "supportText": "Nuxfire is free, open source, and built for the community. If it saved you weeks of work, consider supporting development to keep updates and new features coming.",
+      "supportCta": "Support the project",
+      "githubCta": "Star on GitHub",
+      "supportMicrocopy": "No mandatory subscription. Pay whatever feels right.",
+      "talkTitle": "Official WhatsApp Group",
+      "talkText": "Join our WhatsApp community to ask questions, share feedback, and connect with other developers.",
+      "talkCta": "WhatsApp Group",
       "talkMessage": "Hello! I would like to talk about Nuxfire.",
-      "eyebrow": "Offer"
+      "eyebrow": "Download & Support"
     },
     "faq": {
-      "title": "Questions from people about to buy",
+      "title": "Frequently Asked Questions",
       "items": {
         "needs": {
           "question": "What do I need to know to use it?",
@@ -265,19 +271,23 @@
         },
         "commercial": {
           "question": "Can I use it in commercial and client projects?",
-          "answer": "Yes: the license lets you create as many end products as you like and sell them. It does not allow redistributing the code itself, and freelancers need one license per client. Read the full terms on the license page."
+          "answer": "Yes: the MIT license permits commercial use in as many products as you like without restrictions."
         },
         "updates": {
-          "question": "Which updates are included?",
-          "answer": "{months} months of updates are included in the price, with no subscription."
+          "question": "How do updates work?",
+          "answer": "The codebase is open on GitHub. Bug fixes, enhancements, and new features are published directly there."
         },
         "contact": {
-          "question": "How do I talk to you before buying?",
-          "answer": "On the support WhatsApp. We arrange a conversation and answer your questions before the purchase."
+          "question": "How do I ask questions or get involved?",
+          "answer": "Through our official WhatsApp group. We answer questions, gather feedback, and discuss improvements."
+        },
+        "support": {
+          "question": "How can I support the project?",
+          "answer": "You can support development on Ko-fi and by giving the repository a star on GitHub."
         },
         "pay": {
-          "question": "How do I pay?",
-          "answer": "By card, in the Stripe checkout. To pay with Pix, message support on WhatsApp."
+          "question": "Is the project really free?",
+          "answer": "Yes, Nuxfire is completely free and open source under the MIT license. Financial support is voluntary via Ko-fi."
         }
       }
     }

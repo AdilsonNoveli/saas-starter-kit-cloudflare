@@ -3,6 +3,7 @@ import { secret } from "./secret";
 import { deployWorker } from "./utils/nuxt";
 import { adminSecret, auth, clientID } from "./auth";
 import { wsTicketSecret } from "./websockets";
+import { branding } from "./branding";
 
 // Exported so infra/web.ts can link this same Worker resource and reach it
 // over a service binding (env.AppWorker) instead of a public fetch — same
@@ -24,6 +25,11 @@ export const app = await deployWorker("App", {
   // global fetch() for calls to the OpenAuth issuer.
   link: [auth],
   vars: {
+    // The product name from scripts/branding.ts (BRAND_NAME): the only place it is set. The
+    // server-only copy feeds the MFA issuer shown in authenticator apps; the public copy feeds
+    // the signed-in screens. Plain values, not secrets.
+    NUXT_BRAND_NAME: branding.name,
+    NUXT_PUBLIC_BRAND_NAME: branding.name,
     NUXT_PUBLIC_AUTH_CLIENT_ID: clientID.result,
     NUXT_PUBLIC_AUTH_URL: authUrl.properties.value,
     // Server-side only — deliberately not under NUXT_PUBLIC_, so it never

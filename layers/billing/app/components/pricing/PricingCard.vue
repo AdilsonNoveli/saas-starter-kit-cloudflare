@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex flex-col p-6 bg-elevated rounded-xl border border-default"
+    class="relative flex flex-col p-6 bg-elevated rounded-md border border-default"
     :class="{ 'ring-2 ring-primary': isCurrent || isFeatured }"
   >
     <div class="mb-4">
@@ -36,7 +36,7 @@
       >
         <div class="flex-shrink-0">
           <UIcon
-            :name="feature.included ? 'i-lucide-check' : 'i-lucide-x'"
+            :name="feature.included ? 'i-ph-check-duotone' : 'i-ph-x-duotone'"
             class="w-5 h-5"
             :class="feature.included ? 'text-primary' : 'text-dimmed'"
           />
@@ -63,7 +63,7 @@
 
     <div
       v-if="isCurrent || isFeatured"
-      class="absolute -top-3 right-6 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-inverted"
+      class="absolute -top-3 right-6 rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-inverted"
     >
       {{ isCurrent ? "Current Plan" : "Popular" }}
     </div>

@@ -6,19 +6,112 @@
  * whole must NOT be `as const`, because that makes `compoundVariants` a
  * readonly array, which Nuxt UI's `AppConfigUI` (TVConfig) rejects.
  */
+/**
+ * Font families of every Serelius app, declared once. Each app passes `nuxtFonts` to the `fonts` option
+ * of `@nuxt/fonts`, so no `nuxt.config.ts` names a font. The `fontsource` provider fetches the files at
+ * build time and `@nuxt/fonts` serves them from the app's own domain. Only the listed weights are emitted:
+ * Atkinson Hyperlegible 400 and 700 for text and titles, IBM Plex Mono 400 for data; normal style and the
+ * latin subsets only. `global: true` is required: the families are reached through the `--font-sans` and
+ * `--font-mono` variables, which `@nuxt/fonts` does not follow, so without it no `@font-face` is emitted.
+ */
+export const fontFamilies = [
+  { name: "Atkinson Hyperlegible", provider: "fontsource", weights: [400, 700] },
+  { name: "IBM Plex Mono", provider: "fontsource", weights: [400] },
+] as const;
+
+export const nuxtFonts = {
+  families: fontFamilies.map((family) => ({ name: family.name, provider: family.provider, weights: [...family.weights], styles: ["normal" as const], subsets: ["latin", "latin-ext"], global: true })),
+};
+
+/**
+ * Brand files served from the root of every app (`packages/tokens/public`, exposed as a Nuxt layer).
+ * `logo.light` is drawn for light backgrounds (ink) and `logo.dark` for dark ones (paper). The symbol has
+ * an outline version (`icon-border.svg`) and a filled two-color version (`icon-color.svg`). Every fill in
+ * these SVGs is a color defined in `theme.css`; the policy test checks it.
+ */
+export const brand = {
+  symbol: { outline: "/icon-border.svg", color: "/icon-color.svg" },
+  logo: { light: "/logo-clear.svg", dark: "/logo-dark.svg" },
+  favicon: "/favicon.ico",
+} as const;
+
+/**
+ * Colors for the e-mail templates in `packages/emails`. E-mail clients read neither CSS variables nor
+ * `color-mix()`, so the values are already resolved; `design-tokens.test.ts` fails when one drifts from
+ * `theme.css`, the same guard `themeColor` has. Names are roles, not hues: `ink` is text and headings,
+ * `muted` is secondary text, `line` is rules and borders, `action` / `onAction` is the button.
+ */
+export const emailColors = {
+  canvas: "#f2efe8",
+  ink: "#111213",
+  muted: "#43494c",
+  line: "#c2bcab",
+  action: "#fe1c02",
+  onAction: "#ffffff",
+} as const;
+
+/** The Tailwind config of the e-mail templates: the colors above under their role names. */
+/** E-mail corners follow the same cap as the apps (decision D11): nothing above 3px. */
+export const emailRadius = "3px";
+
+export const emailTailwind = { theme: { extend: { colors: { ...emailColors }, borderRadius: { DEFAULT: emailRadius, sm: "2px", md: emailRadius, lg: emailRadius, xl: emailRadius, "2xl": emailRadius, full: emailRadius } } } };
+
 export const sharedUiConfig = {
+  // Phosphor duotone for every icon Nuxt UI draws by itself (43 keys). Nuxt UI defaults them all to
+  // Lucide, so without this block it would keep emitting Lucide next to the project's Phosphor icons.
   icons: {
-    panelOpen: "i-lucide-chevron-right",
-    panelClose: "i-lucide-chevron-left",
+    arrowDown: "i-ph-arrow-down-duotone",
+    arrowLeft: "i-ph-arrow-left-duotone",
+    arrowRight: "i-ph-arrow-right-duotone",
+    arrowUp: "i-ph-arrow-up-duotone",
+    caution: "i-ph-warning-circle-duotone",
+    check: "i-ph-check-duotone",
+    chevronDoubleLeft: "i-ph-caret-double-left-duotone",
+    chevronDoubleRight: "i-ph-caret-double-right-duotone",
+    chevronDown: "i-ph-caret-down-duotone",
+    chevronLeft: "i-ph-caret-left-duotone",
+    chevronRight: "i-ph-caret-right-duotone",
+    chevronUp: "i-ph-caret-up-duotone",
+    close: "i-ph-x-duotone",
+    copy: "i-ph-copy-duotone",
+    copyCheck: "i-ph-check-square-duotone",
+    dark: "i-ph-moon-duotone",
+    drag: "i-ph-dots-six-vertical-duotone",
+    ellipsis: "i-ph-dots-three-duotone",
+    error: "i-ph-x-circle-duotone",
+    external: "i-ph-arrow-up-right-duotone",
+    eye: "i-ph-eye-duotone",
+    eyeOff: "i-ph-eye-slash-duotone",
+    file: "i-ph-file-duotone",
+    folder: "i-ph-folder-duotone",
+    folderOpen: "i-ph-folder-open-duotone",
+    hash: "i-ph-hash-duotone",
+    info: "i-ph-info-duotone",
+    light: "i-ph-sun-duotone",
+    loading: "i-ph-circle-notch-duotone",
+    menu: "i-ph-list-duotone",
+    minus: "i-ph-minus-duotone",
+    panelClose: "i-ph-caret-left-duotone",
+    panelOpen: "i-ph-caret-right-duotone",
+    plus: "i-ph-plus-duotone",
+    reload: "i-ph-arrow-counter-clockwise-duotone",
+    search: "i-ph-magnifying-glass-duotone",
+    stop: "i-ph-square-duotone",
+    star: "i-ph-star-duotone",
+    success: "i-ph-check-circle-duotone",
+    system: "i-ph-desktop-duotone",
+    tip: "i-ph-lightbulb-duotone",
+    upload: "i-ph-upload-duotone",
+    warning: "i-ph-warning-duotone",
   },
   colors: {
-    primary: "flame",
-    secondary: "fire",
+    primary: "serelius",
+    secondary: "ink",
     success: "green",
     info: "blue",
     warning: "amber",
     error: "red",
-    neutral: "night",
+    neutral: "ink",
   },
   button: {
     defaultVariants: {
@@ -61,6 +154,10 @@ export const sharedUiConfig = {
    * surface ladder, so it stays visible against both the page and any card.
    */
   avatar: {
+    // Nuxt UI draws the avatar `rounded-full`; Serelius corners are almost square (decision D11).
+    slots: {
+      root: "rounded-sm",
+    },
     variants: {
       color: {
         neutral: {
@@ -141,7 +238,7 @@ export const sharedUiConfig = {
     variants: {
       orientation: {
         vertical: {
-          link: "px-3 py-3 rounded-lg before:rounded-lg",
+          link: "px-3 py-3 rounded-xs before:rounded-xs",
           list: "space-y-3",
           linkLeadingIcon: "size-6",
         },
@@ -165,15 +262,15 @@ export const sharedUiConfig = {
       /*
        * The stock active row is `before:bg-elevated`, which on a sidebar that
        * shares the page canvas measures 1.117:1 — the selection was carried
-       * almost entirely by the label color, with no defined edge. pedped's
-       * active item is a tinted background *plus* a matching border — a
-       * bordered chip, not just a wash of color. `ring-inset` keeps the
-       * border from adding to the element's box size.
+       * almost entirely by the label color, with no defined edge. In Serelius
+       * the selected item is the lime marker with ink text (11.13:1 in both
+       * themes): the lime is a highlighter, never ink. `ring-inset` keeps a
+       * transparent ring from adding to the element's box size.
        */
       {
         variant: "pill" as const,
         active: true,
-        class: { link: "before:bg-primary/15 ring ring-inset ring-primary/25" },
+        class: { link: "before:bg-highlight text-on-highlight ring ring-inset ring-transparent" },
       },
     ],
   },
@@ -188,15 +285,53 @@ export const sharedUiConfig = {
     defaultVariants: {
       variant: "link" as const,
     },
+    // The underline indicator is `rounded-full` in the stock theme; it sits on the variant, not on a slot.
+    variants: {
+      variant: {
+        link: {
+          indicator: "rounded-xs",
+        },
+      },
+    },
+  },
+
+  /*
+   * The other Nuxt UI components the product uses that draw `rounded-full` by default (decision D11:
+   * almost square corners). A new component that does the same needs a line here; the policy test
+   * only sees what the code writes, not what a library draws.
+   */
+  switch: {
+    slots: {
+      base: "rounded-sm",
+      thumb: "rounded-xs",
+    },
+  },
+  chip: {
+    slots: {
+      base: "rounded-xs",
+    },
+  },
+  radioGroup: {
+    slots: {
+      base: "rounded-sm",
+      indicator: "after:rounded-xs",
+    },
+  },
+  // The onboarding step indicator (SPEC-0010, DEC-007): the stock step button and the line between
+  // steps are `rounded-full`. Both sit on slots, with no variant redefining the radius.
+  stepper: {
+    slots: {
+      trigger: "rounded-sm",
+      separator: "rounded-xs",
+    },
   },
 };
 
 /**
- * `UTable`'s stock header (`text-sm text-highlighted font-semibold`) reads
- * as a heading, not a column label — the pedped reference's tables use a
- * small, muted, uppercase, letter-spaced header instead (the same
- * convention Linear/Stripe/Notion data tables use), which is what actually
- * separates "table" from "list of headings" at a glance.
+ * `UTable`'s stock header (`text-sm text-highlighted font-semibold`) reads as a heading, not a column
+ * label. Serelius separates "table" from "list of headings" by weight and color instead of caps: the
+ * header is `text-sm` in the muted tone, still semibold, with the same 20px sides and 16px rows of the
+ * "aerada" density (`--sr-density-pad-x` / `--sr-density-pad-y`), so a data row is 56px tall.
  *
  * The header is a flat sticky-style bar in pedped — `bg-surface-raised
  * border-b border-border`, full width, no rounding. An earlier version of
@@ -226,8 +361,8 @@ export const enterpriseTableUi = {
   thead: "[&>tr]:bg-elevated [&>tr]:after:content-none",
   tbody: "[&>tr]:last:[&>td]:border-b-0",
   tr: "hover:bg-elevated/50 transition-colors",
-  th: "py-3 border-b border-default text-xs uppercase tracking-wider text-muted font-semibold",
-  td: "border-b border-default",
+  th: "px-5 py-3 border-b border-default text-sm text-muted font-semibold",
+  td: "px-5 py-4 border-b border-default",
   separator: "h-0",
 } as const;
 
@@ -236,4 +371,4 @@ export const enterpriseTableUi = {
  * here, cannot use a CSS variable. Each value must equal the `--ui-bg` of its mode in
  * theme.css; `theme-color.test.ts` fails when they drift.
  */
-export const themeColor = { light: "#ffffff", dark: "#0d0d0d" } as const;
+export const themeColor = { light: "#f2efe8", dark: "#111213" } as const;

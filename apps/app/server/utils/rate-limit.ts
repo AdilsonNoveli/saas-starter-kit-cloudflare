@@ -1,27 +1,14 @@
-/**
- * Fixed-window rate limiter backed by the app's KV binding. Used to protect
- * public, unauthenticated endpoints (payment webhooks) from abuse/flood —
- * HMAC signature validation alone doesn't stop a high-volume replay of a
- * previously-valid (or leaked) signed payload.
- */
-export async function rateLimit(
-  key: string,
-  { limit, windowSeconds }: { limit: number; windowSeconds: number },
-) {
-  // Cloudflare KV rejects a TTL under 60s, so the window can't be shorter.
-  const window = Math.max(windowSeconds, 60);
-  const kv = hubKV();
-  const windowId = Math.floor(Date.now() / 1000 / window);
-  const kvKey = `ratelimit:${key}:${windowId}`;
-  const count = ((await kv.get<number>(kvKey)) ?? 0) + 1;
-  await kv.set(kvKey, count, { ttl: window });
-  return { allowed: count <= limit, count, limit };
+import { hubKvStore, rateLimit as fixedWindow, type RateLimitRule } from "@nuxfire/rate-limit";
+
+/** Fixed-window rate limit over the app's own KV binding. */
+export function rateLimit(key: string, rule: RateLimitRule) {
+  return fixedWindow(hubKvStore(hubKV()), key, rule);
 }
 
 export async function assertNotRateLimited(
   event: import("h3").H3Event,
   routeKey: string,
-  options: { limit: number; windowSeconds: number },
+  options: RateLimitRule,
 ) {
   const ip = getRequestIP(event, { xForwardedFor: true }) || "unknown";
   const { allowed } = await rateLimit(`${routeKey}:${ip}`, options);

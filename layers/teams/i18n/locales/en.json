@@ -1,3 +1,108 @@
 {
-  "teams": {}
+  "teams": {
+    "select": {
+      "title": "Spaces"
+    },
+    "switcher": {
+      "title": "Choose a Space",
+      "create": "Create a Space",
+      "settings": "Space settings",
+      "settingsOf": "Settings of {name}",
+      "emptyTitle": "No Spaces yet",
+      "emptyDescription": "Spaces you create or join appear here.",
+      "placeholder": "Choose a Space",
+      "avatarAlt": "Space"
+    },
+    "create": {
+      "title": "Create a Space",
+      "close": "Close",
+      "nameLabel": "Space name",
+      "namePlaceholder": "Enter a name for the Space",
+      "nameLength": "Use between 2 and 50 characters.",
+      "slugLabel": "Address",
+      "slugPlaceholder": "my-space",
+      "submit": "Create Space",
+      "failed": "The Space wasn't created"
+    },
+    "dashboard": {
+      "created": "Space created on"
+    },
+    "settings": {
+      "title": "Settings",
+      "general": {
+        "title": "General",
+        "description": "Members and people you invite see this information.",
+        "save": "Save changes",
+        "logoLabel": "Space logo",
+        "nameLabel": "Space name",
+        "namePlaceholder": "Space name",
+        "saved": "Settings saved",
+        "savedDescription": "The Space name was updated.",
+        "saveFailed": "The settings weren't saved",
+        "logoUpdated": "Logo updated",
+        "logoUploadFailed": "The logo wasn't uploaded",
+        "logoRemoved": "Logo removed",
+        "logoRemoveFailed": "The logo wasn't removed"
+      },
+      "members": {
+        "inviteTitle": "Invite people",
+        "emailLabel": "Email",
+        "emailPlaceholder": "name{'@'}company.com",
+        "emailInvalid": "Enter an email address like name{'@'}company.com.",
+        "roleLabel": "Role",
+        "roleRequired": "Choose a role.",
+        "inviteSubmit": "Send invitation",
+        "tabMembers": "Members",
+        "tabInvites": "Invitations",
+        "emptyMembersTitle": "No members yet",
+        "emptyMembersDescription": "People who accept an invitation appear here.",
+        "emptyInvitesTitle": "No pending invitations",
+        "emptyInvitesDescription": "Invitations you send stay here until they are accepted.",
+        "tryAgain": "Try again in a moment.",
+        "inviteSent": "Invitation sent",
+        "inviteSentDescription": "{email} will get an email with the link.",
+        "inviteFailed": "The invitation wasn't sent",
+        "roleUpdated": "Role updated",
+        "roleUpdatedDescription": "The member's role was changed.",
+        "roleUpdateFailed": "The role wasn't changed",
+        "memberRemoved": "Member removed",
+        "memberRemovedDescription": "This person no longer has access to the Space.",
+        "memberRemoveFailed": "The member wasn't removed",
+        "inviteRoleUpdated": "Invitation role updated",
+        "inviteRoleUpdatedDescription": "The person joins with the new role when they accept.",
+        "inviteRoleUpdateFailed": "The invitation role wasn't changed",
+        "inviteRemoved": "Invitation canceled",
+        "inviteRemovedDescription": "The link in the email no longer works.",
+        "inviteRemoveFailed": "The invitation wasn't canceled",
+        "invitedBy": "Invited by {name}",
+        "cancelInvite": "Cancel invitation"
+      },
+      "danger": {
+        "title": "Delete Space",
+        "description": "Deleting a Space removes it for every member, and it can't be undone.",
+        "action": "Delete this Space",
+        "confirmDescription": "Delete the {name} Space? Its members lose access and this can't be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete Space"
+      }
+    },
+    "invite": {
+      "title": "Space invitation",
+      "close": "Close",
+      "invitedBy": "Invited by {name} ({email})",
+      "message": "You were invited to join this Space as {role}.",
+      "notFoundTitle": "Invitation not found",
+      "notFoundDescription": "This invitation doesn't exist or has expired. Ask the person who invited you for a new one.",
+      "decline": "Decline",
+      "accept": "Accept",
+      "errors": {
+        "BAD_REQUEST": "This invitation is no longer valid. Ask the person who invited you for a new one.",
+        "NOT_FOUND": "This invitation doesn't exist or was sent to another email address. Sign in with the address that received it.",
+        "CONFLICT": "You are already a member of this Space.",
+        "FORBIDDEN": "This Space has reached the member limit of its plan. Ask an owner of the Space to free a seat or change the plan.",
+        "UNAUTHORIZED": "Your session has ended. Sign in again to accept the invitation.",
+        "UNKNOWN": "The invitation couldn't be accepted. Try again in a moment."
+      }
+    }
+  }
 }

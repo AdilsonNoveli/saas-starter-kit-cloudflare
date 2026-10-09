@@ -49,7 +49,7 @@ Mandatory checklist per task in exact order:
 
 - [ ] T004 [CODE] [MIGRATION] [US-001] Create persistent schema in apps/functions/src/database/migrations/NNNN_feature.sql — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
   - [ ] **PREP**: Confirm RED TDD, test database isolation, and versioned migration path.
-  - [ ] **EXECUTE**: Declare table in layer schema and generate migration with `drizzle-kit generate`.
+  - [ ] **EXECUTE**: Declare the table in the layer schema and regenerate the init of the owning history with `drizzle-kit generate` (database change policy in `.fireskills/RULES.md`); the responsible person resets the database and redeploys from zero (guarded reset command, then `bun run deploy`).
   - [ ] **VERIFY**: Execute `bunx drizzle-kit generate` and verify SQL contains only planned changes.
   - [ ] **VISUAL**: Mark `Not applicable` because task modifies only persistent database structure.
   - [ ] **EVIDENCE**: Record generated migration file, SQL review, and test results.

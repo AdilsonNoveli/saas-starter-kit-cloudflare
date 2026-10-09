@@ -15,7 +15,7 @@ async function walk(directory) {
   const files = [];
   if (!existsSync(directory)) return files;
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if ([".git", ".claude", "node_modules", "vendor", "_docs", "fireskills", ".nuxt", ".output", ".sst", ".data", "dist"].includes(entry.name)) continue;
+    if ([".git", ".claude", "node_modules", "vendor", "_docs", "fireskills", ".nuxt", ".output", ".sst", ".data", "dist"].includes(entry.name) || entry.name.startsWith("_reference-")) continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) files.push(...await walk(path));
     else files.push(path);

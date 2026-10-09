@@ -9,7 +9,8 @@
     ".data",
     "dist",
     "bun.lock",
-    "apps/web/constants/paths.json"
+    "apps/web/constants/paths.json",
+    "_reference-*"
   ],
   "words": ["fireskills", "fireskill", "nuxfire", "Nuxfire"]
 }

@@ -7,16 +7,32 @@
 // Path on the auth Worker that erases an identity — credentials and every
 // session. It lives here because both sides have to agree on it: the auth
 // Worker serves it (apps/functions/src/auth.ts) and the app Worker calls
-// it over its service binding (apps/app/server/trpc/routers/account.ts).
+// it over its service binding (layers/account/server/trpc/account.ts).
 export const identityDeletePath = "/internal/identity/delete";
 
-// Path on the auth Worker that revokes every refresh token for an identity
-// except the one presented by the caller — "sign out of all other sessions".
-// Same reasoning as identityDeletePath: both sides must agree on the route.
-export const signOutOthersPath = "/internal/identity/sign-out-others";
+// Path on the auth Worker that revokes the refresh tokens of an identity, in
+// one of two modes: `onlySid` ends that one session, `exceptSid` ends every
+// session but the caller's ("sign out of all other sessions"). Same reasoning
+// as identityDeletePath: both sides must agree on the route.
+export const sessionsRevokePath = "/internal/identity/sessions/revoke";
+
+// Path on the auth Worker that tells what an identity has: the providers
+// linked to its profile, whether a password credential exists and the sids
+// with a live refresh record. Same reasoning as identityDeletePath.
+export const identityStatePath = "/internal/identity/state";
+
+// Path on the auth Worker that moves an identity to a new e-mail (profile,
+// password credential and subject key, same id), keeps the caller's session
+// carrying the new address and ends the others. Same reasoning as
+// identityDeletePath.
+export const emailChangePath = "/internal/identity/email";
+
+// Lifetime of the access token the auth Worker issues. A revoked session keeps
+// working at most this long, because the next renewal finds no refresh record.
+export const ACCESS_TOKEN_TTL_SECONDS = 15 * 60;
 
 // Path on the auth Worker that creates (or resets) an identity with a known
-// password. Same reasoning as the two paths above: AuthKV is bound only to the
+// password. Same reasoning as the paths above: AuthKV is bound only to the
 // auth Worker, so anything outside it — here, the manual demo-account seed
 // script (apps/functions/src/database/seed/demo-accounts.ts) — has to ask
 // for the credential to be written rather than write it itself.
@@ -47,7 +63,10 @@ export const layers = {
   // toggleable `kanban`/`billing` below. See
   // apps/functions/src/database/MIGRATIONS.md and
   // fireskill-specialist-drizzle/references/new-table-recipe.md.
-  core: ["teams", "notifications", "admin"] as string[],
+  // `account` comes last and owns its own migration history since SPEC-0010
+  // (`layers/account/migrations/`), which the deploy loop applies after the
+  // others.
+  core: ["teams", "notifications", "admin", "account"] as string[],
 
   // Feature layers — toggleable per build/deploy. `false` drops the layer's
   // pages, components and Nuxt config from the bundle, AND its migration

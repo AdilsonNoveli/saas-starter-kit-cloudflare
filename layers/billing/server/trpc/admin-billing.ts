@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 // See the note in admin-plans.ts: layers reach the Composition Root's tRPC
 // primitives explicitly; platformAdminProcedure is built on
 // protectedProcedure, not on the tenant ability layer.

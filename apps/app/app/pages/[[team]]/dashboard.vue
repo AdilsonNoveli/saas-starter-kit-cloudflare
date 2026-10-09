@@ -15,12 +15,12 @@
               @click="isNotificationsSlideoverOpen = true"
             >
               <UChip color="primary" :show="unread > 0" inset>
-                <UIcon name="i-lucide-bell" class="size-5 shrink-0" />
+                <UIcon name="i-ph-bell-duotone" class="size-5 shrink-0" />
               </UChip>
             </UButton>
           </UTooltip>
 
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>

@@ -1,5 +1,7 @@
 import { Secret, TOTP } from "otpauth/slim";
+import { encryptSecret } from "@nuxfire/crypto";
 import { platformAdmins } from "@nuxfire/functions/schema";
+import { recordAuditLog } from "~~/server/utils/audit-log";
 
 /**
  * Provisions a TOTP seed for a platform admin who has one but hasn't enrolled
@@ -39,7 +41,7 @@ export default defineEventHandler(async (event) => {
   // 160 bits, the size RFC 4226 specifies for HOTP/TOTP seeds.
   const secret = new Secret({ size: 20 });
   const totp = new TOTP({
-    issuer: "Nuxfire",
+    issuer: platformAdminIssuer(event),
     label: user.email ?? user.id,
     secret,
   });

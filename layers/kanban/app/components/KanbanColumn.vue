@@ -17,7 +17,7 @@
           :aria-label="`Open column ${column.name}`"
           @click="toggleCollapse"
         >
-          <UIcon name="i-lucide-chevron-last" class="size-4" />
+          <UIcon name="i-ph-caret-line-right-duotone" class="size-4" />
         </button>
 
         <!-- Contador -->
@@ -94,7 +94,7 @@
             :disabled="!cardState.title.trim()"
             aria-label="Add card"
           >
-            <UIcon name="i-lucide-plus" class="size-4" />
+            <UIcon name="i-ph-plus-duotone" class="size-4" />
           </button>
         </form>
       </div>

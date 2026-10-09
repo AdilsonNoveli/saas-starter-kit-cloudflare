@@ -6,7 +6,7 @@
       target="_blank"
       color="neutral"
       variant="outline"
-      icon="i-lucide-external-link"
+      icon="i-ph-arrow-square-out-duotone"
       label="Manage Billing"
       :to="updateLink"
     />

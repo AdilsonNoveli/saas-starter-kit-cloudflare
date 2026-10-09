@@ -1,5 +1,5 @@
 {
-  "id": "f9c35e3f-0f30-4913-8719-1624b3872491",
+  "id": "654bc476-adf1-48f2-bd0d-549f83e2a195",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -542,7 +542,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "Team_slug_unique": {
+          "name": "Team_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

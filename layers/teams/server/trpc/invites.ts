@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { and, eq, or } from "drizzle-orm";
-import { z } from "zod";
+import { z } from "zod/v4";
 // See the note in teams.ts: layers reach the Composition Root's tRPC
 // primitives and server utils by explicit import, never by Nitro's merge.
 import {
@@ -10,13 +10,19 @@ import {
   router,
 } from "~~/server/trpc/trpc";
 import { useDB } from "~~/server/utils/db";
-import { teamInvites, teamMemberships, teams } from "@nuxfire/functions/schema";
+import {
+  teamInvites,
+  teamMemberships,
+  teams,
+  userPreferences,
+} from "@nuxfire/functions/schema";
 import {
   countPendingInvites,
   countTeamMembers,
   hasSeatAvailable,
   isInviteAcceptable,
 } from "../utils/team-seats";
+import { inviteMatchesUser } from "../utils/invite-policy";
 import {
   teamsDeleteInvite,
   teamsSendInvite,
@@ -28,7 +34,9 @@ export const invitesRouter = router({
     .input(
       z.object({
         teamIdentifier: z.string(),
-        email: z.string().email(),
+        // Stored lower-cased (AC-007), so the duplicate check below and the
+        // match in acceptInvite never depend on how the address was typed.
+        email: z.string().trim().toLowerCase().email(),
         roleId: z.string(),
       }),
     )
@@ -118,10 +126,20 @@ export const invitesRouter = router({
           });
         }
         const inviteLink = `${origin}/invite/${invite.id}`;
+        // The invitee may have no account, so the e-mail speaks the
+        // inviter's language (DEC-016): their preferences row, English
+        // without one. Read through the schema barrel, not the account layer
+        // (the account -> teams edge is one way, AC-047).
+        const inviterPreferences = await useDB().query.userPreferences.findFirst({
+          where: eq(userPreferences.userId, user.id),
+          columns: { locale: true },
+        });
+        const locale = inviterPreferences?.locale;
         await sendEmail(invite.email, "Invitation", {
           teamName: team.name,
           invitedBy: user.name,
           inviteLink,
+          locale: locale === "pt-br" || locale === "es" ? locale : "en",
         });
         return invite;
       },
@@ -141,7 +159,7 @@ export const invitesRouter = router({
           },
         },
       });
-      if (!invite || invite.email !== user.email) {
+      if (!invite || !inviteMatchesUser(invite, user)) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Invalid or expired invite",

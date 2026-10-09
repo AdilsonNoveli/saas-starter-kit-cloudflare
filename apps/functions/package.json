@@ -1,6 +1,7 @@
 {
   "name": "@nuxfire/functions",
   "version": "0.0.0",
+  "description": "Backend Cloudflare Workers functions for OpenAuth, database migrations, jobs and cron",
   "type": "module",
   "scripts": {
     "generate-migrations": "drizzle-kit generate",
@@ -15,12 +16,15 @@
   },
   "dependencies": {
     "@cloudflare/workers-types": "^4.20241230.0",
+    "@nuxfire/crypto": "workspace:*",
     "@nuxfire/emails": "workspace:*",
+    "@nuxfire/layer-account": "workspace:*",
     "@nuxfire/layer-admin": "workspace:*",
     "@nuxfire/layer-billing": "workspace:*",
     "@nuxfire/layer-kanban": "workspace:*",
     "@nuxfire/layer-notifications": "workspace:*",
     "@nuxfire/layer-teams": "workspace:*",
+    "@nuxfire/rate-limit": "workspace:*",
     "@openauthjs/openauth": "^0.3.6",
     "@paralleldrive/cuid2": "^2.2.2",
     "drizzle-orm": "^0.45.2",

@@ -330,6 +330,41 @@ export function auditLiterals(files: Record<string, string>, attributes?: string
 }
 
 // ---------------------------------------------------------------------------------
+// Serelius voice (SPEC-0008, FR-009): plano mestre Part 3.1 and premise P7
+// ---------------------------------------------------------------------------------
+
+/** Where the voice is enforced: the signed-in app, the login and every layer. `apps/web` is the kit's content, rebuilt in Phase 12. */
+const VOICE_SCOPE = /^(?:apps\/app\/|apps\/login\/|layers\/)/;
+/** The people words of premise P7, judged in Portuguese only. */
+const FORBIDDEN_TERMS = /\b(?:contatos?|leads?|registros?|nós)\b/iu;
+
+/** Exclamation, celebration emoji or sparkle icon, and (in Portuguese) the words the premise forbids. */
+export function auditVoice(strings: Record<string, string>, file: string, locale: string): Violation[] {
+  const found: Violation[] = [];
+  for (const [key, value] of Object.entries(strings)) {
+    const where = `${file}:${key}`;
+    if (value.includes("!")) found.push(bad("voice-exclamation", where, `"${value}" has an exclamation mark: the voice is calm, with short sentences`, value));
+    if (/\p{Extended_Pictographic}/u.test(value)) found.push(bad("voice-emoji", where, `"${value}" has an emoji: no celebration emoji and no sparkle for AI`, value));
+    if (/^pt/i.test(locale) && FORBIDDEN_TERMS.test(value)) found.push(bad("voice-forbidden-term", where, `"${value}" uses a word premise P7 forbids: say pessoas, conexões, círculos or conversas`, value));
+  }
+  return found;
+}
+
+/** The voice rules over repository-relative files: locale JSON files and the literals of `.vue` templates. */
+export function auditVoiceFiles(files: Record<string, string>): Violation[] {
+  return Object.keys(files)
+    .filter((file) => VOICE_SCOPE.test(file))
+    .sort()
+    .flatMap((file) => {
+      const locale = /\/i18n\/locales\/([^/]+)\.json$/.exec(file)?.[1];
+      if (locale) return auditVoice(flattenLocale(JSON.parse(files[file])), file, locale);
+      if (!file.endsWith(".vue")) return [];
+      const literals = Object.fromEntries([...new Set(scanLiterals(files[file]))].map((literal, index) => [String(index), literal]));
+      return auditVoice(literals, file, "en");
+    });
+}
+
+// ---------------------------------------------------------------------------------
 // Urgency and testimonials (FR-009, FR-010)
 // ---------------------------------------------------------------------------------
 

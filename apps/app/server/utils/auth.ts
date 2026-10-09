@@ -2,7 +2,7 @@ import { subjects } from "@nuxfire/functions/subjects";
 import { type Client, createClient } from "@openauthjs/openauth/client";
 import type { H3Event } from "h3";
 import { eq } from "drizzle-orm";
-import { users } from "@nuxfire/functions/schema";
+import { userPreferences, users } from "@nuxfire/functions/schema";
 
 type AuthBinding = { fetch: typeof fetch };
 let _client: Client;
@@ -38,8 +38,10 @@ export const getClient = (event: H3Event) => {
   }));
 };
 
-// Sliding: every verified request re-issues both cookies (getUserSession), so
-// this is an idle timeout, not an absolute session length.
+// Sliding: every renewal re-issues both cookies (getUserSession), so this is
+// an idle timeout, not an absolute session length. It is deliberately longer
+// than the 15-minute access token (ACCESS_TOKEN_TTL_SECONDS in config.ts): the
+// expired JWT has to stay in the cookie next to the refresh token that renews it.
 export const SESSION_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 export const setTokens = (event: H3Event, access: string, refresh: string) => {
@@ -75,7 +77,7 @@ export async function getUser(event: H3Event) {
     // By subject id, matching the upsert in api/auth/callback.ts and the
     // permissions lookup below. Reading the profile by email while the
     // permissions were read by id was how the two could disagree.
-    const [[user], { permissions, teams }, isPlatformAdmin] = await Promise.all(
+    const [[user], { permissions, teams }, isPlatformAdmin, [preferences]] = await Promise.all(
       [
         // Explicit column list, `mfaSecret` deliberately excluded: this
         // query's result ends up spread into /api/auth/session's response
@@ -100,6 +102,21 @@ export async function getUser(event: H3Event) {
         // platform_mfa_verified cookie, and copying it here would turn a
         // 30-minute window into a whole login session.
         isActivePlatformAdmin(session.id),
+        // SPEC-0010 (DEC-003): read here, inside the same round trip, so the
+        // session carries the row; its absence is what sends the person to
+        // /onboarding. None of these columns is secret.
+        useDB()
+          .select({
+            userId: userPreferences.userId,
+            locale: userPreferences.locale,
+            timeZone: userPreferences.timeZone,
+            theme: userPreferences.theme,
+            dateFormat: userPreferences.dateFormat,
+            nameOrder: userPreferences.nameOrder,
+            onboardedAt: userPreferences.onboardedAt,
+          })
+          .from(userPreferences)
+          .where(eq(userPreferences.userId, session.id)),
       ],
     );
     // Without the fallback, a session whose users row is missing produced an
@@ -115,6 +132,11 @@ export async function getUser(event: H3Event) {
     };
     event.context.user = {
       ...profile,
+      // Names this login, so account.signOutOtherSessions can spare it.
+      sid: session.sid,
+      // How this login was made (password, code, google, github): the e-mail
+      // change is only offered to the first two, whose address the person owns.
+      provider: session.provider,
       permissions,
       teams,
       isPlatformAdmin,
@@ -124,6 +146,7 @@ export async function getUser(event: H3Event) {
       // (user-mfa-session.ts) and is read by protectedProcedure and
       // /api/mfa/status, not cached here.
       mfaEnabled: Boolean(mfaEnabledAt),
+      preferences: preferences ?? null,
     };
   }
   return event.context.user;
@@ -157,6 +180,19 @@ export async function getUserSession(
   if (!verified.err) {
     if (verified.tokens) {
       setTokens(event, verified.tokens.access, verified.tokens.refresh);
+      // SPEC-0010 (DEC-008): the session row slides once per renewal (about
+      // every 15 minutes), never on a request whose access is still valid.
+      // Metadata only, so a failure is logged and the request goes on.
+      try {
+        await touchSession(verified.subject.properties.sid);
+      } catch (error) {
+        const err = error as { message?: string; name?: string; stack?: string };
+        console.error("session touch failed", {
+          message: err?.message,
+          name: err?.name,
+          stack: err?.stack,
+        });
+      }
     }
     return verified.subject.properties;
   }
@@ -166,6 +202,11 @@ export async function getUserSession(
     hadRefreshToken: !!refresh,
     fromCookie: !accessToken,
   });
+  // A refused token stays refused: left in place, the browser would present
+  // it on every request and pay a round trip to the issuer each time. Same
+  // path as setTokens, or the browser keeps them.
+  deleteCookie(event, "nuxfire-access-token", { path: "/" });
+  deleteCookie(event, "nuxfire-refresh-token", { path: "/" });
 }
 
 export async function getUserPermissions(userId: string) {

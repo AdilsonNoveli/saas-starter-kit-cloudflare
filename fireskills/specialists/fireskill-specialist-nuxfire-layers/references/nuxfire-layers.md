@@ -6,18 +6,20 @@ Each statement includes concrete file evidence. The codebase supersedes this doc
 
 - Business domains reside in `layers/<name>/` (`layers/*` workspace), package
   `@nuxfire/layer-<name>`. Existing today: **core** `teams`, `notifications`,
-  `admin`; **feature** `kanban`, `billing` (`config.ts`). `billing` moved from
+  `admin`, `account` (SPEC-0009, no migration history yet); **feature** `kanban`, `billing` (`config.ts`). `billing` moved from
   core to feature in SPEC-0005, once `layers/teams` stopped importing it (a
   base layer must never import a feature layer, enforced by
   `scripts/layer-dependency-direction.test.ts`).
-- `apps/app` is the **Composition Root**: application shell (dashboard, account),
+- `apps/app` is the **Composition Root**: application shell (dashboard),
   tRPC composition, `nuxt.config.ts`, and core infrastructure
-  (`server/utils/{db,auth,audit-log,mfa-crypto,rate-limit,ws-ticket,user-mfa*}.ts`,
+  (`server/utils/{db,auth,audit-log,rate-limit}.ts`, where `rate-limit.ts` is only the
+  h3 wrapper over `packages/rate-limit`, `server/api/auth/*`,
   `app/plugins/websockets.client.ts`, `app/composables/use-notification.ts`,
-  `app/components/account/MfaSetupModal.vue`,
   `app/middleware/{0.auth,1.teams}.global.ts`). Contains zero business domain logic.
+  Account, profile and user MFA (router, routes, pages, `account`/`avatar`/`settings`
+  components) live in `layers/account`.
 - Other workspace packages: `apps/web` (marketing site + docs), `apps/login` (static login UI),
-  `apps/functions` (Workers), `packages/{emails,tokens,manifest}`.
+  `apps/functions` (Workers), `packages/{emails,tokens,manifest,crypto,rate-limit}`.
 
 ## 2. Where Layers are Registered (`config.ts`)
 

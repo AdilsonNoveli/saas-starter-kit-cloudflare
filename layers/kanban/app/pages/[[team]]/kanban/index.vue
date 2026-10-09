@@ -7,7 +7,7 @@
         </template>
 
         <template #right>
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -17,7 +17,7 @@
         v-if="showInitialLoader"
         class="flex justify-center py-12 text-muted"
       >
-        <UIcon name="i-lucide-loader-circle" class="size-6 animate-spin" />
+        <UIcon name="i-ph-circle-notch-duotone" class="size-6 animate-spin" />
       </div>
 
       <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -26,7 +26,7 @@
           class="flex flex-col items-center justify-center gap-2 min-h-[164px] rounded-lg border-2 border-dashed border-default hover:border-accented text-dimmed hover:text-default transition-colors cursor-pointer"
           @click="showCreateModal = true"
         >
-          <UIcon name="i-lucide-circle-plus" class="size-8" />
+          <UIcon name="i-ph-plus-circle-duotone" class="size-8" />
           <span class="text-sm font-medium">New board</span>
         </button>
 
@@ -44,20 +44,20 @@
           >
             <UButton
               color="neutral"
-              icon="i-lucide-ellipsis-vertical"
+              icon="i-ph-dots-three-vertical-duotone"
               aria-label="Board options"
             />
           </UDropdownMenu>
 
           <div class="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary shrink-0">
-            <UIcon name="i-lucide-kanban" class="size-5" />
+            <UIcon name="i-ph-kanban-duotone" class="size-5" />
           </div>
           <div class="min-w-0">
             <p class="truncate font-semibold text-highlighted">{{ board.name }}</p>
             <p class="flex items-center gap-1 text-xs text-muted">
               Abrir board
               <UIcon
-                name="i-lucide-arrow-right"
+                name="i-ph-arrow-right-duotone"
                 class="size-3.5 -translate-x-0.5 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all"
               />
             </p>
@@ -95,14 +95,14 @@ function boardMenuItems(board: { id: string; name: string }): DropdownMenuItem[]
     [
       {
         label: "Settings",
-        icon: "i-lucide-settings",
+        icon: "i-ph-gear-duotone",
         disabled: true,
       },
     ],
     [
       {
         label: "Delete",
-        icon: "i-lucide-trash-2",
+        icon: "i-ph-trash-duotone",
         color: "error" as const,
         onSelect: () => onDeleteBoard(board),
       },

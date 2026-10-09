@@ -20,7 +20,7 @@ async function json(path) {
 async function files(path, listed = []) {
   if (!existsSync(path) || listed.length >= 80) return listed;
   for (const entry of await readdir(path, { withFileTypes: true })) {
-    if (ignored.has(entry.name) || listed.length >= 80) continue;
+    if (ignored.has(entry.name) || entry.name.startsWith("_reference-") || listed.length >= 80) continue;
     const target = join(path, entry.name);
     if (entry.isDirectory()) await files(target, listed);
     else listed.push(relative(project, target));
@@ -58,7 +58,7 @@ function nuxtVueFiles(kind) {
         let entries = [];
         try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
         for (const entry of entries) {
-          if (ignored.has(entry.name)) continue;
+          if (ignored.has(entry.name) || entry.name.startsWith("_reference-")) continue;
           const target = join(dir, entry.name);
           if (entry.isDirectory()) walk(target);
           else if (entry.name.endsWith(".vue")) found.push(relative(project, target).replaceAll("\\", "/"));

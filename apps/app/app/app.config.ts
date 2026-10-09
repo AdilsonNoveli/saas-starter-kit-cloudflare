@@ -5,17 +5,6 @@ export default defineAppConfig({
     ...sharedUiConfig,
   },
   site: {
-    name: "Nuxfire",
     description: "Production-ready enterprise-grade Nuxt starter kit for Cloudflare.",
-  },
-  docs: {
-    name: "Docs",
-    description: "Nuxfire Documentation",
-    sidebar: {
-      useLevel: false,
-      collapse: false,
-      collapseLevel: 1,
-      folderStyle: "default",
-    },
   },
 });

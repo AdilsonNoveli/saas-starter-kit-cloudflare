@@ -7,7 +7,7 @@
     >
     <UIcon
       class="text-primary w-6 h-6 animate-spin"
-      name="i-lucide-loader-circle"
+      name="i-ph-circle-notch-duotone"
     />
   </div>
 </template>

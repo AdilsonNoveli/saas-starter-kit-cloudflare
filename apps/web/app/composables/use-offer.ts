@@ -16,6 +16,8 @@ interface PublicOfferPlan {
   id: string;
 }
 
+export const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/KSKqVly5tFp2OpUtWrvccY";
+
 export function useOffer() {
   const { locale } = useI18n();
   const config = useRuntimeConfig();
@@ -46,12 +48,14 @@ export function useOffer() {
     price: price(activePrice(OFFER, LAUNCH_OPEN)),
   }));
 
+
   return {
     offer: OFFER,
     launchOpen: LAUNCH_OPEN,
     params,
     checkoutUrl,
     hasCheckout: computed(() => checkoutUrl.value !== ""),
-    whatsapp: (message: string) => whatsappUrl(OFFER.support.whatsapp, message),
+    whatsappGroupUrl: WHATSAPP_GROUP_URL,
+    whatsapp: (_message?: string) => WHATSAPP_GROUP_URL,
   };
 }

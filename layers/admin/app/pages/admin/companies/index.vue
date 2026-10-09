@@ -7,7 +7,7 @@
         </template>
 
         <template #right>
-          <AccountUserDropdown collapsed size="md" />
+          <AccountHeaderActions />
         </template>
       </UDashboardNavbar>
     </template>
@@ -35,7 +35,7 @@
           />
           <UButton
             label="Refresh"
-            icon="i-lucide-refresh-cw"
+            icon="i-ph-arrows-clockwise-duotone"
             color="neutral"
             variant="outline"
             loading-auto
@@ -113,14 +113,14 @@ function getRowItems(row: Row<Company>): DropdownMenuItem[] {
     { type: "label", label: "Actions" },
     {
       label: "View details",
-      icon: "i-lucide-list",
+      icon: "i-ph-list-bullets-duotone",
       onSelect: () => navigateTo(`/admin/companies/${company.id}`),
     },
     { type: "separator" },
     isSuspended
       ? {
           label: "Reactivate",
-          icon: "i-lucide-circle-check",
+          icon: "i-ph-check-circle-duotone",
           onSelect: () => {
             selectedTeam.value = { id: company.id, name: company.name };
             reactivateOpen.value = true;
@@ -128,7 +128,7 @@ function getRowItems(row: Row<Company>): DropdownMenuItem[] {
         }
       : {
           label: "Suspend",
-          icon: "i-lucide-ban",
+          icon: "i-ph-prohibit-duotone",
           color: "error",
           onSelect: () => {
             selectedTeam.value = { id: company.id, name: company.name };
@@ -236,7 +236,7 @@ const columns: TableColumn<Company>[] = [
           { content: { align: "end" }, items: getRowItems(row) },
           () =>
             h(UButton, {
-              icon: "i-lucide-ellipsis-vertical",
+              icon: "i-ph-dots-three-vertical-duotone",
               color: "neutral",
               variant: "ghost",
               class: "ml-auto",
@@ -258,9 +258,9 @@ function sortableHeader(
     label,
     icon: isSorted
       ? isSorted === "asc"
-        ? "i-lucide-arrow-up-narrow-wide"
-        : "i-lucide-arrow-down-wide-narrow"
-      : "i-lucide-arrow-up-down",
+        ? "i-ph-sort-ascending-duotone"
+        : "i-ph-sort-descending-duotone"
+      : "i-ph-arrows-down-up-duotone",
     class: "-mx-2.5",
     onClick,
   });

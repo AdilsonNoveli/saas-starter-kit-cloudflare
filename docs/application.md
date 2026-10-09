@@ -37,12 +37,13 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/app/app/layouts/page.vue | — |
 | Pages | apps/app/app/middleware/0.auth.global.ts | — |
 | Pages | apps/app/app/middleware/1.teams.global.ts | — |
+| Pages | apps/app/app/middleware/2.onboarding.global.ts | — |
 | Pages | apps/app/app/pages/account-settings/appearance.vue | — |
 | Pages | apps/app/app/pages/account-settings/index.vue | handleAvatarUpload, handleAvatarRemove, saveProfile, resetProfileForm |
 | Pages | apps/app/app/pages/account-settings/security.vue | of, goToChangePassword, onMfaEnrolled, onDisableMfa, onSignOutOthers, onDeleteAccount |
 | Pages | apps/app/app/pages/account-settings.vue | — |
 | Pages | apps/app/app/pages/buy/[planId].vue | startCheckout |
-| Pages | apps/app/app/pages/claim/[id].vue | onNameInput, claim |
+| Pages | apps/app/app/pages/claim/[id].vue | onNameInput, destinationParams, claim |
 | Pages | apps/app/app/pages/[...path].vue | — |
 | Pages | apps/app/app/pages/[[team]]/dashboard.vue | — |
 | Pages | apps/app/app/plugins/authorization-resolver.ts | — |
@@ -57,7 +58,7 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/app/nuxt.config.ts | — |
 | Pages | apps/app/public/crisp.js | — |
 | Pages | apps/app/public/static/crisp.js | — |
-| Routes and APIs | apps/app/server/api/auth/callback.ts | — |
+| Routes and APIs | apps/app/server/api/auth/callback.ts | PREFERENCE_COOKIE_MAX_AGE_SECONDS |
 | Routes and APIs | apps/app/server/api/auth/session.delete.ts | — |
 | Routes and APIs | apps/app/server/api/auth/session.get.ts | — |
 | Routes and APIs | apps/app/server/api/auth/ws-ticket.get.ts | — |
@@ -80,11 +81,15 @@ Inventory: maps each observed file to its surface.
 | Routes and APIs | apps/app/server/trpc/routers/public.ts | — |
 | Routes and APIs | apps/app/server/trpc/trpc.ts | is, allow, deny, auth |
 | Pages | apps/app/server/utils/audit-log.ts | AuditLogEntry, recordAuditLog |
+| Pages | apps/app/server/utils/auth.test.ts | IMPORT_TIMEOUT, ACCESS_COOKIE, REFRESH_COOKIE, requestEvent, properties, clearedCookieNames, fakeDatabase |
 | Pages | apps/app/server/utils/auth.ts | SESSION_COOKIE_MAX_AGE_SECONDS, getUser, getUserSession, getUserPermissions |
 | Pages | apps/app/server/utils/db.ts | setHyperdriveBinding, createDB, useDB, closeDB |
 | Pages | apps/app/server/utils/mfa-crypto.ts | toBase64, fromBase64, importAesKey, encryptSecret, decryptSecret |
 | Pages | apps/app/server/utils/mfa-recovery.test.ts | KEY |
 | Pages | apps/app/server/utils/mfa-recovery.ts | RECOVERY_CODE_COUNT, ALPHABET, CODE_LENGTH, generateRecoveryCode, formatRecoveryCode, normalizeRecoveryCode, hashRecoveryCode, replaceRecoveryCodes |
+| Pages | apps/app/server/utils/preference-cookies.test.ts | IMPORT_TIMEOUT |
+| Pages | apps/app/server/utils/preference-cookies.ts | preferenceCookies |
+| Pages | apps/app/server/utils/rate-limit.test.ts | WINDOW_START, stubHubKv |
 | Pages | apps/app/server/utils/rate-limit.ts | rateLimit, assertNotRateLimited |
 | Pages | apps/app/server/utils/user-mfa-session.ts | USER_MFA_COOKIE_NAME, USER_MFA_MAX_AGE_SECONDS, UserMfaSessionData, sessionConfig, getUserMfaSession, startUserMfaSession |
 | Pages | apps/app/server/utils/user-mfa.ts | getUserMfaRecord, isValidUserTotp |
@@ -97,8 +102,10 @@ Inventory: maps each observed file to its surface.
 | Pages | apps/app/vitest.config.ts | Nuxt |
 | Pages | apps/app/vitest.setup.ts | — |
 | Other sources | apps/functions/drizzle.config.ts | — |
-| Other sources | apps/functions/src/auth.ts | sendVerificationCode, Env, secretsMatch, deleteIdentity, recognise, signOutOtherSessions, seedAccount, CREDENTIAL_ROUTES |
-| Other sources | apps/functions/src/cron.ts | Environment |
+| Other sources | apps/functions/src/auth.ts | sendVerificationCode, Env, refuseInternalCall, deleteIdentity, revokeIdentitySessions, readIdentityState, changeIdentityEmail, seedAccount |
+| Tests | apps/functions/src/credential-rate-limit.test.ts | WINDOW_START, fakeAuthKv, envWith, credentialPost |
+| Tests | apps/functions/src/cron.test.ts | DAY, NOW, fakeDb, applyWhere, rowsAtTheBoundary |
+| Other sources | apps/functions/src/cron.ts | Environment, SESSION_RETENTION_DAYS, DAY_MS, purgeExpiredSessions |
 | Other sources | apps/functions/src/database/core-schema.ts | this |
 | Other sources | apps/functions/src/database/grant-platform-admin.ts | PLATFORM_ROLES, parseArgs, main |
 | Other sources | apps/functions/src/database/reset-mfa.ts | SCOPES, parseArgs, main |
@@ -106,15 +113,24 @@ Inventory: maps each observed file to its surface.
 | Other sources | apps/functions/src/database/seed/data.ts | ACTIONS, FREE_PLAN, SYSTEM_ROLES |
 | Other sources | apps/functions/src/database/seed/demo-accounts.ts | DEMO_TEAM_NAME, DEMO_TEAM_SLUG, parseArgs, seedIdentity, main, upsertUser |
 | Other sources | apps/functions/src/database/seed/index.ts | main |
+| Tests | apps/functions/src/database/with-db.test.ts | — |
+| Other sources | apps/functions/src/database/with-db.ts | withDb |
 | Other sources | apps/functions/src/dlq-consumer.ts | Environment, FALLBACK_ERROR |
 | Other sources | apps/functions/src/emails-types.ts | EmailsWorker |
 | Other sources | apps/functions/src/emails.ts | Env, Worker |
+| Tests | apps/functions/src/identity-email.test.ts | ADMIN_SECRET, FLOW_TIMEOUT, MINUTE, OLD, NEW, putProfile, putSession, seedAna |
+| Tests | apps/functions/src/identity-state.test.ts | ADMIN_SECRET, IMPORT_TIMEOUT, putSession, seedAna, callState |
+| Tests | apps/functions/src/issuer-sessions.test.ts | FLOW_TIMEOUT, MINUTE, sidOf, nowSeconds, renew, authWorker |
 | Other sources | apps/functions/src/jobs-consumer.ts | Environment |
 | Other sources | apps/functions/src/rate-limit.ts | rateLimit, clientIp |
 | Other sources | apps/functions/src/sender.ts | — |
+| Tests | apps/functions/src/session-store.test.ts | ADMIN_SECRET, IMPORT_TIMEOUT, FLOW_TIMEOUT, SessionProperties, refreshRecord, putSession, keysUnder, sessionKeysOf |
+| Other sources | apps/functions/src/session-store.ts | stableSubject, sessionRecords, revokeSessions, SessionResponder, normalizeEmail, issueUserSession, rememberPasswordSubject, ownProfile |
 | Other sources | apps/functions/src/subjects.ts | — |
-| Other sources | apps/functions/src/websockets.js | toBufferLike, isPlainObject, fromBase64Url, toBase64Url, hmacSign, verifyTicket, canSubscribeToTopic, Worker |
+| Other sources | apps/functions/src/test-support/issuer-harness.ts | ISSUER_URL, CLIENT_ID, REDIRECT_URI, TestPerson, TokenPair, RefreshRecord, FlowTarget, createFlows |
+| Other sources | apps/functions/src/websockets.js | toBufferLike, isPlainObject, canSubscribeToTopic, Worker, getAttachedState, Websockets |
 | Other sources | apps/functions/sst-env.d.ts | — |
+| Other sources | apps/functions/vitest.config.ts | — |
 | Pages | apps/login/app/app.config.ts | — |
 | Pages | apps/login/app/app.vue | — |
 | Components | apps/login/app/components/AuthAgreement.vue | — |
@@ -220,7 +236,7 @@ Inventory: maps each observed file to its surface.
 | Other sources | apps/web/site.ts | SITE_URL, DEFAULT_OG_IMAGE |
 | Other sources | apps/web/sst-env.d.ts | — |
 | Other sources | apps/web/tailwind.config.ts | — |
-| Other sources | config.ts | — |
+| Other sources | config.ts | ACCESS_TOKEN_TTL_SECONDS |
 | Other sources | infra/app.ts | — |
 | Other sources | infra/auth.ts | — |
 | Other sources | infra/branding.ts | — |
@@ -237,26 +253,15 @@ Inventory: maps each observed file to its surface.
 | Other sources | infra/utils/semaphore.ts | Semaphore |
 | Other sources | infra/web.ts | — |
 | Other sources | infra/websockets.ts | — |
-| Components | layers/admin/app/components/admin/AdminDataTable.vue | EDGE_GUTTER, unconditionally |
-| Components | layers/admin/app/components/admin/companies/ReactivateModal.vue | confirm |
-| Components | layers/admin/app/components/admin/companies/SuspendModal.vue | confirm |
-| Components | layers/admin/app/components/admin/queue/ReplayModal.vue | ALREADY_REPLAYED, confirm |
-| Pages | layers/admin/app/layouts/admin.vue | onMfaVerified |
-| Pages | layers/admin/app/middleware/admin.ts | — |
-| Pages | layers/admin/app/pages/admin/audit-log.vue | UAvatar, UBadge, UButton, UTooltip, describeMetadata, sortableHeader |
-| Pages | layers/admin/app/pages/admin/companies/index.vue | UAvatar, UBadge, UButton, UCheckbox, UDropdownMenu, getRowItems, sortableHeader |
-| Pages | layers/admin/app/pages/admin/companies/[id].vue | — |
-| Pages | layers/admin/app/pages/admin/index.vue | UBadge, formatDate |
-| Pages | layers/admin/app/pages/admin/queue/index.vue | UBadge, UButton, UCheckbox, UDropdownMenu, UTooltip, refreshAll, JOB_STATUSES, describeMessage |
-| Other sources | layers/admin/drizzle.config.ts | — |
-| Other sources | layers/admin/layer.manifest.ts | — |
-| Other sources | layers/admin/nuxt.config.ts | — |
-| Routes and APIs | layers/admin/server/api/admin/mfa/challenge.post.ts | — |
-| Routes and APIs | layers/admin/server/api/admin/mfa/recovery-codes.post.ts | — |
-| Routes and APIs | layers/admin/server/api/admin/mfa/setup.post.ts | — |
-| Routes and APIs | layers/admin/server/api/admin/mfa/status.get.ts | — |
-| Routes and APIs | layers/admin/server/api/admin/mfa/verify.post.ts | — |
-| Other sources | layers/admin/server/database/schema.ts | — |
-| Routes and APIs | layers/admin/server/trpc/admin-audit-log.ts | — |
-| Routes and APIs | layers/admin/server/trpc/admin-queue.ts | CRON_JOB_ID, readJobId |
+| Components | layers/account/app/components/account/AccountEmailChange.vue | codeOf, textOf, focusById, focusFirstError, CODE_ERRORS, open, cancel, requestCodes |
+| Components | layers/account/app/components/account/AccountHeaderActions.vue | trpcCode, save |
+| Components | layers/account/app/components/account/AccountPreferencesForm.vue | shows, set, instead, localized, EXAMPLES, onSubmit |
+| Components | layers/account/app/components/account/AccountSessionsList.vue | MOBILE_SYSTEMS, browserOf, systemOf, deviceOf, iconOf, countryName, placeOf, isoOf |
+| Components | layers/account/app/components/account/AccountUserDropdown.vue | — |
+| Components | layers/account/app/components/account/MfaRecoveryCodes.vue | download |
 <!-- specsfy:documentator:end -->
+
+## Notes
+
+- Account, profile and user MFA moved from `apps/app` to `layers/account` (SPEC-0009); its layout and conventions are in `layers/account/README.md`. The security primitives live in `packages/crypto` and `packages/rate-limit` (`.fireskills/STACK.md`).
+- What exists in the code, and the pending `apps/web` rate-limiting content that still describes the old location, is recorded in `.fireskills/PROJECT.md`.

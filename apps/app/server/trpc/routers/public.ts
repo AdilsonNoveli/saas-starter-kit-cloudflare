@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { publicProcedure, router } from "../trpc";
 import { waitlistEmails } from "@nuxfire/functions/schema";
 

@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Environment, Paddle } from "@paddle/paddle-node-sdk";
 import { createId as cuid } from "@paralleldrive/cuid2";
 // See the note in stripe.ts/billing.ts: layers reach the Composition Root's
@@ -190,7 +190,7 @@ export const checkoutRouter = router({
       return {
         status: purchase!.status,
         planName: plan?.name ?? "",
-        destinationSummary: plan ? await describeBuyerDestination(plan) : "",
+        destination: plan ? await describeBuyerDestination(plan) : null,
         needsTeamName: plan?.buyerTeamMode === PlanBuyerTeamMode.NEW_TEAM,
         ineligibleReason: eligibility.ok ? null : eligibility.reason,
       };
@@ -264,13 +264,11 @@ export const checkoutRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: "Team name must be between 2 and 50 characters" });
         }
         if (result.reason === "invalid_team_slug") {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Slug must be 2 to 50 lowercase letters, numbers, or hyphens",
-          });
+          throw new TRPCError({ code: "BAD_REQUEST", message: "slug_invalid" });
         }
-        // result.reason === "slug_taken"
-        throw new TRPCError({ code: "CONFLICT", message: "Team slug is already in use" });
+        // result.reason === "slug_taken": the stable code the claim page
+        // translates (`errors.slug_taken`, DEC-015).
+        throw new TRPCError({ code: "CONFLICT", message: "slug_taken" });
       }
 
       // The team exists now: reuse the existing single write path for the

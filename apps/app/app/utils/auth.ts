@@ -18,12 +18,21 @@ import type { SubjectUser } from "@nuxfire/functions/subjects";
  * challenge is not reflected here either — layouts/dashboard.vue reads that
  * separately from /api/mfa/status, and protectedProcedure is what actually
  * enforces it.
+ *
+ * `sid` comes with `SubjectUser`: it names this login among the person's
+ * sessions, the one "sign out of the other sessions" spares.
  */
 type SessionUser = SubjectUser & {
   permissions?: Record<string, string[]>;
   teams?: string[];
   isPlatformAdmin?: boolean;
   mfaEnabled?: boolean;
+  /**
+   * The person's preferences row, or `null` before the onboarding ends
+   * (SPEC-0010, DEC-003): middleware/2.onboarding.global.ts reads it, so the
+   * gate needs no call of its own.
+   */
+  preferences?: { locale: string; theme: string } | null;
 };
 
 type UserSession = {
